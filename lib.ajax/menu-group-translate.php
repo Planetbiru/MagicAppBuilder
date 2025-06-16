@@ -1,41 +1,54 @@
 <?php
 
+use MagicApp\AppMenuGroupItem;
+use MagicApp\Field;
+use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
+use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
 use MagicAppTemplate\Entity\App\AppModuleGroupImpl;
+use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
+use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once dirname(__DIR__) . "/inc.app/database.php";
 
+$inputGet = new InputGet();
+$inputPost = new InputPost();
 
-$specs = PicoSpecification::getInstance();
-$sorts = PicoSortable::getInstance()
-    ->addSortable(['sortOrder', 'ASC'])
-;
-$appMenu = new AppModuleGroupImpl(null, $database);
-$langs = new MagicObject();
-$response = array();
-try
+if($inputGet->getUserAction() == 'get')
 {
-    $pageData = $appMenu->findAll($specs, null, $sorts);
-    foreach($pageData->getResult() as $menu)
+    $languageId = $inputGet->getTargetLanguage();
+    $specs = PicoSpecification::getInstance();
+    $sorts = PicoSortable::getInstance()
+        ->addSortable(['sortOrder', 'ASC'])
+    ;
+    $appMenu = new AppModuleGroupImpl(null, $database);
+    $menuTranslation = new AppMenuGroupTranslationImpl(null, $database);
+    $response = array();
+    $langs = new MagicObject();
+    
+    try
     {
-        $key = $menu->getModuleGroupId();
-        $original = $menu->getName();
-        $translated = $langs->get($key);
-        if($translated == null)
+        $translationData = $menuTranslation->findByLanguageId($languageId);
+        foreach($translationData->getResult() as $row)
         {
-            $translated = $original;
-            $response[] = array(
-                'original' => $original, 
-                'translated' => $translated, 
-                'propertyName' => $key
-            );
-        }  
-        else if($filter == 'all') 
+            $langs->set($row->getModuleGroupId(), $row->getName());
+        }
+        $pageData = $appMenu->findAll($specs, null, $sorts);
+        foreach($pageData->getResult() as $menu)
         {
+            $key = $menu->getModuleGroupId();
+            $original = $menu->getName();
+            $translated = $langs->get($key);
+            if($translated == null)
+            {
+                $translated = $original;
+            }
             $response[] = array(
                 'original' => $original, 
                 'translated' => $translated, 
@@ -43,10 +56,42 @@ try
             );
         }
     }
-}
-catch(Exception $e)
-{
-    // Do nothing
-}
+    catch(Exception $e)
+    {
+        // Do nothing
+    }
 
-PicoResponse::sendJSON($response);
+    PicoResponse::sendJSON($response);
+}
+else if($inputPost->getUserAction() == 'set')
+{
+    $languageId = $inputPost->getTargetLanguage(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, true, true);
+    $translated = $inputPost->getTranslated();
+    $propertyName = $inputPost->getPropertyNames();
+    $keys = explode("|", $propertyName);
+    $values = explode("\n", $translated);
+    foreach($values as $index=>$value)
+    {
+        $key = $keys[$index];
+        $menuTranslation = new AppMenuGroupTranslationImpl(null, $database);
+        try
+        {
+            $menuTranslation->findOneByModuleGroupIdAndLanguageId($key, $languageId);
+            $menuTranslation->setName(htmlspecialchars($value));
+            $menuTranslation->update();
+        }
+        catch(Exception $e)
+        {
+            $menuTranslation->setModuleGroupId($key);
+            $menuTranslation->setLanguageId($languageId);
+            $menuTranslation->setName(htmlspecialchars($value));
+            $menuTranslation->insert();
+        }
+    }
+    $menuCache = new AppMenuCacheImpl(null, $database);
+    $menuCache->where(
+        PicoSpecification::getInstance()
+        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->languageId, $languageId))
+    )
+    ->delete();
+}

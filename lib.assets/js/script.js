@@ -1120,7 +1120,7 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
-      data: { action: 'get' },
+      data: { userAction: 'get' },
       success: function (data) {
         decreaseAjaxPending();
         while ($('#modal-update-path table.path-manager > tbody > tr').length > 1) {
@@ -1157,7 +1157,7 @@ let initAll = function () {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-path.php",
-        data: { action: 'update', paths: paths },
+        data: { userAction: 'update', paths: paths },
         success: function (data) {
           decreaseAjaxPending();
           select.empty();
@@ -1184,7 +1184,7 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
-      data: { action: 'default', selected_path: select.val() },
+      data: { userAction: 'default', selected_path: select.val() },
       success: function (data) {
         decreaseAjaxPending();
         select.empty();
@@ -1611,11 +1611,59 @@ let initAll = function () {
     });
   });
 
-  $(document).on('change', '.target-language', function (e) {
+  $(document).on('click', '#button-save-app-translation', function (e) {
+    let translated = transEd6.getDoc().getValue();
+    let propertyNames = $('.app-property-name').val();
+    let targetLanguage = $('.target-language').val();
+    let translationType = $('#app_translation_type').val();
+
+    let url = '';
+    if(translationType == 'menu')
+    {
+      url = 'lib.ajax/menu-translate.php';
+    }
+    else if(translationType == 'menu-group')
+    {
+      url = 'lib.ajax/menu-group-translate.php';
+    }
+    else if(translationType == 'validation')
+    {
+      url = 'lib.ajax/validation-translate.php';
+    }
+
+    if(url != '')
+    {
+      increaseAjaxPending();
+      $.ajax({
+        method: "POST",
+        url: url,
+        dataType: "json",
+        data: { userAction: 'set', translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
+        success: function (data) {
+          decreaseAjaxPending();
+        },
+        error: function (xhr, status, error) {
+          decreaseAjaxPending();
+        }
+      });
+    }
+  });
+
+  $(document).on('change', '.target-language-entity, .target-language-module', function (e) {
     let val = $(this).val();
     let translateFor = $(this).attr('data-translate-for');
     $('.target-language').val(val);
     reloadTranslate(translateFor);
+  });
+  
+  $(document).on('change', '.target-language-app', function (e) {
+    let val = $(this).val();
+    $('.target-language').val(val);
+    loadAppTranslation();
+  });
+  
+  $(document).on('click', '.reload-app-translation', function (e) {    
+    loadAppTranslation();
   });
 
   $(document).on('change', '.filter-translate', function (e) {
@@ -1712,21 +1760,26 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
-      data: { action: 'get' },
+      data: { userAction: 'get' },
       success: function (data) {
         decreaseAjaxPending();
         while ($('#modal-update-language table.language-manager > tbody > tr').length > 1) {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
-        for (let d in data) {
-          if (d > 0) {
+        for (let i = 0; i < data.length; i++) {
+          if (i > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
             $('#modal-update-language table.language-manager > tbody').append(clone);
           }
-          let clone2 = $('#modal-update-language table.language-manager > tbody > tr:nth-child(' + (parseInt(d) + 1) + ')');
-          clone2.find('input[type="text"].language-name').val(data[d].name);
-          clone2.find('input[type="text"].language-code').val(data[d].code);
-          clone2.find('input[type="checkbox"]')[0].checked = data[d].active;
+
+          let child = i + 1;
+          let clone2 = $('#modal-update-language table.language-manager > tbody > tr:nth-child(' + child + ')');
+
+          if (clone2.length) {
+            clone2.find('input[type="text"].language-name').val(data[i].name);
+            clone2.find('input[type="text"].language-code').val(data[i].code);
+            clone2.find('input[type="checkbox"]')[0].checked = data[i].active;
+          }
         }
         fixLanguageForm();
       },
@@ -1750,7 +1803,7 @@ let initAll = function () {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
-        data: { action: 'update', languages: languages },
+        data: { userAction: 'update', languages: languages },
         success: function (data) {
           decreaseAjaxPending();
           select.empty();
@@ -1792,7 +1845,7 @@ let initAll = function () {
             $.ajax({
               method: "POST",
               url: "lib.ajax/query-execute.php",
-              data: { action: 'execute', query: query },
+              data: { userAction: 'execute', query: query },
               success: function (data) {
                 decreaseAjaxPending();
                 let ents = getEntitySelection();
@@ -1826,7 +1879,7 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
-      data: { action: 'default', selected_language: select.val() },
+      data: { userAction: 'default', selected_language: select.val() },
       success: function (data) {
         decreaseAjaxPending();
         select.empty();
@@ -2023,7 +2076,7 @@ let initAll = function () {
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-user.php',
-      data: { action: 'reset-user-password', applicationId: applicationId, adminId: adminIds },
+      data: { userAction: 'reset-user-password', applicationId: applicationId, adminId: adminIds },
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
@@ -2048,7 +2101,7 @@ let initAll = function () {
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-user.php',
-      data: { action: 'set-user-role', applicationId: applicationId, adminId: adminIds },
+      data: { userAction: 'set-user-role', applicationId: applicationId, adminId: adminIds },
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
@@ -7433,144 +7486,46 @@ function getReferenceResource() {
   return referenceResource;
 }
 
-
 /**
- * Loads menu translation data from the server based on the selected target language.
+ * Loads translation data from the server based on the selected target language.
  *
- * This function sends an AJAX GET request to 'menu-translate.php' with the selected language ID.
- * It populates two CodeMirror editors (`transEd5` and `transEd6`) with the original and translated texts.
- * It also updates the `.module-property-name` element with a list of property names.
- * Editors are refreshed and any previous line highlights are cleared.
- *
+ * @param {string} url - The AJAX endpoint to fetch translation data.
+ * @param {string} translationType - The translation type to set in the UI (e.g., 'menu', 'validation', 'menu-group').
  * @returns {void}
  */
-function loadMenuTranslation()
+function loadTranslation(url, translationType)
 {
-  let languageId = $('.container-translate-app .target-language').val();
+  const languageId = $('.container-translate-app .target-language').val();
   increaseAjaxPending();
+
   $.ajax({
     method: "GET",
-    url: "lib.ajax/menu-translate.php",
-    data: { action: 'get', targetLanguage: languageId },
+    url: url,
+    data: { userAction: 'get', targetLanguage: languageId },
     success: function (data) {
       appTranslationData = data;
       decreaseAjaxPending();
 
       $('.module-translation-status').text('');
-      let textOut1 = [];
-      let textOut2 = [];
-      let propertyNames = [];
-      for (let i in data) {
-        textOut1.push(data[i].original);
-        textOut2.push(data[i].translated);
-        propertyNames.push(data[i].propertyName);
+      const textOut1 = [];
+      const textOut2 = [];
+      const propertyNames = [];
+
+      for (const item of data) {
+        textOut1.push(item.original);
+        textOut2.push(item.translated);
+        propertyNames.push(item.propertyName);
       }
+
       transEd5.getDoc().setValue(textOut1.join('\r\n'));
       transEd6.getDoc().setValue(textOut2.join('\r\n'));
       setTimeout(() => {
         transEd5.refresh();
         transEd6.refresh();
-      }, 50); 
+      }, 50);
+
       $('.module-property-name').val(propertyNames.join('|'));
-      focused = {};
-      transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
-      transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
-      lastLine2 = -1; //NOSONAR
-    },
-    error: function (err) {
-      decreaseAjaxPending();
-    },
-  });
-}
-
-/**
- * Loads validation translation data from the server based on the selected target language.
- *
- * This function sends an AJAX GET request to 'validation-translate.php' with the selected language ID.
- * It fills two CodeMirror editors (`transEd5` and `transEd6`) with the original and translated validation messages.
- * The `.module-property-name` field is updated with a pipe-separated list of property names.
- * Editors are refreshed and any previously highlighted lines are cleared.
- *
- * @returns {void}
- */
-function loadValidationTranslation()
-{
-  let languageId = $('.container-translate-app .target-language').val();
-  increaseAjaxPending();
-  $.ajax({
-    method: "GET",
-    url: "lib.ajax/validation-translate.php",
-    data: { action: 'get', targetLanguage: languageId },
-    success: function (data) {
-      appTranslationData = data;
-      decreaseAjaxPending();
-
-      $('.module-translation-status').text('');
-      let textOut1 = [];
-      let textOut2 = [];
-      let propertyNames = [];
-      for (let i in data) {
-        textOut1.push(data[i].original);
-        textOut2.push(data[i].translated);
-        propertyNames.push(data[i].propertyName);
-      }
-      transEd5.getDoc().setValue(textOut1.join('\r\n'));
-      transEd6.getDoc().setValue(textOut2.join('\r\n'));
-      setTimeout(() => {
-        transEd5.refresh();
-        transEd6.refresh();
-      }, 50); 
-      $('.module-property-name').val(propertyNames.join('|'));
-      focused = {};
-      transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
-      transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
-      lastLine2 = -1; //NOSONAR
-    },
-    error: function (err) {
-      decreaseAjaxPending();
-    },
-  });
-}
-
-
-/**
- * Loads menu group translation data from the server based on the selected target language.
- *
- * Sends an AJAX GET request to 'menu-group-translate.php' and populates the CodeMirror editors
- * with original and translated strings. It also updates the `.module-property-name` element
- * with a list of property names and refreshes the editors.
- *
- * @function
- * @returns {void}
- */
-function loadMenuGroupTranslation()
-{
-  let languageId = $('.container-translate-app .target-language').val();
-  increaseAjaxPending();
-  $.ajax({
-    method: "GET",
-    url: "lib.ajax/menu-group-translate.php",
-    data: { action: 'get', targetLanguage: languageId },
-    success: function (data) {
-      appTranslationData = data;
-      decreaseAjaxPending();
-
-      $('.module-translation-status').text('');
-      let textOut1 = [];
-      let textOut2 = [];
-      let propertyNames = [];
-      for (let i in data) {
-        textOut1.push(data[i].original);
-        textOut2.push(data[i].translated);
-        propertyNames.push(data[i].propertyName);
-      }
-      transEd5.getDoc().setValue(textOut1.join('\r\n'));
-      transEd6.getDoc().setValue(textOut2.join('\r\n'));
-      setTimeout(() => {
-        transEd5.refresh();
-        transEd6.refresh();
-      }, 100); 
-      $('.module-property-name').val(propertyNames.join('|'));
+      $('#app_translation_type').val(translationType);
       focused = {};
       transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
       transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
@@ -7580,4 +7535,39 @@ function loadMenuGroupTranslation()
       decreaseAjaxPending();
     },
   });
+}
+
+
+function loadAppTranslation()
+{
+  let translationType = $('#app_translation_type').val();
+  let url = '';
+  if(translationType == 'menu')
+  {
+    url = 'lib.ajax/menu-translate.php';
+  }
+  else if(translationType == 'menu-group')
+  {
+    url = 'lib.ajax/menu-group-translate.php';
+  }
+  else if(translationType == 'validation')
+  {
+    url = 'lib.ajax/validation-translate.php';
+  }
+  
+  loadTranslation(url, translationType);
+}
+
+function loadMenuTranslation()
+{
+  loadTranslation('lib.ajax/menu-translate.php', 'menu');
+}
+function loadMenuGroupTranslation()
+{
+  loadTranslation('lib.ajax/menu-group-translate.php', 'menu-group');
+}
+
+function loadValidationTranslation()
+{
+  loadTranslation('lib.ajax/validation-translate.php', 'validation');
 }

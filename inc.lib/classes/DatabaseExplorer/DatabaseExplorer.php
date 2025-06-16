@@ -1506,7 +1506,7 @@ class DatabaseExplorer // NOSONAR
             $space = $dom->createTextNode(' ');
             $form2->appendChild($space);
 
-            if($inputGet->getAction() == 'insert-form')
+            if($inputGet->getUserAction() == 'insert-form')
             {
                 // Create viewData button
                 $insertData = $dom->createElement('button');

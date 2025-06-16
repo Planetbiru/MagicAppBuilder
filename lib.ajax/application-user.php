@@ -209,7 +209,7 @@ if($applicationId != null)
             error_log($e->getMessage());
         }
         
-        if($inputPost->getAction() == "set-user-role")
+        if($inputPost->getUserAction() == "set-user-role")
         {
             // Clean up admin role from the database
             $deleted = cleanUpRole($database);
@@ -362,7 +362,7 @@ if($applicationId != null)
                     foreach($pageData->getResult() as $admin)
                     {
 
-                        if($inputPost->getAction() == "reset-user-password")
+                        if($inputPost->getUserAction() == "reset-user-password")
                         {
                             // Reset password
                             $username = $admin->trimUsername();
@@ -372,24 +372,24 @@ if($applicationId != null)
                             $admin->update();
                             generateRole($adminLevelId, $database);
                         }
-                        else if($inputPost->getAction() == "delete")
+                        else if($inputPost->getUserAction() == "delete")
                         {
                             // Delete user
                             $admin->delete();
                         }
-                        else if($inputPost->getAction() == "active")
+                        else if($inputPost->getUserAction() == "active")
                         {
                             // Active user
                             $admin->setActive(true);
                             $admin->update();
                         }
-                        else if($inputPost->getAction() == "deactive")
+                        else if($inputPost->getUserAction() == "deactive")
                         {
                             // Deactive user
                             $admin->setActive(false);
                             $admin->update();
                         }
-                        else if($inputPost->getAction() == "set-user-role")
+                        else if($inputPost->getUserAction() == "set-user-role")
                         {
                             $adminLevelId = $admin->getAdminLevelId();
                             generateRole($adminLevelId, $database);

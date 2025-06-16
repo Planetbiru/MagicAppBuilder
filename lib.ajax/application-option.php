@@ -15,7 +15,7 @@ $inputPost = new InputPost();
 
 $attributeChecked = ' checked="checked"';
 
-if($inputPost->getAction() == 'save')
+if($inputPost->getUserAction() == 'save')
 {
     $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
     try

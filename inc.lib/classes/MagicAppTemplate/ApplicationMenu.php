@@ -14,6 +14,8 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
+use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
+use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
 
 /**
  * Class ApplicationMenu
@@ -97,8 +99,6 @@ class ApplicationMenu
                 $li->setAttribute('class', 'nav-item'); // Set the class for the main menu item
                 $sidebarMenu->appendChild($li); // Append the <li> to the sidebar menu
 
-                // Get the localized title of the menu item
-                $item['title'] = $appLanguage->get(strtolower(str_replace(' ', '_', $item['title'])));
                 if(!isset($item['href']))
                 {
                     $item['href'] = '#'.strtolower(str_replace(' ', '-', $item['title']));
@@ -174,8 +174,6 @@ class ApplicationMenu
 
                     // Loop through each submenu item and create the submenu HTML
                     foreach ($item['submenu'] as $subItem) {
-                        // Get the localized title for each submenu item
-                        $subItem['title'] = $appLanguage->get(strtolower(str_replace(' ', '_', $subItem['title'])));
 
                         // Create the <li> element for each submenu item
                         $subLi = $dom->createElement('li');
@@ -257,19 +255,40 @@ class ApplicationMenu
         {
             $cache = new AppMenuCacheImpl(null, $this->database);
             // Find the menu cache by admin level ID
-            $cache->findOneByAdminLevelId($this->currentUser->getAdminLevelId());
+            if($this->currentUser->getLanguageId() != '')
+            {
+                $cache->findOneByAdminLevelIdAndLanguageId($this->currentUser->getAdminLevelId(), $this->currentUser->getLanguageId());
+            }
+            else
+            {
+                $cache->findOneByAdminLevelId($this->currentUser->getAdminLevelId());
+            }
             
             $menuData = json_decode($cache->getData(), true);
             if(empty($menuData))
             {
                 // If cache is empty, update the menu cache
-                $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
+                if($this->currentUser->getLanguageId() != '')
+                {
+                    $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId(), $this->currentUser->getLanguageId());
+                }
+                else
+                {
+                    $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
+                }
             }
         }
         catch(Exception $e)
         {
             // If cache not found, update the menu cache
-            $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
+            if($this->currentUser->getLanguageId() != '')
+            {
+                $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId(), $this->currentUser->getLanguageId());
+            }
+            else
+            {
+                $menuData = $this->updateMenuCache($this->currentUser->getAdminLevelId());
+            }
         }
 		return $menuData;
 	}
@@ -278,20 +297,22 @@ class ApplicationMenu
      * Updates the menu cache for a specific admin level ID.
      *
      * @param string|null $adminLevelId The admin level ID to update the cache for. If null, updates all admin levels.
+     * @param string|null $languageId The language ID to update the cache for. If null, updates default language.
      * @return array The menu data for the specified admin level ID.
      */
-    public function updateMenuCache($adminLevelId = null)
+    public function updateMenuCache($adminLevelId = null, $languageId = null)
     {
-        return $this->updateMenuCacheByAdminLevelId($adminLevelId);
+        return $this->updateMenuCacheByAdminLevelId($adminLevelId, $languageId);
     }
     
     /**
      * Updates the menu cache for a specific admin level ID by admin level ID.
      *
      * @param string $adminLevelId The admin level ID to update the cache for.
+     * @param string|null $languageId The language ID to update the cache for. If null, updates default language.
      * @return array The menu data for the specified admin level ID.
      */
-    public function updateMenuCacheByAdminLevelId($adminLevelId = null)
+    public function updateMenuCacheByAdminLevelId($adminLevelId = null, $languageId = null)
     {
         $menuData = array();
         $cacheFinder = new AppMenuCacheImpl(null, $this->database);
@@ -299,6 +320,10 @@ class ApplicationMenu
         if(isset($adminLevelId) && !empty($adminLevelId))
         {
             $cacheSpecs->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId));   
+        }
+        if(isset($languageId) && !empty($languageId))
+        {
+            $cacheSpecs->addAnd(PicoPredicate::getInstance()->equals(Field::of()->languageId, $languageId));   
         }
         
         $now = date('Y-m-d H:i:s');
@@ -310,9 +335,8 @@ class ApplicationMenu
             {
                 foreach($pageData->getResult() as $cache)
                 {
-                    $menuData = $this->getMenuByAdminLevelId($cache->getAdminLevelId());
+                    $menuData = $this->getMenuByAdminLevelId($cache->getAdminLevelId(), $languageId);
                     $dataToStore = json_encode($menuData);
-                    
                     $cache->setData($dataToStore);
                     $cache->setTimeEdit($now);
                     $cache->update(); // Update the menu data in the cache
@@ -320,11 +344,12 @@ class ApplicationMenu
             }
             else if(isset($adminLevelId) && !empty($adminLevelId))
             {
-                $menuData = $this->getMenuByAdminLevelId($adminLevelId);
+                $menuData = $this->getMenuByAdminLevelId($adminLevelId, $languageId);
                 $dataToStore = json_encode($menuData);
                 
                 $cache = new AppMenuCacheImpl(null, $this->database);
                 $cache->setAdminLevelId($adminLevelId);
+                $cache->setLanguageId($languageId);
                 $cache->setData($dataToStore);
                 $cache->setTimeCreate($now);
                 $cache->setTimeEdit($now);
@@ -362,11 +387,12 @@ class ApplicationMenu
      * Retrieves the menu structure for a specific admin level ID.
      *
      * @param string $adminLevelId The admin level ID to filter the menu.
+     * @param string|null $languageId The language ID to update the cache for. If null, updates default language.
      * @return array The menu list for the specified admin level ID.
      */
-    public function getMenuByAdminLevelId($adminLevelId)
+    public function getMenuByAdminLevelId($adminLevelId, $languageId = null)
     {
-        $moduleGroups = $this->getModuleGrouped($adminLevelId);
+        $moduleGroups = $this->getModuleGrouped($adminLevelId, $languageId);
 
         $menuList = array();
         $menuList['menu'] = array();
@@ -402,9 +428,10 @@ class ApplicationMenu
      * Retrieves the modules grouped by module group.
      *
      * @param string $adminLevelId The admin level ID to filter the modules.
+     * @param string|null $languageId The language ID to update the cache for. If null, updates default language.
      * @return MagicObject[] Array of grouped modules.
      */
-    public function getModuleGrouped($adminLevelId) // NOSONAR
+    public function getModuleGrouped($adminLevelId, $languageId = null) // NOSONAR
     {
         $specialAcess = false;
         try
@@ -421,6 +448,13 @@ class ApplicationMenu
         $adminRoles = $this->loadAminRole($adminLevelId);
         $modules = $this->loadModule();
         $modulesWithGroup = array();
+
+        // Translate module at once
+        foreach($modules as $index => $module)
+        {
+            $moduleName = $this->translateModule($module->getName(), $module->getModuleId(), $languageId);
+            $modules[$index]->setName($moduleName);
+        }
         
         // Step 1 - for module with valid group module
         foreach($modules as $module)
@@ -437,7 +471,10 @@ class ApplicationMenu
                 {
                     $modulesWithGroup[$moduleGroupId] = new MagicObject();
                     $modulesWithGroup[$moduleGroupId]->setModuleGroupId($moduleGroupId);
-                    $modulesWithGroup[$moduleGroupId]->setName($moduleGroup->getName());
+                    // Translated module group
+                    $moduleGroupName = $this->translateModuleGroup($moduleGroup->getName(), $moduleGroupId, $languageId);
+
+                    $modulesWithGroup[$moduleGroupId]->setName($moduleGroupName);
                     $modulesWithGroup[$moduleGroupId]->setHref('#');
                     $modulesWithGroup[$moduleGroupId]->setIcon($moduleGroup->getIcon());
                     $modulesWithGroup[$moduleGroupId]->setModuleGroup($moduleGroup);
@@ -488,6 +525,50 @@ class ApplicationMenu
             }
         }
         return $modulesWithGroup;
+    }
+
+    /**
+     * Translates a module group name based on the provided language ID.
+     *
+     * @param string $name The original name of the module group.
+     * @param string $moduleGroupId The ID of the module group.
+     * @param string|null $languageId The ID of the language for translation. If null, the original name is returned.
+     * @return string The translated module group name, or the original name if no translation is found or language ID is null.
+     */
+    private function translateModuleGroup($name, $moduleGroupId, $languageId)
+    {
+        $menuGroupTranslation = new AppMenuGroupTranslationImpl(null, $this->database);
+        try
+        {
+            $menuGroupTranslation->findOneByModuleGroupIdAndLanguageId($moduleGroupId, $languageId);
+            return $menuGroupTranslation->getName();
+        }
+        catch(Exception $e)
+        {
+            return $name;
+        }
+    }
+
+    /**
+     * Translates a module name based on the provided language ID.
+     *
+     * @param string $name The original name of the module.
+     * @param string $moduleId The ID of the module.
+     * @param string|null $languageId The ID of the language for translation. If null, the original name is returned.
+     * @return string The translated module name, or the original name if no translation is found or language ID is null.
+     */
+    private function translateModule($name, $moduleId, $languageId)
+    {
+        $menuTranslation = new AppMenuTranslationImpl(null, $this->database);
+        try
+        {
+            $menuTranslation->findOneByModuleIdAndLanguageId($moduleId, $languageId);
+            return $menuTranslation->getName();
+        }
+        catch(Exception $e)
+        {
+            return $name;
+        }
     }
     
     /**

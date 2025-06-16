@@ -1,6 +1,6 @@
 <?php
 
-use AppBuilder\AppBuilder;
+use AppBuilder\AppBuilderBase;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\SecretObject;
@@ -8,14 +8,15 @@ use MagicObject\SecretObject;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
+
 $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
-if($inputPost->getAction() == "update")
+if($inputPost->getUserAction() == "update")
 {
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfigBuilder = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
-        
+        $appConfigBuilder = AppBuilderBase::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath); 
+    
         $languages = $inputPost->getLanguages();
         $currentLanguages = array();
         if(is_array($languages) && !empty($languages))
@@ -44,7 +45,7 @@ if($inputPost->getAction() == "update")
                 }
             }
             $appConfigBuilder->setLanguages($currentLanguages);
-            AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfigBuilder);
+            AppBuilderBase::updateConfig($appId, $appBaseConfigPath, $appConfigBuilder);
             
             // Update the application.yml file
             $appConfigPath = $activeApplication->getBaseApplicationDirectory()."/inc.cfg/application.yml";
@@ -64,12 +65,12 @@ if($inputPost->getAction() == "update")
         ResponseUtil::sendJSON(new stdClass);
     }
 }
-else if($inputPost->getAction() == "get")
+else if($inputPost->getUserAction() == "get")
 {
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfigBuilder = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
+        $appConfigBuilder = AppBuilderBase::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);
         $currentLanguages = $appConfigBuilder->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
         {
@@ -84,13 +85,13 @@ else if($inputPost->getAction() == "get")
         ResponseUtil::sendJSON(new stdClass);
     }
 }
-else if($inputPost->getAction() == "default")
+else if($inputPost->getUserAction() == "default")
 {
     $selected = $inputPost->getSelectedLanguage();
     try
     {
         $appId = $activeApplication->getApplicationId();
-        $appConfigBuilder = AppBuilder::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
+        $appConfigBuilder = AppBuilderBase::loadOrCreateConfig($appId, $appBaseConfigPath, $configTemplatePath);      
 
         $currentLanguages = $appConfigBuilder->getLanguages();
         if(!isset($currentLanguages) || !is_array($currentLanguages))
@@ -106,7 +107,7 @@ else if($inputPost->getAction() == "default")
             }
         }
         $appConfigBuilder->setLanguages($currentLanguages);
-        AppBuilder::updateConfig($appId, $appBaseConfigPath, $appConfigBuilder);
+        AppBuilderBase::updateConfig($appId, $appBaseConfigPath, $appConfigBuilder);
         ResponseUtil::sendJSON($currentLanguages);
     }
     catch(Exception $e)
