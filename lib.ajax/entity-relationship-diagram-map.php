@@ -10,6 +10,7 @@ $inputGet = new InputGet();
 
 try
 {
+    $applicationId = $appConfig->getApplication()->getId();
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);

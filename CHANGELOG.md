@@ -538,6 +538,10 @@ When a validation error occurs, the form is **automatically restored** to its pr
 
 A new **Menu Translation** feature is now available, allowing you to translate menu labels based on the user's selected language. Each user level will see the menu in their preferred language. Translated menus are cached, ensuring optimal performance and responsiveness across the system.
 
+### `application_id` Column in Error Cache Entity
+
+A new `application_id` column has been added to the Error Cache entity. This enhancement makes it easier to search and filter error logs based on the originating application, especially in multi-application environments.
+
 ## Bug Fixes
 
 -   Bug fixes in the entity editor when designing database structures.

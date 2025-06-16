@@ -14,6 +14,7 @@ if ($appConfig->getApplication() == null) {
 
 try {
     $inputGet = new InputGet();
+    $applicationId = $appConfig->getApplication()->getId();
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $chk = $inputGet->getAutoload() == 'true' ? ' checked' : '';
 
@@ -119,7 +120,7 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
         
         if ($returnVar === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));
@@ -166,7 +167,7 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));   
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
         
         if ($returnVar === 0) {
             $filetime = date('Y-m-d H:i:s', filemtime($file));

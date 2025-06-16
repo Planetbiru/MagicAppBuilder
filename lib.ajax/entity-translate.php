@@ -14,6 +14,7 @@ if($inputPost->getUserAction() == 'get')
 {
     try
     {
+        $applicationId = $appConfig->getApplication()->getId();
         $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
         $filter = $inputPost->getFilter();
         $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
@@ -38,7 +39,7 @@ if($inputPost->getUserAction() == 'get')
             
             if(file_exists($path))
             {          
-                $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
+                $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path, $applicationId);
                 
                 if($returnVar == 0)
                 {  

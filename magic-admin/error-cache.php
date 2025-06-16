@@ -19,7 +19,9 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\AppUserPermissionExtended;
+use MagicAdmin\Entity\Data\ApplicationMin;
 use MagicAdmin\Entity\Data\ErrorCache;
+use MagicApp\AppFormBuilder;
 use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
 
@@ -179,175 +181,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	}
 	$currentModule->redirectToItself();
 }
-if($inputGet->getUserAction() == UserAction::CREATE)
-{
-$appEntityLanguage = new AppEntityLanguageImpl(new ErrorCache(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
-?>
-<div class="page page-jambi page-insert">
-	<div class="jambi-wrapper">
-		<form name="createform" id="createform" action="" method="post">
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td><?php echo $appEntityLanguage->getFileName();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="file_name" id="file_name"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getFilePath();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="file_path" id="file_path"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getModificationTime();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="datetime-local" name="modification_time" id="modification_time"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getErrorCode();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="error_code" id="error_code"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getMessage();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="message" id="message"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLineNumber();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="line_number" id="line_number"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getActive();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1"/> <?php echo $appEntityLanguage->getActive();?></label>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td></td>
-						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-</div>
-<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
-}
-else if($inputGet->getUserAction() == UserAction::UPDATE)
-{
-	$specification = PicoSpecification::getInstanceOf(Field::of()->errorCacheId, $inputGet->getErrorCacheId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
-	$specification->addAnd($dataFilter);
-	$errorCache = new ErrorCache(null, $database);
-	try{
-		$errorCache->findOne($specification);
-		if($errorCache->issetErrorCacheId())
-		{
-$appEntityLanguage = new AppEntityLanguageImpl(new ErrorCache(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
-?>
-<div class="page page-jambi page-update">
-	<div class="jambi-wrapper">
-		<form name="updateform" id="updateform" action="" method="post">
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td><?php echo $appEntityLanguage->getFileName();?></td>
-						<td>
-							<input class="form-control" type="text" name="file_name" id="file_name" value="<?php echo $errorCache->getFileName();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getFilePath();?></td>
-						<td>
-							<input class="form-control" type="text" name="file_path" id="file_path" value="<?php echo $errorCache->getFilePath();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getModificationTime();?></td>
-						<td>
-							<input class="form-control" type="datetime-local" name="modification_time" id="modification_time" value="<?php echo $errorCache->getModificationTime();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getErrorCode();?></td>
-						<td>
-							<input class="form-control" type="number" step="1" name="error_code" id="error_code" value="<?php echo $errorCache->getErrorCode();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getMessage();?></td>
-						<td>
-							<input class="form-control" type="text" name="message" id="message" value="<?php echo $errorCache->getMessage();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLineNumber();?></td>
-						<td>
-							<input class="form-control" type="number" step="1" name="line_number" id="line_number" value="<?php echo $errorCache->getLineNumber();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getActive();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1" <?php echo $errorCache->createCheckedActive();?>/> <?php echo $appEntityLanguage->getActive();?></label>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td></td>
-						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="update"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-							<input type="hidden" name="error_cache_id" value="<?php echo $errorCache->getErrorCacheId();?>"/>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-</div>
-<?php 
-		}
-		else
-		{
-			// Do somtething here when data is not found
-			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
-			<?php 
-		}
-require_once $appInclude->mainAppFooter(__DIR__);
-	}
-	catch(Exception $e)
-	{
-require_once $appInclude->mainAppHeader(__DIR__);
-		// Do somtething here when exception
-		?>
-		<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
-		<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
-	}
-}
-else if($inputGet->getUserAction() == UserAction::DETAIL)
+if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->errorCacheId, $inputGet->getErrorCacheId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
@@ -376,6 +210,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<form name="detailform" id="detailform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
+					<tr>
+						<td><?php echo $appEntityLanguage->getApplication();?></td>
+						<td><?php echo $errorCache->issetApplication() ? $errorCache->getApplication()->getName() : "";?></td>
+					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getFileName();?></td>
 						<td><?php echo $errorCache->getFileName();?></td>
@@ -474,9 +312,11 @@ else
 $appEntityLanguage = new AppEntityLanguageImpl(new ErrorCache(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
+	"applicationId" => PicoSpecification::filter("applicationId", "fulltext"),
 	"fileName" => PicoSpecification::filter("fileName", "fulltext")
 );
 $sortOrderMap = array(
+	"applicationId" => "applicationId",
 	"fileName" => "fileName",
 	"filePath" => "filePath",
 	"modificationTime" => "modificationTime",
@@ -491,6 +331,14 @@ $sortOrderMap = array(
 $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 $specification->addAnd($dataFilter);
 
+if($inputGet->getError() == "with-error")
+{
+	$specification->addAnd(PicoPredicate::getInstance()->greaterThanOrEquals(Field::of()->lineNumber, 0));
+}
+else if($inputGet->getError() == "without-error")
+{
+	$specification->addAnd(PicoPredicate::getInstance()->equals(Field::of()->lineNumber, -1));
+}
 
 // You can define your own sortable
 // Pay attention to security issues
@@ -508,7 +356,16 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new ErrorCache(null, $database);
 
-$subqueryMap = null;
+$subqueryMap = array(
+	"applicationId" => array(
+	"columnName" => "application_id",
+	"entityName" => "ApplicationMin",
+	"tableName" => "application",
+	"primaryKey" => "application_id",
+	"objectName" => "application",
+	"propertyName" => "name"
+)
+);
 
 if($inputGet->getUserAction() == UserAction::EXPORT)
 {
@@ -566,6 +423,35 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getApplication();?></span>
+					<span class="filter-control">
+							<select class="form-control" name="application_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ApplicationMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->active, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->applicationId, Field::of()->name, $inputGet->getApplicationId())
+								; ?>
+							</select>
+					</span>
+				</span>
+				
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getError();?></span>
+					<span class="filter-control">
+						<select class="form-control" name="error">
+							<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+							<option value="with-error"<?php echo $inputGet->getError() == "with-error" ? " selected" : "";?>><?php echo $appLanguage->getLabelOptionWithError();?></option>
+							<option value="without-error"<?php echo $inputGet->getError() == "without-error" ? " selected" : "";?>><?php echo $appLanguage->getLabelOptionWithoutError();?></option>
+						</select>
+					</span>
+				</span>
+				
+				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getFileName();?></span>
 					<span class="filter-control">
 						<input type="text" name="file_name" class="form-control" value="<?php echo $inputGet->getFileName();?>" autocomplete="off"/>
@@ -579,12 +465,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		
 				<span class="filter-group">
 					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
-				</span>
-				<?php } ?>
-				<?php if($userPermission->isAllowedCreate()){ ?>
-		
-				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
 				</span>
 				<?php } ?>
 			</form>
@@ -618,17 +498,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-error-cache-id"/>
 								</td>
 								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td class="data-controll data-editor">
-									<span class="fa fa-edit"></span>
-								</td>
-								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td class="data-controll data-viewer">
 									<span class="fa fa-folder"></span>
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
+								<td data-col-name="application_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getApplication();?></a></td>
 								<td data-col-name="file_name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFileName();?></a></td>
 								<td data-col-name="file_path" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFilePath();?></a></td>
 								<td data-col-name="modification_time" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModificationTime();?></a></td>
@@ -653,17 +529,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<input type="checkbox" class="checkbox check-slave checkbox-error-cache-id" name="checked_row_id[]" value="<?php echo $errorCache->getErrorCacheId();?>"/>
 								</td>
 								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td>
-									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->error_cache_id, $errorCache->getErrorCacheId());?>"><span class="fa fa-edit"></span></a>
-								</td>
-								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td>
 									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->error_cache_id, $errorCache->getErrorCacheId());?>"><span class="fa fa-folder"></span></a>
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
+								<td data-col-name="application_id"><?php echo $errorCache->issetApplication() ? $errorCache->getApplication()->getName() : "";?></td>
 								<td data-col-name="file_name"><?php echo $errorCache->getFileName();?></td>
 								<td data-col-name="file_path"><?php echo $errorCache->getFilePath();?></td>
 								<td data-col-name="modification_time"><?php echo $errorCache->getModificationTime();?></td>
@@ -681,10 +553,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</div>
 				<div class="button-wrapper">
 					<div class="form-control-container button-area">
-						<?php if($userPermission->isAllowedUpdate()){ ?>
-						<button type="submit" class="btn btn-success" name="user_action" value="activate"><?php echo $appLanguage->getButtonActivate();?></button>
-						<button type="submit" class="btn btn-warning" name="user_action" value="deactivate"><?php echo $appLanguage->getButtonDeactivate();?></button>
-						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
 						<?php } ?>

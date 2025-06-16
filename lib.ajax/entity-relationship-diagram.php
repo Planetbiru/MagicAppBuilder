@@ -10,7 +10,7 @@ require_once dirname(__DIR__) . "/inc.app/entity-diagram-config.php";
 $inputGet = new InputGet();
 try
 {
-
+    $applicationId = $appConfig->getApplication()->getId();
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
@@ -59,7 +59,7 @@ try
             
             if(file_exists($path))
             {
-                $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
+                $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path, $applicationId);
 
                 if($returnVar == 0)
                 {

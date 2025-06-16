@@ -14,6 +14,7 @@ if ($appConfig->getApplication() == null) {
 
 try {
     $inputGet = new InputGet();
+    $applicationId = $appConfig->getApplication()->getId();
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $chk = $inputGet->getAutoload() == 'true' ? ' checked' : '';
 
@@ -43,7 +44,7 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
         
         // Create <li> elements for valid files
         $li = $dom->createElement('li');
@@ -142,7 +143,7 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
 
         // Create <li> elements for valid app files
         $li = $dom->createElement('li');
