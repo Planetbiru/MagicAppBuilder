@@ -103,8 +103,8 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Update the application menu cache for all users
-		$applicationMenu->updateMenuCache();
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 		
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->module_id, $newId);
 	}
@@ -141,8 +141,8 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 		}
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Update the application menu cache for all users
-		$applicationMenu->updateMenuCache();
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -187,8 +187,8 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 		}
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Update the application menu cache for all users
-		$applicationMenu->updateMenuCache();
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -216,8 +216,8 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 		}
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Update the application menu cache for all users
-		$applicationMenu->updateMenuCache();
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -252,8 +252,8 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 		}
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Update the application menu cache for all users
-		$applicationMenu->updateMenuCache();
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }

@@ -92,8 +92,8 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Update the application menu cache for all users
-		$applicationMenu->updateMenuCache();
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 		
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->module_group_id, $newId);
 	}
@@ -128,6 +128,10 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -157,6 +161,10 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -182,6 +190,10 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -214,6 +226,10 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 				error_log($e->getMessage());
 			}
 		}
+		// Update the application menu cache
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }

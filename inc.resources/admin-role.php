@@ -187,9 +187,8 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 		
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Update the menu cache for the specified admin level ID
-		$applicationMenu->updateMenuCache($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_ALPHANUMERIC));
-		
+		// Clear the application menu cache for all users
+		$applicationMenu->clearMenuCache();
 	} catch (PDOException $e) {
 		$database->rollBack();
 	}
