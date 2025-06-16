@@ -27,7 +27,7 @@ $inputPost = new InputPost();
 
 if($inputGet->getUserAction() == 'get')
 {
-    $languageId = $inputGet->getLanguageId();
+    $languageId = $inputGet->getTargetLanguage();
     $appMenu = new AppModuleImpl(null, $database);
     $menuTranslation = new AppMenuTranslationImpl(null, $database);
     $langs = new MagicObject();
@@ -37,9 +37,8 @@ if($inputGet->getUserAction() == 'get')
         $translationData = $menuTranslation->findByLanguageId($languageId);
         foreach($translationData->getResult() as $row)
         {
-            $langs->set($row->getMenuGroupId(), $row->getName());
+            $langs->set($row->getModuleId(), $row->getName());
         }
-
         $pageData = $appMenu->findAll($specs, null, $sorts);
         foreach($pageData->getResult() as $menu)
         {
@@ -49,20 +48,12 @@ if($inputGet->getUserAction() == 'get')
             if($translated == null)
             {
                 $translated = $original;
-                $response[] = array(
-                    'original' => $original, 
-                    'translated' => $translated, 
-                    'propertyName' => $key
-                );
-            }  
-            else if($filter == 'all') 
-            {
-                $response[] = array(
-                    'original' => $original, 
-                    'translated' => $translated, 
-                    'propertyName' => $key
-                );
             }
+            $response[] = array(
+                'original' => $original, 
+                'translated' => $translated, 
+                'propertyName' => $key
+            );
         }
     }
     catch(Exception $e)

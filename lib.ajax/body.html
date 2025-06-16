@@ -718,7 +718,7 @@
             <div class="col col-10">
               <div class="form-control-container column-title"> 
                 <span>Target Language</span>
-                <select class="form-control target-language" data-translate-for="entity">
+                <select class="form-control target-language target-language-entity" data-translate-for="entity">
                 </select>
                 <span>Filter</span>
                 <select class="form-control filter-translate" data-translate-for="entity">
@@ -760,7 +760,7 @@
             <div class="col col-10">
               <div class="form-control-container column-title"> 
                 <span>Target Language</span>
-                <select class="form-control target-language" data-translate-for="module">
+                <select class="form-control target-language target-language-module" data-translate-for="module">
                 </select>
                 <span>Filter</span>
                 <select class="form-control filter-translate" data-translate-for="module">
@@ -803,9 +803,9 @@
             <div class="col col-10">
               <div class="form-control-container column-title"> 
                 <span>Target Language</span>
-                <select class="form-control target-language" data-translate-for="module">
+                <select class="form-control target-language target-language-app" data-translate-for="app">
                 </select>
-                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i> Reload</button>
+                <button type="button" class="btn btn-primary reload-app-translation"><i class="fa-solid fa-refresh"></i> Reload</button>
                 <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> Default Language</button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> Manage</button>
               </div>
@@ -816,7 +816,7 @@
                   <input type="hidden" name="app_translation_type" id="app_translation_type" value="">
                 </div>
                 <div class="form-control-container button-area">
-                  <input type="hidden" class="module-property-name" value="">
+                  <input type="hidden" class="app-property-name" value="">
                   <button type="button" class="btn btn-success" id="button-save-app-translation"><i class="fa-solid fa-floppy-disk"></i> Save Translation</button>
                   <span class="app-translation-status"></span>
                 </div>

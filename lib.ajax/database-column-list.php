@@ -19,20 +19,28 @@ $inputPost = new InputPost();
 /**
  * Extract maximum length from column_type string if applicable.
  *
+ * Supports MySQL, PostgreSQL, and SQLite types.
+ *
  * @param string $columnType
  * @return int|null
  */
 function getMaximumLength($columnType)
 {
-    // Normalize to lowercase for comparison
-    $type = strtolower($columnType);
+    // Normalize to lowercase and remove extra spaces
+    $type = strtolower(trim($columnType));
 
-    // Regex to match types with length like varchar(255), character varying(100), etc.
-    if (preg_match('/^(varchar|character varying|char|character)\s*\((\d+)\)/i', $type, $matches)) {
+    // Regex to match types with length, including:
+    // - varchar(255)
+    // - nvarchar(100)
+    // - character varying(150)
+    // - char(10)
+    // - nchar(20)
+    // - etc.
+    if (preg_match('/^(varchar|nvarchar|char|nchar|character varying|character)\s*\(\s*(\d+)\s*\)/i', $type, $matches)) {
         return (int)$matches[2];
     }
 
-    // For text types or other types without explicit length
+    // No length information found
     return null;
 }
 
