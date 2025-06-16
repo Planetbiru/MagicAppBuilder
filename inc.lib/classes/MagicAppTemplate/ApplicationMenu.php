@@ -382,6 +382,18 @@ class ApplicationMenu
         } 
         return $this;
     }
+
+    /**
+     * Clears all existing menu cache entries from the database.
+     * This method deletes all records in the `AppMenuCacheImpl` table.
+     *
+     * @return void
+     */
+    public function clearMenuCache()
+    {
+        $cache = new AppMenuCacheImpl(null, $this->database);
+        $cache->where(PicoSpecification::alwaysTrue())->delete();
+    }
     
     /**
      * Retrieves the menu structure for a specific admin level ID.

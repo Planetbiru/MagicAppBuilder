@@ -89,9 +89,16 @@ else if($inputPost->getUserAction() == 'set')
         }
     }
     $menuCache = new AppMenuCacheImpl(null, $database);
-    $menuCache->where(
-        PicoSpecification::getInstance()
-        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->languageId, $languageId))
-    )
-    ->delete();
+    try
+    {
+        $menuCache->where(
+            PicoSpecification::getInstance()
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->languageId, $languageId))
+        )
+        ->delete();
+    }
+    catch(Exception $e)
+    {
+        error_log($e->getMessage());
+    }
 }
