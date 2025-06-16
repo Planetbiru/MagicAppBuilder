@@ -144,14 +144,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	.note-hint-popover {
 		position: absolute;
 	}
-	.note-popover {
-		position: absolute !important; 
-	}
-	.note-editor {
-		position: relative !important;
-	}
 </style>
-
 <script>
 	var elements = [];
 	jQuery(function($) {
@@ -236,7 +229,51 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				console.log('No active editor found.');
 			}
 		});
+		initStyle();
+		
 	});
+
+
+	function initStyle() {
+		if ($('#dynamic-popover-stylesheet').length) {
+			$('#dynamic-popover-stylesheet').remove();
+		}
+
+		$('.note-popover.popover').each(function() {
+			const $popover = $(this);
+			const $editor = $popover.closest('.note-editor');
+
+			if ($editor.length === 0) {
+				console.warn('Could not find .note-editor for popover.');
+				return;
+			}
+
+			$popover.css('display', 'none !important'); 
+
+			const editorOffset = $editor.offset();
+
+			const x = editorOffset.left; 
+			const y = editorOffset.top;
+
+			let popoverId = $popover.attr('id');
+			if (!popoverId) {
+				popoverId = 'dynamic-popover-' + Date.now() + Math.floor(Math.random() * 1000);
+				$popover.attr('id', popoverId);
+			}
+
+			const cssRule = `#${popoverId} { 
+				transform: translate3d(${x}px, ${y}px, 0) !important; 
+			}`;
+
+			let $dynamicStyleTag = $('#dynamic-popover-stylesheet');
+			if ($dynamicStyleTag.length === 0) {
+				$dynamicStyleTag = $('<style type="text/css" id="dynamic-popover-stylesheet"></style>');
+				$('head').append($dynamicStyleTag);
+			}
+			$dynamicStyleTag.html(cssRule);
+		});
+	}
+
 </script>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
@@ -324,14 +361,9 @@ try
 	.note-hint-popover {
 		position: absolute;
 	}
-	.note-popover {
-		position: absolute !important; 
-	}
-	.note-editor {
-		position: relative !important;
-	}
-</style>
 
+	
+</style>
 <script>
 	var elements = [];
 	jQuery(function($) {
@@ -364,6 +396,7 @@ try
 					onMediaDelete: function (target) {
 					},
 					onFocus: function() {
+						initStyle();
 						let idx = $(this).attr('data-index');
 						activeEditor = editors[idx];
 						$('.note-editable').attr('spellcheck', 'false');
@@ -416,7 +449,52 @@ try
 				console.log('No active editor found.');
 			}
 		});
+		initStyle();
+		
 	});
+
+
+	function initStyle() {
+		if ($('#dynamic-popover-stylesheet').length) {
+			$('#dynamic-popover-stylesheet').remove();
+		}
+
+		$('.note-popover.popover').each(function() {
+			const $popover = $(this);
+			const $editor = $popover.closest('.note-editor');
+
+			if ($editor.length === 0) {
+				console.warn('Could not find .note-editor for popover.');
+				return;
+			}
+
+			$popover.css('display', 'none !important'); 
+
+			const editorOffset = $editor.offset();
+
+			const x = editorOffset.left; 
+			const y = editorOffset.top;
+
+			let popoverId = $popover.attr('id');
+			if (!popoverId) {
+				popoverId = 'dynamic-popover-' + Date.now() + Math.floor(Math.random() * 1000);
+				$popover.attr('id', popoverId);
+			}
+
+			const cssRule = `#${popoverId} { 
+				transform: translate3d(${x}px, ${y}px, 0) !important; 
+			}`;
+
+			let $dynamicStyleTag = $('#dynamic-popover-stylesheet');
+			if ($dynamicStyleTag.length === 0) {
+				$dynamicStyleTag = $('<style type="text/css" id="dynamic-popover-stylesheet"></style>');
+				$('head').append($dynamicStyleTag);
+			}
+			$dynamicStyleTag.html(cssRule);
+		});
+	}
+
+
 </script>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
