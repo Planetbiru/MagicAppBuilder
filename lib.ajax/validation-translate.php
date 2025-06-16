@@ -13,7 +13,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
 $inputGet = new InputGet();
-if($inputGet->getAction() == 'get')
+if($inputGet->getUserAction() == 'get')
 {
     try
     {
@@ -67,7 +67,7 @@ if($inputGet->getAction() == 'get')
     }
     ResponseUtil::sendJSON([]);
 }
-else if($inputPost->getAction() == 'set')
+else if($inputPost->getUserAction() == 'set')
 {
     $entityName = $inputPost->getEntityName();
     $translated = $inputPost->getTranslated();

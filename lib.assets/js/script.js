@@ -1611,6 +1611,44 @@ let initAll = function () {
     });
   });
 
+  $(document).on('click', '#button-save-app-translation', function (e) {
+    let translated = transEd6.getDoc().getValue();
+    let propertyNames = $('.module-property-name').val();
+    let targetLanguage = $('.target-language').val();
+    let translationType = $('#app_translation_type').val();
+
+    let url = '';
+    if(translationType == 'menu')
+    {
+      url = 'lib.ajax/menu-translate.php';
+    }
+    else if(translationType == 'menu-group')
+    {
+      url = 'lib.ajax/menu-group-translate.php';
+    }
+    else if(translationType == 'validation')
+    {
+      url = 'lib.ajax/validation-translate.php';
+    }
+
+    if(url != '')
+    {
+      increaseAjaxPending();
+      $.ajax({
+        method: "POST",
+        url: url,
+        dataType: "json",
+        data: { userAction: 'set', translated: translated, propertyNames: propertyNames, targetLanguage: targetLanguage },
+        success: function (data) {
+          decreaseAjaxPending();
+        },
+        error: function (xhr, status, error) {
+          decreaseAjaxPending();
+        }
+      });
+    }
+  });
+
   $(document).on('change', '.target-language', function (e) {
     let val = $(this).val();
     let translateFor = $(this).attr('data-translate-for');
@@ -7451,7 +7489,7 @@ function loadMenuTranslation()
   $.ajax({
     method: "GET",
     url: "lib.ajax/menu-translate.php",
-    data: { action: 'get', targetLanguage: languageId },
+    data: { userAction: 'get', targetLanguage: languageId },
     success: function (data) {
       appTranslationData = data;
       decreaseAjaxPending();
@@ -7472,6 +7510,7 @@ function loadMenuTranslation()
         transEd6.refresh();
       }, 50); 
       $('.module-property-name').val(propertyNames.join('|'));
+      $('#app_translation_type').val('menu');
       focused = {};
       transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
       transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
@@ -7500,7 +7539,7 @@ function loadValidationTranslation()
   $.ajax({
     method: "GET",
     url: "lib.ajax/validation-translate.php",
-    data: { action: 'get', targetLanguage: languageId },
+    data: { userAction: 'get', targetLanguage: languageId },
     success: function (data) {
       appTranslationData = data;
       decreaseAjaxPending();
@@ -7521,6 +7560,7 @@ function loadValidationTranslation()
         transEd6.refresh();
       }, 50); 
       $('.module-property-name').val(propertyNames.join('|'));
+      $('#app_translation_type').val('validation');
       focused = {};
       transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
       transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
@@ -7540,7 +7580,6 @@ function loadValidationTranslation()
  * with original and translated strings. It also updates the `.module-property-name` element
  * with a list of property names and refreshes the editors.
  *
- * @function
  * @returns {void}
  */
 function loadMenuGroupTranslation()
@@ -7550,7 +7589,7 @@ function loadMenuGroupTranslation()
   $.ajax({
     method: "GET",
     url: "lib.ajax/menu-group-translate.php",
-    data: { action: 'get', targetLanguage: languageId },
+    data: { userAction: 'get', targetLanguage: languageId },
     success: function (data) {
       appTranslationData = data;
       decreaseAjaxPending();
@@ -7571,6 +7610,7 @@ function loadMenuGroupTranslation()
         transEd6.refresh();
       }, 100); 
       $('.module-property-name').val(propertyNames.join('|'));
+      $('#app_translation_type').val('menu-group');
       focused = {};
       transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
       transEd6.removeLineClass(lastLine2, 'background', 'highlight-line');
