@@ -579,7 +579,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getIpEdit() => $headerFormat->getIpEdit(),
 		$appEntityLanguage->getActive() => $headerFormat->asString()
 	), 
-	function($index, $row, $appLanguage){
+	function($index, $row) use ($appLanguage){
 		global $mapForArchitecture;
 		return array(
 			sprintf("%d", $index + 1),
