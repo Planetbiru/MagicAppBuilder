@@ -534,6 +534,10 @@ If validation fails during insert or update operations, a specific **validation 
 
 When a validation error occurs, the form is **automatically restored** to its previous state, and the field with the error is **highlighted** on the client side. This improves user experience and guides users to correct their input.
 
+### Menu Translation
+
+A new **Menu Translation** feature is now available, allowing you to translate menu labels based on the user's selected language. Each user level will see the menu in their preferred language. Translated menus are cached, ensuring optimal performance and responsiveness across the system.
+
 ## Bug Fixes
 
 -   Bug fixes in the entity editor when designing database structures.
