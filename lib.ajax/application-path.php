@@ -10,7 +10,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
 $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
-if($inputPost->getAction() == "update")
+if($inputPost->getUserAction() == "update")
 {
     try
     {
@@ -59,7 +59,7 @@ if($inputPost->getAction() == "update")
         ResponseUtil::sendJSON(new stdClass);
     }
 }
-else if($inputPost->getAction() == "get")
+else if($inputPost->getUserAction() == "get")
 {
     try
     {
@@ -80,7 +80,7 @@ else if($inputPost->getAction() == "get")
         ResponseUtil::sendJSON(new stdClass);
     }
 }
-else if($inputPost->getAction() == "default")
+else if($inputPost->getUserAction() == "default")
 {
     $selected = $inputPost->getSelectedPath();
     try

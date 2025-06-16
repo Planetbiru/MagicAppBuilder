@@ -1120,7 +1120,7 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
-      data: { action: 'get' },
+      data: { userAction: 'get' },
       success: function (data) {
         decreaseAjaxPending();
         while ($('#modal-update-path table.path-manager > tbody > tr').length > 1) {
@@ -1157,7 +1157,7 @@ let initAll = function () {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-path.php",
-        data: { action: 'update', paths: paths },
+        data: { userAction: 'update', paths: paths },
         success: function (data) {
           decreaseAjaxPending();
           select.empty();
@@ -1184,7 +1184,7 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-path.php",
-      data: { action: 'default', selected_path: select.val() },
+      data: { userAction: 'default', selected_path: select.val() },
       success: function (data) {
         decreaseAjaxPending();
         select.empty();
@@ -1750,21 +1750,26 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
-      data: { action: 'get' },
+      data: { userAction: 'get' },
       success: function (data) {
         decreaseAjaxPending();
         while ($('#modal-update-language table.language-manager > tbody > tr').length > 1) {
           $('#modal-update-language table.language-manager > tbody > tr:last').remove();
         }
-        for (let d in data) {
-          if (d > 0) {
+        for (let i = 0; i < data.length; i++) {
+          if (i > 0) {
             let clone = $('#modal-update-language table.language-manager > tbody > tr:first').clone();
             $('#modal-update-language table.language-manager > tbody').append(clone);
           }
-          let clone2 = $('#modal-update-language table.language-manager > tbody > tr:nth-child(' + (parseInt(d) + 1) + ')');
-          clone2.find('input[type="text"].language-name').val(data[d].name);
-          clone2.find('input[type="text"].language-code').val(data[d].code);
-          clone2.find('input[type="checkbox"]')[0].checked = data[d].active;
+
+          let child = i + 1;
+          let clone2 = $('#modal-update-language table.language-manager > tbody > tr:nth-child(' + child + ')');
+
+          if (clone2.length) {
+            clone2.find('input[type="text"].language-name').val(data[i].name);
+            clone2.find('input[type="text"].language-code').val(data[i].code);
+            clone2.find('input[type="checkbox"]')[0].checked = data[i].active;
+          }
         }
         fixLanguageForm();
       },
@@ -1788,7 +1793,7 @@ let initAll = function () {
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
-        data: { action: 'update', languages: languages },
+        data: { userAction: 'update', languages: languages },
         success: function (data) {
           decreaseAjaxPending();
           select.empty();
@@ -1830,7 +1835,7 @@ let initAll = function () {
             $.ajax({
               method: "POST",
               url: "lib.ajax/query-execute.php",
-              data: { action: 'execute', query: query },
+              data: { userAction: 'execute', query: query },
               success: function (data) {
                 decreaseAjaxPending();
                 let ents = getEntitySelection();
@@ -1864,7 +1869,7 @@ let initAll = function () {
     $.ajax({
       method: "POST",
       url: "lib.ajax/application-language.php",
-      data: { action: 'default', selected_language: select.val() },
+      data: { userAction: 'default', selected_language: select.val() },
       success: function (data) {
         decreaseAjaxPending();
         select.empty();
@@ -2061,7 +2066,7 @@ let initAll = function () {
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-user.php',
-      data: { action: 'reset-user-password', applicationId: applicationId, adminId: adminIds },
+      data: { userAction: 'reset-user-password', applicationId: applicationId, adminId: adminIds },
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);
@@ -2086,7 +2091,7 @@ let initAll = function () {
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-user.php',
-      data: { action: 'set-user-role', applicationId: applicationId, adminId: adminIds },
+      data: { userAction: 'set-user-role', applicationId: applicationId, adminId: adminIds },
       success: function (data) {
         decreaseAjaxPending();
         modal.find('.user-container').empty().append(data);

@@ -15,6 +15,7 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
+use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
 
 /**
  * Class ApplicationMenu
@@ -334,7 +335,7 @@ class ApplicationMenu
             {
                 foreach($pageData->getResult() as $cache)
                 {
-                    $menuData = $this->getMenuByAdminLevelId($cache->getAdminLevelId());
+                    $menuData = $this->getMenuByAdminLevelId($cache->getAdminLevelId(), $languageId);
                     $dataToStore = json_encode($menuData);
                     $cache->setData($dataToStore);
                     $cache->setTimeEdit($now);
@@ -343,7 +344,7 @@ class ApplicationMenu
             }
             else if(isset($adminLevelId) && !empty($adminLevelId))
             {
-                $menuData = $this->getMenuByAdminLevelId($adminLevelId);
+                $menuData = $this->getMenuByAdminLevelId($adminLevelId, $languageId);
                 $dataToStore = json_encode($menuData);
                 
                 $cache = new AppMenuCacheImpl(null, $this->database);
@@ -449,10 +450,10 @@ class ApplicationMenu
         $modulesWithGroup = array();
 
         // Translate module at once
-        foreach($modules as $module)
+        foreach($modules as $index => $module)
         {
             $moduleName = $this->translateModule($module->getName(), $module->getModuleId(), $languageId);
-            $module->setName($moduleName);
+            $modules[$index]->setName($moduleName);
         }
         
         // Step 1 - for module with valid group module
@@ -558,7 +559,7 @@ class ApplicationMenu
      */
     private function translateModule($name, $moduleId, $languageId)
     {
-        $menuTranslation = new AppMenuGroupTranslationImpl(null, $this->database);
+        $menuTranslation = new AppMenuTranslationImpl(null, $this->database);
         try
         {
             $menuTranslation->findOneByModuleIdAndLanguageId($moduleId, $languageId);

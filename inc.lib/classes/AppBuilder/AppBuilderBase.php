@@ -680,17 +680,17 @@ class AppBuilderBase //NOSONAR
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 
-        $phpCode = <<<HTML
-        <?php
-        if(\$currentModule->hasErrorField())
+        $phpCode = '
+        <'.'?'.'php
+        if($currentModule->hasErrorField())
         {
-        ?>
-        <div class="alert alert-error"><?php echo \$currentModule->getErrorMessage(); ?></div>
-        <?php
-            \$currentModule->restoreFormData(\$currentModule->getFormData(), \$currentModule->getErrorField(), '#createform');
+        ?'.'>
+        <div class="alert alert-error"><'.'?'.'php echo $currentModule->getErrorMessage(); ?'.'></div>
+        <'.'?'.'php
+            $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#createform");
         }
-        ?>
-        HTML;
+        ?'.'>
+        ';
 
         $fragment = $dom->createDocumentFragment();
         $fragment->appendXML("<div>{$phpCode}</div>"); // Bungkus dalam elemen sementara agar bisa diproses
@@ -757,17 +757,17 @@ class AppBuilderBase //NOSONAR
         $objectName = lcfirst($entityName);
         $dom = new DOMDocument();
 
-        $phpCode = <<<HTML
-        <?php
-        if(\$currentModule->hasErrorField())
+        $phpCode = '
+        <'.'?'.'php
+        if($currentModule->hasErrorField())
         {
-        ?>
-        <div class="alert alert-error"><?php echo \$currentModule->getErrorMessage(); ?></div>
-        <?php
-            \$currentModule->restoreFormData(\$currentModule->getFormData(), \$currentModule->getErrorField(), '#updateform');
+        ?'.'>
+        <div class="alert alert-error"><'.'?'.'php echo $currentModule->getErrorMessage(); ?'.'></div>
+        <'.'?'.'php
+            $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#updateform");
         }
-        ?>
-        HTML;
+        ?'.'>
+        ';
 
         $fragment = $dom->createDocumentFragment();
         $fragment->appendXML("<div>{$phpCode}</div>"); // Bungkus dalam elemen sementara agar bisa diproses

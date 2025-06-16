@@ -1,12 +1,16 @@
 <?php
 
+use MagicApp\Field;
+use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
+use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Response\PicoResponse;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -67,4 +71,36 @@ if($inputGet->getUserAction() == 'get')
     }
 
     PicoResponse::sendJSON($response);
+}
+else if($inputPost->getUserAction() == 'set')
+{
+    $languageId = $inputPost->getTargetLanguage(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, true, true);
+    $translated = $inputPost->getTranslated();
+    $propertyName = $inputPost->getPropertyNames();
+    $keys = explode("|", $propertyName);
+    $values = explode("\n", $translated);
+    foreach($values as $index=>$value)
+    {
+        $key = $keys[$index];
+        $menuTranslation = new AppMenuTranslationImpl(null, $database);
+        try
+        {
+            $menuTranslation->findOneByModuleIdAndLanguageId($key, $languageId);
+            $menuTranslation->setName(htmlspecialchars($value));
+            $menuTranslation->update();
+        }
+        catch(Exception $e)
+        {
+            $menuTranslation->setModuleId($key);
+            $menuTranslation->setLanguageId($languageId);
+            $menuTranslation->setName(htmlspecialchars($value));
+            $menuTranslation->insert();
+        }
+    }
+    $menuCache = new AppMenuCacheImpl(null, $database);
+    $menuCache->where(
+        PicoSpecification::getInstance()
+        ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->languageId, $languageId))
+    )
+    ->delete();
 }
