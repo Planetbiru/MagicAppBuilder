@@ -10,6 +10,7 @@ if ($appConfig->getApplication() == null) {
 }
 
 try {
+    $applicationId = $appConfig->getApplication()->getId();
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     
     $baseEntityData = $appConfig->getApplication()->getBaseEntityDataNamespace();
@@ -23,7 +24,7 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
 
         $className = "\\".$baseEntityData."\\".$entityName;
         $path = $baseDirData."/".$entityName.".php";
@@ -52,7 +53,7 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
 
         $className = "\\".$baseEntityApp."\\".$entityName;
         $path = $baseDirApp."/".$entityName.".php";

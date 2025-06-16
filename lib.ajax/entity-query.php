@@ -33,6 +33,7 @@ try
 {
     if($database->isConnected())
     {
+        $applicationId = $appConfig->getApplication()->getId();
         $applicationName = $appConfig->getApplication()->getName();
         $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
         $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
@@ -97,7 +98,7 @@ try
                     
                     if(file_exists($path))
                     {
-                        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
+                        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path, $applicationId);
                         if($returnVar == 0)
                         {
                             include_once $path;                  
@@ -159,7 +160,7 @@ try
                     $path = $baseDir."/".$entityName.".php"; 
                     if(file_exists($path))
                     {
-                        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path);
+                        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path, $applicationId);
                         if($returnVar == 0)
                         {         
                             include_once $path;                     

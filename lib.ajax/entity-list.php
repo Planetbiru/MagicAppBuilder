@@ -12,6 +12,7 @@ if ($appConfig->getApplication() == null) {
 }
 
 try {
+    $applicationId = $appConfig->getApplication()->getId();
     $baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     
     // Create the DOMDocument instance
@@ -46,7 +47,7 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
         if ($returnVar === 0) {          
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
@@ -126,7 +127,7 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file);
+        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
         if ($returnVar === 0) {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;

@@ -10,6 +10,11 @@ if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
     exit();
 }
 
+if(!isset($databaseName))
+{
+    $databaseName = "";
+}
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>

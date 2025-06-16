@@ -25,9 +25,10 @@ class ErrorChecker
      *
      * @param PicoDatabase $databaseBuilder The database connection object for managing error cache.
      * @param string $path Path to the PHP file to be checked for syntax errors.
+     * @param string $applicationId Application ID
      * @return int Returns 0 if there are no syntax errors, 1 if there are errors, and 2 if the check could not be performed.
      */
-    public static function errorCheck($databaseBuilder, $path)
+    public static function errorCheck($databaseBuilder, $path, $applicationId)
     {
         $normalizedPath = FileDirUtil::normalizePath($path);
         $ft = filemtime($path);
@@ -42,7 +43,7 @@ class ErrorChecker
             if (strtotime($errorCache->getModificationTime()) < $ft) {
                 $phpError = self::phpTest($path);
                 $returnVar = $phpError->errorCode;
-                ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError);
+                ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError, $applicationId);
             }
 
         } catch (Exception $e) {
@@ -51,7 +52,7 @@ class ErrorChecker
             $returnVar = $phpError->errorCode;
 
             try {
-                ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError);
+                ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError, $applicationId);
             } catch (Exception $e) {
                 // Do nothing if cache saving fails
             }
@@ -137,11 +138,12 @@ class ErrorChecker
      * @param PicoDatabase $databaseBuilder The database connection object used for managing the error cache.
      * @param string $normalizedPath The normalized path to the PHP file being checked.
      * @param int $ft The file modification time as a Unix timestamp.
+     * @param string $applicationId Application ID
      * @param PhpError $phpError The `PhpError` object containing the result of the PHP syntax check.
      * 
      * @return void
      */
-    public static function saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError)
+    public static function saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError, $applicationId)
     {
         $now = date("Y-m-d H:i:s");
         $errorMessage = implode("\r\n", $phpError->errors);
@@ -149,9 +151,15 @@ class ErrorChecker
         {
             $errorMessage = "";
         }
+        $databaseBuilder->setCallbackDebugQuery(function($sql){
+           error_log($sql); 
+           
+        });
+        error_log("APPLICATION ID = $applicationId");
         $errorCache = new PhpErrorCache(null, $databaseBuilder);
         $errorCacheId = md5($normalizedPath);
         $errorCache->setErrorCacheId($errorCacheId);
+        $errorCache->setApplicationId($applicationId);
         $errorCache->setFileName(basename($normalizedPath));
         $errorCache->setFilePath($normalizedPath);
         $errorCache->setErrorCode($phpError->errorCode);

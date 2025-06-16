@@ -8,6 +8,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 $inputGet = new InputGet();
 try
 {
+    $applicationId = $appConfig->getApplication()->getId();
 	$baseDirectory = $appConfig->getApplication()->getBaseEntityDirectory();
     $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
     $baseEntity = str_replace("\\\\", "\\", $baseEntity);
@@ -32,7 +33,7 @@ try
         $path1 = $baseDir."/".$entityName.".php";
         if(file_exists($path1))
         {
-            $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path1);
+            $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path1, $applicationId);
             if($returnVar == 0)
             {
                 include_once $path1;                  
@@ -101,7 +102,7 @@ try
         $path2 = $baseDir."/".$entityName.".php";
         if(file_exists($path2))
         {
-            $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path2);
+            $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path2, $applicationId);
             if($returnVar == 0)
             {
                 include_once $path2;                  
