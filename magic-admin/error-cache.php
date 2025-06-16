@@ -273,9 +273,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->error_cache_id, $errorCache->getErrorCacheId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
-							<?php } ?>
 		
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 							<input type="hidden" name="error_cache_id" value="<?php echo $errorCache->getErrorCacheId();?>"/>
@@ -378,6 +375,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 	$exporter->write($pageData, $fileName, $sheetName, array(
 		$appLanguage->getNumero() => $headerFormat->asNumber(),
 		$appEntityLanguage->getErrorCacheId() => $headerFormat->getErrorCacheId(),
+		$appEntityLanguage->getApplication() => $headerFormat->getApplication(),
 		$appEntityLanguage->getFileName() => $headerFormat->getFileName(),
 		$appEntityLanguage->getFilePath() => $headerFormat->getFilePath(),
 		$appEntityLanguage->getModificationTime() => $headerFormat->getModificationTime(),
@@ -392,11 +390,12 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getIpEdit() => $headerFormat->getIpEdit(),
 		$appEntityLanguage->getActive() => $headerFormat->asString()
 	), 
-	function($index, $row, $appLanguage){
+	function($index, $row) use ($appLanguage){
 		
 		return array(
 			sprintf("%d", $index + 1),
 			$row->getErrorCacheId(),
+			$row->issetApplication() ? $row->getApplication()->getName() : "",
 			$row->getFileName(),
 			$row->getFilePath(),
 			$row->getModificationTime(),
