@@ -93,28 +93,20 @@ else if($inputPost->getUserAction() == 'set')
 
     try
     {
-        $path = $appConfig->getApplication()->getBaseEntityDirectory();
-        $baseEntity = $appConfig->getApplication()->getBaseEntityNamespace();
-        $baseEntity = str_replace("\\\\", "\\", $baseEntity);
-        $baseDir = rtrim($path, "\\/")."/".str_replace("\\", "/", trim($baseEntity, "\\/"));
-        
-        $allQueries = array();
 
-        if($inputPost->getEntityName())
+        $path = str_replace("\\", "/", $appConfig->getApplication()->getBaseApplicationDirectory() . "/inc.lang/$targetLanguage" . dirname(dirname($appConfig->getApplication()->baseEntityDataNamespace()))."/validator.ini");
+        $dir = dirname($path); 
+        if(!file_exists($dir))
         {
-            $path = $appConfig->getApplication()->getBaseLanguageDirectory()."/".$targetLanguage."/Entity/".$entityName.".ini";
-            $dir = dirname($path); 
-            if(!file_exists($dir))
-            {
-                mkdir($dir, 0755, true);
-            }
-            $original = PicoIniUtil::parseIniFile($path);
-            foreach($translatedLabel as $key => $value)
-            {
-                $original[$key] = $value;
-            }
-            PicoIniUtil::writeIniFile($original, $path);
+            mkdir($dir, 0755, true);
         }
+        $original = PicoIniUtil::parseIniFile($path);
+        foreach($translatedLabel as $key => $value)
+        {
+            $original[$key] = $value;
+        }
+        PicoIniUtil::writeIniFile($original, $path);
+        
         ResponseUtil::sendJSON([]);
     }
     catch(Exception $e)
