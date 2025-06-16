@@ -2013,7 +2013,7 @@ let initAll = function () {
       type: 'POST',
       url: 'lib.ajax/application-option.php',
       data: { 
-        action: 'save', 
+        userAction: 'save', 
         developmentMode: form.find('[name="development_mode"]:checked').val(), 
         bypassRole: form.find('[name="bypass_role"]:checked').val(), 
         accessLocalhostOnly: form.find('[name="access_localhost_only"]:checked').val(),
@@ -2038,7 +2038,6 @@ let initAll = function () {
         modal.find('.menu-container').empty().append(data);
       }
     });
-
   });
   
   $(document).on('click', '#create-user', function (e) {
@@ -2059,7 +2058,6 @@ let initAll = function () {
         decreaseAjaxPending();
       }
     });
-
   });
   
   $(document).on('click', '#reset-user-password', function (e) {
@@ -7497,7 +7495,6 @@ function loadTranslation(url, translationType)
 {
   const languageId = $('.container-translate-app .target-language').val();
   increaseAjaxPending();
-
   $.ajax({
     method: "GET",
     url: url,
@@ -7505,7 +7502,6 @@ function loadTranslation(url, translationType)
     success: function (data) {
       appTranslationData = data;
       decreaseAjaxPending();
-
       $('.module-translation-status').text('');
       const textOut1 = [];
       const textOut2 = [];
@@ -7524,7 +7520,7 @@ function loadTranslation(url, translationType)
         transEd6.refresh();
       }, 50);
 
-      $('.module-property-name').val(propertyNames.join('|'));
+      $('.app-property-name').val(propertyNames.join('|'));
       $('#app_translation_type').val(translationType);
       focused = {};
       transEd5.removeLineClass(lastLine2, 'background', 'highlight-line');
@@ -7537,37 +7533,43 @@ function loadTranslation(url, translationType)
   });
 }
 
-
-function loadAppTranslation()
-{
-  let translationType = $('#app_translation_type').val();
-  let url = '';
-  if(translationType == 'menu')
-  {
-    url = 'lib.ajax/menu-translate.php';
-  }
-  else if(translationType == 'menu-group')
-  {
-    url = 'lib.ajax/menu-group-translate.php';
-  }
-  else if(translationType == 'validation')
-  {
-    url = 'lib.ajax/validation-translate.php';
-  }
-  
-  loadTranslation(url, translationType);
+/**
+ * Loads the appropriate application translation based on the selected type.
+ * It determines the correct AJAX URL and translation type, then calls `loadTranslation`.
+ */
+function loadAppTranslation() {
+    let translationType = $('#app_translation_type').val();
+    let url = '';
+    if (translationType == 'menu') {
+        url = 'lib.ajax/menu-translate.php';
+    } else if (translationType == 'menu-group') {
+        url = 'lib.ajax/menu-group-translate.php';
+    } else if (translationType == 'validation') {
+        url = 'lib.ajax/validation-translate.php';
+    }
+    loadTranslation(url, translationType);
 }
 
-function loadMenuTranslation()
-{
-  loadTranslation('lib.ajax/menu-translate.php', 'menu');
-}
-function loadMenuGroupTranslation()
-{
-  loadTranslation('lib.ajax/menu-group-translate.php', 'menu-group');
+/**
+ * Loads the menu translations specifically.
+ * It calls `loadTranslation` with the URL for menu translations and the type 'menu'.
+ */
+function loadMenuTranslation() {
+    loadTranslation('lib.ajax/menu-translate.php', 'menu');
 }
 
-function loadValidationTranslation()
-{
-  loadTranslation('lib.ajax/validation-translate.php', 'validation');
+/**
+ * Loads the menu group translations specifically.
+ * It calls `loadTranslation` with the URL for menu group translations and the type 'menu-group'.
+ */
+function loadMenuGroupTranslation() {
+    loadTranslation('lib.ajax/menu-group-translate.php', 'menu-group');
+}
+
+/**
+ * Loads the validation translations specifically.
+ * It calls `loadTranslation` with the URL for validation translations and the type 'validation'.
+ */
+function loadValidationTranslation() {
+    loadTranslation('lib.ajax/validation-translate.php', 'validation');
 }

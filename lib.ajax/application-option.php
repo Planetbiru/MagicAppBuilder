@@ -41,15 +41,11 @@ if($inputPost->getUserAction() == 'save')
         $appConf->setAccessLocalhostOnly($inputPost->getAccessLocalhostOnly() == 1);
         $yaml = $appConf->dumpYaml(true, true, true);
         file_put_contents($appConfigPath, $yaml);
- 
-        
     }
     catch (Exception $e)
     {
         $application = null;
     }
-
-    
     exit();
 }
 

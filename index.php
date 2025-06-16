@@ -36,7 +36,7 @@ function basenameRequestUri($uri)
   <meta name="application-name" content="<?php echo $activeApplicationName; ?>">
   <meta name="builder-name" content="<?php echo $builderName; ?>">
   <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>">
-  <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']);?>">
+  <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']); ?>">
   <title><?php echo htmlspecialchars($pageTitle); ?></title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />

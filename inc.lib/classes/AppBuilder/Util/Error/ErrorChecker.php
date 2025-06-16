@@ -151,11 +151,6 @@ class ErrorChecker
         {
             $errorMessage = "";
         }
-        $databaseBuilder->setCallbackDebugQuery(function($sql){
-           error_log($sql); 
-           
-        });
-        error_log("APPLICATION ID = $applicationId");
         $errorCache = new PhpErrorCache(null, $databaseBuilder);
         $errorCacheId = md5($normalizedPath);
         $errorCache->setErrorCacheId($errorCacheId);
