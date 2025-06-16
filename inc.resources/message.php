@@ -144,7 +144,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	.note-hint-popover {
 		position: absolute;
 	}
+	.note-popover {
+		position: absolute !important; 
+	}
+	.note-editor {
+		position: relative !important;
+	}
 </style>
+
 <script>
 	var elements = [];
 	jQuery(function($) {
@@ -230,8 +237,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			}
 		});
 	});
-
-
 </script>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
@@ -319,7 +324,14 @@ try
 	.note-hint-popover {
 		position: absolute;
 	}
+	.note-popover {
+		position: absolute !important; 
+	}
+	.note-editor {
+		position: relative !important;
+	}
 </style>
+
 <script>
 	var elements = [];
 	jQuery(function($) {
@@ -405,8 +417,6 @@ try
 			}
 		});
 	});
-
-
 </script>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
