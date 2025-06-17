@@ -1,11 +1,13 @@
 let initielized = false;
-let currentEntity = "";
-let currentModule = "";
-let currentEntity2Translated = "";
+let currentEntity = '';
+let currentValidator = '';
+let currentModule = '';
+let currentEntity2Translated = '';
 let lastErrorLine = -1;
 let ajaxPending = 0;
 let referenceResource = '';
 let currentEntityName = '';
+let currentValidatorName = '';
 let currentTableName = '';
 let currentTableStructure = {};
 
@@ -595,11 +597,11 @@ let initAll = function () {
               data: { entity: currentEntity},
               success: function (data) {
                 decreaseAjaxPending();
-                updateEntityFile();
+                updateEntityFile();updateValidatorFile();
                 resetFileManager();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
-                removeHilightLineError();
+                removeHilightLineError(cmEditorFile);
                 if(data.success)
                 {
                   setEntityFile('');
@@ -1210,6 +1212,17 @@ let initAll = function () {
       el.closest('li').addClass("selected-file");
     });
   });
+  
+  $(document).on("click", ".validator-container-file .validator-li a", function (e) {
+    e.preventDefault();
+    let validatorName = $(this).attr("data-validator-name");
+    currentValidatorName = validatorName;
+    let el = $(this);
+    getValidatorFile(validatorName, function () {
+      $('.validator-container-file .validator-li').removeClass("selected-file");
+      el.closest('li').addClass("selected-file");
+    });
+  });
 
   $(document).on("click", ".module-list-file .file-li a", function (e) {
     e.preventDefault();
@@ -1243,6 +1256,16 @@ let initAll = function () {
   $(document).on("click", "#button_save_entity_file_as", function (e) {
     e.preventDefault();
     saveEntityAs();
+  });
+  
+  $(document).on("click", "#button_save_validator_file", function (e) {
+    e.preventDefault();
+    saveValidator();
+  });
+
+  $(document).on("click", "#button_save_validator_file_as", function (e) {
+    e.preventDefault();
+    saveValidatorAs();
   });
 
   $(document).on("click", "#button_save_entity_query", function (e) {
@@ -1361,7 +1384,7 @@ let initAll = function () {
               data: { entityName: entityName, tableName: tableName },
               success: function (data) {
                 decreaseAjaxPending();
-                updateEntityFile();
+                updateEntityFile();updateValidatorFile();
                 resetFileManager();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
@@ -3559,7 +3582,7 @@ function loadAllResource() {
   updateEntityQuery(false);
   
   updateEntityRelationshipDiagram();
-  updateEntityFile();
+  updateEntityFile();updateValidatorFile();
   updateModuleFile();
   resetFileManager();
   initTooltip();
@@ -3590,7 +3613,7 @@ function onSetDefaultApplication() {
   loadTable();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
-  updateEntityFile();
+  updateEntityFile();updateValidatorFile();
   updateModuleFile();
   resetFileManager();
   initTooltip();
@@ -3605,7 +3628,7 @@ function onSetDefaultApplication() {
 function onModuleCreated() {
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
-  updateEntityFile();
+  updateEntityFile();updateValidatorFile();
   updateModuleFile();
   resetFileManager();
   initTooltip();
@@ -4734,8 +4757,8 @@ function saveEntity() {
         });
         updateEntityQuery(true);
         updateEntityRelationshipDiagram();
-        removeHilightLineError();
-        addHilightLineError(data.error_line - 1)
+        removeHilightLineError(cmEditorFile);
+        addHilightLineError(cmEditorFile, data.error_line - 1)
         if (!data.success) {
           showAlertUI(data.title, data.message);
           setTimeout(function () { closeAlertUI() }, 5000);
@@ -4748,12 +4771,133 @@ function saveEntity() {
 }
 
 /**
+ * Saves the current validator to the server.
+ *
+ * This function checks if a validator is currently open. If so, it disables the
+ * save button and retrieves the content from the validator editor. It then sends an AJAX
+ * POST request to update the validator's content on the server. Upon successful
+ * completion, it re-enables the save button, updates the validator file, highlights
+ * any error lines, and updates the UI. If no validator is open, it shows an alert to the user.
+ *
+ * @returns {void} This function does not return a value.
+ */
+function saveValidator() {
+  if (currentValidator != "") {
+    $("#button_save_validator_file").attr("disabled", "disabled");
+    let fileContent = cmEditorValidator.getDoc().getValue();
+    increaseAjaxPending();
+    $.ajax({
+      type: "POST",
+      url: "lib.ajax/validator-file.php",
+      dataType: "json",
+      data: { userAction: 'set', content: fileContent, validator: currentValidator },
+      success: function (data) {
+        decreaseAjaxPending();
+        $("#button_save_validator_file").removeAttr("disabled");
+        updateValidatorFile(function(){
+          setValidatorFile(fileContent);
+          updateSelectedValidator();
+          
+          removeHilightLineError(cmEditorValidator);
+          addHilightLineError(cmEditorValidator, data.error_line - 1);
+        });
+        
+        removeHilightLineError(cmEditorValidator);
+        addHilightLineError(cmEditorValidator, data.error_line - 1);
+        
+        if (!data.success) {
+          showAlertUI(data.title, data.message);
+          setTimeout(function () { closeAlertUI() }, 5000);
+        }
+      },
+      error: function(err)
+      {
+        $("#button_save_validator_file").removeAttr("disabled");
+        decreaseAjaxPending();
+      }
+    });
+  } else {
+    showAlertUI("Alert", "No file open");
+  }
+}
+
+/**
+ * Saves the current validator as a new validator file on the server.
+ *
+ * This function checks if a validator is currently open. If so, it retrieves the content from the validator editor,
+ * prompts the user for a new validator name, and sends an AJAX POST request to save the validator under the new name.
+ * Upon successful completion, it updates the validator file list, resets the file manager, highlights any error lines,
+ * and displays an alert if there are errors. If no validator is open, it shows an alert to the user.
+ *
+ * @returns {void} This function does not return a value.
+ */
+function saveValidatorAs() {
+  if (currentValidator != "") {
+    let fileContent = cmEditorValidator.getDoc().getValue();
+
+    getUserInput('New Validator Name', 'Save Validator As', [
+      {
+        'caption': 'Yes',  // Caption for the button
+        'fn': () => {
+          let newValidator = $('.prompt-input').val();
+          increaseAjaxPending();
+          $.ajax({
+            type: "POST",
+            url: "lib.ajax/validator-file.php",
+            dataType: "json",
+            data: { userAction: 'save', content: fileContent, validator: currentValidator, newValidator: newValidator },
+            success: function (data) {
+              decreaseAjaxPending();
+              updateValidatorFile();
+              resetFileManager();
+              
+              removeHilightLineError(cmEditorValidator);
+              addHilightLineError(cmEditorValidator, data.error_line - 1)
+              if (!data.success) {
+                showAlertUI(data.title, data.message);
+                setTimeout(function () { closeAlertUI() }, 5000);
+              }
+            },
+          });
+        },  // Callback for OK button
+        'class': 'btn-primary'  // Bootstrap class for styling
+      },
+      {
+        'caption': 'No',  // Caption for the button
+        'fn': () => { },  // Callback for Cancel button
+        'class': 'btn-secondary'  // Bootstrap class for styling
+      }
+    ],
+      currentEntity);
+  } else {
+    showAlertUI("Alert", "No file open");
+  }
+}
+
+/**
  * Updates the selected entity in the list by highlighting the relevant item.
+ *
+ * This function removes the 'selected-file' class from all entity list items,
+ * then adds the 'selected-file' class to the entity item that matches the current entity.
+ * It ensures that only the currently selected entity is visually highlighted in the UI.
  */
 function updateSelectedEntity()
 {
   $('.entity-list .entity-li').removeClass('selected-file');
   $('.entity-list [data-entity-name="'+currentEntity.split('\\').join('\\\\')+'"]').closest('.entity-li').addClass('selected-file');
+}
+
+/**
+ * Updates the selected validator in the list by highlighting the relevant item.
+ *
+ * This function removes the 'selected-file' class from all validator list items,
+ * then adds the 'selected-file' class to the validator item that matches the current validator.
+ * It ensures that only the currently selected validator is visually highlighted in the UI.
+ */
+function updateSelectedValidator()
+{
+  $('.validator-list .validator-li').removeClass('selected-file');
+  $('.validator-list [data-validator-name="'+currentEntity.split('\\').join('\\\\')+'"]').closest('.validator-li').addClass('selected-file');
 }
 
 /**
@@ -4784,12 +4928,12 @@ function saveEntityAs() {
             data: { content: fileContent, entity: currentEntity, newEntity: newEntity },
             success: function (data) {
               decreaseAjaxPending();
-              updateEntityFile();
+              updateEntityFile();updateValidatorFile();
               resetFileManager();
               updateEntityQuery(true);
               updateEntityRelationshipDiagram();
-              removeHilightLineError();
-              addHilightLineError(data.error_line - 1)
+              removeHilightLineError(cmEditorFile);
+              addHilightLineError(cmEditorFile, data.error_line - 1)
               if (!data.success) {
                 showAlertUI(data.title, data.message);
                 setTimeout(function () { closeAlertUI() }, 5000);
@@ -4820,9 +4964,9 @@ function saveEntityAs() {
  * @param {number} lineNumber - The line number to highlight.
  * @returns {void} This function does not return a value.
  */
-function addHilightLineError(lineNumber) {
+function addHilightLineError(cmEditor, lineNumber) {
   if (lineNumber != -1) {
-    cmEditorFile.addLineClass(lineNumber, 'background', 'highlight-line');
+    cmEditor.addLineClass(lineNumber, 'background', 'highlight-line');
   }
   lastErrorLine = lineNumber;
 }
@@ -4835,9 +4979,9 @@ function addHilightLineError(lineNumber) {
  *
  * @returns {void} This function does not return a value.
  */
-function removeHilightLineError() {
+function removeHilightLineError(cmEditor) {
   if (lastErrorLine != -1) {
-    cmEditorFile.removeLineClass(lastErrorLine, 'background', 'highlight-line');
+    cmEditor.removeLineClass(lastErrorLine, 'background', 'highlight-line');
   }
 }
 
@@ -4956,6 +5100,43 @@ function getEntityFile(entity, clbk) {
   });
 }
 
+/**
+ * Fetches the content of a validator file and updates the validator editor.
+ *
+ * This function sends an AJAX POST request to retrieve the content of the specified
+ * validator file and sets it in the validator editor. It also enables the save and
+ * delete buttons for the validator, updates the currentValidator variable, and calls
+ * an optional callback function after loading.
+ *
+ * @param {string} validator - The validator to load.
+ * @param {function} [clbk] - Optional callback function to call after loading.
+ * @returns {void} This function does not return a value.
+ */
+function getValidatorFile(validator, clbk) {
+  increaseAjaxPending();
+  $.ajax({
+    type: "POST",
+    url: "lib.ajax/validator-file.php",
+    data: { validator: validator },
+    dataType: "text",
+    success: function (data) {
+      decreaseAjaxPending();
+      cmEditorValidator.getDoc().setValue(data);
+      setTimeout(function () {
+        cmEditorValidator.refresh();
+      }, 1);
+      $("#button_save_validator_file").removeAttr("disabled");
+      $("#button_delete_validator_file").removeAttr("disabled");
+      currentValidator = validator;
+      if (clbk) {
+        clbk();
+      }
+    },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
+  });
+}
 
 /**
  * Fetches the content of a module file and updates the editor.
@@ -5067,6 +5248,40 @@ function updateEntityFile(clbk) {
       decreaseAjaxPending();
       $(".entity-container-file .entity-list").empty().append(data);
       $(".container-translate-entity .entity-list").empty().append(data);
+      clearEntityFile();
+      if(typeof clbk == 'function')
+      {
+        clbk();
+      }
+      clearTtransEd3();
+      clearTtransEd4();
+    },
+    error: function (xhr, status, error) {
+      decreaseAjaxPending();
+    }
+  });
+}
+
+/**
+ * Updates the validator file list in the UI.
+ *
+ * This function retrieves the list of validator files and updates the corresponding
+ * sections in the UI. It also clears the entity file and translation editors.
+ * If a callback function is provided, it will be called after the update.
+ *
+ * @param {function} [clbk] - Optional callback function to call after updating the validator file list.
+ * @returns {void} This function does not return a value.
+ */
+function updateValidatorFile(clbk) {
+  increaseAjaxPending();
+  $.ajax({
+    type: "GET",
+    url: "lib.ajax/validator-list.php",
+    dataType: "html",
+    success: function (data) {
+      decreaseAjaxPending();
+      $(".validator-container-file .validator-list").empty().append(data);
+      $(".container-translate-validator .validator-list").empty().append(data);
       clearEntityFile();
       if(typeof clbk == 'function')
       {
@@ -5720,7 +5935,7 @@ function generateAllCode(dataToPost) {
         showToast(data.title, data.message);
       }
       decreaseAjaxPending();
-      updateEntityFile();
+      updateEntityFile();updateValidatorFile();
       updateEntityQuery(true);
       updateEntityRelationshipDiagram();
       if (data.success) {
