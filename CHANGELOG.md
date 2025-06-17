@@ -554,13 +554,21 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 ## What's New
 
 -  Validator Class Editor: A new editor is available for managing validator classes.
+
 -  Ability to save and load string format, date format, and number format for data output in list and detail views.
 
 ## Improvements
 
+-  Enhanced captions and tooltips on the main module and entity generation forms.
+
 -  Enhanced entity development for more effective language localization.
+
+-  Enhanced file manager.
+
+-  Reorganized module tabs for more intuitive workflow.
 
 ## Fixes
 
 -  Display improvements.
+
 -  General bug fixes.
