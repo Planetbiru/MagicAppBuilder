@@ -152,6 +152,78 @@ class AppAdminRoleImpl extends MagicObject
      * @var bool
      */
     protected $allowedExport;
+
+    /**
+     * Module Group
+     *
+     * @Label(content="Module Group")
+     * @var bool
+     */
+    protected $moduleGroup;
+
+    /**
+     * Allowed show list
+     *
+     * @Label(content="List")
+     * @var bool
+     */
+    protected $list;
+
+    /**
+     * Allowed show detail
+     *
+     * @Label(content="Detail")
+     * @var bool
+     */
+    protected $detail;
+
+    /**
+     * Allowed create
+     *
+     * @Label(content="Create")
+     * @var bool
+     */
+    protected $create;
+
+    /**
+     * Allowed update
+     *
+     * @Label(content="Update")
+     * @var bool
+     */
+    protected $update;
+
+    /**
+     * Allowed delete
+     *
+     * @Label(content="Delete")
+     * @var bool
+     */
+    protected $delete;
+
+    /**
+     * Allowed approve/reject
+     *
+     * @Label(content="Approve")
+     * @var bool
+     */
+    protected $approve;
+
+    /**
+     * Allowed short order
+     *
+     * @Label(content="Sort Order")
+     * @var bool
+     */
+    protected $sortOrder;
+
+    /**
+     * Allowed export
+     *
+     * @Label(content="Export")
+     * @var bool
+     */
+    protected $export;
     
     /**
 	 * Time Create
