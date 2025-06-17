@@ -59,8 +59,8 @@ try
             
             if(file_exists($path))
             {
-                $returnVar = ErrorChecker::errorCheck($databaseBuilder, $path, $applicationId);
-
+                $phpError = ErrorChecker::errorCheck($databaseBuilder, $path, $applicationId);
+                $returnVar = intval($phpError->errorCode);
                 if($returnVar == 0)
                 {
                     include_once $path;   

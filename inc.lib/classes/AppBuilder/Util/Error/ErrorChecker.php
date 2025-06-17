@@ -26,30 +26,28 @@ class ErrorChecker
      * @param PicoDatabase $databaseBuilder The database connection object for managing error cache.
      * @param string $path Path to the PHP file to be checked for syntax errors.
      * @param string $applicationId Application ID
-     * @return int Returns 0 if there are no syntax errors, 1 if there are errors, and 2 if the check could not be performed.
+     * @return PhpError Represents an error that occurs in PHP code, providing details such as the error code, line number, and associated error messages.
      */
     public static function errorCheck($databaseBuilder, $path, $applicationId)
     {
         $normalizedPath = FileDirUtil::normalizePath($path);
         $ft = filemtime($path);
-        $returnVar = 1;
+
+        $phpError = new PhpError();
 
         try {
             // Check if cached error result exists
             $errorCache = self::getErrorCode($databaseBuilder, $normalizedPath, $ft);
-            $returnVar = intval($errorCache->getErrorCode());
 
             // If the file has been modified since last check, run a new PHP syntax check
             if (strtotime($errorCache->getModificationTime()) < $ft) {
                 $phpError = self::phpTest($path);
-                $returnVar = $phpError->errorCode;
                 ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError, $applicationId);
             }
 
         } catch (Exception $e) {
             // No record found in cache, perform syntax check
             $phpError = self::phpTest($path);
-            $returnVar = $phpError->errorCode;
 
             try {
                 ErrorChecker::saveCacheError($databaseBuilder, $normalizedPath, $ft, $phpError, $applicationId);
@@ -58,7 +56,7 @@ class ErrorChecker
             }
         }
 
-        return $returnVar;
+        return $phpError;
     }
 
     /**

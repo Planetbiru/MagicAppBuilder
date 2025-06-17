@@ -351,7 +351,8 @@ class EntityRelationshipDiagram //NOSONAR
         
         if(file_exists($path))
         {
-            $returnVar = ErrorChecker::errorCheck($this->databaseBuilder, $path, $application->getId());
+            $phpError = ErrorChecker::errorCheck($this->databaseBuilder, $path, $application->getId());
+            $returnVar = intval($phpError->errorCode);
             if($returnVar == 0)
             {
                 require_once $path;

@@ -44,7 +44,8 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
         
         // Create <li> elements for valid files
         $li = $dom->createElement('li');
@@ -143,7 +144,8 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
 
         // Create <li> elements for valid app files
         $li = $dom->createElement('li');
