@@ -20,12 +20,6 @@
 <button class="nav-link" id="define-column-tab" data-toggle="tab" data-target="#define-column" type="button" role="tab" aria-controls="config" aria-selected="true">Generate Module</button>
 </li>
 <li class="nav-item" role="presentation">
-<button class="nav-link" id="module-file-tab" data-toggle="tab" data-target="#module-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Module</button>
-</li>
-<li class="nav-item" role="presentation">
-<button class="nav-link" id="entity-file-tab" data-toggle="tab" data-target="#entity-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Entity</button>
-</li>
-<li class="nav-item" role="presentation">
 <button class="nav-link" id="entity-relationship-tab" data-toggle="tab" data-target="#entity-relationship" type="button" role="tab" aria-controls="config" aria-selected="true">ERD</button>
 </li>
 <li class="nav-item" role="presentation">
@@ -39,6 +33,15 @@
 </li>
 <li class="nav-item" role="presentation">
 <button class="nav-link" id="translate-validation-menu-tab" data-toggle="tab" data-target="#translate-validation-menu" type="button" role="tab" aria-controls="config" aria-selected="true">Translate App</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="entity-file-tab" data-toggle="tab" data-target="#entity-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Entity</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="module-file-tab" data-toggle="tab" data-target="#module-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Module</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" id="validator-file-tab" data-toggle="tab" data-target="#validator-file" type="button" role="tab" aria-controls="config" aria-selected="true">Edit Validator</button>
 </li>
 <li class="nav-item" role="presentation">
 <button class="nav-link" id="file-manager-tab" data-toggle="tab" data-target="#file-manager" type="button" role="tab" aria-controls="config" aria-selected="true">File Manager</button>
@@ -244,31 +247,31 @@
 <td rowspan="2" class="data-sort data-sort-header"></td>
 <td rowspan="2" align="center">Field</td>
 <td rowspan="2" align="center">Caption</td>
-<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Insert<div class='horizontal-line'></div>Indicates whether the column <br>is present in the create data form.">I</td>
-<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Update<div class='horizontal-line'></div>Indicates whether the column <br>is present in the update data form.">U</td>
-<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Detail<div class='horizontal-line'></div>Indicates whether the column <br>is present in the detail data page.">D</td>
-<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="List<div class='horizontal-line'></div>Indicates whether the column <br>is present in the list data.">L</td>
-<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Export<div class='horizontal-line'></div>Indicates whether the column <br>is included in the data to be exported.">E</td>
-<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key<div class='horizontal-line'></div>Indicates whether the column <br>is used by the application as a primary key.">K</td>
-<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required<div class='horizontal-line'></div>Indicates whether the column is <br>required to be filled by the user <br>in the create and update data forms.">R</td>
-<td colspan="6" align="center">Input</td>
-<td colspan="4" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Filter">Filter</td>
-<td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Data Type">Data Type</td>
-<td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Format">Format</td>
-<td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="Filter Type">Filter Type</td>
-<td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Validation">Validation</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Insert<div class='horizontal-line'></div>Is column shown <br>on create form?">I</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Update<div class='horizontal-line'></div>Is column shown <br>on update form?">U</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Detail<div class='horizontal-line'></div>Is column shown <br>on detail page?">D</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="List<div class='horizontal-line'></div>Is column shown <br>in data list?">L</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Export<div class='horizontal-line'></div>Is column included <br>in exported data?">E</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Primary Key<div class='horizontal-line'></div>Is column a <br>primary key?">K</td>
+<td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Required<div class='horizontal-line'></div>Must user fill this <br>field on forms?">R</td>
+<td colspan="6" align="center" data-toggle="tooltip" data-placement="top" data-title="HTML element for user input on insert and update forms">Input Element</td>
+<td colspan="4" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="HTML element for filtering list data">Filter Element</td>
+<td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="Data type for single-line input">Data Type</td>
+<td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Output format for list and detail">Format</td>
+<td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="Backend input filter <br>before data is saved.">Filter Type</td>
+<td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="Backend validation for user input">Validation</td>
 </tr>
 <tr>
-<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text<div class='horizontal-line'></div>The input control <br>is a single-line text-based element.">TE</td>
-<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Textarea<div class='horizontal-line'></div>The input control <br>is a multi-line text field.">TA</td>
-<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Checkbox<div class='horizontal-line'></div>The input control <br>is a checkbox.">CB</td>
-<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select<div class='horizontal-line'></div>The input control <br>is a dropdown menu.">SE</td>
-<td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select<div class='horizontal-line'></div>The input control <br>is a dropdown menu.">Source</td>
-<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Multiple<div class='horizontal-line'></div>The input allows <br>multiple values.">MU</td>
-<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text<div class='horizontal-line'></div>The filter control <br>is a single-line text-based element.">TE</td>
-<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select<div class='horizontal-line'></div>The filter control <br>is a dropdown menu.">SE</td>
-<td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Select<div class='horizontal-line'></div>The filter control <br>is a dropdown menu.">Source</td>
-<td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Multiple<div class='horizontal-line'></div>The filter allows <br>multiple values.">MU</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text<div class='horizontal-line'></div>Single-line text input.">TE</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Textarea<div class='horizontal-line'></div>Multi-line text input.">TA</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Checkbox<div class='horizontal-line'></div>A checkbox control.">CB</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select<div class='horizontal-line'></div>A dropdown menu.">SL</td>
+<td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Source<div class='horizontal-line'></div>Data source for select.">Source</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Multiple<div class='horizontal-line'></div>Allows multiple values.">MI</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Text<div class='horizontal-line'></div>Single-line text filter.">TE</td>
+<td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="Select<div class='horizontal-line'></div>A dropdown filter.">SL</td>
+<td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="Source<div class='horizontal-line'></div>Data source for select filter.">Source</td>
+<td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="Multiple<div class='horizontal-line'></div>Allows multiple filter values.">MI</td>
 </tr>
 </thead>
 
@@ -632,6 +635,35 @@
 <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Entity As</button>
 <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Entity</button>
 <button type="button" class="btn btn-primary" id="button_create_entity_file"><i class="fa-solid fa-file"></i> Create Entity</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="validator-file" class="tab-pane fade" role="tabpanel" aria-labelledby="validator-file-tab">
+<div class="validator-container-file">
+<div class="row">
+<div class="col col-2">
+<div class="form-control-container column-title">
+<h4>Validators</h4>
+</div>
+<div class="column-body">
+<div class="validator-list"></div>
+</div>
+</div>
+<div class="col col-10">
+<div class="form-control-container column-title">
+<h4>Content</h4>
+</div>
+<div class="column-body">
+<textarea class="validator-file app-code" spellcheck="false" contenteditable="true"></textarea>
+<div class="form-control-container button-area">
+<button type="button" class="btn btn-success" id="button_save_validator_file" disabled><i class="fa-solid fa-floppy-disk"></i> Save Validator</button>
+<button type="button" class="btn btn-success" id="button_save_validator_file_as"><i class="fa-solid fa-floppy-disk"></i> Save Validator As</button>
+<button type="button" class="btn btn-danger" id="button_delete_validator_file" disabled><i class="fa-solid fa-trash-can"></i> Delete Validator</button>
+<button type="button" class="btn btn-primary" id="button_create_validator_file"><i class="fa-solid fa-file"></i> Create Validator</button>
 </div>
 </div>
 </div>
@@ -1331,7 +1363,7 @@
 <div class="modal-content">
 <form onsubmit="event.preventDefault(); validatorBuilder.saveAllValidation(true);">
 <div class="modal-header">
-<h5 class="modal-title" id="validationModalLabel">Add Validation</h5>
+<h5 class="modal-title" id="validationModalLabel">Input Validation</h5>
 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 <span aria-hidden="true">&times;</span>
 </button>

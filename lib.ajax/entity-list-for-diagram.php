@@ -44,14 +44,17 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
+
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         
         // Create <li> elements for valid files
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li');
-
+        
         if ($returnVar === 0) {
-            $filetime = date('Y-m-d H:i:s', filemtime($file));
+            
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
 
@@ -143,7 +146,8 @@ try {
     foreach ($list as $idx => $file) {
         $entityName = basename($file, '.php');
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
 
         // Create <li> elements for valid app files
         $li = $dom->createElement('li');

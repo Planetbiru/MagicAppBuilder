@@ -21,7 +21,7 @@ class PhpError
     /**
      * The line number where the PHP error occurred in the source file.
      *
-     * @var string
+     * @var int
      */
     public $lineNumber;
 
@@ -38,4 +38,18 @@ class PhpError
      * @var string[]
      */
     public $errors;
+
+    /**
+     * Undocumented function
+     *
+     * @param PhpErrorCache $cache
+     * @return self
+     */
+    public function restoreErrorFromCache($cache)
+    {
+        $this->errorCode = $cache->errorCode;
+        $this->errors = explode("\n", $cache->message);
+        $this->lineNumberRaw = $cache->lineNumber;
+        $this->lineNumber = intval($cache->lineNumber);
+    }
 }

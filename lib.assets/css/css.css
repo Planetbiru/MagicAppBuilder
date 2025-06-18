@@ -280,21 +280,21 @@ table.table.table-reference tr > td:last-child {
   display: table-row;
 }
 
-.entity-list ul {
+.entity-list ul, .validator-list ul {
   list-style: none;
   margin: 0;
   padding: 0;
   line-height: 1.7;
   margin-bottom: 10px;
 }
-.entity-list ul li {
+.entity-list ul li, .validator-list ul li {
   white-space: nowrap;
   position: relative;
   padding-right: 20px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.entity-list > div {
+.entity-list > div, .validator-list > div {
   height: calc(100vh - 146px);
   overflow-x: auto;
 }
@@ -1342,6 +1342,10 @@ li.menu-exists > a::after {
   font-family: "Font Awesome 6 Free";
   content: "\f0c8"; /* fa-square */
   margin-right: 0.5em;
+}
+
+.column-body li a[data-error=true] {
+  color: red;
 }
 
 .animation-wave, .animation-wave > span {

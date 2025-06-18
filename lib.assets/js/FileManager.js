@@ -1074,6 +1074,7 @@ function setDisplayMode(mode) {
     }
 }
 
+
 /**
  * Changes the mode of the CodeMirror editor based on the file's extension.
  * 
@@ -1116,3 +1117,148 @@ function changeMode(filename, extension) {
         CodeMirror.autoLoadMode(fileManagerEditor, mode);  // Load the mode dynamically
     }
 }
+
+/**
+ * Initializes the CodeMirror editor for the file manager.
+ *
+ * This function sets up the CodeMirror editor with various configurations such as line numbers,
+ * line wrapping, bracket matching, and indentation settings. It also adjusts the editor's size
+ * based on the window's size, ensuring the editor fits within the available space in the UI.
+ *
+ * - CodeMirror's mode URL is configured to load the correct syntax mode files.
+ * - The editor is initialized with the content of the textarea with ID 'code'.
+ * - A resize event listener is added to dynamically adjust the editor's size when the window is resized.
+ * - Crucially, 'indentWithTabs' is set to false, and a 'Smart Mode' function is introduced
+ * to handle specific indentation rules for file types like YAML.
+ */
+
+// --- Centralized Mode and Indentation Mapping ---
+// This object serves as the single source of truth for file extension to CodeMirror mode mappings
+// and associated indentation preferences.
+const editorModeMap = {
+    // Key: file extension (or array of extensions)
+    // Value: { mode: CodeMirror_MIME_Type, indentUnit: number, indentWithTabs: boolean (optional, default false) }
+    // General web/config files (2 spaces)
+    'yaml': { mode: "text/x-yaml", indentUnit: 2 },
+    'yml': { mode: "text/x-yaml", indentUnit: 2 }, // YAML alias
+    'js': { mode: "text/javascript", indentUnit: 2 },
+    'json': { mode: "application/json", indentUnit: 2 },
+    'css': { mode: "text/css", indentUnit: 2 },
+    'xml': { mode: "application/xml", indentUnit: 2 },
+    'html': { mode: "text/html", indentUnit: 2 },
+    'htm': { mode: "text/html", indentUnit: 2 }, // HTML alias
+    'md': { mode: "text/x-markdown", indentUnit: 2 },
+    'markdown': { mode: "text/x-markdown", indentUnit: 2 }, // Markdown alias
+    'ts': { mode: "text/typescript", indentUnit: 2 },
+    'tsx': { mode: "text/typescript", indentUnit: 2 }, // TypeScript alias
+    'jsx': { mode: "text/jsx", indentUnit: 2 },
+    'vue': { mode: "text/x-vue", indentUnit: 2 },
+    'rb': { mode: "text/x-ruby", indentUnit: 2 }, // Ruby
+    'sh': { mode: "text/x-sh", indentUnit: 2 }, // Shell Script
+    'conf': { mode: "text/x-properties", indentUnit: 2 }, // Generic config
+    'cfg': { mode: "text/x-properties", indentUnit: 2 }, // Generic config
+    'properties': { mode: "text/x-properties", indentUnit: 2 }, // Properties file
+    'ini': { mode: "text/x-properties", indentUnit: 2 }, // INI file
+    'env': { mode: "text/x-properties", indentUnit: 2 }, // .env file
+
+    // Languages commonly using 4 spaces
+    'php': { mode: "application/x-httpd-php", indentUnit: 4 },
+    'py': { mode: "text/x-python", indentUnit: 4 },
+    'java': { mode: "text/x-java", indentUnit: 4 },
+    'c': { mode: "text/x-csrc", indentUnit: 4 },
+    'cpp': { mode: "text/x-csrc", indentUnit: 4 },
+    'h': { mode: "text/x-csrc", indentUnit: 4 }, // C/C++ Header
+    'go': { mode: "text/x-go", indentUnit: 4 },
+    'sql': { mode: "text/x-sql", indentUnit: 4 },
+
+    // Plain text types (no specific highlighting, simple indentation)
+    'log': { mode: "text/plain", indentUnit: 2 },
+    'txt': { mode: "text/plain", indentUnit: 2 },
+    'csv': { mode: "text/plain", indentUnit: 2 },
+};
+
+function initCodeMirror() {
+    // Ensure CodeMirror library is loaded
+    if (typeof CodeMirror === 'undefined') {
+        console.error("CodeMirror library not found. Please ensure codemirror.js is loaded.");
+        return;
+    }
+
+    // Get the filename element and set the modeURL
+    modeInput = document.getElementById('filename');
+    CodeMirror.modeURL = "lib.assets/cm/mode/%N/%N.js"; // Path to CodeMirror mode files
+
+    fileManagerEditor = CodeMirror.fromTextArea(document.getElementById("code"),
+    {
+        lineNumbers: true,           // Show line numbers in the editor
+        lineWrapping: true,          // Enable line wrapping to prevent horizontal scrolling
+        matchBrackets: true,         // Highlight matching brackets
+        indentUnit: 4,               // Default indentation unit (can be overridden by mode map)
+        indentWithTabs: false,       // Default to spaces (crucial for YAML)
+        // Optional: Set keymap for Vim, Emacs, or Sublime if desired
+        // keyMap: "sublime",
+        // extraKeys: {"Ctrl-Space": "autocomplete"}
+    });
+
+    // --- Function to Set Mode and Indentation based on File Extension ---
+    /**
+     * Sets the CodeMirror mode and indentation preferences based on the file extension.
+     * This ensures correct highlighting and indentation for different file types.
+     * It uses a centralized `editorModeMap` for consistent configuration.
+     * @param {string} filename The name of the file being edited (e.g., 'config.yaml').
+     */
+    window.setEditorModeByFilename = function(filename) {
+        let currentMode = "text/plain"; // Default CodeMirror MIME type
+        let currentIndentUnit = 2;      // Default indentation unit
+        let currentIndentWithTabs = false; // Default to spaces
+
+        const lastDotIndex = filename.lastIndexOf('.');
+        const extension = lastDotIndex > -1 ? filename.substring(lastDotIndex + 1).toLowerCase() : '';
+
+        // 1. Try to find configuration in our custom map first
+        const config = editorModeMap[extension];
+
+        if (config) {
+            currentMode = config.mode;
+            currentIndentUnit = config.indentUnit;
+            // Only override indentWithTabs if explicitly defined in config, otherwise use default (false)
+            if (typeof config.indentWithTabs !== 'undefined') {
+                currentIndentWithTabs = config.indentWithTabs;
+            }
+        } else if (extension) {
+            // 2. If not in our custom map, try CodeMirror's built-in extension finder
+            const info = CodeMirror.findModeByExtension(extension);
+            if (info) {
+                currentMode = info.mime;
+                // CodeMirror's built-in modes usually default to spaces unless specified
+                // We'll stick to our default indentUnit and indentWithTabs unless overridden
+            }
+        }
+        // If no extension or no info found, it remains "text/plain" and default indentation
+
+        fileManagerEditor.setOption("mode", currentMode);
+        fileManagerEditor.setOption("indentWithTabs", currentIndentWithTabs);
+        fileManagerEditor.setOption("indentUnit", currentIndentUnit);
+
+        // Load mode if not already loaded (important for dynamic mode changes)
+        // Use info.mode if available, otherwise just use currentMode (which could be the MIME type directly)
+        const modeName = CodeMirror.findModeByMIME(currentMode)?.mode || currentMode;
+        CodeMirror.autoLoadMode(fileManagerEditor, modeName);
+
+        console.log(`Editor mode set to: ${currentMode} for file: ${filename} (Indent: ${currentIndentUnit} spaces, Tabs: ${!currentIndentWithTabs ? 'No' : 'Yes'})`);
+    };
+
+    // --- Initial Initialization and Size Adjustment ---
+    // Adjust editor size when window is resized
+    window.addEventListener('resize', function(e){
+        let w = document.querySelector('#file-content').offsetWidth - 16;  // Adjust width
+        let h = document.innerHeight - 160;  // Adjust height based on window height
+        fileManagerEditor.setSize(w, h);  // Apply the new size to the editor
+    });
+
+    // Initial editor size adjustment
+    let w = document.querySelector('#file-content').offsetWidth - 16;
+    let h = document.innerHeight - 160;
+    fileManagerEditor.setSize(w, h);
+}
+

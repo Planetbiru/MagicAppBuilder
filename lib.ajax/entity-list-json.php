@@ -24,7 +24,8 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
 
         $className = "\\".$baseEntityData."\\".$entityName;
         $path = $baseDirData."/".$entityName.".php";
@@ -53,8 +54,9 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
-
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
+        
         $className = "\\".$baseEntityApp."\\".$entityName;
         $path = $baseDirApp."/".$entityName.".php";
         

@@ -47,7 +47,8 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
         if ($returnVar === 0) {          
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
@@ -64,7 +65,8 @@ try {
                 'filetime'    => $filetime,
                 'entityName'  => $entityName,
                 'className'   => $className,
-                'path'        => $path
+                'path'        => $path,
+                'lineNumber'  => $phpError->lineNumber
             );
         } else {
             if (!isset($liData[$idx])) {
@@ -73,7 +75,8 @@ try {
             $liData[$idx][] = array(
                 'name'        => sprintf($format3, $dir, $entityName), 
                 'html'        => sprintf($format2, $dir, $entityName, $filetime, $entityName),
-                'filetime'    => $filetime
+                'filetime'    => $filetime,
+                'lineNumber'  => $phpError->lineNumber
             );
         }
     }
@@ -97,10 +100,15 @@ try {
                 $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
                 $a->setAttribute('data-title', $title);
                 $a->setAttribute('data-html', 'true');
+                $a->setAttribute('data-error', 'false');
             }
             else
             {
-                $a->setAttribute('data-title', 'Last Update '.$item['filetime']);
+                $title = $item['name'];
+                $title .= "<br>Error at line ".$item['lineNumber'];
+                $a->setAttribute('data-title', $title);
+                $a->setAttribute('data-html', 'true');
+                $a->setAttribute('data-error', 'true');
             }
             $li->appendChild($a);
             $ulData->appendChild($li);
@@ -127,7 +135,8 @@ try {
         $entityName = basename($file, '.php');
         $filetime = date('Y-m-d H:i:s', filemtime($file));
         $dir = basename(dirname($file));
-        $returnVar = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
+        $returnVar = intval($phpError->errorCode);
         if ($returnVar === 0) {
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
@@ -144,7 +153,7 @@ try {
                 'filetime'    => $filetime,
                 'entityName'  => $entityName,
                 'className'   => $className,
-                'path'=>$path
+                'path'        => $path
             );
         } else {
             if (!isset($liApp[$idx])) {
@@ -178,10 +187,14 @@ try {
                 $title = EntityUtil::getEntityTooltip($databaseBuilder, $path, $className, $filetime);
                 $a->setAttribute('data-title', $title);
                 $a->setAttribute('data-html', 'true');
+                $a->setAttribute('data-error', 'false');
             }
             else
             {
-                $a->setAttribute('data-title', 'Last Update '.$item['filetime']);
+                $title = "$className<br>Error at line ".$phpError->lineNumber;
+                $a->setAttribute('data-title', $title);
+                $a->setAttribute('data-html', 'true');
+                $a->setAttribute('data-error', 'true');
             }
 
 

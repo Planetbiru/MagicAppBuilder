@@ -547,3 +547,30 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 -   Bug fixes in the entity editor when designing database structures.
     
 -   Resolved issues related to entity field synchronization and missing metadata after import.
+
+
+
+# MagicAppBuilder Version 1.3.1
+
+## What's New
+
+-   **Validator Class Editor:** A new editor is available for managing validator classes.
+
+-   **Error Detection for Entities and Validators:** Find errors more easily within your entities and validators with this new feature.
+
+-   **Save and Load Format Strings:** You can now save and load string, date, and number formats for data output in list and detail views.
+
+## Improvements
+
+-   **Enhanced Captions and Tooltips:** Captions and tooltips on the main module and entity generation forms have been improved for clarity.
+
+-   **Enhanced Language Localization:** Entity development has been improved for more effective language localization.
+
+-   **Enhanced File Manager:** The file manager now offers a better user experience.
+
+-   **Reorganized Module Tabs:** Module tabs have been reorganized for a more intuitive workflow.
+
+## Fixes
+
+-   Display improvements.
+-   General bug fixes.
