@@ -4961,10 +4961,17 @@ function saveValidatorAs() {
             type: "POST",
             url: "lib.ajax/validator-file.php",
             dataType: "json",
-            data: { userAction: 'save', content: fileContent, validator: currentValidator, newValidator: newValidator },
+            data: { userAction: 'set', content: fileContent, validator: currentValidator, newValidator: newValidator },
             success: function (data) {
+              currentValidator = newValidator;
               decreaseAjaxPending();
-              updateValidatorFile();
+              $("#button_save_validator_file").removeAttr("disabled");
+              updateValidatorFile(function(){
+                setValidatorFile(data.new_content);
+                updateSelectedValidator();
+                removeHilightLineError(cmEditorValidator);
+                addHilightLineError(cmEditorValidator, data.error_line - 1);
+              });
               resetFileManager();
               
               removeHilightLineError(cmEditorValidator);
@@ -4974,6 +4981,10 @@ function saveValidatorAs() {
                 setTimeout(function () { closeAlertUI() }, 5000);
               }
             },
+            error: function(err)
+            {
+              decreaseAjaxPending();
+            }
           });
         },  // Callback for OK button
         'class': 'btn-primary'  // Bootstrap class for styling
