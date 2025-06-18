@@ -27,7 +27,6 @@ function getPath($appConfig, $inputPost)
     $inputValidator = trim($inputValidator);
     return $baseDir."/".$inputValidator.".php";
 }
-
 if($inputPost->getUserAction() == 'set')
 {
     $applicationId = $appConfig->getApplication()->getId();
@@ -35,7 +34,17 @@ if($inputPost->getUserAction() == 'set')
     if (isset($validator) && !empty($validator)) {
         $content = $inputPost->getContent();
         $path = getPath($appConfig, $inputPost);
-        file_put_contents($path, $content);
+        if($inputPost->getNewValidator() !== null && $inputPost->getNewValidator() != "")
+        {
+            $newValidator = $inputPost->getNewValidator();
+            $path = str_replace($validator, $newValidator, $path);
+            $content = str_replace($validator, $newValidator, $content);       
+            file_put_contents($path, $content);
+        }
+        else
+        {
+            file_put_contents($path, $content);
+        }
 
         $phpError = ErrorChecker::errorCheck($databaseBuilder, $path, $applicationId);
         $returnVar = intval($phpError->errorCode);
@@ -53,7 +62,8 @@ if($inputPost->getUserAction() == 'set')
             ResponseUtil::sendJSON(array(
                 "success" => true,
                 "message" => "Success",
-                "error_line" => 0
+                "error_line" => 0,
+                "new_content" => $content
             ));
         }
     }

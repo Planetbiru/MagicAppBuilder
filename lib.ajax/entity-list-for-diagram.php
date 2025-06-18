@@ -101,16 +101,19 @@ try {
             $input->setAttribute('name', sprintf($nameFormat, $idx));
             $input->setAttribute('value', $dir . '\\' . $entityName);
             $input->setAttribute('disabled', 'disabled');
-            $input->setAttribute('data-toggle', 'tooltip');
-            $input->setAttribute('data-placement', 'top');
-            $input->setAttribute('data-title', $filetime);
+
             
 
             // Add a whitespace (text node) after the checkbox
             $whitespace = $dom->createTextNode(' ');
 
+            $title = $entityName . "<br>Error at line ".$phpError->lineNumber;
+
             // Create the span element for entity name
             $span = $dom->createElement('span', $entityName);
+            $span->setAttribute('data-toggle', 'tooltip');
+            $span->setAttribute('data-placement', 'top');
+            $span->setAttribute('data-title', $title);
 
             // Append the input, whitespace, and span elements to the li element
             $li->appendChild($input);
@@ -201,15 +204,16 @@ try {
             $input->setAttribute('name', sprintf($nameFormat, $idx));
             $input->setAttribute('value', $dir . '\\' . $entityName);
             $input->setAttribute('disabled', 'disabled');
-            $input->setAttribute('data-toggle', 'tooltip');
-            $input->setAttribute('data-placement', 'top');
-            $input->setAttribute('data-title', $filetime);
+
 
             // Add a whitespace (text node) after the checkbox
             $whitespace = $dom->createTextNode(' ');
 
             // Create the span element for entity name
             $span = $dom->createElement('span', $entityName);
+            $span->setAttribute('data-toggle', 'tooltip');
+            $span->setAttribute('data-placement', 'top');
+            $span->setAttribute('data-title', $filetime);
 
             // Append the input, whitespace, and span elements to the li element
             $li->appendChild($input);

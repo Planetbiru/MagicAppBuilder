@@ -417,6 +417,118 @@ let validatorBuilder = null;
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+  
+  $(document).on('click', '.button-load-string-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'get',
+      dataType: 'json',
+      url: 'lib.ajax/format-string.php',
+      success: function(data)
+      {
+        $('#input-control-string-format').val(data.stringFormat);
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  $(document).on('click', '.button-save-string-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'post',
+      dataType: 'json',
+      url: 'lib.ajax/format-string.php',
+      data: {stringFormat: $('#input-control-string-format').val()},
+      success: function(data)
+      {
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+
+  $(document).on('click', '.button-load-date-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'get',
+      dataType: 'json',
+      url: 'lib.ajax/format-date.php',
+      success: function(data)
+      {
+        $('#input-control-date-format').val(data.dateFormat);
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  $(document).on('click', '.button-save-date-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'post',
+      dataType: 'json',
+      url: 'lib.ajax/format-date.php',
+      data: {dateFormat: $('#input-control-date-format').val()},
+      success: function(data)
+      {
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+
+  $(document).on('click', '.button-load-number-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'get',
+      dataType: 'json',
+      url: 'lib.ajax/format-number.php',
+      success: function(data)
+      {
+        $('#input-control-decimal').val(data.decimal);
+        $('#input-control-decimal-separator').val(data.separator);
+        $('#input-control-thousands-separator').val(data.thousandsSeparator);
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  $(document).on('click', '.button-save-number-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'post',
+      dataType: 'json',
+      url: 'lib.ajax/format-number.php',
+      data: {
+        decimal: $('#input-control-decimal').val(),
+        separator: $('#input-control-decimal-separator').val(),
+        thousandsSeparator: $('#input-control-thousands-separator').val()
+      },
+      success: function(data)
+      {
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  
   validatorBuilder = new ValidationBuilder('.field-validation-modal', '.validation-modal', '.json-output');
   $(document).on('click', '#button-load-module-features', function (e) {
     e.preventDefault();
@@ -4849,10 +4961,17 @@ function saveValidatorAs() {
             type: "POST",
             url: "lib.ajax/validator-file.php",
             dataType: "json",
-            data: { userAction: 'save', content: fileContent, validator: currentValidator, newValidator: newValidator },
+            data: { userAction: 'set', content: fileContent, validator: currentValidator, newValidator: newValidator },
             success: function (data) {
+              currentValidator = newValidator;
               decreaseAjaxPending();
-              updateValidatorFile();
+              $("#button_save_validator_file").removeAttr("disabled");
+              updateValidatorFile(function(){
+                setValidatorFile(data.new_content);
+                updateSelectedValidator();
+                removeHilightLineError(cmEditorValidator);
+                addHilightLineError(cmEditorValidator, data.error_line - 1);
+              });
               resetFileManager();
               
               removeHilightLineError(cmEditorValidator);
@@ -4862,6 +4981,10 @@ function saveValidatorAs() {
                 setTimeout(function () { closeAlertUI() }, 5000);
               }
             },
+            error: function(err)
+            {
+              decreaseAjaxPending();
+            }
           });
         },  // Callback for OK button
         'class': 'btn-primary'  // Bootstrap class for styling

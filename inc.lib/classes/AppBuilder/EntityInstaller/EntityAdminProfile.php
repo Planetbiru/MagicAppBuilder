@@ -52,6 +52,24 @@ class EntityAdminProfile extends MagicObject
 	protected $admin;
 
 	/**
+	 * Application ID
+	 * 
+	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
+	 * @Label(content="Application ID")
+	 * @var string
+	 */
+	protected $applicationId;
+
+	/**
+	 * Application
+	 * 
+	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
+	 * @Label(content="Application")
+	 * @var EntityAdmin
+	 */
+	protected $application;
+
+	/**
 	 * Profile Name
 	 * 
 	 * @Column(name="profile_name", type="varchar(100)", length=100, nullable=true)
@@ -63,7 +81,7 @@ class EntityAdminProfile extends MagicObject
 	/**
 	 * Profile Value
 	 * 
-	 * @Column(name="profile_value", type="varchar(100)", length=100, nullable=true)
+	 * @Column(name="profile_value", type="longtext", nullable=true)
 	 * @Label(content="Profile Value")
 	 * @var string
 	 */
@@ -72,7 +90,7 @@ class EntityAdminProfile extends MagicObject
 	/**
 	 * User Agent
 	 * 
-	 * @Column(name="user_agent", type="text", nullable=true)
+	 * @Column(name="user_agent", type="longtext", nullable=true)
 	 * @Label(content="User Agent")
 	 * @var string
 	 */
