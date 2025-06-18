@@ -73,8 +73,8 @@ try {
         }
         
         // Add space after checkbox (using span with &nbsp;)
-        $span = $dom->createElement('span');
-        $span->appendChild($dom->createTextNode(' ')); // Adding space after checkbox
+        $whitespace = $dom->createElement('span');
+        $whitespace->appendChild($dom->createTextNode(' ')); // Adding space after checkbox
         
         $a = $dom->createElement('a', $entityName);
         $a->setAttribute('href', '#');
@@ -85,13 +85,13 @@ try {
         $a->setAttribute('data-html', 'true');
         
         $li->appendChild($input);
-        $li->appendChild($span); // Add space
+        $li->appendChild($whitespace); // Add space
         $li->appendChild($a);
         
         return $li;
     };
     
-    $format2 = function($idx, $dir, $entityName, $filetime) use ($dom) {
+    $format2 = function($idx, $dir, $entityName, $lineNumber) use ($dom) {
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li file-syntax-error');
         
@@ -101,17 +101,20 @@ try {
         $input->setAttribute('name', "entity[$idx]");
         $input->setAttribute('value', "$dir\\$entityName");
         $input->setAttribute('disabled', 'disabled');
-        $input->setAttribute('data-toggle', 'tooltip');
-        $input->setAttribute('data-placement', 'top');
-        $input->setAttribute('data-title', $filetime);
+
         
         // Add space after checkbox (using span with &nbsp;)
-        $span = $dom->createElement('span');
-        $span->appendChild($dom->createTextNode(' ')); // Adding space after checkbox
+        $whitespace = $dom->createElement('span');
+        $whitespace->appendChild($dom->createTextNode(' ')); // Adding space after checkbox
+
+        $span = $dom->createElement('span', $entityName);
+        $span->setAttribute('data-toggle', 'tooltip');
+        $span->setAttribute('data-placement', 'top');
+        $span->setAttribute('data-title', $entityName."<br>Error at line ".$lineNumber);
         
         $li->appendChild($input);
-        $li->appendChild($span); // Add space
-        $li->appendChild($dom->createTextNode($entityName));
+        $li->appendChild($whitespace);
+        $li->appendChild($span);
         
         return $li;
     };
@@ -139,7 +142,7 @@ try {
             if (!isset($li[$idx])) {
                 $li[$idx] = array();
             }
-            $li[$idx][] = $format2($idx, $dir, $entityName, $filetime);
+            $li[$idx][] = $format2($idx, $dir, $entityName, $phpError->lineNumber);
         }
     }
 
@@ -187,7 +190,7 @@ try {
             if (!isset($li[$idx])) {
                 $li[$idx] = array();
             }
-            $li[$idx][] = $format2($idx, $dir, $entityName, $filetime);
+            $li[$idx][] = $format2($idx, $dir, $entityName, $phpError->lineNumber);
         }
     }
     

@@ -76,7 +76,8 @@ try {
                 'name'        => sprintf($format3, $dir, $entityName), 
                 'html'        => sprintf($format2, $dir, $entityName, $filetime, $entityName),
                 'filetime'    => $filetime,
-                'lineNumber'  => $phpError->lineNumber
+                'lineNumber'  => $phpError->lineNumber,
+                'entityName'  => $entityName,
             );
         }
     }
@@ -163,7 +164,9 @@ try {
             $liApp[$idx][] = array(
                 'name'        => sprintf($format3, $dir, $entityName), 
                 'html'        => sprintf($format2, $dir, $entityName, $filetime, $entityName),
-                'filetime'    => $filetime
+                'filetime'    => $filetime,
+                'entityName'  => $entityName,
+                'className'   => $className,
             );
         }
     }
@@ -192,7 +195,9 @@ try {
             }
             else
             {
-                $title = "$className<br>Error at line ".$phpError->lineNumber;
+                $entityName = $item['entityName'];
+                $className = $item['className'];
+                $title = "$entityName<br>Error at line ".$phpError->lineNumber;
                 $a->setAttribute('data-title', $title);
                 $a->setAttribute('data-html', 'true');
                 $a->setAttribute('data-error', 'true');

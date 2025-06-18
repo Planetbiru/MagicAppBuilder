@@ -417,6 +417,118 @@ let validatorBuilder = null;
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+  
+  $(document).on('click', '.button-load-string-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'get',
+      dataType: 'json',
+      url: 'lib.ajax/format-string.php',
+      success: function(data)
+      {
+        $('#input-control-string-format').val(data.stringFormat);
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  $(document).on('click', '.button-save-string-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'post',
+      dataType: 'json',
+      url: 'lib.ajax/format-string.php',
+      data: {stringFormat: $('#input-control-string-format').val()},
+      success: function(data)
+      {
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+
+  $(document).on('click', '.button-load-date-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'get',
+      dataType: 'json',
+      url: 'lib.ajax/format-date.php',
+      success: function(data)
+      {
+        $('#input-control-date-format').val(data.dateFormat);
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  $(document).on('click', '.button-save-date-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'post',
+      dataType: 'json',
+      url: 'lib.ajax/format-date.php',
+      data: {dateFormat: $('#input-control-date-format').val()},
+      success: function(data)
+      {
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+
+  $(document).on('click', '.button-load-number-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'get',
+      dataType: 'json',
+      url: 'lib.ajax/format-number.php',
+      success: function(data)
+      {
+        $('#input-control-decimal').val(data.decimal);
+        $('#input-control-decimal-separator').val(data.separator);
+        $('#input-control-thousands-separator').val(data.thousandsSeparator);
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  $(document).on('click', '.button-save-number-format', function(e){
+    increaseAjaxPending();
+    $.ajax({
+      type: 'post',
+      dataType: 'json',
+      url: 'lib.ajax/format-number.php',
+      data: {
+        decimal: $('#input-control-decimal').val(),
+        separator: $('#input-control-decimal-separator').val(),
+        thousandsSeparator: $('#input-control-thousands-separator').val()
+      },
+      success: function(data)
+      {
+        decreaseAjaxPending();
+      },
+      error: function()
+      {
+        decreaseAjaxPending();
+      }
+    })
+  });
+  
   validatorBuilder = new ValidationBuilder('.field-validation-modal', '.validation-modal', '.json-output');
   $(document).on('click', '#button-load-module-features', function (e) {
     e.preventDefault();
