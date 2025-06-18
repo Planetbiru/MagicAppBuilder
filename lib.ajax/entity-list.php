@@ -109,6 +109,7 @@ try {
                 $a->setAttribute('data-title', $title);
                 $a->setAttribute('data-html', 'true');
                 $a->setAttribute('data-error', 'true');
+                $a->setAttribute('data-error-line-number', $item['lineNumber']);
             }
             $li->appendChild($a);
             $ulData->appendChild($li);

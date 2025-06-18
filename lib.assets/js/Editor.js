@@ -675,3 +675,39 @@ function initCodeMirror2() {
     let h = document.innerHeight - 160;
     fileManagerEditor.setSize(w, h);
 }
+
+/**
+ * Focuses the CodeMirror editor on a specific line, moves the cursor to its beginning,
+ * and ensures the line is visible within the editor's viewport.
+ *
+ * @param {CodeMirror.Editor} editor - The CodeMirror editor instance.
+ * @param {number} lineNumber - The 0-indexed line number to focus on.
+ * (e.g., 0 for the first line, 1 for the second, and so on).
+ * @returns {void}
+ */
+function focusOnLine(editor, lineNumber) {
+    // Check if the editor object is valid and its DOM element is still connected.
+    // The .getWrapperElement() method should return the main div of the CodeMirror instance.
+    if (!editor || !editor.getWrapperElement() || !editor.getWrapperElement().isConnected) {
+        console.error("CodeMirror editor instance is invalid or not connected to the DOM. Cannot focus on line.");
+        // Consider re-initializing the editor here if this is a recoverable state,
+        // e.g., initializeValidatorEditor();
+        return;
+    }
+
+    // Ensure the line number is within the current document's bounds.
+    if (lineNumber < 0 || lineNumber >= editor.lineCount()) {
+        return;
+    }
+    
+    try {
+        editor.setCursor(lineNumber, 0); // Move the cursor to the beginning of the specified line.
+        editor.scrollIntoView({line: lineNumber, ch: 0}, 20); // Scroll the view to make the line visible with a 20px margin.
+        editor.focus(); // Give keyboard focus to the editor.
+        editor.addLineClass(lineNumber, 'background', 'highlight-line');
+    } catch (e) {
+        // Do nothing
+    }
+
+    
+}
