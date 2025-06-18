@@ -22,7 +22,6 @@ use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\Entity\Data\GitProfile;
 
-
 require_once __DIR__ . "/inc.app/auth-profile.php";
 
 $inputGet = new InputGet();

@@ -1344,6 +1344,10 @@ li.menu-exists > a::after {
   margin-right: 0.5em;
 }
 
+.column-body li a[data-error=true] {
+  color: red;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;

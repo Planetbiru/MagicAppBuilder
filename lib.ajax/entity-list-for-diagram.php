@@ -46,13 +46,15 @@ try {
         $dir = basename(dirname($file));
         $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
         $returnVar = intval($phpError->errorCode);
+
+        $filetime = date('Y-m-d H:i:s', filemtime($file));
         
         // Create <li> elements for valid files
         $li = $dom->createElement('li');
         $li->setAttribute('class', 'entity-li');
-
+        
         if ($returnVar === 0) {
-            $filetime = date('Y-m-d H:i:s', filemtime($file));
+            
             $entityInfo = EntityUtil::getTableName($file);
             $tableName = isset($entityInfo['name']) ? $entityInfo['name'] : $idx;
 

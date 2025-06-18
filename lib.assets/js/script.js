@@ -597,7 +597,7 @@ let initAll = function () {
               data: { entity: currentEntity},
               success: function (data) {
                 decreaseAjaxPending();
-                updateEntityFile();updateValidatorFile();
+                updateEntityFile();
                 resetFileManager();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
@@ -1384,7 +1384,7 @@ let initAll = function () {
               data: { entityName: entityName, tableName: tableName },
               success: function (data) {
                 decreaseAjaxPending();
-                updateEntityFile();updateValidatorFile();
+                updateEntityFile();
                 resetFileManager();
                 updateEntityQuery(true);
                 updateEntityRelationshipDiagram();
@@ -3582,7 +3582,8 @@ function loadAllResource() {
   updateEntityQuery(false);
   
   updateEntityRelationshipDiagram();
-  updateEntityFile();updateValidatorFile();
+  updateEntityFile();
+  updateValidatorFile();
   updateModuleFile();
   resetFileManager();
   initTooltip();
@@ -3613,7 +3614,8 @@ function onSetDefaultApplication() {
   loadTable();
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
-  updateEntityFile();updateValidatorFile();
+  updateEntityFile();
+  updateValidatorFile();
   updateModuleFile();
   resetFileManager();
   initTooltip();
@@ -3628,7 +3630,8 @@ function onSetDefaultApplication() {
 function onModuleCreated() {
   updateEntityQuery(false);
   updateEntityRelationshipDiagram();
-  updateEntityFile();updateValidatorFile();
+  updateEntityFile();
+  updateValidatorFile();
   updateModuleFile();
   resetFileManager();
   initTooltip();
@@ -4797,7 +4800,6 @@ function saveValidator() {
         updateValidatorFile(function(){
           setValidatorFile(fileContent);
           updateSelectedValidator();
-          
           removeHilightLineError(cmEditorValidator);
           addHilightLineError(cmEditorValidator, data.error_line - 1);
         });
@@ -4897,7 +4899,7 @@ function updateSelectedEntity()
 function updateSelectedValidator()
 {
   $('.validator-list .validator-li').removeClass('selected-file');
-  $('.validator-list [data-validator-name="'+currentEntity.split('\\').join('\\\\')+'"]').closest('.validator-li').addClass('selected-file');
+  $('.validator-list [data-validator-name="'+currentValidator.split('\\').join('\\\\')+'"]').closest('.validator-li').addClass('selected-file');
 }
 
 /**
@@ -4928,7 +4930,7 @@ function saveEntityAs() {
             data: { content: fileContent, entity: currentEntity, newEntity: newEntity },
             success: function (data) {
               decreaseAjaxPending();
-              updateEntityFile();updateValidatorFile();
+              updateEntityFile();
               resetFileManager();
               updateEntityQuery(true);
               updateEntityRelationshipDiagram();
@@ -5248,6 +5250,15 @@ function updateEntityFile(clbk) {
       decreaseAjaxPending();
       $(".entity-container-file .entity-list").empty().append(data);
       $(".container-translate-entity .entity-list").empty().append(data);
+
+      // Mark tab
+      $('button#entity-file-tab').removeClass('text-danger');
+      let errorCount = $(".entity-container-file .entity-list").find('a[data-error="true"]').length;
+      if(errorCount)
+      {
+        $('button#entity-file-tab').addClass('text-danger');
+      }
+
       clearEntityFile();
       if(typeof clbk == 'function')
       {
@@ -5282,13 +5293,22 @@ function updateValidatorFile(clbk) {
       decreaseAjaxPending();
       $(".validator-container-file .validator-list").empty().append(data);
       $(".container-translate-validator .validator-list").empty().append(data);
-      clearEntityFile();
+
+      // Mark tab
+      $('button#validator-file-tab').removeClass('text-danger');
+      let errorCount = $(".validator-container-file .validator-list").find('a[data-error="true"]').length;
+      if(errorCount)
+      {
+        $('button#validator-file-tab').addClass('text-danger');
+      }
+
+      clearValidatorFile();
       if(typeof clbk == 'function')
       {
         clbk();
       }
-      clearTtransEd3();
-      clearTtransEd4();
+      clearTtransEd5();
+      clearTtransEd6();
     },
     error: function (xhr, status, error) {
       decreaseAjaxPending();
@@ -5935,7 +5955,8 @@ function generateAllCode(dataToPost) {
         showToast(data.title, data.message);
       }
       decreaseAjaxPending();
-      updateEntityFile();updateValidatorFile();
+      updateEntityFile();
+      updateValidatorFile();
       updateEntityQuery(true);
       updateEntityRelationshipDiagram();
       if (data.success) {

@@ -44,59 +44,34 @@ try {
         $dir = basename(dirname($file));
         $phpError = ErrorChecker::errorCheck($databaseBuilder, $file, $applicationId);
         $returnVar = intval($phpError->errorCode);
-        if ($returnVar === 0) {          
-            
+        
+        $li = $doc->createElement('li');
+        $li->setAttribute('class', 'validator-li');
+        $a = $doc->createElement('a', $validatorName);
+        $a->setAttribute('href', '#');
+        $a->setAttribute('data-validator-name', $validatorName);
+        $a->setAttribute('data-toggle', 'tooltip');
+        $a->setAttribute('data-placement', 'top');
+        
+        $title = $validatorName;
 
-            $className = "\\".$baseValidator."\\".$validatorName;
-            $path = $baseDir."/".$validatorName.".php";
-
-            $liData[$tableName][] = array(
-                'name'        => $validatorName, 
-                'html'        => sprintf($format1, $dir, $validatorName, $validatorName),
-                'filetime'    => $filetime,
-                'validatorName'  => $validatorName,
-                'className'   => $className,
-                'path'        => $path
-            );
-        } else {
-            if (!isset($liData[$idx])) {
-                $liData[$idx] = array();
-            }
-            $liData[$idx][] = array(
-                'name'        => $validatorName, 
-                'html'        => sprintf($format2, $dir, $validatorName, $validatorName),
-                'filetime'    => $filetime
-            );
+        if($phpError->lineNumber != -1)
+        {
+            $title .= "<br>Error at line ".$phpError->lineNumber;
+            $a->setAttribute('data-error', 'true');
         }
-    }
-
-    ksort($liData);
-    foreach ($liData as $tableName=>$items) {
-        foreach ($items as $item) {
-            $li = $doc->createElement('li');
-            $li->setAttribute('class', 'validator-li');
-            $a = $doc->createElement('a', strip_tags($item['html']));
-            $a->setAttribute('href', '#');
-            $a->setAttribute('data-validator-name', $item['name']);
-            $a->setAttribute('data-table-name', $tableName);
-            $a->setAttribute('data-toggle', 'tooltip');
-            $a->setAttribute('data-placement', 'top');
-            if(isset($item['validatorName']) && isset($item['className']) && isset($item['path']))
-            {
-                $validatorName = $item['validatorName'];
-                $className = $item['className'];
-                $path = $item['path'];
-                $a->setAttribute('data-title', $className);
-                $a->setAttribute('data-html', 'true');
-            }
-            else
-            {
-                $a->setAttribute('data-title', 'Last Update '.$item['filetime']);
-            }
-            $li->appendChild($a);
-            $ulData->appendChild($li);
+        else
+        {
+            $a->setAttribute('data-error', 'false');
         }
+
+        $a->setAttribute('data-title', $title);
+        $a->setAttribute('data-html', 'true');
+        
+        $li->appendChild($a);
+        $ulData->appendChild($li);
     }
+    
 
     // Output the result
     echo $doc->saveHTML();

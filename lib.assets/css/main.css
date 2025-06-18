@@ -1342,4 +1342,8 @@ li.menu-exists > a::after {
   font-family: "Font Awesome 6 Free";
   content: "\f0c8"; /* fa-square */
   margin-right: 0.5em;
+}
+
+.column-body li a[data-error=true] {
+  color: red;
 }/*# sourceMappingURL=main.css.map */

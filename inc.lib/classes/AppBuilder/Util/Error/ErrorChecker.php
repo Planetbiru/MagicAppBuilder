@@ -38,6 +38,7 @@ class ErrorChecker
         try {
             // Check if cached error result exists
             $errorCache = self::getErrorCode($databaseBuilder, $normalizedPath, $ft);
+            $phpError->restoreErrorFromCache($errorCache);
 
             // If the file has been modified since last check, run a new PHP syntax check
             if (strtotime($errorCache->getModificationTime()) < $ft) {
