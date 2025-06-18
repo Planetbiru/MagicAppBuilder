@@ -59,6 +59,7 @@ try {
         {
             $title .= "<br>Error at line ".$phpError->lineNumber;
             $a->setAttribute('data-error', 'true');
+            $a->setAttribute('data-error-line-number', $phpError->lineNumber);
         }
         else
         {

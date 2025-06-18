@@ -1204,24 +1204,26 @@ let initAll = function () {
     e.preventDefault();
     let entityName = $(this).attr("data-entity-name");
     let tableName = $(this).attr("data-table-name");
+    let lineNumber = parseInt($(this).attr("data-error-line-number"));
     currentEntityName = entityName;
     currentTableName = tableName;
     let el = $(this);
     getEntityFile([entityName], function () {
       $('.entity-container-file .entity-li').removeClass("selected-file");
       el.closest('li').addClass("selected-file");
-    });
+    }, lineNumber);
   });
   
   $(document).on("click", ".validator-container-file .validator-li a", function (e) {
     e.preventDefault();
     let validatorName = $(this).attr("data-validator-name");
+    let lineNumber = parseInt($(this).attr("data-error-line-number"));
     currentValidatorName = validatorName;
     let el = $(this);
     getValidatorFile(validatorName, function () {
       $('.validator-container-file .validator-li').removeClass("selected-file");
       el.closest('li').addClass("selected-file");
-    });
+    }, lineNumber);
   });
 
   $(document).on("click", ".module-list-file .file-li a", function (e) {
@@ -5074,9 +5076,10 @@ function getEntityQuery(entity, merged, createNew) {
  *
  * @param {string} entity - The entity to load.
  * @param {function} [clbk] - Optional callback function to call after loading.
+ * @param {number} lineNumber - Optional line number to higlight the entity code
  * @returns {void} This function does not return a value.
  */
-function getEntityFile(entity, clbk) {
+function getEntityFile(entity, clbk, lineNumber) {
   increaseAjaxPending();
   $.ajax({
     type: "POST",
@@ -5088,6 +5091,10 @@ function getEntityFile(entity, clbk) {
       cmEditorFile.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorFile.refresh();
+        if(lineNumber && lineNumber > -1)
+        {
+          focusOnLine(cmEditorFile, lineNumber);
+        }
       }, 1);
       $("#button_save_entity_file").removeAttr("disabled");
       $("#button_delete_entity_file").removeAttr("disabled");
@@ -5112,9 +5119,10 @@ function getEntityFile(entity, clbk) {
  *
  * @param {string} validator - The validator to load.
  * @param {function} [clbk] - Optional callback function to call after loading.
+ * @param {number} lineNumber - Optional line number to higlight the entity code
  * @returns {void} This function does not return a value.
  */
-function getValidatorFile(validator, clbk) {
+function getValidatorFile(validator, clbk, lineNumber) {
   increaseAjaxPending();
   $.ajax({
     type: "POST",
@@ -5126,6 +5134,10 @@ function getValidatorFile(validator, clbk) {
       cmEditorValidator.getDoc().setValue(data);
       setTimeout(function () {
         cmEditorValidator.refresh();
+        if(lineNumber && lineNumber > -1)
+        {
+          focusOnLine(cmEditorValidator, lineNumber);
+        }
       }, 1);
       $("#button_save_validator_file").removeAttr("disabled");
       $("#button_delete_validator_file").removeAttr("disabled");
