@@ -413,10 +413,58 @@ function restoreFeatureForm() {
 
 let validatorBuilder = null;
 
+function testValidator(elem)
+{
+  let frm = elem.form;
+  increaseAjaxPending();
+  $.ajax({
+    type: 'post',
+    dataType: 'json',
+    url: 'lib.ajax/validator-test.php',
+    data: {validator: currentValidator},
+    success: function(data)
+    {
+      $('#genericModal .modal-body .test-message').empty().append(data);
+      decreaseAjaxPending();
+    },
+    error: function()
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
+
+function showTestValidatorForm()
+{
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST',
+    dataType: 'html',
+    url: 'lib.ajax/validator-form.php',
+    data: {validator: currentValidator},
+    success: function(data)
+    {
+      console.log(data)
+      $('#genericModal .modal-body').empty().append(data);
+      $('#genericModal .generic-modal-ok').attr('onclick', "testValidator(this)");
+      $('#genericModal').modal('show');
+      decreaseAjaxPending();
+    },
+    error: function()
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
+
 /**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+
+  $(document).on('click', '#button_test_validator', function(e){
+    showTestValidatorForm();
+  });
   
   $(document).on('click', '.button-load-string-format', function(e){
     increaseAjaxPending();
