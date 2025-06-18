@@ -1,7 +1,5 @@
 <?php
 
-use AppBuilder\Util\Error\ErrorChecker;
-use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;

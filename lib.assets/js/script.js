@@ -414,9 +414,80 @@ function restoreFeatureForm() {
 let validatorBuilder = null;
 
 /**
+ * Submits the form data to the validator test endpoint via AJAX.
+ * Displays success or error messages in a modal.
+ *
+ * @param {HTMLElement} elem The element that triggered the function (e.g., the submit button).
+ */
+function testValidator(elem) {
+  let frm = elem.form;
+  increaseAjaxPending(); // Assumption: this function exists for loading indicators
+
+  $.ajax({
+    type: 'post',
+    dataType: 'json',
+    url: 'lib.ajax/validator-test.php?validator=' + encodeURIComponent(currentValidator),
+    data: $(frm).serialize(), // Gathers all data from the form
+    success: function(data) {
+      // Ensure `data` is a JSON object, not an HTML string.
+      // If the server returns HTML, you might need to change dataType or how it's handled here.
+      if (data && data.success) {
+        $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-success">' + data.message + '</div>');
+      } else {
+        let errorMessage = 'An error occurred. ';
+        if (data && data.message) {
+          errorMessage = data.message;
+        }
+        $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-danger">' + errorMessage + '</div>');
+        if (data.propertyName) {
+          $('#genericModal .modal-body input[name="'+data.propertyName+'"]').select();
+        }
+      }
+      decreaseAjaxPending(); // Assumption: this function exists
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      // Handles HTTP or network errors
+      $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-danger">AJAX Error: ' + textStatus + ' - ' + errorThrown + '</div>');
+      decreaseAjaxPending(); // Assumption: this function exists
+    }
+  });
+}
+
+/**
+ * Displays a modal containing a form generated for the current validator.
+ * The form's content is fetched via an AJAX call.
+ */
+function showTestValidatorForm()
+{
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST',
+    dataType: 'html',
+    url: 'lib.ajax/validator-form.php',
+    data: {validator: currentValidator},
+    success: function(data)
+    {
+      $('#genericModal .modal-header .modal-title').text(currentValidator+' Test');
+      $('#genericModal .modal-body').empty().append(data);
+      $('#genericModal .generic-modal-ok').attr('onclick', "testValidator(this)");
+      $('#genericModal').modal('show');
+      decreaseAjaxPending();
+    },
+    error: function()
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
+
+/**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+
+  $(document).on('click', '#button_test_validator', function(e){
+    showTestValidatorForm();
+  });
   
   $(document).on('click', '.button-load-string-format', function(e){
     increaseAjaxPending();
