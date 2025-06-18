@@ -2,13 +2,15 @@
 
 namespace AppBuilder\Util;
 
+use MagicObject\Request\PicoRequestBase;
+
 class ValidatorUtil
 {
     /**
      * Get file path
      *
      * @param SecretObject $appConfig Application config
-     * @param InputPost $inputPost Input post
+     * @param PicoRequestBase $inputPost Input post
      * @return string
      */
     public static function getPath($appConfig, $inputPost)

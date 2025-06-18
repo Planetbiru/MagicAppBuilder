@@ -53,14 +53,14 @@ if ($inputPost->getValidator() != '')
                     $table->setAttribute('class', 'config-table'); // Bootstrap table classes
 
                     foreach ($keys as $key) {
-                        $label = ucwords(str_replace('_', ' ', $key)); 
+                        $label = $key; 
                         $value = $values[$key]; 
 
                         $tr = $dom->createElement('tr');
                         $table->appendChild($tr);
 
                         $tdLabel = $dom->createElement('td');
-                        $labelElement = $dom->createElement('label', htmlspecialchars(PicoStringUtil::camelToTitle($label)));
+                        $labelElement = $dom->createElement('label', htmlspecialchars($label));
                         $labelElement->setAttribute('for', htmlspecialchars($key));
                         $tdLabel->appendChild($labelElement);
                         $tr->appendChild($tdLabel);
@@ -84,6 +84,10 @@ if ($inputPost->getValidator() != '')
                         }
                         $tdInput->appendChild($inputField);
                     }
+
+                    $div = $dom->createElement('div');
+                    $div->setAttribute('class', 'validator-test-message');
+                    $dom->appendChild($div);
 
                     // Output the generated HTML
                     $dom->appendChild($table);

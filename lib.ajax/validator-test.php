@@ -3,21 +3,23 @@
 use AppBuilder\Util\Error\ErrorChecker;
 use AppBuilder\Util\ResponseUtil;
 use AppBuilder\Util\ValidatorUtil;
+use MagicObject\Exceptions\InvalidValueException;
+use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
-header("Content-type: text/plain");
+$inputGet = new InputGet();
 
-if ($inputPost->getValidator() != '')
+if ($inputGet->getValidator() != '')
 {
     $applicationId = $appConfig->getApplication()->getId();
-    $validatorClassName = $inputPost->getValidator(); // Rename variable for clearer representation of the class name
+    $validatorClassName = $inputGet->getValidator(); // Rename variable for clearer representation of the class name
     
     if (isset($validatorClassName) && !empty($validatorClassName)) {
         $content = $inputPost->getContent(); // This content seems unused in this block; ensure it's not needed
-        $path = ValidatorUtil::getPath($appConfig, $inputPost);
+        $path = ValidatorUtil::getPath($appConfig, $inputGet);
 
         // Ensure the validator file exists before attempting to check or load it
         if (!file_exists($path)) {
@@ -71,11 +73,12 @@ if ($inputPost->getValidator() != '')
                         'className' => $fullValidatorClassName
                     ]);
 
-                } catch (Throwable $e) {
+                } catch (InvalidValueException $e) {
                     // Handle error if there's an issue during class instantiation
                     ResponseUtil::sendJSON([
                         'success' => false,
-                        'message' => 'Failed to create validator class instance: ' . $e->getMessage()
+                        'message' => $e->getMessage(),
+                        'propertyName' => $e->getPropertyName()
                     ]);
                 }
             } else {
