@@ -100,7 +100,7 @@ class PicoEntityGenerator
      * @param bool $prettifyLabel Whether to convert column names to human-readable labels (default is true).
      * @return string PHP code for the property with a docblock, ready to be inserted into a class.
      */
-    protected function createProperty($typeMap, $columnMap, $row, $nonupdatables = null, $prettifyLabel = true)
+    public function createProperty($typeMap, $columnMap, $row, $nonupdatables = null, $prettifyLabel = true)
     {
         $columnName = $row['Field'];
         $columnType = $row['Type'];
@@ -183,7 +183,7 @@ class PicoEntityGenerator
      * @param bool $prettifyLabel Whether to replace 'Id' with 'ID' and 'Ip' with 'IP'
      * @return string Formatted property name (e.g., 'User ID', 'User IP')
      */
-    protected function getPropertyName($name, $prettifyLabel = true)
+    public function getPropertyName($name, $prettifyLabel = true)
     {
         $arr = explode("_", $name);
         foreach ($arr as $k => $v) {
@@ -206,7 +206,7 @@ class PicoEntityGenerator
      * @param string $columnType Database column type
      * @return string Corresponding PHP data type
      */
-    protected function getColumnType($typeMap, $columnType)
+    public function getColumnType($typeMap, $columnType)
     {
         $length = "";
         $pos = strpos($columnType, "(");
@@ -231,7 +231,7 @@ class PicoEntityGenerator
      * @param string $columnType Database column type
      * @return string Corresponding PHP data type
      */
-    protected function getDataType($typeMap, $columnType)
+    public function getDataType($typeMap, $columnType)
     {
         $type = "";
         foreach ($typeMap as $key => $val) {
@@ -258,7 +258,7 @@ class PicoEntityGenerator
      * @param string $dataType Column definition containing type and optional length/precision
      * @return int Length of the column
      */
-    protected function getDataLength($dataType)
+    public function getDataLength($dataType)
     {
         $length = 0;
 
@@ -306,7 +306,7 @@ class PicoEntityGenerator
      * @return array Associative array of type mappings where the keys are database column types
      *               and the values are corresponding PHP types.
      */
-    protected function getTypeMap()
+    public function getTypeMap()
     {
         return array(
             // Numeric types

@@ -21,10 +21,12 @@ if ($baseDirectory === false) {
 $applicationId = $inputPost->getApplicationId();
 $databaseName = $inputPost->getDatabase();
 $schemaName = $inputPost->getSchema();
+$targetDatabaseType = $inputPost->getTargetDatabaseType();
 
 $_GET['applicationId'] = $applicationId;
 $_GET['databaseName'] = $databaseName;
 $_GET['schemaName'] = $schemaName;
+$_GET['targetDatabaseType'] = $targetDatabaseType;
 
 require_once __DIR__ . "/inc.db/config.php";
 
@@ -32,6 +34,7 @@ require_once __DIR__ . "/inc.db/config.php";
 $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $databaseName = $inputPost->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $schemaName = $inputPost->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$targetDatabaseType = $inputPost->getTargetDatabaseType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
 // Ensure tmp folder exists
 if (!file_exists($baseDirectory)) {
@@ -72,7 +75,7 @@ header('Content-type: application/json');
 try {
     if ($includeStructure) {
         $exporter->appendExportData("\r\n-- Database structure of `$tableName`\r\n");
-        $exporter->exportTableStructure($tables, $schemaName);
+        $exporter->exportTableStructure($tables, $schemaName, $targetDatabaseType);
     }
 
     if ($includeData) {

@@ -112,7 +112,7 @@ class PicoDtoGenerator
      * @return string PHP code for the property with a docblock, including the appropriate annotations like 
      *                `@Label` and `@var`, ready to be inserted into a class.
      */
-    protected function createProperty($typeMap, $columnName, $columnType, $prettifyLabel = true)
+    public function createProperty($typeMap, $columnName, $columnType, $prettifyLabel = true)
     {
         $propertyName = PicoStringUtil::camelize($columnName);
         $docs = array();
@@ -143,7 +143,7 @@ class PicoDtoGenerator
      * @param bool $prettifyLabel Whether to replace 'Id' with 'ID' and 'Ip' with 'IP'
      * @return string Formatted property name (e.g., 'User ID', 'User IP')
      */
-    protected function getPropertyName($name, $prettifyLabel = true)
+    public function getPropertyName($name, $prettifyLabel = true)
     {
         $arr = explode("_", $name);
         foreach ($arr as $k => $v) {
@@ -166,7 +166,7 @@ class PicoDtoGenerator
      * @param string $columnType Database column type
      * @return string Corresponding PHP data type
      */
-    protected function getDataType($typeMap, $columnType)
+    public function getDataType($typeMap, $columnType)
     {
         $type = "";
         foreach ($typeMap as $key => $val) {
@@ -185,7 +185,7 @@ class PicoDtoGenerator
      * @param array $rows Data rows from the database
      * @return string PHP code for the valueOf method
      */
-    protected function createValueOf($picoTableName, $rows)
+    public function createValueOf($picoTableName, $rows)
     {
         $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($picoTableName));
         $dtoName = isset($this->dtoName) ? $this->dtoName : ucfirst(PicoStringUtil::camelize($picoTableName)) . "Dto";
@@ -215,7 +215,7 @@ class PicoDtoGenerator
      *
      * @return array Associative array of type mappings
      */
-    protected function getTypeMap()
+    public function getTypeMap()
     {
         return array(
             "bigint"      => "int",
