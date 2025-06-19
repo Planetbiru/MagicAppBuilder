@@ -339,10 +339,7 @@ class ValidationBuilder {
             if(en)
             {
                 _this.enumEditor = new EnumEditor(div.querySelector('.enum-editor'));
-                if(validation[prop])
-                {
-                    _this.enumEditor.setItems(validation[prop]);
-                }
+                _this.enumEditor.setItems(validation[prop]);
             }
         });
 
@@ -450,6 +447,8 @@ class ValidationBuilder {
         } else {
             this.validationsPerField[this.currentField].push(validation);
         }
+        const container = this.baseElement.querySelector(".field-validations-list");
+        let data = this.validationsPerField[this.currentField] || [];
         this.renderValidationsMerged()
         $(this.modalSelector).modal('hide');
         return this;
