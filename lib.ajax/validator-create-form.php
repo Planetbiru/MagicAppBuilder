@@ -81,23 +81,27 @@ $fields = $tableColumnInfo['fields'];
         </tr>
     </tbody>
 </table>
-<hr>
 <?php
 foreach($fields as $field)
 {
     $fieldName = $field['column_name'];
+    $maximumLength = $field['maximum_length'];
     if(!in_array($fieldName, $tableColumnInfo['skipped_insert_edit']))
     {
 ?>
-<div class="mb-3 field-group validation-item" data-field="<?php echo $fieldName;?>">
+<hr>
+<div class="mb-3 field-group validation-item" data-field-name="<?php echo $fieldName;?>" data-maximum-length="<?php echo $maximumLength;?>">
     <span class="form-label"><?php echo $fieldName;?></span>
     <div class="field-validations-list mt-2"></div>
-    <button type="button" class="btn btn-primary mt-2 add-validation"><i class="fa-solid fa-plus"></i> Add Validation</button>
+    <button type="button" class="btn btn-primary mt-2 add-validation-merged"><i class="fa-solid fa-plus"></i> Add Validation</button>
 </div>
 <?php
 }
 }
 ?>
-<pre class="validation-output"></pre>
+<hr>
+<span class="form-label">Definition</span>
+<textarea class="form-control validation-output validatorDefinition" rows="5" readonly></textarea>
+<input type="hidden" name="validatorName" value="<?php echo htmlspecialchars($validatorName);?>">
 <?php
 }

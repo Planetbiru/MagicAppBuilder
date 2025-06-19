@@ -111,7 +111,6 @@ class ValidationBuilder {
      */
     bindFieldButtons() {
         let _this = this;
-        console.log(_this.baseSelector)
         $(document).on('click', _this.rowSelector + ' .validation-button', function(e){
             let tr = $(this).closest(".validation-item")[0];
             _this.currentField = tr.dataset.fieldName;
@@ -143,6 +142,16 @@ class ValidationBuilder {
                 _this.applyUpdateCheckbox.disabled = true;
                 _this.applyUpdateCheckbox.checked = false;
             }
+
+            _this.updateDropDown();
+            $(_this.modalSelector).modal('show');
+        });
+        $(document).on('click', this.baseSelector + ' .add-validation-merged', function(e){
+            _this.currentField = $(this)[0].closest('.validation-item').dataset.fieldName;
+            _this.currentIndex = null;
+            _this.modalElement.querySelector('.validation-type').value = "";
+            _this.propsContainer.innerHTML = "";
+
 
             _this.updateDropDown();
             $(_this.modalSelector).modal('show');
@@ -287,6 +296,44 @@ class ValidationBuilder {
         return this;
     }
 
+    saveValidationToSelectedField()
+    {
+        const type = this.modalElement.querySelector('.validation-type').value;
+        if (!type || !this.currentField) return;
+        const props = {};
+        this.propsContainer.querySelectorAll("input").forEach(input => {
+            props[input.dataset.prop] = input.value;
+        });
+        const validation = {
+            type,
+            ...props
+        };
+        if (!this.validationsPerField[this.currentField]) {
+            this.validationsPerField[this.currentField] = [];
+        }
+        if (this.currentIndex !== null) {
+            this.validationsPerField[this.currentField][this.currentIndex] = validation;
+        } else {
+            this.validationsPerField[this.currentField].push(validation);
+        }
+        const container = this.baseElement.querySelector(".field-validations-list");
+        let data = this.validationsPerField[this.currentField] || [];
+        this.renderValidationsMerged()
+        $(this.modalSelector).modal('hide');
+        return this;
+    }
+
+    renderValidationsMerged() {
+        let _this = this;
+        const container = this.baseElement.querySelectorAll(".validation-item");
+        container.forEach((field) => {
+            let fieldName = field.dataset.fieldName;
+            let data = this.validationsPerField[fieldName] || [];
+            _this.renderFieldValidationsMerged(field.querySelector('.field-validations-list'), fieldName, data);
+        })
+        
+    }
+
     /**
      * Saves validation status for all fields in the table.
      * 
@@ -382,6 +429,33 @@ class ValidationBuilder {
         return this;
     }
 
+    renderFieldValidationsMerged(container, field, data) {
+        container.innerHTML = "";
+        (data || []).forEach((val, idx) => {
+            const propsStr = Object.entries(val)
+                .filter(([k]) => k !== "type" && k !== "applyInsert" && k !== "applyUpdate") // Exclude these keys
+                .map(([k, v]) => `${k}="${v}"`).join(", ");
+
+            let applyCheckboxes = '';
+
+
+            const div = document.createElement("div");
+            div.className = "field-validations d-flex justify-content-between align-items-center mb-2";
+            div.innerHTML = `
+            <div>
+              <span>@${val.type}(${propsStr})</span>
+              ${applyCheckboxes}
+            </div>
+            <div>
+              <button type="button" class="btn btn-sm btn-primary me-1" onclick="valBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="valBuilder.deleteValidationMerged('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
+            </div>`;
+            container.appendChild(div);
+        });
+        document.querySelector(this.jsonOutputSelector).value = JSON.stringify(this.validationsPerField, null, 2);
+        return this;
+    }
+
     /**
      * Deletes a validation rule at the specified index for a given field.
      *
@@ -396,6 +470,23 @@ class ValidationBuilder {
             delete this.validationsPerField[field];
         }
         this.renderValidations();
+        return this;
+    }
+
+    /**
+     * Deletes a validation rule at the specified index for a given field.
+     *
+     * @param {string} field - The field name.
+     * @param {number} index - The index of the validation to delete.
+     * @returns {ValidationBuilder} The current instance for chaining.
+     */
+    deleteValidationMerged(field, index) {
+        this.validationsPerField[field].splice(index, 1);
+        if (this.validationsPerField[field].length === 0) 
+        {
+            delete this.validationsPerField[field];
+        }
+        this.renderValidationsMerged();
         return this;
     }
 
@@ -417,6 +508,7 @@ class ValidationBuilder {
         this.updateDropDown(validation.type);
         $(this.modalSelector).modal('show');
     }
+    
 
     /**
      * Retrieves the validation data for all fields.

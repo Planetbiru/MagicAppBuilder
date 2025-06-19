@@ -413,6 +413,27 @@ function restoreFeatureForm() {
 
 let validatorBuilder = null;
 let valBuilder = null;
+function createValidator(elem)
+{
+  increaseAjaxPending();createValidator
+  $.ajax({
+    type: 'POST',
+    dataType: 'html',
+    url: 'lib.ajax/validator-create.php',
+    data: {userAction: 'create', validator: $('#genericModal [name="validatorName"]').val(), definition: $('#genericModal [name="validatorDefinition"]').val()},
+    success: function(data)
+    {
+      $('#genericModal').modal('hide');
+      $('.modal-backdrop').css('display', 'none');
+      $('body').removeClass('modal-open');
+      decreaseAjaxPending();
+    },
+    error: function()
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
 function addValidatorForm()
 {
   increaseAjaxPending();
@@ -434,9 +455,10 @@ function addValidatorForm()
         keyboard: false,
         show: true
       });
-
-      valBuilder = new ValidationBuilder('#genericModal', '.validation-modal-merged', '#genericModal .validation-output', '#genericModal .field-group');
-
+      if(!valBuilder)
+      {
+        valBuilder = new ValidationBuilder('#genericModal', '.validation-modal-merged', '#genericModal .validation-output', '#genericModal .field-group');
+      }
       decreaseAjaxPending();
     },
     error: function()
@@ -465,7 +487,6 @@ function selectTableForNewValidator(elem)
       $('#genericModal').data('bs.modal', null);
       // Tampilkan modal dengan opsi yang benar-benar baru
       $('#genericModal').modal({
-        backdrop: 'static',
         keyboard: false,
         show: true
       });
@@ -552,6 +573,14 @@ function showTestValidatorForm()
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+
+  $(document).on('hidden.bs.modal', '.validation-modal-merged', function () {
+  setTimeout(function () {
+    if ($('.modal.show').length > 0) {
+      $('body').addClass('modal-open');
+    }
+  }, 200);
+});
 
   $(document).on('click', '#button_create_validator_file', function(e){
     addValidatorForm();
@@ -6438,14 +6467,11 @@ function loadColumn(tableName, selector) {
         args = { data_type: data[i].data_type, column_type: data[i].column_type };
         domHtml = generateRow(field, args, skippedOnInsertEdit);
         let tr = $(domHtml);
-        
-
         tr.attr('data-include-detail', 'true');
         tr.attr('data-include-list', 'true');
         tr.attr('data-element-type', 'text');
         tr.attr('data-field-type', data[i].data_type);
         tr.attr('data-maximum-length', data[i].maximum_length);
-
         $(selector).append(tr);
       }
 
