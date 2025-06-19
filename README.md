@@ -390,6 +390,7 @@ composer dump-autoload --ignore-platform-reqs
 | User Management            | Yes       | Yes       |
 | Monolith Application       | Yes       | Yes       |
 | Micro-Services Application | No        | Yes       |
+| Export Project Files       | No        | Yes       |
 | Push Notification          | No        | Yes       |
 
 ## Browser Support
