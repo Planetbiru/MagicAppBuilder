@@ -1564,3 +1564,15 @@ li.menu-exists > a::after{
 .column-body li a[data-error="true"]{
 	color: red;
 }
+
+
+table.table.table-enum
+{
+	margin-bottom: 0;
+	tr > td:first-child {
+		padding: 0px 2px 0px 0;
+	}
+ 	tr > td:last-child {
+		padding: 3px 0 0px 5px;
+	}
+}
