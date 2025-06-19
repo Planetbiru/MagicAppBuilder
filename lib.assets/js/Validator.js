@@ -15,10 +15,11 @@ class ValidationBuilder {
      * @param {string} modalSelector - CSS selector for the "Add/Edit Validation" modal used to configure individual rules.
      * @param {string} jsonOutputSelector - CSS selector for the element where the current validation definition (as JSON) will be rendered.
      */
-    constructor(baseSelector, modalSelector, jsonOutputSelector) {
+    constructor(baseSelector, modalSelector, jsonOutputSelector, rowSelector) {
         this.baseSelector = baseSelector;
         this.modalSelector = modalSelector;
         this.jsonOutputSelector = jsonOutputSelector;
+        this.rowSelector = rowSelector;
         this.baseElement = document.querySelector(baseSelector);
         this.modalElement = document.querySelector(modalSelector);
         this.currentField = null;
@@ -109,20 +110,38 @@ class ValidationBuilder {
      */
     bindFieldButtons() {
         let _this = this;
-        $(document).on('click', '.main-table tbody tr .validation-button', function(e){
-            let tr = $(this).closest("tr")[0];
+        console.log(_this.baseSelector)
+        $(document).on('click', _this.rowSelector + ' .validation-button', function(e){
+            let tr = $(this).closest(".validation-item")[0];
             _this.currentField = tr.dataset.fieldName;
-            $('#field-to-validate').text(tr.dataset.fieldName);
+            $('.field-to-validate').text(tr.dataset.fieldName);
+            if(_this.applyInsertCheckbox)
+            {
+                _this.applyInsertCheckbox.disabled = true;
+            }
+            if(_this.applyUpdateCheckbox)
+            {
+                _this.applyUpdateCheckbox.disabled = true;
+            }
             _this.renderValidations();
             $(_this.baseSelector).modal('show');
         });
-        $(document).on('click', '.add-validation', function(e){
+        $(document).on('click', this.baseSelector + ' .add-validation', function(e){
             _this.currentIndex = null;
             _this.modalElement.querySelector('.validation-type').value = "";
             _this.propsContainer.innerHTML = "";
             // Reset checkboxes when opening for new validation
-            _this.applyInsertCheckbox.checked = false;
-            _this.applyUpdateCheckbox.checked = false;
+            if(_this.applyInsertCheckbox)
+            {
+                _this.applyInsertCheckbox.disabled = true;
+                _this.applyInsertCheckbox.checked = false;
+            }
+            if(_this.applyUpdateCheckbox)
+            {
+                _this.applyUpdateCheckbox.disabled = true;
+                _this.applyUpdateCheckbox.checked = false;
+            }
+
             _this.updateDropDown();
             $(_this.modalSelector).modal('show');
         });
@@ -191,8 +210,16 @@ class ValidationBuilder {
         });
 
         // Set checkbox states if validation object is provided (for editing)
-        this.applyInsertCheckbox.checked = validation.applyInsert === true;
-        this.applyUpdateCheckbox.checked = validation.applyUpdate === true;
+        if(this.applyInsertCheckbox)
+        {
+            this.applyInsertCheckbox.disabled = false;
+            this.applyInsertCheckbox.checked = validation.applyInsert === true;
+        }
+        if(this.applyUpdateCheckbox)
+        {
+            this.applyUpdateCheckbox.disabled = false;
+            this.applyUpdateCheckbox.checked = validation.applyUpdate === true;
+        }
 
         // Update max length
         this.autopopulateMinMax(selected);
@@ -272,7 +299,7 @@ class ValidationBuilder {
      * @param {boolean} closeModal - Whether or not the modal should be closed after saving (passed to getValidation).
      */
     saveAllValidation(closeModal) {
-        validation = this.getValidation(closeModal);
+        validation = this.getValidation(closeModal); // NOSONAR
         return this.markValidation();
     }
 
@@ -292,7 +319,7 @@ class ValidationBuilder {
     {
         const validated = Object.keys(this.validationsPerField);
 
-        const rows = document.querySelectorAll('.main-table tbody tr');
+        const rows = document.querySelectorAll(this.rowSelector);
         rows.forEach((row) => {
             const field = row.dataset.fieldName;
             row.dataset.hasValidation = validated.includes(field) ? 'true' : 'false';

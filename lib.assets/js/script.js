@@ -412,6 +412,71 @@ function restoreFeatureForm() {
 }
 
 let validatorBuilder = null;
+let valBuilder = null;
+function addValidatorForm()
+{
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST',
+    dataType: 'html',
+    url: 'lib.ajax/validator-create-form.php',
+    data: {userAction: 'select-table'},
+    success: function(data)
+    {
+      $('#genericModal .modal-header .modal-title').text('Create New Validator');
+      $('#genericModal .modal-body').empty().append(data);
+      $('#genericModal .generic-modal-ok').text('Create Form');
+      $('#genericModal .generic-modal-ok').attr('onclick', "selectTableForNewValidator(this)");
+      
+      $('#genericModal').data('bs.modal', null);
+      $('#genericModal').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: true
+      });
+
+      valBuilder = new ValidationBuilder('#genericModal', '.validation-modal-merged', '#genericModal .validation-output', '#genericModal .field-group');
+
+      decreaseAjaxPending();
+    },
+    error: function()
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
+
+function selectTableForNewValidator(elem)
+{
+  let tableName = elem.form.querySelector('[name="tableName"]').value;
+  let validatorName = elem.form.querySelector('[name="validatorName"]').value;
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST',
+    dataType: 'html',
+    url: 'lib.ajax/validator-create-form.php',
+    data: {userAction: 'create-form', tableName: tableName, validatorName:validatorName},
+    success: function(data)
+    {
+      $('#genericModal .modal-header .modal-title').text('Create New Validator');
+      $('#genericModal .modal-body').empty().append(data);
+      $('#genericModal .generic-modal-ok').text('Create');
+      $('#genericModal .generic-modal-ok').attr('onclick', "createValidator(this)");
+      $('#genericModal').data('bs.modal', null);
+      // Tampilkan modal dengan opsi yang benar-benar baru
+      $('#genericModal').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: true
+      });
+      decreaseAjaxPending();
+    },
+    error: function()
+    {
+      decreaseAjaxPending();
+    }
+  });
+}
 
 /**
  * Submits the form data to the validator test endpoint via AJAX.
@@ -431,11 +496,13 @@ function testValidator(elem) {
     success: function(data) {
       // Ensure `data` is a JSON object, not an HTML string.
       // If the server returns HTML, you might need to change dataType or how it's handled here.
-      if (data && data.success) {
+      if (data && data.success) // NOSONAR
+      {
         $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-success">' + data.message + '</div>');
       } else {
         let errorMessage = 'An error occurred. ';
-        if (data && data.message) {
+        if (data && data.message) // NOSONAR
+        {
           errorMessage = data.message;
         }
         $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-danger">' + errorMessage + '</div>');
@@ -469,6 +536,7 @@ function showTestValidatorForm()
     {
       $('#genericModal .modal-header .modal-title').text(currentValidator+' Test');
       $('#genericModal .modal-body').empty().append(data);
+      $('#genericModal .generic-modal-ok').text('Test Validator');
       $('#genericModal .generic-modal-ok').attr('onclick', "testValidator(this)");
       $('#genericModal').modal('show');
       decreaseAjaxPending();
@@ -485,6 +553,9 @@ function showTestValidatorForm()
  */
 let initAll = function () {
 
+  $(document).on('click', '#button_create_validator_file', function(e){
+    addValidatorForm();
+  });
   $(document).on('click', '#button_test_validator', function(e){
     showTestValidatorForm();
   });
@@ -600,7 +671,7 @@ let initAll = function () {
     })
   });
   
-  validatorBuilder = new ValidationBuilder('.field-validation-modal', '.validation-modal', '.json-output');
+  validatorBuilder = new ValidationBuilder('.field-validation-modal', '.validation-modal', '.json-output', '.main-table tbody tr');
   $(document).on('click', '#button-load-module-features', function (e) {
     e.preventDefault();
     restoreFeatureForm();
@@ -7079,6 +7150,7 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
   let classes = [];
   let cls = "";
   classes.push("row-column");
+  classes.push("validation-item")
   if (isKW) {
     classes.push("reserved");
   }
