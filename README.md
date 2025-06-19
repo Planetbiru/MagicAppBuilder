@@ -56,6 +56,8 @@ Imagine you're tasked with building a large-scale application composed of **hund
 
 -   Role-based access and permission handling for **multi-level users**
     
+-   Data can be filtered by **branch or client**, ensuring data cannot be read or modified by unauthorized users.
+    
 
 ### ✅ Enable/Disable Records
 
