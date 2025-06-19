@@ -415,18 +415,24 @@ let validatorBuilder = null;
 let valBuilder = null;
 function createValidator(elem)
 {
-  increaseAjaxPending();createValidator
+  increaseAjaxPending();
   $.ajax({
     type: 'POST',
     dataType: 'html',
     url: 'lib.ajax/validator-create.php',
-    data: {userAction: 'create', validator: $('#genericModal [name="validatorName"]').val(), definition: $('#genericModal [name="validatorDefinition"]').val()},
+    data: {
+      userAction: 'create', 
+      tableName: $('#genericModal [name="tableName"]').val(),
+      validator: $('#genericModal [name="validatorName"]').val(), 
+      definition: $('#genericModal [name="validatorDefinition"]').val()
+    },
     success: function(data)
     {
+      decreaseAjaxPending();
       $('#genericModal').modal('hide');
       $('.modal-backdrop').css('display', 'none');
       $('body').removeClass('modal-open');
-      decreaseAjaxPending();
+      updateValidatorFile();
     },
     error: function()
     {
@@ -480,6 +486,8 @@ function selectTableForNewValidator(elem)
     data: {userAction: 'create-form', tableName: tableName, validatorName:validatorName},
     success: function(data)
     {
+
+      valBuilder.setValidation({});
       $('#genericModal .modal-header .modal-title').text('Create New Validator');
       $('#genericModal .modal-body').empty().append(data);
       $('#genericModal .generic-modal-ok').text('Create');

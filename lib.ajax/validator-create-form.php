@@ -101,7 +101,8 @@ foreach($fields as $field)
 ?>
 <hr>
 <span class="form-label">Definition</span>
-<textarea class="form-control validation-output validatorDefinition" rows="5" readonly></textarea>
+<input type="hidden" name="tableName" value="<?php echo htmlspecialchars($tableName);?>">
 <input type="hidden" name="validatorName" value="<?php echo htmlspecialchars($validatorName);?>">
+<textarea class="form-control validation-output" name="validatorDefinition" rows="5" readonly></textarea>
 <?php
 }
