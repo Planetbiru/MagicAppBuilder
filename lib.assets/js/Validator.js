@@ -6,8 +6,8 @@ class EnumEditor {
         this.outputContainer.value = '';
 
         const addButton = document.createElement('button');
-        addButton.className = 'btn btn-primary btn-sm mt-2';
-        addButton.textContent = '+ Add Item';
+        addButton.className = 'btn btn-primary mt-2';
+        addButton.innerHTML = '<i class="fa fa-plus"></i> Add Item';
         addButton.type = 'button';
         addButton.onclick = () => this.addItem();
 
@@ -23,6 +23,13 @@ class EnumEditor {
     addItem(value = '') {
         const div = document.createElement('div');
         div.className = 'enum-item input-group';
+        let table = document.createElement('table');
+        table.className = 'table table-borderless table-enum';
+        let tbody = document.createElement('tbody');
+        let tr = document.createElement('tr');
+        let td1 = document.createElement('td');
+        let td2 = document.createElement('td');
+        td2.setAttribute('width', '30');
 
         const input = document.createElement('input');
         input.type = 'text';
@@ -31,16 +38,26 @@ class EnumEditor {
         input.oninput = () => this.updateOutput();
 
         const btn = document.createElement('button');
-        btn.className = 'btn btn-outline-danger';
+        btn.className = 'btn btn-danger';
         btn.type = 'button';
-        btn.innerHTML = '&times;';
+        btn.innerHTML = '<i class="fa fa-trash"></i>';
         btn.onclick = () => {
             this.itemsContainer.removeChild(div);
             this.updateOutput();
         };
 
-        div.appendChild(input);
-        div.appendChild(btn);
+        td1.appendChild(input);
+        td2.appendChild(btn);
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+
+        tbody.appendChild(tr);
+
+        table.appendChild(tbody);
+
+        div.appendChild(table);
+
         this.itemsContainer.appendChild(div);
 
         this.updateOutput();
@@ -74,7 +91,6 @@ class EnumEditor {
      * @param {string[]} items
      */
     setItems(items = []) {
-        console.log(items)
         this.itemsContainer.innerHTML = '';
         if(typeof items == 'string')
         {
@@ -87,6 +103,12 @@ class EnumEditor {
         }
     }
 
+    /**
+     * Parses a string representation of an enum (e.g., '{"A","B","C"}') into an array of strings.
+     *
+     * @param {string} str - The enum string to parse, typically in the format '{"A","B","C"}'.
+     * @returns {string[]} An array of enum values as strings. Returns an empty array if input is empty or '{}'.
+     */
     parseEnumString(str) {
         if (!str || str.trim() === '{}') 
         {
@@ -249,8 +271,10 @@ class ValidationBuilder {
             $(_this.modalSelector).modal('show');
         });
         $(document).on('click', this.baseSelector + ' .add-validation-merged', function(e){
-            _this.currentField = $(this)[0].closest('.validation-item').dataset.fieldName;
+            let tr = $(this)[0].closest('.validation-item');
+            _this.currentField = tr.dataset.fieldName;
             _this.currentIndex = null;
+            _this.currentMaximumLength = tr.dataset.maximumLength;
             _this.modalElement.querySelector('.validation-type').value = "";
             _this.propsContainer.innerHTML = "";
 
@@ -305,6 +329,13 @@ class ValidationBuilder {
         return this;
     }
 
+    /**
+     * Checks if the given property is 'allowedValues' when the selected type is 'Enum'.
+     *
+     * @param {string} selected - The selected type to check.
+     * @param {string} prop - The property name to verify.
+     * @returns {boolean} Returns true if selected is 'Enum' and prop is 'allowedValues', otherwise false.
+     */
     isEnum(selected, prop)
     {
         return selected == 'Enum' && prop == 'allowedValues';
@@ -339,7 +370,11 @@ class ValidationBuilder {
             if(en)
             {
                 _this.enumEditor = new EnumEditor(div.querySelector('.enum-editor'));
-                _this.enumEditor.setItems(validation[prop]);
+                let val = validation[prop];
+                if(typeof val != 'undefined' && val)
+                {
+                    _this.enumEditor.setItems(val);
+                }
             }
         });
 
@@ -423,6 +458,17 @@ class ValidationBuilder {
         return this;
     }
 
+    /**
+     * Saves the current validation settings to the selected field.
+     *
+     * This method collects the selected validation type and its properties from the modal,
+     * constructs a validation object, and stores it in the `validationsPerField` mapping
+     * for the currently selected field. If editing an existing validation, it updates the
+     * corresponding entry; otherwise, it appends a new validation. After saving, it re-renders
+     * the merged validations and hides the modal dialog.
+     *
+     * @returns {this} Returns the current instance for chaining.
+     */
     saveValidationToSelectedField()
     {
         const type = this.modalElement.querySelector('.validation-type').value;
@@ -447,13 +493,21 @@ class ValidationBuilder {
         } else {
             this.validationsPerField[this.currentField].push(validation);
         }
-        const container = this.baseElement.querySelector(".field-validations-list");
-        let data = this.validationsPerField[this.currentField] || [];
         this.renderValidationsMerged()
         $(this.modalSelector).modal('hide');
         return this;
     }
 
+    /**
+     * @function renderValidationsMerged
+     * @description
+     * Iterates over all elements with the class "validation-item" within the base element,
+     * retrieves their associated field names, and renders the merged validations for each field
+     * by calling `renderFieldValidationsMerged` with the appropriate parameters.
+     *
+     * @memberof Validator
+     * @returns {void}
+     */
     renderValidationsMerged() {
         let _this = this;
         const container = this.baseElement.querySelectorAll(".validation-item");
@@ -529,7 +583,12 @@ class ValidationBuilder {
         (data || []).forEach((val, idx) => {
             const propsStr = Object.entries(val)
                 .filter(([k]) => k !== "type" && k !== "applyInsert" && k !== "applyUpdate") // Exclude these keys
-                .map(([k, v]) => `${k}="${v}"`).join(", ");
+                .map(([k, v]) => {
+                    if (k === "allowedValues" && typeof v === 'string' && v.startsWith("{") && v.endsWith("}")) {
+                        return `${k}=${v}`; // Don't quote if it's a JSON string
+                    }
+                    return `${k}="${v}"`; // Otherwise, quote the value
+                }).join(", ");
 
             let applyCheckboxes = '';
             applyCheckboxes += `<div class="validation-targets">`;
@@ -560,27 +619,44 @@ class ValidationBuilder {
         return this;
     }
 
+    /**
+     * Renders the merged field validations into the specified container element.
+     *
+     * This method clears the container and iterates over the provided validation data,
+     * generating a visual representation for each validation rule. Each rule is displayed
+     * with its type and properties, along with edit and delete buttons for user interaction.
+     * The method also updates the JSON output field with the current state of validations.
+     *
+     * @param {HTMLElement} container - The DOM element where the validations will be rendered.
+     * @param {string} field - The name of the field for which validations are being rendered.
+     * @param {Array<Object>} data - An array of validation rule objects to render.
+     * @returns {this} Returns the current instance for chaining.
+     */
     renderFieldValidationsMerged(container, field, data) {
         container.innerHTML = "";
         (data || []).forEach((val, idx) => {
             const propsStr = Object.entries(val)
                 .filter(([k]) => k !== "type" && k !== "applyInsert" && k !== "applyUpdate") // Exclude these keys
-                .map(([k, v]) => `${k}="${v}"`).join(", ");
+                .map(([k, v]) => {
+                    if (k === "allowedValues" && typeof v === 'string' && v.startsWith("{") && v.endsWith("}")) {
+                        return `${k}=${v}`; // Don't quote if it's a JSON string
+                    }
+                    return `${k}="${v}"`; // Otherwise, quote the value
+                }).join(", ");
 
             let applyCheckboxes = '';
-
 
             const div = document.createElement("div");
             div.className = "field-validations d-flex justify-content-between align-items-center mb-2";
             div.innerHTML = `
-            <div style="width: calc(100% - 90px)">
-              <span>@${val.type}(${propsStr})</span>
-              ${applyCheckboxes}
-            </div>
-            <div style="width: 90px; text-align: right;">
-              <button type="button" class="btn btn-sm btn-primary me-1" onclick="valBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
-              <button type="button" class="btn btn-sm btn-danger" onclick="valBuilder.deleteValidationMerged('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
-            </div>`;
+                <div style="width: calc(100% - 90px)">
+                <span>@${val.type}(${propsStr})</span>
+                ${applyCheckboxes}
+                </div>
+                <div style="width: 90px; text-align: right;">
+                <button type="button" class="btn btn-sm btn-primary me-1" onclick="valBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="valBuilder.deleteValidationMerged('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`;
             container.appendChild(div);
         });
         document.querySelector(this.jsonOutputSelector).value = JSON.stringify(this.validationsPerField, null, 2);
