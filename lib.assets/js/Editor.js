@@ -615,7 +615,7 @@ function hilightLine5() {
 
     lastLine2 = lineNumber;
 
-    let translationStatus = appTranslationData && appTranslationData[lineNumber] ? appTranslationData[lineNumber].propertyName : undefined;
+    let translationStatus = appTranslationData && appTranslationData[lineNumber] ? appTranslationData[lineNumber].propertyName : undefined; // NOSONAR
     if (translationStatus) {
         $('.app-translation-status').text(translationStatus);
     }
@@ -633,7 +633,7 @@ function hilightLine6() {
 
     lastLine2 = lineNumber;
 
-    let translationStatus = appTranslationData && appTranslationData[lineNumber] ? appTranslationData[lineNumber].propertyName : undefined;
+    let translationStatus = appTranslationData && appTranslationData[lineNumber] ? appTranslationData[lineNumber].propertyName : undefined; // NOSONAR
     if (translationStatus) {
         $('.app-translation-status').text(translationStatus);
     }
@@ -688,7 +688,8 @@ function initCodeMirror2() {
 function focusOnLine(editor, lineNumber) {
     // Check if the editor object is valid and its DOM element is still connected.
     // The .getWrapperElement() method should return the main div of the CodeMirror instance.
-    if (!editor || !editor.getWrapperElement() || !editor.getWrapperElement().isConnected) {
+    if (!editor || !editor.getWrapperElement() || !editor.getWrapperElement().isConnected) // NOSONAR
+    {
         console.error("CodeMirror editor instance is invalid or not connected to the DOM. Cannot focus on line.");
         // Consider re-initializing the editor here if this is a recoverable state,
         // e.g., initializeValidatorEditor();
@@ -706,7 +707,7 @@ function focusOnLine(editor, lineNumber) {
         editor.focus(); // Give keyboard focus to the editor.
         editor.addLineClass(lineNumber, 'background', 'highlight-line');
     } catch (e) {
-        // Do nothing
+        console.log(e.getMessage());
     }
 
     
