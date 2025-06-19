@@ -31,6 +31,8 @@ Imagine you're tasked with building a large-scale application composed of **hund
 -   Built-in support for rules like `@Required`, `@Email`, `@Min`, etc.
     
 -   **User-friendly error handling** and form restoration when validation fails
+
+-   Some inputs support **multiple values**.
     
 
 ### 📤 Exporting Capabilities
@@ -65,6 +67,9 @@ Imagine you're tasked with building a large-scale application composed of **hund
 -   Instead of hard-deleting records, data is **moved to a dedicated trash table**, allowing for future recovery and auditing
 
 
+### ⬆️ File Uploads
+
+-   Supports uploading images, audio, video, and documents.
 
 This project must be completed within a very short time—less than 3 months.
 
@@ -362,25 +367,30 @@ composer dump-autoload --ignore-platform-reqs
 
 ## User Plan
 
-| Object                 | Community | Pro       |
-| ---------------------- | --------- | --------- |
-| Application starter    | Yes       | Yes       |
-| Module generator       | Yes       | Yes       |
-| Entity generator       | Yes       | Yes       |
-| Entity translator      | Yes       | Yes       |
-| Application translator | Yes       | Yes       |
-| Table creator          | Yes       | Yes       |
-| Table modifier         | Yes       | Yes       |
-| Number of project      | Unlimited | Unlimited |
-| Simultaneous projects  | Unlimited | Unlimited |
-| Number of table        | Unlimited | Unlimited |
-| Number of directory    | Unlimited | Unlimited |
-| Number of entity       | Unlimited | Unlimited |
-| Number of module       | Unlimited | Unlimited |
-| Number of theme        | 1         | 3         |
-| Number of user         | 10        | Unlimited |
-| User management        | No        | Yes       |
-| Push notification      | No        | Yes       |
+| Object                     | Community | Pro       |
+| -------------------------- | --------- | --------- |
+| Application Starter        | Yes       | Yes       |
+| Module Generator           | Yes       | Yes       |
+| Entity Generator           | Yes       | Yes       |
+| Entity Translator          | Yes       | Yes       |
+| Application Translator     | Yes       | Yes       |
+| Table Creator              | Yes       | Yes       |
+| Table Codifier             | Yes       | Yes       |
+| File Manager               | Yes       | Yes       |
+| Number of Projects         | Unlimited | Unlimited |
+| Simultaneous Projects      | Unlimited | Unlimited |
+| Number of Tables           | Unlimited | Unlimited |
+| Number of Directories      | Unlimited | Unlimited |
+| Number of Entities         | Unlimited | Unlimited |
+| Number of Validators       | Unlimited | Unlimited |
+| Number of Modules          | Unlimited | Unlimited |
+| Number of Users            | Unlimited | Unlimited |
+| Number of Themes           | 2         | 3         |
+| Number of Menu Levels      | 2         | Unlimited |
+| User Management            | Yes       | Yes       |
+| Monolith Application       | Yes       | Yes       |
+| Micro-Services Application | No        | Yes       |
+| Push Notification          | No        | Yes       |
 
 ## Browser Support
 
