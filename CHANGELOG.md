@@ -549,7 +549,7 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 -   Resolved issues related to entity field synchronization and missing metadata after import.
 
 
-# MagicAppBuilder Version 1.3.1
+# MagicAppBuilder Version 1.4.0
 
 ## What's New
 
