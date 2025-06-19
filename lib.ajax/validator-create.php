@@ -121,7 +121,7 @@ class MenuGroupTranslationUpdateValidator extends MagicObject
                         if ($v === '' || $v === null) {
                             $attributeParts[] = "$k=\"\"";
                         } else {
-                            if (is_string($v)) {
+                            if (is_string($v) && $validationType != 'Enum') {
                                 $attributeParts[] = "$k=\"" . addslashes($v) . "\"";
                             } else {
                                 $attributeParts[] = "$k=$v";
