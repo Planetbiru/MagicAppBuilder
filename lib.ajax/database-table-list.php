@@ -14,6 +14,8 @@ if(!$database->isConnected())
 
 try {
     $databaseType = $database->getDatabaseType();
+    $schemaName = $databaseConfig->getDatabaseSchema();
+    $databaseName = $databaseConfig->getDatabaseName();
 
     $tables = AppDatabase::getTableList($database, $databaseName, $schemaName);
 

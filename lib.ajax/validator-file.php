@@ -8,7 +8,7 @@ use MagicObject\Request\InputPost;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
-header("Content-type: text/plain");
+
 
 if($inputPost->getUserAction() == 'set')
 {
@@ -53,6 +53,7 @@ if($inputPost->getUserAction() == 'set')
 }
 else
 {
+    header("Content-type: text/plain");
     $path = ValidatorUtil::getPath($appConfig, $inputPost);
     if(file_exists($path))
     {         

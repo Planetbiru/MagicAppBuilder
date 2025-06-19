@@ -1,3 +1,104 @@
+class EnumEditor {
+    constructor(parentElement) {
+        this.parent = parentElement;
+        this.itemsContainer = document.createElement('div');
+        this.outputContainer = this.parent.closest('.modal').querySelector('[data-prop="allowedValues"]');
+        this.outputContainer.value = '';
+
+        const addButton = document.createElement('button');
+        addButton.className = 'btn btn-primary btn-sm mt-2';
+        addButton.textContent = '+ Add Item';
+        addButton.type = 'button';
+        addButton.onclick = () => this.addItem();
+
+        this.parent.appendChild(this.itemsContainer);
+        this.parent.appendChild(addButton);
+        this.addItem();
+    }
+
+    sanitize(value) {
+        return value.replace(/["']/g, ''); // remove double and single quotes
+    }
+
+    addItem(value = '') {
+        const div = document.createElement('div');
+        div.className = 'enum-item input-group';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control';
+        input.value = this.sanitize(value);
+        input.oninput = () => this.updateOutput();
+
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-danger';
+        btn.type = 'button';
+        btn.innerHTML = '&times;';
+        btn.onclick = () => {
+            this.itemsContainer.removeChild(div);
+            this.updateOutput();
+        };
+
+        div.appendChild(input);
+        div.appendChild(btn);
+        this.itemsContainer.appendChild(div);
+
+        this.updateOutput();
+    }
+
+    updateOutput() {
+        const inputs = this.itemsContainer.querySelectorAll('input');
+        const values = [];
+
+        inputs.forEach(input => {
+            const val = this.sanitize(input.value.trim());
+            if (val) {
+            values.push(`"${val}"`);
+            }
+        });
+
+        const output = values.length === 0 ? '' : `{${values.join(', ')}}`;
+        this.outputContainer.value = output;
+    }
+
+    /**
+     * Get current output value
+     * @returns {string}
+     */
+    getValue() {
+        return this.outputContainer.value;
+    }
+
+    /**
+     * Set editor items from array of strings
+     * @param {string[]} items
+     */
+    setItems(items = []) {
+        console.log(items)
+        this.itemsContainer.innerHTML = '';
+        if(typeof items == 'string')
+        {
+            let parsedItems = this.parseEnumString(items)
+            this.setItems(parsedItems);
+        }
+        else if(typeof items == 'object' && items.length > 0)
+        {
+            items.forEach(item => this.addItem(item));
+        }
+    }
+
+    parseEnumString(str) {
+        if (!str || str.trim() === '{}') 
+        {
+            return [];
+        }
+        return str
+            .replace(/^\{|\}$/g, '') // NOSONAR
+            .split(',')
+            .map(s => s.trim().replace(/^"(.*)"$/, '$1'));  
+    }
+}
+
 /**
  * ValidationBuilder is responsible for managing validation rules for form fields.
  * It provides methods to add, edit, delete, and render validations for each field,
@@ -15,14 +116,16 @@ class ValidationBuilder {
      * @param {string} modalSelector - CSS selector for the "Add/Edit Validation" modal used to configure individual rules.
      * @param {string} jsonOutputSelector - CSS selector for the element where the current validation definition (as JSON) will be rendered.
      */
-    constructor(baseSelector, modalSelector, jsonOutputSelector) {
+    constructor(baseSelector, modalSelector, jsonOutputSelector, rowSelector) {
         this.baseSelector = baseSelector;
         this.modalSelector = modalSelector;
         this.jsonOutputSelector = jsonOutputSelector;
+        this.rowSelector = rowSelector;
         this.baseElement = document.querySelector(baseSelector);
         this.modalElement = document.querySelector(modalSelector);
         this.currentField = null;
         this.currentIndex = null;
+        this.currentMaximumLength = null;
         this.validationsPerField = {};
         this.propsContainer = this.modalElement.querySelector(".validation-props");
         this.applyInsertCheckbox = this.modalElement.querySelector(".apply-insert");
@@ -30,6 +133,7 @@ class ValidationBuilder {
         this.schema = this.initSchema();
         this.bindFieldButtons();
         this.initValidationSelector();
+        this.enumEditor = null;
     }
 
     /**
@@ -109,20 +213,48 @@ class ValidationBuilder {
      */
     bindFieldButtons() {
         let _this = this;
-        $(document).on('click', '.main-table tbody tr .validation-button', function(e){
-            let tr = $(this).closest("tr")[0];
+        $(document).on('click', _this.rowSelector + ' .validation-button', function(e){
+            let tr = $(this).closest(".validation-item")[0];
             _this.currentField = tr.dataset.fieldName;
-            $('#field-to-validate').text(tr.dataset.fieldName);
+            _this.currentMaximumLength = tr.dataset.maximumLength;
+            $('.field-to-validate').text(tr.dataset.fieldName);
+            if(_this.applyInsertCheckbox)
+            {
+                _this.applyInsertCheckbox.disabled = true;
+            }
+            if(_this.applyUpdateCheckbox)
+            {
+                _this.applyUpdateCheckbox.disabled = true;
+            }
             _this.renderValidations();
             $(_this.baseSelector).modal('show');
         });
-        $(document).on('click', '.add-validation', function(e){
+        $(document).on('click', this.baseSelector + ' .add-validation', function(e){
             _this.currentIndex = null;
             _this.modalElement.querySelector('.validation-type').value = "";
             _this.propsContainer.innerHTML = "";
             // Reset checkboxes when opening for new validation
-            _this.applyInsertCheckbox.checked = false;
-            _this.applyUpdateCheckbox.checked = false;
+            if(_this.applyInsertCheckbox)
+            {
+                _this.applyInsertCheckbox.disabled = true;
+                _this.applyInsertCheckbox.checked = false;
+            }
+            if(_this.applyUpdateCheckbox)
+            {
+                _this.applyUpdateCheckbox.disabled = true;
+                _this.applyUpdateCheckbox.checked = false;
+            }
+
+            _this.updateDropDown();
+            $(_this.modalSelector).modal('show');
+        });
+        $(document).on('click', this.baseSelector + ' .add-validation-merged', function(e){
+            _this.currentField = $(this)[0].closest('.validation-item').dataset.fieldName;
+            _this.currentIndex = null;
+            _this.modalElement.querySelector('.validation-type').value = "";
+            _this.propsContainer.innerHTML = "";
+
+
             _this.updateDropDown();
             $(_this.modalSelector).modal('show');
         });
@@ -173,6 +305,11 @@ class ValidationBuilder {
         return this;
     }
 
+    isEnum(selected, prop)
+    {
+        return selected == 'Enum' && prop == 'allowedValues';
+    }
+
     /**
      * Renders input fields for a validation type's properties.
      * Optionally pre-fills values if editing an existing rule.
@@ -181,18 +318,42 @@ class ValidationBuilder {
      * @returns {ValidationBuilder} The current instance for chaining.
      */
     renderPropsInputs(validation = {}) {
+        let _this = this;
         const selected = this.modalElement.querySelector('.validation-type').value;
         this.propsContainer.innerHTML = "";
         (this.schema[selected] || []).forEach(prop => {
             const div = document.createElement("div");
             div.className = "mb-2";
-            div.innerHTML = `<label class="form-label">${prop}</label><input type="text" class="form-control" data-prop="${prop}" placeholder="${prop}" value="${validation[prop] || ''}">`;
+            let en = _this.isEnum(selected, prop);
+            if(en)
+            {
+                div.innerHTML = `<label class="form-label">${prop}</label><div class="enum-editor"></div><input type="text" class="form-control" data-prop="${prop}" placeholder="${prop}" value="${validation[prop] || ''}" readonly>`;
+            }
+            else
+            {
+                div.innerHTML = `<label class="form-label">${prop}</label><input type="text" class="form-control" data-prop="${prop}" placeholder="${prop}" value="${validation[prop] || ''}">`;
+            }
+            
             this.propsContainer.appendChild(div);
+
+            if(en)
+            {
+                _this.enumEditor = new EnumEditor(div.querySelector('.enum-editor'));
+                _this.enumEditor.setItems(validation[prop]);
+            }
         });
 
         // Set checkbox states if validation object is provided (for editing)
-        this.applyInsertCheckbox.checked = validation.applyInsert === true;
-        this.applyUpdateCheckbox.checked = validation.applyUpdate === true;
+        if(this.applyInsertCheckbox)
+        {
+            this.applyInsertCheckbox.disabled = false;
+            this.applyInsertCheckbox.checked = validation.applyInsert === true;
+        }
+        if(this.applyUpdateCheckbox)
+        {
+            this.applyUpdateCheckbox.disabled = false;
+            this.applyUpdateCheckbox.checked = validation.applyUpdate === true;
+        }
 
         // Update max length
         this.autopopulateMinMax(selected);
@@ -210,14 +371,11 @@ class ValidationBuilder {
         let _this = this;
         if(selected == 'Size' || selected == 'Length')
         {
-            currentTableStructure.fields.forEach((field) => {
-                if(field.column_name == _this.currentField && field.maximum_length)
-                {
-                    this.propsContainer.querySelector('input[data-prop="min"').value = 0;
-                    this.propsContainer.querySelector('input[data-prop="max"').value = field.maximum_length;
-                }
-            })
-            
+            if(_this.currentMaximumLength)
+            {
+                this.propsContainer.querySelector('input[data-prop="min"').value = 0;
+                this.propsContainer.querySelector('input[data-prop="max"').value = _this.currentMaximumLength;
+            }     
         }
     }
 
@@ -233,7 +391,11 @@ class ValidationBuilder {
 
         const props = {};
         this.propsContainer.querySelectorAll("input").forEach(input => {
-            props[input.dataset.prop] = input.value;
+            let prop = input.dataset.prop;
+            if(typeof prop != 'undefined' && prop)
+            {
+                props[prop] = input.value;
+            }
         });
 
         const validation = {
@@ -261,6 +423,48 @@ class ValidationBuilder {
         return this;
     }
 
+    saveValidationToSelectedField()
+    {
+        const type = this.modalElement.querySelector('.validation-type').value;
+        if (!type || !this.currentField) return;
+        const props = {};
+        this.propsContainer.querySelectorAll("input").forEach(input => {
+            let prop = input.dataset.prop;
+            if(typeof prop != 'undefined' && prop)
+            {
+                props[prop] = input.value;
+            }
+        });
+        const validation = {
+            type,
+            ...props
+        };
+        if (!this.validationsPerField[this.currentField]) {
+            this.validationsPerField[this.currentField] = [];
+        }
+        if (this.currentIndex !== null) {
+            this.validationsPerField[this.currentField][this.currentIndex] = validation;
+        } else {
+            this.validationsPerField[this.currentField].push(validation);
+        }
+        const container = this.baseElement.querySelector(".field-validations-list");
+        let data = this.validationsPerField[this.currentField] || [];
+        this.renderValidationsMerged()
+        $(this.modalSelector).modal('hide');
+        return this;
+    }
+
+    renderValidationsMerged() {
+        let _this = this;
+        const container = this.baseElement.querySelectorAll(".validation-item");
+        container.forEach((field) => {
+            let fieldName = field.dataset.fieldName;
+            let data = this.validationsPerField[fieldName] || [];
+            _this.renderFieldValidationsMerged(field.querySelector('.field-validations-list'), fieldName, data);
+        })
+        
+    }
+
     /**
      * Saves validation status for all fields in the table.
      * 
@@ -272,7 +476,7 @@ class ValidationBuilder {
      * @param {boolean} closeModal - Whether or not the modal should be closed after saving (passed to getValidation).
      */
     saveAllValidation(closeModal) {
-        validation = this.getValidation(closeModal);
+        validation = this.getValidation(closeModal); // NOSONAR
         return this.markValidation();
     }
 
@@ -292,7 +496,7 @@ class ValidationBuilder {
     {
         const validated = Object.keys(this.validationsPerField);
 
-        const rows = document.querySelectorAll('.main-table tbody tr');
+        const rows = document.querySelectorAll(this.rowSelector);
         rows.forEach((row) => {
             const field = row.dataset.fieldName;
             row.dataset.hasValidation = validated.includes(field) ? 'true' : 'false';
@@ -342,17 +546,44 @@ class ValidationBuilder {
             const div = document.createElement("div");
             div.className = "field-validations d-flex justify-content-between align-items-center mb-2";
             div.innerHTML = `
-            <div>
+            <div style="width: calc(100% - 90px)">
               <span>@${val.type}(${propsStr})</span>
               ${applyCheckboxes}
             </div>
-            <div>
+            <div style="width: 90px; text-align: right;">
               <button type="button" class="btn btn-sm btn-primary me-1" onclick="validatorBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
               <button type="button" class="btn btn-sm btn-danger" onclick="validatorBuilder.deleteValidation('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
             </div>`;
             container.appendChild(div);
         });
         document.querySelector(this.jsonOutputSelector).textContent = JSON.stringify(this.validationsPerField, null, 2);
+        return this;
+    }
+
+    renderFieldValidationsMerged(container, field, data) {
+        container.innerHTML = "";
+        (data || []).forEach((val, idx) => {
+            const propsStr = Object.entries(val)
+                .filter(([k]) => k !== "type" && k !== "applyInsert" && k !== "applyUpdate") // Exclude these keys
+                .map(([k, v]) => `${k}="${v}"`).join(", ");
+
+            let applyCheckboxes = '';
+
+
+            const div = document.createElement("div");
+            div.className = "field-validations d-flex justify-content-between align-items-center mb-2";
+            div.innerHTML = `
+            <div style="width: calc(100% - 90px)">
+              <span>@${val.type}(${propsStr})</span>
+              ${applyCheckboxes}
+            </div>
+            <div style="width: 90px; text-align: right;">
+              <button type="button" class="btn btn-sm btn-primary me-1" onclick="valBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="valBuilder.deleteValidationMerged('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
+            </div>`;
+            container.appendChild(div);
+        });
+        document.querySelector(this.jsonOutputSelector).value = JSON.stringify(this.validationsPerField, null, 2);
         return this;
     }
 
@@ -374,21 +605,41 @@ class ValidationBuilder {
     }
 
     /**
+     * Deletes a validation rule at the specified index for a given field.
+     *
+     * @param {string} field - The field name.
+     * @param {number} index - The index of the validation to delete.
+     * @returns {ValidationBuilder} The current instance for chaining.
+     */
+    deleteValidationMerged(field, index) {
+        this.validationsPerField[field].splice(index, 1);
+        if (this.validationsPerField[field].length === 0) 
+        {
+            delete this.validationsPerField[field];
+        }
+        this.renderValidationsMerged();
+        return this;
+    }
+
+    /**
      * Opens the modal to edit an existing validation rule for a given field and index.
      *
      * @param {string} field - The field name.
      * @param {number} index - The index of the validation to edit.
+     * @param {string} maximumLength - Maximum lenght of the current field.
      * @returns {ValidationBuilder} The current instance for chaining.
      */
-    editValidation(field, index) {
+    editValidation(field, index, maximumLength) {
         this.currentField = field;
         this.currentIndex = index;
+        this.currentMaximumLength = maximumLength;
         const validation = this.validationsPerField[field][index];
         this.modalElement.querySelector('.validation-type').value = validation.type;
         this.renderPropsInputs(validation); // Pass the validation object to pre-fill props and checkboxes
         this.updateDropDown(validation.type);
         $(this.modalSelector).modal('show');
     }
+    
 
     /**
      * Retrieves the validation data for all fields.
