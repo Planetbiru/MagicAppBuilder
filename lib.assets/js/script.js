@@ -6444,6 +6444,7 @@ function loadColumn(tableName, selector) {
         tr.attr('data-include-list', 'true');
         tr.attr('data-element-type', 'text');
         tr.attr('data-field-type', data[i].data_type);
+        tr.attr('data-maximum-length', data[i].maximum_length);
 
         $(selector).append(tr);
       }

@@ -24,6 +24,7 @@ class ValidationBuilder {
         this.modalElement = document.querySelector(modalSelector);
         this.currentField = null;
         this.currentIndex = null;
+        this.currentMaximumLength = null;
         this.validationsPerField = {};
         this.propsContainer = this.modalElement.querySelector(".validation-props");
         this.applyInsertCheckbox = this.modalElement.querySelector(".apply-insert");
@@ -114,6 +115,7 @@ class ValidationBuilder {
         $(document).on('click', _this.rowSelector + ' .validation-button', function(e){
             let tr = $(this).closest(".validation-item")[0];
             _this.currentField = tr.dataset.fieldName;
+            _this.currentMaximumLength = tr.dataset.maximumLength;
             $('.field-to-validate').text(tr.dataset.fieldName);
             if(_this.applyInsertCheckbox)
             {
@@ -237,14 +239,11 @@ class ValidationBuilder {
         let _this = this;
         if(selected == 'Size' || selected == 'Length')
         {
-            currentTableStructure.fields.forEach((field) => {
-                if(field.column_name == _this.currentField && field.maximum_length)
-                {
-                    this.propsContainer.querySelector('input[data-prop="min"').value = 0;
-                    this.propsContainer.querySelector('input[data-prop="max"').value = field.maximum_length;
-                }
-            })
-            
+            if(_this.currentMaximumLength)
+            {
+                this.propsContainer.querySelector('input[data-prop="min"').value = 0;
+                this.propsContainer.querySelector('input[data-prop="max"').value = _this.currentMaximumLength;
+            }     
         }
     }
 
@@ -405,11 +404,13 @@ class ValidationBuilder {
      *
      * @param {string} field - The field name.
      * @param {number} index - The index of the validation to edit.
+     * @param {string} maximumLength - Maximum lenght of the current field.
      * @returns {ValidationBuilder} The current instance for chaining.
      */
-    editValidation(field, index) {
+    editValidation(field, index, maximumLength) {
         this.currentField = field;
         this.currentIndex = index;
+        this.currentMaximumLength = maximumLength;
         const validation = this.validationsPerField[field][index];
         this.modalElement.querySelector('.validation-type').value = validation.type;
         this.renderPropsInputs(validation); // Pass the validation object to pre-fill props and checkboxes
