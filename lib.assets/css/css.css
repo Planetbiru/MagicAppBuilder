@@ -1348,6 +1348,16 @@ li.menu-exists > a::after {
   color: red;
 }
 
+table.table.table-enum {
+  margin-bottom: 0;
+}
+table.table.table-enum tr > td:first-child {
+  padding: 0px 2px 0px 0;
+}
+table.table.table-enum tr > td:last-child {
+  padding: 3px 0 0px 5px;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;
