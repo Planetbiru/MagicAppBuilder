@@ -1,8 +1,3 @@
-
-Tentu, ini perbandingan MagicAppBuilder dengan _platform_ sejenis, diterjemahkan ke dalam Bahasa Indonesia:
-
-----------
-
 # Perbandingan MagicAppBuilder dengan Platform Low-Code Sejenis
 
 _Platform low-code_ dirancang untuk mempercepat pengembangan aplikasi dengan meminimalkan kode manual, memanfaatkan antarmuka visual, fungsionalitas _drag-and-drop_, dan komponen pra-bangun. MagicAppBuilder sangat cocok dalam kategori ini, dengan fokus kuat pada pengembangan cepat aplikasi tingkat perusahaan yang kaya modul.
