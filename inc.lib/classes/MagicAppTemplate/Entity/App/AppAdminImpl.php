@@ -208,7 +208,7 @@ class AppAdminImpl extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
 	 * @DefaultColumn(value="true")
 	 * @Label(content="Active")
 	 * @var bool
