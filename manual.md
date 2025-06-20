@@ -454,7 +454,7 @@ By default, MagicAppBuilder uses **SQLite** as its database. However, you can sw
        host: ''
        port: 3306
        username: root
-       password: Cebong2017
+       password: GajahDuduk
        databaseName: sipro
        databaseSchema: public
        timeZone: Asia/Jakarta
