@@ -49,6 +49,13 @@ class PicoDatabaseConverter // NOSONAR
      * @var array
      */
     private $dbToPostgreSQL;
+    
+    /**
+     * Array mapping of database field types to SQLServer data types.
+     *
+     * @var array
+     */
+    private $dbToSQLServer;
 
     /**
      * Array mapping of SQL data types to PHP types.
@@ -147,11 +154,11 @@ class PicoDatabaseConverter // NOSONAR
             "tinyint(1)" => "TINYINT(1)", // NOSONAR
             "tinyint" => "TINYINT",
             "integer" => "BIGINT",
+            "int" => "INT",
             
             "bigserial" => "BIGINT",
             "serial" => "INT",
 
-            "int" => "INT",
             "float" => "FLOAT",
             "real" => "DOUBLE",
             "double precision" => "DOUBLE",
@@ -191,6 +198,73 @@ class PicoDatabaseConverter // NOSONAR
             "enum" => "ENUM",
             "set" => "SET"
         ];
+        
+        $this->dbToSQLServer = [
+            // Integer types
+            "bigint" => "BIGINT",
+            "mediumint" => "INT",              // Tidak ada MEDIUMINT di SQL Server
+            "smallint" => "SMALLINT",
+            "tinyint(1)" => "BIT",             // tinyint(1) biasa digunakan sebagai boolean
+            "tinyint" => "TINYINT",
+            "integer" => "INT",
+            "int" => "INT",
+
+            // Serial types (PostgreSQL)
+            "bigserial" => "BIGINT IDENTITY(1,1)",
+            "serial" => "INT IDENTITY(1,1)",
+
+            // Floating-point types
+            "float" => "FLOAT",
+            "real" => "REAL",
+            "double precision" => "FLOAT",
+            "double" => "FLOAT",
+            "decimal" => "DECIMAL(18,2)",      // Presisi default, bisa disesuaikan
+            "numeric" => "NUMERIC(18,2)",
+            "money" => "MONEY",
+
+            // Boolean / bit
+            "bit" => "BIT",
+            "boolean" => "BIT",
+
+            // Character types
+            "char" => "NCHAR",
+            "varchar" => "NVARCHAR",           // Harus disesuaikan panjangnya saat digunakan
+            "nvarchar" => "NVARCHAR",
+            "character varying" => "NVARCHAR",
+
+            // Text types
+            "tinytext" => "NVARCHAR(255)",     // Approximation
+            "text" => "NVARCHAR(MAX)",
+            "mediumtext" => "NVARCHAR(MAX)",
+            "longtext" => "NVARCHAR(MAX)",
+
+            // JSON and XML
+            "json" => "NVARCHAR(MAX)",
+            "jsonb" => "NVARCHAR(MAX)",        // PostgreSQL specific, treated the same
+            "xml" => "XML",
+
+            // Binary types
+            "binary" => "BINARY",
+            "varbinary" => "VARBINARY(MAX)",
+            "blob" => "VARBINARY(MAX)",        // No BLOB in SQL Server, use VARBINARY(MAX)
+
+            // UUID
+            "uuid" => "UNIQUEIDENTIFIER",
+
+            // Date and time
+            "timestamp with time zone" => "DATETIMEOFFSET", // SQL Server equivalent
+            "timestamp without time zone" => "DATETIME2",
+            "timestamptz" => "DATETIMEOFFSET",
+            "datetime" => "DATETIME",
+            "date" => "DATE",
+            "time" => "TIME",
+            "year" => "SMALLINT", // No 'YEAR' type in SQL Server
+
+            // Unsupported types
+            "enum" => "NVARCHAR(255)",         // SQL Server does not support ENUM natively
+            "set" => "NVARCHAR(255)",          // Likewise, SET not supported
+        ];
+
 
         $this->dbToPostgreSQL = [
             "bigint" => "BIGINT",
@@ -389,7 +463,7 @@ class PicoDatabaseConverter // NOSONAR
      *
      * @param mixed  $value   The raw input value (e.g., string, int, stream resource).
      * @param string $sqlType The SQL type name (e.g., 'int', 'boolean', 'json', etc.).
-     * @param string $dialect The database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @param string $dialect The database dialect (e.g., 'mysql', 'postgresql', 'sqlite', 'sqlserver').
      *
      * @return mixed The value converted to the appropriate PHP type or quoted string.
      */
@@ -415,22 +489,22 @@ class PicoDatabaseConverter // NOSONAR
             case 'bigserial':
             case 'year':
             case 'bit':
-                return (int) $value;
+                    return (int) $value;
 
             case 'tinyint':
             case 'tinyint(1)':
             case 'boolean':
             case 'bool':
-                // Convert to boolean; fall back to null if unrecognized
-                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                if (!isset($value)) {
-                    return null;
-                }
-                // For SQLite, return as integer 0/1
-                if (stripos($dialect, 'sqlite') !== false) {
-                    return $value === true ? 1 : 0;
-                }
-                return $value ? "TRUE" : "FALSE";
+                    // Convert to boolean; fall back to null if unrecognized
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    if (!isset($value)) {
+                        return null;
+                    }
+                    // For SQLite, return as integer 0/1
+                    if (stripos($dialect, 'sqlite') !== false) {
+                        return $value === true ? 1 : 0;
+                    }
+                    return $value ? "TRUE" : "FALSE";
 
             case 'float':
             case 'real':
@@ -439,20 +513,20 @@ class PicoDatabaseConverter // NOSONAR
             case 'decimal':
             case 'numeric':
             case 'money':
-                return (float) $value;
+                    return (float) $value;
 
             case 'json':
             case 'jsonb':
-                // Decode JSON into an associative array
-                return $this->quoteString(json_decode($value, true));
+                    // Decode JSON into an associative array
+                    return $this->quoteString(json_decode($value, true));
 
             case 'blob':
             case 'binary':
             case 'varbinary':
             case 'bytea':
-                // If the value is a resource (e.g., stream), read it; otherwise cast to string
-                $result = is_resource($value) ? stream_get_contents($value) : (string) $value;
-                return $this->quoteString($result);
+                    // If the value is a resource (e.g., stream), read it; otherwise cast to string
+                    $result = is_resource($value) ? stream_get_contents($value) : (string) $value;
+                    return $this->quoteString($result);
 
             case 'date':
             case 'time':
@@ -461,14 +535,25 @@ class PicoDatabaseConverter // NOSONAR
             case 'timestamp with time zone':
             case 'timestamp without time zone':
             case 'timestamptz':
-                // Optionally return as DateTime object instead of string
-                $result = (string) $value;
-                return $this->quoteString($result);
+                    // Optionally return as DateTime object instead of string
+                    $result = (string) $value;
+                    return $this->quoteString($result);
+
+            // --- SQL Server specific types ---
+            case 'nvarchar':
+            case 'nchar':
+            case 'varchar':
+            case 'char':
+            case 'text':
+            case 'ntext':
+            case 'uniqueidentifier':
+            case 'xml':
+                    return $this->quoteString((string) $value);
 
             default:
-                // Fallback: treat as string
-                $result = (string) $value; // NOSONAR
-                return $this->quoteString($result); // quote and escape the string
+                    // Fallback: treat as string
+                    $result = (string) $value; // NOSONAR
+                    return $this->quoteString($result); // quote and escape the string
         }
     }
 
@@ -567,6 +652,10 @@ class PicoDatabaseConverter // NOSONAR
             }
             case 'sqlite': {
                 $targetMap = $this->dbToSqlite;
+                break;
+            }
+            case 'sqlserver': {
+                $targetMap = $this->dbToSQLServer;
                 break;
             }
             default: {
@@ -837,6 +926,410 @@ class PicoDatabaseConverter // NOSONAR
 
         return trim($finalSql) . ';';
     }
+    
+    /**
+     * Translates a CREATE TABLE statement from MySQL to SQL Server.
+     *
+     * @param string $sql The MySQL CREATE TABLE statement.
+     * @return string The translated SQL Server CREATE TABLE statement.
+     * @throws DatabaseConversionException If the SQL format is invalid.
+     */
+    public function mysqlToSQLServer($sql) // NOSONAR
+    {
+        $sql = trim($sql);
+
+        // This regex needs to properly capture the table name and the main body.
+        // The previous one might miss IF NOT EXISTS correctly for SQL Server later.
+        // For SQL Server, IF NOT EXISTS is not standard in CREATE TABLE.
+        if (!preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([^\s`(]+)`?(\s*COLLATE\s+[^\s]+)?\s*\(/i', $sql, $matches, PREG_OFFSET_CAPTURE)) {
+            throw new DatabaseConversionException("Invalid MySQL CREATE TABLE statement format.");
+        }
+
+        // SQL Server typically doesn't use IF NOT EXISTS directly in CREATE TABLE.
+        // You might want to handle this with a separate check (e.g., `IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'YourTable') CREATE TABLE...`)
+        // For this function's scope, we'll just ignore or remove it from the final output.
+        $ifNotExists = isset($matches[1][0]) ? $matches[1][0] : ''; // Capture it, but we'll remove it later
+        $tableName = $this->quoteIdentifier($matches[2][0], 'sqlserver');
+        $startPos = $matches[0][1] + strlen($matches[0][0]) - 1;
+
+        $depth = 1;
+        $i = $startPos + 1;
+        $len = strlen($sql);
+        while ($i < $len && $depth > 0) {
+            if ($sql[$i] === '(') {
+                $depth++;
+            } elseif ($sql[$i] === ')') {
+                $depth--;
+            }
+            $i++;
+        }
+
+        if ($depth !== 0) {
+            throw new DatabaseConversionException("Unbalanced parentheses in CREATE TABLE statement.");
+        }
+
+        $columnsSection = substr($sql, $startPos + 1, $i - $startPos - 2);
+
+        // Split lines by comma, but only if the comma is NOT inside parentheses.
+        // This is crucial for handling ENUM/SET definitions.
+        $lines = preg_split('/,(?![^\(\)]*\))/', $columnsSection);
+        $newLines = [];
+        $tableConstraints = [];
+        $columnComments = []; // To store comments for SQL Server's COMMENT ON syntax
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+
+            // 1. Capture and temporarily remove COMMENT from the end of the line
+            // For SQL Server, comments are typically added via COMMENT ON COLUMN after CREATE TABLE.
+            // If you absolutely need them inline as a string, we can put them back.
+            $comment = '';
+            if (preg_match("/COMMENT\s*'(.*?)'$/i", $line, $commentMatches)) {
+                $comment = " COMMENT '" . $commentMatches[1] . "'"; // Store as string if you want inline
+                $line = preg_replace("/COMMENT\s*'.*?'$/i", '', $line); // Remove comment for parsing
+            }
+            
+            // Remove other MySQL-specific attributes
+            $line = preg_replace('/\s+CHARACTER\s+SET\s+[a-zA-Z0-9_]+/i', '', $line);
+            $line = preg_replace('/\s+COLLATE\s+[a-zA-Z0-9_]+/i', '', $line);
+            $line = preg_replace('/\s+UNSIGNED/i', '', $line);
+            $line = preg_replace('/\s+ZEROFILL/i', '', $line);
+
+
+            // Column definition parsing
+            // This regex needs to be careful not to capture `enum('A','B')` as part of type if it's separate.
+            // We'll rely on the specific ENUM/SET check below.
+            if (preg_match('/^`?([^`\s]+)`?\s+([a-zA-Z0-9_]+(?:\s*\([^)]*\))?)(.*)$/i', $line, $colMatches)) {
+                $columnName = $this->quoteIdentifier($colMatches[1], 'sqlserver');
+                $columnTypeRaw = strtolower(trim($colMatches[2])); // Capture original type with length/options
+                $columnDefinition = trim($colMatches[3]);
+
+                $translatedType = '';
+
+                // --- FOKUS UTAMA: ENUM/SET -> NVARCHAR(255) ---
+                if (preg_match('/^(enum|set)\s*\(([^)]+)\)/i', $columnTypeRaw, $enumMatches)) {
+                    // Set the translated type directly to NVARCHAR(255)
+                    $translatedType = 'NVARCHAR(255)';
+
+                    // Remove the enum options from the columnDefinition, if they somehow remained
+                    // This regex specifically targets the ('value1','value2') pattern
+                    $columnDefinition = preg_replace('/\s*\(\s*\'[^\']+\'(?:,\s*\'[^\']+\')*\s*\)/i', '', $columnDefinition);
+                    
+                    // If there's a DEFAULT value for ENUM, make sure it's handled correctly
+                    // e.g., 'P' for 'enum('P','A')' -> 'DEFAULT N'P''
+                    if (preg_match("/DEFAULT\s+'([^']+)'/i", $columnDefinition, $defaultMatches)) {
+                        $columnDefinition = str_ireplace("DEFAULT '" . $defaultMatches[1] . "'", "DEFAULT N'" . $defaultMatches[1] . "'", $columnDefinition);
+                    }
+                }
+                // AUTO_INCREMENT -> IDENTITY(1,1)
+                elseif ($this->isAutoIncrementColumn($columnTypeRaw, $columnDefinition)) {
+                    // Ensure it becomes BIGINT for IDENTITY(1,1) if original was BIGINT, otherwise INT.
+                    // SQL Server IDENTITY requires integer types.
+                    if (stripos($columnTypeRaw, 'bigint') !== false) {
+                        $translatedType = 'BIGINT IDENTITY(1,1)';
+                    } else {
+                        $translatedType = 'INT IDENTITY(1,1)';
+                    }
+                    
+                    $columnDefinition = preg_replace('/\bAUTO_INCREMENT\b/i', '', $columnDefinition);
+                    // Remove MySQL's DEFAULT value if it came with AUTO_INCREMENT, as IDENTITY handles defaults
+                    $columnDefinition = preg_replace('/\bDEFAULT\s+[^ ]+/i', '', $columnDefinition);
+                    // PRIMARY KEY will be handled by tableConstraints if it's explicitly defined,
+                    // but for identity columns, it's often implicit or added separately.
+                    // We'll let the PRIMARY KEY constraint logic handle it if it exists as a separate line.
+                }
+                // BOOLEAN (tinyint(1)) -> BIT
+                elseif (preg_match('/tinyint\s*\(\s*1\s*\)/i', $columnTypeRaw)) {
+                    $translatedType = 'BIT';
+                    $columnDefinition = str_ireplace("DEFAULT '1'", 'DEFAULT 1', $columnDefinition);
+                    $columnDefinition = str_ireplace("DEFAULT '0'", 'DEFAULT 0', $columnDefinition);
+                }
+                // Handle other general types
+                else {
+                    // Remove length from types like bigint(20), int(11) before passing to translateFieldType
+                    $baseType = preg_replace('/\(\d+\)/', '', $columnTypeRaw);
+                    $translatedType = $this->translateFieldType($baseType, 'mysql', 'sqlserver');
+
+                    // If original type was VARCHAR(N) or CHAR(N), re-append length
+                    if (preg_match('/^(?:var)?char\((\d+)\)$/i', $columnTypeRaw, $lenMatches)) {
+                        // For SQL Server, typically VARCHAR stays VARCHAR, TEXT stays TEXT (or VARCHAR(MAX))
+                        // If translateFieldType converts VARCHAR to NVARCHAR, append length to NVARCHAR
+                        if (strtoupper($translatedType) === 'VARCHAR' || strtoupper($translatedType) === 'NVARCHAR') {
+                            $translatedType .= '(' . $lenMatches[1] . ')';
+                        }
+                    }
+                    // Handle TEXT type from MySQL (longtext, mediumtext, text) to NVARCHAR(MAX) or TEXT in SQL Server
+                    if (in_array(strtolower($columnTypeRaw), ['text', 'mediumtext', 'longtext'])) {
+                        $translatedType = 'NVARCHAR(MAX)'; // Common mapping for text types in SQL Server
+                    }
+                }
+
+                // Remove MySQL-specific ON UPDATE
+                $columnDefinition = preg_replace('/\s+ON\s+UPDATE\s+CURRENT_TIMESTAMP/i', '', $columnDefinition);
+                
+                // Normalize spaces and remove any lingering outer parentheses
+                $columnDefinition = preg_replace('/\s+/', ' ', trim($columnDefinition));
+                $columnDefinition = preg_replace('/^\s*\(?\s*|\s*\)\s*$/', '', $columnDefinition);
+
+                // Add 'N' prefix to default string values for NVARCHAR, but only if they don't already have it
+                if (stripos($translatedType, 'NVARCHAR') !== false && preg_match("/DEFAULT\s+'([^']+)'/i", $columnDefinition, $defaultValMatches)) {
+                    if (stripos($defaultValMatches[0], "DEFAULT N'") === false) { // Avoid double N'
+                        $columnDefinition = str_ireplace("DEFAULT '" . $defaultValMatches[1] . "'", "DEFAULT N'" . $defaultValMatches[1] . "'", $columnDefinition);
+                    }
+                }
+                $columnDefinition = preg_replace("/DEFAULT\s+N'([^']+)'/i", "DEFAULT '$1'", $columnDefinition);
+
+                $newLines[] = $columnName . ' ' . $translatedType . ' ' . trim($columnDefinition);
+                // Store column comments for SQL Server's COMMENT ON syntax (if desired, currently inline)
+                // If you want actual SQL Server comments, this part needs to generate separate COMMENT ON statements.
+                // For inline comments (as you previously requested), they are already appended in $newLines.
+            }
+            // Handle table-level PRIMARY KEY and UNIQUE KEY constraints
+            elseif (preg_match('/^(PRIMARY KEY|UNIQUE KEY|FOREIGN KEY)\s*`?([^`]+)?`?\s*\((.+)\)(.*)$/i', $line, $keyMatches)) {
+                $keyType = strtoupper($keyMatches[1]);
+                $keyName = isset($keyMatches[2]) && !empty($keyMatches[2]) ? $this->quoteIdentifier($keyMatches[2], 'sqlserver') : null;
+                $keyColumns = preg_replace('/`([^`]+)`/', '[$1]', $keyMatches[3]); // Convert backticks to square brackets
+                $keyRest = trim($keyMatches[4]); // For FOREIGN KEY REFERENCES clause
+
+                $constraintDeclaration = '';
+                if ($keyName) {
+                    $constraintDeclaration = 'CONSTRAINT ' . $keyName . ' ';
+                }
+
+                if ($keyType === 'PRIMARY KEY') {
+                    $tableConstraints[] = $constraintDeclaration . 'PRIMARY KEY (' . $keyColumns . ')';
+                } elseif ($keyType === 'UNIQUE KEY') {
+                    $tableConstraints[] = $constraintDeclaration . 'UNIQUE (' . $keyColumns . ')';
+                } elseif ($keyType === 'FOREIGN KEY') {
+                    // Convert REFERENCES table and columns to SQL Server format
+                    $keyRest = preg_replace_callback('/REFERENCES\s+`?([^`]+)`?\s*\(([^)]+)\)/i', function($m) {
+                        $refTable = $this->quoteIdentifier($m[1], 'sqlserver');
+                        $refColumns = preg_replace('/`([^`]+)`/', '[$1]', $m[2]);
+                        return 'REFERENCES ' . $refTable . ' (' . $refColumns . ')';
+                    }, $keyRest);
+                    // Convert ON DELETE/ON UPDATE actions if necessary
+                    $keyRest = preg_replace('/\s+ON\s+DELETE\s+NO\s+ACTION/i', ' ON DELETE NO ACTION', $keyRest);
+                    $keyRest = preg_replace('/\s+ON\s+DELETE\s+RESTRICT/i', ' ON DELETE NO ACTION', $keyRest); // RESTRICT maps to NO ACTION
+                    $keyRest = preg_replace('/\s+ON\s+UPDATE\s+NO\s+ACTION/i', ' ON UPDATE NO ACTION', $keyRest);
+                    $keyRest = preg_replace('/\s+ON\s+UPDATE\s+RESTRICT/i', ' ON UPDATE NO ACTION', $keyRest); // RESTRICT maps to NO ACTION
+
+                    $tableConstraints[] = $constraintDeclaration . 'FOREIGN KEY (' . $keyColumns . ') ' . $keyRest;
+                }
+            }
+            // General line handling for anything not caught above (e.g., general comments, other table options)
+            else {
+                // Replace backticks with square brackets for SQL Server identifiers
+                $line = preg_replace_callback('/`([^`]+)`/', function ($m) {
+                    return $this->quoteIdentifier($m[1], 'sqlserver');
+                }, $line);
+                
+                // Remove MySQL-specific table options that might appear on separate lines
+                $line = preg_replace('/\s*AUTO_INCREMENT/i', '', $line);
+                $line = preg_replace('/\s*DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $line);
+                $line = preg_replace('/\s*COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $line);
+                $line = preg_replace('/\s*ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $line);
+                $line = preg_replace("/COMMENT\s+'.*?'/i", '', $line); // Table-level comment
+                $line = preg_replace('/\s+ROW_FORMAT\s*=\s*DYNAMIC/i', '', $line);
+                
+                $line = preg_replace('/\s+/', ' ', trim($line)); // Normalize spaces
+                if ($line !== '') {
+                    $newLines[] = $line;
+                }
+            }
+        }
+
+        // Append table constraints
+        if (!empty($tableConstraints)) {
+            // Filter out redundant primary keys if IDENTITY already implied one
+            $filteredTableConstraints = [];
+            $hasIdentityPrimaryKey = false;
+            foreach ($newLines as $colDef) {
+                if (preg_match('/\s(?:IDENTITY)\s.*PRIMARY KEY/i', $colDef)) {
+                    $hasIdentityPrimaryKey = true;
+                    break;
+                }
+            }
+            foreach ($tableConstraints as $constraint) {
+                if ($hasIdentityPrimaryKey && stripos($constraint, 'PRIMARY KEY') !== false) {
+                    if (preg_match('/PRIMARY KEY \(\[([^\]]+)\]\)/i', $constraint, $pkMatch) && count(explode(',', $pkMatch[1])) == 1) {
+                        continue; // Skip simple primary key if identity already made one
+                    }
+                }
+                $filteredTableConstraints[] = $constraint;
+            }
+            $newLines = array_merge($newLines, $filteredTableConstraints);
+        }
+
+        // Final SQL Construction
+        $finalSql = "CREATE TABLE " . $tableName . " (\n    " . implode(",\n    ", array_filter($newLines)) . "\n)";
+
+        // Clean up MySQL-specific table options (again, in case they are at the very end of the statement)
+        $finalSql = preg_replace('/\s+ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql); // Table-level comment
+        $finalSql = preg_replace('/\s+AUTO_INCREMENT\s*=\s*\d+/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+IF\s+NOT\s+EXISTS/i', '', $finalSql); // Remove MySQL IF NOT EXISTS
+
+        // Replace backticks with square brackets for SQL Server identifiers
+        $finalSql = preg_replace_callback('/`([^`]+)`/', function ($m) {
+            return '[' . str_replace(']', ']]', $m[1]) . ']'; // Handle escaping brackets
+        }, $finalSql);
+
+        // Final cleanup of extra spaces or common MySQL remnants
+        $finalSql = preg_replace('/\s+DEFAULT\s+NULL/', ' NULL DEFAULT NULL', $finalSql);
+        $finalSql = preg_replace('/\s+NULL\s+NULL\s+DEFAULT\s+NULL/', ' NULL DEFAULT NULL', $finalSql);
+        $finalSql = preg_replace('/\s+unsigned/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+zerofill/i', '', $finalSql);
+        
+        // Clean up excessive whitespace
+        $finalSql = preg_replace('/\s*\n\s*/', "\n", $finalSql);
+        $finalSql = preg_replace('/\s{2,}/', ' ', $finalSql);
+        
+        // Assuming fixLines handles general formatting, like consistent indentation.
+        $finalSql = $this->fixLines($finalSql);
+
+        return trim($finalSql) . ';';
+    }
+    
+    /**
+     * Translates a SQL Server CREATE TABLE statement to MySQL.
+     * Converts data types and constraints to MySQL equivalents.
+     *
+     * @param string $sql The SQL Server CREATE TABLE statement.
+     * @return string The translated MySQL CREATE TABLE statement.
+     * @throws DatabaseConversionException If the SQL format is invalid.
+     */
+    public function sqlServerToMySQL($sql) // NOSONAR
+    {
+        $posOpen = strpos(strtoupper($sql), '(');
+        if ($posOpen === false) {
+            throw new DatabaseConversionException("Invalid CREATE TABLE: missing opening parenthesis.");
+        }
+
+        $len = strlen($sql);
+        $parenCount = 0;
+        $posClose = false;
+        for ($i = $posOpen; $i < $len; $i++) {
+            if ($sql[$i] === '(') {
+                $parenCount++;
+            } elseif ($sql[$i] === ')') {
+                $parenCount--;
+            }
+            if ($parenCount === 0) {
+                $posClose = $i;
+                break;
+            }
+        }
+
+        if ($posClose === false) {
+            throw new DatabaseConversionException("Invalid CREATE TABLE: unbalanced parentheses.");
+        }
+
+        if (!preg_match('/CREATE TABLE\s+(\[?)([^\[\]\s]+)\1/i', substr($sql, 0, $posOpen), $matches)) {
+            throw new DatabaseConversionException("Cannot parse table name.");
+        }
+
+        $tableName = $this->quoteIdentifier($matches[2], 'mysql');
+        $columnsDef = trim(substr($sql, $posOpen + 1, $posClose - $posOpen - 1));
+
+        // Split by comma, considering parentheses (for types like DECIMAL(10,2))
+        $lines = [];
+        $buffer = '';
+        $parenLevel = 0;
+        for ($i = 0; $i < strlen($columnsDef); $i++) {
+            $char = $columnsDef[$i];
+            if ($char === '(') $parenLevel++;
+            elseif ($char === ')') $parenLevel--;
+
+            if ($char === ',' && $parenLevel === 0) {
+                $lines[] = trim($buffer);
+                $buffer = '';
+            } else {
+                $buffer .= $char;
+            }
+        }
+        if (trim($buffer) !== '') {
+            $lines[] = trim($buffer);
+        }
+
+        $newLines = [];
+        $primaryKeys = [];
+
+        foreach ($lines as $line) {
+            // Handle identity columns
+            if (preg_match('/^\[?([^\]\s]+)\]?\s+(BIGINT|INT)\s+IDENTITY\s*\(\d+,\s*\d+\)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $type = strtoupper($colMatch[2]);
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} {$type} NOT NULL AUTO_INCREMENT {$rest}";
+            }
+            // Translate NVARCHAR/CHAR types
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+NVARCHAR\s*\((MAX|\d+)\)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $length = strtoupper($colMatch[2]) === 'MAX' ? '65535' : $colMatch[2];
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} VARCHAR({$length}) {$rest}";
+            }
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+NCHAR\s*\((\d+)\)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} CHAR({$colMatch[2]}) {$rest}";
+            }
+            // Translate BIT → TINYINT(1)
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+BIT(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[2]);
+                $newLines[] = "{$colName} TINYINT(1) {$rest}";
+            }
+            // Translate DATETIME2, DATETIMEOFFSET → DATETIME
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+(DATETIME2|DATETIMEOFFSET)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} DATETIME {$rest}";
+            }
+            // Translate XML → TEXT
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+XML(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[2]);
+                $newLines[] = "{$colName} TEXT {$rest}";
+            }
+            // Translate UNIQUEIDENTIFIER → CHAR(36)
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+UNIQUEIDENTIFIER(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[2]);
+                $newLines[] = "{$colName} CHAR(36) {$rest}";
+            }
+            // PRIMARY KEY constraint
+            elseif (preg_match('/^PRIMARY KEY\s*\((.+)\)/i', $line, $pkMatch)) {
+                $columns = preg_replace('/\[(.*?)\]/', '`$1`', $pkMatch[1]);
+                $newLines[] = "PRIMARY KEY ({$columns})";
+            }
+            // Default handling (just replace brackets)
+            else {
+                $line = preg_replace('/\[(.*?)\]/', '`$1`', $line);
+                $newLines[] = $line;
+            }
+        }
+
+        // Tambahkan koma di akhir setiap baris kecuali baris terakhir
+        $count = count($newLines);
+        foreach ($newLines as $i => &$l) {
+            $l = rtrim($l, ',');
+            if ($i < $count - 1) {
+                $l .= ',';
+            }
+        }
+        unset($l);
+
+        $finalSql = "CREATE TABLE {$tableName} (\n    " . implode("\n    ", $newLines) . "\n)";
+        $finalSql .= "\nENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+        $finalSql = $this->fixLines($finalSql);
+        return trim($finalSql) . ";";
+    }
+
 
     /**
      * Translates a CREATE TABLE statement from MySQL to SQLite.
@@ -1352,7 +1845,97 @@ class PicoDatabaseConverter // NOSONAR
 
         return $result;
     }
+    
+    /**
+     * Normalizes spacing around parentheses in SQL column type declarations.
+     *
+     * This function removes unnecessary spaces between SQL data types and the opening parenthesis
+     * (e.g., converts "VARCHAR (255)" to "VARCHAR(255)"). It handles various SQL types such as 
+     * character, integer, decimal, and boolean types, making the format consistent.
+     *
+     * Additionally, it performs a special case replacement for "BOOLEAN(11)" to "INTEGER(11)",
+     * which is commonly needed when converting from MySQL's TINYINT(1) to a more appropriate type
+     * in other database systems.
+     *
+     * @param string $sql The SQL string containing column type definitions to normalize.
+     * @return string The normalized SQL string with consistent type formatting.
+     */
+    public function trimColumnType($sql)
+    {
+        $sql = str_ireplace(' NVARCHAR (', ' NVARCHAR(', $sql);
+        $sql = str_ireplace(' VARCHAR (', ' VARCHAR(', $sql);
+        $sql = str_ireplace(' CHARACTER VARYING (', ' CHARACTER VARYING(', $sql);
+        $sql = str_ireplace(' CHAR (', ' CHAR(', $sql);
+        $sql = str_ireplace(' NCHAR (', ' NCHAR(', $sql);
 
+        $sql = str_ireplace(' INT (', ' INT(', $sql);
+        $sql = str_ireplace(' INTEGER (', ' INTEGER(', $sql);
+        $sql = str_ireplace(' TINYINT (', ' TINYINT(', $sql);
+        $sql = str_ireplace(' SMALLINT (', ' SMALLINT(', $sql);
+        $sql = str_ireplace(' MEDIUMINT (', ' MEDIUMINT(', $sql);
+        $sql = str_ireplace(' BIGINT (', ' BIGINT(', $sql);
+
+        $sql = str_ireplace(' DECIMAL (', ' DECIMAL(', $sql);
+        $sql = str_ireplace(' NUMERIC (', ' NUMERIC(', $sql);
+        $sql = str_ireplace(' FLOAT (', ' FLOAT(', $sql);
+        $sql = str_ireplace(' DOUBLE (', ' DOUBLE(', $sql);
+        $sql = str_ireplace(' REAL (', ' REAL(', $sql);
+
+        $sql = str_ireplace(' BOOLEAN (', ' BOOLEAN(', $sql);
+
+        return $sql;
+    }
+
+    /**
+     * Returns the canonical name for a given database dialect alias.
+     *
+     * This method normalizes various aliases for common database dialects
+     * into their standard (canonical) names. For example, 'pgsql' and 'postgres'
+     * both map to 'postgresql', and 'mariadb' maps to 'mysql'.
+     *
+     * Supported aliases:
+     * - mysql, mariadb → mysql
+     * - postgres, pgsql, postgresql → postgresql
+     * - sqlite, sqlite3 → sqlite
+     *
+     * @param string $dialect The input dialect name (case-insensitive).
+     * @return string The canonical dialect name.
+     *
+     * @throws DatabaseConversionException If the dialect is not supported.
+     */
+    public function normalizeDialect($dialect)
+    {
+        $dialect = strtolower(trim($dialect));
+
+        $mapping = [
+        'mysql'       => 'mysql',
+        'mariadb'     => 'mysql',
+        'postgres'    => 'postgresql',
+        'pgsql'       => 'postgresql',
+        'postgresql'  => 'postgresql',
+        'sqlite'      => 'sqlite',
+        'sqlite3'     => 'sqlite',
+        'sqlserver'   => 'sqlserver',
+        'mssql'       => 'sqlserver',
+        'sqlsrv'      => 'sqlserver'
+    ];
+
+        if (isset($mapping[$dialect])) {
+            return $mapping[$dialect];
+        }
+
+        throw new DatabaseConversionException("Unsupported database dialect: " . $dialect);
+    }
+
+    public function normalizeCreateTableSql($sql)
+    {
+        $sql = trim($sql);
+        $sql = str_replace("`", "", $sql); // Remove backticks for standard SQL
+        $sql = preg_replace('/\s+/', ' ', $sql); // Normalize spaces
+        $sql = preg_replace('/\s*;\s*$/', '', $sql); // Remove trailing semicolon if present
+        return $sql;
+    }
+    
     /**
      * Translates a CREATE TABLE statement from a source dialect to a target dialect.
      *
@@ -1383,34 +1966,15 @@ class PicoDatabaseConverter // NOSONAR
         $result = str_ireplace(' PRIMARY KEY NULL', ' PRIMARY KEY NOT NULL', $result);
 
         // Removes redundant spaces around parentheses for data types like NVARCHAR
-        $result = str_ireplace(' NVARCHAR (', ' NVARCHAR(', $result);
-        $result = str_ireplace(' VARCHAR (', ' VARCHAR(', $result);
-        $result = str_ireplace(' CHARACTER VARYING (', ' CHARACTER VARYING(', $result);
-        $result = str_ireplace(' CHAR (', ' CHAR(', $result);
-        $result = str_ireplace(' NCHAR (', ' NCHAR(', $result);
-
-        $result = str_ireplace(' INT (', ' INT(', $result);
-        $result = str_ireplace(' INTEGER (', ' INTEGER(', $result);
-        $result = str_ireplace(' TINYINT (', ' TINYINT(', $result);
-        $result = str_ireplace(' SMALLINT (', ' SMALLINT(', $result);
-        $result = str_ireplace(' MEDIUMINT (', ' MEDIUMINT(', $result);
-        $result = str_ireplace(' BIGINT (', ' BIGINT(', $result);
-
-        $result = str_ireplace(' DECIMAL (', ' DECIMAL(', $result);
-        $result = str_ireplace(' NUMERIC (', ' NUMERIC(', $result);
-        $result = str_ireplace(' FLOAT (', ' FLOAT(', $result);
-        $result = str_ireplace(' DOUBLE (', ' DOUBLE(', $result);
-        $result = str_ireplace(' REAL (', ' REAL(', $result);
-
-        $result = str_ireplace(' BOOLEAN (', ' BOOLEAN(', $result);
-
+        $result = $this->trimColumnType($result);
+        
         // Specific conversion for BOOLEAN(11) which might come from MySQL TINYINT(1) export and needs to be INTEGER(11) for some targets
-        $result = str_ireplace(' BOOLEAN(11)', ' INTEGER(11)', $result);
+        $sql = str_ireplace(' BOOLEAN(11)', ' INTEGER(11)', $sql);
         
         // Add more similar patterns as needed.
         return $result;
     }
-
+    
     /**
      * Translates a CREATE TABLE statement from a source dialect to a target dialect.
      *
@@ -1427,64 +1991,89 @@ class PicoDatabaseConverter // NOSONAR
                 return $this->mysqlToPostgreSQL($sql);
             case 'mysqlToSqlite':
                 return $this->mysqlToSQLite($sql);
+            case 'mysqlToSqlserver':
+                return $this->mysqlToSQLServer($sql);
+
             case 'postgresqlToMysql':
                 return $this->postgresqlToMySQL($sql);
             case 'postgresqlToSqlite':
                 return $this->postgresqlToSQLite($sql);
+            case 'postgresqlToSqlserver':
+                return $this->postgresqlToSQLServer($sql);
+
             case 'sqliteToMysql':
                 return $this->sqliteToMySQL($sql);
             case 'sqliteToPostgresql':
                 return $this->sqliteToPostgreSQL($sql);
+            case 'sqliteToSqlserver':
+                return $this->sqliteToSQLServer($sql);
+
+            case 'sqlserverToMysql':
+                return $this->sqlServerToMySQL($sql);
+            case 'sqlserverToPostgresql':
+                return $this->sqlServerToPostgreSQL($sql);
+            case 'sqlserverToSqlite':
+                return $this->sqlServerToSQLite($sql);
+
             default:
                 throw new DatabaseConversionException("Unsupported CREATE TABLE translation: from " . $sourceDialect . " to " . $targetDialect);
         }
     }
-
+    
     /**
-     * Returns the canonical name for a given database dialect alias.
+     * Converts a PostgreSQL CREATE TABLE statement to SQL Server format.
+     * This is done via intermediate conversion to MySQL.
      *
-     * This method normalizes various aliases for common database dialects
-     * into their standard (canonical) names. For example, 'pgsql' and 'postgres'
-     * both map to 'postgresql', and 'mariadb' maps to 'mysql'.
-     *
-     * Supported aliases:
-     * - mysql, mariadb → mysql
-     * - postgres, pgsql, postgresql → postgresql
-     * - sqlite, sqlite3 → sqlite
-     *
-     * @param string $dialect The input dialect name (case-insensitive).
-     * @return string The canonical dialect name.
-     *
-     * @throws DatabaseConversionException If the dialect is not supported.
+     * @param string $sql The PostgreSQL CREATE TABLE statement.
+     * @return string The translated SQL Server CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
      */
-    public function normalizeDialect($dialect)
+    public function postgresqlToSQLServer($sql)
     {
-        $dialect = strtolower(trim($dialect));
-
-        $mapping = [
-            'mysql'     => 'mysql',
-            'mariadb'   => 'mysql',
-            'postgres'  => 'postgresql',
-            'pgsql'     => 'postgresql',
-            'postgresql'=> 'postgresql',
-            'sqlite'    => 'sqlite',
-            'sqlite3'   => 'sqlite',
-        ];
-
-        if (isset($mapping[$dialect])) {
-            return $mapping[$dialect];
-        }
-
-        throw new DatabaseConversionException("Unsupported database dialect: " . $dialect);
+        $sql = $this->postgresqlToMySQL($sql);
+        return $this->mysqlToSQLServer($sql);
     }
 
-    public function normalizeCreateTableSql($sql)
+    /**
+     * Converts a SQLite CREATE TABLE statement to SQL Server format.
+     * This is done via intermediate conversion to MySQL.
+     *
+     * @param string $sql The SQLite CREATE TABLE statement.
+     * @return string The translated SQL Server CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
+     */
+    public function sqliteToSQLServer($sql)
     {
-        $sql = trim($sql);
-        $sql = str_replace("`", "", $sql); // Remove backticks for standard SQL
-        $sql = preg_replace('/\s+/', ' ', $sql); // Normalize spaces
-        $sql = preg_replace('/\s*;\s*$/', '', $sql); // Remove trailing semicolon if present
-        return $sql;
+        $sql = $this->sqliteToMySQL($sql);
+        return $this->mysqlToSQLServer($sql);
+    }
+
+    /**
+     * Converts a SQL Server CREATE TABLE statement to PostgreSQL format.
+     * This is done via intermediate conversion to MySQL.
+     *
+     * @param string $sql The SQL Server CREATE TABLE statement.
+     * @return string The translated PostgreSQL CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
+     */
+    public function sqlServerToPostgreSQL($sql)
+    {
+        $sql = $this->sqlServerToMySQL($sql);
+        return $this->mysqlToPostgreSQL($sql);
+    }
+
+    /**
+     * Converts a SQL Server CREATE TABLE statement to SQLite format.
+     * This is done via intermediate conversion to MySQL.
+     *
+     * @param string $sql The SQL Server CREATE TABLE statement.
+     * @return string The translated SQLite CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
+     */
+    public function sqlServerToSQLite($sql)
+    {
+        $sql = $this->sqlServerToMySQL($sql);
+        return $this->mysqlToSQLite($sql);
     }
 
     /**
@@ -1527,6 +2116,26 @@ class PicoDatabaseConverter // NOSONAR
 
         return implode("\r\n", $fixedLines);
     }
+    
+    /**
+     * Detects whether a field definition implies an auto-increment behavior,
+     * regardless of the source DBMS (MySQL, PostgreSQL, SQLite).
+     *
+     * @param string $type The column type (e.g., 'int', 'serial', etc.).
+     * @param string $definition The rest of the column definition (e.g., 'AUTO_INCREMENT PRIMARY KEY').
+     * @return bool True if the column is auto-increment.
+     */
+    private function isAutoIncrementColumn($type, $definition)
+    {
+        $type = strtolower($type);
+        $definition = strtolower($definition);
+
+        return
+            strpos($definition, 'auto_increment') !== false ||          // MySQL
+            $type === 'serial' || $type === 'bigserial' ||              // PostgreSQL
+            preg_match('/\binteger\b.*\bprimary key\b.*\bautoincrement\b/', $type . ' ' . $definition); // SQLite
+    }
+
 
     /**
      * Cleans a single line of SQL by removing comments and excess whitespace.
