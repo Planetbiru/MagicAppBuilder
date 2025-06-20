@@ -37,7 +37,7 @@ class AppUserActivityImpl extends MagicObject
      * Admin ID
      * 
      * @NotNull
-     * @Column(name="admin_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+     * @Column(name="admin_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Admin ID")
      * @var string
      */
@@ -56,7 +56,7 @@ class AppUserActivityImpl extends MagicObject
      * User Action
      * 
      * @NotNull
-     * @Column(name="user_action", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+     * @Column(name="user_action", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="User Action")
      * @var string
      */
@@ -66,7 +66,7 @@ class AppUserActivityImpl extends MagicObject
      * Username
      * 
      * @NotNull
-     * @Column(name="username", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+     * @Column(name="username", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Username")
      * @var string
      */

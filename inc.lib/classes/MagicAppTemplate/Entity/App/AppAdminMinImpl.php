@@ -135,7 +135,7 @@ class AppAdminMinImpl extends MagicObject
 	/**
 	 * Blocked
 	 * 
-	 * @Column(name="blocked", type="tinyint(1)", length=1, defaultValue="false", nullable=true)
+	 * @Column(name="blocked", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
 	 * @DefaultColumn(value="false")
 	 * @Label(content="Blocked")
 	 * @var bool
@@ -199,7 +199,7 @@ class AppAdminMinImpl extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value=TRUE, nullable=true)
 	 * @DefaultColumn(value="true")
 	 * @Label(content="Active")
 	 * @var bool
