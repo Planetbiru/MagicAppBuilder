@@ -84,7 +84,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed show list
      *
-     * @Column(name="allowed_list", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_list", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed List")
      * @var bool
      */
@@ -93,7 +93,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed show detail
      *
-     * @Column(name="allowed_detail", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_detail", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed Detail")
      * @var bool
      */
@@ -102,7 +102,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed create
      *
-     * @Column(name="allowed_create", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_create", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed Create")
      * @var bool
      */
@@ -111,7 +111,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed update
      *
-     * @Column(name="allowed_update", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_update", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed Update")
      * @var bool
      */
@@ -120,7 +120,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed delete
      *
-     * @Column(name="allowed_delete", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_delete", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed Delete")
      * @var bool
      */
@@ -129,7 +129,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed approve/reject
      *
-     * @Column(name="allowed_approve", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_approve", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed Approve")
      * @var bool
      */
@@ -138,7 +138,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed short order
      *
-     * @Column(name="allowed_sort_order", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_sort_order", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed Sort Order")
      * @var bool
      */
@@ -147,7 +147,7 @@ class AppAdminRoleMinImpl extends MagicObject
     /**
      * Allowed export
      *
-     * @Column(name="allowed_export", type="tinyint(1)", length=1, default_value="0", nullable=true)
+     * @Column(name="allowed_export", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
      * @Label(content="Allowed Export")
      * @var bool
      */

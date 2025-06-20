@@ -87,7 +87,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * Default Data
 	 * 
 	 * @NotNull
-	 * @Column(name="default_data", type="tinyint(1)", length=1, default_value="0", nullable=true)
+	 * @Column(name="default_data", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
 	 * @Label(content="Default Data")
 	 * @var bool
 	 */

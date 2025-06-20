@@ -81,7 +81,7 @@ class AppAdminImpl extends MagicObject
 	/**
 	 * Gender
 	 * 
-	 * @Column(name="gender", type="varchar(1)", length=1, nullable=true)
+	 * @Column(name="gender", type="varchar(2)", length=2, nullable=true)
 	 * @Label(content="Gender")
 	 * @var string
 	 */
