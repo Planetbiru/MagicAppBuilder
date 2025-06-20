@@ -3,6 +3,8 @@
 namespace MagicAppTemplate;
 
 use DOMDocument;
+use DOMElement;
+use DOMXPath;
 use Exception;
 use MagicApp\Field;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
@@ -67,6 +69,13 @@ class ApplicationMenu
      * @var AppLanguage
      */
     private $appLanguage;
+    
+    /**
+     * Active URL
+     *
+     * @var string
+     */
+    private $activeUrl;
     
     /**
      * Generates an HTML sidebar menu based on the given JSON data.
@@ -623,7 +632,7 @@ class ApplicationMenu
      */
 	public function loadModule()
 	{
-        $modules = [];
+        $modules = array();
 		$module = new AppModuleImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->menu, true))
@@ -640,7 +649,7 @@ class ApplicationMenu
         }
         catch(Exception $e)
         {
-            $modules = [];
+            $modules = array();
         }
         return $modules;
 	}
@@ -653,7 +662,7 @@ class ApplicationMenu
      */
     public function loadAminRole($adminLevelId)
     {
-        $adminRoles = [];
+        $adminRoles = array();
 		$adminRole = new AppAdminRoleMinImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId))
@@ -667,7 +676,7 @@ class ApplicationMenu
         }
         catch(Exception $e)
         {
-            $adminRoles = [];
+            $adminRoles = array();
         }
         return $adminRoles;
     }
@@ -688,6 +697,201 @@ class ApplicationMenu
             return $this->getMenuFromDatabase();
         }
     }
+    
+    /**
+     * Builds a hierarchical menu array from a flat list of modules.
+     *
+     * This function recursively processes a flat list of Module objects (which are also MagicObjects),
+     * organizing them into a nested structure based on their parent_id. Only modules
+     * explicitly marked as menu items (`isMenu()`) are included in the hierarchy.
+     *
+     * @param MagicObject[] $modules A flat array of Module objects to be processed.
+     * @param string|null $parentId The ID of the parent module to filter by.
+     * Use `null` to start building the top-level menu.
+     * @return MagicObject[] A hierarchical array of Module objects, where each parent module
+     * might contain a 'children' property (or similar, set via `setChildren()`)
+     * containing its sub-modules.
+     */
+    public function buildMenuHierarchy($modules, $parentId = null) {
+        $branch = array();
+        foreach ($modules as $module) {
+            // Check if the current module's parent_id matches the requested parentId
+            // Also ensure it's marked as a 'menu' item if your design requires it
+            if ($module->getParentId() === $parentId && $module->isMenu()) {
+                // Recursively find children for the current module
+                $children = $this->buildMenuHierarchy($modules, $module->getModuleId());
+                if (!empty($children)) {
+                    $module->setChildren($children); // Add children to the module object
+                }
+                $branch[] = $module; // Add the module (with its children) to the current branch
+            }
+        }
+        return $branch;
+    }
+    
+    /**
+     * Renders the menu hierarchy as an unordered list (UL) using DOMDocument.
+     * Adds 'open' and 'selected' classes based on the active URL.
+     *
+     * @param MagicObject[] $menuItems The hierarchical array of menu items to render.
+     * @param string $activeUrl The URL of the currently active/selected page/module.
+     * @param int $level The current nesting level (for styling).
+     * @param DOMDocument|null $dom The DOMDocument instance for the main document.
+     * @return DOMElement|null The UL DOMElement representing the menu, or null if empty.
+     */
+    public function renderMenuHierarchy($menuItems, $activeUrl, $level = 0, $dom = null) // NOSONAR
+    {
+        if (empty($menuItems)) {
+            return null;
+        }
+
+        // Initialize DOMDocument for the top-level call
+        if ($dom === null) {
+            $dom = new DOMDocument('1.0', 'UTF-8');
+            // This is crucial: we need to pass the initial DOM object through recursive calls
+            // For simplicity, we'll return the root UL and let the caller append it
+            // to a complete document if needed.
+        }
+
+        $this->activeUrl = $activeUrl; // Set the active URL for this rendering cycle
+
+        $ul = $dom->createElement('ul');
+        $ul->setAttribute('class', 'menu-level-' . $level);
+
+        foreach ($menuItems as $item) {
+            $li = $dom->createElement('li');
+            $a = $dom->createElement('a');
+            $a->setAttribute('href', htmlspecialchars($item->getUrl()));
+            $a->setAttribute('target', htmlspecialchars($item->getTarget() ?: '_self'));
+
+            if ($item->getIcon()) {
+                $i = $dom->createElement('i');
+                $i->setAttribute('class', 'fa ' . htmlspecialchars($item->getIcon()));
+                $a->appendChild($i);
+                $a->appendChild($dom->createTextNode(' ')); // Add a space after icon
+            }
+
+            $a->appendChild($dom->createTextNode(htmlspecialchars($item->getName())));
+            $li->appendChild($a);
+
+            $hasChildren = $item->hasChildren();
+            $liClasses = array(); // Array to build up classes for the LI
+
+            if ($hasChildren) {
+                $liClasses[] = 'has-submenu';
+            }
+
+            // --- Logic for 'selected' and 'open' classes ---
+            $isItemSelected = (strcasecmp($item->getUrl(), $this->activeUrl) === 0);
+
+            if ($isItemSelected) {
+                $liClasses[] = 'open';
+                $liClasses[] = 'selected';
+            }
+
+            // Recursively render children if they exist
+            if ($hasChildren) {
+                $childUl = $this->renderMenuHierarchy($item->getChildren(), $this->activeUrl, $level + 1, $dom);
+                if ($childUl) {
+                    $li->appendChild($childUl);
+
+                    // If any child (or grandchild) is selected, this parent should be 'open'
+                    // We need to check the childUl's content for 'open' class on any of its LIs
+                    if ($this->hasOpenChild($childUl)) {
+                        $liClasses[] = 'open';
+                    }
+                }
+            }
+            // Add collected classes to the LI
+            if (!empty($liClasses)) {
+                $li->setAttribute('class', implode(' ', array_unique($liClasses)));
+            }
+
+            $ul->appendChild($li);
+        }
+
+        return $ul;
+    }
+
+    /**
+     * Helper to check if any child LI element within a UL has the 'open' class.
+     * This is used to determine if a parent should also be 'open'.
+     *
+     * @param DOMElement $ulElement The UL element to check.
+     * @return bool
+     */
+    private function hasOpenChild($ulElement)
+    {
+        $lis = $ulElement->getElementsByTagName('li');
+        foreach ($lis as $li) {
+            if ($li->hasAttribute('class') && str_contains($li->getAttribute('class'), 'open')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Traverses the menu DOM to mark all parent LIs of the 'selected' item with the 'open' class.
+     *
+     * @param DOMDocument $dom The main DOMDocument object.
+     */
+    public function markParentsOpen($dom) // NOSONAR
+    {
+        $xpath = new DOMXPath($dom);
+        $selectedItems = $xpath->query("//li[contains(concat(' ', normalize-space(@class), ' '), ' selected ')]");
+
+        foreach ($selectedItems as $selectedLi) {
+            $parentLi = $selectedLi;
+
+            while ($parentLi !== null) {
+                // Find parent <li> via XPath: move up from current node
+                $parentLi = $xpath->query("ancestor::li[1]", $parentLi)->item(0);
+                if ($parentLi instanceof DOMElement) {
+                    $classAttr = $parentLi->getAttribute('class');
+                    $classes = preg_split('/\s+/', $classAttr, -1, PREG_SPLIT_NO_EMPTY);
+
+                    if (!in_array('open', $classes)) {
+                        $classes[] = 'open';
+                        $parentLi->setAttribute('class', implode(' ', array_unique($classes)));
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Renders a hierarchical menu as a flat list of <option> elements for a <select> dropdown.
+     * Indentation is added based on the menu item's level to simulate hierarchy.
+     *
+     * @param MagicObject[] $menuItems The hierarchical array of menu items (from buildMenuHierarchy).
+     * @param string $selectedValue The module_id of the currently selected option (optional).
+     * @param int $level The current nesting level, used for indentation.
+     * @param string $indentChar The character(s) to use for indentation (e.g., '&nbsp;&nbsp;', '--').
+     * @return string The HTML string containing <option> tags.
+     */
+    public function renderMenuAsSelectOptions($menuItems, $selectedValue = null, $level = 0, $indentChar = '&nbsp;&nbsp;&nbsp;&nbsp;') {
+        $html = '';
+        $prefix = str_repeat($indentChar, $level); // Create indentation string
+
+        foreach ($menuItems as $item) {
+            $selectedAttribute = ($selectedValue === $item->getModuleId()) ? ' selected' : '';
+            
+            // Add the option tag with indentation
+            $html .= '<option value="' . htmlspecialchars($item->getModuleId()) . '"' . $selectedAttribute . '>';
+            $html .= $prefix . htmlspecialchars($item->getName());
+            $html .= '</option>';
+
+            // Recursively add children's options
+            if ($item->issetChildren()) {
+                $html .= $this->renderMenuAsSelectOptions($item->getChildren(), $selectedValue, $level + 1, $indentChar);
+            }
+        }
+        return $html;
+    }
+
     
     /**
      * Renders the complete menu (either from Yaml file or database depending on the environment).

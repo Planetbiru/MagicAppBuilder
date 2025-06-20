@@ -34,15 +34,18 @@ if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseT
     // Unsupported database type
 }
 
+$selected =' selected';
+
 ?>
 
 <div class="input-label">
     Target Database Type 
     <select class="form-control" name="target_database_type">
-        <option value="mysql"<?php echo $dbType == 'mysql' ? ' selected' : '';?>>MySQL</option>
-        <option value="mariadb"<?php echo $dbType == 'mariadb' ? ' selected' : '';?>>MariaDB</option>
-        <option value="postgresql"<?php echo $dbType == 'pgsql' || $dbType == 'postgresql' ? ' selected' : '';?>>PostgreSQL</option>
-        <option value="sqlite"<?php echo $dbType == 'sqlite' ? ' selected' : '';?>>SQLite</option>
+        <option value="mysql"<?php echo $dbType == 'mysql' ? $selected : '';?>>MySQL</option>
+        <option value="mariadb"<?php echo $dbType == 'mariadb' ? $selected : '';?>>MariaDB</option>
+        <option value="postgresql"<?php echo $dbType == 'pgsql' || $dbType == 'postgresql' ? $selected : '';?>>PostgreSQL</option>
+        <option value="sqlite"<?php echo $dbType == 'sqlite' ? $selected : '';?>>SQLite</option>
+        <option value="sqlserver"<?php echo $dbType == 'sqlserver' ? $selected : '';?>>SQL Server</option>
     </select>
 </div>
 

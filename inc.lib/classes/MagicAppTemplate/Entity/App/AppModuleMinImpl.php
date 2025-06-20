@@ -41,6 +41,16 @@ class AppModuleMinImpl extends MagicObject
 	 * @var string
 	 */
 	protected $moduleGroupId;
+	
+	/**
+	 * Parent Module ID
+	 * 
+	 * @NotNull
+	 * @Column(name="parent_module_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Label(content="Parent Module")
+	 * @var string
+	 */
+	protected $parentModuleId;
 
 	/**
 	 * Name
