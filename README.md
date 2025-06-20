@@ -73,6 +73,14 @@ Imagine you're tasked with building a large-scale application composed of **hund
 
 -   Supports uploading images, audio, video, and documents.
 
+### 🗄️ Database Flexibility
+
+-   Supports MySQL, MariaDB, and PostgreSQL databases, allowing users to switch between them without needing application upgrades or modifications.
+
+### ⬆️ Scalability
+
+-   Users can perform horizontal scaling for both the application and the database without requiring application upgrades or modifications.
+
 This project must be completed within a very short time—less than 3 months.
 
 In this situation, the project owner definitely needs a tool that can build applications very quickly, without compromising on accuracy.
