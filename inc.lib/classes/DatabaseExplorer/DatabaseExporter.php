@@ -43,6 +43,10 @@ class DatabaseExporter // NOSONAR
      * This constant is used to identify the PostgreSQL database type in the application.
      */
     const DATABASE_TYPE_PGSQL = 'pgsql';
+    
+    const NEW_LINE = "\r\n";
+    
+    const DOUBLE_NEW_LINE = "\r\n\r\n";
 
     /**
      * Database connection (SQLite, MySQL, or PostgreSQL)
@@ -186,12 +190,12 @@ class DatabaseExporter // NOSONAR
                 $createTable = $this->db->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='$tableName';");
                 $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['sql'];
                 $createTableSql = $this->formatSQL($createTableSql);
+                $createTableSql = $converter->trimColumnType($createTableSql);
                 $createTableSql = str_replace(array("[", "]"), "", $createTableSql);
                 $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
-
                 $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
-                $this->outputBuffer .= "$createTableSql\n\n";
+                $this->outputBuffer .= $createTableSql.self::DOUBLE_NEW_LINE;
             }
         }
     }
@@ -215,7 +219,7 @@ class DatabaseExporter // NOSONAR
 
                 $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
-                $this->outputBuffer .= "$createTableSql\n\n";
+                $this->outputBuffer .= $createTableSql.self::DOUBLE_NEW_LINE;
             }
         }
     }
@@ -316,7 +320,7 @@ class DatabaseExporter // NOSONAR
 
                 $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
-                $this->outputBuffer .= "$createTableSql\n\n";
+                $this->outputBuffer .= $createTableSql.self::DOUBLE_NEW_LINE;
             }
         }
     }
@@ -566,7 +570,7 @@ class DatabaseExporter // NOSONAR
     private function addNewLine($nrec)
     {
         if ($nrec > 0) {
-            $this->outputBuffer .= "\r\n";
+            $this->outputBuffer .= self::NEW_LINE;
         }
     }
 
@@ -626,7 +630,7 @@ class DatabaseExporter // NOSONAR
 
                     // If we hit either the batch size or max query size, execute and reset
                     if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
-                        $this->outputBuffer .= $insertSql."\r\n";
+                        $this->outputBuffer .= $insertSql.self::NEW_LINE;
                         $batchValues = [];  // Clear the batch for the next set
                         $querySize = 0;     // Reset query size
                     }
@@ -681,7 +685,7 @@ class DatabaseExporter // NOSONAR
 
                     // If we hit either the batch size or max query size, execute and reset
                     if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
-                        $this->outputBuffer .= $insertSql."\r\n";
+                        $this->outputBuffer .= $insertSql.self::NEW_LINE;
                         $batchValues = [];  // Clear the batch for the next set
                         $querySize = 0;     // Reset query size
                     }
@@ -750,7 +754,7 @@ class DatabaseExporter // NOSONAR
 
                     // If we hit either the batch size or max query size, execute and reset
                     if ($this->reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)) {
-                        $this->outputBuffer .= $insertSql."\r\n";
+                        $this->outputBuffer .= $insertSql.self::NEW_LINE;
                         $batchValues = [];  // Clear the batch for the next set
                         $querySize = 0;     // Reset query size
                     }

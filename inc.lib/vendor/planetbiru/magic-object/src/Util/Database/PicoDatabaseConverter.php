@@ -1383,32 +1383,53 @@ class PicoDatabaseConverter // NOSONAR
         $result = str_ireplace(' PRIMARY KEY NULL', ' PRIMARY KEY NOT NULL', $result);
 
         // Removes redundant spaces around parentheses for data types like NVARCHAR
-        $result = str_ireplace(' NVARCHAR (', ' NVARCHAR(', $result);
-        $result = str_ireplace(' VARCHAR (', ' VARCHAR(', $result);
-        $result = str_ireplace(' CHARACTER VARYING (', ' CHARACTER VARYING(', $result);
-        $result = str_ireplace(' CHAR (', ' CHAR(', $result);
-        $result = str_ireplace(' NCHAR (', ' NCHAR(', $result);
-
-        $result = str_ireplace(' INT (', ' INT(', $result);
-        $result = str_ireplace(' INTEGER (', ' INTEGER(', $result);
-        $result = str_ireplace(' TINYINT (', ' TINYINT(', $result);
-        $result = str_ireplace(' SMALLINT (', ' SMALLINT(', $result);
-        $result = str_ireplace(' MEDIUMINT (', ' MEDIUMINT(', $result);
-        $result = str_ireplace(' BIGINT (', ' BIGINT(', $result);
-
-        $result = str_ireplace(' DECIMAL (', ' DECIMAL(', $result);
-        $result = str_ireplace(' NUMERIC (', ' NUMERIC(', $result);
-        $result = str_ireplace(' FLOAT (', ' FLOAT(', $result);
-        $result = str_ireplace(' DOUBLE (', ' DOUBLE(', $result);
-        $result = str_ireplace(' REAL (', ' REAL(', $result);
-
-        $result = str_ireplace(' BOOLEAN (', ' BOOLEAN(', $result);
-
+        $result = $this->trimColumnType($result);
+        
         // Specific conversion for BOOLEAN(11) which might come from MySQL TINYINT(1) export and needs to be INTEGER(11) for some targets
-        $result = str_ireplace(' BOOLEAN(11)', ' INTEGER(11)', $result);
+        $sql = str_ireplace(' BOOLEAN(11)', ' INTEGER(11)', $sql);
         
         // Add more similar patterns as needed.
         return $result;
+    }
+    
+    /**
+     * Normalizes spacing around parentheses in SQL column type declarations.
+     *
+     * This function removes unnecessary spaces between SQL data types and the opening parenthesis
+     * (e.g., converts "VARCHAR (255)" to "VARCHAR(255)"). It handles various SQL types such as 
+     * character, integer, decimal, and boolean types, making the format consistent.
+     *
+     * Additionally, it performs a special case replacement for "BOOLEAN(11)" to "INTEGER(11)",
+     * which is commonly needed when converting from MySQL's TINYINT(1) to a more appropriate type
+     * in other database systems.
+     *
+     * @param string $sql The SQL string containing column type definitions to normalize.
+     * @return string The normalized SQL string with consistent type formatting.
+     */
+    public function trimColumnType($sql)
+    {
+        $sql = str_ireplace(' NVARCHAR (', ' NVARCHAR(', $sql);
+        $sql = str_ireplace(' VARCHAR (', ' VARCHAR(', $sql);
+        $sql = str_ireplace(' CHARACTER VARYING (', ' CHARACTER VARYING(', $sql);
+        $sql = str_ireplace(' CHAR (', ' CHAR(', $sql);
+        $sql = str_ireplace(' NCHAR (', ' NCHAR(', $sql);
+
+        $sql = str_ireplace(' INT (', ' INT(', $sql);
+        $sql = str_ireplace(' INTEGER (', ' INTEGER(', $sql);
+        $sql = str_ireplace(' TINYINT (', ' TINYINT(', $sql);
+        $sql = str_ireplace(' SMALLINT (', ' SMALLINT(', $sql);
+        $sql = str_ireplace(' MEDIUMINT (', ' MEDIUMINT(', $sql);
+        $sql = str_ireplace(' BIGINT (', ' BIGINT(', $sql);
+
+        $sql = str_ireplace(' DECIMAL (', ' DECIMAL(', $sql);
+        $sql = str_ireplace(' NUMERIC (', ' NUMERIC(', $sql);
+        $sql = str_ireplace(' FLOAT (', ' FLOAT(', $sql);
+        $sql = str_ireplace(' DOUBLE (', ' DOUBLE(', $sql);
+        $sql = str_ireplace(' REAL (', ' REAL(', $sql);
+
+        $sql = str_ireplace(' BOOLEAN (', ' BOOLEAN(', $sql);
+
+        return $sql;
     }
 
     /**
