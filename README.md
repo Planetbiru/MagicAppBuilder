@@ -414,6 +414,16 @@ composer dump-autoload --ignore-platform-reqs
 | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/brave-browser-icon.png)   | Brave            | 1.78            |
 | ![](https://github.com/Planetbiru/MagicAppBuilder/blob/main/lib.assets/images/64/vivaldi-icon.png)         | Vivaldi          | 7.4             |
 
+## Database Support
+
+| DBMS                    | Envrionemt               |
+| ----------------------- | ------------------------ |
+| MySQL                   | Development & Production |
+| MariaDB                 | Development & Production |
+| PostgreSQL              | Development & Production |
+| SQLite                  | Development & Production |
+| SQL Server              | Production only          |
+
 
 ## Conclusion
 
