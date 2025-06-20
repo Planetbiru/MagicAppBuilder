@@ -169,7 +169,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * Active
 	 * 
 	 * @NotNull
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="0", nullable=true)
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
 	 * @Label(content="Active")
 	 * @var bool
 	 */
