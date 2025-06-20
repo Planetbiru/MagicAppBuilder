@@ -564,7 +564,7 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 -   **Validation Message Localization:** Translate input validation messages to match the user's preferred language.
 
--   **Database Export Query Conversion:** Convert `CREATE TABLE` and `INSERT` queries to match the target DBMS during database export.
+-   **Database Export Query Conversion:** Convert `CREATE TABLE` and `INSERT` statements to match the target DBMS during database export.
 
 -   **New Database Conversion Support:** You can now convert `CREATE TABLE` and `INSERT` statements to SQL Server from:
 
