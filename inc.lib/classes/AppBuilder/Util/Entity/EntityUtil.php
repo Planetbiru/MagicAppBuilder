@@ -190,7 +190,7 @@ class EntityUtil
         if (isset($joinColumns) && is_array($joinColumns) && !empty($joinColumns)) {
             $table .= '<tr><td colspan="2">Join Columns</td></tr>';
             foreach ($joinColumns as $column) {
-                $ref = isset($column['refernceColumnName']) ? $column['refernceColumnName'] : $column['name'];
+                $ref = isset($column['referenceColumnName']) ? $column['referenceColumnName'] : $column['name'];
                 $table .= '<tr><td>'.$column['name'].'</td><td>'.$ref.'</td></tr>'; // NOSONAR
             }
         }
