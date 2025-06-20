@@ -1,4 +1,4 @@
-# MagicAppBuilder: Low-Code Programming Platform
+# MagicAppBuilder: Low-Code Platform
 
 
 ## History and Introduction
