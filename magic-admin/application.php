@@ -504,6 +504,7 @@ $sortOrderMap = array(
 	"author" => "author",
 	"baseApplicationDirectory" => "baseApplicationDirectory",
 	"sortOrder" => "sortOrder",
+	"timeCreate" => "timeCreate",
 	"active" => "active"
 );
 
@@ -709,6 +710,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="author" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAuthor();?></a></td>
 								<td data-col-name="base_application_directory" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
+								<td data-col-name="time_create" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTimeCreate();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
@@ -748,6 +750,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="author"><?php echo $application->getAuthor();?></td>
 								<td data-col-name="base_application_directory"><?php echo $application->getBaseApplicationDirectory();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $application->getSortOrder();?></td>
+								<td data-col-name="time_create"><?php echo $application->getTimeCreate();?></td>
 								<td data-col-name="active"><?php echo $application->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
