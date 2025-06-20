@@ -938,10 +938,17 @@ class PicoDatabaseConverter // NOSONAR
     {
         $sql = trim($sql);
 
-        if (!preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([^\s`(]+)`?\s*\(/i', $sql, $matches, PREG_OFFSET_CAPTURE)) {
+        // This regex needs to properly capture the table name and the main body.
+        // The previous one might miss IF NOT EXISTS correctly for SQL Server later.
+        // For SQL Server, IF NOT EXISTS is not standard in CREATE TABLE.
+        if (!preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([^\s`(]+)`?(\s*COLLATE\s+[^\s]+)?\s*\(/i', $sql, $matches, PREG_OFFSET_CAPTURE)) {
             throw new DatabaseConversionException("Invalid MySQL CREATE TABLE statement format.");
         }
 
+        // SQL Server typically doesn't use IF NOT EXISTS directly in CREATE TABLE.
+        // You might want to handle this with a separate check (e.g., `IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'YourTable') CREATE TABLE...`)
+        // For this function's scope, we'll just ignore or remove it from the final output.
+        $ifNotExists = isset($matches[1][0]) ? $matches[1][0] : ''; // Capture it, but we'll remove it later
         $tableName = $this->quoteIdentifier($matches[2][0], 'sqlserver');
         $startPos = $matches[0][1] + strlen($matches[0][0]) - 1;
 
@@ -963,76 +970,224 @@ class PicoDatabaseConverter // NOSONAR
 
         $columnsSection = substr($sql, $startPos + 1, $i - $startPos - 2);
 
+        // Split lines by comma, but only if the comma is NOT inside parentheses.
+        // This is crucial for handling ENUM/SET definitions.
         $lines = preg_split('/,(?![^\(\)]*\))/', $columnsSection);
         $newLines = [];
         $tableConstraints = [];
+        $columnComments = []; // To store comments for SQL Server's COMMENT ON syntax
 
         foreach ($lines as $line) {
             $line = trim($line);
             if ($line === '') continue;
 
-            if (preg_match('/^`?([^`\s]+)`?\s+([a-zA-Z0-9_\(\)]+)(.*)$/i', $line, $colMatches)) {
+            // 1. Capture and temporarily remove COMMENT from the end of the line
+            // For SQL Server, comments are typically added via COMMENT ON COLUMN after CREATE TABLE.
+            // If you absolutely need them inline as a string, we can put them back.
+            $comment = '';
+            if (preg_match("/COMMENT\s*'(.*?)'$/i", $line, $commentMatches)) {
+                $comment = " COMMENT '" . $commentMatches[1] . "'"; // Store as string if you want inline
+                $line = preg_replace("/COMMENT\s*'.*?'$/i", '', $line); // Remove comment for parsing
+            }
+            
+            // Remove other MySQL-specific attributes
+            $line = preg_replace('/\s+CHARACTER\s+SET\s+[a-zA-Z0-9_]+/i', '', $line);
+            $line = preg_replace('/\s+COLLATE\s+[a-zA-Z0-9_]+/i', '', $line);
+            $line = preg_replace('/\s+UNSIGNED/i', '', $line);
+            $line = preg_replace('/\s+ZEROFILL/i', '', $line);
+
+
+            // Column definition parsing
+            // This regex needs to be careful not to capture `enum('A','B')` as part of type if it's separate.
+            // We'll rely on the specific ENUM/SET check below.
+            if (preg_match('/^`?([^`\s]+)`?\s+([a-zA-Z0-9_]+(?:\s*\([^)]*\))?)(.*)$/i', $line, $colMatches)) {
                 $columnName = $this->quoteIdentifier($colMatches[1], 'sqlserver');
-                $columnType = strtolower(trim($colMatches[2]));
+                $columnTypeRaw = strtolower(trim($colMatches[2])); // Capture original type with length/options
                 $columnDefinition = trim($colMatches[3]);
 
-                $translatedType = $this->translateFieldType($columnType, 'mysql', 'sqlserver');
+                $translatedType = '';
 
-                // AUTO_INCREMENT → IDENTITY
-                if ($this->isAutoIncrementColumn($columnType, $columnDefinition)) {
-                    $translatedType = 'BIGINT IDENTITY(1,1)';
-                    $columnDefinition = preg_replace('/\bAUTO_INCREMENT\b/i', '', $columnDefinition);
-                    $columnDefinition = preg_replace('/\bDEFAULT\s+[^ ]+/i', '', $columnDefinition);
-                    $columnDefinition = preg_replace('/\bPRIMARY KEY\b/i', '', $columnDefinition); // akan diproses tersendiri
+                // --- FOKUS UTAMA: ENUM/SET -> NVARCHAR(255) ---
+                if (preg_match('/^(enum|set)\s*\(([^)]+)\)/i', $columnTypeRaw, $enumMatches)) {
+                    // Set the translated type directly to NVARCHAR(255)
+                    $translatedType = 'NVARCHAR(255)';
+
+                    // Remove the enum options from the columnDefinition, if they somehow remained
+                    // This regex specifically targets the ('value1','value2') pattern
+                    $columnDefinition = preg_replace('/\s*\(\s*\'[^\']+\'(?:,\s*\'[^\']+\')*\s*\)/i', '', $columnDefinition);
+                    
+                    // If there's a DEFAULT value for ENUM, make sure it's handled correctly
+                    // e.g., 'P' for 'enum('P','A')' -> 'DEFAULT N'P''
+                    if (preg_match("/DEFAULT\s+'([^']+)'/i", $columnDefinition, $defaultMatches)) {
+                        $columnDefinition = str_ireplace("DEFAULT '" . $defaultMatches[1] . "'", "DEFAULT N'" . $defaultMatches[1] . "'", $columnDefinition);
+                    }
                 }
-                
-                // BOOLEAN (tinyint(1)) → BIT
-                if (preg_match('/tinyint\s*\(\s*1\s*\)/i', $columnType)) {
+                // AUTO_INCREMENT -> IDENTITY(1,1)
+                elseif ($this->isAutoIncrementColumn($columnTypeRaw, $columnDefinition)) {
+                    // Ensure it becomes BIGINT for IDENTITY(1,1) if original was BIGINT, otherwise INT.
+                    // SQL Server IDENTITY requires integer types.
+                    if (stripos($columnTypeRaw, 'bigint') !== false) {
+                        $translatedType = 'BIGINT IDENTITY(1,1)';
+                    } else {
+                        $translatedType = 'INT IDENTITY(1,1)';
+                    }
+                    
+                    $columnDefinition = preg_replace('/\bAUTO_INCREMENT\b/i', '', $columnDefinition);
+                    // Remove MySQL's DEFAULT value if it came with AUTO_INCREMENT, as IDENTITY handles defaults
+                    $columnDefinition = preg_replace('/\bDEFAULT\s+[^ ]+/i', '', $columnDefinition);
+                    // PRIMARY KEY will be handled by tableConstraints if it's explicitly defined,
+                    // but for identity columns, it's often implicit or added separately.
+                    // We'll let the PRIMARY KEY constraint logic handle it if it exists as a separate line.
+                }
+                // BOOLEAN (tinyint(1)) -> BIT
+                elseif (preg_match('/tinyint\s*\(\s*1\s*\)/i', $columnTypeRaw)) {
                     $translatedType = 'BIT';
                     $columnDefinition = str_ireplace("DEFAULT '1'", 'DEFAULT 1', $columnDefinition);
                     $columnDefinition = str_ireplace("DEFAULT '0'", 'DEFAULT 0', $columnDefinition);
                 }
+                // Handle other general types
+                else {
+                    // Remove length from types like bigint(20), int(11) before passing to translateFieldType
+                    $baseType = preg_replace('/\(\d+\)/', '', $columnTypeRaw);
+                    $translatedType = $this->translateFieldType($baseType, 'mysql', 'sqlserver');
 
-                // ENUM/SET → NVARCHAR
-                if (stripos($columnType, 'enum') !== false || stripos($columnType, 'set') !== false) {
-                    $translatedType = 'NVARCHAR(255)';
+                    // If original type was VARCHAR(N) or CHAR(N), re-append length
+                    if (preg_match('/^(?:var)?char\((\d+)\)$/i', $columnTypeRaw, $lenMatches)) {
+                        // For SQL Server, typically VARCHAR stays VARCHAR, TEXT stays TEXT (or VARCHAR(MAX))
+                        // If translateFieldType converts VARCHAR to NVARCHAR, append length to NVARCHAR
+                        if (strtoupper($translatedType) === 'VARCHAR' || strtoupper($translatedType) === 'NVARCHAR') {
+                            $translatedType .= '(' . $lenMatches[1] . ')';
+                        }
+                    }
+                    // Handle TEXT type from MySQL (longtext, mediumtext, text) to NVARCHAR(MAX) or TEXT in SQL Server
+                    if (in_array(strtolower($columnTypeRaw), ['text', 'mediumtext', 'longtext'])) {
+                        $translatedType = 'NVARCHAR(MAX)'; // Common mapping for text types in SQL Server
+                    }
                 }
+
+                // Remove MySQL-specific ON UPDATE
+                $columnDefinition = preg_replace('/\s+ON\s+UPDATE\s+CURRENT_TIMESTAMP/i', '', $columnDefinition);
+                
+                // Normalize spaces and remove any lingering outer parentheses
+                $columnDefinition = preg_replace('/\s+/', ' ', trim($columnDefinition));
+                $columnDefinition = preg_replace('/^\s*\(?\s*|\s*\)\s*$/', '', $columnDefinition);
+
+                // Add 'N' prefix to default string values for NVARCHAR, but only if they don't already have it
+                if (stripos($translatedType, 'NVARCHAR') !== false && preg_match("/DEFAULT\s+'([^']+)'/i", $columnDefinition, $defaultValMatches)) {
+                    if (stripos($defaultValMatches[0], "DEFAULT N'") === false) { // Avoid double N'
+                        $columnDefinition = str_ireplace("DEFAULT '" . $defaultValMatches[1] . "'", "DEFAULT N'" . $defaultValMatches[1] . "'", $columnDefinition);
+                    }
+                }
+                $columnDefinition = preg_replace("/DEFAULT\s+N'([^']+)'/i", "DEFAULT '$1'", $columnDefinition);
 
                 $newLines[] = $columnName . ' ' . $translatedType . ' ' . trim($columnDefinition);
+                // Store column comments for SQL Server's COMMENT ON syntax (if desired, currently inline)
+                // If you want actual SQL Server comments, this part needs to generate separate COMMENT ON statements.
+                // For inline comments (as you previously requested), they are already appended in $newLines.
             }
-            elseif (preg_match('/^(PRIMARY KEY|UNIQUE KEY)\s*`?([^`]+)?`?\s*\((.+)\)/i', $line, $keyMatches)) {
+            // Handle table-level PRIMARY KEY and UNIQUE KEY constraints
+            elseif (preg_match('/^(PRIMARY KEY|UNIQUE KEY|FOREIGN KEY)\s*`?([^`]+)?`?\s*\((.+)\)(.*)$/i', $line, $keyMatches)) {
                 $keyType = strtoupper($keyMatches[1]);
-                $keyName = $keyMatches[2];
-                $keyColumns = preg_replace('/`([^`]+)`/', '[$1]', $keyMatches[3]);
+                $keyName = isset($keyMatches[2]) && !empty($keyMatches[2]) ? $this->quoteIdentifier($keyMatches[2], 'sqlserver') : null;
+                $keyColumns = preg_replace('/`([^`]+)`/', '[$1]', $keyMatches[3]); // Convert backticks to square brackets
+                $keyRest = trim($keyMatches[4]); // For FOREIGN KEY REFERENCES clause
+
+                $constraintDeclaration = '';
+                if ($keyName) {
+                    $constraintDeclaration = 'CONSTRAINT ' . $keyName . ' ';
+                }
 
                 if ($keyType === 'PRIMARY KEY') {
-                    $tableConstraints[] = 'PRIMARY KEY (' . $keyColumns . ')';
+                    $tableConstraints[] = $constraintDeclaration . 'PRIMARY KEY (' . $keyColumns . ')';
                 } elseif ($keyType === 'UNIQUE KEY') {
-                    $tableConstraints[] = 'CONSTRAINT ' . $this->quoteIdentifier($keyName, 'sqlserver') . ' UNIQUE (' . $keyColumns . ')';
+                    $tableConstraints[] = $constraintDeclaration . 'UNIQUE (' . $keyColumns . ')';
+                } elseif ($keyType === 'FOREIGN KEY') {
+                    // Convert REFERENCES table and columns to SQL Server format
+                    $keyRest = preg_replace_callback('/REFERENCES\s+`?([^`]+)`?\s*\(([^)]+)\)/i', function($m) {
+                        $refTable = $this->quoteIdentifier($m[1], 'sqlserver');
+                        $refColumns = preg_replace('/`([^`]+)`/', '[$1]', $m[2]);
+                        return 'REFERENCES ' . $refTable . ' (' . $refColumns . ')';
+                    }, $keyRest);
+                    // Convert ON DELETE/ON UPDATE actions if necessary
+                    $keyRest = preg_replace('/\s+ON\s+DELETE\s+NO\s+ACTION/i', ' ON DELETE NO ACTION', $keyRest);
+                    $keyRest = preg_replace('/\s+ON\s+DELETE\s+RESTRICT/i', ' ON DELETE NO ACTION', $keyRest); // RESTRICT maps to NO ACTION
+                    $keyRest = preg_replace('/\s+ON\s+UPDATE\s+NO\s+ACTION/i', ' ON UPDATE NO ACTION', $keyRest);
+                    $keyRest = preg_replace('/\s+ON\s+UPDATE\s+RESTRICT/i', ' ON UPDATE NO ACTION', $keyRest); // RESTRICT maps to NO ACTION
+
+                    $tableConstraints[] = $constraintDeclaration . 'FOREIGN KEY (' . $keyColumns . ') ' . $keyRest;
                 }
             }
+            // General line handling for anything not caught above (e.g., general comments, other table options)
             else {
-                // Replace backticks with square brackets for SQL Server
+                // Replace backticks with square brackets for SQL Server identifiers
                 $line = preg_replace_callback('/`([^`]+)`/', function ($m) {
                     return $this->quoteIdentifier($m[1], 'sqlserver');
                 }, $line);
-                $newLines[] = $line;
+                
+                // Remove MySQL-specific table options that might appear on separate lines
+                $line = preg_replace('/\s*AUTO_INCREMENT/i', '', $line);
+                $line = preg_replace('/\s*DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $line);
+                $line = preg_replace('/\s*COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $line);
+                $line = preg_replace('/\s*ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $line);
+                $line = preg_replace("/COMMENT\s+'.*?'/i", '', $line); // Table-level comment
+                $line = preg_replace('/\s+ROW_FORMAT\s*=\s*DYNAMIC/i', '', $line);
+                
+                $line = preg_replace('/\s+/', ' ', trim($line)); // Normalize spaces
+                if ($line !== '') {
+                    $newLines[] = $line;
+                }
             }
         }
 
+        // Append table constraints
         if (!empty($tableConstraints)) {
-            $newLines = array_merge($newLines, $tableConstraints);
+            // Filter out redundant primary keys if IDENTITY already implied one
+            $filteredTableConstraints = [];
+            $hasIdentityPrimaryKey = false;
+            foreach ($newLines as $colDef) {
+                if (preg_match('/\s(?:IDENTITY)\s.*PRIMARY KEY/i', $colDef)) {
+                    $hasIdentityPrimaryKey = true;
+                    break;
+                }
+            }
+            foreach ($tableConstraints as $constraint) {
+                if ($hasIdentityPrimaryKey && stripos($constraint, 'PRIMARY KEY') !== false) {
+                    if (preg_match('/PRIMARY KEY \(\[([^\]]+)\]\)/i', $constraint, $pkMatch) && count(explode(',', $pkMatch[1])) == 1) {
+                        continue; // Skip simple primary key if identity already made one
+                    }
+                }
+                $filteredTableConstraints[] = $constraint;
+            }
+            $newLines = array_merge($newLines, $filteredTableConstraints);
         }
 
-        $finalSql = "CREATE TABLE " . $tableName . " (\n    " . implode(",\n    ", $newLines) . "\n)";
+        // Final SQL Construction
+        $finalSql = "CREATE TABLE " . $tableName . " (\n    " . implode(",\n    ", array_filter($newLines)) . "\n)";
 
-        // Clean up MySQL-specific options
-        $finalSql = preg_replace('/ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
-        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql);
+        // Clean up MySQL-specific table options (again, in case they are at the very end of the statement)
+        $finalSql = preg_replace('/\s+ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql); // Table-level comment
+        $finalSql = preg_replace('/\s+AUTO_INCREMENT\s*=\s*\d+/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+IF\s+NOT\s+EXISTS/i', '', $finalSql); // Remove MySQL IF NOT EXISTS
 
-        // Final cleanup
+        // Replace backticks with square brackets for SQL Server identifiers
+        $finalSql = preg_replace_callback('/`([^`]+)`/', function ($m) {
+            return '[' . str_replace(']', ']]', $m[1]) . ']'; // Handle escaping brackets
+        }, $finalSql);
+
+        // Final cleanup of extra spaces or common MySQL remnants
+        $finalSql = preg_replace('/\s+DEFAULT\s+NULL/', ' NULL DEFAULT NULL', $finalSql);
+        $finalSql = preg_replace('/\s+NULL\s+NULL\s+DEFAULT\s+NULL/', ' NULL DEFAULT NULL', $finalSql);
+        $finalSql = preg_replace('/\s+unsigned/i', '', $finalSql);
+        $finalSql = preg_replace('/\s+zerofill/i', '', $finalSql);
+        
+        // Clean up excessive whitespace
+        $finalSql = preg_replace('/\s*\n\s*/', "\n", $finalSql);
+        $finalSql = preg_replace('/\s{2,}/', ' ', $finalSql);
+        
+        // Assuming fixLines handles general formatting, like consistent indentation.
         $finalSql = $this->fixLines($finalSql);
 
         return trim($finalSql) . ';';
