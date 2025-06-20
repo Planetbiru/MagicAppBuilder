@@ -45,7 +45,7 @@ class AppAdminProfileImpl extends MagicObject
 	/**
 	 * Admin
 	 * 
-	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
+	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Admin")
 	 * @var AppAdminMinImpl
 	 */

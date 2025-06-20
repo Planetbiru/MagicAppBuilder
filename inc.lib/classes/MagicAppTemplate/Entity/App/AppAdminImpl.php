@@ -72,7 +72,7 @@ class AppAdminImpl extends MagicObject
 	/**
 	 * Admin Level ID
 	 * 
-	 * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id")
+	 * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id", referenceTableName="admin_level")
 	 * @Label(content="Admin Level")
 	 * @var AppAdminLevelMinImpl
 	 */

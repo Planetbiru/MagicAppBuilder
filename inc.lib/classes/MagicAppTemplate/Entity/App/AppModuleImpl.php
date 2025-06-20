@@ -66,7 +66,7 @@ class AppModuleImpl extends MagicObject
 	 * Module Group
 	 * 
 	 * @NotNull
-	 * @JoinColumn(name="module_group_id", referenceColumnName="module_group_id")
+	 * @JoinColumn(name="module_group_id", referenceColumnName="module_group_id", referenceTableName="module_group")
 	 * @Label(content="Module Group")
 	 * @var AppModuleGroupImpl
 	 */
@@ -86,7 +86,7 @@ class AppModuleImpl extends MagicObject
 	 * Parent Module
 	 * 
 	 * @NotNull
-	 * @JoinColumn(name="parent_module_id", referenceColumnName="module_id")
+	 * @JoinColumn(name="parent_module_id", referenceColumnName="module_id", referenceTableName="module")
 	 * @Label(content="Parent Module")
 	 * @var AppModuleMinImpl
 	 */
@@ -192,7 +192,7 @@ class AppModuleImpl extends MagicObject
 	/**
 	 * Creator
 	 * 
-	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id")
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Creator")
 	 * @var AppAdminMinImpl
 	 */
@@ -210,7 +210,7 @@ class AppModuleImpl extends MagicObject
 	/**
 	 * Editor
 	 * 
-	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id")
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Editor")
 	 * @var AppAdminMinImpl
 	 */

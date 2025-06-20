@@ -123,7 +123,7 @@ class AppModuleGroupImpl extends MagicObject
 	/**
 	 * Creator
 	 * 
-	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id")
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Creator")
 	 * @var AppAdminMinImpl
 	 */
@@ -141,7 +141,7 @@ class AppModuleGroupImpl extends MagicObject
 	/**
 	 * Editor
 	 * 
-	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id")
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Editor")
 	 * @var AppAdminMinImpl
 	 */
