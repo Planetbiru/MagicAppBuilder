@@ -49,6 +49,13 @@ class PicoDatabaseConverter // NOSONAR
      * @var array
      */
     private $dbToPostgreSQL;
+    
+    /**
+     * Array mapping of database field types to SQLServer data types.
+     *
+     * @var array
+     */
+    private $dbToSQLServer;
 
     /**
      * Array mapping of SQL data types to PHP types.
@@ -147,11 +154,11 @@ class PicoDatabaseConverter // NOSONAR
             "tinyint(1)" => "TINYINT(1)", // NOSONAR
             "tinyint" => "TINYINT",
             "integer" => "BIGINT",
+            "int" => "INT",
             
             "bigserial" => "BIGINT",
             "serial" => "INT",
 
-            "int" => "INT",
             "float" => "FLOAT",
             "real" => "DOUBLE",
             "double precision" => "DOUBLE",
@@ -191,6 +198,73 @@ class PicoDatabaseConverter // NOSONAR
             "enum" => "ENUM",
             "set" => "SET"
         ];
+        
+        $this->dbToSQLServer = [
+            // Integer types
+            "bigint" => "BIGINT",
+            "mediumint" => "INT",              // Tidak ada MEDIUMINT di SQL Server
+            "smallint" => "SMALLINT",
+            "tinyint(1)" => "BIT",             // tinyint(1) biasa digunakan sebagai boolean
+            "tinyint" => "TINYINT",
+            "integer" => "INT",
+            "int" => "INT",
+
+            // Serial types (PostgreSQL)
+            "bigserial" => "BIGINT IDENTITY(1,1)",
+            "serial" => "INT IDENTITY(1,1)",
+
+            // Floating-point types
+            "float" => "FLOAT",
+            "real" => "REAL",
+            "double precision" => "FLOAT",
+            "double" => "FLOAT",
+            "decimal" => "DECIMAL(18,2)",      // Presisi default, bisa disesuaikan
+            "numeric" => "NUMERIC(18,2)",
+            "money" => "MONEY",
+
+            // Boolean / bit
+            "bit" => "BIT",
+            "boolean" => "BIT",
+
+            // Character types
+            "char" => "NCHAR",
+            "varchar" => "NVARCHAR",           // Harus disesuaikan panjangnya saat digunakan
+            "nvarchar" => "NVARCHAR",
+            "character varying" => "NVARCHAR",
+
+            // Text types
+            "tinytext" => "NVARCHAR(255)",     // Approximation
+            "text" => "NVARCHAR(MAX)",
+            "mediumtext" => "NVARCHAR(MAX)",
+            "longtext" => "NVARCHAR(MAX)",
+
+            // JSON and XML
+            "json" => "NVARCHAR(MAX)",
+            "jsonb" => "NVARCHAR(MAX)",        // PostgreSQL specific, treated the same
+            "xml" => "XML",
+
+            // Binary types
+            "binary" => "BINARY",
+            "varbinary" => "VARBINARY(MAX)",
+            "blob" => "VARBINARY(MAX)",        // No BLOB in SQL Server, use VARBINARY(MAX)
+
+            // UUID
+            "uuid" => "UNIQUEIDENTIFIER",
+
+            // Date and time
+            "timestamp with time zone" => "DATETIMEOFFSET", // SQL Server equivalent
+            "timestamp without time zone" => "DATETIME2",
+            "timestamptz" => "DATETIMEOFFSET",
+            "datetime" => "DATETIME",
+            "date" => "DATE",
+            "time" => "TIME",
+            "year" => "SMALLINT", // No 'YEAR' type in SQL Server
+
+            // Unsupported types
+            "enum" => "NVARCHAR(255)",         // SQL Server does not support ENUM natively
+            "set" => "NVARCHAR(255)",          // Likewise, SET not supported
+        ];
+
 
         $this->dbToPostgreSQL = [
             "bigint" => "BIGINT",
@@ -389,7 +463,7 @@ class PicoDatabaseConverter // NOSONAR
      *
      * @param mixed  $value   The raw input value (e.g., string, int, stream resource).
      * @param string $sqlType The SQL type name (e.g., 'int', 'boolean', 'json', etc.).
-     * @param string $dialect The database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @param string $dialect The database dialect (e.g., 'mysql', 'postgresql', 'sqlite', 'sqlserver').
      *
      * @return mixed The value converted to the appropriate PHP type or quoted string.
      */
@@ -415,22 +489,22 @@ class PicoDatabaseConverter // NOSONAR
             case 'bigserial':
             case 'year':
             case 'bit':
-                return (int) $value;
+                    return (int) $value;
 
             case 'tinyint':
             case 'tinyint(1)':
             case 'boolean':
             case 'bool':
-                // Convert to boolean; fall back to null if unrecognized
-                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                if (!isset($value)) {
-                    return null;
-                }
-                // For SQLite, return as integer 0/1
-                if (stripos($dialect, 'sqlite') !== false) {
-                    return $value === true ? 1 : 0;
-                }
-                return $value ? "TRUE" : "FALSE";
+                    // Convert to boolean; fall back to null if unrecognized
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    if (!isset($value)) {
+                        return null;
+                    }
+                    // For SQLite, return as integer 0/1
+                    if (stripos($dialect, 'sqlite') !== false) {
+                        return $value === true ? 1 : 0;
+                    }
+                    return $value ? "TRUE" : "FALSE";
 
             case 'float':
             case 'real':
@@ -439,20 +513,20 @@ class PicoDatabaseConverter // NOSONAR
             case 'decimal':
             case 'numeric':
             case 'money':
-                return (float) $value;
+                    return (float) $value;
 
             case 'json':
             case 'jsonb':
-                // Decode JSON into an associative array
-                return $this->quoteString(json_decode($value, true));
+                    // Decode JSON into an associative array
+                    return $this->quoteString(json_decode($value, true));
 
             case 'blob':
             case 'binary':
             case 'varbinary':
             case 'bytea':
-                // If the value is a resource (e.g., stream), read it; otherwise cast to string
-                $result = is_resource($value) ? stream_get_contents($value) : (string) $value;
-                return $this->quoteString($result);
+                    // If the value is a resource (e.g., stream), read it; otherwise cast to string
+                    $result = is_resource($value) ? stream_get_contents($value) : (string) $value;
+                    return $this->quoteString($result);
 
             case 'date':
             case 'time':
@@ -461,14 +535,25 @@ class PicoDatabaseConverter // NOSONAR
             case 'timestamp with time zone':
             case 'timestamp without time zone':
             case 'timestamptz':
-                // Optionally return as DateTime object instead of string
-                $result = (string) $value;
-                return $this->quoteString($result);
+                    // Optionally return as DateTime object instead of string
+                    $result = (string) $value;
+                    return $this->quoteString($result);
+
+            // --- SQL Server specific types ---
+            case 'nvarchar':
+            case 'nchar':
+            case 'varchar':
+            case 'char':
+            case 'text':
+            case 'ntext':
+            case 'uniqueidentifier':
+            case 'xml':
+                    return $this->quoteString((string) $value);
 
             default:
-                // Fallback: treat as string
-                $result = (string) $value; // NOSONAR
-                return $this->quoteString($result); // quote and escape the string
+                    // Fallback: treat as string
+                    $result = (string) $value; // NOSONAR
+                    return $this->quoteString($result); // quote and escape the string
         }
     }
 
@@ -567,6 +652,10 @@ class PicoDatabaseConverter // NOSONAR
             }
             case 'sqlite': {
                 $targetMap = $this->dbToSqlite;
+                break;
+            }
+            case 'sqlserver': {
+                $targetMap = $this->dbToSQLServer;
                 break;
             }
             default: {
@@ -837,6 +926,255 @@ class PicoDatabaseConverter // NOSONAR
 
         return trim($finalSql) . ';';
     }
+    
+    /**
+     * Translates a CREATE TABLE statement from MySQL to SQL Server.
+     *
+     * @param string $sql The MySQL CREATE TABLE statement.
+     * @return string The translated SQL Server CREATE TABLE statement.
+     * @throws DatabaseConversionException If the SQL format is invalid.
+     */
+    public function mysqlToSQLServer($sql) // NOSONAR
+    {
+        $sql = trim($sql);
+
+        if (!preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([^\s`(]+)`?\s*\(/i', $sql, $matches, PREG_OFFSET_CAPTURE)) {
+            throw new DatabaseConversionException("Invalid MySQL CREATE TABLE statement format.");
+        }
+
+        $tableName = $this->quoteIdentifier($matches[2][0], 'sqlserver');
+        $startPos = $matches[0][1] + strlen($matches[0][0]) - 1;
+
+        $depth = 1;
+        $i = $startPos + 1;
+        $len = strlen($sql);
+        while ($i < $len && $depth > 0) {
+            if ($sql[$i] === '(') {
+                $depth++;
+            } elseif ($sql[$i] === ')') {
+                $depth--;
+            }
+            $i++;
+        }
+
+        if ($depth !== 0) {
+            throw new DatabaseConversionException("Unbalanced parentheses in CREATE TABLE statement.");
+        }
+
+        $columnsSection = substr($sql, $startPos + 1, $i - $startPos - 2);
+
+        $lines = preg_split('/,(?![^\(\)]*\))/', $columnsSection);
+        $newLines = [];
+        $tableConstraints = [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+
+            if (preg_match('/^`?([^`\s]+)`?\s+([a-zA-Z0-9_\(\)]+)(.*)$/i', $line, $colMatches)) {
+                $columnName = $this->quoteIdentifier($colMatches[1], 'sqlserver');
+                $columnType = strtolower(trim($colMatches[2]));
+                $columnDefinition = trim($colMatches[3]);
+
+                $translatedType = $this->translateFieldType($columnType, 'mysql', 'sqlserver');
+
+                // AUTO_INCREMENT → IDENTITY
+                if ($this->isAutoIncrementColumn($columnType, $columnDefinition)) {
+                    $translatedType = 'BIGINT IDENTITY(1,1)';
+                    $columnDefinition = preg_replace('/\bAUTO_INCREMENT\b/i', '', $columnDefinition);
+                    $columnDefinition = preg_replace('/\bDEFAULT\s+[^ ]+/i', '', $columnDefinition);
+                    $columnDefinition = preg_replace('/\bPRIMARY KEY\b/i', '', $columnDefinition); // akan diproses tersendiri
+                }
+                
+                // BOOLEAN (tinyint(1)) → BIT
+                if (preg_match('/tinyint\s*\(\s*1\s*\)/i', $columnType)) {
+                    $translatedType = 'BIT';
+                    $columnDefinition = str_ireplace("DEFAULT '1'", 'DEFAULT 1', $columnDefinition);
+                    $columnDefinition = str_ireplace("DEFAULT '0'", 'DEFAULT 0', $columnDefinition);
+                }
+
+                // ENUM/SET → NVARCHAR
+                if (stripos($columnType, 'enum') !== false || stripos($columnType, 'set') !== false) {
+                    $translatedType = 'NVARCHAR(255)';
+                }
+
+                $newLines[] = $columnName . ' ' . $translatedType . ' ' . trim($columnDefinition);
+            }
+            elseif (preg_match('/^(PRIMARY KEY|UNIQUE KEY)\s*`?([^`]+)?`?\s*\((.+)\)/i', $line, $keyMatches)) {
+                $keyType = strtoupper($keyMatches[1]);
+                $keyName = $keyMatches[2];
+                $keyColumns = preg_replace('/`([^`]+)`/', '[$1]', $keyMatches[3]);
+
+                if ($keyType === 'PRIMARY KEY') {
+                    $tableConstraints[] = 'PRIMARY KEY (' . $keyColumns . ')';
+                } elseif ($keyType === 'UNIQUE KEY') {
+                    $tableConstraints[] = 'CONSTRAINT ' . $this->quoteIdentifier($keyName, 'sqlserver') . ' UNIQUE (' . $keyColumns . ')';
+                }
+            }
+            else {
+                // Replace backticks with square brackets for SQL Server
+                $line = preg_replace_callback('/`([^`]+)`/', function ($m) {
+                    return $this->quoteIdentifier($m[1], 'sqlserver');
+                }, $line);
+                $newLines[] = $line;
+            }
+        }
+
+        if (!empty($tableConstraints)) {
+            $newLines = array_merge($newLines, $tableConstraints);
+        }
+
+        $finalSql = "CREATE TABLE " . $tableName . " (\n    " . implode(",\n    ", $newLines) . "\n)";
+
+        // Clean up MySQL-specific options
+        $finalSql = preg_replace('/ENGINE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/DEFAULT\s+CHARSET\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql);
+        $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql);
+
+        // Final cleanup
+        $finalSql = $this->fixLines($finalSql);
+
+        return trim($finalSql) . ';';
+    }
+    
+    /**
+     * Translates a SQL Server CREATE TABLE statement to MySQL.
+     * Converts data types and constraints to MySQL equivalents.
+     *
+     * @param string $sql The SQL Server CREATE TABLE statement.
+     * @return string The translated MySQL CREATE TABLE statement.
+     * @throws DatabaseConversionException If the SQL format is invalid.
+     */
+    public function sqlServerToMySQL($sql) // NOSONAR
+    {
+        $posOpen = strpos(strtoupper($sql), '(');
+        if ($posOpen === false) {
+            throw new DatabaseConversionException("Invalid CREATE TABLE: missing opening parenthesis.");
+        }
+
+        $len = strlen($sql);
+        $parenCount = 0;
+        $posClose = false;
+        for ($i = $posOpen; $i < $len; $i++) {
+            if ($sql[$i] === '(') {
+                $parenCount++;
+            } elseif ($sql[$i] === ')') {
+                $parenCount--;
+            }
+            if ($parenCount === 0) {
+                $posClose = $i;
+                break;
+            }
+        }
+
+        if ($posClose === false) {
+            throw new DatabaseConversionException("Invalid CREATE TABLE: unbalanced parentheses.");
+        }
+
+        if (!preg_match('/CREATE TABLE\s+(\[?)([^\[\]\s]+)\1/i', substr($sql, 0, $posOpen), $matches)) {
+            throw new DatabaseConversionException("Cannot parse table name.");
+        }
+
+        $tableName = $this->quoteIdentifier($matches[2], 'mysql');
+        $columnsDef = trim(substr($sql, $posOpen + 1, $posClose - $posOpen - 1));
+
+        // Split by comma, considering parentheses (for types like DECIMAL(10,2))
+        $lines = [];
+        $buffer = '';
+        $parenLevel = 0;
+        for ($i = 0; $i < strlen($columnsDef); $i++) {
+            $char = $columnsDef[$i];
+            if ($char === '(') $parenLevel++;
+            elseif ($char === ')') $parenLevel--;
+
+            if ($char === ',' && $parenLevel === 0) {
+                $lines[] = trim($buffer);
+                $buffer = '';
+            } else {
+                $buffer .= $char;
+            }
+        }
+        if (trim($buffer) !== '') {
+            $lines[] = trim($buffer);
+        }
+
+        $newLines = [];
+        $primaryKeys = [];
+
+        foreach ($lines as $line) {
+            // Handle identity columns
+            if (preg_match('/^\[?([^\]\s]+)\]?\s+(BIGINT|INT)\s+IDENTITY\s*\(\d+,\s*\d+\)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $type = strtoupper($colMatch[2]);
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} {$type} NOT NULL AUTO_INCREMENT {$rest}";
+            }
+            // Translate NVARCHAR/CHAR types
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+NVARCHAR\s*\((MAX|\d+)\)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $length = strtoupper($colMatch[2]) === 'MAX' ? '65535' : $colMatch[2];
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} VARCHAR({$length}) {$rest}";
+            }
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+NCHAR\s*\((\d+)\)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} CHAR({$colMatch[2]}) {$rest}";
+            }
+            // Translate BIT → TINYINT(1)
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+BIT(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[2]);
+                $newLines[] = "{$colName} TINYINT(1) {$rest}";
+            }
+            // Translate DATETIME2, DATETIMEOFFSET → DATETIME
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+(DATETIME2|DATETIMEOFFSET)(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[3]);
+                $newLines[] = "{$colName} DATETIME {$rest}";
+            }
+            // Translate XML → TEXT
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+XML(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[2]);
+                $newLines[] = "{$colName} TEXT {$rest}";
+            }
+            // Translate UNIQUEIDENTIFIER → CHAR(36)
+            elseif (preg_match('/^\[?([^\]\s]+)\]?\s+UNIQUEIDENTIFIER(.*)$/i', $line, $colMatch)) {
+                $colName = $this->quoteIdentifier($colMatch[1], 'mysql');
+                $rest = trim($colMatch[2]);
+                $newLines[] = "{$colName} CHAR(36) {$rest}";
+            }
+            // PRIMARY KEY constraint
+            elseif (preg_match('/^PRIMARY KEY\s*\((.+)\)/i', $line, $pkMatch)) {
+                $columns = preg_replace('/\[(.*?)\]/', '`$1`', $pkMatch[1]);
+                $newLines[] = "PRIMARY KEY ({$columns})";
+            }
+            // Default handling (just replace brackets)
+            else {
+                $line = preg_replace('/\[(.*?)\]/', '`$1`', $line);
+                $newLines[] = $line;
+            }
+        }
+
+        // Tambahkan koma di akhir setiap baris kecuali baris terakhir
+        $count = count($newLines);
+        foreach ($newLines as $i => &$l) {
+            $l = rtrim($l, ',');
+            if ($i < $count - 1) {
+                $l .= ',';
+            }
+        }
+        unset($l);
+
+        $finalSql = "CREATE TABLE {$tableName} (\n    " . implode("\n    ", $newLines) . "\n)";
+        $finalSql .= "\nENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+        $finalSql = $this->fixLines($finalSql);
+        return trim($finalSql) . ";";
+    }
+
 
     /**
      * Translates a CREATE TABLE statement from MySQL to SQLite.
@@ -1352,45 +1690,6 @@ class PicoDatabaseConverter // NOSONAR
 
         return $result;
     }
-
-    /**
-     * Translates a CREATE TABLE statement from a source dialect to a target dialect.
-     *
-     * @param string $sql The CREATE TABLE statement.
-     * @param string $sourceDialect The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
-     * @param string $targetDialect The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
-     * @return string The translated CREATE TABLE statement.
-     * @throws DatabaseConversionException If an unsupported translation is requested or SQL format is invalid.
-     */
-    public function translateCreateTable($sql, $sourceDialect, $targetDialect) // NOSONAR
-    {
-        $sourceDialect = $this->normalizeDialect($sourceDialect);
-        $targetDialect = $this->normalizeDialect($targetDialect);
-
-        if ($sourceDialect === $targetDialect) {
-            return $sql; // No translation needed
-        }
-
-        // Perform the core dialect-to-dialect translation
-        $result = $this->doTranslateCreateTable($sql, $sourceDialect, $targetDialect);
-
-        // --- Applying common post-translation fixes ---
-        // These fixes address general syntax inconsistencies that might arise across various conversions.
-        // For more complex or dialect-specific transformations, it's better to implement them
-        // within the dedicated `mysqlToPostgreSQL`, `postgresqlToMySQL`, etc., methods.
-
-        // Ensures PRIMARY KEY is always followed by NOT NULL if it was implicitly NULL
-        $result = str_ireplace(' PRIMARY KEY NULL', ' PRIMARY KEY NOT NULL', $result);
-
-        // Removes redundant spaces around parentheses for data types like NVARCHAR
-        $result = $this->trimColumnType($result);
-        
-        // Specific conversion for BOOLEAN(11) which might come from MySQL TINYINT(1) export and needs to be INTEGER(11) for some targets
-        $sql = str_ireplace(' BOOLEAN(11)', ' INTEGER(11)', $sql);
-        
-        // Add more similar patterns as needed.
-        return $result;
-    }
     
     /**
      * Normalizes spacing around parentheses in SQL column type declarations.
@@ -1433,35 +1732,6 @@ class PicoDatabaseConverter // NOSONAR
     }
 
     /**
-     * Translates a CREATE TABLE statement from a source dialect to a target dialect.
-     *
-     * @param string $sql The CREATE TABLE statement.
-     * @param string $sourceDialect The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
-     * @param string $targetDialect The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
-     * @return string The translated CREATE TABLE statement.
-     * @throws DatabaseConversionException If an unsupported translation is requested or SQL format is invalid.
-     */
-    public function doTranslateCreateTable($sql, $sourceDialect, $targetDialect) // NOSONAR
-    {
-        switch ($sourceDialect . 'To' . ucfirst($targetDialect)) {
-            case 'mysqlToPostgresql':
-                return $this->mysqlToPostgreSQL($sql);
-            case 'mysqlToSqlite':
-                return $this->mysqlToSQLite($sql);
-            case 'postgresqlToMysql':
-                return $this->postgresqlToMySQL($sql);
-            case 'postgresqlToSqlite':
-                return $this->postgresqlToSQLite($sql);
-            case 'sqliteToMysql':
-                return $this->sqliteToMySQL($sql);
-            case 'sqliteToPostgresql':
-                return $this->sqliteToPostgreSQL($sql);
-            default:
-                throw new DatabaseConversionException("Unsupported CREATE TABLE translation: from " . $sourceDialect . " to " . $targetDialect);
-        }
-    }
-
-    /**
      * Returns the canonical name for a given database dialect alias.
      *
      * This method normalizes various aliases for common database dialects
@@ -1483,14 +1753,17 @@ class PicoDatabaseConverter // NOSONAR
         $dialect = strtolower(trim($dialect));
 
         $mapping = [
-            'mysql'     => 'mysql',
-            'mariadb'   => 'mysql',
-            'postgres'  => 'postgresql',
-            'pgsql'     => 'postgresql',
-            'postgresql'=> 'postgresql',
-            'sqlite'    => 'sqlite',
-            'sqlite3'   => 'sqlite',
-        ];
+        'mysql'       => 'mysql',
+        'mariadb'     => 'mysql',
+        'postgres'    => 'postgresql',
+        'pgsql'       => 'postgresql',
+        'postgresql'  => 'postgresql',
+        'sqlite'      => 'sqlite',
+        'sqlite3'     => 'sqlite',
+        'sqlserver'   => 'sqlserver',
+        'mssql'       => 'sqlserver',
+        'sqlsrv'      => 'sqlserver'
+    ];
 
         if (isset($mapping[$dialect])) {
             return $mapping[$dialect];
@@ -1506,6 +1779,146 @@ class PicoDatabaseConverter // NOSONAR
         $sql = preg_replace('/\s+/', ' ', $sql); // Normalize spaces
         $sql = preg_replace('/\s*;\s*$/', '', $sql); // Remove trailing semicolon if present
         return $sql;
+    }
+    
+    /**
+     * Translates a CREATE TABLE statement from a source dialect to a target dialect.
+     *
+     * @param string $sql The CREATE TABLE statement.
+     * @param string $sourceDialect The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @param string $targetDialect The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @return string The translated CREATE TABLE statement.
+     * @throws DatabaseConversionException If an unsupported translation is requested or SQL format is invalid.
+     */
+    public function translateCreateTable($sql, $sourceDialect, $targetDialect) // NOSONAR
+    {
+        $sourceDialect = $this->normalizeDialect($sourceDialect);
+        $targetDialect = $this->normalizeDialect($targetDialect);
+
+        if ($sourceDialect === $targetDialect) {
+            return $sql; // No translation needed
+        }
+
+        // Perform the core dialect-to-dialect translation
+        $result = $this->doTranslateCreateTable($sql, $sourceDialect, $targetDialect);
+
+        // --- Applying common post-translation fixes ---
+        // These fixes address general syntax inconsistencies that might arise across various conversions.
+        // For more complex or dialect-specific transformations, it's better to implement them
+        // within the dedicated `mysqlToPostgreSQL`, `postgresqlToMySQL`, etc., methods.
+
+        // Ensures PRIMARY KEY is always followed by NOT NULL if it was implicitly NULL
+        $result = str_ireplace(' PRIMARY KEY NULL', ' PRIMARY KEY NOT NULL', $result);
+
+        // Removes redundant spaces around parentheses for data types like NVARCHAR
+        $result = $this->trimColumnType($result);
+        
+        // Specific conversion for BOOLEAN(11) which might come from MySQL TINYINT(1) export and needs to be INTEGER(11) for some targets
+        $sql = str_ireplace(' BOOLEAN(11)', ' INTEGER(11)', $sql);
+        
+        // Add more similar patterns as needed.
+        return $result;
+    }
+    
+    /**
+     * Translates a CREATE TABLE statement from a source dialect to a target dialect.
+     *
+     * @param string $sql The CREATE TABLE statement.
+     * @param string $sourceDialect The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @param string $targetDialect The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @return string The translated CREATE TABLE statement.
+     * @throws DatabaseConversionException If an unsupported translation is requested or SQL format is invalid.
+     */
+    public function doTranslateCreateTable($sql, $sourceDialect, $targetDialect) // NOSONAR
+    {
+        switch ($sourceDialect . 'To' . ucfirst($targetDialect)) {
+            case 'mysqlToPostgresql':
+                return $this->mysqlToPostgreSQL($sql);
+            case 'mysqlToSqlite':
+                return $this->mysqlToSQLite($sql);
+            case 'mysqlToSqlserver':
+                return $this->mysqlToSQLServer($sql);
+
+            case 'postgresqlToMysql':
+                return $this->postgresqlToMySQL($sql);
+            case 'postgresqlToSqlite':
+                return $this->postgresqlToSQLite($sql);
+            case 'postgresqlToSqlserver':
+                return $this->postgresqlToSQLServer($sql);
+
+            case 'sqliteToMysql':
+                return $this->sqliteToMySQL($sql);
+            case 'sqliteToPostgresql':
+                return $this->sqliteToPostgreSQL($sql);
+            case 'sqliteToSqlserver':
+                return $this->sqliteToSQLServer($sql);
+
+            case 'sqlserverToMysql':
+                return $this->sqlServerToMySQL($sql);
+            case 'sqlserverToPostgresql':
+                return $this->sqlServerToPostgreSQL($sql);
+            case 'sqlserverToSqlite':
+                return $this->sqlServerToSQLite($sql);
+
+            default:
+                throw new DatabaseConversionException("Unsupported CREATE TABLE translation: from " . $sourceDialect . " to " . $targetDialect);
+        }
+    }
+    
+    /**
+     * Converts a PostgreSQL CREATE TABLE statement to SQL Server format.
+     * This is done via intermediate conversion to MySQL.
+     *
+     * @param string $sql The PostgreSQL CREATE TABLE statement.
+     * @return string The translated SQL Server CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
+     */
+    public function postgresqlToSQLServer($sql)
+    {
+        $sql = $this->postgresqlToMySQL($sql);
+        return $this->mysqlToSQLServer($sql);
+    }
+
+    /**
+     * Converts a SQLite CREATE TABLE statement to SQL Server format.
+     * This is done via intermediate conversion to MySQL.
+     *
+     * @param string $sql The SQLite CREATE TABLE statement.
+     * @return string The translated SQL Server CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
+     */
+    public function sqliteToSQLServer($sql)
+    {
+        $sql = $this->sqliteToMySQL($sql);
+        return $this->mysqlToSQLServer($sql);
+    }
+
+    /**
+     * Converts a SQL Server CREATE TABLE statement to PostgreSQL format.
+     * This is done via intermediate conversion to MySQL.
+     *
+     * @param string $sql The SQL Server CREATE TABLE statement.
+     * @return string The translated PostgreSQL CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
+     */
+    public function sqlServerToPostgreSQL($sql)
+    {
+        $sql = $this->sqlServerToMySQL($sql);
+        return $this->mysqlToPostgreSQL($sql);
+    }
+
+    /**
+     * Converts a SQL Server CREATE TABLE statement to SQLite format.
+     * This is done via intermediate conversion to MySQL.
+     *
+     * @param string $sql The SQL Server CREATE TABLE statement.
+     * @return string The translated SQLite CREATE TABLE statement.
+     * @throws DatabaseConversionException If conversion fails at any step.
+     */
+    public function sqlServerToSQLite($sql)
+    {
+        $sql = $this->sqlServerToMySQL($sql);
+        return $this->mysqlToSQLite($sql);
     }
 
     /**
@@ -1548,6 +1961,26 @@ class PicoDatabaseConverter // NOSONAR
 
         return implode("\r\n", $fixedLines);
     }
+    
+    /**
+     * Detects whether a field definition implies an auto-increment behavior,
+     * regardless of the source DBMS (MySQL, PostgreSQL, SQLite).
+     *
+     * @param string $type The column type (e.g., 'int', 'serial', etc.).
+     * @param string $definition The rest of the column definition (e.g., 'AUTO_INCREMENT PRIMARY KEY').
+     * @return bool True if the column is auto-increment.
+     */
+    private function isAutoIncrementColumn($type, $definition)
+    {
+        $type = strtolower($type);
+        $definition = strtolower($definition);
+
+        return
+            strpos($definition, 'auto_increment') !== false ||          // MySQL
+            $type === 'serial' || $type === 'bigserial' ||              // PostgreSQL
+            preg_match('/\binteger\b.*\bprimary key\b.*\bautoincrement\b/', $type . ' ' . $definition); // SQLite
+    }
+
 
     /**
      * Cleans a single line of SQL by removing comments and excess whitespace.

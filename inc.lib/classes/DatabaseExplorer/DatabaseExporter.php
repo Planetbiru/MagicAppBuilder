@@ -138,16 +138,18 @@ class DatabaseExporter // NOSONAR
      */
     public function exportTableStructure($tables, $schema = 'public', $targetDatabaseType = null)
     {
+        $converter = new PicoDatabaseConverter();
+        $targetDatabaseType = $converter->normalizeDialect($targetDatabaseType);
         switch ($this->dbType) {
             case PicoDatabaseType::DATABASE_TYPE_SQLITE:
-                $this->exportSQLiteTableStructure($tables, $targetDatabaseType);
+                $this->exportSQLiteTableStructure($tables, $targetDatabaseType, $converter);
                 break;
             case PicoDatabaseType::DATABASE_TYPE_MYSQL:
             case PicoDatabaseType::DATABASE_TYPE_MARIADB:
-                $this->exportMySQLTableStructure($tables, $targetDatabaseType);
+                $this->exportMySQLTableStructure($tables, $targetDatabaseType, $converter);
                 break;
             case PicoDatabaseType::DATABASE_TYPE_PGSQL:
-                $this->exportPostgreSQLTableStructure($tables, $schema, $targetDatabaseType);
+                $this->exportPostgreSQLTableStructure($tables, $schema, $targetDatabaseType, $converter);
                 break;
             default:
                 break;
@@ -179,9 +181,8 @@ class DatabaseExporter // NOSONAR
      * 
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      */
-    private function exportSQLiteTableStructure($tables, $targetDatabaseType)
+    private function exportSQLiteTableStructure($tables, $targetDatabaseType, $converter)
     {
-        $converter = new PicoDatabaseConverter();
         $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = $table['name'];
@@ -192,7 +193,8 @@ class DatabaseExporter // NOSONAR
                 $createTableSql = $this->formatSQL($createTableSql);
                 $createTableSql = $converter->trimColumnType($createTableSql);
                 $createTableSql = str_replace(array("[", "]"), "", $createTableSql);
-                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
+                
+                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql, $targetDatabaseType);
                 $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
                 $this->outputBuffer .= $createTableSql.self::DOUBLE_NEW_LINE;
@@ -205,9 +207,8 @@ class DatabaseExporter // NOSONAR
      * 
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      */
-    private function exportMySQLTableStructure($tables, $targetDatabaseType)
+    private function exportMySQLTableStructure($tables, $targetDatabaseType, $converter)
     {
-        $converter = new PicoDatabaseConverter();
         $result = $this->db->query(ConstantText::SHOW_TABLES);
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = array_values($table)[0];
@@ -215,7 +216,7 @@ class DatabaseExporter // NOSONAR
             {
                 $createTable = $this->db->query("SHOW CREATE TABLE $tableName");
                 $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['Create Table'];
-                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
+                $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql, $targetDatabaseType);
 
                 $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
@@ -230,9 +231,8 @@ class DatabaseExporter // NOSONAR
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      * @param string $schema The schema where the tables reside (default is 'public').
      */
-    private function exportPostgreSQLTableStructure($tables, $schema = 'public', $targetDatabaseType = null) // NOSONAR
+    private function exportPostgreSQLTableStructure($tables, $schema = 'public', $targetDatabaseType = null, $converter) // NOSONAR
     {
-        $converter = new PicoDatabaseConverter();
         if(!isset($targetDatabaseType))
         {
             $targetDatabaseType = $this->dbType;
@@ -384,7 +384,7 @@ class DatabaseExporter // NOSONAR
      * @param string $createTableQuery The SQL query that creates a table (can be unformatted or missing "IF NOT EXISTS").
      * @return string The processed SQL query with "IF NOT EXISTS" correctly inserted and proper formatting.
      */
-    private function ensureCreateTableIfNotExists($createTableQuery) {
+    private function ensureCreateTableIfNotExists($createTableQuery, $targetDatabaseType) {
         // Remove unnecessary whitespace (tabs, newlines, multiple spaces) from the input query.
         // This ensures the query has only single spaces between tokens.
         $cleanQuery = preg_replace('/\s+/', ' ', $createTableQuery); // Normalize whitespaces.
@@ -417,7 +417,14 @@ class DatabaseExporter // NOSONAR
         $afterTableName = substr($createTableQuery, $tableStartPos + strlen($tableName));
         // Reconstruct the SQL query by adding "CREATE TABLE IF NOT EXISTS" and the table name, 
         // followed by the rest of the query (columns, constraints, etc.).
-        return "CREATE TABLE IF NOT EXISTS " . $tableName . " " . ltrim($afterTableName);
+        if($targetDatabaseType == 'sqlserver')
+        {
+            return "CREATE TABLE $tableName " . ltrim($afterTableName);
+        }
+        else
+        {
+            return "CREATE TABLE IF NOT EXISTS $tableName " . ltrim($afterTableName);
+        }
     }
 
     /**

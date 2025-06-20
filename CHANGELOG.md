@@ -566,6 +566,28 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 -   **Database Export Query Conversion:** Convert `CREATE TABLE` and `INSERT` queries to match the target DBMS during database export.
 
+-   **New Database Conversion Support:** You can now convert `CREATE TABLE` and `INSERT` statements to SQL Server from:
+
+    -  MySQL → SQL Server
+
+    -  MariaDB → SQL Server
+
+    -  PostgreSQL → SQL Server
+
+    -  SQLite → SQL Server
+    
+    Supported target databases now include:
+
+    -  MySQL
+
+    -  MariaDB
+
+    -  PostgreSQL
+
+    -  SQLite
+
+    -  SQL Server
+    
 
 ## Improvements
 
