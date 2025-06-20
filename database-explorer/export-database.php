@@ -68,7 +68,7 @@ if ($realPath === false || strpos($realPath, $baseDirectory) !== 0) {
 
 // Begin export process
 $tables = [$tableName];
-$exporter = new DatabaseExporter($database->getDatabaseType(), $database->getDatabaseConnection());
+$exporter = new DatabaseExporter($database->getDatabaseType(), $database->getDatabaseConnection(), $databaseName);
 
 header('Content-type: application/json');
 
@@ -80,7 +80,7 @@ try {
 
     if ($includeData) {
         $exporter->appendExportData("\r\n-- Database content of `$tableName`\r\n");
-        $exporter->exportTableData($tables, $schemaName, $batchSize, $maxQuerySize);
+        $exporter->exportTableData($tables, $schemaName, $targetDatabaseType, $batchSize, $maxQuerySize);
     }
 
     // Write export data to file (append mode)

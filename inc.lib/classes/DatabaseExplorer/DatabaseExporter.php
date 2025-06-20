@@ -66,16 +66,27 @@ class DatabaseExporter // NOSONAR
     private $dbType; 
 
     /**
-     * DatabaseExporter constructor.
-     * 
-     * Initializes the database connection based on the specified database type.
+     * The name of the database.
      *
-     * @param string $dbType The type of the database (PicoDatabaseType::DATABASE_TYPE_SQLITE, PicoDatabaseType::DATABASE_TYPE_MYSQL, PicoDatabaseType::DATABASE_TYPE_PGSQL).
-     * @param PDO $pdo The PDO instance for the database connection.
+     * @var string
      */
-    public function __construct($dbType, $pdo)
+    private $dbName;
+
+    /**
+     * Constructor for DatabaseExporter.
+     *
+     * Initializes the DatabaseExporter instance with the necessary database
+     * connection details and sets up the output buffer.
+     *
+     * @param string $dbType The type of the database, expected to be one of the constants from `PicoDatabaseType` (e.g., `PicoDatabaseType::DATABASE_TYPE_SQLITE`).
+     * @param PDO $pdo An active PDO instance connected to the database.
+     * @param string|null $dbName The name of the database.
+     * @param string|null $dbSchema The name of the schema, primarily used for PostgreSQL.
+     */
+    public function __construct($dbType, $pdo, $dbName = null)
     {
         $this->dbType = strtolower($dbType);
+        $this->dbName = $dbName;
         $this->outputBuffer = '';
         $this->db = $pdo;
     }
@@ -166,6 +177,7 @@ class DatabaseExporter // NOSONAR
      */
     private function exportSQLiteTableStructure($tables, $targetDatabaseType)
     {
+        $converter = new PicoDatabaseConverter();
         $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = $table['name'];
@@ -177,7 +189,7 @@ class DatabaseExporter // NOSONAR
                 $createTableSql = str_replace(array("[", "]"), "", $createTableSql);
                 $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
 
-                $createTableSql = $this->convertDatabaseStructure($createTableSql, $this->dbType, $targetDatabaseType);
+                $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
                 $this->outputBuffer .= "$createTableSql\n\n";
             }
@@ -191,6 +203,7 @@ class DatabaseExporter // NOSONAR
      */
     private function exportMySQLTableStructure($tables, $targetDatabaseType)
     {
+        $converter = new PicoDatabaseConverter();
         $result = $this->db->query(ConstantText::SHOW_TABLES);
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = array_values($table)[0];
@@ -200,7 +213,7 @@ class DatabaseExporter // NOSONAR
                 $createTableSql = $createTable->fetch(PDO::FETCH_ASSOC)['Create Table'];
                 $createTableSql = $this->ensureCreateTableIfNotExists($createTableSql);
 
-                $createTableSql = $this->convertDatabaseStructure($createTableSql, $this->dbType, $targetDatabaseType);
+                $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
                 $this->outputBuffer .= "$createTableSql\n\n";
             }
@@ -213,8 +226,14 @@ class DatabaseExporter // NOSONAR
      * @param array|null $tables Table names to be exported. If null, all tables will be exported.
      * @param string $schema The schema where the tables reside (default is 'public').
      */
-    private function exportPostgreSQLTableStructure($tables, $schema = 'public', $targetDatabaseType)
+    private function exportPostgreSQLTableStructure($tables, $schema = 'public', $targetDatabaseType = null) // NOSONAR
     {
+        $converter = new PicoDatabaseConverter();
+        if(!isset($targetDatabaseType))
+        {
+            $targetDatabaseType = $this->dbType;
+        }
+
         // Query to get all table names in PostgreSQL for the specified schema
         $result = $this->db->query("
             SELECT table_name 
@@ -295,7 +314,7 @@ class DatabaseExporter // NOSONAR
                 // Construct CREATE TABLE statement
                 $createTableSql = "CREATE TABLE IF NOT EXISTS $tableName (\r\n\t" . implode(", \r\n\t", $columns) . "\r\n);\n";
 
-                $createTableSql = $this->convertDatabaseStructure($createTableSql, $this->dbType, $targetDatabaseType);
+                $createTableSql = $this->convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter);
 
                 $this->outputBuffer .= "$createTableSql\n\n";
             }
@@ -310,17 +329,16 @@ class DatabaseExporter // NOSONAR
      * database types are considered equal, the original SQL statement is returned without conversion.
      *
      * @param string $createTableSql The CREATE TABLE SQL statement to convert.
-     * @param string $sourceDatabaseType The type of the source database (e.g., 'mysql', 'postgresql', 'sqlite').
      * @param string $targetDatabaseType The type of the target database (e.g., 'mysql', 'postgresql', 'sqlite').
      * @return string The converted CREATE TABLE SQL statement, or the original if no conversion is needed/possible.
+     * @param PicoDatabaseConverter $converter An instance of a database converter responsible for type conversions.
      */
-    public function convertDatabaseStructure($createTableSql, $sourceDatabaseType, $targetDatabaseType)
+    public function convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter)
     {
-        if (!isset($targetDatabaseType) || empty($targetDatabaseType) || $this->equalsDatabaseType($sourceDatabaseType, $targetDatabaseType)) {
+        if (!isset($targetDatabaseType) || empty($targetDatabaseType) || $this->equalsDatabaseType($this->dbType, $targetDatabaseType)) {
             return $createTableSql;
         } else {
-            $converter = new PicoDatabaseConverter(); // Assuming PicoDatabaseConverter is defined elsewhere
-            return $converter->translateCreateTable($createTableSql, $sourceDatabaseType, $targetDatabaseType);
+            return $converter->translateCreateTable($createTableSql, $this->dbType, $targetDatabaseType);
         }
     }
 
@@ -351,15 +369,7 @@ class DatabaseExporter // NOSONAR
      */
     private function normalizeDatabaseType($type) // NOSONAR
     {
-        $type = strtolower(trim($type));
-        if (in_array($type, ['mysql', 'mariadb'])) {
-            return 'mysql';
-        } elseif (in_array($type, ['postgresql', 'pgsql'])) {
-            return 'pgsql';
-        } elseif ($type === 'sqlite') {
-            return 'sqlite';
-        }
-        return $type;
+        return (new PicoDatabaseConverter())->normalizeDialect($type);
     }
 
     /**
@@ -510,18 +520,20 @@ class DatabaseExporter // NOSONAR
      * @param int $batchSize The number of rows per INSERT query (default is 100).
      * @param int $maxQuerySize The maximum allowed size of the query (default is 524288 bytes).
      */
-    public function exportTableData($tables, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
+    public function exportTableData($tables, $schema = 'public', $targetDatabaseType, $batchSize = 100, $maxQuerySize = 524288) // NOSONAR
     {
+        $targetDatabaseType = $this->normalizeDatabaseType($targetDatabaseType);
+
         switch ($this->dbType) {
             case PicoDatabaseType::DATABASE_TYPE_SQLITE:
-                $this->exportSQLiteTableData($tables, $batchSize, $maxQuerySize);
+                $this->exportSQLiteTableData($tables, $targetDatabaseType, $batchSize, $maxQuerySize);
                 break;
             case PicoDatabaseType::DATABASE_TYPE_MYSQL:
             case PicoDatabaseType::DATABASE_TYPE_MARIADB:
-                $this->exportMySQLTableData($tables, $batchSize, $maxQuerySize);
+                $this->exportMySQLTableData($tables, $targetDatabaseType, $targetDatabaseType, $batchSize, $maxQuerySize);
                 break;
             case PicoDatabaseType::DATABASE_TYPE_PGSQL:
-                $this->exportPostgreSQLTableData($tables, $schema, $batchSize, $maxQuerySize);
+                $this->exportPostgreSQLTableData($tables, $targetDatabaseType, $targetDatabaseType, $schema, $batchSize, $maxQuerySize);
                 break;
             default:
                 break;
@@ -583,12 +595,18 @@ class DatabaseExporter // NOSONAR
      * @param int $batchSize The number of rows per INSERT query.
      * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
      */
-    private function exportSQLiteTableData($tables, $batchSize = 100, $maxQuerySize = 524288)
+    private function exportSQLiteTableData($tables, $targetDatabaseType, $batchSize = 100, $maxQuerySize = 524288)
     {
+        $converter = new PicoDatabaseConverter(); 
+
         $result = $this->db->query('SELECT name FROM sqlite_master WHERE type="table";');
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = $table['name'];
             if ($this->toBeExported($tableName, $tables)) {
+
+
+                $columnTypes = $this->getSQLiteColumnTypes($tableName);
+                $targetColumnTypes = $this->convertColumnTypes($columnTypes, $targetDatabaseType, $converter);
                 $rows = $this->db->query("SELECT * FROM $tableName;");
                 $nrec = 0;
                 $batchValues = [];
@@ -596,11 +614,10 @@ class DatabaseExporter // NOSONAR
 
                 while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
                     $columns = array_keys($row);
-                    $values = array_values($row);
-                    $valuesList = implode(", ", array_map(function ($value) {
-                        return $this->db->quote($value);
-                    }, $values));
-                    $batchValues[] = "($valuesList)";
+
+                    $valuesList = $this->createInsertValue($row, $converter, $targetColumnTypes, $targetDatabaseType);
+
+                    $batchValues[] = $valuesList;
                     $nrec++;
 
                     // Generate the INSERT statement up to the current batch
@@ -633,12 +650,18 @@ class DatabaseExporter // NOSONAR
      * @param int $batchSize The number of rows per INSERT query.
      * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
      */
-    private function exportMySQLTableData($tables, $batchSize = 100, $maxQuerySize = 524288)
+    private function exportMySQLTableData($tables, $targetDatabaseType, $batchSize = 100, $maxQuerySize = 524288)
     {
+        $converter = new PicoDatabaseConverter(); 
+
         $result = $this->db->query(ConstantText::SHOW_TABLES);
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = array_values($table)[0];
             if ($this->toBeExported($tableName, $tables)) {
+
+                $columnTypes = $this->getMySQLColumnTypes($tableName, $this->dbName);
+                $targetColumnTypes = $this->convertColumnTypes($columnTypes, $targetDatabaseType, $converter);
+
                 $rows = $this->db->query("SELECT * FROM $tableName");
                 $nrec = 0;
                 $batchValues = [];
@@ -646,11 +669,10 @@ class DatabaseExporter // NOSONAR
 
                 while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
                     $columns = array_keys($row);
-                    $values = array_values($row);
-                    $valuesList = implode(", ", array_map(function ($value) {
-                        return $this->db->quote($value);
-                    }, $values));
-                    $batchValues[] = "($valuesList)";
+
+                    $valuesList = $this->createInsertValue($row, $converter, $targetColumnTypes, $targetDatabaseType);
+
+                    $batchValues[] = $valuesList;
                     $nrec++;
 
                     // Generate the INSERT statement up to the current batch
@@ -684,8 +706,10 @@ class DatabaseExporter // NOSONAR
      * @param int $batchSize The number of rows per INSERT query.
      * @param int $maxQuerySize The maximum allowed size of the query (in bytes).
      */
-    private function exportPostgreSQLTableData($tables, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
+    private function exportPostgreSQLTableData($tables, $targetDatabaseType, $schema = 'public', $batchSize = 100, $maxQuerySize = 524288)
     {
+        $converter = new PicoDatabaseConverter(); 
+
         // Query to get all table names in the specified schema
         $result = $this->db->query("
             SELECT table_name 
@@ -696,6 +720,10 @@ class DatabaseExporter // NOSONAR
         while ($table = $result->fetch(PDO::FETCH_ASSOC)) {
             $tableName = $table['table_name'];
             if ($this->toBeExported($tableName, $tables)) {
+
+                $columnTypes = $this->getPostgreSQLColumnTypes($tableName, $schema);
+                $targetColumnTypes = $this->convertColumnTypes($columnTypes, $targetDatabaseType, $converter);
+
                 // Query to get all rows from the specified table
                 $rows = $this->db->query("SELECT * FROM $schema.$tableName");
                 $nrec = 0;
@@ -704,12 +732,16 @@ class DatabaseExporter // NOSONAR
 
                 // Iterate through the rows and generate INSERT INTO statements
                 while ($row = $rows->fetch(PDO::FETCH_ASSOC)) {
+
+                    // Convert data type
+                    $row = $this->convertData($row, $converter, $targetColumnTypes, $targetDatabaseType);
+
                     $columns = array_keys($row);
-                    $values = array_values($row);
-                    $valuesList = implode(", ", array_map(function ($value) {
-                        return $this->db->quote($value);
-                    }, $values));
-                    $batchValues[] = "($valuesList)";
+
+                    $valuesList = $this->createInsertValue($row, $converter, $targetColumnTypes, $targetDatabaseType);
+
+                    $batchValues[] = $valuesList;
+                    
                     $nrec++;
 
                     // Generate the INSERT statement up to the current batch
@@ -733,6 +765,164 @@ class DatabaseExporter // NOSONAR
                 $this->addNewLine($nrec);
             }
         }
+    }
+
+    /**
+     * Get column types for an SQLite table.
+     *
+     * This method queries the SQLite `PRAGMA table_info` to retrieve column
+     * names and their data types for the specified table.
+     *
+     * @param string $tableName The name of the SQLite table.
+     * @return array An associative array where keys are column names and values are their SQLite data types.
+     */
+    private function getSQLiteColumnTypes($tableName)
+    {
+        $stmt = $this->db->query("PRAGMA table_info(" . $this->quoteIdentifier($tableName) . ")");
+        $columns = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $columns[$row['name']] = $row['type'];
+        }
+        return $columns;
+    }
+
+    /**
+     * Get column types for a MySQL or MariaDB table.
+     *
+     * This method queries the `INFORMATION_SCHEMA.COLUMNS` view to retrieve
+     * column names and their data types for the specified table and database.
+     *
+     * @param string $tableName The name of the MySQL/MariaDB table.
+     * @param string $databaseName The name of the database (schema).
+     * @return array An associative array where keys are column names and values are their MySQL/MariaDB data types.
+     */
+    private function getMySQLColumnTypes($tableName, $databaseName)
+    {
+        $sql = "
+            SELECT COLUMN_NAME, COLUMN_TYPE
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = :schema
+            AND TABLE_NAME = :table
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':schema' => $databaseName,
+            ':table' => $tableName
+        ]);
+
+        $columns = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $columns[$row['COLUMN_NAME']] = $row['COLUMN_TYPE'];
+        }
+        return $columns;
+    }
+
+    /**
+     * Get column types for a PostgreSQL table.
+     *
+     * This method queries the `information_schema.columns` view to retrieve
+     * column names and their data types for the specified table and schema.
+     *
+     * @param string $tableName The name of the PostgreSQL table.
+     * @param string $schemaName The name of the schema.
+     * @return array An associative array where keys are column names and values are their PostgreSQL data types.
+     */
+    private function getPostgreSQLColumnTypes($tableName, $schemaName)
+    {
+        $sql = "
+            SELECT column_name, data_type
+            FROM information_schema.columns
+            WHERE table_schema = :schema
+            AND table_name = :table
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':schema' => $schemaName,
+            ':table' => $tableName
+        ]);
+
+        $columns = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $columns[$row['column_name']] = $row['data_type'];
+        }
+        return $columns;
+    }
+
+    /**
+     * Quotes an identifier to prevent SQL injection.
+     *
+     * This method adds double quotes around the identifier and escapes any
+     * existing double quotes within the identifier.
+     *
+     * @param string $identifier The identifier to quote (e.g., table name, column name).
+     * @return string The quoted identifier.
+     */
+    private function quoteIdentifier($identifier)
+    {
+        return '"' . str_replace('"', '""', $identifier) . '"';
+    }
+
+    /**
+     * Converts an array of column types from one database type to another.
+     *
+     * This method iterates through the provided column types and uses the given
+     * converter to translate each column's type to the specified target database type.
+     *
+     * @param array $columnTypes An associative array where keys are column names and values are their original data types.
+     * @param string $targetDatabaseType The target database type to convert the column types to (e.g., 'mysql', 'pgsql').
+     * @param PicoDatabaseConverter $converter An instance of the PicoDatabaseConverter responsible for type translation.
+     * @return array An associative array with column names as keys and their converted data types as values.
+     */
+    private function convertColumnTypes($columnTypes, $targetDatabaseType, $converter)
+    {
+        $result = array();
+        foreach($columnTypes as $columnName => $columnType)
+        {
+            $result[$columnName] = $converter->translateFieldType($columnType, $this->dbType, $targetDatabaseType);
+        }
+        return $result;
+    }
+
+    /**
+     * Creates a string of comma-separated values enclosed in parentheses for an SQL INSERT statement.
+     *
+     * This method converts the data types in the provided row to the target database
+     * types and then formats them as a string suitable for an SQL `INSERT` statement's
+     * `VALUES` clause.
+     *
+     * @param array $row An associative array representing a table row, where keys are column names and values are raw data.
+     * @param PicoDatabaseConverter $converter An instance of a database converter responsible for type conversions.
+     * @param array $targetColumnTypes An associative array where keys are column names and values are their target SQL column types (e.g., `NVARCHAR`, `CHARACTER VARYING`).
+     * @param string $targetDatabaseType The target database type (e.g., `PicoDatabaseType::DATABASE_TYPE_MYSQL`).
+     * @return string A string formatted as "(`value1`, `value2`, ...)" suitable for an SQL `INSERT` statement.
+     */
+    private function createInsertValue($row, $converter, $targetColumnTypes, $targetDatabaseType)
+    {
+        return "(".implode(", ", $this->convertData($row, $converter, $targetColumnTypes, $targetDatabaseType)).")"; // Added closing parenthesis
+    }
+
+    /**
+     * Converts data types in a table row based on target database types.
+     *
+     * This method iterates through a table row, converts raw values to PHP types
+     * using a provided converter, and returns an array of the converted values.
+     * Conversion only occurs if the current database type differs from the target.
+     *
+     * @param array $row An associative array representing a table row, where keys are column names and values are raw data.
+     * @param PicoDatabaseConverter $converter An instance of a database converter responsible for type conversions.
+     * @param array $targetColumnTypes An associative array where keys are column names and values are their target SQL column types (e.g., `NVARCHAR`, `CHARACTER VARYING`).
+     * @param string $targetDatabaseType The target database type (e.g., `PicoDatabaseType::DATABASE_TYPE_MYSQL`).
+     * @return array An indexed array of converted values. Returns the original row if no conversion is needed.
+     */
+    private function convertData($row, $converter, $targetColumnTypes, $targetDatabaseType)
+    {
+        $values = [];
+        foreach ($row as $columnName => $rawValue) {
+            $sqlType = $converter->getColumnType($targetColumnTypes, $columnName);
+            $value = $converter->convertToPhpType($rawValue, $sqlType, $targetDatabaseType);
+            $values[] = $value;
+        }
+        return $values;   
     }
 
     /**
