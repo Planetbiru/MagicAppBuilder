@@ -505,7 +505,8 @@ class PicoDatabaseConverter // NOSONAR
                         return $value === true ? 1 : 0;
                     }
                     return $value ? "TRUE" : "FALSE";
-
+            case 'bit':
+                return $value ? 1 : 0;
             case 'float':
             case 'real':
             case 'double':
@@ -1044,12 +1045,23 @@ class PicoDatabaseConverter // NOSONAR
                     $translatedType = 'BIT';
                     $columnDefinition = str_ireplace("DEFAULT '1'", 'DEFAULT 1', $columnDefinition);
                     $columnDefinition = str_ireplace("DEFAULT '0'", 'DEFAULT 0', $columnDefinition);
+
+                    $columnDefinition = str_ireplace("DEFAULT TRUE", 'DEFAULT 1', $columnDefinition);
+                    $columnDefinition = str_ireplace("DEFAULT FALSE", 'DEFAULT 0', $columnDefinition);
                 }
                 // Handle other general types
                 else {
                     // Remove length from types like bigint(20), int(11) before passing to translateFieldType
                     $baseType = preg_replace('/\(\d+\)/', '', $columnTypeRaw);
                     $translatedType = $this->translateFieldType($baseType, 'mysql', 'sqlserver');
+
+                    if(strtoupper($translatedType) == 'BIT')
+                    {
+                        $columnDefinition = str_ireplace("DEFAULT '1'", 'DEFAULT 1', $columnDefinition);
+                        $columnDefinition = str_ireplace("DEFAULT '0'", 'DEFAULT 0', $columnDefinition);
+                        $columnDefinition = str_ireplace("DEFAULT TRUE", 'DEFAULT 1', $columnDefinition);
+                        $columnDefinition = str_ireplace("DEFAULT FALSE", 'DEFAULT 0', $columnDefinition);
+                    }
 
                     // If original type was VARCHAR(N) or CHAR(N), re-append length
                     if (preg_match('/^(?:var)?char\((\d+)\)$/i', $columnTypeRaw, $lenMatches)) {
