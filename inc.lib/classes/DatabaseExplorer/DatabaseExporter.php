@@ -563,7 +563,31 @@ class DatabaseExporter // NOSONAR
      */
     private function reachBatchLimit($nrec, $batchSize, $querySize, $maxQuerySize)
     {
+        $nrec = $this->positiveInteger($nrec);
+        $batchSize = $this->positiveInteger($batchSize);
+        $querySize = $this->positiveInteger($querySize);
+        $maxQuerySize = $this->positiveInteger($maxQuerySize);
         return $nrec % $batchSize == 0 || $querySize > $maxQuerySize;
+    }
+
+    /**
+     * Ensures a given value is a positive integer.
+     *
+     * This method converts the input value to an integer. If the converted
+     * integer is less than or equal to zero, it defaults the value to 1.
+     * This is useful for parameters that must be positive, such as sizes or counts.
+     *
+     * @param mixed $value The value to convert and validate.
+     * @return int A positive integer representation of the input value.
+     */
+    private function positiveInteger($value)
+    {
+        $value = intval($value);
+        if($value <= 0)
+        {
+            $value = 1;
+        }
+        return $value;
     }
 
     /**

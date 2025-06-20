@@ -19,7 +19,7 @@ if ($baseDirectory === false) {
 
 // Sanitize application-related input
 $applicationId = $inputPost->getApplicationId();
-$databaseName = $inputPost->getDatabase();
+$databaseName = $inputPost->getDatabaseName();
 $schemaName = $inputPost->getSchema();
 $targetDatabaseType = $inputPost->getTargetDatabaseType();
 
@@ -32,7 +32,7 @@ require_once __DIR__ . "/inc.db/config.php";
 
 // Sanitize from POST
 $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
-$databaseName = $inputPost->getDatabase(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+$databaseName = $inputPost->getDatabaseName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $schemaName = $inputPost->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $targetDatabaseType = $inputPost->getTargetDatabaseType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
