@@ -369,15 +369,7 @@ class DatabaseExporter // NOSONAR
      */
     private function normalizeDatabaseType($type) // NOSONAR
     {
-        $type = strtolower(trim($type));
-        if (in_array($type, ['mysql', 'mariadb'])) {
-            return 'mysql';
-        } elseif (in_array($type, ['postgresql', 'pgsql'])) {
-            return 'pgsql';
-        } elseif ($type === 'sqlite') {
-            return 'sqlite';
-        }
-        return $type;
+        return (new PicoDatabaseConverter())->normalizeDialect($type);
     }
 
     /**
