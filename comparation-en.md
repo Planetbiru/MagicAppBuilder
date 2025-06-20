@@ -1,3 +1,5 @@
+# MagicAppBuilder Comparison with Similar Low-Code Platforms
+
 Low-code platforms are designed to accelerate application development by minimizing manual coding, utilizing visual interfaces, drag-and-drop functionalities, and pre-built components. MagicAppBuilder fits squarely into this category, with a strong focus on rapid development of module-rich enterprise applications.
 
 Here's a comparison of MagicAppBuilder with other prominent low-code platforms, highlighting common features and distinctions:
