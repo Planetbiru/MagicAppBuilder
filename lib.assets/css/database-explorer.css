@@ -847,4 +847,20 @@ a.all-table {
 }
 .context-menu-relation ul li[data-type=relation] * {
   vertical-align: text-top;
+}
+
+.input-label {
+  padding: 0.375rem 0;
+}
+
+.form-control {
+  height: calc(1.5em + 0.6rem + 1px);
+  padding: 0.15rem 0.6rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }/*# sourceMappingURL=database-explorer.css.map */

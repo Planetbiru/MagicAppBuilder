@@ -549,7 +549,7 @@ class PicoDatabaseConverter // NOSONAR
      * @return string The translated base field type.
      * @throws DatabaseConversionException If an unsupported target dialect is provided.
      */
-    private function translateFieldType($type, $sourceDialect, $targetDialect) // NOSONAR
+    public function translateFieldType($type, $sourceDialect, $targetDialect) // NOSONAR
     {
         $type = strtolower(trim($type));
         // Normalize spaces in the type string
@@ -677,7 +677,7 @@ class PicoDatabaseConverter // NOSONAR
      * @param string $dialect The SQL dialect (e.g., 'mysql', 'postgresql', 'sqlite').
      * @return string The properly quoted identifier.
      */
-    private function quoteIdentifier($identifier, $dialect)
+    public function quoteIdentifier($identifier, $dialect)
     {
         $identifier = trim($identifier, "`\"[]"); // Remove existing quotes
         switch ($dialect) {
@@ -1286,7 +1286,7 @@ class PicoDatabaseConverter // NOSONAR
         unset($l);
 
         $finalSql = "CREATE TABLE " . $ifNotExists . $tableName . " (\n    " . implode("\n    ", $newLines) . "\n)";
-        $finalSql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+        $finalSql .= "\nENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
         $finalSql = preg_replace('/`PRIMARY` KEY/i', 'PRIMARY KEY', $finalSql); // NOSONAR
         $finalSql = str_replace('"', '`', $finalSql);
@@ -1325,7 +1325,7 @@ class PicoDatabaseConverter // NOSONAR
      * @param string $sql The part inside CREATE TABLE (...) to be split.
      * @return array An array of lines representing column or constraint definitions.
      */
-    private function splitSqlByCommaRespectingParentheses($sql)
+    public function splitSqlByCommaRespectingParentheses($sql)
     {
         $result = [];
         $buffer = '';
@@ -1371,6 +1371,57 @@ class PicoDatabaseConverter // NOSONAR
             return $sql; // No translation needed
         }
 
+        // Perform the core dialect-to-dialect translation
+        $result = $this->doTranslateCreateTable($sql, $sourceDialect, $targetDialect);
+
+        // --- Applying common post-translation fixes ---
+        // These fixes address general syntax inconsistencies that might arise across various conversions.
+        // For more complex or dialect-specific transformations, it's better to implement them
+        // within the dedicated `mysqlToPostgreSQL`, `postgresqlToMySQL`, etc., methods.
+
+        // Ensures PRIMARY KEY is always followed by NOT NULL if it was implicitly NULL
+        $result = str_ireplace(' PRIMARY KEY NULL', ' PRIMARY KEY NOT NULL', $result);
+
+        // Removes redundant spaces around parentheses for data types like NVARCHAR
+        $result = str_ireplace(' NVARCHAR (', ' NVARCHAR(', $result);
+        $result = str_ireplace(' VARCHAR (', ' VARCHAR(', $result);
+        $result = str_ireplace(' CHARACTER VARYING (', ' CHARACTER VARYING(', $result);
+        $result = str_ireplace(' CHAR (', ' CHAR(', $result);
+        $result = str_ireplace(' NCHAR (', ' NCHAR(', $result);
+
+        $result = str_ireplace(' INT (', ' INT(', $result);
+        $result = str_ireplace(' INTEGER (', ' INTEGER(', $result);
+        $result = str_ireplace(' TINYINT (', ' TINYINT(', $result);
+        $result = str_ireplace(' SMALLINT (', ' SMALLINT(', $result);
+        $result = str_ireplace(' MEDIUMINT (', ' MEDIUMINT(', $result);
+        $result = str_ireplace(' BIGINT (', ' BIGINT(', $result);
+
+        $result = str_ireplace(' DECIMAL (', ' DECIMAL(', $result);
+        $result = str_ireplace(' NUMERIC (', ' NUMERIC(', $result);
+        $result = str_ireplace(' FLOAT (', ' FLOAT(', $result);
+        $result = str_ireplace(' DOUBLE (', ' DOUBLE(', $result);
+        $result = str_ireplace(' REAL (', ' REAL(', $result);
+
+        $result = str_ireplace(' BOOLEAN (', ' BOOLEAN(', $result);
+
+        // Specific conversion for BOOLEAN(11) which might come from MySQL TINYINT(1) export and needs to be INTEGER(11) for some targets
+        $result = str_ireplace(' BOOLEAN(11)', ' INTEGER(11)', $result);
+        
+        // Add more similar patterns as needed.
+        return $result;
+    }
+
+    /**
+     * Translates a CREATE TABLE statement from a source dialect to a target dialect.
+     *
+     * @param string $sql The CREATE TABLE statement.
+     * @param string $sourceDialect The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @param string $targetDialect The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').
+     * @return string The translated CREATE TABLE statement.
+     * @throws DatabaseConversionException If an unsupported translation is requested or SQL format is invalid.
+     */
+    public function doTranslateCreateTable($sql, $sourceDialect, $targetDialect) // NOSONAR
+    {
         switch ($sourceDialect . 'To' . ucfirst($targetDialect)) {
             case 'mysqlToPostgresql':
                 return $this->mysqlToPostgreSQL($sql);

@@ -335,10 +335,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Export Database', 'Yes', 'No', function(isOk) {
                 if (isOk) 
                 {
-                    startExportDatabase(selector);
+                    let select = document.querySelector('[name="target_database_type"]');
+                    disableOtherOptions(select);
+                    startExportDatabase(selector, function(){
+                        enableAllOptions(select);
+                    });
                 }
                 else 
                 {
+                    let select = document.querySelector('[name="target_database_type"]');
+                    enableAllOptions(select);
                     document.querySelector('#exportModal').style.display = 'none' 
                 } 
             });
@@ -473,12 +479,12 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {string} selector - A CSS selector targeting the HTML element(s) 
  *                            to export data from (e.g., a table row).
  */
-function startExportDatabase(selector)
+function startExportDatabase(selector, onFinish)
 {
     if (!isExporting)
     {
         isExporting = true;
-        exportDatabase(selector);
+        exportDatabase(selector, onFinish);
     }
 }
 
@@ -488,7 +494,7 @@ function startExportDatabase(selector)
  *
  * @param {string} selector - The CSS selector for the table containing table rows to export.
  */
-function exportDatabase(selector) {
+function exportDatabase(selector, onFinish) {
     // Read metadata from <meta> tags
     let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
     let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
@@ -530,7 +536,7 @@ function exportDatabase(selector) {
     };
 
     // Begin exporting tables
-    exportTable(selector);
+    exportTable(selector, onFinish);
 }
 
 /**
@@ -539,10 +545,14 @@ function exportDatabase(selector) {
  *
  * @param {string} selector - The CSS selector used to find the modal or table.
  */
-function exportTable(selector) {
+function exportTable(selector, onFinish) {
     // Stop if all tables have been processed
     if (tableIndex >= maxTableIndex) {
         isExporting = false;
+        if(typeof onFinish == 'function')
+        {
+            onFinish();
+        }
         // Trigger file download after export is complete
         window.open('export-download.php?fileName=' + encodeURIComponent(exportFileName));
     }
@@ -556,6 +566,8 @@ function exportTable(selector) {
             tr.attr('data-status', 'in-progress');
         }
 
+        let targetDatabaseType = document.querySelector('[name="target_database_type"]').value;
+
         // Send table export request to server
         $.ajax({
             type: 'POST',
@@ -565,7 +577,8 @@ function exportTable(selector) {
                 tableName: currentTable.tableName,
                 includeStructure: currentTable.structure ? 1 : 0,
                 includeData: currentTable.data ? 1 : 0,
-                fileName: exportFileName
+                fileName: exportFileName,
+                targetDatabaseType: targetDatabaseType
             },
             dataType: 'json',
             success: function (data) {
@@ -579,7 +592,7 @@ function exportTable(selector) {
                     
                     timeoutDownload = setTimeout(function(){
                         tableIndex++;
-                        exportTable(selector);
+                        exportTable(selector, onFinish);
                     }, 20);
                 }
                 else if(tr != null)
@@ -1147,3 +1160,25 @@ function buildUrl(type, applicationId, databaseType, databaseName, databaseSchem
     }
 }
 
+/**
+ * Disables all options in a <select> element except the currently selected one.
+ *
+ * @param {HTMLSelectElement} selectElement - The select element whose options will be disabled.
+ */
+function disableOtherOptions(selectElement) {
+  const selectedValue = selectElement.value;
+  for (let option of selectElement.options) {
+    option.disabled = option.value !== selectedValue;
+  }
+}
+
+/**
+ * Enables all options in a <select> element.
+ *
+ * @param {HTMLSelectElement} selectElement - The select element whose options will be enabled.
+ */
+function enableAllOptions(selectElement) {
+  for (let option of selectElement.options) {
+    option.disabled = false;
+  }
+}

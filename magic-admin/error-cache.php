@@ -510,7 +510,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="error_code" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getErrorCode();?></a></td>
 								<td data-col-name="message" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getMessage();?></a></td>
 								<td data-col-name="line_number" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLineNumber();?></a></td>
-								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
 					
@@ -541,7 +540,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="error_code"><?php echo $errorCache->getErrorCode();?></td>
 								<td data-col-name="message"><?php echo $errorCache->getMessage();?></td>
 								<td data-col-name="line_number"><?php echo $errorCache->getLineNumber();?></td>
-								<td data-col-name="active"><?php echo $errorCache->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}
