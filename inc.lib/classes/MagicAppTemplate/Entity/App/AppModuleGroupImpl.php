@@ -36,7 +36,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * Name
 	 * 
 	 * @NotNull
-	 * @Column(name="name", type="varchar(100)", length=100, default_value="NULL", nullable=true)
+	 * @Column(name="name", type="varchar(100)", length=100, default_value=NULL, nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
@@ -46,7 +46,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * URL
 	 * 
 	 * @NotNull
-	 * @Column(name="url", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Column(name="url", type="varchar(255)", length=255, default_value=NULL, nullable=true)
 	 * @Label(content="URL")
 	 * @var string
 	 */
@@ -56,7 +56,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * Target
 	 * 
 	 * @NotNull
-	 * @Column(name="target", type="varchar(20)", length=20, default_value="NULL", nullable=true)
+	 * @Column(name="target", type="varchar(20)", length=20, default_value=NULL, nullable=true)
 	 * @Label(content="Target")
 	 * @var string
 	 */
@@ -66,7 +66,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * Icon
 	 * 
 	 * @NotNull
-	 * @Column(name="icon", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="icon", type="varchar(40)", length=40, default_value=NULL, nullable=true)
 	 * @Label(content="Icon")
 	 * @var string
 	 */
@@ -169,7 +169,7 @@ class AppModuleGroupImpl extends MagicObject
 	 * Active
 	 * 
 	 * @NotNull
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value=TRUE, nullable=true)
 	 * @Label(content="Active")
 	 * @var bool
 	 */

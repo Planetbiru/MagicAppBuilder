@@ -36,7 +36,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * Name
 	 * 
 	 * @NotNull
-	 * @Column(name="name", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="name", type="varchar(40)", length=40, default_value=NULL, nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
@@ -130,7 +130,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * Active
 	 * 
 	 * @NotNull
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value=TRUE, nullable=true)
 	 * @Label(content="Active")
 	 * @var bool
 	 */

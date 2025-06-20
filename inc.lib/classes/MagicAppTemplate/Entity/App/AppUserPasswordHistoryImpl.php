@@ -37,7 +37,7 @@ class AppUserPasswordHistoryImpl extends MagicObject
      * Admin ID
      * 
      * @NotNull
-     * @Column(name="admin_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+     * @Column(name="admin_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Admin ID")
      * @var string
      */

@@ -36,7 +36,7 @@ class AppModuleImpl extends MagicObject
 	 * Name
 	 * 
 	 * @NotNull
-	 * @Column(name="name", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Column(name="name", type="varchar(255)", length=255, default_value=NULL, nullable=true)
 	 * @Label(content="Name")
 	 * @var string
 	 */
@@ -46,7 +46,7 @@ class AppModuleImpl extends MagicObject
 	 * Module Code
 	 * 
 	 * @NotNull
-	 * @Column(name="module_code", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Column(name="module_code", type="varchar(255)", length=255, default_value=NULL, nullable=true)
 	 * @Label(content="Module Code")
 	 * @var string
 	 */
@@ -56,7 +56,7 @@ class AppModuleImpl extends MagicObject
 	 * Module Group ID
 	 * 
 	 * @NotNull
-	 * @Column(name="module_group_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="module_group_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
 	 * @Label(content="Module Group ID")
 	 * @var string
 	 */
@@ -76,7 +76,7 @@ class AppModuleImpl extends MagicObject
 	 * Parent Module ID
 	 * 
 	 * @NotNull
-	 * @Column(name="parent_module_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="parent_module_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
 	 * @Label(content="Parent Module")
 	 * @var string
 	 */
@@ -106,7 +106,7 @@ class AppModuleImpl extends MagicObject
 	 * Target
 	 * 
 	 * @NotNull
-	 * @Column(name="target", type="varchar(20)", length=20, default_value="NULL", nullable=true)
+	 * @Column(name="target", type="varchar(20)", length=20, default_value=NULL, nullable=true)
 	 * @Label(content="Target")
 	 * @var string
 	 */
@@ -116,7 +116,7 @@ class AppModuleImpl extends MagicObject
 	 * Icon
 	 * 
 	 * @NotNull
-	 * @Column(name="icon", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+	 * @Column(name="icon", type="varchar(40)", length=40, default_value=NULL, nullable=true)
 	 * @Label(content="Icon")
 	 * @var string
 	 */
@@ -238,7 +238,7 @@ class AppModuleImpl extends MagicObject
 	 * Active
 	 * 
 	 * @NotNull
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value=TRUE, nullable=true)
 	 * @Label(content="Active")
 	 * @var bool
 	 */

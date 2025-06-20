@@ -117,7 +117,7 @@ class AppAdminProfileImpl extends MagicObject
 	/**
 	 * Active
 	 * 
-	 * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
+	 * @Column(name="active", type="tinyint(1)", length=1, default_value=TRUE, nullable=true)
 	 * @Label(content="Active")
 	 * @var bool
 	 */

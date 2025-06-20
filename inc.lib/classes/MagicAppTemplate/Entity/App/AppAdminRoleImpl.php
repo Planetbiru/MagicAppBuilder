@@ -36,7 +36,7 @@ class AppAdminRoleImpl extends MagicObject
      * Admin Level ID
      * 
      * @NotNull
-     * @Column(name="admin_level_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+     * @Column(name="admin_level_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Admin Level ID")
      * @var string
      */
@@ -55,7 +55,7 @@ class AppAdminRoleImpl extends MagicObject
     /**
      * Module ID
      * 
-     * @Column(name="module_id", type="varchar(40)", length=40, default_value="NULL", nullable=true)
+     * @Column(name="module_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Module ID")
      * @var string
      */
@@ -75,7 +75,7 @@ class AppAdminRoleImpl extends MagicObject
 	 * Module Code
 	 * 
 	 * @NotNull
-	 * @Column(name="module_code", type="varchar(255)", length=255, default_value="NULL", nullable=true)
+	 * @Column(name="module_code", type="varchar(255)", length=255, default_value=NULL, nullable=true)
 	 * @Label(content="Module Code")
 	 * @var string
 	 */
@@ -282,7 +282,7 @@ class AppAdminRoleImpl extends MagicObject
     /**
      * Active
      *
-     * @Column(name="active", type="tinyint(1)", length=1, default_value="true", nullable="true")
+     * @Column(name="active", type="tinyint(1)", length=1, default_value=TRUE, nullable=true)
      * @Label(content="Active")
      * @var bool
      */
