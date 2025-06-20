@@ -86,7 +86,7 @@ class AppModuleImpl extends MagicObject
 	 * Parent Module
 	 * 
 	 * @NotNull
-	 * @JoinColumn(name="parent_module_id", referenceColumnName="parent_module_id")
+	 * @JoinColumn(name="parent_module_id", referenceColumnName="module_id")
 	 * @Label(content="Parent Module")
 	 * @var AppModuleMinImpl
 	 */
