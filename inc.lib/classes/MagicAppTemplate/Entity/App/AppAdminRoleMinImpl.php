@@ -46,7 +46,7 @@ class AppAdminRoleMinImpl extends MagicObject
      * Admin Level
      * 
      * @NotNull
-     * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id")
+     * @JoinColumn(name="admin_level_id", referenceColumnName="admin_level_id", referenceTableName="admin_level")
      * @Label(content="Admin Level")
      * @var AppAdminLevelImpl
      */
@@ -65,7 +65,7 @@ class AppAdminRoleMinImpl extends MagicObject
      * Module
      * 
      * @NotNull
-     * @JoinColumn(name="module_id", referenceColumnName="module_id")
+     * @JoinColumn(name="module_id", referenceColumnName="module_id", referenceTableName="module")
      * @Label(content="Module")
      * @var AppModuleImpl
      */

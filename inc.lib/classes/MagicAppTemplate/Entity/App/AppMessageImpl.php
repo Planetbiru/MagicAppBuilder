@@ -54,7 +54,7 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Sender
 	 * 
-	 * @JoinColumn(name="sender_id", referenceColumnName="admin_id")
+	 * @JoinColumn(name="sender_id", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Sender")
 	 * @var AppAdminMinImpl
 	 */
@@ -72,7 +72,7 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Receiver
 	 * 
-	 * @JoinColumn(name="receiver_id", referenceColumnName="admin_id")
+	 * @JoinColumn(name="receiver_id", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Receiver")
 	 * @var AppAdminMinImpl
 	 */
@@ -90,7 +90,7 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Message Folder
 	 * 
-	 * @JoinColumn(name="message_folder_id", referenceColumnName="message_folder_id")
+	 * @JoinColumn(name="message_folder_id", referenceColumnName="message_folder_id", referenceTableName="message_folder")
 	 * @Label(content="Message Folder")
 	 * @var AppMessageFolderMinImpl
 	 */

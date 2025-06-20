@@ -153,7 +153,7 @@ class EntityUtil
      * 
      * @return string The formatted HTML content that includes entity details and table structure.
      */
-    public static function formatTitle($entityName, $filetime, $entityInfo)
+    public static function formatTitle($entityName, $filetime, $entityInfo) // NOSONAR
     {
         // Table for basic entity info
         $table1 = '<table><tbody>
@@ -190,8 +190,9 @@ class EntityUtil
         if (isset($joinColumns) && is_array($joinColumns) && !empty($joinColumns)) {
             $table .= '<tr><td colspan="2">Join Columns</td></tr>';
             foreach ($joinColumns as $column) {
-                $ref = isset($column['referenceColumnName']) ? $column['referenceColumnName'] : $column['name'];
-                $table .= '<tr><td>'.$column['name'].'</td><td>'.$ref.'</td></tr>'; // NOSONAR
+                $referenceTableName = isset($column['referenceTableName']) ? $column['referenceTableName']."." : "";
+                $referenceColumnName = isset($column['referenceColumnName']) ? $column['referenceColumnName'] : $column['name'];
+                $table .= '<tr><td>'.$column['name'].'</td><td>'.$referenceTableName.$referenceColumnName.'</td></tr>'; // NOSONAR
             }
         }
 
