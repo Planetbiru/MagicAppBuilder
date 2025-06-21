@@ -2,6 +2,7 @@
 
 namespace DatabaseExplorer;
 
+use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\Database\PicoDatabaseConverter;
 use PDO;
@@ -82,17 +83,36 @@ class DatabaseExporter // NOSONAR
      * Initializes the DatabaseExporter instance with the necessary database
      * connection details and sets up the output buffer.
      *
-     * @param string $dbType The type of the database, expected to be one of the constants from `PicoDatabaseType` (e.g., `PicoDatabaseType::DATABASE_TYPE_SQLITE`).
+     * @param string $databaseType The type of the database, expected to be one of the constants from `PicoDatabaseType` (e.g., `PicoDatabaseType::DATABASE_TYPE_SQLITE`).
      * @param PDO $pdo An active PDO instance connected to the database.
      * @param string|null $dbName The name of the database.
      * @param string|null $dbSchema The name of the schema, primarily used for PostgreSQL.
      */
-    public function __construct($dbType, $pdo, $dbName = null)
+    public function __construct($databaseType, $pdo, $dbName = null)
     {
-        $this->dbType = strtolower($dbType);
         $this->dbName = $dbName;
         $this->outputBuffer = '';
         $this->db = $pdo;
+        $databaseType = $this->fixDatabaseType($databaseType);
+        $this->dbType = strtolower($databaseType);
+    }
+
+    /**
+     * Ensures that the given database type is set.
+     * If not provided, it retrieves the database driver name from the PDO instance
+     * and maps it to a known database type using PicoDatabase::getDbType().
+     *
+     * @param string|null $databaseType The provided database type or null.
+     * @return string The resolved database type.
+     */
+    private function fixDatabaseType($databaseType)
+    {
+        if(!isset($databaseType) || empty($databaseType))
+        {
+            $driver = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
+            $databaseType = PicoDatabase::getDbType($driver);
+        }
+        return $databaseType;
     }
 
     /**
@@ -112,7 +132,7 @@ class DatabaseExporter // NOSONAR
         $this->outputBuffer .= "-- Database structure\r\n\r\n";
         $this->exportTableStructure($tables, $schema);
         $this->outputBuffer .= "-- Database content\r\n";
-        $this->exportTableData($tables, $schema, $batchSize, $maxQuerySize);
+        $this->exportTableData($tables, $schema, null, $batchSize, $maxQuerySize);
     }
 
     /**
@@ -126,6 +146,8 @@ class DatabaseExporter // NOSONAR
      */
     public function exportStructure($tables = null, $schema = 'public', $targetDatabaseType = null)
     {
+        $targetDatabaseType = $this->fixDatabaseType($targetDatabaseType);
+        $targetDatabaseType = $this->normalizeDatabaseType($targetDatabaseType);
         $this->outputBuffer .= "-- Database structure\r\n\r\n";
         $this->exportTableStructure($tables, $schema, $targetDatabaseType);
     }
@@ -138,6 +160,8 @@ class DatabaseExporter // NOSONAR
      */
     public function exportTableStructure($tables, $schema = 'public', $targetDatabaseType = null)
     {
+        $targetDatabaseType = $this->fixDatabaseType($targetDatabaseType);
+        $targetDatabaseType = $this->normalizeDatabaseType($targetDatabaseType);
         $converter = new PicoDatabaseConverter();
         $targetDatabaseType = $converter->normalizeDialect($targetDatabaseType);
         switch ($this->dbType) {
@@ -533,6 +557,7 @@ class DatabaseExporter // NOSONAR
      */
     public function exportTableData($tables, $schema = 'public', $targetDatabaseType, $batchSize = 100, $maxQuerySize = 524288) // NOSONAR
     {
+        $targetDatabaseType = $this->fixDatabaseType($targetDatabaseType);
         $targetDatabaseType = $this->normalizeDatabaseType($targetDatabaseType);
 
         switch ($this->dbType) {
