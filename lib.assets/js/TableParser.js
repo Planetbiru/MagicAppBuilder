@@ -72,7 +72,10 @@ class TableParser {
      * @returns {Object} An object containing table name and columns, along with primary key information.
      */
     parseTable(sql) // NOSONAR
-    { 
+    {
+        sql = sql.replace(/(\bnvarchar\s*)\(\s*max\s*\)/gi, 'TEXT');
+        sql = sql.replace(/(\bvarchar\s*)\(\s*max\s*\)/gi, 'TEXT');
+
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
         let rg_fld = /(\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+serial8|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime2.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(([^)]+)\)|\w+\s+set\s*\(([^)]+)\)|\w+\s+numeric\s*\(([^)]+)\)|\w+\s+decimal\s*\(([^)]+)\)|\w+\s+float\s*\(([^)]+)\)|\w+\s+int2.*|\w+\s+int4.*|\w+\s+int8.*|\w+\s+time.*|\w+\s+uuid.*|\w+\s+money.*|\w+\s+blob.*|\w+\s+bit.*|\w+\s+json.*)/gim; // NOSONAR
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
