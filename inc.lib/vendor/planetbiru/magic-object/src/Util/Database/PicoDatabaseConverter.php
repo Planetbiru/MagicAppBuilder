@@ -29,40 +29,42 @@ use MagicObject\Exceptions\DatabaseConversionException;
  */
 class PicoDatabaseConverter // NOSONAR
 {
+    const INVALID_CREATE_TABLE_STATEMENT_MYSQL = "Invalid MySQL CREATE TABLE statement format.";
+
     /**
      * Array mapping of database field types to SQLite data types.
      *
      * @var array
      */
-    private $dbToSqlite;
+    protected $dbToSqlite;
 
     /**
      * Array mapping of database field types to MySQL data types.
      *
      * @var array
      */
-    private $dbToMySQL;
+    protected $dbToMySQL;
 
     /**
      * Array mapping of database field types to PostgreSQL data types.
      *
      * @var array
      */
-    private $dbToPostgreSQL;
+    protected $dbToPostgreSQL;
     
     /**
      * Array mapping of database field types to SQLServer data types.
      *
      * @var array
      */
-    private $dbToSQLServer;
+    protected $dbToSQLServer;
 
     /**
      * Array mapping of SQL data types to PHP types.
      *
      * @var array
      */
-    private $sqlToPhpType;
+    protected $sqlToPhpType;
 
     /**
      * PicoDatabaseConverter constructor.
@@ -255,7 +257,8 @@ class PicoDatabaseConverter // NOSONAR
             "timestamp with time zone" => "DATETIMEOFFSET", // SQL Server equivalent
             "timestamp without time zone" => "DATETIME2",
             "timestamptz" => "DATETIMEOFFSET",
-            "datetime" => "DATETIME",
+            "datetime" => "DATETIME2",
+            "timestamp" => "DATETIME2",
             "date" => "DATE",
             "time" => "TIME",
             "year" => "SMALLINT", // No 'YEAR' type in SQL Server
@@ -619,7 +622,7 @@ class PicoDatabaseConverter // NOSONAR
      * @param string $value The input string to be escaped.
      * @return string The escaped string with single quotes doubled.
      */
-    protected function escapeSqlString($value)
+    public function escapeSqlString($value)
     {
         return str_replace("'", "''", $value);
     }
@@ -782,6 +785,36 @@ class PicoDatabaseConverter // NOSONAR
     }
 
     /**
+     * Sanitizes improperly quoted SQL keywords in a PostgreSQL-generated SQL string.
+     *
+     * This function replaces SQL keywords that have been incorrectly quoted with double quotes
+     * (e.g., "PRIMARY" KEY, "NOT" NULL) with their standard unquoted forms, improving compatibility
+     * and readability across different database systems.
+     *
+     * @param string $finalSql The SQL string containing quoted keywords.
+     * @return string The sanitized SQL string with corrected keyword formatting.
+     */
+    public function sanitizeQuotedSqlKeywords($finalSql)
+    {
+        // Fix PostgreSQL's unnecessary quoting of SQL keywords
+        $finalSql = str_replace('"PRIMARY" KEY', 'PRIMARY KEY', $finalSql);
+        $finalSql = str_replace('"UNIQUE" KEY', 'UNIQUE', $finalSql);
+        $finalSql = str_replace('"FOREIGN" KEY', 'FOREIGN KEY', $finalSql);
+        $finalSql = str_replace('"CHECK" (', 'CHECK (', $finalSql);
+        $finalSql = str_replace('"DEFAULT" ', 'DEFAULT ', $finalSql);
+        $finalSql = str_replace('"NOT" NULL', 'NOT NULL', $finalSql);
+        $finalSql = str_replace('"NULL"', 'NULL', $finalSql);
+        $finalSql = str_replace('"REFERENCES"', 'REFERENCES', $finalSql);
+        $finalSql = str_replace('"ON" DELETE', 'ON DELETE', $finalSql);
+        $finalSql = str_replace('"ON" UPDATE', 'ON UPDATE', $finalSql);
+        $finalSql = str_replace('"USING"', 'USING', $finalSql);
+        $finalSql = str_replace('"WITH"', 'WITH', $finalSql);
+        $finalSql = str_replace('"CONSTRAINT"', 'CONSTRAINT', $finalSql);
+
+        return $finalSql;
+    }
+
+    /**
      * Translates a CREATE TABLE statement from MySQL to PostgreSQL.
      *
      * @param string $sql The MySQL CREATE TABLE statement.
@@ -794,7 +827,7 @@ class PicoDatabaseConverter // NOSONAR
 
         // Extract table name and body using a custom parser to handle nested parentheses
         if (!preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([^\s`(]+)`?\s*\(/i', $sql, $matches, PREG_OFFSET_CAPTURE)) {
-            throw new DatabaseConversionException("Invalid MySQL CREATE TABLE statement format.");
+            throw new DatabaseConversionException(self::INVALID_CREATE_TABLE_STATEMENT_MYSQL);
         }
 
         $ifNotExists = isset($matches[1][0]) ? 'IF NOT EXISTS ' : ''; // NOSONAR
@@ -905,20 +938,8 @@ class PicoDatabaseConverter // NOSONAR
         $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
         $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql); // NOSONAR
 
-        $finalSql = str_replace('`', '"', $finalSql); // Convert backticks to double quotes for PostgreSQL
-        $finalSql = str_replace('"PRIMARY" KEY', 'PRIMARY KEY', $finalSql); // Fix PostgreSQL's PRIMARY KEY quoting
-        $finalSql = str_replace('"UNIQUE" KEY', 'UNIQUE', $finalSql); // Fix PostgreSQL's UNIQUE KEY quoting
-        $finalSql = str_replace('"FOREIGN" KEY', 'FOREIGN KEY', $finalSql); // Fix PostgreSQL's FOREIGN KEY quoting
-        $finalSql = str_replace('"CHECK" (', 'CHECK (', $finalSql); // Fix PostgreSQL's CHECK constraint quoting
-        $finalSql = str_replace('"DEFAULT" ', 'DEFAULT ', $finalSql); // Fix PostgreSQL's DEFAULT quoting
-        $finalSql = str_replace('"NOT" NULL', 'NOT NULL', $finalSql); // Fix PostgreSQL's NOT NULL quoting
-        $finalSql = str_replace('"NULL"', 'NULL', $finalSql); // Fix PostgreSQL's NULL quoting
-        $finalSql = str_replace('"REFERENCES"', 'REFERENCES', $finalSql); // Fix PostgreSQL's REFERENCES quoting
-        $finalSql = str_replace('"ON" DELETE', 'ON DELETE', $finalSql); // Fix PostgreSQL's ON DELETE quoting
-        $finalSql = str_replace('"ON" UPDATE', 'ON UPDATE', $finalSql); // Fix PostgreSQL's ON UPDATE quoting
-        $finalSql = str_replace('"USING"', 'USING', $finalSql); // Fix PostgreSQL's USING quoting
-        $finalSql = str_replace('"WITH"', 'WITH', $finalSql); // Fix PostgreSQL's WITH quoting
-        $finalSql = str_replace('"CONSTRAINT"', 'CONSTRAINT', $finalSql); // Fix PostgreSQL's CONSTRAINT quoting
+        $finalSql = str_replace('`', '"', $finalSql); // Convert backticks to double quotes for PostgreSQL     
+        $finalSql = $this->sanitizeQuotedSqlKeywords($finalSql);
 
         $finalSql = str_replace(' DEFAULT NULL', ' NULL DEFAULT NULL', $finalSql);
         $finalSql = str_replace(' NULL NULL DEFAULT NULL', ' NULL DEFAULT NULL', $finalSql);
@@ -943,13 +964,12 @@ class PicoDatabaseConverter // NOSONAR
         // The previous one might miss IF NOT EXISTS correctly for SQL Server later.
         // For SQL Server, IF NOT EXISTS is not standard in CREATE TABLE.
         if (!preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([^\s`(]+)`?(\s*COLLATE\s+[^\s]+)?\s*\(/i', $sql, $matches, PREG_OFFSET_CAPTURE)) {
-            throw new DatabaseConversionException("Invalid MySQL CREATE TABLE statement format.");
+            throw new DatabaseConversionException(self::INVALID_CREATE_TABLE_STATEMENT_MYSQL);
         }
 
         // SQL Server typically doesn't use IF NOT EXISTS directly in CREATE TABLE.
         // You might want to handle this with a separate check (e.g., `IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'YourTable') CREATE TABLE...`)
         // For this function's scope, we'll just ignore or remove it from the final output.
-        $ifNotExists = isset($matches[1][0]) ? $matches[1][0] : ''; // Capture it, but we'll remove it later
         $tableName = $this->quoteIdentifier($matches[2][0], 'sqlserver');
         $startPos = $matches[0][1] + strlen($matches[0][0]) - 1;
 
@@ -1356,7 +1376,7 @@ class PicoDatabaseConverter // NOSONAR
 
         // Ambil nama tabel dan isi definisi kolom/constraint
         if (!preg_match('/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([^\s`(]+)`?\s*\(/i', $sql, $matches, PREG_OFFSET_CAPTURE)) {
-            throw new DatabaseConversionException("Invalid MySQL CREATE TABLE statement format.");
+            throw new DatabaseConversionException(self::INVALID_CREATE_TABLE_STATEMENT_MYSQL);
         }
 
         $ifNotExists = isset($matches[1][0]) ? 'IF NOT EXISTS ' : '';
@@ -1463,20 +1483,8 @@ class PicoDatabaseConverter // NOSONAR
         $finalSql = preg_replace('/COLLATE\s*=\s*[a-zA-Z0-9_]+/i', '', $finalSql); // NOSONAR
         $finalSql = preg_replace('/COMMENT\s+\'.*?\'/i', '', $finalSql); // NOSONAR
 
-        $finalSql = str_replace('"PRIMARY" KEY', 'PRIMARY KEY', $finalSql); // Fix PostgreSQL's PRIMARY KEY quoting
-        $finalSql = str_replace('"UNIQUE" KEY', 'UNIQUE', $finalSql); // Fix PostgreSQL's UNIQUE KEY quoting
-        $finalSql = str_replace('"FOREIGN" KEY', 'FOREIGN KEY', $finalSql); // Fix PostgreSQL's FOREIGN KEY quoting
-        $finalSql = str_replace('"CHECK" (', 'CHECK (', $finalSql); // Fix PostgreSQL's CHECK constraint quoting
-        $finalSql = str_replace('"DEFAULT" ', 'DEFAULT ', $finalSql); // Fix PostgreSQL's DEFAULT quoting
-        $finalSql = str_replace('"NOT" NULL', 'NOT NULL', $finalSql); // Fix PostgreSQL's NOT NULL quoting
-        $finalSql = str_replace('"NULL"', 'NULL', $finalSql); // Fix PostgreSQL's NULL quoting
-        $finalSql = str_replace('"REFERENCES"', 'REFERENCES', $finalSql); // Fix PostgreSQL's REFERENCES quoting
-        $finalSql = str_replace('"ON" DELETE', 'ON DELETE', $finalSql); // Fix PostgreSQL's ON DELETE quoting
-        $finalSql = str_replace('"ON" UPDATE', 'ON UPDATE', $finalSql); // Fix PostgreSQL's ON UPDATE quoting
-        $finalSql = str_replace('"USING"', 'USING', $finalSql); // Fix PostgreSQL's USING quoting
-        $finalSql = str_replace('"WITH"', 'WITH', $finalSql); // Fix PostgreSQL's WITH quoting
-        $finalSql = str_replace('"CONSTRAINT"', 'CONSTRAINT', $finalSql); // Fix PostgreSQL's CONSTRAINT quoting
         $finalSql = str_replace('`', '"', $finalSql); // Convert backticks to double quotes for SQLite
+        $finalSql = $this->sanitizeQuotedSqlKeywords($finalSql);
 
         $finalSql = $this->fixLines($finalSql);
 
@@ -1920,17 +1928,17 @@ class PicoDatabaseConverter // NOSONAR
         $dialect = strtolower(trim($dialect));
 
         $mapping = [
-        'mysql'       => 'mysql',
-        'mariadb'     => 'mysql',
-        'postgres'    => 'postgresql',
-        'pgsql'       => 'postgresql',
-        'postgresql'  => 'postgresql',
-        'sqlite'      => 'sqlite',
-        'sqlite3'     => 'sqlite',
-        'sqlserver'   => 'sqlserver',
-        'mssql'       => 'sqlserver',
-        'sqlsrv'      => 'sqlserver'
-    ];
+            'mysql'       => 'mysql',
+            'mariadb'     => 'mysql',
+            'postgres'    => 'postgresql',
+            'pgsql'       => 'postgresql',
+            'postgresql'  => 'postgresql',
+            'sqlite'      => 'sqlite',
+            'sqlite3'     => 'sqlite',
+            'sqlserver'   => 'sqlserver',
+            'mssql'       => 'sqlserver',
+            'sqlsrv'      => 'sqlserver'
+        ];
 
         if (isset($mapping[$dialect])) {
             return $mapping[$dialect];
@@ -2137,7 +2145,7 @@ class PicoDatabaseConverter // NOSONAR
      * @param string $definition The rest of the column definition (e.g., 'AUTO_INCREMENT PRIMARY KEY').
      * @return bool True if the column is auto-increment.
      */
-    private function isAutoIncrementColumn($type, $definition)
+    public function isAutoIncrementColumn($type, $definition)
     {
         $type = strtolower($type);
         $definition = strtolower($definition);
@@ -2147,7 +2155,6 @@ class PicoDatabaseConverter // NOSONAR
             $type === 'serial' || $type === 'bigserial' ||              // PostgreSQL
             preg_match('/\binteger\b.*\bprimary key\b.*\bautoincrement\b/', $type . ' ' . $definition); // SQLite
     }
-
 
     /**
      * Cleans a single line of SQL by removing comments and excess whitespace.
