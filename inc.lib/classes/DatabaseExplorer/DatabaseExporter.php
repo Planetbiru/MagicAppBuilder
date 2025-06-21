@@ -364,7 +364,7 @@ class DatabaseExporter // NOSONAR
     public function convertDatabaseStructure($createTableSql, $targetDatabaseType, $converter)
     {
         if (!isset($targetDatabaseType) || empty($targetDatabaseType) || $this->equalsDatabaseType($this->dbType, $targetDatabaseType)) {
-            return $createTableSql;
+            return $createTableSql.";";
         } else {
             return $converter->translateCreateTable($createTableSql, $this->dbType, $targetDatabaseType);
         }
