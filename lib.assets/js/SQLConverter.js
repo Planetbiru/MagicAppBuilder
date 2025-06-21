@@ -15,6 +15,7 @@ class SQLConverter {
         this.dbToSqlite = {
             // MySQL and PostgreSQL types to SQLite mapping
             "int": "INTEGER",
+            "bit": "BOOLEAN",  // MySQL treats tinyint(1) as boolean
             "tinyint(1)": "BOOLEAN",  // MySQL treats tinyint(1) as boolean
             "tinyint": "INTEGER",  // MySQL treats tinyint as integer
             "smallint": "INTEGER",
@@ -70,6 +71,7 @@ class SQLConverter {
             "tinyint(1)": "TINYINT(1)",
             "tinyint": "TINYINT",
             "boolean": "TINYINT(1)",
+            "bit": "TINYINT(1)",
             "int": "INT",
             "datetime2": "TIMESTAMP",
             "datetime": "DATETIME",
@@ -104,6 +106,7 @@ class SQLConverter {
             "varchar": "CHARACTER VARYING",
             "char": "CHARACTER",
             "boolean": "BOOLEAN",
+            "bit": "BOOLEAN",
             "datetime2": "TIMESTAMP WITH TIME ZONE",
             "datetime": "TIMESTAMP WITHOUT TIME ZONE",
             "date": "DATE",
@@ -349,7 +352,7 @@ class SQLConverter {
      */
     isTinyInt1(type, length)
     {
-        return type.toUpperCase() === 'TINYINT' && length == 1 || type.toUpperCase() === 'BIT';
+        return (type.toUpperCase() === 'TINYINT' && length == 1) || type.toUpperCase() === 'BIT' || type.toUpperCase() === 'BOOLEAN';
     }
 
     /**
@@ -533,7 +536,15 @@ class SQLConverter {
         }
         lines.push(linesCol.join(',\r\n'));
         lines.push(');');
-        return lines.join('\r\n');
+        let createTable = lines.join('\r\n');
+
+        createTable = createTable
+            .replace(/boolean\s+null\s+default\s+true/gi, 'BOOLEAN NULL DEFAULT 1')
+            .replace(/boolean\s+null\s+default\s+false/gi, 'BOOLEAN NULL DEFAULT 0')
+            .replace(/boolean\s+default\s+true/gi, 'BOOLEAN NULL DEFAULT 1')
+            .replace(/boolean\s+default\s+false/gi, 'BOOLEAN NULL DEFAULT 0');
+
+        return createTable;
     }
 
     /**
@@ -622,7 +633,7 @@ class SQLConverter {
      * @returns {string} The converted SQLite column type.
      */
     toSqliteType(type, length) {
-        if(type.toLowerCase() == 'tinyint' && length == 1)
+        if(this.isTinyInt1(type, length))
         {
             return 'BOOLEAN';
         }
