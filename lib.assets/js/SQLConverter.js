@@ -32,6 +32,7 @@ class SQLConverter {
             "mediumtext": "TEXT",
             "longtext": "TEXT",
             "text": "TEXT",
+            "datetime2": "TIMESTAMP", 
             "datetime": "DATETIME", // SQLite stores datetime as DATETIME in ISO 8601 format
             "timestamp": "TIMESTAMP", // Same as datetime for SQLite
             "date": "DATE",  // SQLite stores dates as DATE in ISO 8601 format
@@ -70,6 +71,7 @@ class SQLConverter {
             "tinyint": "TINYINT",
             "boolean": "TINYINT(1)",
             "int": "INT",
+            "datetime2": "TIMESTAMP",
             "datetime": "DATETIME",
             "date": "DATE",
             "timestamptz": "TIMESTAMP",
@@ -102,6 +104,7 @@ class SQLConverter {
             "varchar": "CHARACTER VARYING",
             "char": "CHARACTER",
             "boolean": "BOOLEAN",
+            "datetime2": "TIMESTAMP WITH TIME ZONE",
             "datetime": "TIMESTAMP WITHOUT TIME ZONE",
             "date": "DATE",
             "timestamptz": "TIMESTAMP WITH TIME ZONE",
@@ -346,7 +349,7 @@ class SQLConverter {
      */
     isTinyInt1(type, length)
     {
-        return type.toUpperCase() === 'TINYINT' && length == 1;
+        return type.toUpperCase() === 'TINYINT' && length == 1 || type.toUpperCase() === 'BIT';
     }
 
     /**
