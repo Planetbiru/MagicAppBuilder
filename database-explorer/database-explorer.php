@@ -98,7 +98,7 @@ if(!isset($databaseName))
             </div>
             
             <div class="modal-body">
-                <textarea name="original" id="original" class="original" spellcheck="false"></textarea>
+                <textarea name="original" id="original" class="original" spellcheck="false" autocomplete="off"></textarea>
             </div>
 
             <div class="modal-footer">
@@ -160,7 +160,7 @@ if(!isset($databaseName))
                         <div class="right-panel">
                             <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all <span class="entity-count"></span></label></div>
                             <ul class="table-list-for-export"></ul>
-                            <textarea class="query-generated" spellcheck="false"></textarea>
+                            <textarea class="query-generated" spellcheck="false" autocomplete="off"></textarea>
                         </div>
                     </div>
                     
