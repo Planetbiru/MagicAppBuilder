@@ -1495,7 +1495,7 @@ class DatabaseExplorer // NOSONAR
             $form2->appendChild($space);
 
             $exportTable = $dom->createElement('button');
-            $exportTable->setAttribute('type', 'button');
+            $exportTable->setAttribute('type', 'submit');
             $exportTable->setAttribute('name', '___export_table___');
             $exportTable->setAttribute('value', $tableName);
             $exportTable->setAttribute('class', ConstantText::BTN_SUCCESS);

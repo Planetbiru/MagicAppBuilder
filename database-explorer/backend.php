@@ -76,7 +76,7 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
     $filename = trim($filename, " - ");
     header("Content-type: text/plain");
     header("Content-disposition: attachment; filename=\"$filename\"");
-    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
+    $exporter = new DatabaseExporter("", $pdo, $databaseConfig->getDatabaseName());
     $exporter->exportData($tables, $schemaName, $maxRecord, $maxQuerySize);
     
     echo $exporter->getExportData();
@@ -102,7 +102,7 @@ if(isset($_POST['___export_database_structure___']) || isset($_POST['___export_t
     $filename = trim($filename, " - ");
     header("Content-type: text/plain");
     header("Content-disposition: attachment; filename=\"$filename\"");
-    $exporter = new DatabaseExporter($database->getDatabaseType(), $pdo);
+    $exporter = new DatabaseExporter("", $pdo, $databaseConfig->getDatabaseName());
     $exporter->exportStructure($tables, $schemaName);
     
     echo $exporter->getExportData();
