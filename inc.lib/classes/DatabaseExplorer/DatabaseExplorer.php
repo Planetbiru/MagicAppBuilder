@@ -1375,6 +1375,7 @@ class DatabaseExplorer // NOSONAR
         $textarea = $dom->createElement('textarea', htmlspecialchars($lastQueries));
         $textarea->setAttribute('name', 'query');
         $textarea->setAttribute('spellcheck', 'false');
+        $textarea->setAttribute('autocomplete', 'off');
         $form1->appendChild($textarea);
 
         // Create submit button
