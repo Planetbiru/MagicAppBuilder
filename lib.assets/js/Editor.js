@@ -522,7 +522,59 @@ let initEditor = function () {
         }, 1);
     }
 
+    // Update scroll
+    syncScroll(transEd1, transEd2);
+    syncScroll(transEd3, transEd4);
+    syncScroll(transEd5, transEd6);
+
 }; // End of initEditor function
+
+/**
+ * Synchronizes the scroll position between two CodeMirror editor instances.
+ * When one editor is scrolled, the other editor will scroll to the same position.
+ * This helps in scenarios like parallel translation or diff viewing.
+ *
+ * @param {CodeMirror.Editor} editor1 - The first CodeMirror editor instance.
+ * @param {CodeMirror.Editor} editor2 - The second CodeMirror editor instance.
+ */
+function syncScroll(editor1, editor2) {
+    // Get the scroller element for each editor
+    let scroller1 = editor1.getScrollerElement();
+    let scroller2 = editor2.getScrollerElement();
+
+    // Variable to prevent infinite loops (when editors scroll each other)
+    let syncingScroll = false;
+
+    // Listener for editor1
+    scroller1.addEventListener('scroll', function() {
+        if (!syncingScroll) {
+            syncingScroll = true;
+            // Get scroll position of editor1
+            let scrollInfo1 = editor1.getScrollInfo();
+            // Set scroll position of editor2
+            editor2.scrollTo(scrollInfo1.left, scrollInfo1.top);
+            // Reset flag after scroll completes
+            setTimeout(function() {
+                syncingScroll = false;
+            }, 10); // Small delay to ensure the event completes
+        }
+    });
+
+    // Listener for editor2
+    scroller2.addEventListener('scroll', function() {
+        if (!syncingScroll) {
+            syncingScroll = true;
+            // Get scroll position of editor2
+            let scrollInfo2 = editor2.getScrollInfo();
+            // Set scroll position of editor1
+            editor1.scrollTo(scrollInfo2.left, scrollInfo2.top);
+            // Reset flag after scroll completes
+            setTimeout(function() {
+                syncingScroll = false;
+            }, 10); // Small delay
+        }
+    });
+}
 
 /**
  * Highlights the current line in the first translation editor.
