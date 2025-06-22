@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "92c98d6b3e624198b8ed0a63fd98d9da",
+    "content-hash": "a069d1e070a8c39d321d867e7738b424",
     "packages": [
         {
             "name": "meyfa/php-svg",
@@ -142,12 +142,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "452709ae9d0fa021c0b60a586029f8952e9eefba"
+                "reference": "0e21bf06ebd63afe2094c193ce36f0f6987be342"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/452709ae9d0fa021c0b60a586029f8952e9eefba",
-                "reference": "452709ae9d0fa021c0b60a586029f8952e9eefba",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/0e21bf06ebd63afe2094c193ce36f0f6987be342",
+                "reference": "0e21bf06ebd63afe2094c193ce36f0f6987be342",
                 "shasum": ""
             },
             "require": {
@@ -174,7 +174,7 @@
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
                 "source": "https://github.com/Planetbiru/MagicApp/tree/3.14.0"
             },
-            "time": "2025-06-22T08:02:03+00:00"
+            "time": "2025-06-22T17:26:27+00:00"
         },
         {
             "name": "planetbiru/magic-object",
