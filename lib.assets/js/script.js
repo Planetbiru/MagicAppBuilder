@@ -5935,19 +5935,21 @@ function generateScript(selector) // NOSONAR
   let subquery = $("#subquery")[0].checked && true; //NOSONAR
   let requireApproval = $("#with_approval")[0].checked && true; //NOSONAR
   let withTrash = $("#with_trash")[0].checked && true; //NOSONAR
-  let manualSortOrder = $("#manualsortorder")[0].checked && true; //NOSONAR
+  let manualSortOrder = $("#manual_sort_order")[0].checked && true; //NOSONAR
   let exportToExcel = $("#export_to_excel")[0].checked && true; //NOSONAR
   let exportToCsv = $("#export_to_csv")[0].checked && true; //NOSONAR
   let exportUseTemporary = $("#export_use_temporary")[0].checked && true; //NOSONAR
   let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
   let userActivityLogger = $("#user_activity_logger")[0].checked && true; //NOSONAR
   let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
-  let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
   let approvalByAnotherUser = $('[name="approval_by_other_user"]')[0].checked && true; //NOSONAR
-  let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
   let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
   let backendOnly = $("#backend_only")[0].checked && true; //NOSONAR
   let useValidator = $("#validator")[0].checked && true; //NOSONAR
+
+  let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
+  let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
+
   let entity = {
     mainEntity: {
       entityName: $('[name="entity_master_name"]').val(),
@@ -6653,7 +6655,7 @@ function restoreForm(data)  //NOSONAR
     if(data.features)
     {
       $('#activate_deactivate')[0].checked = isTrue(data.features.activateDeactivate);
-      $('#manualsortorder')[0].checked = isTrue(data.features.sortOrder);
+      $('#manual_sort_order')[0].checked = isTrue(data.features.sortOrder);
       $('#export_to_excel')[0].checked = isTrue(data.features.exportToExcel);
       $('#export_to_csv')[0].checked = isTrue(data.features.exportToCsv);
       $('#export_use_temporary')[0].checked = isTrue(data.features.exportUseTemporary);
@@ -6800,7 +6802,7 @@ function restoreForm(data)  //NOSONAR
 function resetFeatureForm()
 {
   $('#activate_deactivate')[0].checked = false
-  $('#manualsortorder')[0].checked = false;
+  $('#manual_sort_order')[0].checked = false;
   $('#export_to_excel')[0].checked = false;
   $('#export_to_csv')[0].checked = false;
   $('#export_use_temporary')[0].checked = false;

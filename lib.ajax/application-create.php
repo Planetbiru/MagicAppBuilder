@@ -480,9 +480,16 @@ file_put_contents($path5, "Options -Indexes
   Deny from all
 </Files>");
 $dir6 = $baseDir."/inc.database";
-mkdir($dir6, 0755, true);
+if(!file_exists($dir6))
+{
+    mkdir($dir6, 0755, true);
+}
+
 $dir7 = $baseDir."/lib.upload";
-mkdir($dir7, 0755, true);
+if(!file_exists($dir7))
+{
+    mkdir($dir7, 0755, true);
+}
 if($async)
 {
     $pathPreparation = '"'.FileDirUtil::normalizationPath(__DIR__) . "/application-preparation.php".'"';

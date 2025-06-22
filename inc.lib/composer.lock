@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "92c98d6b3e624198b8ed0a63fd98d9da",
+    "content-hash": "a069d1e070a8c39d321d867e7738b424",
     "packages": [
         {
             "name": "meyfa/php-svg",
@@ -142,12 +142,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "85019ef01d4d77ad006c03648b8e8dd593400669"
+                "reference": "0e21bf06ebd63afe2094c193ce36f0f6987be342"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/85019ef01d4d77ad006c03648b8e8dd593400669",
-                "reference": "85019ef01d4d77ad006c03648b8e8dd593400669",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/0e21bf06ebd63afe2094c193ce36f0f6987be342",
+                "reference": "0e21bf06ebd63afe2094c193ce36f0f6987be342",
                 "shasum": ""
             },
             "require": {
@@ -174,7 +174,7 @@
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
                 "source": "https://github.com/Planetbiru/MagicApp/tree/3.14.0"
             },
-            "time": "2025-06-21T00:13:09+00:00"
+            "time": "2025-06-22T17:26:27+00:00"
         },
         {
             "name": "planetbiru/magic-object",
@@ -182,12 +182,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "6e21f78818082d73b740310fd4b6149f8d7c2a63"
+                "reference": "a1db19c9df309c15f064c7b16759c80b4d5e89b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/6e21f78818082d73b740310fd4b6149f8d7c2a63",
-                "reference": "6e21f78818082d73b740310fd4b6149f8d7c2a63",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/a1db19c9df309c15f064c7b16759c80b4d5e89b4",
+                "reference": "a1db19c9df309c15f064c7b16759c80b4d5e89b4",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
                 "source": "https://github.com/Planetbiru/MagicObject/tree/3.14.0"
             },
-            "time": "2025-06-21T00:09:18+00:00"
+            "time": "2025-06-22T07:57:28+00:00"
         }
     ],
     "packages-dev": [],
