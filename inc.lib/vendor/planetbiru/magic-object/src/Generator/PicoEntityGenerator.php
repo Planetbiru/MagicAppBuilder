@@ -826,6 +826,10 @@ class ' . $className . ' extends MagicObject
                             continue;
                         }
 
+                        if($key == 'message' && empty($value)) {
+                            continue;
+                        }
+
                         if ($value === '' || $value === null) {
                             $parts[] = "$key=\"\"";
                         } elseif (is_string($value) && $type !== 'Enum') {
@@ -835,13 +839,13 @@ class ' . $className . ' extends MagicObject
                         }
                     }
 
-                    $summary = $type . (!empty($parts) ? '(' . implode(', ', $parts) . ')' : '');
+                    $summary = "**$type**" . (!empty($parts) ? '(' . implode(', ', $parts) . ')' : '');
                     $ruleSummaries[] = $summary;
                 }
             }
 
             if (!empty($ruleSummaries)) {
-                $output .= " * $no. **\$$camelField** ( " . implode(', ', $ruleSummaries) . " )\r\n";
+                $output .= " * $no. `\$$camelField` ( " . implode(', ', $ruleSummaries) . " )\r\n";
                 $no++;
             }
         }
