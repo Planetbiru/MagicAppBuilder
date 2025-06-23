@@ -5,7 +5,7 @@ namespace MagicAppTemplate\Entity\App;
 use MagicObject\MagicObject;
 
 /**
- * The AppModuleImpl class represents an entity in the "module" table.
+ * The AppModuleMultiLevelImpl class represents an entity in the "module" table.
  *
  * This entity maps to the "module" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
@@ -19,7 +19,7 @@ use MagicObject\MagicObject;
  * @Table(name="module")
  * @package MagicAppTemplate\Entity\App
  */
-class AppModuleImpl extends MagicObject
+class AppModuleMultiLevelImpl extends MagicObject
 {
 	/**
 	 * Module ID
@@ -71,6 +71,26 @@ class AppModuleImpl extends MagicObject
 	 * @var AppModuleGroupImpl
 	 */
 	protected $moduleGroup;
+	
+	/**
+	 * Parent Module ID
+	 * 
+	 * @NotNull
+	 * @Column(name="parent_module_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
+	 * @Label(content="Parent Module")
+	 * @var string
+	 */
+	protected $parentModuleId;
+	
+	/**
+	 * Parent Module
+	 * 
+	 * @NotNull
+	 * @JoinColumn(name="parent_module_id", referenceColumnName="module_id", referenceTableName="module")
+	 * @Label(content="Parent Module")
+	 * @var AppModuleMinImpl
+	 */
+	protected $parentModule;
 
 	/**
 	 * URL
