@@ -1358,6 +1358,10 @@ table.table.table-enum tr > td:last-child {
   padding: 3px 0 0px 5px;
 }
 
+.application-icon-preview {
+  margin-bottom: 0.75rem;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;

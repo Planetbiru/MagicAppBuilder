@@ -619,3 +619,19 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 -   **Application Creation Directory Bug Fix:** We've squashed a bug that prevented the correct directory creation when you were setting up a new application. This ensures a smoother and more reliable setup process.
 
+
+# MagicAppBuilder Version 1.5.0
+
+## What's New
+
+-   **Project Exporter:** You can now export individual applications as portable project files.  
+    A new **Export** button has been added directly to each application card, allowing you to back up or transfer applications one at a time.
+    
+-   **Project Importer:** A new **Import** button is available on the **Apps** tab.  
+    Use this to load a previously exported project file and restore the corresponding application instantly.
+    
+
+## What's Changed
+
+-   **Icon Button Relocation:** The icon button that was previously located on each application card has been moved to the **application options dialog**.  
+    This adjustment makes space for the new **Export** button and improves the overall interface organization.
