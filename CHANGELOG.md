@@ -640,3 +640,7 @@ A new `application_id` column has been added to the Error Cache entity. This enh
    Module feature preferences are no longer saved in project files.  
    All user-specific feature settings are now stored directly in the **database**, making preferences persistent across exports, imports, and deployments.
 
+
+## Improvements
+
+-   **Smoother Database Export Experience:** We've refined the database export process. Previously, after the SQL was generated, the screen would momentarily flash as the browser opened and then immediately closed a new window to trigger the file download. Now, the download process happens **seamlessly in the background**, ensuring an uninterrupted and more professional user experience.
