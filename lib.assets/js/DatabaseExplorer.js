@@ -544,73 +544,79 @@ function exportDatabase(selector, onFinish) {
  * After all tables are processed, a download is triggered.
  *
  * @param {string} selector - The CSS selector used to find the modal or table.
+ * @param {function} [onFinish] - Callback function to execute when export is complete.
  */
 function exportTable(selector, onFinish) {
     // Stop if all tables have been processed
     if (tableIndex >= maxTableIndex) {
         isExporting = false;
-        if(typeof onFinish == 'function')
-        {
+        if (typeof onFinish === 'function') {
             onFinish();
         }
-        // Trigger file download after export is complete
-        window.open('export-download.php?fileName=' + encodeURIComponent(exportFileName));
-    }
-    else
-    {
+
+        // Trigger download using a hidden iframe to prevent page navigation.
+        // This is a common method for initiating file downloads without
+        // redirecting the current page.
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none'; // Make the iframe invisible
+        iframe.src = 'export-download.php?fileName=' + encodeURIComponent(exportFileName);
+        document.body.appendChild(iframe); // Append the iframe to the document body
+
+        // Remove the iframe after a short delay to clean up the DOM.
+        // The download usually initiates immediately, so the iframe is no longer needed.
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 5000); // Remove after 5 seconds
+    } else {
         const currentTable = exportTableList[tableIndex];
 
-        let tr = $(selector).find('table tbody').find('tr[data-table-name="'+currentTable.tableName+'"]').attr('data-status', 'none');
-        if(tr != null)
-        {
+        // Find the table row corresponding to the current table being exported
+        // and update its status.
+        let tr = $(selector).find('table tbody').find('tr[data-table-name="' + currentTable.tableName + '"]');
+        if (tr.length) {
             tr.attr('data-status', 'in-progress');
         }
 
+        // Get the target database type from the form input.
         let targetDatabaseType = document.querySelector('[name="target_database_type"]').value;
 
-        // Send table export request to server
+        // Send AJAX request to the server to export the current table.
         $.ajax({
             type: 'POST',
             url: 'export-database.php',
             data: {
-                ...exportConfig,
+                ...exportConfig, // Spread operator to include existing export configuration
                 tableName: currentTable.tableName,
-                includeStructure: currentTable.structure ? 1 : 0,
-                includeData: currentTable.data ? 1 : 0,
+                includeStructure: currentTable.structure ? 1 : 0, // Convert boolean to 1 or 0
+                includeData: currentTable.data ? 1 : 0,           // Convert boolean to 1 or 0
                 fileName: exportFileName,
                 targetDatabaseType: targetDatabaseType
             },
-            dataType: 'json',
+            dataType: 'json', // Expecting a JSON response from the server
             success: function (data) {
-                // Continue with the next table after success
-                if(data.success)
-                {
-                    if(tr != null)
-                    {
+                // If the export of the current table was successful,
+                // update its status and proceed to the next table.
+                if (data.success) {
+                    if (tr.length) {
                         tr.attr('data-status', 'finish');
                     }
-                    
-                    timeoutDownload = setTimeout(function(){
-                        tableIndex++;
-                        exportTable(selector, onFinish);
-                    }, 20);
-                }
-                else if(tr != null)
-                {
+                    tableIndex++; // Increment index to move to the next table
+                    exportTable(selector, onFinish); // Recursively call for the next table
+                } else if (tr.length) {
+                    // If export failed for this table, mark its status as 'error'.
                     tr.attr('data-status', 'error');
                 }
-                
             },
             error: function () {
+                // If the AJAX request itself failed (e.g., network error, server error),
+                // stop the export process and mark the current table as 'error'.
                 isExporting = false;
-                if(tr != null)
-                {
+                if (tr.length) {
                     tr.attr('data-status', 'error');
                 }
             }
         });
     }
-    
 }
 
 /**
