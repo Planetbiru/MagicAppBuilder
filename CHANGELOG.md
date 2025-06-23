@@ -604,3 +604,18 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 -   Display improvements.
 -   General bug fixes.
+
+
+# MagicAppBuilder Version 1.4.1
+
+## Improvements
+
+-   **Database Explorer Enhancements:** We've made the database explorer more stable and reliable. This includes adding the `autocomplete="off"` attribute to the SQL editor element, which helps prevent annoying browser autocomplete suggestions.
+-   **Validator Generator Updates:** The validator generator has received improvements, specifically in its output. The **docblock format for generated validator classes is now more readable and clearer**, making it easier to understand and use.
+-   **Optimized Dependency Management:** We've cleaned up our Composer dependencies. This means we've removed unnecessary duplicate packages, particularly ensuring `MagicObject` isn't redundantly included in the `vendor` directory when `MagicAppBuilder` already handles it. This makes your project lighter and dependency resolution smoother.
+-   **Synchronized Translation Editors:** Our translation editors now feature synchronized scrolling. When you scroll one editor, the other automatically matches its position, creating a much more fluid and intuitive translation experience.
+
+## Fixes
+
+-   **Application Creation Directory Bug Fix:** We've squashed a bug that prevented the correct directory creation when you were setting up a new application. This ensures a smoother and more reliable setup process.
+
