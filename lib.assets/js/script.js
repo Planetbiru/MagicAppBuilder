@@ -2597,6 +2597,36 @@ let initAll = function () {
       }
     });
   });
+  
+  $(document).on('click', '.button-application-export', function (e) {
+    e.preventDefault();
+    
+    let applicationId = $(this).closest('.application-item').attr('data-application-id') || '';
+
+    // Create a temporary form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'lib.ajax/application-export.php';
+    form.style.display = 'none';
+
+    // Add input for applicationId
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'applicationId';
+    input.value = applicationId;
+    form.appendChild(input);
+
+    // Append form to body and submit
+    document.body.appendChild(form);
+    form.submit();
+
+    // Remove form after submission (optional)
+    setTimeout(() => {
+        document.body.removeChild(form);
+    }, 1000);
+  });
+
+
 
   $(document).on('click', '.button-application-open', function (e) {
     e.preventDefault();
