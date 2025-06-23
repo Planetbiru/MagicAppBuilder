@@ -635,3 +635,8 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 -   **Icon Button Relocation:** The icon button that was previously located on each application card has been moved to the **application options dialog**.  
     This adjustment makes space for the new **Export** button and improves the overall interface organization.
+
+-  **Feature Preferences Now Stored in Database:**  
+   Module feature preferences are no longer saved in project files.  
+   All user-specific feature settings are now stored directly in the **database**, making preferences persistent across exports, imports, and deployments.
+
