@@ -71,7 +71,7 @@
 <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application"><i class="fa fa-plus"></i> Create New</button>
 <button type="button" class="btn btn-primary refresh-application-list"><i class="fa fa-refresh"></i> Refresh</button>
 <input type="text" class="form-control" id="search-application" placeholder="Type to search...">
-<button type="button" class="btn btn-primary import-application" data-toggle="modal" data-target="#modal-import-application"><i class="fa fa-file-import"></i> Import Application</button>
+<button type="button" class="btn btn-primary button-import-application"><i class="fa fa-file-import"></i> Import Application</button>
 </div>
 
 <div class="container-fluid application-container">
@@ -1212,6 +1212,26 @@
 </div>
 <div class="modal-footer">
 <button type="button" class="btn btn-success button-save-application-option" name="button-save-application-option"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-application-import" tabindex="-1" aria-labelledby="application_import" aria-hidden="true">
+<div class="modal-dialog modal-md">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Import Application</h5>
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="application-import"></div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-success button-save-application-import" name="button-save-application-import"><i class="fa-solid fa-file-import"></i> Import</button>
 <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
 </div>
 </div>

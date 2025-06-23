@@ -2322,6 +2322,93 @@ let initAll = function () {
       }
     });
   });
+  
+  $(document).on('click', '.button-import-application', function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-import .button-save-application-import');
+    updateBtn[0].disabled = true;
+    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+    $('#modal-application-import .application-import').empty();
+    $('#modal-application-import').modal('show');
+    increaseAjaxPending();
+
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/application-import.php',
+      data: { applicationId: applicationId },
+      dataType: 'html',
+      success: function (data) {
+        decreaseAjaxPending();
+        $('#modal-application-import').attr('data-application-id', applicationId);
+        $('#modal-application-import .application-import').empty().append(data);
+        updateBtn[0].disabled = false;
+        
+        
+        const importInfoDiv = $('.application-import-info');
+        const applicationImportFileSelector = $('.application-import-file-selector');
+
+        // Create a hidden file input element dynamically using jQuery
+        const fileInput = $('<input type="file" accept=".zip" style="display: none;">');
+        fileInput.appendTo(applicationImportFileSelector); // Append to a visible container
+
+        // 1. When the ".button-select-file-import" is clicked, trigger the hidden file input
+        // Using event delegation with $(document).on()
+        $('.button-select-file-import').on('click', function() {
+            fileInput.click(); // Programmatically click the hidden file input
+        });
+
+        // 2. When a file is selected in the input
+        fileInput.on('change', function() {
+            if (this.files.length > 0) {
+                const selectedFile = this.files[0];
+
+                // Create FormData object to send file via AJAX
+                const formData = new FormData();
+                formData.append('user_action', 'preview'); // Add user_action
+                formData.append('file[]', selectedFile);   // Append the selected file(s)
+
+                // Clear previous preview messages and show loading
+                importInfoDiv.html('<div class="alert alert-info">Uploading and parsing file...</div>');
+
+                // Send the file via AJAX using jQuery's $.ajax
+                $.ajax({
+                    url: 'lib.ajax/application-import.php', // URL to send the AJAX request
+                    type: 'POST',                            // HTTP method
+                    data: formData,                          // FormData object
+                    processData: false,                      // Don't process the data (required for FormData)
+                    contentType: false,                      // Don't set content type (required for FormData)
+                    success: function(responseHtml) {
+                        // 3. Append the preview HTML to the .application-import-info div
+                        importInfoDiv.html(responseHtml);
+                        
+                        // Optional: Reset the file input to allow selecting the same file again
+                        fileInput.val(''); 
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('Error during file upload:', textStatus, errorThrown, jqXHR);
+                        let errorMessage = `Error: Failed to upload or parse file. ${errorThrown}`;
+                        if (jqXHR.responseText) {
+                            // If server provided a response text, use it for more detail
+                            errorMessage += `<br>Server Response: ${jqXHR.responseText.substring(0, 200)}...`; // Limit length
+                        }
+                        importInfoDiv.html(`<div class="alert alert-danger">${errorMessage}</div>`);
+                    }
+                });
+            }
+        });
+        
+        
+        
+        
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+  });
+  
+  
+  
   $(document).on("click", ".button-save-application-option", function (e) {
     e.preventDefault();
     let form = $(this).closest(".modal").find('form');
