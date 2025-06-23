@@ -75,8 +75,8 @@ try
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-open">
                 <i class="fas fa-code"></i> Code
             </a>
-            <a href="javascript:;" class="btn btn-tn btn-primary button-application-icons">
-                <i class="fas fa-icons"></i> Icon
+            <a href="javascript:;" class="btn btn-tn btn-primary button-application-export">
+                <i class="fas fa-file-export"></i> Export
             </a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-default">
                 <i class="fas fa-check"></i> Active

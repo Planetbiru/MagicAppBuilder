@@ -1356,4 +1356,8 @@ table.table.table-enum tr > td:first-child {
 }
 table.table.table-enum tr > td:last-child {
   padding: 3px 0 0px 5px;
+}
+
+.application-icon-preview {
+  margin-bottom: 0.75rem;
 }/*# sourceMappingURL=main.css.map */

@@ -2597,6 +2597,36 @@ let initAll = function () {
       }
     });
   });
+  
+  $(document).on('click', '.button-application-export', function (e) {
+    e.preventDefault();
+    
+    let applicationId = $(this).closest('.application-item').attr('data-application-id') || '';
+
+    // Create a temporary form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'lib.ajax/application-export.php';
+    form.style.display = 'none';
+
+    // Add input for applicationId
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'applicationId';
+    input.value = applicationId;
+    form.appendChild(input);
+
+    // Append form to body and submit
+    document.body.appendChild(form);
+    form.submit();
+
+    // Remove form after submission (optional)
+    setTimeout(() => {
+        document.body.removeChild(form);
+    }, 1000);
+  });
+
+
 
   $(document).on('click', '.button-application-open', function (e) {
     e.preventDefault();
@@ -2768,118 +2798,95 @@ let initAll = function () {
     doFilterApplication($(this));
   });
 
-  $(document).on("click", '.button-application-icons', function () {
-    let applicationId = $(this).closest('.application-item').attr('data-application-id');
+  $(document).on("click", '.upload-application-icons', function () {
+    let applicationId = $(this).closest('form').find('input[name="application_id"]').val();
     
     let el = document.querySelector('#iconFileInput');
-    if(el)
-    {
-      el.parentNode.removeChild(el);
+    if (el) {
+        el.parentNode.removeChild(el);
     }
-    
+
     // Create dynamic input file element
     const inputFile = document.createElement('input');
     inputFile.type = 'file';
-    inputFile.accept = 'image/png';  // Only accept PNG files
+    inputFile.accept = 'image/png';
     inputFile.id = 'iconFileInput';
     inputFile.style.position = 'absolute';
     inputFile.style.left = '-1000000px';
     inputFile.style.top = '-1000000px';
 
-    // Handle file selection change
     inputFile.addEventListener('change', function () {
-        const selectedFile = inputFile.files[0]; // Get the selected file
+        const selectedFile = inputFile.files[0];
         if (!selectedFile) {
-            asyncAlert(
-              'Please select a PNG file first.',  // Message to display in the modal
-              'Notification',  
-              [
-                {
-                  'caption': 'Close',  
-                  'fn': () => {
-                  },  
-                  'class': 'btn-primary'  
+            asyncAlert('Please select a PNG file first.', 'Notification', [
+                { caption: 'Close', fn: () => {}, class: 'btn-primary' }
+            ]);
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const image = new Image();
+            image.onload = function () {
+                // Validate image dimensions (minimum 512x512)
+                if (image.width < 512 || image.height < 512) {
+                    asyncAlert('The image must be at least 512x512 pixels.', 'Notification', [
+                        { caption: 'Close', fn: () => {}, class: 'btn-primary' }
+                    ]);
+                    return;
                 }
-              ]
-            );
-        }
-        else
-        {
-        
-          // Read the file using FileReader
-          const reader = new FileReader();
-          reader.onload = function(event) {
-              const image = new Image();
-              
-              image.onload = function() // NOSONAR
-              {
-                  // Validate image dimensions (minimum 512x512)
-                  if (image.width < 512 || image.height < 512) {
-                      asyncAlert(
-                        'The image must be at least 512x512 pixels.',  // Message to display in the modal
-                        'Notification',  
-                        [
-                          {
-                            'caption': 'Close',  
-                            'fn': () => {
-                            },  
-                            'class': 'btn-primary'  
-                          }
-                        ]
-                      );
-                      return;
-                  }
 
-                  const canvas = document.createElement('canvas');
-                  const ctx = canvas.getContext('2d');
-                  const iconSizes = [
-                      { size: 16, name: "favicon-16x16.png" },
-                      { size: 32, name: "favicon-32x32.png" },
-                      { size: 48, name: "favicon-48x48.png" },
-                      { size: 57, name: "apple-icon-57x57.png" },
-                      { size: 60, name: "apple-icon-60x60.png" },
-                      { size: 72, name: "apple-icon-72x72.png" },
-                      { size: 76, name: "apple-icon-76x76.png" },
-                      { size: 114, name: "apple-icon-114x114.png" },
-                      { size: 120, name: "apple-icon-120x120.png" },
-                      { size: 144, name: "apple-icon-144x144.png" },
-                      { size: 152, name: "apple-icon-152x152.png" },
-                      { size: 180, name: "apple-icon-180x180.png" },
-                      { size: 192, name: "android-icon-192x192.png" },
-                      { size: 256, name: "favicon.png" },
-                      { size: 512, name: "android-icon-512x512.png" }
-                  ];
+                // === PREVIEW the uploaded image ===
+                const previewImg = document.querySelector('.application-icon-preview');
+                if (previewImg) {
+                    previewImg.src = event.target.result;
+                    previewImg.width = 256;
+                    previewImg.height = 256;
+                }
 
-                  // Generate icons for each size
-                  iconSizes.forEach(icon => {
-                      canvas.width = icon.size;
-                      canvas.height = icon.size;
-                      ctx.clearRect(0, 0, canvas.width, canvas.height);
-                      ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
-                      const dataUrl = canvas.toDataURL('image/png');
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const iconSizes = [
+                    { size: 16, name: "favicon-16x16.png" },
+                    { size: 32, name: "favicon-32x32.png" },
+                    { size: 48, name: "favicon-48x48.png" },
+                    { size: 57, name: "apple-icon-57x57.png" },
+                    { size: 60, name: "apple-icon-60x60.png" },
+                    { size: 72, name: "apple-icon-72x72.png" },
+                    { size: 76, name: "apple-icon-76x76.png" },
+                    { size: 114, name: "apple-icon-114x114.png" },
+                    { size: 120, name: "apple-icon-120x120.png" },
+                    { size: 144, name: "apple-icon-144x144.png" },
+                    { size: 152, name: "apple-icon-152x152.png" },
+                    { size: 180, name: "apple-icon-180x180.png" },
+                    { size: 192, name: "android-icon-192x192.png" },
+                    { size: 256, name: "favicon.png" },
+                    { size: 512, name: "android-icon-512x512.png" }
+                ];
 
-                      // Send each PNG icon to the server
-                      sendIconPngToServer(applicationId, dataUrl, icon.name);
-                  });
+                iconSizes.forEach(icon => {
+                    canvas.width = icon.size;
+                    canvas.height = icon.size;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
+                    const dataUrl = canvas.toDataURL('image/png');
+                    sendIconPngToServer(applicationId, dataUrl, icon.name);
+                });
 
-                  // Additional step: Generate favicon.ico
-                  generateFaviconICO(applicationId, image);
-                  resetFileManager();
-              };
-            
-              // Load the image data
-              image.src = event.target.result;
-          };
+                generateFaviconICO(applicationId, image);
+                resetFileManager();
+            };
 
-          // Read the image as a data URL
-          reader.readAsDataURL(selectedFile);
-        }
+            image.src = event.target.result;
+        };
+
+        reader.readAsDataURL(selectedFile);
     });
-    
 
-    // Trigger input file dialog
-    inputFile.click();  // Open file selection dialog
+    // Trigger file dialog
+    inputFile.click();
   });
+
   
   $(document).on('click', '.button-open-file', function(e1){
     let el = document.querySelector('#sqlFileInput');
