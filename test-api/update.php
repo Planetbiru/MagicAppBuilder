@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\EntityInstaller\EntityApplication;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\AppDto\MocroServices\PicoAllowedAction;
 use MagicApp\AppDto\MocroServices\PicoEntityInfo;
 use MagicApp\AppDto\MocroServices\PicoInputField;
@@ -9,7 +10,6 @@ use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoInputFieldUpdate;
 use MagicApp\AppDto\MocroServices\PicoResponseBody;
 use MagicApp\AppDto\MocroServices\PicoUserFormOutputDetail;
-use MagicAdmin\AppEntityLanguageImpl;
 use MagicObject\Response\PicoResponse;
 use MagicObject\SecretObject;
 
@@ -21,7 +21,7 @@ $picoEntityInfo = new PicoEntityInfo(["active"=>"active"]);
 $data = new PicoUserFormOutputDetail($entity, $picoEntityInfo);
 
 $appConfig = new SecretObject();
-$entityLanguage = new AppEntityLanguage($entity, $appConfig, 'en');
+$entityLanguage = new AppEntityLanguageImpl($entity, $appConfig, 'en');
 
 $map1 = array(
 	"monolith" => array("value" => "monolith", "label" => "Monolith", "selected" => false),
