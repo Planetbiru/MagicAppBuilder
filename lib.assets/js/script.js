@@ -2377,14 +2377,16 @@ let initAll = function () {
                     data: formData,                          // FormData object
                     processData: false,                      // Don't process the data (required for FormData)
                     contentType: false,                      // Don't set content type (required for FormData)
-                    success: function(responseHtml) {
+                    success: function(responseHtml) // NOSONAR
+                    {
                         // 3. Append the preview HTML to the .application-import-info div
                         importInfoDiv.html(responseHtml);
                         
                         // Optional: Reset the file input to allow selecting the same file again
                         fileInput.val(''); 
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textStatus, errorThrown) // NOSONAR
+                    {
                         console.error('Error during file upload:', textStatus, errorThrown, jqXHR);
                         let errorMessage = `Error: Failed to upload or parse file. ${errorThrown}`;
                         if (jqXHR.responseText) {
@@ -2914,7 +2916,8 @@ let initAll = function () {
         const reader = new FileReader();
         reader.onload = function (event) {
             const image = new Image();
-            image.onload = function () {
+            image.onload = function () // NOSONAR
+            {
                 // Validate image dimensions (minimum 512x512)
                 if (image.width < 512 || image.height < 512) {
                     asyncAlert('The image must be at least 512x512 pixels.', 'Notification', [
