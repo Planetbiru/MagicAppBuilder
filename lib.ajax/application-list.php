@@ -45,7 +45,7 @@ try
         }
         else
         {
-            $applicationUrl = $app->getId();
+            $applicationUrl = '<a href="'.$app->getId().'" target="_blank">'.$app->getId().'</a>';
         }
 ?>
 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
