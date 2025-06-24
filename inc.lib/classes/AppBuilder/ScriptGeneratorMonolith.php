@@ -230,6 +230,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
                 $deactivationSection = $appBuilder->createDeactivationApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);  
             }   
             $deleteSection = $appBuilder->createDeleteApprovalSection($entityMain, $callbackUpdateStatusSuccess, $callbackUpdateStatusException);
+            
             $approvalSection = $appBuilder->createApprovalSection($entityMain, $editFields, $approvalRequired, $entityApproval, $trashRequired, $entityTrash);
             $rejectionSection = $appBuilder->createRejectionSection($entityMain, $approvalRequired, $entityApproval);  
 

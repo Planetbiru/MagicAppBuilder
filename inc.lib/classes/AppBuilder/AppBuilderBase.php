@@ -2106,6 +2106,7 @@ $subqueryMap = '.$referece.';
     public function createButtonWrapper($dom, $appFeatures)
     {
         $activate = $appFeatures->isActivateDeactivate();
+        $bulkApproval = $appFeatures->getApprovalBulk();
 
         $sortOrder = $appFeatures->isSortOrder();
 
@@ -2153,6 +2154,33 @@ $subqueryMap = '.$referece.';
         $wrapper->appendChild($delete);
         $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG));
 
+        if($bulkApproval)
+        {
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedApproval()){ '.self::PHP_CLOSE_TAG)); // NOSONAR 
+            $approve = $dom->createElement('button');
+            $approve->setAttribute('type', 'submit');
+            $approve->setAttribute('class', ElementClass::BUTTON_SUCCESS);
+            $approve->setAttribute('name', 'user_action');
+            $approve->setAttribute('id', 'approve_selected');
+            $approve->setAttribute('value', 'approve');
+            $approve->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->'.'getButtonApprove();'.self::PHP_CLOSE_TAG));
+
+            $reject = $dom->createElement('button');
+            $reject->setAttribute('type', 'submit');
+            $reject->setAttribute('class', ElementClass::BUTTON_WARNING); // NOSONAR
+            $reject->setAttribute('name', 'user_action');
+            $reject->setAttribute('id', 'reject_selected');
+            $reject->setAttribute('value', 'reject');
+            $reject->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->'.'getButtonReject();'.self::PHP_CLOSE_TAG));
+
+            
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
+            $wrapper->appendChild($approve);
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
+            $wrapper->appendChild($reject);
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG));
+        }
+        
         if($sortOrder)
         {
             $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedSortOrder()){ '.self::PHP_CLOSE_TAG)); // NOSONAR

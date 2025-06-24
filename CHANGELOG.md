@@ -630,7 +630,11 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 -   **Project Importer:** A new **Import** button is available on the **Apps** tab.  
     Use this to load a previously exported project file and restore the corresponding application instantly.
     
--   **Quick Application Access with Base URL:** We've introduced a new **Base Application URL** feature. This allows you to define a direct URL for each application, providing quick and convenient access to your apps.
+-   **Multiple Approval and Rejection:** We've significantly enhanced workflow management by adding support for **bulk approval and rejection** processes. 
+    This means you can now configure more complex approval flows for your applications, allowing users to approve or reject **multiple rows at once**.
+    
+-   **Quick Application Access with Base URL:** We've introduced a new **Base Application URL** feature. 
+    This allows you to define a direct URL for each application, providing quick and convenient access to your apps.
     
 
 ## What's Changed
@@ -646,3 +650,8 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 ## Improvements
 
 -   **Smoother Database Export Experience:** We've refined the database export process. Previously, after the SQL was generated, the screen would momentarily flash as the browser opened and then immediately closed a new window to trigger the file download. Now, the download process happens **seamlessly in the background**, ensuring an uninterrupted and more professional user experience.
+
+
+## Fixes
+
+-   **UI Typo Corrections:** We've addressed and fixed various typographical errors throughout the user interface, improving overall readability and professionalism.

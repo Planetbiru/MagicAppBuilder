@@ -77,6 +77,13 @@ class AppFeatures // NOSONAR
      * @var bool
      */
     private $approvalByAnotherUser = false;
+    
+    /**
+     * Approval bulk
+     *
+     * @var bool
+     */
+    private $approvalBulk = false;
 
     /**
      * Subquery feature
@@ -150,6 +157,7 @@ class AppFeatures // NOSONAR
             $this->approvalType = $features->get('approvalType') == 2 ? 2 : 1;
             $this->approvalPosition = $features->get('approvalPosition') == self::BEFORE_DATA ? self::BEFORE_DATA : self::AFTER_DATA;
             $this->approvalByAnotherUser = $this->isTrue($features->get('approvalByAnotherUser'));
+            $this->approvalBulk = $this->isTrue($features->get('approvalBulk'));
             $this->exportUseTemporary = $this->isTrue($features->get('exportUseTemporary'));
             $this->backendOnly = $this->isTrue($features->get('backendOnly'));
             $this->validator = $this->isTrue($features->get('validator'));
@@ -349,6 +357,30 @@ class AppFeatures // NOSONAR
     public function setApprovalByAnotherUser($approvalByAnotherUser)
     {
         $this->approvalByAnotherUser = $approvalByAnotherUser;
+
+        return $this;
+    }
+    
+    /**
+     * Get approval bulk.
+     *
+     * @return bool Returns whether approval bulk is allowed.
+     */ 
+    public function getApprovalBulk()
+    {
+        return $this->approvalBulk;
+    }
+
+    /**
+     * Set approval by another user.
+     *
+     * @param bool $approvalBulk Whether approval bulk is allowed.
+     *
+     * @return self Returns the current instance for method chaining.
+     */ 
+    public function setApprovalBulk($approvalBulk)
+    {
+        $this->approvalBulk = $approvalBulk;
 
         return $this;
     }
