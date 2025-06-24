@@ -630,7 +630,11 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 -   **Project Importer:** A new **Import** button is available on the **Apps** tab.  
     Use this to load a previously exported project file and restore the corresponding application instantly.
     
--   **Quick Application Access with Base URL:** We've introduced a new **Base Application URL** feature. This allows you to define a direct URL for each application, providing quick and convenient access to your apps.
+-   **Multiple Approval and Rejection:** We've significantly enhanced workflow management by adding support for **bulk approval and rejection** processes. 
+    This means you can now configure more complex approval flows for your applications, allowing users to approve or reject **multiple rows at once**.
+    
+-   **Quick Application Access with Base URL:** We've introduced a new **Base Application URL** feature. 
+    This allows you to define a direct URL for each application, providing quick and convenient access to your apps.
     
 
 ## What's Changed
