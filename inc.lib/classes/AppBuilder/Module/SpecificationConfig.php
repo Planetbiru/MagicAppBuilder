@@ -2,6 +2,12 @@
 
 namespace AppBuilder\Module;
 
+/**
+ * Class SpecificationConfig
+ *
+ * Represents a filtering or query specification applied to a data column.
+ * Defines the column to filter, the value to compare against, and the comparison operator.
+ */
 class SpecificationConfig {
 
     /**
@@ -19,7 +25,7 @@ class SpecificationConfig {
     public $value;
 
     /**
-     * The comparison operator (e.g., equals, greater than).
+     * The comparison operator (e.g., "equals", "like", ">", "<").
      *
      * @var string
      */
@@ -27,6 +33,8 @@ class SpecificationConfig {
 
     /**
      * SpecificationConfig constructor.
+     *
+     * Initializes a specification using the provided configuration array.
      *
      * @param array $data Configuration data for the specification.
      */

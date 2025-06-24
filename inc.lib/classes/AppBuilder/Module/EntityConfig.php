@@ -2,6 +2,13 @@
 
 namespace AppBuilder\Module;
 
+/**
+ * Class EntityConfig
+ *
+ * Represents the configuration for entities used in a module, including
+ * main entity, approval entity, and trash entity, along with flags that
+ * indicate whether approval and trash functionalities are required.
+ */
 class EntityConfig {
     /**
      * Main entity configuration.
