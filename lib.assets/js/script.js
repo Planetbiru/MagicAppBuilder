@@ -2323,91 +2323,87 @@ let initAll = function () {
     });
   });
   
+  // When the "Import Application" button is clicked
   $(document).on('click', '.button-import-application', function (e) {
-    e.preventDefault();
-    let updateBtn = $('#modal-application-import .button-save-application-import');
-    updateBtn[0].disabled = true;
-    let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    $('#modal-application-import .application-import').empty();
-    $('#modal-application-import').modal('show');
-    increaseAjaxPending();
+      e.preventDefault();
+      
+      // Display initial info message in modal
+      let importInfoDiv = $('#modal-application-import .import-message');
+      importInfoDiv.html('<div class="alert alert-info">Select file to import the application.</div>');
 
-    $.ajax({
-      type: 'GET',
-      url: 'lib.ajax/application-import.php',
-      data: { applicationId: applicationId },
-      dataType: 'html',
-      success: function (data) {
-        decreaseAjaxPending();
-        $('#modal-application-import').attr('data-application-id', applicationId);
-        $('#modal-application-import .application-import').empty().append(data);
-        updateBtn[0].disabled = false;
-        
-        
-        const importInfoDiv = $('.application-import-info');
-        const applicationImportFileSelector = $('.application-import-file-selector');
+      // Disable the "Import" button until a valid file is selected
+      let updateBtn = $('#modal-application-import .button-save-application-import');
+      updateBtn[0].disabled = true;
 
-        // Create a hidden file input element dynamically using jQuery
-        const fileInput = $('<input type="file" accept=".zip" style="display: none;">');
-        fileInput.appendTo(applicationImportFileSelector); // Append to a visible container
-
-        // 1. When the ".button-select-file-import" is clicked, trigger the hidden file input
-        // Using event delegation with $(document).on()
-        $('.button-select-file-import').on('click', function() {
-            fileInput.click(); // Programmatically click the hidden file input
-        });
-
-        // 2. When a file is selected in the input
-        fileInput.on('change', function() {
-            if (this.files.length > 0) {
-                const selectedFile = this.files[0];
-
-                // Create FormData object to send file via AJAX
-                const formData = new FormData();
-                formData.append('user_action', 'preview'); // Add user_action
-                formData.append('file[]', selectedFile);   // Append the selected file(s)
-
-                // Clear previous preview messages and show loading
-                importInfoDiv.html('<div class="alert alert-info">Uploading and parsing file...</div>');
-
-                // Send the file via AJAX using jQuery's $.ajax
-                $.ajax({
-                    url: 'lib.ajax/application-import.php', // URL to send the AJAX request
-                    type: 'POST',                            // HTTP method
-                    data: formData,                          // FormData object
-                    processData: false,                      // Don't process the data (required for FormData)
-                    contentType: false,                      // Don't set content type (required for FormData)
-                    success: function(responseHtml) // NOSONAR
-                    {
-                        // 3. Append the preview HTML to the .application-import-info div
-                        importInfoDiv.html(responseHtml);
-                        
-                        // Optional: Reset the file input to allow selecting the same file again
-                        fileInput.val(''); 
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) // NOSONAR
-                    {
-                        console.error('Error during file upload:', textStatus, errorThrown, jqXHR);
-                        let errorMessage = `Error: Failed to upload or parse file. ${errorThrown}`;
-                        if (jqXHR.responseText) {
-                            // If server provided a response text, use it for more detail
-                            errorMessage += `<br>Server Response: ${jqXHR.responseText.substring(0, 200)}...`; // Limit length
-                        }
-                        importInfoDiv.html(`<div class="alert alert-danger">${errorMessage}</div>`);
-                    }
-                });
-            }
-        });
-        
-        
-        
-        
-      },
-      error: function (xhr, status, error) {
-        decreaseAjaxPending();
-      }
-    });
+      // Show the modal for importing application
+      $('#modal-application-import').modal('show');
   });
+
+  // When the "Select File" button is clicked, trigger the hidden file input
+  $(document).on('click', '.button-select-file-import', function () {
+      $('#import-application-file').click(); // Simulate click on hidden file input
+  });
+
+  // When a file is selected from the file input
+  $(document).on('change', '#import-application-file', function () {
+      let importInfoDiv = $('#modal-application-import .import-message');
+      let updateBtn = $('#modal-application-import .button-save-application-import');
+
+      if (this.files.length > 0) {
+          const selectedFile = this.files[0];
+
+          // Prepare FormData object for file upload via AJAX
+          const formData = new FormData();
+          formData.append('user_action', 'preview');     // Indicate preview action
+          formData.append('file[]', selectedFile);        // Append selected file
+
+          // Store selected file name in hidden input (for display or processing)
+          $('#modal-application-import [name="file_name"]').val(selectedFile.name);
+
+          // Show loading message
+          importInfoDiv.html('<div class="alert alert-info">Uploading and parsing file...</div>');
+
+          // Send file to server using AJAX
+          $.ajax({
+              url: 'lib.ajax/application-import.php', // Server-side handler
+              type: 'POST',
+              data: formData,
+              processData: false,    // Required for FormData
+              contentType: false,    // Required for FormData
+              dataType: 'json',
+              success: function (data) // NOSONAR
+              {
+                  if (data.status === 'success') {
+                      // Populate the form fields with parsed YAML data
+                      $('#modal-application-import [name="application_id"]').val(data.data.application_id);
+                      $('#modal-application-import [name="base_application_directory"]').val(data.data.base_application_directory);
+                      updateBtn[0].disabled = false;
+                  } else {
+                      updateBtn[0].disabled = true;
+                  }
+
+                  // Display server message
+                  importInfoDiv.html(`<div class="alert alert-${data.status}">${data.message}</div>`);
+              },
+              error: function (jqXHR, textStatus, errorThrown) // NOSONAR
+              {
+                  updateBtn[0].disabled = true;
+
+                  console.error('Error during file upload:', textStatus, errorThrown, jqXHR);
+
+                  let errorMessage = `Error: Failed to upload or parse file. ${errorThrown}`;
+
+                  if (jqXHR.responseText) {
+                      // Include server response if available
+                      errorMessage += `<br>Server Response: ${jqXHR.responseText.substring(0, 200)}...`;
+                  }
+
+                  importInfoDiv.html(`<div class="alert alert-danger">${errorMessage}</div>`);
+              }
+          });
+      }
+  });
+
   
   
   
