@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\AppImporter;
 use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputFiles;
@@ -22,10 +23,11 @@ $inputFile = new InputFiles();
  *
  * @param SecretObject $applicationConfig The current application configuration object to update.
  * @param string $applicationId The new application ID to assign.
+ * @param string $applicationName The new application name to assign.
  * @param string $baseApplicationDirectory The base directory of the application used to derive paths.
  * @return SecretObject The updated application configuration object.
  */
-function updateApplicationConfig($applicationConfig, $applicationId, $baseApplicationDirectory)
+function updateApplicationConfig($applicationConfig, $applicationId, $applicationName, $baseApplicationDirectory)
 {
     if($applicationConfig->issetApplication())
     {
@@ -34,16 +36,26 @@ function updateApplicationConfig($applicationConfig, $applicationId, $baseApplic
         $baseLanguageDirectory = rtrim($baseApplicationDirectory, "\\/")."/inc.lang";
         $applicationConfig->getApplication()
             ->setId($applicationId)
+            ->setName($applicationName)
             ->setBaseApplicationDirectory($baseApplicationDirectory)
             ->setBaseEntityDirectory($baseEntityDirectory)
             ->setBaseLanguageDirectory($baseLanguageDirectory)
             ;
+        
+        $baseUrl = $applicationConfig->getApplication()->getBaseApplicationUrl();
+        if(!isset($baseUrl) || strpos($baseUrl, "://") === false)
+        {
+            // Fix base application URL
+            $baseUrl = "http://" . $_SERVER['SERVER_NAME'] . "/" . basename(rtrim($baseApplicationDirectory, '/'));
+            $applicationConfig->getApplication()->setBaseApplicationUrl($baseUrl);
+        }
+
         if($applicationConfig->issetResetPassword() && $applicationConfig->getResetPassword()->getEmail())
         {
-            $baseUrl = $applicationConfig->getResetPassword()->getEmail()->getBaseUrl();
-            $baseUrl = str_replace($oldApplicationId, $applicationId, $baseUrl);
+            $resetPasswordUrl = $applicationConfig->getResetPassword()->getEmail()->getBaseUrl();
+            $resetPasswordUrl = str_replace($oldApplicationId, $applicationId, $resetPasswordUrl);
             $applicationConfig->getResetPassword()->getEmail()
-                ->setBaseUrl($baseUrl);
+                ->setBaseUrl($resetPasswordUrl);
         }
     }
     return $applicationConfig;
@@ -103,6 +115,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
     $file1 = $inputFile->file;
 
     $applicationId = $inputPost->getApplicationId();
+    $applicationName = $inputPost->getApplicationName();
     $baseApplicationDirectory = $inputPost->getBaseApplicationDirectory();
     $workspaceId = $activeWorkspace->getWorkspaceId();
     $workspace = new EntityWorkspace(null, $databaseBuilder);
@@ -126,18 +139,25 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                     $applicationConfig->loadYamlString($yamlContent, false, true, true);
 
                     if ($applicationConfig->issetApplication()) {
-                        $applicationName = $applicationConfig->getApplication()->getName();
 
-                        $applicationConfig = updateApplicationConfig($applicationConfig, $applicationId, $baseApplicationDirectory);
+                        $applicationConfig = updateApplicationConfig($applicationConfig, $applicationId, $applicationName, $baseApplicationDirectory);
 
                         $projectDirectory = $workspaceDirectory . "/" . $applicationId;
-                        $yaml = $applicationConfig->dumpYaml();
+                        $yamlContent = $applicationConfig->dumpYaml();
 
                         if (!is_dir($projectDirectory)) {
                             mkdir($projectDirectory, 0755, true);
                         }
                         $zip->extractTo($projectDirectory);
-                        file_put_contents($projectDirectory . '/default.yml', $yaml);
+                        $yml = $projectDirectory . '/default.yml';
+                        file_put_contents($yml, $yamlContent);
+
+                        // Ensure that file is exists
+                        if(file_exists($yml))
+                        {
+                            $applicationImporter = new AppImporter($databaseBuilder);
+                            $applicationImporter->importApplication($yml, $projectDirectory, $workspaceId, $author, $adminId);
+                        }
 
                         echo json_encode([
                             "status" => "success",

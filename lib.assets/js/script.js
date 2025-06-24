@@ -580,11 +580,18 @@ function showTestValidatorForm()
 }
 
 /**
- * Uploads application file and handles response
- * @param {File} file - The selected file
- * @param {string} action - 'preview' or 'import'
+ * Uploads an application file and handles the server response.
+ *
+ * This function is used for both previewing and importing application files.
+ * It sends the file and related metadata to the server and updates the UI based on the response.
+ *
+ * @param {File} file - The file selected by the user for upload.
+ * @param {string} action - The action to perform: either 'preview' or 'import'.
+ * @param {string} [application_id] - The ID of the application (if available).
+ * @param {string} [application_name] - The name of the application (if available).
+ * @param {string} [base_application_directory] - The base directory path for the application (if applicable).
  */
-function handleApplicationFileUpload(file, action, application_id, base_application_directory) {
+function handleApplicationFileUpload(file, action, application_id, application_name, base_application_directory) {
     const importInfoDiv = $('#modal-application-import .import-message');
     const updateBtn = $('#modal-application-import .button-save-application-import');
 
@@ -593,6 +600,10 @@ function handleApplicationFileUpload(file, action, application_id, base_applicat
     if(application_id)
     {
       formData.append('application_id', application_id);
+    }
+    if(application_name)
+    {
+      formData.append('application_name', application_name);
     }
     if(base_application_directory)
     {
@@ -616,6 +627,11 @@ function handleApplicationFileUpload(file, action, application_id, base_applicat
               $('#modal-application-import [name="application_id"]').val(data.data.application_id);
               $('#modal-application-import [name="base_application_directory"]').val(data.data.base_application_directory);
               updateBtn[0].disabled = false;
+              if(action == 'import')
+              {
+                loadAllResource();
+                $('#modal-application-import').modal('hide');
+              }
             } else {
               updateBtn[0].disabled = true;
             }
@@ -2419,9 +2435,10 @@ let initAll = function () {
   $(document).on('click', '.button-save-application-import', function () {
       const input = document.getElementById('import-application-file');
       let application_id = $('#modal-application-import [name="application_id"]').val();
+      let application_name = $('#modal-application-import [name="application_name"]').val();
       let base_application_directory = $('#modal-application-import [name="base_application_directory"]').val();
       if (input.files.length > 0) {
-          handleApplicationFileUpload(input.files[0], 'import', application_id, base_application_directory);
+          handleApplicationFileUpload(input.files[0], 'import', application_id, application_name, base_application_directory);
       }
   });
   
