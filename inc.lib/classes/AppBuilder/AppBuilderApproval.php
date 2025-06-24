@@ -556,7 +556,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterInsert(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after new data is inserted".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -565,7 +565,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeUpdate(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before updating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -573,7 +573,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterUpdate(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after updating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -581,7 +581,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterActivate(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after activating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -589,7 +589,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDeactivate(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deactivating data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -597,7 +597,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeDelete(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before deleting data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
@@ -605,7 +605,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDelete(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deleting data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -613,7 +613,7 @@ class AppBuilderApproval extends AppBuilderBase
 
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterApprove(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after approval".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -728,14 +728,14 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeReject(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before reject data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterReject(function("
-        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after reject data".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
@@ -797,7 +797,8 @@ class AppBuilderApproval extends AppBuilderBase
         {
             $entityTrashName = $trashEntity->getEntityName();
             
-            $result .= ", ".parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1."true, ".parent::NEW_LINE 
+            $result .= ", ".parent::NEW_LINE
+            .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."true, ".parent::NEW_LINE 
             .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."new $entityTrashName() ".parent::NEW_LINE;
             $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.");";
         }
