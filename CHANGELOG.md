@@ -635,23 +635,31 @@ A new `application_id` column has been added to the Error Cache entity. This enh
     
 -   **Quick Application Access with Base URL:** We've introduced a new **Base Application URL** feature. 
     This allows you to define a direct URL for each application, providing quick and convenient access to your apps.
-    
+
 
 ## What's Changed
 
-
--   **Icon Button Relocation:** We've moved the icon button that was previously on each application card to the **application options dialog**. This change makes space for the new **Export** button and generally improves how the interface is organized, giving you a cleaner look.
+-   **Icon Button Relocation:** We've moved the icon button that was previously on each application card to the **application options dialog**.  
+    This change makes space for the new **Export** button and generally improves how the interface is organized, giving you a cleaner look.
     
--   **Feature Preferences Now Stored in Database:** Module feature preferences are no longer saved within project files. All your user-specific feature settings are now stored directly in the **database**. This means your preferences will stick around, remaining consistent across different exports, imports, and deployments.
+-   **Feature Preferences Now Stored in Database:** Module feature preferences are no longer saved within project files.  
+    All your user-specific feature settings are now stored directly in the **database**. This means your preferences will stick around, remaining consistent across different exports, imports, and deployments.
     
--   **Refactored Application Create and Update Forms:** We've updated the **field naming conventions** in both the application creation and update forms. This change ensures greater consistency and clarity across the application, making it easier to understand and manage your forms.
+-   **Refactored Application Create and Update Forms:** We've updated the **field naming conventions** in both the application creation and update forms.  
+    This change ensures greater consistency and clarity across the application, making it easier to understand and manage your forms.
+    
+-   **Function Refactoring to Reduce Redundancy:** Several internal functions, especially those related to module processing, application metadata handling, and form generation, have been **refactored** to eliminate redundant logic and duplicate code.  
+    This not only improves maintainability but also reduces the risk of inconsistencies and simplifies future enhancements.
 
 
 ## Improvements
 
--   **Smoother Database Export Experience:** We've refined the database export process. Previously, after the SQL was generated, the screen would momentarily flash as the browser opened and then immediately closed a new window to trigger the file download. Now, the download process happens **seamlessly in the background**, ensuring an uninterrupted and more professional user experience.
+-   **Smoother Database Export Experience:** We've refined the database export process.  
+    Previously, after the SQL was generated, the screen would momentarily flash as the browser opened and then immediately closed a new window to trigger the file download.  
+    Now, the download process happens **seamlessly in the background**, ensuring an uninterrupted and more professional user experience.
 
 
 ## Fixes
 
 -   **UI Typo Corrections:** We've addressed and fixed various typographical errors throughout the user interface, improving overall readability and professionalism.
+    
