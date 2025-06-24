@@ -72,6 +72,7 @@ if ($inputPost->getUserAction() == 'preview' && $inputFile->file) {
                         "status" => "success",
                         "message" => "Application configuration loaded successfully.",
                         "data" => [
+                            "application_name" => $applicationConfig->getApplication()->getName(),
                             "application_id" => $applicationConfig->getApplication()->getId(),
                             "base_application_directory" => $applicationConfig->getApplication()->getBaseApplicationDirectory()
                         ]
@@ -104,14 +105,12 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
     $applicationId = $inputPost->getApplicationId();
     $baseApplicationDirectory = $inputPost->getBaseApplicationDirectory();
     $workspaceId = $activeWorkspace->getWorkspaceId();
-
     $workspace = new EntityWorkspace(null, $databaseBuilder);
     try {
         $workspace->find($workspaceId);
         $adminId = $entityAdmin->getAdminId();
         $author = $entityAdmin->getName();
         $workspaceDirectory = FileDirUtil::normalizePath($workspace->getDirectory() . "/applications");
-
         foreach ($file1->getAll() as $fileItem) {
             $temporaryName = $fileItem->getTmpName();
             $name = $fileItem->getName();
@@ -127,7 +126,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                     $applicationConfig->loadYamlString($yamlContent, false, true, true);
 
                     if ($applicationConfig->issetApplication()) {
-                        $applicationName = htmlspecialchars($applicationConfig->getApplication()->getName());
+                        $applicationName = $applicationConfig->getApplication()->getName();
 
                         $applicationConfig = updateApplicationConfig($applicationConfig, $applicationId, $baseApplicationDirectory);
 
@@ -144,6 +143,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                             "status" => "success",
                             "message" => "Application '$applicationName' has been imported successfully.",
                             "data" => [
+                                "application_name" => $applicationName,
                                 "application_id" => $applicationId,
                                 "base_application_directory" => $baseApplicationDirectory
                             ]
@@ -153,6 +153,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                             "status" => "warning",
                             "message" => "The file 'default.yml' does not contain application information.",
                             "data" => [
+                                "application_name" => $applicationName,
                                 "application_id" => $applicationId,
                                 "base_application_directory" => $baseApplicationDirectory
                             ]
@@ -163,6 +164,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                         "status" => "warning",
                         "message" => "The file 'default.yml' was not found in the ZIP archive.",
                         "data" => [
+                            "application_name" => $applicationName,
                             "application_id" => $applicationId,
                             "base_application_directory" => $baseApplicationDirectory
                         ]
@@ -175,6 +177,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                     "status" => "error",
                     "message" => "Failed to open the ZIP file.",
                     "data" => [
+                        "application_name" => $applicationName,
                         "application_id" => $applicationId,
                         "base_application_directory" => $baseApplicationDirectory
                     ]
@@ -186,6 +189,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
             "status" => "error",
             "message" => "Invalid workspace.",
             "data" => [
+                "application_name" => $applicationName,
                 "application_id" => $applicationId,
                 "base_application_directory" => $baseApplicationDirectory
             ]

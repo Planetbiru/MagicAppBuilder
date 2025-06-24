@@ -630,15 +630,17 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 -   **Project Importer:** A new **Import** button is available on the **Apps** tab.  
     Use this to load a previously exported project file and restore the corresponding application instantly.
     
+-   **Quick Application Access with Base URL:** We've introduced a new **Base Application URL** feature. This allows you to define a direct URL for each application, providing quick and convenient access to your apps.
+    
 
 ## What's Changed
 
--   **Icon Button Relocation:** The icon button that was previously located on each application card has been moved to the **application options dialog**.  
-    This adjustment makes space for the new **Export** button and improves the overall interface organization.
 
--  **Feature Preferences Now Stored in Database:**  
-   Module feature preferences are no longer saved in project files.  
-   All user-specific feature settings are now stored directly in the **database**, making preferences persistent across exports, imports, and deployments.
+-   **Icon Button Relocation:** We've moved the icon button that was previously on each application card to the **application options dialog**. This change makes space for the new **Export** button and generally improves how the interface is organized, giving you a cleaner look.
+    
+-   **Feature Preferences Now Stored in Database:** Module feature preferences are no longer saved within project files. All your user-specific feature settings are now stored directly in the **database**. This means your preferences will stick around, remaining consistent across different exports, imports, and deployments.
+    
+-   **Refactored Application Create and Update Forms:** We've updated the **field naming conventions** in both the application creation and update forms. This change ensures greater consistency and clarity across the application, making it easier to understand and manage your forms.
 
 
 ## Improvements

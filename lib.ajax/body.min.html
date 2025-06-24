@@ -967,6 +967,10 @@
 <tr>
 <td>Application Directory</td>
 <td><span class="directory-container input-with-checker" data-failed-if-exists="true"><input type="text" class="form-control" name="application_directory"></span></td>
+</tr>  
+<tr>
+<td>Application URL</td>
+<td><input type="text" class="form-control" name="application_url"></td>
 </tr>                
 <tr>
 <td>Base Namespace</td>
@@ -1229,20 +1233,32 @@
 </div>
 <div class="modal-body">
 <div class="import-message"></div>
-<div class="mb-2">Application ID</div>
-<div class="mb-3">
-<input type="text" class="form-control" name="application_id" value="">
-</div>
-<div class="mb-2">Base Application Directory</div>
-<div class="mb-3">
-<input type="text" class="form-control" name="base_application_directory" value="">
-</div>
-<div class="mb-2">File</div>
-<div class="mb-3">
-<input type="text" class="form-control" name="file_name" value="">
+
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Application Name</td>
+<td><input class="form-control" type="text" name="application_name" value=""></td>
+</tr>
+<tr>
+<td>Application ID</td>
+<td><input class="form-control" type="text" name="application_id" value=""></td>
+</tr>
+<tr>
+<td>Base Application Directory</td>
+<td><input class="form-control" type="text" name="base_application_directory" value=""></td>
+</tr>
+<tr>
+<td>File</td>
+<td>
+<input class="form-control" type="text" name="file_name" value="">
 <input type="file" id="import-application-file" accept=".zip" style="display: none;">
-</div>    
+</td>
+</tr>
+</tbody>
+</table>
 </div>
+
 <div class="modal-footer">
 <button class="btn btn-primary button-select-file-import"><i class="fa fa-folder-open"></i> Select File</button>
 <button type="button" class="btn btn-success button-save-application-import" name="button-save-application-import"><i class="fa-solid fa-file-import"></i> Import</button>

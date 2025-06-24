@@ -26,6 +26,8 @@ $appBaseDir = dirname(dirname(__DIR__)) . "/$appId";
 $appBaseDir = str_replace("/", DIRECTORY_SEPARATOR, $appBaseDir);
 $appBaseDir = str_replace("\\", DIRECTORY_SEPARATOR, $appBaseDir);
 
+$appBaseUrl = "http://".$_SERVER['SERVER_NAME']."/$appId";
+
 $composerOnline = false;
 
 if (ComposerUtil::checkInternetConnection()) {
@@ -165,6 +167,7 @@ $data = array(
     'application_name' => 'ApplicationName',
     'application_id' => $appId,
     'application_directory' => $appBaseDir,
+    'application_url' => $appBaseUrl,
     'application_workspace' => $workspaceList,
     'application_namespace' => 'ApplicationName',
     'application_author' => $author,

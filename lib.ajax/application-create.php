@@ -111,11 +111,11 @@ if (!file_exists($dir2))
 {
     mkdir($dir2, 0755, true);
 }
-
+$baseApplicationUrl = $inputPost->getApplicationUrl();
 $author = $entityAdmin->getName();
 $adminId = $entityAdmin->getAdminId();
 
-$baseApplicationDirectory = $inputPost->getDirectory();
+$baseApplicationDirectory = $inputPost->getApplicationDirectory();
 $baseApplicationDirectory = preg_replace('/[^:A-Za-z0-9\\-\/\\\\]/', '', $baseApplicationDirectory);
 $baseApplicationDirectory = str_replace("\\", "/", $baseApplicationDirectory);
 $baseApplicationDirectory = preg_replace('/\/+/', '/', $baseApplicationDirectory);
@@ -151,10 +151,10 @@ if(!file_exists($baseApplicationDirectory))
     mkdir($baseApplicationDirectory, 0755, true);
 }
 $workspaceId = trim($inputPost->getWorkspaceId());
-$applicationName = trim($inputPost->getName());
-$applicationArchitecture = trim($inputPost->getArchitecture());
+$applicationName = trim($inputPost->getApplicationName());
+$applicationArchitecture = trim($inputPost->getApplicationArchitecture());
 $applicationDirectory = trim($baseApplicationDirectory);
-$applicationDescription = trim($inputPost->getDescription());
+$applicationDescription = trim($inputPost->getApplicationDescription());
 $onlineInstallation = $inputPost->getComposerOnline() == 'true' || $inputPost->getComposerOnline() == 1;
 $projectDirectory = $dir2;
 
@@ -163,10 +163,11 @@ $application->setName($applicationName);
 $application->setDescription($applicationDescription);
 $application->setArchitecture($applicationArchitecture);
 
-$appBaseNamespace = trim($inputPost->getNamespace());
+$appBaseNamespace = trim($inputPost->getApplicationNamespace());
 $namespace = preg_replace('/[^A-Za-z0-9]/', '', $appBaseNamespace);
 $application->setBaseApplicationNamespace($namespace);
 $application->setBaseApplicationDirectory($applicationDirectory);
+$application->setBaseApplicationUrl($baseApplicationUrl);
 $application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
 $application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
 $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
@@ -323,7 +324,7 @@ $newApp->setAccessLocalhostOnly(true);
 
 $newApp->setDateFormatDetail('j F Y H:i:s');
 
-$url = "http://".$_SERVER['SERVER_NAME']."/".$newAppId."/";
+
 
 $resetPasswordContainer = new SecretObject();
 $resetPasswordContainer->loadYamlString(
@@ -340,7 +341,7 @@ resetPassword:
     from:
       name: '.$applicationName.'
       email: noreply@domain.tld
-    baseUrl: '.$url.'
+    baseUrl: '.$baseApplicationUrl.'
 '    
 );
 
@@ -367,7 +368,7 @@ $entityApplication->setName($applicationName);
 $entityApplication->setDescription($applicationDescription);
 $entityApplication->setProjectDirectory($projectDirectory);
 $entityApplication->setBaseApplicationDirectory($applicationDirectory);
-$entityApplication->setUrl($url);
+$entityApplication->setUrl($baseApplicationUrl);
 $entityApplication->setArchitecture($applicationArchitecture);
 $entityApplication->setAuthor($author);
 $entityApplication->setAdminId($adminId);
