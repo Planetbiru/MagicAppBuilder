@@ -2156,7 +2156,7 @@ $subqueryMap = '.$referece.';
 
         if($bulkApproval)
         {
-            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedApproval()){ '.self::PHP_CLOSE_TAG)); // NOSONAR 
+            $wrapper->appendChild($dom->createTextNode(self::N_TAB4.self::PHP_OPEN_TAG.'if($userPermission->isAllowedApprove()){ '.self::PHP_CLOSE_TAG)); // NOSONAR 
             $approve = $dom->createElement('button');
             $approve->setAttribute('type', 'submit');
             $approve->setAttribute('class', ElementClass::BUTTON_SUCCESS);
