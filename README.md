@@ -414,7 +414,6 @@ composer dump-autoload --ignore-platform-reqs
 | Micro-Services Application | No        | Yes       |
 | Export Project             | No        | Yes       |
 | Import Project             | No        | Yes       |
-| Bulk Approval              | No        | Yes       |
 
 ## Browser Support
 

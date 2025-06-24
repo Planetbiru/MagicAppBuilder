@@ -505,98 +505,126 @@ class AppBuilderApproval extends AppBuilderBase
         $objectName = lcfirst($entityName);
         $lines = array();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
+        
+        
 
         $lines[] = "if(".parent::VAR."inputPost".parent::CALL_GET."UserAction() == $userAction)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
+        
         $lines[] = parent::TAB1."if(".parent::VAR."inputPost->isset".$upperPrimaryKeyName."())";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.'$rowIds = array($inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).", false, false, true));";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        
+        if($this->appFeatures->getApprovalBulk())
+        {
+            // Bulk approval
+            $lines[] = parent::TAB1.'else if($inputPost->countableCheckedRowId())';
+            
+            $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+            $lines[] = parent::TAB1.parent::TAB1.'$rowIds = $inputPost->getCheckedRowId(PicoFilterConstant::'.$this->getInputFilter($primaryKeyName).");";
+            $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        }
+        
+        $lines[] = parent::TAB1."else";
+        
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.'$rowIds = null;';
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        
+        $lines[] = parent::TAB1.'if(isset($rowIds) && is_array($rowIds) && !empty($rowIds))';
         $lines[] = parent::TAB1."{";
     
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));";
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification->addAnd($dataFilter);';
+        $lines[] = parent::TAB1.parent::TAB1.'foreach($rowIds as $rowId)';
+        $lines[] = parent::TAB1.parent::TAB1."{";
+        
+        
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $rowId);';
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'specification->addAnd($dataFilter);';
         $lines[] = "";
 
-        $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
         $lines[] = "";
-        $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
-        $lines[] = parent::TAB1.parent::TAB1."{";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
 
         $lines[] = $this->constructApproval($objectName, $entityInfoName, $entityApvInfoName, $trashRequired, $trashEntity);
         $lines[] = "";
         
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterInsert(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after new data is inserted".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterInsert(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after new data is inserted".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeUpdate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before updating data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeUpdate(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before updating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterUpdate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after updating data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterUpdate(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after updating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterActivate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after activating data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterActivate(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after activating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDeactivate(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deactivating data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDeactivate(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deactivating data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeDelete(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before deleting data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeDelete(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before deleting data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR     
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDelete(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deleting data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterDelete(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after deleting data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterApprove(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after approval".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterApprove(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after approval".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."// List of properties to be copied from $entityApprovalName to $entityName when the user approves data modification.";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."// You can modify this list by adding or removing fields as needed.".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."columnToBeCopied = array(".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.implode(', '.parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1, $toBeCopied).parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// List of properties to be copied from $entityApprovalName to $entityName when the user approves data modification.";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// You can modify this list by adding or removing fields as needed.".parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."columnToBeCopied = array(".parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.implode(', '.parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1, $toBeCopied).parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.");";
         $lines[] = "";
 
         if($entityTrashName == null)
@@ -607,14 +635,15 @@ class AppBuilderApproval extends AppBuilderBase
         {
             $trash = "new $entityTrashName()";
         }
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval->approve("
-        .parent::VAR."columnToBeCopied, new $entityApprovalName(), $trash, ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.$currentUser.",  ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.$currentTime.",  ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.$currentIp.", ".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback);";                                               
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval->approve("
+        .parent::TAB1.parent::VAR."columnToBeCopied, new $entityApprovalName(), $trash, ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$currentUser.",  ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$currentTime.",  ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$currentIp.", ".parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback);";                                               
 
 
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
         $lines[] = parent::TAB1.parent::TAB1."}";
 
         $lines[] = parent::TAB1."}";
@@ -652,46 +681,75 @@ class AppBuilderApproval extends AppBuilderBase
 
         $lines[] = "if(".parent::VAR."inputPost".parent::CALL_GET."UserAction() == $userAction)";
         $lines[] = parent::CURLY_BRACKET_OPEN;
-        $lines[] = parent::TAB1."if(".parent::VAR."inputPost->isset".$upperPrimaryKeyName."())";
-        $lines[] = parent::TAB1."{";
         
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName)."));";
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.'specification->addAnd($dataFilter);';
-        $lines[] = "";
+        $lines[] = parent::TAB1."if(".parent::VAR."inputPost->isset".$upperPrimaryKeyName."())";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.'$rowIds = array($inputPost->get'.$upperPrimaryKeyName."(PicoFilterConstant::".$this->getInputFilter($primaryKeyName).", false, false, true));";
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        
+        if($this->appFeatures->getApprovalBulk())
+        {
+            // Bulk approval
+            $lines[] = parent::TAB1.'else if($inputPost->countableCheckedRowId())';
+            
+            $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+            $lines[] = parent::TAB1.parent::TAB1.'$rowIds = $inputPost->getCheckedRowId(PicoFilterConstant::'.$this->getInputFilter($primaryKeyName).");";
+            $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        }
+        
+        $lines[] = parent::TAB1."else";
+        
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
+        $lines[] = parent::TAB1.parent::TAB1.'$rowIds = null;';
+        $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
+        
+        $lines[] = parent::TAB1.'if(isset($rowIds) && is_array($rowIds) && !empty($rowIds))';
+        $lines[] = parent::TAB1."{";
+    
 
-        $lines[] = parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
-        $lines[] = "";
-
-        $lines[] = parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
+        $lines[] = parent::TAB1.parent::TAB1.'foreach($rowIds as $rowId)';
         $lines[] = parent::TAB1.parent::TAB1."{";
+        
+        
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'specification = PicoSpecification::getInstanceOf('.self::getStringOf(PicoStringUtil::camelize($primaryKeyName)).', $rowId);';
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.'specification->addAnd($dataFilter);';
+        $lines[] = "";
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.$this->createConstructor($objectName, $entityName);
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_FIND_ONE."(".parent::VAR."specification);";
+        $lines[] = "";
+
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."if(".parent::VAR.$objectName."->isset".$upperPrimaryKeyName."())";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."{";
 
         $lines[] = $this->constructApproval($objectName, $entityInfoName, $entityApvInfoName).parent::NEW_LINE;
 
         $lines[] = "";
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback = new SetterGetter();";
         
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeReject(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before reject data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."BeforeReject(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute before reject data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterReject(function("
-        .parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after reject data".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
-        .parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::CALL_SET."AfterReject(function("
+        .parent::TAB1.parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Logic to execute after reject data".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Your code goes here".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE //NOSONAR
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."});".parent::NEW_LINE;
 
-        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval->reject(new $entityApprovalName(),".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.$currentUser.",  ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.$currentTime.",  ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.$currentIp.", ".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.");";
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval->reject(new $entityApprovalName(),".parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$currentUser.",  ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$currentTime.",  ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.$currentIp.", ".parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approvalCallback".parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.");";
 
+        $lines[] = parent::TAB1.parent::TAB1.parent::TAB1."}";
+        
         $lines[] = parent::TAB1.parent::TAB1."}";
 
         $lines[] = parent::TAB1."}";
@@ -714,34 +772,34 @@ class AppBuilderApproval extends AppBuilderBase
      */
     protected function constructApproval($objectName, $entityInfoName, $entityApvInfoName, $trashRequired = false, $trashEntity = null)
     {
-        $result = parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval = new PicoApproval(".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.", ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityInfoName.", ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityApvInfoName.", ".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Approval validation logic".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// If the return is false, approval will not proceed".parent::NEW_LINE 
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE;
+        $result = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."approval = new PicoApproval(".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$objectName.", ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityInfoName.", ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR.$entityApvInfoName.", ".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."function(".parent::VAR."param1 = null, ".parent::VAR."param2 = null, ".parent::VAR."param3 = null) use (".parent::VAR."dataControlConfig, ".parent::VAR."database, ".parent::VAR."currentAction) {".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Approval validation logic".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// If the return is false, approval will not proceed".parent::NEW_LINE 
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."".parent::NEW_LINE;
          
         if($this->appFeatures->getApprovalByAnotherUser())
         {
-            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."dataControlConfig->isTwoUserApproval() && ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE; 
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return ".parent::VAR."dataControlConfig->isTwoUserApproval() && ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE; 
         }
         else
         {
-            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Example: return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE 
-            .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE;
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// Example: return ".parent::VAR."param1->notEquals".PicoStringUtil::upperCamelize($this->entityInfo->getAdminAskEdit())."(".parent::VAR."currentAction->getUserId());".parent::NEW_LINE 
+            .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."return true;".parent::NEW_LINE;
         }
         
-        $result .= parent::TAB1.parent::TAB1.parent::TAB1."}";
+        $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."}";
 
         if($trashRequired)
         {
             $entityTrashName = $trashEntity->getEntityName();
             
             $result .= ", ".parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1."true, ".parent::NEW_LINE 
-            .parent::TAB1.parent::TAB1.parent::TAB1."new $entityTrashName() ".parent::NEW_LINE;
-            $result .= parent::TAB1.parent::TAB1.parent::TAB1.");";
+            .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."new $entityTrashName() ".parent::NEW_LINE;
+            $result .= parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.");";
         }
         else
         {

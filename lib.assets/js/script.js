@@ -375,6 +375,7 @@ function restoreFeatureForm() {
           $('#approval_position1')[0].disabled = false;
           $('#approval_position2')[0].disabled = false;
           $('#approval_by_other_user')[0].disabled = false; 
+          $('#approval_bulk')[0].disabled = false;
         }
         else
         {
@@ -383,6 +384,7 @@ function restoreFeatureForm() {
           $('#approval_position1')[0].disabled = true;
           $('#approval_position2')[0].disabled = true;
           $('#approval_by_other_user')[0].disabled = true;
+          $('#approval_bulk')[0].disabled = true;
         }
         
         if(data.export_to_csv)
@@ -1789,6 +1791,7 @@ let initAll = function () {
       $('#approval_type2')[0].disabled = false;
       $('#approval_position1')[0].disabled = false;
       $('#approval_position2')[0].disabled = false;
+      $('#approval_bulk')[0].disabled = false;
     }
     else {
       $('#approval_by_other_user')[0].checked = false;
@@ -1797,6 +1800,7 @@ let initAll = function () {
       $('#approval_type2')[0].disabled = true;
       $('#approval_position1')[0].disabled = true;
       $('#approval_position2')[0].disabled = true;
+      $('#approval_bulk')[0].disabled = true;
     }
   });
 
@@ -6059,6 +6063,7 @@ function generateScript(selector) // NOSONAR
   let useValidator = $("#validator")[0].checked && true; //NOSONAR
 
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
+  let approvalBulk = $('[name="approval_bulk"]:checked').val(); //NOSONAR
   let approvalType = $('[name="approval_type"]:checked').val(); //NOSONAR
 
   let entity = {
@@ -6100,6 +6105,7 @@ function generateScript(selector) // NOSONAR
     approvalType: approvalType,
     approvalPosition: approvalPosition,
     approvalByAnotherUser: approvalByAnotherUser,
+    approvalBulk: approvalBulk,
     validator: useValidator,
     backendOnly: backendOnly,
     subquery: subquery,
@@ -6789,6 +6795,7 @@ function restoreForm(data)  //NOSONAR
         $('#approval_type2')[0].disabled = false;
         $('#approval_position1')[0].disabled = false;
         $('#approval_position2')[0].disabled = false;
+        $('#approval_bulk')[0].disabled = false;
       }
       else
       {
@@ -6797,6 +6804,7 @@ function restoreForm(data)  //NOSONAR
         $('#approval_type2')[0].disabled = true;
         $('#approval_position1')[0].disabled = true;
         $('#approval_position2')[0].disabled = true;
+        $('#approval_bulk')[0].disabled = true;
       }
       $('#with_approval_note')[0].checked = isTrue(data.features.approvalNote);
       $('#approval_by_other_user')[0].checked = isTrue(data.features.approvalByAnotherUser);
@@ -6926,6 +6934,7 @@ function resetFeatureForm()
   $('#approval_type2')[0].disabled = true;
   $('#approval_position1')[0].disabled = true;
   $('#approval_position2')[0].disabled = true;
+  $('#approval_bulk')[0].disabled = true;
   $('[name="approval_type"][value="2"]')[0].checked = true;
   $('[name="approval_position"][value="after-data"]')[0].checked = true;
   $('#with_approval_note')[0].checked = false;
