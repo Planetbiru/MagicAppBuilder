@@ -32,7 +32,7 @@ function updateApplicationConfig($applicationConfig, $applicationId, $applicatio
     if($applicationConfig->issetApplication())
     {
         $oldApplicationId = $applicationConfig->getApplication()->getId();
-        $baseEntityDirectory = rtrim($baseApplicationDirectory, "\\/")."/classes";
+        $baseEntityDirectory = rtrim($baseApplicationDirectory, "\\/")."/inc.lib/classes";
         $baseLanguageDirectory = rtrim($baseApplicationDirectory, "\\/")."/inc.lang";
         $applicationConfig->getApplication()
             ->setId($applicationId)
