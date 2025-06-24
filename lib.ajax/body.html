@@ -1228,9 +1228,23 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="application-import"></div>
+        <div class="import-message"></div>
+        <div class="mb-2">Application ID</div>
+        <div class="mb-3">
+            <input type="text" class="form-control" name="application_id" value="">
+        </div>
+        <div class="mb-2">Base Application Directory</div>
+        <div class="mb-3">
+            <input type="text" class="form-control" name="base_application_directory" value="">
+        </div>
+        <div class="mb-2">File</div>
+        <div class="mb-3">
+            <input type="text" class="form-control" name="file_name" value="">
+            <input type="file" id="import-application-file" accept=".zip" style="display: none;">
+        </div>    
       </div>
       <div class="modal-footer">
+        <button class="btn btn-primary button-select-file-import"><i class="fa fa-folder-open"></i> Select File</button>
         <button type="button" class="btn btn-success button-save-application-import" name="button-save-application-import"><i class="fa-solid fa-file-import"></i> Import</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
       </div>
