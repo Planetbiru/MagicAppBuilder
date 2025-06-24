@@ -53,9 +53,9 @@ try
 		$appConfig->getApplication()->setDescription($description);
 		$appConfig->getApplication()->setArchitecture($architecture);
 
-        if($inputPost->getBaseApplicationDirectory() != null)
+        if($inputPost->getApplicationDirectory() != null)
         {
-            $baseApplicationDirectory = $inputPost->getBaseApplicationDirectory();
+            $baseApplicationDirectory = $inputPost->getApplicationDirectory();
             $baseApplicationDirectory = rtrim($baseApplicationDirectory);
             $baseEntityDirectory = $baseApplicationDirectory . '/inc.lib/classes';
             $baseLanguageDirectory = $baseApplicationDirectory . '/inc.lang';
@@ -63,6 +63,11 @@ try
             $appConfig->getApplication()->setBaseApplicationDirectory($baseApplicationDirectory);
             $appConfig->getApplication()->setBaseEntityDirectory($baseEntityDirectory);
             $appConfig->getApplication()->setBaseLanguageDirectory($baseLanguageDirectory);
+        }
+        if($inputPost->getApplicationUrl() != null)
+        {
+            $baseApplicationUrl = $inputPost->getApplicationUrl();
+            $appConfig->getApplication()->setBaseApplicationUrl($baseApplicationUrl);
         }
 	}
 

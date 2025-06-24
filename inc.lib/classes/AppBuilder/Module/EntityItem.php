@@ -2,6 +2,13 @@
 
 namespace AppBuilder\Module;
 
+
+/**
+ * Class EntityItem
+ *
+ * Represents metadata for an entity used in a module, including the entity's
+ * name, associated database table, and primary key column.
+ */
 class EntityItem {
 
     /**

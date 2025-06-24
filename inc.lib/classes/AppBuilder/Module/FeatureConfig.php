@@ -2,6 +2,13 @@
 
 namespace AppBuilder\Module;
 
+/**
+ * Class FeatureConfig
+ *
+ * Holds configuration flags that define which features are enabled
+ * for a particular module, such as support for subqueries, approval
+ * processes, export options, and AJAX support.
+ */
 class FeatureConfig {
     /**
      * Undocumented variable

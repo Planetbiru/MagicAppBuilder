@@ -578,6 +578,60 @@ function showTestValidatorForm()
 }
 
 /**
+ * Uploads application file and handles response
+ * @param {File} file - The selected file
+ * @param {string} action - 'preview' or 'import'
+ */
+function handleApplicationFileUpload(file, action, application_id, base_application_directory) {
+    const importInfoDiv = $('#modal-application-import .import-message');
+    const updateBtn = $('#modal-application-import .button-save-application-import');
+
+    const formData = new FormData();
+    formData.append('user_action', action);
+    if(application_id)
+    {
+      formData.append('application_id', application_id);
+    }
+    if(base_application_directory)
+    {
+      formData.append('base_application_directory', base_application_directory);
+    }
+    formData.append('file[]', file);
+
+    $('#modal-application-import [name="file_name"]').val(file.name);
+    importInfoDiv.html('<div class="alert alert-info">Uploading and parsing file...</div>');
+
+    $.ajax({
+        url: 'lib.ajax/application-import.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function (data) {
+            if (data.status === 'success') {
+              $('#modal-application-import [name="application_name"]').val(data.data.application_name);
+              $('#modal-application-import [name="application_id"]').val(data.data.application_id);
+              $('#modal-application-import [name="base_application_directory"]').val(data.data.base_application_directory);
+              updateBtn[0].disabled = false;
+            } else {
+              updateBtn[0].disabled = true;
+            }
+            importInfoDiv.html(`<div class="alert alert-${data.status}">${data.message}</div>`);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            updateBtn[0].disabled = true;
+            console.error('Error during file upload:', textStatus, errorThrown, jqXHR);
+            let errorMessage = `Error: Failed to upload or parse file. ${errorThrown}`;
+            if (jqXHR.responseText) {
+                errorMessage += `<br>Server Response: ${jqXHR.responseText.substring(0, 200)}...`;
+            }
+            importInfoDiv.html(`<div class="alert alert-danger">${errorMessage}</div>`);
+        }
+    });
+}
+
+/**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
@@ -971,6 +1025,7 @@ let initAll = function () {
       name: form.find('[name="application_name"]').val(),
       architecture: form.find('[name="application_architecture"]').val(),
       base_application_directory: form.find('[name="application_base_directory"]').val(),
+      base_application_url: form.find('[name="application_url_directory"]').val(),
       description: form.find('[name="description"]').val(),
       database: {},
       sessions: {},
@@ -1356,6 +1411,7 @@ let initAll = function () {
     let description = modal.find('[name="application_description"]').val().trim();
     let id = modal.find('[name="application_id"]').val().trim();
     let directory = modal.find('[name="application_directory"]').val().trim();
+    let url = modal.find('[name="application_url"]').val().trim();
     let namespace = modal.find('[name="application_namespace"]').val().trim();
     let workspace_id = modal.find('[name="application_workspace_id"]').val().trim();
     let author = modal.find('[name="application_author"]').val().trim();
@@ -1382,11 +1438,12 @@ let initAll = function () {
         dataType: "html",
         data: {
           id: id,
-          name: name,
-          architecture: architecture,
-          description: description,
-          directory: directory,
-          namespace: namespace,
+          application_name: name,
+          application_architecture: architecture,
+          application_description: description,
+          application_directory: directory,
+          application_url: url,
+          application_namespace: namespace,
           workspace_id: workspace_id,
           author: author,
           paths: paths,
@@ -1860,6 +1917,7 @@ let initAll = function () {
           modal.find('[name="application_id"]').val(data.application_id);
           modal.find('[name="application_architecture"]').val(data.application_architecture);
           modal.find('[name="application_directory"]').val(data.application_directory);
+          modal.find('[name="application_url"]').val(data.application_url);
           modal.find('[name="composer_online"]').val(data.composer_online ? 1 : 0);
           modal.find('[name="application_namespace"]').val(data.application_namespace);
           modal.find('[name="application_workspace_id"]').empty();
@@ -2323,92 +2381,45 @@ let initAll = function () {
     });
   });
   
+  // When the "Import Application" button is clicked
   $(document).on('click', '.button-import-application', function (e) {
-    e.preventDefault();
-    let updateBtn = $('#modal-application-import .button-save-application-import');
-    updateBtn[0].disabled = true;
-    let applicationId = $(this).closest('.application-item').attr('data-application-id');
-    $('#modal-application-import .application-import').empty();
-    $('#modal-application-import').modal('show');
-    increaseAjaxPending();
+      e.preventDefault();
+      
+      // Display initial info message in modal
+      $('#modal-application-import .import-message').html('<div class="alert alert-info">Select file to import the application.</div>')
+      $('#modal-application-import [name="application_id"]').val('');
+      $('#modal-application-import [name="application_name"]').val('');
+      $('#modal-application-import [name="base_application_directory"]').val('');
+      $('#modal-application-import [name="file_name"]').val('');
+      // Disable the "Import" button until a valid file is selected
+      let updateBtn = $('#modal-application-import .button-save-application-import');
+      updateBtn[0].disabled = true;
 
-    $.ajax({
-      type: 'GET',
-      url: 'lib.ajax/application-import.php',
-      data: { applicationId: applicationId },
-      dataType: 'html',
-      success: function (data) {
-        decreaseAjaxPending();
-        $('#modal-application-import').attr('data-application-id', applicationId);
-        $('#modal-application-import .application-import').empty().append(data);
-        updateBtn[0].disabled = false;
-        
-        
-        const importInfoDiv = $('.application-import-info');
-        const applicationImportFileSelector = $('.application-import-file-selector');
+      // Show the modal for importing application
+      $('#modal-application-import').modal('show');
+  });
 
-        // Create a hidden file input element dynamically using jQuery
-        const fileInput = $('<input type="file" accept=".zip" style="display: none;">');
-        fileInput.appendTo(applicationImportFileSelector); // Append to a visible container
-
-        // 1. When the ".button-select-file-import" is clicked, trigger the hidden file input
-        // Using event delegation with $(document).on()
-        $('.button-select-file-import').on('click', function() {
-            fileInput.click(); // Programmatically click the hidden file input
-        });
-
-        // 2. When a file is selected in the input
-        fileInput.on('change', function() {
-            if (this.files.length > 0) {
-                const selectedFile = this.files[0];
-
-                // Create FormData object to send file via AJAX
-                const formData = new FormData();
-                formData.append('user_action', 'preview'); // Add user_action
-                formData.append('file[]', selectedFile);   // Append the selected file(s)
-
-                // Clear previous preview messages and show loading
-                importInfoDiv.html('<div class="alert alert-info">Uploading and parsing file...</div>');
-
-                // Send the file via AJAX using jQuery's $.ajax
-                $.ajax({
-                    url: 'lib.ajax/application-import.php', // URL to send the AJAX request
-                    type: 'POST',                            // HTTP method
-                    data: formData,                          // FormData object
-                    processData: false,                      // Don't process the data (required for FormData)
-                    contentType: false,                      // Don't set content type (required for FormData)
-                    success: function(responseHtml) // NOSONAR
-                    {
-                        // 3. Append the preview HTML to the .application-import-info div
-                        importInfoDiv.html(responseHtml);
-                        
-                        // Optional: Reset the file input to allow selecting the same file again
-                        fileInput.val(''); 
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) // NOSONAR
-                    {
-                        console.error('Error during file upload:', textStatus, errorThrown, jqXHR);
-                        let errorMessage = `Error: Failed to upload or parse file. ${errorThrown}`;
-                        if (jqXHR.responseText) {
-                            // If server provided a response text, use it for more detail
-                            errorMessage += `<br>Server Response: ${jqXHR.responseText.substring(0, 200)}...`; // Limit length
-                        }
-                        importInfoDiv.html(`<div class="alert alert-danger">${errorMessage}</div>`);
-                    }
-                });
-            }
-        });
-        
-        
-        
-        
-      },
-      error: function (xhr, status, error) {
-        decreaseAjaxPending();
-      }
-    });
+  // When the "Select File" button is clicked, trigger the hidden file input
+  $(document).on('click', '.button-select-file-import', function (e) {
+      $('#import-application-file').click(); // Simulate click on hidden file input
   });
   
+  // Preview file (called first when user selects file)
+  $(document).on('change', '#import-application-file', function () {
+      if (this.files.length > 0) {
+          handleApplicationFileUpload(this.files[0], 'preview');
+      }
+  });
+
+  // Import file (re-uses selected file and sends as 'import')
+  $(document).on('click', '.button-save-application-import', function () {
+      const input = document.getElementById('import-application-file');
+      let application_id = $('#modal-application-import [name="application_id"]').val();
+      let base_application_directory = $('#modal-application-import [name="base_application_directory"]').val();
+      if (input.files.length > 0) {
+          handleApplicationFileUpload(input.files[0], 'import', application_id, base_application_directory);
+      }
+  });
   
   
   $(document).on("click", ".button-save-application-option", function (e) {
@@ -3509,13 +3520,16 @@ function changeApplicationId(applicationId) {
  */
 function changeApplicationDirectory(applicationId) {
     // Get the original directory path
-    let originalPath = $('#modal-create-application input[name="application_directory"]').val();
+    let originalDirectory = $('#modal-create-application input[name="application_directory"]').val();
+    let originalUrl = $('#modal-create-application input[name="application_url"]').val();
 
     // Replace the last part of the path (basename) with the application ID
-    let newPath = replaceBasename(originalPath, applicationId);
+    let newDirectory = replaceBasename(originalDirectory, applicationId);
+    let newUrl = replaceBasename(originalUrl, applicationId);
 
     // Update the input field with the new directory path
-    $('#modal-create-application input[name="application_directory"]').val(newPath);
+    $('#modal-create-application input[name="application_directory"]').val(newDirectory);
+    $('#modal-create-application input[name="application_url"]').val(newUrl);
 
     // Delay checking the directory's writability status to prevent multiple rapid checks
     clearTimeout(checkTimeout);

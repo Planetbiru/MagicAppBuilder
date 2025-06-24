@@ -140,7 +140,11 @@ $nameInIndonesian = array(
                             </tr>
                             <tr>
                                 <td>Application Directory</td>
-                                <td><span class="directory-container input-with-checker"><input class="form-control" type="text" name="application_base_directory" value="<?php echo $app->getBaseApplicationDirectory(); ?>"></span></td>
+                                <td><span class="directory-container input-with-checker"><input class="form-control" type="text" name="application_directory" value="<?php echo $app->getBaseApplicationDirectory(); ?>"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Application URL</td>
+                                <td><span class="directory-container input-with-checker"><input class="form-control" type="text" name="application_url" value="<?php echo $app->getBaseApplicationUrl(); ?>"></span></td>
                             </tr>
                             <tr>
                                 <td>Path</td>

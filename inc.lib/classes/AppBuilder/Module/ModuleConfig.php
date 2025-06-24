@@ -2,92 +2,106 @@
 
 namespace AppBuilder\Module;
 
+/**
+ * Class ModuleConfig
+ *
+ * Represents the full configuration of a module, including its entity structure,
+ * fields, filters, sorting options, features, and metadata such as module name
+ * and menu integration.
+ */
 class ModuleConfig {
 
     /**
-     * Undocumented variable
+     * Configuration for the module's main, approval, and trash entities.
      *
      * @var EntityConfig
      */
     public $entity;
 
     /**
-     * Undocumented variable
+     * List of field configurations used in the module.
      *
      * @var FieldConfig[]
      */
     public $fields;
 
     /**
-     * Undocumented variable
+     * List of specifications (filters or conditions) for the module.
      *
      * @var SpecificationConfig[]
      */
     public $specifications;
 
     /**
-     * Undocumented variable
+     * List of sort configurations used to order data in lists.
      *
      * @var SortableConfig[]
      */
     public $sortables;
 
     /**
-     * Undocumented variable
+     * Feature-level flags controlling module capabilities.
      *
      * @var FeatureConfig
      */
     public $feature;
 
     /**
-     * Undocumented variable
+     * Unique code identifying the module.
      *
      * @var string
      */
     public $moduleCode;
 
     /**
-     * Undocumented variable
+     * Human-readable name of the module.
      *
      * @var string
      */
     public $moduleName;
 
     /**
-     * Undocumented variable
+     * File name or identifier of the module definition.
      *
      * @var string
      */
     public $moduleFile;
 
     /**
-     * Undocumented variable
+     * Whether the module should appear as a menu item.
      *
      * @var bool
      */
     public $moduleAsMenu;
 
     /**
-     * Undocumented variable
+     * Menu label or identifier under which the module appears.
      *
      * @var string
      */
     public $moduleMenu;
 
     /**
-     * Undocumented variable
+     * The target location or context for the module (e.g., backend, frontend).
      *
      * @var string
      */
     public $target;
 
     /**
-     * Undocumented variable
+     * Whether this module is responsible for updating entity data.
      *
-     * @var string
+     * @var bool
      */
     public $updateEntity;
 
+    /**
+     * ModuleConfig constructor.
+     *
+     * Initializes the module configuration from a JSON string.
+     *
+     * @param string $jsonData JSON string representing the module configuration.
+     */
     public function __construct($jsonData) {
         $data = json_decode($jsonData, true);
 
