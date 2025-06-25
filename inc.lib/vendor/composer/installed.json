@@ -143,19 +143,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "0e21bf06ebd63afe2094c193ce36f0f6987be342"
+                "reference": "c7e87906919e6e8d0d394f3fb69d32ff3f1496ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/0e21bf06ebd63afe2094c193ce36f0f6987be342",
-                "reference": "0e21bf06ebd63afe2094c193ce36f0f6987be342",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/c7e87906919e6e8d0d394f3fb69d32ff3f1496ec",
+                "reference": "c7e87906919e6e8d0d394f3fb69d32ff3f1496ec",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "planetbiru/magic-object": "^3.14"
             },
-            "time": "2025-06-22T17:26:27+00:00",
+            "time": "2025-06-25T01:30:23+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -186,18 +186,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "a1db19c9df309c15f064c7b16759c80b4d5e89b4"
+                "reference": "11b030d29bd246ffc6fb025d7479e5365335062d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/a1db19c9df309c15f064c7b16759c80b4d5e89b4",
-                "reference": "a1db19c9df309c15f064c7b16759c80b4d5e89b4",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/11b030d29bd246ffc6fb025d7479e5365335062d",
+                "reference": "11b030d29bd246ffc6fb025d7479e5365335062d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4"
             },
-            "time": "2025-06-22T07:57:28+00:00",
+            "time": "2025-06-25T01:27:05+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
