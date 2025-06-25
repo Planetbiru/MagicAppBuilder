@@ -77,7 +77,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $entityMainName = $entityMain->getEntityName();
         $approvalRequired = $appFeatures->isApprovalRequired();
         $trashRequired = $appFeatures->isTrashRequired();
-        $validatorRequired = $appFeatures->isValidator();
+        $validatorRequired = $appFeatures->isValidationRequired();
         $sortOrder = $appFeatures->isSortOrder();    
         $activationKey = $entityInfo->getActive();
         $appConf = $appConfig->getApplication();
@@ -189,7 +189,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
 
         // Generate validator
         $validationInfo = new AppValidatorInfo();
-        if($appFeatures->isValidator())
+        if($appFeatures->isValidationRequired())
         {
             $entityGenerator = new PicoEntityGenerator(null, null, null, null);
             $validator = $request->getValidator();
@@ -216,7 +216,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         if($approvalRequired) {
             $appBuilder = new AppBuilderApproval($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
-            if($appFeatures->isValidator())
+            if($appFeatures->isValidationRequired())
             {
                 $appBuilder->setValidatiorInfo($validationInfo);
             }
@@ -251,7 +251,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         {
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
-            if($appFeatures->isValidator())
+            if($appFeatures->isValidationRequired())
             {
                 $appBuilder->setValidatiorInfo($validationInfo);
             }

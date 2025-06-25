@@ -961,3 +961,28 @@ MagicObject 3.14 introduces a new **`with()`** method within `PicoDatabasePersis
 **Key feature:**
 
 -   **`with()` Method**: Provides a convenient entry point for fluent setter chaining, returning the current object instance to allow for sequential method calls.
+
+# MagicObject Version 3.14.1
+
+## What's Changed
+
+### Enhanced Validation Flexibility
+
+MagicObject 3.14.1 introduces an additional parameter to the `validate()` method across `MagicObject` and related input classes (`InputPost`, `InputGet`, `MagicDto`, `SetterGetter`, `SecretObject`, and `PicoDatabasePersistenceExtended`). This enhancement provides more granular control over validation behavior, particularly when utilizing a **reference object** for validation annotations.
+
+The `validate()` method now accepts a new boolean parameter:
+
+-   **`$validateIfReferenceEmpty`**:
+    -   **`true`** (default): If a `$reference` object is provided but it contains no properties (is considered "empty" in terms of its defined attributes), the validation will still proceed. In this scenario, the validation annotations from the current object (`$this`) will be used to validate the current object's data.
+    -   **`false`**: If a `$reference` object is provided and it has no properties, the validation process will be **skipped entirely**. This is useful when you want validation to occur _only_ if the reference model actually defines validation rules.
+
+This new parameter provides developers with more precise control over when and how validation occurs, especially in dynamic scenarios where reference models might not always contain defined properties.
+
+
+### New `@MaxLength` Validation Annotation
+
+MagicObject now supports a dedicated **`@MaxLength`** annotation for string properties. This new annotation allows you to quickly and clearly enforce a maximum length constraint without needing to specify a minimum length.
+
+-   **`@MaxLength(value=X, message="...")`**: Ensures that a string property's value does not exceed `X` characters.
+
+This simplifies common validation scenarios where only an upper bound on string length is required.

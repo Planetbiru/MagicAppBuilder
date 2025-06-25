@@ -80,6 +80,7 @@ class ValidationUtil // NOSONAR
             'digits' => "Value for field '\${property}' must have at most \${integer} integer digits and \${fraction} fractional digits",
             'assertTrue' => "Field '\${property}' must be true",
             'futureOrPresent' => "Date for field '\${property}' cannot be in the past",
+            'maxLength' => "Field '\${property}' cannot exceed \${value} characters",
             'length' => "Field '\${property}' must be between \${min} and \${max} characters",
             'range' => "Value for field '\${property}' must be between \${min} and \${max}",
             'noHtml' => "Field '\${property}' contains HTML tags and must be removed",
@@ -190,6 +191,7 @@ class ValidationUtil // NOSONAR
      * @param object $object The object to be validated. It's expected that properties might be
      * accessed via Reflection, so protected/private properties are handled.
      * @param string|null $parentPropertyName Optional. The name of the parent property, used for nested validation messages.
+     * @return self Returns the current instance for method chaining.
      * @throws InvalidValueException If any validation constraint is violated.
      */
     public function validate($object, $parentPropertyName = null) // NOSONAR
@@ -236,6 +238,7 @@ class ValidationUtil // NOSONAR
             $this->validateAssertTrueAnnotation($fullPropertyName, $propertyValue, $docComment);
             $this->validateFutureOrPresentAnnotation($fullPropertyName, $propertyValue, $docComment);
             $this->validateLengthAnnotation($fullPropertyName, $propertyValue, $docComment);
+            $this->validateMaxLengthAnnotation($fullPropertyName, $propertyValue, $docComment);
             $this->validateRangeAnnotation($fullPropertyName, $propertyValue, $docComment);
             $this->validateNoHtmlAnnotation($fullPropertyName, $propertyValue, $docComment);
             $this->validatePositiveAnnotation($fullPropertyName, $propertyValue, $docComment);
@@ -249,6 +252,7 @@ class ValidationUtil // NOSONAR
             $this->validatePhoneAnnotation($fullPropertyName, $propertyValue, $docComment);
             $this->validateEnumAnnotation($fullPropertyName, $propertyValue, $docComment);
         }
+        return $this; // Allow method chaining
     }
     
     /**
@@ -827,6 +831,32 @@ class ValidationUtil // NOSONAR
             // Convert the property value to a DateTime object
             $date = $this->convertToDateTime($propertyValue);
             if ($date instanceof DateTimeInterface && $date->getTimestamp() < (new DateTime())->getTimestamp()) {
+                throw new InvalidValueException($propertyName, $message);
+            }
+        }
+    }
+
+    /**
+     * Validates the **`MaxLength`** annotation.
+     * Ensures the length of a string does not exceed a specified maximum value.
+     *
+     * @param string $propertyName The name of the property being validated, potentially including parent path.
+     * @param mixed $propertyValue The current value of the property.
+     * @param string $docComment The docblock comment of the property.
+     * @throws InvalidValueException If the string length exceeds the specified maximum.
+     */
+    private function validateMaxLengthAnnotation($propertyName, $propertyValue, $docComment)
+    {
+        if (preg_match('/@MaxLength(?: vigilance)?\(([^)]*)\)/', $docComment, $matches)) {
+            $params = $this->parseAnnotationParams($matches[1]);
+            $maxLength = $this->getAnnotationParam($params, 'value', 'int'); 
+            $message = $this->getAnnotationParam($params, 'message', 'string');
+
+            if ($this->isBlank($message)) {
+                $message = $this->createMessage('maxLength', array('property' => $propertyName, 'value' => $maxLength));
+            }
+
+            if (is_string($propertyValue) && $maxLength !== null && strlen($propertyValue) > $maxLength) {
                 throw new InvalidValueException($propertyName, $message);
             }
         }

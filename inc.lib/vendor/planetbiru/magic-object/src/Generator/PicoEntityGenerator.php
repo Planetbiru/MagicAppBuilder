@@ -100,7 +100,7 @@ class PicoEntityGenerator
      * @param bool $prettifyLabel Whether to convert column names to human-readable labels (default is true).
      * @return string PHP code for the property with a docblock, ready to be inserted into a class.
      */
-    public function createProperty($typeMap, $columnMap, $row, $nonupdatables = null, $prettifyLabel = true)
+    public function createProperty($typeMap, $columnMap, $row, $nonupdatables = null, $prettifyLabel = true) // NOSONAR
     {
         $columnName = $row['Field'];
         $columnType = $row['Type'];
@@ -167,10 +167,44 @@ class PicoEntityGenerator
         }
 
         $docs[] = "\t * @Label(content=\"$description\")";
+
+        $max = $this->getMaximumLength($columnType);
+        if (isset($max)) {
+            $docs[] = "\t * @MaxLength(value=$max)";
+        }
+
         $docs[] = "\t * @var $type";
         $docs[] = $docEnd;
         $prop = "\tprotected \$$propertyName;";
         return implode("\r\n", $docs) . "\r\n" . $prop . "\r\n";
+    }
+
+    /**
+     * Extract maximum length from column_type string if applicable.
+     *
+     * Supports MySQL, PostgreSQL, and SQLite types.
+     *
+     * @param string $columnType
+     * @return int|null
+     */
+    public function getMaximumLength($columnType)
+    {
+        // Normalize to lowercase and remove extra spaces
+        $type = strtolower(trim($columnType));
+
+        // Regex to match types with length, including:
+        // - varchar(255)
+        // - nvarchar(100)
+        // - character varying(150)
+        // - char(10)
+        // - nchar(20)
+        // - etc.
+        if (preg_match('/^(varchar|nvarchar|char|nchar|character varying|character)\s*\(\s*(\d+)\s*\)/i', $type, $matches)) {
+            return (int)$matches[2];
+        }
+
+        // No length information found
+        return null;
     }
 
     /**

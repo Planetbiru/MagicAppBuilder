@@ -6064,20 +6064,20 @@ function generateScript(selector) // NOSONAR
       fields.push(field);
     });
 
-  let subquery = $("#subquery")[0].checked && true; //NOSONAR
-  let requireApproval = $("#with_approval")[0].checked && true; //NOSONAR
-  let withTrash = $("#with_trash")[0].checked && true; //NOSONAR
-  let manualSortOrder = $("#manual_sort_order")[0].checked && true; //NOSONAR
-  let exportToExcel = $("#export_to_excel")[0].checked && true; //NOSONAR
-  let exportToCsv = $("#export_to_csv")[0].checked && true; //NOSONAR
-  let exportUseTemporary = $("#export_use_temporary")[0].checked && true; //NOSONAR
-  let activateDeactivate = $("#activate_deactivate")[0].checked && true; //NOSONAR
-  let userActivityLogger = $("#user_activity_logger")[0].checked && true; //NOSONAR
-  let withApprovalNote = $("#with_approval_note")[0].checked && true; //NOSONAR
+  let subquery = $('#subquery')[0].checked && true; //NOSONAR
+  let requireApproval = $('#with_approval')[0].checked && true; //NOSONAR
+  let withTrash = $('#with_trash')[0].checked && true; //NOSONAR
+  let manualSortOrder = $('#manual_sort_order')[0].checked && true; //NOSONAR
+  let exportToExcel = $('#export_to_excel')[0].checked && true; //NOSONAR
+  let exportToCsv = $('#export_to_csv')[0].checked && true; //NOSONAR
+  let exportUseTemporary = $('#export_use_temporary')[0].checked && true; //NOSONAR
+  let activateDeactivate = $('#activate_deactivate')[0].checked && true; //NOSONAR
+  let userActivityLogger = $('#user_activity_logger')[0].checked && true; //NOSONAR
+  let withApprovalNote = $('#with_approval_note')[0].checked && true; //NOSONAR
   let approvalByAnotherUser = $('[name="approval_by_other_user"]')[0].checked && true; //NOSONAR
-  let ajaxSupport = $("#ajax_support")[0].checked && true; //NOSONAR
-  let backendOnly = $("#backend_only")[0].checked && true; //NOSONAR
-  let useValidator = $("#validator")[0].checked && true; //NOSONAR
+  let ajaxSupport = $('#ajax_support')[0].checked && true; //NOSONAR
+  let backendOnly = $('#backend_only')[0].checked && true; //NOSONAR
+  let withValidation = $('#with_validation')[0].checked && true; //NOSONAR
 
   let approvalPosition = $('[name="approval_position"]:checked').val(); //NOSONAR
   let approvalBulk = $('[name="approval_bulk"]:checked').val(); //NOSONAR
@@ -6123,7 +6123,7 @@ function generateScript(selector) // NOSONAR
     approvalPosition: approvalPosition,
     approvalByAnotherUser: approvalByAnotherUser,
     approvalBulk: approvalBulk,
-    validator: useValidator,
+    withValidation: withValidation,
     backendOnly: backendOnly,
     subquery: subquery,
     ajaxSupport: ajaxSupport
@@ -6827,7 +6827,7 @@ function restoreForm(data)  //NOSONAR
       $('#approval_by_other_user')[0].checked = isTrue(data.features.approvalByAnotherUser);
       $('#with_trash')[0].checked = isTrue(data.features.trashRequired);
       $('#subquery')[0].checked = isTrue(data.features.subquery);
-      $('#validator')[0].checked = isTrue(data.features.validator);
+      $('#with_validation')[0].checked = isTrue(data.features.withValidation);
       $('#ajax_support')[0].checked = isTrue(data.features.ajaxSupport);
       $('#backend_only')[0].checked = isTrue(data.features.backendOnly);
       if(isTrue(data.features.backendOnly))
