@@ -663,5 +663,5 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 -   **UI Typo Corrections:** We've addressed and fixed various typographical errors throughout the user interface, improving overall readability and professionalism.
 
--   **Form Data Restoration Bug:** Fixed an issue where form fields were not properly restored after validation errors in some scenarios.
-This resolves inconsistent behaviors in pre-filling user input after failed submissions and improves error field highlighting reliability.
+-   **Form Data Restoration Bug:** Fixed an issue where form fields were not properly restored after validation errors in some scenarios. 
+    This resolves inconsistent behaviors in pre-filling user input after failed submissions and improves error field highlighting reliability.
