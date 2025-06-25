@@ -86,9 +86,9 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1."try";
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_OPEN;
 
-        if($this->appFeatures->isValidator())
+        if($this->appFeatures->isValidationRequired())
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->validate(null, AppValidatorMessage::loadTemplate(\$currentUser->getLanguageId()), new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->insertValidationClass."());";
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName."->validate(null, AppValidatorMessage::loadTemplate(\$currentUser->getLanguageId()), new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->insertValidationClass."(), true);";
         }
 
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectName.parent::CALL_INSERT_END;
@@ -106,7 +106,7 @@ class AppBuilderApproval extends AppBuilderBase
 
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
 
-        if($this->appFeatures->isValidator())
+        if($this->appFeatures->isValidationRequired())
         {
             $lines[] = "\tcatch(InvalidValueException \$e)";
             $lines[] = "\t{";
@@ -213,9 +213,9 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName.parent::BRACKETS.");";
 
-        if($this->appFeatures->isValidator())
+        if($this->appFeatures->isValidationRequired())
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName."->validate(null, AppValidatorMessage::loadTemplate(\$currentUser->getLanguageId()), new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->updateValidationClass."());";
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName."->validate(null, AppValidatorMessage::loadTemplate(\$currentUser->getLanguageId()), new ".$this->validatorInfo->namespace."\\".$this->validatorInfo->updateValidationClass."(), true);";
         }
 
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_INSERT_END;
@@ -245,7 +245,7 @@ class AppBuilderApproval extends AppBuilderBase
         
         $lines[] = parent::TAB1.parent::CURLY_BRACKET_CLOSE;
 
-        if($this->appFeatures->isValidator())
+        if($this->appFeatures->isValidationRequired())
         {
             $lines[] = "\tcatch(InvalidValueException \$e)";
             $lines[] = "\t{";

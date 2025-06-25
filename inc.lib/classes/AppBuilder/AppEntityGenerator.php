@@ -108,12 +108,11 @@ class AppEntityGenerator extends PicoEntityGenerator
      * @param string $joinColumn The name of the join column.
      * @param string $entityName The name of the related entity.
      * @param string $objectName The name of the object variable.
-     * @param string $propertyName The name of the property in the related entity.
      * @param string $referenceColumnName The name of the reference column in the related entity.
      * @param string $tableName The name of the reference table in the related entity.
      * @return string Returns the generated property reference string.
      */
-    public function createPropertyReference($joinColumn, $entityName, $objectName, $propertyName, $referenceColumnName, $tableName)
+    public function createPropertyReference($joinColumn, $entityName, $objectName, $referenceColumnName, $tableName)
     {
         $description = $this->getPropertyName(PicoStringUtil::snakeize($objectName), true);
         $objectName = PicoStringUtil::camelize($objectName);
@@ -323,7 +322,7 @@ class AppEntityGenerator extends PicoEntityGenerator
                     $joinColumn = $columnName;
                     if($this->notEmpty($objectName, $propertyName))
                     {
-                        $propRef = $this->createPropertyReference($joinColumn, $entityName, $objectName, $propertyName, $referenceColumnName, $referenceEntity->getTableName());
+                        $propRef = $this->createPropertyReference($joinColumn, $entityName, $objectName, $referenceColumnName, $referenceEntity->getTableName());
                         $attrs[] = $propRef;
                     }
                 }

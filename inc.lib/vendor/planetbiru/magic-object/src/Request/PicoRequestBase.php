@@ -3,6 +3,7 @@
 namespace MagicObject\Request;
 
 use MagicObject\Exceptions\InvalidAnnotationException;
+use MagicObject\Exceptions\ObjectParsingError;
 use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoAnnotationParser;
 use MagicObject\Util\PicoStringUtil;
@@ -945,14 +946,73 @@ class PicoRequestBase extends stdClass // NOSONAR
      * This method checks the properties of the current object against validation annotations.
      * If any validation rule fails, an InvalidValueException will be thrown.
      *
-     * @param string|null $parentPropertyName The name of the parent property, if applicable (for nested validation).
-     * @param array|null $messageTemplate Optional custom message templates for validation errors.
-     * @throws \MagicObject\Exceptions\InvalidValueException If validation fails.
+     * @param string|null      $parentPropertyName        The name of the parent property, if applicable (for nested validation).
+     * @param array|null       $messageTemplate           Optional custom message templates for validation errors.
+     * @param MagicObject|null $reference                 Optional reference object. If provided and is an instance of MagicObject,
+     * validation will use the property annotations from the reference class
+     * (not from the validated object's class), but the data to validate is taken from the current object.
+     * @param bool             $validateIfReferenceEmpty  If true, and a reference object is provided but empty,
+     * validation will proceed using the current object's properties.
+     * If false, validation is skipped if the reference object is empty.
+     * Defaults to true.
+     * @throws InvalidValueException If validation fails due to a validation rule.
+     * @throws ObjectParsingError If the object cannot be converted to a valid JSON string for validation.
      * @return self Returns the current instance for method chaining.
      */
-    public function validate($parentPropertyName = null, $messageTemplate = null)
+    public function validate($parentPropertyName = null, $messageTemplate = null, $reference = null, $validateIfReferenceEmpty = null) // NOSONAR
     {
-        ValidationUtil::getInstance($messageTemplate)->validate($this, $parentPropertyName);
+        $objectToValidate = $this->object; // Default: validate the internal object of this persistence class
+        $shouldValidate = true; // Flag to determine if validation should proceed
+
+        // Check if a reference object is provided and is an instance of MagicObject
+        if (isset($reference) && $reference instanceof MagicObject) {
+            // A reference object exists. Now determine if it has properties.
+            if ($reference->hasProperties()) {
+                // The reference has properties, so use annotations from the reference.
+                // The data being validated remains from $this->object.
+
+                // Attempt to convert the internal object to JSON string and then decode it
+                // for loadData, assuming $this->object has a __toString() or similar that returns JSON.
+                $jsonString = (string) $this->object; // Ensure this returns a valid JSON string for $this->object
+
+                // Error handling for JSON decoding
+                $objectToLoad = json_decode($jsonString);
+
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new ObjectParsingError(
+                        "Failed to decode object to JSON for validation reference: " . json_last_error_msg()
+                    );
+                }
+                
+                // If the decoded object is not an object or array, it might indicate an issue
+                // depending on what loadData expects. A simple check is added.
+                if (!is_object($objectToLoad) && !is_array($objectToLoad)) {
+                     throw new ObjectParsingError(
+                        "Decoded JSON is not a valid object or array for validation reference. Decoded type: " . gettype($objectToLoad)
+                    );
+                }
+
+
+                $objectToValidate = $reference->loadData($objectToLoad);
+            } else {
+                // The reference has no properties (it's empty).
+                // Determine if validation should still proceed based on $validateIfReferenceEmpty.
+                if (!$validateIfReferenceEmpty) {
+                    $shouldValidate = false; // Skip validation
+                }
+                // If $validateIfReferenceEmpty is true, $objectToValidate remains $this->object (default)
+                // and $shouldValidate remains true.
+            }
+        }
+        // If no reference ($reference == null), $shouldValidate remains true,
+        // and $objectToValidate remains $this->object, which is the desired behavior.
+
+
+        if ($shouldValidate) {
+            // Call the main validation utility only once
+            ValidationUtil::getInstance($messageTemplate)->validate($objectToValidate, $parentPropertyName);
+        }
+        
         return $this;
     }
 

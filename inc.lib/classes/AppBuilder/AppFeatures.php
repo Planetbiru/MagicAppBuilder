@@ -132,7 +132,7 @@ class AppFeatures // NOSONAR
      *
      * @var boolean
      */
-    private $validator = false;
+    private $withValidation = false;
 
     /**
      * Constructor
@@ -160,7 +160,7 @@ class AppFeatures // NOSONAR
             $this->approvalBulk = $this->isTrue($features->get('approvalBulk'));
             $this->exportUseTemporary = $this->isTrue($features->get('exportUseTemporary'));
             $this->backendOnly = $this->isTrue($features->get('backendOnly'));
-            $this->validator = $this->isTrue($features->get('validator'));
+            $this->withValidation = $this->isTrue($features->get('withValidation'));
         }
     }
     
@@ -428,19 +428,19 @@ class AppFeatures // NOSONAR
     }
 
     /**
-     * Get validator
+     * Get with validator
      */
-    public function isValidator()
+    public function isValidationRequired()
     {
-        return $this->validator;
+        return $this->withValidation;
     }
 
     /**
-     * Set validator
+     * Set with validator
      */
-    public function setValidator($validator)
+    public function setValidationRequired($withValidation)
     {
-        $this->validator = $validator;
+        $this->withValidation = $withValidation;
 
         return $this;
     }

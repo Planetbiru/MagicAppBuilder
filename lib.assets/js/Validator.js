@@ -198,6 +198,7 @@ class ValidationBuilder {
             Range: ["min", "max", "message"],
             Size: ["min", "max", "message"],
             Length: ["min", "max", "message"],
+            MaxLength: ["value", "message"],
             Digits: ["integer", "fraction", "message"],
             Positive: ["message"],
             PositiveOrZero: ["message"],
@@ -416,21 +417,26 @@ class ValidationBuilder {
     }
 
     /**
-     * Automatically populates the "min" and "max" input fields based on the selected constraint type
-     * (either "Size" or "Length") and the current field's maximum length defined in the table structure.
+     * Automatically populates input fields for "min", "max", or "value"
+     * based on the selected constraint type and the current field's maximum length
+     * defined in the table structure.
      *
-     * @param {string} selected - The selected constraint type (e.g., "Size", "Length").
+     * This method is specifically designed to pre-fill validation parameters
+     * when a user selects a length-based constraint.
+     *
+     * @param {string} selected - The selected constraint type (e.g., "Size", "Length", "MaxLength").
      */
     autopopulateMinMax(selected)
     {
         let _this = this;
-        if(selected == 'Size' || selected == 'Length')
+        if((selected == 'Size' || selected == 'Length') && _this.currentMaximumLength)
         {
-            if(_this.currentMaximumLength)
-            {
-                this.propsContainer.querySelector('input[data-prop="min"').value = 0;
-                this.propsContainer.querySelector('input[data-prop="max"').value = _this.currentMaximumLength;
-            }     
+            this.propsContainer.querySelector('input[data-prop="min"]').value = 0;
+            this.propsContainer.querySelector('input[data-prop="max"]').value = _this.currentMaximumLength;    
+        }
+        else if(selected == 'MaxLength' && _this.currentMaximumLength)
+        {
+            this.propsContainer.querySelector('input[data-prop="value"]').value = _this.currentMaximumLength;
         }
     }
 
