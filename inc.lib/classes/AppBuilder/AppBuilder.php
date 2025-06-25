@@ -151,7 +151,8 @@ class AppBuilder extends AppBuilderBase
         $lines[] = parent::TAB1.'$specification->addAnd($dataFilter);';
         
         $lines[] = parent::TAB1.$this->createConstructor($objectName, $entityName);
-        $lines[] = parent::TAB1.'$updater = '.parent::VAR.$objectName.'->where($specification)';
+        $lines[] = parent::TAB1.'$updater = '.parent::VAR.$objectName.'->where($specification);';
+        $lines[] = parent::TAB1.'$updater->with()';
         
         $inputFile = 0;
         foreach($appFields as $field)

@@ -952,3 +952,12 @@ Users can perform validation on objects that extend from the following base clas
 
 This means that property validation is supported not only for entities derived from `MagicObject`, but also for data transfer objects (`MagicDto`) and HTTP input wrappers (`InputPost`, `InputGet`).  
 You can annotate properties in any of these classes with validation annotations, and the validation mechanism will recursively check all nested properties, ensuring robust data integrity across your application's data models and input layers.
+
+
+### Fluent Setter Chaining
+
+MagicObject 3.14 introduces a new **`with()`** method within `PicoDatabasePersistenceExtended`, designed to enhance the readability and flow of setting multiple properties through method chaining. This simple yet powerful addition allows developers to initiate a setter chain with improved clarity, especially when configuring objects before persistence operations.
+
+**Key feature:**
+
+-   **`with()` Method**: Provides a convenient entry point for fluent setter chaining, returning the current object instance to allow for sequential method calls.

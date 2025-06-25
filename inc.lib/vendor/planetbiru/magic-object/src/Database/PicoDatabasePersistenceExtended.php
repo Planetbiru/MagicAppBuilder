@@ -26,6 +26,21 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     private $map = array();
 
     /**
+     * Begin a fluent setter chain.
+     *
+     * This method is primarily used to start a method chaining sequence for
+     * setting properties on the object, enhancing readability and allowing
+     * multiple setters to be called sequentially. It simply returns the
+     * current object instance.
+     *
+     * @return self Returns the current instance of the object, allowing for method chaining.
+     */
+    public function with()
+    {
+        return $this;
+    }
+
+    /**
      * Sets a property value and adds it to the internal map.
      *
      * This method sets a value to a property of the associated object and adds the property name and value 
