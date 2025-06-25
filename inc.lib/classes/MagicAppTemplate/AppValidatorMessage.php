@@ -28,10 +28,9 @@ class AppValidatorMessage
      */
     public static function loadTemplate($languageId)
     {
-        $path = dirname(dirname(__DIR__)) . "/" . $languageId . "/validator.ini";
+        $path = dirname(dirname(dirname(__DIR__))) . "/inc.lang/" . $languageId . "/validator.ini";
         if (file_exists($path)) {
-            $loader = new PicoIniUtil();
-            return $loader->parseIniFile($path);
+            return PicoIniUtil::parseIniFile($path);
         }
         return null;
     }

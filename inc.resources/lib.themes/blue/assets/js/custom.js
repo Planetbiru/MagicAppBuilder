@@ -634,7 +634,7 @@ function doRestoreFormData(formData, errorField, formSelector) {
     errorField = camelToSnake(errorField);
 
     for (let [camelName, value] of Object.entries(formData)) {
-        let name = camelToSnake(camelName);
+        const name = camelToSnake(camelName);
         const elements = form.querySelectorAll(`[name="${name}"]`);
 
         elements.forEach(element => {
