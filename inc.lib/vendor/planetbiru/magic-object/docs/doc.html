@@ -39692,7 +39692,30 @@ with custom templates provided as an argument.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">4. <span class="method-label">convertToDateTime</span></div>
+<div class="method-identity">4. <span class="method-label">isCaseSensitive</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isCaseSensitive</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$params</span><br>
+) : <span class="return-type">bool</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Determines whether case sensitivity is enabled based on the 'caseSensitive' value in the provided parameters array.</p>
+<p>Logic:</p>
+<ul>
+<li>Returns true if the value is: 'true', '1', 1, or true</li>
+<li>Returns false if the value is: 'false', '0', 0, or false</li>
+<li>Returns true for any other value, or if the key is not set</li>
+</ul>
+<h3>Parameters</h3>
+<div class="parameter-name">$params</div>
+<div class="parameter-description"><p>An associative array of parameters to check.</p></div>
+<h3>Return</h3>
+<div class="return-type">bool</div>
+<div class="return-description"><p>False if case sensitivity is explicitly disabled, true otherwise.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">5. <span class="method-label">convertToDateTime</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">convertToDateTime</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">mixed</span> <span class="parameter-name">$value</span><br>
@@ -39718,7 +39741,7 @@ with custom templates provided as an argument.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">5. <span class="method-label">validate</span></div>
+<div class="method-identity">6. <span class="method-label">validate</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validate</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">object</span> <span class="parameter-name">$object</span>, <br>
@@ -39740,7 +39763,7 @@ accessed via Reflection, so protected/private properties are handled.</p></div>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">6. <span class="method-label">createMessage</span></div>
+<div class="method-identity">7. <span class="method-label">createMessage</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createMessage</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$validationType</span>, <br>
@@ -39762,7 +39785,7 @@ with the corresponding values from the provided associative array.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">7. <span class="method-label">getAnnotationParam</span></div>
+<div class="method-identity">8. <span class="method-label">getAnnotationParam</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getAnnotationParam</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$params</span>, <br>
@@ -39788,7 +39811,7 @@ with the corresponding values from the provided associative array.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">8. <span class="method-label">parseAnnotationParams</span></div>
+<div class="method-identity">9. <span class="method-label">parseAnnotationParams</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">parseAnnotationParams</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$annotationParams</span><br>
@@ -39805,7 +39828,7 @@ with the corresponding values from the provided associative array.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">9. <span class="method-label">validateValidAnnotation</span></div>
+<div class="method-identity">10. <span class="method-label">validateValidAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateValidAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -39832,7 +39855,7 @@ This annotation triggers recursive validation for MagicObject instances.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">10. <span class="method-label">validateRequiredAnnotation</span></div>
+<div class="method-identity">11. <span class="method-label">validateRequiredAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateRequiredAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -39856,7 +39879,7 @@ Ensures the property value is not strictly null.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">11. <span class="method-label">validateNotEmptyAnnotation</span></div>
+<div class="method-identity">12. <span class="method-label">validateNotEmptyAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateNotEmptyAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -39880,7 +39903,7 @@ Ensures a string is not empty or an array is not empty.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">12. <span class="method-label">validateNotBlankAnnotation</span></div>
+<div class="method-identity">13. <span class="method-label">validateNotBlankAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateNotBlankAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -39904,7 +39927,7 @@ Ensures a string is not empty and not just whitespace.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">13. <span class="method-label">validateSizeAnnotation</span></div>
+<div class="method-identity">14. <span class="method-label">validateSizeAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateSizeAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -39928,7 +39951,7 @@ Ensures the size of a string (length) or an array (count) is within a specified 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">14. <span class="method-label">validateMinAnnotation</span></div>
+<div class="method-identity">15. <span class="method-label">validateMinAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateMinAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -39952,7 +39975,7 @@ Ensures a numeric value is greater than or equal to a specified minimum.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">15. <span class="method-label">validateMaxAnnotation</span></div>
+<div class="method-identity">16. <span class="method-label">validateMaxAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateMaxAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -39976,7 +39999,7 @@ Ensures a numeric value is less than or equal to a specified maximum.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">16. <span class="method-label">validatePatternAnnotation</span></div>
+<div class="method-identity">17. <span class="method-label">validatePatternAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validatePatternAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40000,7 +40023,7 @@ Ensures a string matches a specified regular expression.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">17. <span class="method-label">validateEmailAnnotation</span></div>
+<div class="method-identity">18. <span class="method-label">validateEmailAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateEmailAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40024,7 +40047,7 @@ Ensures a string is a well-formed email address.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">18. <span class="method-label">validatePastAnnotation</span></div>
+<div class="method-identity">19. <span class="method-label">validatePastAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validatePastAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40048,7 +40071,7 @@ Ensures a date is in the past. Supports DateTimeInterface, int (timestamp), and 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">19. <span class="method-label">validateFutureAnnotation</span></div>
+<div class="method-identity">20. <span class="method-label">validateFutureAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateFutureAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40072,7 +40095,7 @@ Ensures a date is in the future. Supports DateTimeInterface, int (timestamp), an
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">20. <span class="method-label">validateDecimalMinAnnotation</span></div>
+<div class="method-identity">21. <span class="method-label">validateDecimalMinAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateDecimalMinAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40096,7 +40119,7 @@ Ensures a numeric value is greater than or equal to a specified decimal minimum.
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">21. <span class="method-label">validateDecimalMaxAnnotation</span></div>
+<div class="method-identity">22. <span class="method-label">validateDecimalMaxAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateDecimalMaxAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40120,7 +40143,7 @@ Ensures a numeric value is less than or equal to a specified decimal maximum.</p
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">22. <span class="method-label">validateDigitsAnnotation</span></div>
+<div class="method-identity">23. <span class="method-label">validateDigitsAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateDigitsAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40144,7 +40167,7 @@ Ensures a numeric value has at most a specified number of integer and fractional
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">23. <span class="method-label">validateAssertTrueAnnotation</span></div>
+<div class="method-identity">24. <span class="method-label">validateAssertTrueAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateAssertTrueAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40168,7 +40191,7 @@ Ensures a boolean property value is strictly true.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">24. <span class="method-label">validateFutureOrPresentAnnotation</span></div>
+<div class="method-identity">25. <span class="method-label">validateFutureOrPresentAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateFutureOrPresentAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40192,7 +40215,7 @@ Ensures a date is in the future or the present. Supports DateTimeInterface, int 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">25. <span class="method-label">validateLengthAnnotation</span></div>
+<div class="method-identity">26. <span class="method-label">validateLengthAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateLengthAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40216,7 +40239,7 @@ Ensures the length of a string is within a specified range. This is specific to 
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">26. <span class="method-label">validateRangeAnnotation</span></div>
+<div class="method-identity">27. <span class="method-label">validateRangeAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateRangeAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40240,7 +40263,7 @@ Ensures a numeric value is within a specified inclusive range.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">27. <span class="method-label">parseAnnotationParameters</span></div>
+<div class="method-identity">28. <span class="method-label">parseAnnotationParameters</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">parseAnnotationParameters</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$annotation</span>, <br>
@@ -40260,7 +40283,7 @@ Ensures a numeric value is within a specified inclusive range.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">28. <span class="method-label">validateNoHtmlAnnotation</span></div>
+<div class="method-identity">29. <span class="method-label">validateNoHtmlAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateNoHtmlAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40284,7 +40307,7 @@ Ensures a string does not contain any HTML tags.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">29. <span class="method-label">validateEnumAnnotation</span></div>
+<div class="method-identity">30. <span class="method-label">validateEnumAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateEnumAnnotation</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -40309,7 +40332,7 @@ Supports string and numeric values, with optional case-sensitive or case-insensi
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">30. <span class="method-label">validatePositiveAnnotation</span></div>
+<div class="method-identity">31. <span class="method-label">validatePositiveAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validatePositiveAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40319,7 +40342,7 @@ Ensures a numeric value is positive (&gt; 0).</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">31. <span class="method-label">validatePositiveOrZeroAnnotation</span></div>
+<div class="method-identity">32. <span class="method-label">validatePositiveOrZeroAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validatePositiveOrZeroAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40329,7 +40352,7 @@ Ensures a numeric value is positive or zero (&gt;= 0).</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">32. <span class="method-label">validateNegativeAnnotation</span></div>
+<div class="method-identity">33. <span class="method-label">validateNegativeAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateNegativeAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40339,7 +40362,7 @@ Ensures a numeric value is negative (&lt; 0).</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">33. <span class="method-label">validateNegativeOrZeroAnnotation</span></div>
+<div class="method-identity">34. <span class="method-label">validateNegativeOrZeroAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateNegativeOrZeroAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40349,7 +40372,7 @@ Ensures a numeric value is negative or zero (&lt;= 0).</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">34. <span class="method-label">validatePastOrPresentAnnotation</span></div>
+<div class="method-identity">35. <span class="method-label">validatePastOrPresentAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validatePastOrPresentAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40359,7 +40382,7 @@ Ensures a date/time is in the past or present.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">35. <span class="method-label">validateUrlAnnotation</span></div>
+<div class="method-identity">36. <span class="method-label">validateUrlAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateUrlAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40369,7 +40392,7 @@ Ensures a string is a valid URL.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">36. <span class="method-label">validateIpAnnotation</span></div>
+<div class="method-identity">37. <span class="method-label">validateIpAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateIpAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40379,7 +40402,7 @@ Ensures a string is a valid IP address.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">37. <span class="method-label">validateDateFormatAnnotation</span></div>
+<div class="method-identity">38. <span class="method-label">validateDateFormatAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateDateFormatAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40389,7 +40412,7 @@ Ensures a string matches a specific date format.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">38. <span class="method-label">validatePhoneAnnotation</span></div>
+<div class="method-identity">39. <span class="method-label">validatePhoneAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validatePhoneAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40399,7 +40422,7 @@ Ensures a string is a valid phone number (basic pattern).</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">39. <span class="method-label">isBlank</span></div>
+<div class="method-identity">40. <span class="method-label">isBlank</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isBlank</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$value</span><br>
@@ -40417,7 +40440,7 @@ Blank is defined as null, an empty string, or a string containing only whitespac
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">40. <span class="method-label">validateAlphaAnnotation</span></div>
+<div class="method-identity">41. <span class="method-label">validateAlphaAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateAlphaAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40427,7 +40450,7 @@ Ensures a string contains only alphabetic characters.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">41. <span class="method-label">validateAlphaNumericAnnotation</span></div>
+<div class="method-identity">42. <span class="method-label">validateAlphaNumericAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateAlphaNumericAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40437,7 +40460,7 @@ Ensures a string contains only alphanumeric characters.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">42. <span class="method-label">validateStartsWithAnnotation</span></div>
+<div class="method-identity">43. <span class="method-label">validateStartsWithAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateStartsWithAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40448,7 +40471,7 @@ Supports caseSensitive=true|false.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">43. <span class="method-label">validateEndsWithAnnotation</span></div>
+<div class="method-identity">44. <span class="method-label">validateEndsWithAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateEndsWithAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40459,7 +40482,7 @@ Supports caseSensitive=true|false.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">44. <span class="method-label">validateContainsAnnotation</span></div>
+<div class="method-identity">45. <span class="method-label">validateContainsAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateContainsAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40470,7 +40493,7 @@ Supports caseSensitive=true|false.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">45. <span class="method-label">validateBeforeDateAnnotation</span></div>
+<div class="method-identity">46. <span class="method-label">validateBeforeDateAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateBeforeDateAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
@@ -40480,7 +40503,7 @@ Ensures a date is before a specified date.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">46. <span class="method-label">validateAfterDateAnnotation</span></div>
+<div class="method-identity">47. <span class="method-label">validateAfterDateAnnotation</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validateAfterDateAnnotation</span>()<br>{<br>}</div>
 <div class='docblock'>
