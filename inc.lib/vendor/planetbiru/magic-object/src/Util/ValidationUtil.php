@@ -1,4 +1,5 @@
 <?php
+
 namespace MagicObject\Util;
 
 use DateTime;
@@ -112,6 +113,38 @@ class ValidationUtil // NOSONAR
             $this->validationMessageTemplate = array_merge($this->validationMessageTemplate, $camelizedCustomTemplates);
         }
         return $this; // Allow method chaining
+    }
+
+    /**
+     * Determines whether case sensitivity is enabled based on the 'caseSensitive' value in the provided parameters array.
+     *
+     * Logic:
+     * - Returns true if the value is: 'true', '1', 1, or true
+     * - Returns false if the value is: 'false', '0', 0, or false
+     * - Returns true for any other value, or if the key is not set
+     *
+     * @param array $params An associative array of parameters to check.
+     * @return bool False if case sensitivity is explicitly disabled, true otherwise.
+     */
+    private function isCaseSensitive($params)
+    {
+        // Return true if 'caseSensitive' is not defined
+        if (!isset($params['caseSensitive'])) {
+            return true;
+        }
+
+        $value = $params['caseSensitive'];
+
+        // Normalize string values to lowercase for comparison
+        $normalized = is_string($value) ? strtolower($value) : $value;
+
+        // Return false for specific representations of false
+        if ($normalized === 'false' || $normalized === '0' || $normalized === 0 || $normalized === false) {
+            return false;
+        }
+
+        // All other values are considered true
+        return true;
     }
     
     /**
@@ -954,7 +987,7 @@ class ValidationUtil // NOSONAR
                 $message =  $this->createMessage('enum', array('property' => $propertyName, 'allowedValues' => $allowedValue));
             }
             $allowedValues = $allowedValuesArr;
-            $caseSensitive = isset($params['caseSensitive']) ? $params['caseSensitive'] : true;
+            $caseSensitive = $this->isCaseSensitive($params);
 
             $isValid = false;
             if (is_string($propertyValue)) {
@@ -1185,7 +1218,7 @@ class ValidationUtil // NOSONAR
         if (preg_match('/@StartsWith\(([^)]*)\)/', $docComment, $matches)) {
             $params = $this->parseAnnotationParams($matches[1]);
             $prefix = isset($params['prefix']) ? $params['prefix'] : '';
-            $caseSensitive = isset($params['caseSensitive']) ? $params['caseSensitive'] : true;
+            $caseSensitive = $this->isCaseSensitive($params);
             $message = isset($params['message']) ? $params['message'] : null;
             if ($this->isBlank($message)) {
                 $message = $this->createMessage('startsWith', array('property' => $propertyName, 'prefix' => $prefix));
@@ -1214,7 +1247,7 @@ class ValidationUtil // NOSONAR
         if (preg_match('/@EndsWith\(([^)]*)\)/', $docComment, $matches)) {
             $params = $this->parseAnnotationParams($matches[1]);
             $suffix = isset($params['suffix']) ? $params['suffix'] : '';
-            $caseSensitive = isset($params['caseSensitive']) ? $params['caseSensitive'] : true;
+            $caseSensitive = $this->isCaseSensitive($params);
             $message = isset($params['message']) ? $params['message'] : null;
             if ($this->isBlank($message)) {
                 $message = $this->createMessage('endsWith', array('property' => $propertyName, 'suffix' => $suffix));
@@ -1244,7 +1277,7 @@ class ValidationUtil // NOSONAR
         if (preg_match('/@Contains\(([^)]*)\)/', $docComment, $matches)) {
             $params = $this->parseAnnotationParams($matches[1]);
             $substring = isset($params['substring']) ? $params['substring'] : '';
-            $caseSensitive = isset($params['caseSensitive']) ? $params['caseSensitive'] : true;
+            $caseSensitive = $this->isCaseSensitive($params);
             $message = isset($params['message']) ? $params['message'] : null;
             if ($this->isBlank($message)) {
                 $message = $this->createMessage('contains', array('property' => $propertyName, 'substring' => $substring));
