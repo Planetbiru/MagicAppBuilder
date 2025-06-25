@@ -4,6 +4,7 @@ use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
+use MagicObject\SetterGetter;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\ValidationUtil;
 
@@ -20,12 +21,15 @@ if($inputGet->getUserAction() == 'get')
         $filter = $inputGet->getFilter();
         $allQueries = array();
 
-        $langs = new MagicObject();
+        $langs = new SetterGetter();
         if(file_exists($path))
         {
-            $langs->loadIniFile($path);
+            $langs->loadData(PicoIniUtil::parseIniFile($path));
         }
-        
+        else
+        {
+            $langs->loadData(array());
+        }
         $validatorUtil = new ValidationUtil();
         $reflection = new ReflectionClass($validatorUtil);
         $property = $reflection->getProperty('validationMessageTemplate');

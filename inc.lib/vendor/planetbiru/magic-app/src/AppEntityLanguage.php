@@ -5,6 +5,7 @@ namespace MagicApp;
 use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
+use MagicObject\Util\PicoIniUtil;
 
 /**
  * Class AppEntityLanguage
@@ -107,7 +108,7 @@ class AppEntityLanguage extends PicoEntityLanguage
             
             // Load the language file if it exists
             if (file_exists($languageFilePath)) {
-                $langs->loadIniFile($languageFilePath);
+                $langs->loadData(PicoIniUtil::parseIniFile($languageFilePath));
             }
             return $langs;
         }
