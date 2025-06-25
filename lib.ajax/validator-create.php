@@ -92,7 +92,7 @@ use MagicObject\MagicObject;
  *
  * @package '.$baseApplicationNamespace.'\\'.$validator.'
  */
-class MenuGroupTranslationUpdateValidator extends MagicObject
+class '.$validator.' extends MagicObject
 {';
 
         // Loop through each column in the table
@@ -106,7 +106,7 @@ class MenuGroupTranslationUpdateValidator extends MagicObject
             // Only generate properties for fields with validation definitions
             if(isset($data[$fieldName]))
             {
-                $properties[] = "\t/* ";
+                $properties[] = "\t/** ";
 
                 $validations = $data[$fieldName];
                 foreach($validations as $validation)

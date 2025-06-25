@@ -69,7 +69,7 @@ if ($inputGet->getValidator() != '')
                     // If you just want to ensure the class can be instantiated:
                     ResponseUtil::sendJSON([
                         'success' => true,
-                        'message' => 'Validator class successfully loaded and instantiated.',
+                        'message' => 'Validation succeeded. All inputs meet the required criteria.',
                         'className' => $fullValidatorClassName
                     ]);
 

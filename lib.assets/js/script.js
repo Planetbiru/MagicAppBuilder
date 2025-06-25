@@ -415,6 +415,7 @@ function restoreFeatureForm() {
 
 let validatorBuilder = null;
 let valBuilder = null;
+
 function createValidator(elem)
 {
   increaseAjaxPending();
@@ -442,6 +443,7 @@ function createValidator(elem)
     }
   });
 }
+
 function addValidatorForm()
 {
   increaseAjaxPending();
@@ -525,31 +527,44 @@ function testValidator(elem) {
     url: 'lib.ajax/validator-test.php?validator=' + encodeURIComponent(currentValidator),
     data: $(frm).serialize(), // Gathers all data from the form
     success: function(data) {
-      // Ensure `data` is a JSON object, not an HTML string.
-      // If the server returns HTML, you might need to change dataType or how it's handled here.
+      const modalBody = $('#genericModal .modal-body');
+
+      // Clear validation states
+      modalBody.find('input').removeClass('is-invalid');
+
       if (data && data.success) // NOSONAR
       {
-        $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-success">' + data.message + '</div>');
+        modalBody.find('.validator-test-message').empty().append(
+          '<div class="alert alert-success">' + data.message + '</div>'
+        );
       } else {
-        let errorMessage = 'An error occurred. ';
+        let errorMessage = 'An error occurred.';
         if (data && data.message) // NOSONAR
         {
           errorMessage = data.message;
         }
-        $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-danger">' + errorMessage + '</div>');
+
+        modalBody.find('.validator-test-message').empty().append(
+          '<div class="alert alert-danger">' + errorMessage + '</div>'
+        );
+
         if (data.propertyName) {
-          $('#genericModal .modal-body input[name="'+data.propertyName+'"]').select();
+          let inputElem = modalBody.find('input[name="' + data.propertyName + '"]');
+          inputElem.addClass('is-invalid').select();
         }
       }
+
       decreaseAjaxPending(); // Assumption: this function exists
     },
     error: function(jqXHR, textStatus, errorThrown) {
-      // Handles HTTP or network errors
-      $('#genericModal .modal-body .validator-test-message').empty().append('<div class="alert alert-danger">AJAX Error: ' + textStatus + ' - ' + errorThrown + '</div>');
+      $('#genericModal .modal-body .validator-test-message').empty().append(
+        '<div class="alert alert-danger">AJAX Error: ' + textStatus + ' - ' + errorThrown + '</div>'
+      );
       decreaseAjaxPending(); // Assumption: this function exists
     }
   });
 }
+
 
 /**
  * Displays a modal containing a form generated for the current validator.
@@ -578,6 +593,52 @@ function showTestValidatorForm()
     }
   });
 }
+
+function deleteValidatorFile()
+{
+  asyncAlert(
+    `Do you want to delete file ${currentValidator}.php?`,  // Message to display in the modal
+    'Confirmation',  
+    [
+      {
+        'caption': 'Yes',  
+        'fn': () => {
+          
+          increaseAjaxPending();
+          $.ajax({
+            type: "POST",
+            url: "lib.ajax/validator-delete.php",
+            dataType: "json",
+            data: { validator: currentValidator},
+            success: function (data) {
+              decreaseAjaxPending();
+              updateValidatorFile();
+              resetFileManager();
+              removeHilightLineError(cmEditorValidator);
+              if(data.success)
+              {
+                setValidatorFile('');
+                $('#button_save_validator_file').attr('disabled', 'disabled');
+                $('#button_save_validator_file_as').attr('disabled', 'disabled');
+                $('#button_test_validator').attr('disabled', 'disabled');
+                $('#button_delete_validator_file').attr('disabled', 'disabled');
+              }
+            }, 
+            error: function(e){
+              decreaseAjaxPending();
+            },
+          });
+        },  
+        'class': 'btn-primary'  
+      },
+      {
+        'caption': 'No',  
+        'fn': () => { },  
+        'class': 'btn-secondary'  
+      }
+    ]
+  );
+};
 
 /**
  * Uploads an application file and handles the server response.
@@ -667,6 +728,10 @@ let initAll = function () {
   });
   $(document).on('click', '#button_test_validator', function(e){
     showTestValidatorForm();
+  });
+
+  $(document).on('click', '#button_delete_validator_file', function(e){
+    deleteValidatorFile();
   });
   
   $(document).on('click', '.button-load-string-format', function(e){
@@ -5574,7 +5639,10 @@ function getValidatorFile(validator, clbk, lineNumber) {
         }
       }, 1);
       $("#button_save_validator_file").removeAttr("disabled");
+      $("#button_save_validator_file_as").removeAttr("disabled");
       $("#button_delete_validator_file").removeAttr("disabled");
+      $("#button_test_validator").removeAttr("disabled");
+
       currentValidator = validator;
       if (clbk) {
         clbk();
