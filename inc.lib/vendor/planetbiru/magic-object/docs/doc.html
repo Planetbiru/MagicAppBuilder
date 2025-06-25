@@ -10338,7 +10338,23 @@ record selection capabilities.</p>
 </div>
 <h2>Methods</h2>
 <div class='method'>
-<div class="method-identity">1. <span class="method-label">set</span></div>
+<div class="method-identity">1. <span class="method-label">with</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">with</span>() : <span class="return-type">self</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Begin a fluent setter chain.</p>
+<p>This method is primarily used to start a method chaining sequence for
+setting properties on the object, enhancing readability and allowing
+multiple setters to be called sequentially. It simply returns the
+current object instance.</p>
+<h3>Return</h3>
+<div class="return-type">self</div>
+<div class="return-description"><p>Returns the current instance of the object, allowing for method chaining.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">2. <span class="method-label">set</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">set</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -10360,7 +10376,7 @@ to an internal map for further processing.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">2. <span class="method-label">addToMap</span></div>
+<div class="method-identity">3. <span class="method-label">addToMap</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">addToMap</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$propertyName</span>, <br>
@@ -10381,7 +10397,7 @@ to an internal map for further processing.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">3. <span class="method-label">__call</span></div>
+<div class="method-identity">4. <span class="method-label">__call</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__call</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$method</span>, <br>
@@ -10410,7 +10426,7 @@ to an internal map for further processing.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">4. <span class="method-label">validate</span></div>
+<div class="method-identity">5. <span class="method-label">validate</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">validate</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span>|<span class="parameter-type">null</span> <span class="parameter-name">$parentPropertyName <span class="parameter-equal-sign">=</span> <span class="parameter-default">null</span></span>, <br>
@@ -10440,7 +10456,7 @@ validation will use the property annotations from the reference class
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">5. <span class="method-label">currentDatabase</span></div>
+<div class="method-identity">6. <span class="method-label">currentDatabase</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">currentDatabase</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">MagicObject</span> <span class="parameter-name">$entity</span><br>
@@ -10461,7 +10477,7 @@ primary database connection.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">8. <span class="method-label">__toString</span></div>
+<div class="method-identity">9. <span class="method-label">__toString</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">__toString</span>() : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
@@ -20739,7 +20755,7 @@ via APIs or for serialization into files or databases.</p>
 <div class='method'>
 <div class="method-identity">2. <span class="method-label">createProperty</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createProperty</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createProperty</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$typeMap</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnName</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnType</span>, <br>
@@ -20770,7 +20786,7 @@ on database column information.</p>
 <div class='method'>
 <div class="method-identity">3. <span class="method-label">getPropertyName</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getPropertyName</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getPropertyName</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$name</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">bool</span> <span class="parameter-name">$prettifyLabel <span class="parameter-equal-sign">=</span> <span class="parameter-default">true</span></span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
@@ -20793,7 +20809,7 @@ of the column name (split by underscores) is capitalized. Special cases such as
 <div class='method'>
 <div class="method-identity">4. <span class="method-label">getDataType</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getDataType</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getDataType</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$typeMap</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnType</span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
@@ -20813,7 +20829,7 @@ of the column name (split by underscores) is capitalized. Special cases such as
 <div class='method'>
 <div class="method-identity">5. <span class="method-label">createValueOf</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createValueOf</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createValueOf</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$picoTableName</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$rows</span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
@@ -20833,7 +20849,7 @@ of the column name (split by underscores) is capitalized. Special cases such as
 <div class='method'>
 <div class="method-identity">6. <span class="method-label">getTypeMap</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getTypeMap</span>() : <span class="return-type">array</span><br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getTypeMap</span>() : <span class="return-type">array</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
 <p>Get a mapping of database types to PHP types.</p>
@@ -20965,7 +20981,7 @@ Users must provide appropriate parameters so that the entity class can be direct
 <div class='method'>
 <div class="method-identity">2. <span class="method-label">createProperty</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createProperty</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">createProperty</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$typeMap</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$columnMap</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$row</span>, <br>
@@ -20998,7 +21014,7 @@ provided database-to-PHP type mappings.</p>
 <div class='method'>
 <div class="method-identity">3. <span class="method-label">getPropertyName</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getPropertyName</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getPropertyName</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$name</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">bool</span> <span class="parameter-name">$prettifyLabel <span class="parameter-equal-sign">=</span> <span class="parameter-default">true</span></span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
@@ -21021,7 +21037,7 @@ of the column name (split by underscores) is capitalized. Special cases such as
 <div class='method'>
 <div class="method-identity">4. <span class="method-label">getColumnType</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getColumnType</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getColumnType</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$typeMap</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnType</span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
@@ -21041,7 +21057,7 @@ of the column name (split by underscores) is capitalized. Special cases such as
 <div class='method'>
 <div class="method-identity">5. <span class="method-label">getDataType</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getDataType</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getDataType</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">array</span> <span class="parameter-name">$typeMap</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$columnType</span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
@@ -21061,7 +21077,7 @@ of the column name (split by underscores) is capitalized. Special cases such as
 <div class='method'>
 <div class="method-identity">6. <span class="method-label">getDataLength</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getDataLength</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getDataLength</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$dataType</span><br>
 ) : <span class="return-type">int</span><br>{<br>}</div>
 <div class='docblock'>
@@ -21089,7 +21105,7 @@ of the column name (split by underscores) is capitalized. Special cases such as
 <div class='method'>
 <div class="method-identity">7. <span class="method-label">getTypeMap</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getTypeMap</span>() : <span class="return-type">array</span><br>{<br>}</div>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">getTypeMap</span>() : <span class="return-type">array</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
 <p>Get a mapping of database types to PHP types for MySQL, PostgreSQL, and SQLite.</p>
@@ -28848,11 +28864,12 @@ interoperability between different database engines, without requiring entity de
 </li>
 </ul>
 </div>
-<h2>Properties</h2>
+<h2>Constants</h2>
+<div class="php-constant"><span class="php-keyword">const</span> <span class="constant-name">INVALID_CREATE_TABLE_STATEMENT_MYSQL</span> = <span class="constant-value">"Invalid MySQL CREATE TABLE statement format."</span>;</div><h2>Properties</h2>
 <div class="property">
 <div class="property-identity">1. <span class="property-label">dbToSqlite</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array</span> <span class="property-name">$dbToSqlite</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$dbToSqlite</span>;</div>
 <div class="docblock">
 <h3>Description</h3>
 <p>Array mapping of database field types to SQLite data types.</p>
@@ -28861,7 +28878,7 @@ interoperability between different database engines, without requiring entity de
 <div class="property">
 <div class="property-identity">2. <span class="property-label">dbToMySQL</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array</span> <span class="property-name">$dbToMySQL</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$dbToMySQL</span>;</div>
 <div class="docblock">
 <h3>Description</h3>
 <p>Array mapping of database field types to MySQL data types.</p>
@@ -28870,16 +28887,25 @@ interoperability between different database engines, without requiring entity de
 <div class="property">
 <div class="property-identity">3. <span class="property-label">dbToPostgreSQL</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array</span> <span class="property-name">$dbToPostgreSQL</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$dbToPostgreSQL</span>;</div>
 <div class="docblock">
 <h3>Description</h3>
 <p>Array mapping of database field types to PostgreSQL data types.</p>
 </div>
 </div>
 <div class="property">
-<div class="property-identity">4. <span class="property-label">sqlToPhpType</span></div>
+<div class="property-identity">4. <span class="property-label">dbToSQLServer</span></div>
 <h3>Declaration</h3>
-<div class="property-declaratiopn"><span class="access-level">private</span> <span class="property-type">array</span> <span class="property-name">$sqlToPhpType</span>;</div>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$dbToSQLServer</span>;</div>
+<div class="docblock">
+<h3>Description</h3>
+<p>Array mapping of database field types to SQLServer data types.</p>
+</div>
+</div>
+<div class="property">
+<div class="property-identity">5. <span class="property-label">sqlToPhpType</span></div>
+<h3>Declaration</h3>
+<div class="property-declaratiopn"><span class="access-level">protected</span> <span class="property-type">array</span> <span class="property-name">$sqlToPhpType</span>;</div>
 <div class="docblock">
 <h3>Description</h3>
 <p>Array mapping of SQL data types to PHP types.</p>
@@ -29022,7 +29048,7 @@ database field values into native PHP types before usage in application logic.</
 <div class="parameter-name">$sqlType</div>
 <div class="parameter-description"><p>The SQL type name (e.g., 'int', 'boolean', 'json', etc.).</p></div>
 <div class="parameter-name">$dialect</div>
-<div class="parameter-description"><p>The database dialect (e.g., 'mysql', 'postgresql', 'sqlite').</p></div>
+<div class="parameter-description"><p>The database dialect (e.g., 'mysql', 'postgresql', 'sqlite', 'sqlserver').</p></div>
 <h3>Return</h3>
 <div class="return-type">mixed</div>
 <div class="return-description"><p>The value converted to the appropriate PHP type or quoted string.</p></div>
@@ -29072,7 +29098,7 @@ by first mapping the SQL type to a native PHP type.</p>
 <div class='method'>
 <div class="method-identity">9. <span class="method-label">escapeSqlString</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">protected</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">escapeSqlString</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">escapeSqlString</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$value</span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
@@ -29089,7 +29115,7 @@ by first mapping the SQL type to a native PHP type.</p>
 <div class='method'>
 <div class="method-identity">10. <span class="method-label">translateFieldType</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">translateFieldType</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">translateFieldType</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$type</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sourceDialect</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$targetDialect</span><br>
@@ -29117,7 +29143,7 @@ handle modifiers like AUTO_INCREMENT, SERIAL, BOOLEAN defaults, etc.</p>
 <div class='method'>
 <div class="method-identity">11. <span class="method-label">quoteIdentifier</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">quoteIdentifier</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">quoteIdentifier</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$identifier</span>, <br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$dialect</span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
@@ -29136,7 +29162,27 @@ handle modifiers like AUTO_INCREMENT, SERIAL, BOOLEAN defaults, etc.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">12. <span class="method-label">mysqlToPostgreSQL</span></div>
+<div class="method-identity">12. <span class="method-label">sanitizeQuotedSqlKeywords</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">sanitizeQuotedSqlKeywords</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$finalSql</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Sanitizes improperly quoted SQL keywords in a PostgreSQL-generated SQL string.</p>
+<p>This function replaces SQL keywords that have been incorrectly quoted with double quotes
+(e.g., &quot;PRIMARY&quot; KEY, &quot;NOT&quot; NULL) with their standard unquoted forms, improving compatibility
+and readability across different database systems.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$finalSql</div>
+<div class="parameter-description"><p>The SQL string containing quoted keywords.</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The sanitized SQL string with corrected keyword formatting.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">13. <span class="method-label">mysqlToPostgreSQL</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">mysqlToPostgreSQL</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
@@ -29156,7 +29202,48 @@ handle modifiers like AUTO_INCREMENT, SERIAL, BOOLEAN defaults, etc.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">13. <span class="method-label">mysqlToSQLite</span></div>
+<div class="method-identity">14. <span class="method-label">mysqlToSQLServer</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">mysqlToSQLServer</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Translates a CREATE TABLE statement from MySQL to SQL Server.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The MySQL CREATE TABLE statement.</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated SQL Server CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If the SQL format is invalid.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">15. <span class="method-label">sqlServerToMySQL</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">sqlServerToMySQL</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Translates a SQL Server CREATE TABLE statement to MySQL.
+Converts data types and constraints to MySQL equivalents.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The SQL Server CREATE TABLE statement.</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated MySQL CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If the SQL format is invalid.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">16. <span class="method-label">mysqlToSQLite</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">mysqlToSQLite</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
@@ -29176,7 +29263,7 @@ handle modifiers like AUTO_INCREMENT, SERIAL, BOOLEAN defaults, etc.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">14. <span class="method-label">postgresqlToMySQL</span></div>
+<div class="method-identity">17. <span class="method-label">postgresqlToMySQL</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">postgresqlToMySQL</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
@@ -29198,7 +29285,7 @@ and preserving other attributes like NULL/NOT NULL/DEFAULT.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">15. <span class="method-label">sqliteToMySQL</span></div>
+<div class="method-identity">18. <span class="method-label">sqliteToMySQL</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">sqliteToMySQL</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
@@ -29218,7 +29305,7 @@ and preserving other attributes like NULL/NOT NULL/DEFAULT.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">16. <span class="method-label">postgresqlToSQLite</span></div>
+<div class="method-identity">19. <span class="method-label">postgresqlToSQLite</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">postgresqlToSQLite</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
@@ -29238,7 +29325,7 @@ and preserving other attributes like NULL/NOT NULL/DEFAULT.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">17. <span class="method-label">sqliteToPostgreSQL</span></div>
+<div class="method-identity">20. <span class="method-label">sqliteToPostgreSQL</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">sqliteToPostgreSQL</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
@@ -29258,9 +29345,9 @@ and preserving other attributes like NULL/NOT NULL/DEFAULT.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">18. <span class="method-label">splitSqlByCommaRespectingParentheses</span></div>
+<div class="method-identity">21. <span class="method-label">splitSqlByCommaRespectingParentheses</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">private</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">splitSqlByCommaRespectingParentheses</span>(<br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">splitSqlByCommaRespectingParentheses</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
 ) : <span class="return-type">array</span><br>{<br>}</div>
 <div class='docblock'>
@@ -29276,33 +29363,30 @@ while respecting commas that are inside parentheses (e.g., data types or express
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">19. <span class="method-label">translateCreateTable</span></div>
+<div class="method-identity">22. <span class="method-label">trimColumnType</span></div>
 <h3>Declaration</h3>
-<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">translateCreateTable</span>(<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sourceDialect</span>, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$targetDialect</span><br>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">trimColumnType</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
 ) : <span class="return-type">string</span><br>{<br>}</div>
 <div class='docblock'>
 <h3>Description</h3>
-<p>Translates a CREATE TABLE statement from a source dialect to a target dialect.</p>
+<p>Normalizes spacing around parentheses in SQL column type declarations.</p>
+<p>This function removes unnecessary spaces between SQL data types and the opening parenthesis
+(e.g., converts &quot;VARCHAR (255)&quot; to &quot;VARCHAR(255)&quot;). It handles various SQL types such as
+character, integer, decimal, and boolean types, making the format consistent.</p>
+<p>Additionally, it performs a special case replacement for &quot;BOOLEAN(11)&quot; to &quot;INTEGER(11)&quot;,
+which is commonly needed when converting from MySQL's TINYINT(1) to a more appropriate type
+in other database systems.</p>
 <h3>Parameters</h3>
 <div class="parameter-name">$sql</div>
-<div class="parameter-description"><p>The CREATE TABLE statement.</p></div>
-<div class="parameter-name">$sourceDialect</div>
-<div class="parameter-description"><p>The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').</p></div>
-<div class="parameter-name">$targetDialect</div>
-<div class="parameter-description"><p>The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').</p></div>
+<div class="parameter-description"><p>The SQL string containing column type definitions to normalize.</p></div>
 <h3>Return</h3>
 <div class="return-type">string</div>
-<div class="return-description"><p>The translated CREATE TABLE statement.</p></div>
-<h3>Throws</h3>
-<div class="return-type">DatabaseConversionException</div>
-<div class="return-description"><p>If an unsupported translation is requested or SQL format is invalid.</p></div>
+<div class="return-description"><p>The normalized SQL string with consistent type formatting.</p></div>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">20. <span class="method-label">normalizeDialect</span></div>
+<div class="method-identity">23. <span class="method-label">normalizeDialect</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">normalizeDialect</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$dialect</span><br>
@@ -29331,7 +29415,143 @@ both map to 'postgresql', and 'mariadb' maps to 'mysql'.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">22. <span class="method-label">strContains</span></div>
+<div class="method-identity">25. <span class="method-label">translateCreateTable</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">translateCreateTable</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sourceDialect</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$targetDialect</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Translates a CREATE TABLE statement from a source dialect to a target dialect.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The CREATE TABLE statement.</p></div>
+<div class="parameter-name">$sourceDialect</div>
+<div class="parameter-description"><p>The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').</p></div>
+<div class="parameter-name">$targetDialect</div>
+<div class="parameter-description"><p>The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If an unsupported translation is requested or SQL format is invalid.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">26. <span class="method-label">doTranslateCreateTable</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">doTranslateCreateTable</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sourceDialect</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$targetDialect</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Translates a CREATE TABLE statement from a source dialect to a target dialect.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The CREATE TABLE statement.</p></div>
+<div class="parameter-name">$sourceDialect</div>
+<div class="parameter-description"><p>The source database dialect (e.g., 'mysql', 'postgresql', 'sqlite').</p></div>
+<div class="parameter-name">$targetDialect</div>
+<div class="parameter-description"><p>The target database dialect (e.g., 'mysql', 'postgresql', 'sqlite').</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If an unsupported translation is requested or SQL format is invalid.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">27. <span class="method-label">postgresqlToSQLServer</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">postgresqlToSQLServer</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Converts a PostgreSQL CREATE TABLE statement to SQL Server format.
+This is done via intermediate conversion to MySQL.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The PostgreSQL CREATE TABLE statement.</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated SQL Server CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If conversion fails at any step.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">28. <span class="method-label">sqliteToSQLServer</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">sqliteToSQLServer</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Converts a SQLite CREATE TABLE statement to SQL Server format.
+This is done via intermediate conversion to MySQL.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The SQLite CREATE TABLE statement.</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated SQL Server CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If conversion fails at any step.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">29. <span class="method-label">sqlServerToPostgreSQL</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">sqlServerToPostgreSQL</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Converts a SQL Server CREATE TABLE statement to PostgreSQL format.
+This is done via intermediate conversion to MySQL.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The SQL Server CREATE TABLE statement.</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated PostgreSQL CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If conversion fails at any step.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">30. <span class="method-label">sqlServerToSQLite</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">sqlServerToSQLite</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
+) : <span class="return-type">string</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Converts a SQL Server CREATE TABLE statement to SQLite format.
+This is done via intermediate conversion to MySQL.</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$sql</div>
+<div class="parameter-description"><p>The SQL Server CREATE TABLE statement.</p></div>
+<h3>Return</h3>
+<div class="return-type">string</div>
+<div class="return-description"><p>The translated SQLite CREATE TABLE statement.</p></div>
+<h3>Throws</h3>
+<div class="return-type">DatabaseConversionException</div>
+<div class="return-description"><p>If conversion fails at any step.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">31. <span class="method-label">strContains</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">strContains</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$haystack</span>, <br>
@@ -29351,7 +29571,7 @@ both map to 'postgresql', and 'mariadb' maps to 'mysql'.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">23. <span class="method-label">fixLines</span></div>
+<div class="method-identity">32. <span class="method-label">fixLines</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">fixLines</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$sql</span><br>
@@ -29368,7 +29588,28 @@ both map to 'postgresql', and 'mariadb' maps to 'mysql'.</p>
 </div>
 </div>
 <div class='method'>
-<div class="method-identity">24. <span class="method-label">fixLine</span></div>
+<div class="method-identity">33. <span class="method-label">isAutoIncrementColumn</span></div>
+<h3>Declaration</h3>
+<div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">isAutoIncrementColumn</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$type</span>, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$definition</span><br>
+) : <span class="return-type">bool</span><br>{<br>}</div>
+<div class='docblock'>
+<h3>Description</h3>
+<p>Detects whether a field definition implies an auto-increment behavior,
+regardless of the source DBMS (MySQL, PostgreSQL, SQLite).</p>
+<h3>Parameters</h3>
+<div class="parameter-name">$type</div>
+<div class="parameter-description"><p>The column type (e.g., 'int', 'serial', etc.).</p></div>
+<div class="parameter-name">$definition</div>
+<div class="parameter-description"><p>The rest of the column definition (e.g., 'AUTO_INCREMENT PRIMARY KEY').</p></div>
+<h3>Return</h3>
+<div class="return-type">bool</div>
+<div class="return-description"><p>True if the column is auto-increment.</p></div>
+</div>
+</div>
+<div class='method'>
+<div class="method-identity">34. <span class="method-label">fixLine</span></div>
 <h3>Declaration</h3>
 <div class="method-declaratiopn"><span class="access-level">public</span> <span class="access-level"></span> <span class="php-keyword">function</span> <span class="method-name">fixLine</span>(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="parameter-type">string</span> <span class="parameter-name">$line</span><br>

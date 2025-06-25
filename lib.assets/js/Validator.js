@@ -342,6 +342,17 @@ class ValidationBuilder {
     }
 
     /**
+     * Checks if the given property is 'caseSensitive'.
+     *
+     * @param {string} prop - The property name to verify.
+     * @returns {boolean} Returns true if prop is 'caseSensitive', otherwise false.
+     */
+    isCaseSensitive(prop)
+    {
+        return prop == 'caseSensitive';
+    }
+
+    /**
      * Renders input fields for a validation type's properties.
      * Optionally pre-fills values if editing an existing rule.
      *
@@ -356,9 +367,18 @@ class ValidationBuilder {
             const div = document.createElement("div");
             div.className = "mb-2";
             let en = _this.isEnum(selected, prop);
+            let cs = _this.isCaseSensitive(prop);
             if(en)
             {
                 div.innerHTML = `<label class="form-label">${prop}</label><div class="enum-editor"></div><input type="text" class="form-control" data-prop="${prop}" placeholder="${prop}" value="${validation[prop] || ''}" readonly>`;
+            }
+            else if(cs)
+            {
+                div.innerHTML = `<label class="form-label">${prop}</label><select class="form-control" data-prop="${prop}">
+                <option value="true"${validation[prop] == 'true' || validation[prop] === true ? ' selected' : ''}>true</option>
+                <option value="false"${validation[prop] == 'false' || validation[prop] === false ? ' selected' : ''}>false</option>
+                </select>
+                `;
             }
             else
             {
@@ -425,7 +445,7 @@ class ValidationBuilder {
         if (!type || !this.currentField) return;
 
         const props = {};
-        this.propsContainer.querySelectorAll("input").forEach(input => {
+        this.propsContainer.querySelectorAll("[data-prop]").forEach(input => {
             let prop = input.dataset.prop;
             if(typeof prop != 'undefined' && prop)
             {
@@ -474,7 +494,7 @@ class ValidationBuilder {
         const type = this.modalElement.querySelector('.validation-type').value;
         if (!type || !this.currentField) return;
         const props = {};
-        this.propsContainer.querySelectorAll("input").forEach(input => {
+        this.propsContainer.querySelectorAll("[data-prop]").forEach(input => {
             let prop = input.dataset.prop;
             if(typeof prop != 'undefined' && prop)
             {

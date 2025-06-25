@@ -34,7 +34,7 @@ if($inputPost->getUserAction() == 'get')
             $langs = new MagicObject();
             if(file_exists($pathTrans))
             {
-                $langs->loadIniFile($pathTrans);
+                $langs->loadData(PicoIniUtil::parseIniFile($pathTrans));
             }
             
             if(file_exists($path))
