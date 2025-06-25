@@ -588,20 +588,53 @@ function initPage()
 }
 
 /**
+ * Convert a camelCase string to snake_case.
+ *
+ * Useful for matching JavaScript variable names to backend naming conventions.
+ *
+ * @param {string} str - The camelCase string.
+ * @returns {string} The converted snake_case string.
+ */
+function camelToSnake(str) {
+  return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1_$2').toLowerCase();
+}
+
+/**
  * Restore form fields with provided data and highlight the error field.
  *
- * @param {Object} formData - An object where each key is the field name and the value is the field value.
- * @param {string} errorField - The name of the field that contains an error.
- * @param {string} formSelector - A CSS selector string that identifies the form.
+ * This function delays execution until the DOM is ready, then delegates to `doRestoreFormData`.
+ *
+ * @param {Object} formData - An object where each key is the camelCase field name and the value is the field value.
+ * @param {string} errorField - The camelCase name of the field that contains an error (will be converted to snake_case).
+ * @param {string} formSelector - A CSS selector string used to identify the form element.
  */
 function restoreFormData(formData, errorField, formSelector) {
+    document.addEventListener('DOMContentLoaded', () => {
+      doRestoreFormData(formData, errorField, formSelector);
+    });
+}
+
+/**
+ * Populate form fields with data and visually indicate which field contains an error.
+ *
+ * This function assumes the form uses snake_case for input names and handles various input types
+ * including checkboxes, radios, selects, and standard text inputs.
+ *
+ * @param {Object} formData - Form data where keys are camelCase field names.
+ * @param {string} errorField - The camelCase name of the field to highlight as invalid.
+ * @param {string} formSelector - CSS selector pointing to the target form.
+ */
+function doRestoreFormData(formData, errorField, formSelector) {
     const form = document.querySelector(formSelector);
     if (!form) {
         console.warn("Form not found:", formSelector);
         return;
     }
 
-    for (const [name, value] of Object.entries(formData)) {
+    errorField = camelToSnake(errorField);
+
+    for (let [camelName, value] of Object.entries(formData)) {
+        let name = camelToSnake(camelName);
         const elements = form.querySelectorAll(`[name="${name}"]`);
 
         elements.forEach(element => {
@@ -634,7 +667,6 @@ function restoreFormData(formData, errorField, formSelector) {
         });
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
   initPage();

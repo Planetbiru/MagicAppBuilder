@@ -685,7 +685,7 @@ class AppBuilderBase //NOSONAR
         if($currentModule->hasErrorField())
         {
         ?'.'>
-        <div class="alert alert-error"><'.'?'.'php echo $currentModule->getErrorMessage(); ?'.'></div>
+        <div class="alert alert-danger"><'.'?'.'php echo $currentModule->getErrorMessage(); ?'.'></div>
         <'.'?'.'php
             $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#createform");
         }
@@ -762,7 +762,7 @@ class AppBuilderBase //NOSONAR
         if($currentModule->hasErrorField())
         {
         ?'.'>
-        <div class="alert alert-error"><'.'?'.'php echo $currentModule->getErrorMessage(); ?'.'></div>
+        <div class="alert alert-danger"><'.'?'.'php echo $currentModule->getErrorMessage(); ?'.'></div>
         <'.'?'.'php
             $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#updateform");
         }

@@ -972,6 +972,7 @@ class PicoRequestBase extends stdClass // NOSONAR
         {
             $data[$field] = $this->get($field);
         }
+        return $data;
     }
 
 }
