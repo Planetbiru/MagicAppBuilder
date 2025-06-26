@@ -711,10 +711,29 @@ A new interactive **Validation Class Editor** has been added to simplify the cre
 -   Ensures consistency with backend validator class generation.
     
 
+### Entity Field Reordering via Drag-and-Drop
+
+The Entity Editor now supports **drag-and-drop row sorting** to reorder fields visually, replacing the previous method that used only "move up" and "move down" buttons.
+
+-   Each row now includes a drag handle for intuitive movement.
+    
+-   Users can rearrange fields freely without multiple clicks.
+    
+-   Works seamlessly with both static and dynamically added fields.
+    
+
+#### Benefits:
+
+-   Significantly improves usability when managing large entities.
+    
+-   Allows for rapid restructuring of field order without repetitive actions.
+    
+-   Reduces misclicks and speeds up the editing workflow.
+    
+
 ### UI Fixes
 
 -   **Entity Editor Context Menu:** Fixed an issue where the context menu to select related entities was not showing properly in the entity editor.
     
 -   **Modal Backdrop Cleanup:** Addressed a Bootstrap 4 issue where modal backdrops were not removed when clicking outside the modal. A general fix was applied to ensure all `.modal-backdrop` elements are cleaned up once all modals are closed, restoring `body` styles as expected.
     
-
