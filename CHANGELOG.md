@@ -688,7 +688,10 @@ MagicAppBuilder 1.5.2 adds integration with the `tableName` parameter introduced
 -   Strengthens the link between the generated validator and its underlying database table for clearer structure and better documentation.
     
 
-### Fixes
+### UI Fixes
 
 -   **Entity Editor Context Menu:** Fixed an issue where the context menu to select related entities was not showing properly in the entity editor.
+    
+-   **Modal Backdrop Cleanup:** Addressed a Bootstrap 4 issue where modal backdrops were not removed when clicking outside the modal. A general fix was applied to ensure all `.modal-backdrop` elements are cleaned up once all modals are closed, restoring `body` styles as expected.
+    
 
