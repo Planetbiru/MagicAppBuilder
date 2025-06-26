@@ -75,6 +75,7 @@ class ScriptGeneratorMonolith extends ScriptGenerator
         $appFeatures = new AppFeatures($request->getFeatures());
 
         $entityMainName = $entityMain->getEntityName();
+        $mainTableName = $entityMain->getTableName();
         $approvalRequired = $appFeatures->isApprovalRequired();
         $trashRequired = $appFeatures->isTrashRequired();
         $validatorRequired = $appFeatures->isValidationRequired();
@@ -201,9 +202,9 @@ class ScriptGeneratorMonolith extends ScriptGenerator
             {
                 mkdir(dirname($insertPath), 0755, true);
             }
-            $insertValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getInsertValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyInsert');
+            $insertValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getInsertValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyInsert', $mainTableName);
             file_put_contents($insertPath, $insertValidator);
-            $updateValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getUpdateValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyUpdate');
+            $updateValidator = $entityGenerator->generateValidatorClass($namespace, $validator->getUpdateValidatorClass(), $request->getModuleCode(), $validator->getValidationDefinition(), 'applyUpdate', $mainTableName);
             file_put_contents($updatePath, $updateValidator);
 
             $validationInfo->namespace = $namespace;

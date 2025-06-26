@@ -667,8 +667,28 @@ A new `application_id` column has been added to the Error Cache entity. This enh
     This resolves inconsistent behaviors in pre-filling user input after failed submissions and improves error field highlighting reliability.
 
 
-# MagicObject Version 1.5.1
 
-## Fixes
+# MagicAppBuilder Version 1.5.2
 
--   **Entity Editor Context Menu:** Bug fix show context menu to select related entity. 
+## What's Changed
+
+### Validator Generator Enhancement: `tableName` Support
+
+MagicAppBuilder 1.5.2 adds integration with the `tableName` parameter introduced in **MagicObject 3.14.2** when generating validator classes.
+
+-   When generating a validator class, the corresponding table name (if defined in the entity metadata) is now included via `@Table(name="...")` in the class-level PHPDoc.
+    
+-   The `@Validator` annotation is also automatically added to mark the class as a validator.
+    
+
+#### Benefits:
+
+-   Enhances interoperability with annotation-aware tools such as ORMs, scaffolding engines, or validation frameworks.
+    
+-   Strengthens the link between the generated validator and its underlying database table for clearer structure and better documentation.
+    
+
+### Fixes
+
+-   **Entity Editor Context Menu:** Fixed an issue where the context menu to select related entities was not showing properly in the entity editor.
+

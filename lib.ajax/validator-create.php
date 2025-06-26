@@ -90,6 +90,8 @@ use MagicObject\MagicObject;
  *
  * You may add additional validation rules or modify the generated annotations as needed.
  *
+ * @Validator
+ * @Table(name="'.$tableName.'")
  * @package '.$baseApplicationNamespace.'\\'.$validator.'
  */
 class '.$validator.' extends MagicObject
