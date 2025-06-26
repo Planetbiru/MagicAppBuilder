@@ -77,6 +77,17 @@ class AppModuleImpl extends MagicObject
 	protected $moduleGroup;
 
 	/**
+	 * Parent Module ID
+	 * 
+	 * @NotNull
+	 * @Column(name="parent_module_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
+	 * @Label(content="Parent Module")
+	 * @MaxLength(value=40)
+	 * @var string
+	 */
+	protected $parentModuleId;
+
+	/**
 	 * URL
 	 * 
 	 * @NotNull
