@@ -295,4 +295,12 @@ class AppAdminRoleImpl extends MagicObject
      * @var bool
      */
     protected $active;
+
+    /**
+     * All
+     *
+     * @Label(content="All")
+     * @var bool
+     */
+    protected $all;
 }
