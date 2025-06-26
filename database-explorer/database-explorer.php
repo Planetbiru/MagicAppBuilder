@@ -194,6 +194,7 @@ if(!isset($databaseName))
                                     <table id="table-entity-editor">
                                         <thead>
                                             <tr>
+                                                <th class="header-drag-handle"></th>
                                                 <th class="column-action"></th>
                                                 <th>Column Name</th>
                                                 <th>Type</th>
@@ -219,6 +220,7 @@ if(!isset($databaseName))
                                     <table id="table-template-editor" class="table-template-editor">
                                         <thead>
                                             <tr>
+                                                <th class="header-drag-handle"></th>
                                                 <th class="column-action"></th>
                                                 <th>Column Name</th>
                                                 <th>Type</th>

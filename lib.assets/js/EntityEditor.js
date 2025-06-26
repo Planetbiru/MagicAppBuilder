@@ -618,6 +618,8 @@ class EntityEditor {
         }
         this.template = {columns: []};
         this.clearBeforeImport = true;
+        this.dragSrcRow = null;
+        this.tbody = null;
     }
 
     /**
@@ -887,6 +889,7 @@ class EntityEditor {
         }
         
         row.innerHTML = `
+            <td class="drag-handle"></td>
             <td class="column-action">
                 <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
                 <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
@@ -905,13 +908,88 @@ class EntityEditor {
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
             <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${column.autoIncrement ? '' : 'disabled'}></td>
         `;
-
         tableBody.appendChild(row);
+        this.initDraggableRow(row);
         if(focus)
         {
             row.querySelector('.column-name').select();
         }
     }
+
+    /**
+     * Initializes drag-and-drop functionality for a given table row.
+     *
+     * This function enables a `<tr>` element to be draggable and defines how it behaves
+     * during the drag-and-drop lifecycle, including visual feedback and reordering logic.
+     *
+     * The function ensures:
+     * - The row is marked draggable.
+     * - Appropriate classes are added/removed during drag events.
+     * - Drop location is determined and the row is repositioned accordingly.
+     * - Row numbering is updated after reorder.
+     *
+     * Assumptions:
+     * - A global variable `dragSrcRow` holds the row being dragged.
+     * - A global variable `tbody` refers to the `<tbody>` element containing the rows.
+     * - A function `updateRowNumbers()` is defined to renumber rows after drag-drop.
+     *
+     * @param {HTMLElement} row - The table row element (<tr>) to make draggable.
+     */
+    initDraggableRow(row) {
+        let _this = this;
+        if(typeof _this.tbody == 'undefined' || _this.tbody === null)
+        {
+            _this.tbody = row.closest('tbody');
+        }
+        // Enable native HTML5 drag support
+        row.setAttribute("draggable", "true");
+
+        // When dragging starts
+        row.addEventListener("dragstart", function (e) {
+            _this.dragSrcRow = this; // Store the source row globally
+            this.classList.add("dragging"); // Add visual cue
+            e.dataTransfer.effectAllowed = "move"; // Set allowed operation
+        });
+
+        // When dragging ends
+        row.addEventListener("dragend", function () {
+            this.classList.remove("dragging"); // Remove visual cue
+        });
+
+        // When a dragged item is moved over another row
+        row.addEventListener("dragover", function (e) {
+            e.preventDefault(); // Allow dropping
+            e.dataTransfer.dropEffect = "move";
+            this.classList.add("over"); // Highlight potential drop target
+        });
+
+        // When a dragged item leaves a row without dropping
+        row.addEventListener("dragleave", function () {
+            this.classList.remove("over");
+        });
+
+        // When the dragged row is dropped on another row
+        row.addEventListener("drop", function (e) {
+            e.preventDefault();
+            if (_this.dragSrcRow !== this) {
+                const draggedIndex = Array.from(_this.tbody.children).indexOf(_this.dragSrcRow);
+                const targetIndex = Array.from(_this.tbody.children).indexOf(this);
+
+                // Insert the dragged row before or after the drop target based on position
+                if (draggedIndex < targetIndex) {
+                    _this.tbody.insertBefore(_this.dragSrcRow, this.nextSibling);
+                } else {
+                    _this.tbody.insertBefore(_this.dragSrcRow, this);
+                }
+
+            }
+            this.classList.remove("over");
+        });
+
+        // Prevent multiple initialization
+        row.dataset.hasDragEvent = 'true';
+    }
+
 
     /**
      * Adds a new column to the entity being edited.
@@ -1095,6 +1173,7 @@ class EntityEditor {
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
         row.innerHTML = `
+            <td class="drag-handle"></td>
             <td class="column-action">
                 <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
                 <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
@@ -1112,6 +1191,7 @@ class EntityEditor {
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
         `;
         tableBody.appendChild(row);
+        this.initDraggableRow(row);
         if (focus) {
             row.querySelector('.column-name').select();
         }
