@@ -686,8 +686,7 @@ MagicAppBuilder 1.5.2 adds integration with the `tableName` parameter introduced
 -   Enhances interoperability with annotation-aware tools such as ORMs, scaffolding engines, or validation frameworks.
     
 -   Strengthens the link between the generated validator and its underlying database table for clearer structure and better documentation.
-
-
+    
 
 ### Validation Class Editor GUI
 
@@ -740,7 +739,6 @@ MagicAppBuilder now integrates validator execution directly into **Bootstrap-bas
 -   Validation messages are displayed in the UI and mapped to the corresponding input fields.
     
 -   If a validator class does not exist, the operation continues without interruption.
-
     
 
 #### Benefits:
@@ -753,11 +751,32 @@ MagicAppBuilder now integrates validator execution directly into **Bootstrap-bas
     
 
 
+### User Role Safety Fix
+
+A safeguard has been implemented to **prevent users from deleting their own user level**.
+
+-   When attempting to delete a role or level that is currently in use by the active user, the system now blocks the operation.
+    
+-   This prevents accidental loss of access, which could render the system unusable.
+    
+
+#### Benefits:
+
+-   Protects against administrative lockout.
+    
+-   Ensures system access is always retained by at least one active role.
+    
+-   Encourages safer role and permission management workflows.
+    
+
+
 ### UI Fixes
 
 -   **Entity Editor Context Menu:** Fixed an issue where the context menu to select related entities was not showing properly in the entity editor.
     
 -   **Modal Backdrop Cleanup:** Addressed a Bootstrap 4 issue where modal backdrops were not removed when clicking outside the modal. A general fix was applied to ensure all `.modal-backdrop` elements are cleaned up once all modals are closed, restoring `body` styles as expected.
     
+
+
 
 
