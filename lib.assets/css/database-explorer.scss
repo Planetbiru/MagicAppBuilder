@@ -740,9 +740,11 @@ a.all-table{
     background-clip: padding-box;
     border: 1px solid #ced4da;
     border-radius: .25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
-
+th.header-drag-handle{
+    width: 17px;
+}
 .drag-handle {
     cursor: move;
 }
@@ -752,10 +754,11 @@ a.all-table{
     width: 17px;
     text-align: center !important;
     display: inherit;
+    color: #555555;
 }
 tr.dragging {
     opacity: 0.5;
 }
 tr.over {
-    outline: 2px dashed #333;
+    outline: 2px dashed #747474;
 }
