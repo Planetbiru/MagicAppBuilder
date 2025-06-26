@@ -21,6 +21,7 @@ use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppModuleGroupImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -59,6 +60,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$moduleGroup->setIpEdit($currentAction->getIp());
 	try
 	{
+		$moduleGroup->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$moduleGroup->insert();
 		$newId = $moduleGroup->getModuleGroupId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->module_group_id, $newId);
@@ -73,7 +75,8 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$specification = PicoSpecification::getInstanceOf(Field::of()->moduleGroupId, $inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$moduleGroup = new AppModuleGroupImpl(null, $database);
-	$updater = $moduleGroup->where($specification)
+	$updater = $moduleGroup->where($specification);
+	$updater->with()
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setTarget($inputPost->getTarget(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -87,6 +90,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater->setIpEdit($currentAction->getIp());
 	try
 	{
+		$updater->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$updater->update();
 		$newId = $inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 		

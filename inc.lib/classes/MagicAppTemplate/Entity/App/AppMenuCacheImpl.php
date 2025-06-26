@@ -28,6 +28,7 @@ class AppMenuCacheImpl extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @Column(name="menu_cache_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Menu Cache ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $menuCacheId;
@@ -37,6 +38,7 @@ class AppMenuCacheImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Level ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminLevelId;
@@ -46,6 +48,7 @@ class AppMenuCacheImpl extends MagicObject
 	 * 
 	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Language ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $languageId;

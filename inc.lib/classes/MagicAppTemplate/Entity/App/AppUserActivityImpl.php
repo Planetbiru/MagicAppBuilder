@@ -29,6 +29,7 @@ class AppUserActivityImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="user_activity_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="User Activity ID")
+	 * @MaxLength(value=40)
 	 * @var int
 	 */
 	protected $userActivityId;
@@ -39,6 +40,7 @@ class AppUserActivityImpl extends MagicObject
      * @NotNull
      * @Column(name="admin_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Admin ID")
+	 * @MaxLength(value=40)
      * @var string
      */
     protected $adminId;
@@ -58,6 +60,7 @@ class AppUserActivityImpl extends MagicObject
      * @NotNull
      * @Column(name="user_action", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="User Action")
+	 * @MaxLength(value=40)
      * @var string
      */
     protected $userAction;
@@ -68,6 +71,7 @@ class AppUserActivityImpl extends MagicObject
      * @NotNull
      * @Column(name="username", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Username")
+	 * @MaxLength(value=40)
      * @var string
      */
     protected $username;
@@ -86,6 +90,7 @@ class AppUserActivityImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;

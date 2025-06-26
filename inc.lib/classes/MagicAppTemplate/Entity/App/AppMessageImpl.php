@@ -29,6 +29,7 @@ class AppMessageImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="message_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Message ID")
+	 * @MaxLength(value=40)
 	 * @var int
 	 */
 	protected $messageId;
@@ -38,6 +39,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @Column(name="message_direction", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Message Direction")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $messageDirection;
@@ -47,6 +49,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @Column(name="sender_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Sender ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $senderId;
@@ -65,6 +68,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @Column(name="receiver_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Receiver ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $receiverId;
@@ -83,6 +87,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Message Folder ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $messageFolderId;
@@ -99,8 +104,9 @@ class AppMessageImpl extends MagicObject
 	/**
 	 * Icon
 	 * 
-	 * @Column(name="icon", type="varchar(20)", length=20, nullable=true)
+	 * @Column(name="icon", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Icon")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $icon;
@@ -110,6 +116,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @Column(name="subject", type="varchar(255)", length=255, nullable=true)
 	 * @Label(content="Subject")
+	 * @MaxLength(value=255)
 	 * @var string
 	 */
 	protected $subject;
@@ -155,6 +162,7 @@ class AppMessageImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;

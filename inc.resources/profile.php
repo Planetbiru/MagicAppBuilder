@@ -15,6 +15,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppUserPasswordHistoryImpl;
 use MagicObject\Database\PicoDatabase;
@@ -93,7 +94,8 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $currentUser->getAdminId());
 	$admin = new AppAdminImpl(null, $database);
-	$updater = $admin->where($specification)
+	$updater = $admin->where($specification);
+	$updater->with()
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -106,6 +108,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 	$passwordUsed = false;
 	try
 	{
+		$updater->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$updater->update();
 		$adminId = $currentUser->getAdminId();
 

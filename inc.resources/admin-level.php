@@ -20,6 +20,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -56,6 +57,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$adminLevel->setIpEdit($currentAction->getIp());
 	try
 	{
+		$adminLevel->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$adminLevel->insert();
 		$newId = $adminLevel->getAdminLevelId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_level_id, $newId);
@@ -70,7 +72,8 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminLevelId, $inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$adminLevel = new AppAdminLevelImpl(null, $database);
-	$updater = $adminLevel->where($specification)
+	$updater = $adminLevel->where($specification);
+	$updater->with()
 		->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
@@ -87,6 +90,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	
 	try
 	{
+		$updater->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$updater->update();
 
 		// update primary key value
@@ -168,7 +172,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			{
 				$specification = PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $rowId))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 					;
 				$adminLevel = new AppAdminLevelImpl(null, $database);
 				$adminLevel->where($specification)

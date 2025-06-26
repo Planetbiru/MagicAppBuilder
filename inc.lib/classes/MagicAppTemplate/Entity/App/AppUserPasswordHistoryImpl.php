@@ -29,6 +29,7 @@ class AppUserPasswordHistoryImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="user_password_history_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="User Password History ID")
+	 * @MaxLength(value=40)
 	 * @var int
 	 */
 	protected $userPasswordHistoryId;
@@ -39,6 +40,7 @@ class AppUserPasswordHistoryImpl extends MagicObject
      * @NotNull
      * @Column(name="admin_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Admin ID")
+	 * @MaxLength(value=40)
      * @var string
      */
     protected $adminId;
@@ -48,6 +50,7 @@ class AppUserPasswordHistoryImpl extends MagicObject
 	 * 
 	 * @Column(name="password", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Password")
+	 * @MaxLength(value=200)
 	 * @var string
 	 */
 	protected $password;
@@ -66,6 +69,7 @@ class AppUserPasswordHistoryImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;
