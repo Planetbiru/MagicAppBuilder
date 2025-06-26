@@ -419,6 +419,7 @@ let valBuilder = null;
 function createValidator(elem)
 {
   increaseAjaxPending();
+  currentValidator = $('#validationMasterModal [name="validatorName"]').val();
   $.ajax({
     type: 'POST',
     dataType: 'html',
@@ -431,13 +432,30 @@ function createValidator(elem)
     },
     success: function(data)
     {
+      $(".validator-container-file .validator-list").empty().append(data);
+      $(".container-translate-validator .validator-list").empty().append(data);
+      // Mark tab
+      $('button#validator-file-tab').removeClass('text-danger');
+      let errorCount = $(".validator-container-file .validator-list").find('a[data-error="true"]').length;
+      if(errorCount)
+      {
+        $('button#validator-file-tab').addClass('text-danger');
+      }
+      clearValidatorFile();
+      clearTtransEd5();
+      clearTtransEd6();
+
+      let lineNumber = 0;
       decreaseAjaxPending();
       $('#validationMasterModal').modal('hide');
       $('.modal-backdrop').css('display', 'none');
       $('body').removeClass('modal-open');
-      updateValidatorFile();
+      getValidatorFile(currentValidator, function () {
+        $('.validator-container-file .validator-li').removeClass("selected-file");
+        $('.validator-container-file .validator-li [data-validator-name="'+currentValidator+'"]').closest('li').addClass("selected-file");
+      }, lineNumber);
     },
-    error: function()
+    error: function(e)
     {
       decreaseAjaxPending();
     }
@@ -527,7 +545,8 @@ function testValidator(elem) {
     url: 'lib.ajax/validator-test.php?validator=' + encodeURIComponent(currentValidator),
     data: $(frm).serialize(), // Gathers all data from the form
     success: function(data) {
-      const modalBody = $('#validationMasterModal .modal-body');
+      
+      const modalBody = $('#genericModal .modal-body');
 
       // Clear validation states
       modalBody.find('input').removeClass('is-invalid');
@@ -538,6 +557,7 @@ function testValidator(elem) {
           '<div class="alert alert-success">' + data.message + '</div>'
         );
       } else {
+        
         let errorMessage = 'An error occurred.';
         if (data && data.message) // NOSONAR
         {
@@ -548,8 +568,9 @@ function testValidator(elem) {
           '<div class="alert alert-danger">' + errorMessage + '</div>'
         );
 
+
         if (data.propertyName) {
-          let inputElem = modalBody.find('input[name="' + data.propertyName + '"]');
+          let inputElem = modalBody.find('[name="' + data.propertyName + '"]');
           inputElem.addClass('is-invalid').select();
         }
       }
@@ -563,6 +584,92 @@ function testValidator(elem) {
       decreaseAjaxPending(); // Assumption: this function exists
     }
   });
+}
+
+function updateValidatorForm()
+{
+  $('#validationMasterModal .modal-header .modal-title').text('Update Validator');
+  $('#validationMasterModal .modal-body').empty();
+  $('#validationMasterModal .master-validation-modal-ok').text('Update Form');
+  $('#validationMasterModal .master-validation-modal-ok').attr('onclick', "createValidator(this)");
+  $.ajax({
+    type: 'post',
+    dataType: 'html',
+    url: 'lib.ajax/validator-create-form.php',
+    data: {userAction: 'update-form', validator: currentValidator}, 
+    success: function(data) {
+      decreaseAjaxPending(); 
+      $('#validationMasterModal .modal-body').append(data);
+      if(!valBuilder)
+      {
+        valBuilder = new ValidationBuilder('#validationMasterModal', '.validation-modal-merged', '#validationMasterModal .validation-output', '#validationMasterModal .field-group');
+      }
+      let json = JSON.parse($('#validationMasterModal .modal-body [name="existing"]').val());
+      valBuilder.setValidation(json.properties);
+      valBuilder.renderValidationsMerged();
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+
+      decreaseAjaxPending(); 
+    }
+  });
+  
+  $('#validationMasterModal').data('bs.modal', null);
+  $('#validationMasterModal').modal({
+    backdrop: 'static',
+    keyboard: false,
+    show: true
+  });
+}
+
+function renderValidatorEditor(data) {
+  const wrapper = document.createElement('div');
+
+  // Info table
+  const infoTable = document.createElement('table');
+  infoTable.className = 'config-table';
+  infoTable.innerHTML = `
+    <tbody>
+      <tr><td>Table Name</td><td>${data.tableName}</td></tr>
+      <tr><td>Validator Class Name</td><td>${data.className}</td></tr>
+    </tbody>
+  `;
+  wrapper.appendChild(infoTable);
+
+  // Fields
+  Object.entries(data.properties).forEach(([fieldName, fieldData]) => {
+    const fieldGroup = document.createElement('div');
+    fieldGroup.className = 'mb-3 field-group validation-item';
+    fieldGroup.dataset.fieldName = fieldName;
+    fieldGroup.dataset.maximumLength = fieldData?.validators?.find(v => v.validationType === 'MaxLength')?.attributes?.value || '';
+
+    fieldGroup.innerHTML = `
+      <hr>
+      <span class="form-label">${fieldName}</span>
+      <div class="field-validations-list mt-2"></div>
+      <button type="button" class="btn btn-primary mt-2 add-validation-merged">
+        <i class="fa-solid fa-plus"></i> Add Validation
+      </button>
+    `;
+    wrapper.appendChild(fieldGroup);
+  });
+
+  // Hidden inputs + output textarea
+  wrapper.innerHTML += `
+    <hr>
+    <span class="form-label">Definition</span>
+    <input type="hidden" name="tableName" value="${htmlEncode(data.tableName)}">
+    <input type="hidden" name="validatorName" value="${htmlEncode(data.className)}">
+    <textarea class="form-control validation-output" name="validatorDefinition" rows="5" readonly></textarea>
+  `;
+
+  return wrapper;
+}
+
+function htmlEncode(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 
@@ -622,6 +729,7 @@ function deleteValidatorFile()
                 $('#button_save_validator_file_as').attr('disabled', 'disabled');
                 $('#button_test_validator').attr('disabled', 'disabled');
                 $('#button_delete_validator_file').attr('disabled', 'disabled');
+                $('#button_update_validator_file').attr('disabled', 'disabled');
               }
             }, 
             error: function(e){
@@ -735,6 +843,9 @@ let initAll = function () {
 
   $(document).on('click', '#button_create_validator_file', function(e){
     addValidatorForm();
+  });
+  $(document).on('click', '#button_update_validator_file', function(e){
+    updateValidatorForm();
   });
   $(document).on('click', '#button_test_validator', function(e){
     showTestValidatorForm();
@@ -5652,6 +5763,7 @@ function getValidatorFile(validator, clbk, lineNumber) {
       $("#button_save_validator_file_as").removeAttr("disabled");
       $("#button_delete_validator_file").removeAttr("disabled");
       $("#button_test_validator").removeAttr("disabled");
+      $('#button_update_validator_file').removeAttr('disabled');
 
       currentValidator = validator;
       if (clbk) {

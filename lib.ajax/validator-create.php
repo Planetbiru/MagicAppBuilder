@@ -150,3 +150,5 @@ class '.$validator.' extends MagicObject
         file_put_contents($path, implode("\r\n", $properties));
     }
 }
+
+require_once __DIR__ ."/validator-list.php";

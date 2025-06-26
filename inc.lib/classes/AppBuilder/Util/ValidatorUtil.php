@@ -151,17 +151,24 @@ class ValidatorUtil
                 }
 
                 if ($validatorName !== 'Table') {
-                    $validators[] = [
-                        'validationType' => $validatorName,
-                        'attributes' => $attributes
+                    $val = [
+                        'type' => $validatorName
                     ];
+                    // Manipulate for Validation Editor
+                    foreach($attributes as $k=>$v)
+                    {
+                        if($k == 'allowedValues')
+                        {
+                            $attributes[$k] = '{"'.implode('", "', $v).'"}';
+                        }
+                    }
+
+                    $val = array_merge($val, $attributes);
+                    $validators[] = $val;
                 }
             }
 
-            $result['properties'][$propertyName] = [
-                "columnName" => PicoStringUtil::snakeize($propertyName),
-                "validators" => $validators
-            ];
+            $result['properties'][PicoStringUtil::snakeize($propertyName)] = $validators;
         }
 
         return $result;

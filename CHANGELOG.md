@@ -686,6 +686,29 @@ MagicAppBuilder 1.5.2 adds integration with the `tableName` parameter introduced
 -   Enhances interoperability with annotation-aware tools such as ORMs, scaffolding engines, or validation frameworks.
     
 -   Strengthens the link between the generated validator and its underlying database table for clearer structure and better documentation.
+
+
+
+### Validation Class Editor GUI
+
+A new interactive **Validation Class Editor** has been added to simplify the creation and management of validation annotations through a **form-based GUI**.
+
+-   Displays fields dynamically based on the selected table structure.
+    
+-   Allows users to add, update, or remove multiple validation rules per field.
+    
+-   Automatically serializes the validation definition into a compatible JSON format.
+    
+-   Supports drag-and-drop sorting (including for dynamically added fields).
+    
+
+#### Benefits:
+
+-   Eliminates manual editing of raw annotations.
+    
+-   Increases productivity and reduces syntax errors when defining validation rules.
+    
+-   Ensures consistency with backend validator class generation.
     
 
 ### UI Fixes

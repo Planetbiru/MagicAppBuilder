@@ -3,6 +3,7 @@
 use AppBuilder\AppDatabase;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
+use AppBuilder\Util\ValidatorUtil;
 use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -104,5 +105,62 @@ foreach($fields as $field)
 <input type="hidden" name="tableName" value="<?php echo htmlspecialchars($tableName);?>">
 <input type="hidden" name="validatorName" value="<?php echo htmlspecialchars($validatorName);?>">
 <textarea class="form-control validation-output" name="validatorDefinition" rows="5" readonly></textarea>
+<?php
+}
+else if($inputPost->getUserAction() == 'update-form')
+{
+$path = ValidatorUtil::getPath($appConfig, $inputPost);
+$data = ValidatorUtil::parseValidatorClass(file_get_contents($path));
+
+// JavaScript need object instead of associated array
+if(is_array($data['properties']) && empty($data['properties']))
+{
+    $data['properties'] = new stdClass;
+}
+
+$tableName = $data['tableName'];
+$validatorName = $data['className'];
+
+$tableColumnInfo = AppDatabase::getColumnList($appConfig, $databaseConfig, $database, $tableName);
+
+$fields = $tableColumnInfo['fields'];
+?>
+
+<table class="config-table">
+    <tbody>
+        <tr>
+            <td>Table Name</td>
+            <td><?php echo $tableName;?></td>
+        </tr>
+        <tr>
+            <td>Validator Class Name</td>
+            <td><?php echo $validatorName;?></td>
+        </tr>
+    </tbody>
+</table>
+<?php
+foreach($fields as $field)
+{
+    $fieldName = $field['column_name'];
+    $maximumLength = $field['maximum_length'];
+    if(!in_array($fieldName, $tableColumnInfo['skipped_insert_edit']))
+    {
+?>
+<hr>
+<div class="mb-3 field-group validation-item" data-field-name="<?php echo $fieldName;?>" data-maximum-length="<?php echo $maximumLength;?>">
+    <span class="form-label"><?php echo $fieldName;?></span>
+    <div class="field-validations-list mt-2"></div>
+    <button type="button" class="btn btn-primary mt-2 add-validation-merged"><i class="fa-solid fa-plus"></i> Add Validation</button>
+</div>
+<?php
+}
+}
+?>
+<hr>
+<span class="form-label">Definition</span>
+<input type="hidden" name="tableName" value="<?php echo htmlspecialchars($tableName);?>">
+<input type="hidden" name="validatorName" value="<?php echo htmlspecialchars($validatorName);?>">
+<textarea class="form-control validation-output" name="validatorDefinition" rows="5" readonly></textarea>
+<input name="existing" type="hidden" value="<?php echo htmlspecialchars(json_encode($data));?>">
 <?php
 }
