@@ -742,7 +742,9 @@ a.all-table{
     border-radius: .25rem;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
-
+th.header-drag-handle{
+    width: 17px;
+}
 .drag-handle {
     cursor: move;
 }
@@ -757,5 +759,5 @@ tr.dragging {
     opacity: 0.5;
 }
 tr.over {
-    outline: 2px dashed #333;
+    outline: 2px dashed #747474;
 }

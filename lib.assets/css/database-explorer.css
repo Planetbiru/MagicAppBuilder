@@ -865,6 +865,10 @@ a.all-table {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+th.header-drag-handle {
+  width: 17px;
+}
+
 .drag-handle {
   cursor: move;
 }
@@ -882,5 +886,5 @@ tr.dragging {
 }
 
 tr.over {
-  outline: 2px dashed #333;
+  outline: 2px dashed #747474;
 }/*# sourceMappingURL=database-explorer.css.map */
