@@ -28,6 +28,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Admin ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminLevelId;
@@ -36,8 +37,9 @@ class AppAdminLevelImpl extends MagicObject
 	 * Name
 	 * 
 	 * @NotNull
-	 * @Column(name="name", type="varchar(40)", length=40, default_value=NULL, nullable=true)
+	 * @Column(name="name", type="varchar(100)", length=100, default_value=NULL, nullable=true)
 	 * @Label(content="Name")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $name;
@@ -95,6 +97,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminCreate;
@@ -104,6 +107,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Edit")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminEdit;
@@ -113,6 +117,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;
@@ -122,6 +127,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Edit")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipEdit;

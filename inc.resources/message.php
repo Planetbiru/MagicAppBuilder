@@ -20,6 +20,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminMinImpl;
 use MagicAppTemplate\Entity\App\AppMessageFolderMinImpl;
 use MagicAppTemplate\Entity\App\AppMessageImpl;
@@ -61,6 +62,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$message->setIpEdit($currentAction->getIp());
 	try
 	{
+		$message->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$message->setMessageDirection('in');
 		$message->insert();
 

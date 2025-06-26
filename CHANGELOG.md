@@ -731,9 +731,33 @@ The Entity Editor now supports **drag-and-drop row sorting** to reorder fields v
 -   Reduces misclicks and speeds up the editing workflow.
     
 
+### Built-in Module Validation Integration
+
+MagicAppBuilder now integrates validator execution directly into **Bootstrap-based auto-generated modules** (e.g., Admin, Module, Group Module, etc.).
+
+-   Modules now automatically validate input length constraints.
+    
+-   Validation messages are displayed in the UI and mapped to the corresponding input fields.
+    
+-   If a validator class does not exist, the operation continues without interruption.
+
+    
+
+#### Benefits:
+
+-   Eliminates the need to manually wire validators in custom code.
+    
+-   Ensures consistent validation across all data entry points.
+    
+-   Reduces potential bugs from missing or inconsistent validation logic.
+    
+
+
 ### UI Fixes
 
 -   **Entity Editor Context Menu:** Fixed an issue where the context menu to select related entities was not showing properly in the entity editor.
     
 -   **Modal Backdrop Cleanup:** Addressed a Bootstrap 4 issue where modal backdrops were not removed when clicking outside the modal. A general fix was applied to ensure all `.modal-backdrop` elements are cleaned up once all modals are closed, restoring `body` styles as expected.
     
+
+

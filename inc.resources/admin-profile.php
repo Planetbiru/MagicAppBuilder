@@ -20,6 +20,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAdmin\AppIncludeImpl;
 use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminProfileImpl;
 
@@ -55,6 +56,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$adminProfile->setIpEdit($currentAction->getIp());
 	try
 	{
+		$adminProfile->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$adminProfile->insert();
 		$newId = $adminProfile->getAdminProfileId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_profile_id, $newId);
@@ -69,7 +71,8 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminProfileId, $inputPost->getAdminProfileId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$adminProfile = new AppAdminProfileImpl(null, $database);
-	$updater = $adminProfile->where($specification)
+	$updater = $adminProfile->where($specification);
+	$updater->with()
 		->setAdminId($inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setProfileName($inputPost->getProfileName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setProfileValue($inputPost->getProfileValue(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -80,6 +83,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater->setIpEdit($currentAction->getIp());
 	try
 	{
+		$updater->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$updater->update();
 		$newId = $inputPost->getAdminProfileId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_profile_id, $newId);

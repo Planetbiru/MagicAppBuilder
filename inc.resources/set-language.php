@@ -1,5 +1,6 @@
 <?php
 
+use MagicAppTemplate\AppValidatorMessage;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
 
@@ -19,6 +20,7 @@ if($inputGet->getLanguageId())
         try
         {
             $currentUser->setLanguageId($languageId);
+            $currentUser->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
             $currentUser->update();    
         }
         catch(Exception $e)

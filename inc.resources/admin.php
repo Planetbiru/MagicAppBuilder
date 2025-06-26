@@ -20,6 +20,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 
@@ -65,6 +66,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$admin->setIpEdit($currentAction->getIp());
 	try
 	{
+		$admin->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$admin->insert();
 		$newId = $admin->getAdminId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
@@ -79,7 +81,8 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$specification = PicoSpecification::getInstanceOf(Field::of()->adminId, $inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$admin = new AppAdminImpl(null, $database);
-	$updater = $admin->where($specification)
+	$updater = $admin->where($specification);
+	$updater->with()
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -104,6 +107,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	
 	try
 	{
+		$updater->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$updater->update();
 		$newId = $inputPost->getAdminId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
