@@ -863,4 +863,24 @@ a.all-table {
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.drag-handle {
+  cursor: move;
+}
+
+.drag-handle::before {
+  content: "⠿";
+  font-size: 15px !important;
+  width: 17px;
+  text-align: center !important;
+  display: inherit;
+}
+
+tr.dragging {
+  opacity: 0.5;
+}
+
+tr.over {
+  outline: 2px dashed #333;
 }/*# sourceMappingURL=database-explorer.css.map */

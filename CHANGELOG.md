@@ -686,6 +686,49 @@ MagicAppBuilder 1.5.2 adds integration with the `tableName` parameter introduced
 -   Enhances interoperability with annotation-aware tools such as ORMs, scaffolding engines, or validation frameworks.
     
 -   Strengthens the link between the generated validator and its underlying database table for clearer structure and better documentation.
+
+
+
+### Validation Class Editor GUI
+
+A new interactive **Validation Class Editor** has been added to simplify the creation and management of validation annotations through a **form-based GUI**.
+
+-   Displays fields dynamically based on the selected table structure.
+    
+-   Allows users to add, update, or remove multiple validation rules per field.
+    
+-   Automatically serializes the validation definition into a compatible JSON format.
+    
+-   Supports drag-and-drop sorting (including for dynamically added fields).
+    
+
+#### Benefits:
+
+-   Eliminates manual editing of raw annotations.
+    
+-   Increases productivity and reduces syntax errors when defining validation rules.
+    
+-   Ensures consistency with backend validator class generation.
+    
+
+### Entity Field Reordering via Drag-and-Drop
+
+The Entity Editor now supports **drag-and-drop row sorting** to reorder fields visually, replacing the previous method that used only "move up" and "move down" buttons.
+
+-   Each row now includes a drag handle for intuitive movement.
+    
+-   Users can rearrange fields freely without multiple clicks.
+    
+-   Works seamlessly with both static and dynamically added fields.
+    
+
+#### Benefits:
+
+-   Significantly improves usability when managing large entities.
+    
+-   Allows for rapid restructuring of field order without repetitive actions.
+    
+-   Reduces misclicks and speeds up the editing workflow.
     
 
 ### UI Fixes
@@ -694,4 +737,3 @@ MagicAppBuilder 1.5.2 adds integration with the `tableName` parameter introduced
     
 -   **Modal Backdrop Cleanup:** Addressed a Bootstrap 4 issue where modal backdrops were not removed when clicking outside the modal. A general fix was applied to ensure all `.modal-backdrop` elements are cleaned up once all modals are closed, restoring `body` styles as expected.
     
-
