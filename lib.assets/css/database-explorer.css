@@ -879,6 +879,7 @@ th.header-drag-handle {
   width: 17px;
   text-align: center !important;
   display: inherit;
+  color: #555555;
 }
 
 tr.dragging {
