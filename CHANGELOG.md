@@ -668,13 +668,13 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 
 
-# MagicAppBuilder Version 1.5.2
+# MagicAppBuilder Version 1.5.1
 
 ## What's Changed
 
 ### Validator Generator Enhancement: `tableName` Support
 
-MagicAppBuilder 1.5.2 adds integration with the `tableName` parameter introduced in **MagicObject 3.14.2** when generating validator classes.
+MagicAppBuilder 1.5.1 adds integration with the `tableName` parameter introduced in **MagicObject 3.14.2** when generating validator classes.
 
 -   When generating a validator class, the corresponding table name (if defined in the entity metadata) is now included via `@Table(name="...")` in the class-level PHPDoc.
     
