@@ -776,7 +776,5 @@ A safeguard has been implemented to **prevent users from deleting their own user
     
 -   **Modal Backdrop Cleanup:** Addressed a Bootstrap 4 issue where modal backdrops were not removed when clicking outside the modal. A general fix was applied to ensure all `.modal-backdrop` elements are cleaned up once all modals are closed, restoring `body` styles as expected.
     
-
-
-
-
+-   **Entity Download Button:** Fixed an issue where downloading entity definitions from the Entity Editor failed under certain configurations.
+    

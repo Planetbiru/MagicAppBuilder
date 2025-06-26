@@ -1796,6 +1796,36 @@ class EntityEditor {
     
         svg.addEventListener('click', svg._clickHandler);
     }
+
+    /**
+     * Collects and returns a list of diagrams with their metadata.
+     *
+     * This function retrieves all diagram tabs from the DOM and constructs an array
+     * of diagram objects. Each object includes:
+     * - `id`: The unique identifier of the diagram tab (from `data-id` attribute).
+     * - `name`: The name of the diagram (from the input field inside the tab).
+     * - `sortOrder`: The index order of the diagram in the tab list.
+     * - `entities`: An array of entity IDs associated with the diagram (from the container's data).
+     *
+     * Assumptions:
+     * - Diagrams are listed as `<li class="diagram-tab">` inside `.diagram-list.tabs`.
+     * - Each diagram has a corresponding `.diagram-container > div` with a matching ID and `data-entities` attribute.
+     *
+     * @returns {Array<Object>} Array of diagram metadata objects.
+     */
+    getDiagrams()
+    {
+        let diagrams = [];
+        document.querySelector('.diagram-list.tabs').querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+            diagrams.push({
+                id: tab.dataset.id,
+                name: tab.querySelector('input').value,
+                sortOrder: index,
+                entities: document.querySelector('.diagram-container').querySelector(`#${tab.dataset.id}`).dataset.entities.split(',')
+            })
+        });
+        return diagrams;
+    }
     
     /**
      * Removes a click event listener from an SVG diagram.
@@ -2373,7 +2403,7 @@ class EntityEditor {
             databaseName: databaseName,
             databaseSchema: databaseSchema,
             entities: this.entities,  // Converting the entities array into a JSON string
-            diagrams: this.diagrams // Converting the diagrams array into a JSON string
+            diagrams: this.getDiagrams() // Converting the diagrams array into a JSON string
         };
         
         this.exportJSON(data); // Export the sample object to a JSON file
