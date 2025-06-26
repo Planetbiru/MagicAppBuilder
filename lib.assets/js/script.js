@@ -425,14 +425,14 @@ function createValidator(elem)
     url: 'lib.ajax/validator-create.php',
     data: {
       userAction: 'create', 
-      tableName: $('#genericModal [name="tableName"]').val(),
-      validator: $('#genericModal [name="validatorName"]').val(), 
-      definition: $('#genericModal [name="validatorDefinition"]').val()
+      tableName: $('#validationMasterModal [name="tableName"]').val(),
+      validator: $('#validationMasterModal [name="validatorName"]').val(), 
+      definition: $('#validationMasterModal [name="validatorDefinition"]').val()
     },
     success: function(data)
     {
       decreaseAjaxPending();
-      $('#genericModal').modal('hide');
+      $('#validationMasterModal').modal('hide');
       $('.modal-backdrop').css('display', 'none');
       $('body').removeClass('modal-open');
       updateValidatorFile();
@@ -454,20 +454,20 @@ function addValidatorForm()
     data: {userAction: 'select-table'},
     success: function(data)
     {
-      $('#genericModal .modal-header .modal-title').text('Create New Validator');
-      $('#genericModal .modal-body').empty().append(data);
-      $('#genericModal .generic-modal-ok').text('Create Form');
-      $('#genericModal .generic-modal-ok').attr('onclick', "selectTableForNewValidator(this)");
+      $('#validationMasterModal .modal-header .modal-title').text('Create New Validator');
+      $('#validationMasterModal .modal-body').empty().append(data);
+      $('#validationMasterModal .master-validation-modal-ok').text('Create Form');
+      $('#validationMasterModal .master-validation-modal-ok').attr('onclick', "selectTableForNewValidator(this)");
       
-      $('#genericModal').data('bs.modal', null);
-      $('#genericModal').modal({
+      $('#validationMasterModal').data('bs.modal', null);
+      $('#validationMasterModal').modal({
         backdrop: 'static',
         keyboard: false,
         show: true
       });
       if(!valBuilder)
       {
-        valBuilder = new ValidationBuilder('#genericModal', '.validation-modal-merged', '#genericModal .validation-output', '#genericModal .field-group');
+        valBuilder = new ValidationBuilder('#validationMasterModal', '.validation-modal-merged', '#validationMasterModal .validation-output', '#validationMasterModal .field-group');
       }
       decreaseAjaxPending();
     },
@@ -492,13 +492,13 @@ function selectTableForNewValidator(elem)
     {
 
       valBuilder.setValidation({});
-      $('#genericModal .modal-header .modal-title').text('Create New Validator');
-      $('#genericModal .modal-body').empty().append(data);
-      $('#genericModal .generic-modal-ok').text('Create');
-      $('#genericModal .generic-modal-ok').attr('onclick', "createValidator(this)");
-      $('#genericModal').data('bs.modal', null);
+      $('#validationMasterModal .modal-header .modal-title').text('Create New Validator');
+      $('#validationMasterModal .modal-body').empty().append(data);
+      $('#validationMasterModal .master-validation-modal-ok').text('Create');
+      $('#validationMasterModal .master-validation-modal-ok').attr('onclick', "createValidator(this)");
+      $('#validationMasterModal').data('bs.modal', null);
       // Tampilkan modal dengan opsi yang benar-benar baru
-      $('#genericModal').modal({
+      $('#validationMasterModal').modal({
         keyboard: false,
         show: true
       });
@@ -527,7 +527,7 @@ function testValidator(elem) {
     url: 'lib.ajax/validator-test.php?validator=' + encodeURIComponent(currentValidator),
     data: $(frm).serialize(), // Gathers all data from the form
     success: function(data) {
-      const modalBody = $('#genericModal .modal-body');
+      const modalBody = $('#validationMasterModal .modal-body');
 
       // Clear validation states
       modalBody.find('input').removeClass('is-invalid');
@@ -557,7 +557,7 @@ function testValidator(elem) {
       decreaseAjaxPending(); // Assumption: this function exists
     },
     error: function(jqXHR, textStatus, errorThrown) {
-      $('#genericModal .modal-body .validator-test-message').empty().append(
+      $('#validationMasterModal .modal-body .validator-test-message').empty().append(
         '<div class="alert alert-danger">AJAX Error: ' + textStatus + ' - ' + errorThrown + '</div>'
       );
       decreaseAjaxPending(); // Assumption: this function exists
@@ -715,13 +715,23 @@ function handleApplicationFileUpload(file, action, application_id, application_n
  */
 let initAll = function () {
 
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    setTimeout(() => {
+      const anyModalShown = document.querySelector('.modal.show');
+      if (!anyModalShown) {
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').removeAttr('style');
+      }
+    }, 40);
+  });
+
   $(document).on('hidden.bs.modal', '.validation-modal-merged', function () {
-  setTimeout(function () {
-    if ($('.modal.show').length > 0) {
-      $('body').addClass('modal-open');
-    }
-  }, 200);
-});
+    setTimeout(function () {
+      if ($('.modal.show').length > 0) {
+        $('body').addClass('modal-open');
+      }
+    }, 40);
+  });
 
   $(document).on('click', '#button_create_validator_file', function(e){
     addValidatorForm();
