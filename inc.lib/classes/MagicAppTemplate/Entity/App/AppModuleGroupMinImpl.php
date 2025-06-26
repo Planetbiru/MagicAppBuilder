@@ -28,6 +28,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @Column(name="module_group_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Module Group ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $moduleGroupId;
@@ -38,6 +39,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="name", type="varchar(100)", length=100, default_value=NULL, nullable=true)
 	 * @Label(content="Name")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $name;
@@ -48,6 +50,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="url", type="varchar(255)", length=255, default_value=NULL, nullable=true)
 	 * @Label(content="URL")
+	 * @MaxLength(value=255)
 	 * @var string
 	 */
 	protected $url;
@@ -58,6 +61,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="target", type="varchar(20)", length=20, default_value=NULL, nullable=true)
 	 * @Label(content="Target")
+	 * @MaxLength(value=20)
 	 * @var string
 	 */
 	protected $target;
@@ -68,6 +72,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="icon", type="varchar(40)", length=40, default_value=NULL, nullable=true)
 	 * @Label(content="Icon")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $icon;
@@ -116,6 +121,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminCreate;
@@ -125,6 +131,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Edit")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminEdit;
@@ -134,6 +141,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;
@@ -141,8 +149,9 @@ class AppModuleGroupMinImpl extends MagicObject
 	/**
 	 * IP Edit
 	 * 
-	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Edit")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipEdit;

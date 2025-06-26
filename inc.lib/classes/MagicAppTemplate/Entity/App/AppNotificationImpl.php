@@ -29,6 +29,7 @@ class AppNotificationImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="notification_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Notification ID")
+	 * @MaxLength(value=40)
 	 * @var int
 	 */
 	protected $notificationId;
@@ -38,6 +39,7 @@ class AppNotificationImpl extends MagicObject
 	 * 
 	 * @Column(name="notification_type", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Notification Type")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $notificationType;
@@ -47,6 +49,7 @@ class AppNotificationImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_group", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Group")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminGroup;
@@ -56,6 +59,7 @@ class AppNotificationImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminId;
@@ -72,8 +76,9 @@ class AppNotificationImpl extends MagicObject
 	/**
 	 * Icon
 	 * 
-	 * @Column(name="icon", type="varchar(20)", length=20, nullable=true)
+	 * @Column(name="icon", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Icon")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $icon;
@@ -83,6 +88,7 @@ class AppNotificationImpl extends MagicObject
 	 * 
 	 * @Column(name="subject", type="varchar(255)", length=255, nullable=true)
 	 * @Label(content="Subject")
+	 * @MaxLength(value=255)
 	 * @var string
 	 */
 	protected $subject;
@@ -128,6 +134,7 @@ class AppNotificationImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;

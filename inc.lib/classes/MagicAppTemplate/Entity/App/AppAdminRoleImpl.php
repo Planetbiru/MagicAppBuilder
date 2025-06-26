@@ -28,6 +28,7 @@ class AppAdminRoleImpl extends MagicObject
      * @GeneratedValue(strategy=GenerationType.UUID)
      * @Column(name="admin_role_id", type="varchar(40)", length=40, nullable=false)
      * @Label(content="Admin Role ID")
+     * @MaxLength(value=40)
      * @var string
      */
     protected $adminRoleId;
@@ -38,6 +39,7 @@ class AppAdminRoleImpl extends MagicObject
      * @NotNull
      * @Column(name="admin_level_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Admin Level ID")
+     * @MaxLength(value=40)
      * @var string
      */
     protected $adminLevelId;
@@ -57,6 +59,7 @@ class AppAdminRoleImpl extends MagicObject
      * 
      * @Column(name="module_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
      * @Label(content="Module ID")
+     * @MaxLength(value=40)
      * @var string
      */
     protected $moduleId;
@@ -77,6 +80,7 @@ class AppAdminRoleImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="module_code", type="varchar(255)", length=255, default_value=NULL, nullable=true)
 	 * @Label(content="Module Code")
+     * @MaxLength(value=255)
 	 * @var string
 	 */
 	protected $moduleCode;
@@ -248,6 +252,7 @@ class AppAdminRoleImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminCreate;
@@ -257,6 +262,7 @@ class AppAdminRoleImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Edit")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminEdit;
@@ -266,6 +272,7 @@ class AppAdminRoleImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;
@@ -273,8 +280,9 @@ class AppAdminRoleImpl extends MagicObject
 	/**
 	 * IP Edit
 	 * 
-	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Edit")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipEdit;

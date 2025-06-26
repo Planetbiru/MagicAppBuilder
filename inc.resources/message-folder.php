@@ -20,6 +20,7 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppMessageFolderImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
@@ -54,7 +55,8 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$messageFolder->setIpEdit($currentAction->getIp());
 	try
 	{
-		$messageFolder->insert();
+		$adminProfile->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
+		$adminProfile->insert();
 		$newId = $messageFolder->getMessageFolderId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->message_folder_id, $newId);
 	}
@@ -68,7 +70,8 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$specification = PicoSpecification::getInstanceOf(Field::of()->messageFolderId, $inputPost->getMessageFolderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$messageFolder = new AppMessageFolderImpl(null, $database);
-	$updater = $messageFolder->where($specification)
+	$updater = $messageFolder->where($specification);
+	$updater->with()
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setAdminId($currentUser->getAdminId())
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
@@ -79,6 +82,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater->setIpEdit($currentAction->getIp());
 	try
 	{
+		$updater->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$updater->update();
 		$newId = $inputPost->getMessageFolderId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->message_folder_id, $newId);

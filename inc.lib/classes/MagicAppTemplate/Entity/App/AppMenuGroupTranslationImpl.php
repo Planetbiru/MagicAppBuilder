@@ -28,6 +28,7 @@ class AppMenuGroupTranslationImpl extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @Column(name="menu_group_translation_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Menu Group Translation ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $menuGroupTranslationId;
@@ -37,6 +38,7 @@ class AppMenuGroupTranslationImpl extends MagicObject
 	 * 
 	 * @Column(name="module_group_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Module Group ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $moduleGroupId;
@@ -46,6 +48,7 @@ class AppMenuGroupTranslationImpl extends MagicObject
 	 * 
 	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Language ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $languageId;
@@ -55,6 +58,7 @@ class AppMenuGroupTranslationImpl extends MagicObject
 	 * 
 	 * @Column(name="name", type="varchar(255)", length=255, nullable=true)
 	 * @Label(content="Name")
+	 * @MaxLength(value=255)
 	 * @var string
 	 */
 	protected $name;

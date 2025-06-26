@@ -29,6 +29,7 @@ class AppAdminProfileImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="admin_profile_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Admin Profile ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminProfileId;
@@ -38,6 +39,7 @@ class AppAdminProfileImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminId;
@@ -65,6 +67,7 @@ class AppAdminProfileImpl extends MagicObject
 	 * 
 	 * @Column(name="profile_value", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Profile Value")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $profileValue;
@@ -101,6 +104,7 @@ class AppAdminProfileImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;
@@ -108,8 +112,9 @@ class AppAdminProfileImpl extends MagicObject
 	/**
 	 * IP Edit
 	 * 
-	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Edit")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipEdit;

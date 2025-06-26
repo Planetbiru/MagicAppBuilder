@@ -29,6 +29,7 @@ class AppAdminMinImpl extends MagicObject
 	 * @NotNull
 	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Admin ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminId;
@@ -38,6 +39,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="name", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Name")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $name;
@@ -47,6 +49,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="username", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Username")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $username;
@@ -56,6 +59,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="password", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Password")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $password;
@@ -65,6 +69,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Level ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminLevelId;
@@ -74,6 +79,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="gender", type="varchar(2)", length=2, nullable=true)
 	 * @Label(content="Gender")
+	 * @MaxLength(value=2)
 	 * @var string
 	 */
 	protected $gender;
@@ -92,6 +98,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="email", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Email")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $email;
@@ -101,6 +108,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="phone", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Phone")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $phone;
@@ -110,6 +118,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="language_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Language ID")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $languageId;
@@ -165,6 +174,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminCreate;
@@ -174,6 +184,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Edit")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminEdit;
@@ -183,6 +194,7 @@ class AppAdminMinImpl extends MagicObject
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;
@@ -190,8 +202,9 @@ class AppAdminMinImpl extends MagicObject
 	/**
 	 * IP Edit
 	 * 
-	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Edit")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipEdit;
