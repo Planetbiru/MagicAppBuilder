@@ -172,7 +172,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			{
 				$specification = PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $rowId))
-					->addAnd($dataFilter)
+					->addAnd($dataFilterDanger)
 					;
 				$adminLevel = new AppAdminLevelImpl(null, $database);
 				$adminLevel->where($specification)
