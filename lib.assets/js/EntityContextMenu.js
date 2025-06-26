@@ -55,11 +55,8 @@ function renderContextMenu(entity) {
 
     columns.forEach((col, index) => {
         const columnName = col.textContent.trim();
-
-        if (!columnName.startsWith(tableName) && columnName.endsWith('_id')) {
-
-            let table = columnName.substring(0, columnName.length - 3);
-
+        let table = columnName.substring(0, columnName.length - 3);
+        if (table != tableName && columnName.endsWith('_id')) {
             let testInput = document.querySelector(`.table-list input[data-name="${table}"]`);
             if(testInput != null)
             {

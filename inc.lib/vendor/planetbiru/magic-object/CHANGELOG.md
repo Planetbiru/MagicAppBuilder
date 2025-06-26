@@ -986,3 +986,49 @@ MagicObject now supports a dedicated **`@MaxLength`** annotation for string prop
 -   **`@MaxLength(value=X, message="...")`**: Ensures that a string property's value does not exceed `X` characters.
 
 This simplifies common validation scenarios where only an upper bound on string length is required.
+
+# MagicObject Version 3.14.2
+
+## What's Changed
+
+### Validator Generator Enhancement with `tableName` Support
+
+In version 3.14.2, the **validator class generator** has been enhanced to support an optional `tableName` parameter. This addition provides improved integration with annotation-based ORMs or systems that benefit from structural metadata within validator classes.
+
+#### New Behavior:
+
+When the `tableName` parameter is provided to the `PicoEntityGenerator::generateValidatorClass()` method:
+
+-   The generated validator class will include the following additional class-level annotations:
+    
+    -   `@Validator`
+        
+    -   `@Table(name="your_table_name")`
+        
+
+#### Benefits:
+
+-   Enables clearer association between the validator class and the underlying database table.
+    
+-   Improves compatibility with tools or frameworks that rely on metadata annotations for mapping or validation contexts.
+    
+-   Provides a better foundation for auto-documentation or introspection tools.
+    
+
+#### Example Output:
+
+```php
+/**
+ * Represents a validator class for the `user` module.
+ *
+ * @Validator
+ * @Table(name="user_account")
+ */
+class UserValidator extends MagicObject
+{
+    ...
+}
+
+```
+
+This enhancement makes the validator generator more expressive and future-proof, especially when building layered architectures or generating documentation automatically.

@@ -768,10 +768,10 @@ class ' . $className . ' extends MagicObject
      * @param string $moduleCode            The code name of the module this validator is for.
      * @param array  $validationDefinition  An array of field definitions, each containing field name, type, and validation rules.
      * @param string $applyKey              Determines which rules to apply, usually 'applyInsert' or 'applyUpdate'.
-     *
+     * @param string $tableName             Original table name
      * @return string Returns the full PHP source code of the generated class as a string.
      */
-    public function generateValidatorClass($namespace, $className, $moduleCode, $validationDefinition, $applyKey) // NOSONAR
+    public function generateValidatorClass($namespace, $className, $moduleCode, $validationDefinition, $applyKey, $tableName = null) // NOSONAR
     {
         $properties = array();
         $typeMap = $this->getTypeMap();
@@ -884,7 +884,13 @@ class ' . $className . ' extends MagicObject
             }
         }
 
-        $output .= " * \r\n * @package $namespace\r\n";
+        $output .= " * \r\n";
+        if(isset($tableName) && !empty($tableName))
+        {
+            $output .= " * @Validator\r\n";
+            $output .= " * @Table(name=\"$tableName\")\r\n";
+        }
+        $output .= " * @package $namespace\r\n";
         $output .= " */\r\n";
 
         // Begin class definition
