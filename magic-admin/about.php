@@ -30,13 +30,27 @@ $dataFilter = null;
 $ini = new MagicObject(null, $databaseBuilder);
 $ini->loadIniFile(dirname(__DIR__)."/app.ini");
 
-if(!file_exists(__DIR__."/update"))
-{
-  mkdir(__DIR__."/update", 0755, true);
-  copy(__DIR__."/__update/AppUpdater.php", __DIR__."/update/AppUpdater.php");
-  copy(__DIR__."/__update/extract-release.php", __DIR__."/update/extract-release.php");
-  copy(__DIR__."/__update/download-release.php", __DIR__."/update/download-release.php");
-  copy(__DIR__."/__update/list-releases.php", __DIR__."/update/list-releases.php");
+$files = [
+    "AppUpdater.php",
+    "extract-release.php",
+    "download-release.php",
+    "list-releases.php"
+];
+
+$sourceDir = __DIR__ . "/__update/";
+$targetDir = __DIR__ . "/update/";
+
+if (!file_exists($targetDir)) {
+    mkdir($targetDir, 0755, true);
+}
+
+foreach ($files as $file) {
+    $src = $sourceDir . $file;
+    $dst = $targetDir . $file;
+
+    if (!file_exists($dst) || filemtime($src) > filemtime($dst)) {
+        copy($src, $dst);
+    }
 }
 
 require_once $appInclude->mainAppHeader(__DIR__);
