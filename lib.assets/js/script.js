@@ -246,7 +246,7 @@ function setCheckingStatus(id, startTime)
 {
   $.ajax({
     type: 'GET', 
-    data: {applicationId: id},
+    data: {userAction:'check-status', applicationId: id},
     url: 'lib.ajax/application-status.php',
     dataType: 'json',
     success: function(data)
@@ -261,6 +261,7 @@ function setCheckingStatus(id, startTime)
       {
         let seconds = ((new Date()).getTime() - startTime) / 1000;
         showToast("Application Ready", `The application was successfully created in ${seconds.toFixed(2)} seconds.`);
+        updateApplicationInfo(id);
         hideWaitingScreen();
         loadAllResource();
       }
@@ -268,6 +269,34 @@ function setCheckingStatus(id, startTime)
     error: function(err)
     {
       console.error(err);
+    }
+  });
+}
+
+/**
+ * Sends a request to update the application's information on the server.
+ *
+ * This function increases the global AJAX pending counter before sending the request,
+ * and decreases it upon success or error. It uses a POST request to inform the server
+ * to update the specified application's information.
+ *
+ * @param {string} id - The unique ID of the application whose information should be updated.
+ */
+function updateApplicationInfo(id)
+{
+  increaseAjaxPending();
+  $.ajax({
+    type: 'POST', 
+    data: {userAction:'update-info', applicationId: id},
+    url: 'lib.ajax/application-status.php',
+    dataType: 'json',
+    success: function(data)
+    {
+      decreaseAjaxPending();
+    },
+    error: function(err)
+    {
+      decreaseAjaxPending();
     }
   });
 }

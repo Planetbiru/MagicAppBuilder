@@ -518,9 +518,6 @@ else
     $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
 }
 
-
-
-$entityApplication = new EntityApplication(null, $databaseBuilder);
 try
 {
     $admin = new Admin(null, $databaseBuilder);
