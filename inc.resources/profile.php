@@ -17,7 +17,7 @@ use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
-use MagicAdmin\Entity\App\AppUserPasswordHistoryImpl;
+use MagicAppTemplate\Entity\App\AppUserPasswordHistoryImpl;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Exceptions\InvalidValueException;
 
