@@ -23,7 +23,9 @@ try {
 
     echo json_encode([
         'success' => true,
-        'message' => $appLanguage->getExtractionAndUpdateCompleted()
+        'message' => $appLanguage->getExtractionAndUpdateCompleted(),
+        'new_version' => $ini['application_version'],
+        'last_update' => $ini['last_update']
     ]);
 } catch (Exception $e) {
     http_response_code(500);
