@@ -779,3 +779,12 @@ A safeguard has been implemented to **prevent users from deleting their own user
 -   **Entity Download Button:** Fixed an issue where downloading entity definitions from the Entity Editor failed under certain configurations.
     
 -   **Create New Application Dialog:** Previously, users could fill out the form before the base data from the server had fully loaded, which caused their input to be overwritten and inconsistent. Now, the form is temporarily disabled while waiting for the server response, preventing user input from being accidentally overridden by incoming default values.
+
+
+### General Bug Fixes
+
+-   Various bugs from previous versions have been resolved to improve overall stability and consistency.
+    
+-   Minor issues affecting UI behavior, validation processing, and dynamic content rendering have been addressed.
+    
+-   Codebase has been cleaned up to reduce edge case failures and improve maintainability.
