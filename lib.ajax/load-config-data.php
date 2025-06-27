@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
@@ -15,14 +16,25 @@ if($inputPost->getConfig() != null)
     $databaseType = $inputPost->getDatabaseType();
     $databaseName = $inputPost->getDatabaseName();
     $databaseSchema = $inputPost->getDatabaseSchema();
-    $config = $inputPost->getConfig();
-    $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $activeWorkspace->getDirectory()."/entity/config/$filename";
-    if(!file_exists(dirname($path)))
+
+    $selectedApplication = new EntityApplication(null, $databaseBuilder);
+    try
     {
-        mkdir(dirname($path), 0755, true);
+        $selectedApplication->find($applicationId);
+        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/config";
+        $config = $inputPost->getConfig();
+        $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
+        $path = $basePath."/$filename";
+        if(!file_exists(dirname($path)))
+        {
+            mkdir(dirname($path), 0755, true);
+        }
+        file_put_contents($path, $config);
     }
-    file_put_contents($path, $config);
+    catch(Exception $e)
+    {
+        // Do noting
+    }
     ResponseUtil::sendJSON([]);
 }
 else
@@ -31,20 +43,29 @@ else
     $databaseType = $inputGet->getDatabaseType();
     $databaseName = $inputGet->getDatabaseName();
     $databaseSchema = $inputGet->getDatabaseSchema();
+
+    $json = array(
+        'primaryKeyDataType'=> 'VARCHAR',
+        'primaryKeyDataLength'=> 40,
+        'defaultDataType'=> 'VARCHAR',
+        'defaultDataLength'=> 50
+    );
+
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $activeWorkspace->getDirectory()."/entity/config/$filename";
-    if(!file_exists($path))
+    $selectedApplication = new EntityApplication(null, $databaseBuilder);
+    try
     {
-        $json = array(
-            'primaryKeyDataType'=> 'VARCHAR',
-            'primaryKeyDataLength'=> 40,
-            'defaultDataType'=> 'VARCHAR',
-            'defaultDataLength'=> 50
-        );
+        $selectedApplication->find($applicationId);
+        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/config";
+        $path = $basePath."/$filename";
+        if(file_exists($path))
+        {
+            $json = file_get_contents($path);
+        }
     }
-    else
+    catch(Exception $e)
     {
-        $json = file_get_contents($path);
+        // Do noting
     }
     ResponseUtil::sendJSON($json);
 }
