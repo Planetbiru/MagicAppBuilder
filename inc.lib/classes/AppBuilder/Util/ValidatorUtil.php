@@ -4,6 +4,7 @@ namespace AppBuilder\Util;
 
 use MagicObject\Request\PicoRequestBase;
 use MagicObject\Util\PicoStringUtil;
+use stdClass;
 
 class ValidatorUtil
 {
@@ -154,7 +155,7 @@ class ValidatorUtil
                     $val = [
                         'type' => $validatorName
                     ];
-                    // Manipulate for Validation Editor
+                    // Manipulate allowedValues attribute in case of Enum for Validation Editor
                     foreach($attributes as $k=>$v)
                     {
                         if($k == 'allowedValues')
@@ -169,6 +170,11 @@ class ValidatorUtil
             }
 
             $result['properties'][PicoStringUtil::snakeize($propertyName)] = $validators;
+        }
+
+        if(empty($result['properties']))
+        {
+            $result['properties'] = new stdClass;
         }
 
         return $result;

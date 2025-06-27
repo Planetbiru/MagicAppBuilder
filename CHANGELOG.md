@@ -821,3 +821,9 @@ These configurations are now stored alongside other project resources, making th
     
 
 This change ensures that the visual and structural designs built using the Entity Editor are **portable, persistent, and tightly coupled** with the project they belong to.
+
+
+### Validator UI Fix
+
+-   Fixed a minor issue where the submit button in the **Validator Editor** was incorrectly labeled as **"Update Form"**. It now correctly displays **"Update"**, providing better clarity and consistency.
+    
