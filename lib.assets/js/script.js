@@ -1622,6 +1622,7 @@ let initAll = function () {
     let magic_app_version = modal.find('[name="magic_app_version"]').val();
     let composer_online = modal.find('[name="installation_method"]').val().toLowerCase().indexOf('online') === 0;
     let paths = [];
+
     $('#modal-create-application table.path-manager tbody tr').each(function () {
       let tr = $(this);
       let name = tr.find('td:nth-child(1) input[type="text"]').val();
@@ -2101,6 +2102,10 @@ let initAll = function () {
     modal.find('[name="application_author"]').val('');
     modal.find('[name="magic_app_version"]').empty();
     modal.find('[name="installation_method"]').val('');
+    // Disable input
+    $('#modal-create-application .modal-body :input').each(function(){
+      $(this)[0].disabled = true;
+    });
     increaseAjaxPending();
     resetCheckWriretableDirectory(modal.find('[name="application_directory"]'));
     $.ajax({
@@ -2133,6 +2138,11 @@ let initAll = function () {
           updateNewApplicationForm(data);
           checkWriretableDirectory(modal.find('[name="application_directory"]'));
           createBtn[0].disabled = false;
+
+          // Enable input
+          $('#modal-create-application .modal-body :input').each(function(){
+            $(this)[0].disabled = false;
+          });
         }
       }
     });

@@ -18,10 +18,11 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicAdmin\AppIncludeImpl;
+use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
+use MagicObject\Exceptions\InvalidValueException;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -62,6 +63,13 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 		$newId = $adminLevel->getAdminLevelId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_level_id, $newId);
 	}
+	catch(InvalidValueException $e)
+	{
+		$currentModule->setErrorMessage($e->getMessage());
+		$currentModule->setErrorField($e->getPropertyName());
+		$currentModule->setCurrentAction(UserAction::CREATE);
+		$currentModule->setFormData($inputPost->formData());
+	}
 	catch(Exception $e)
 	{
 		$currentModule->redirectToItself();
@@ -98,6 +106,13 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		$adminLevel = new AppAdminLevelImpl(null, $database);
 		$adminLevel->where($specification)->setAdminLevelId($newId)->update();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_level_id, $newId);
+	}
+	catch(InvalidValueException $e)
+	{
+		$currentModule->setErrorMessage($e->getMessage());
+		$currentModule->setErrorField($e->getPropertyName());
+		$currentModule->setCurrentAction(UserAction::UPDATE);
+		$currentModule->setFormData($inputPost->formData());
 	}
 	catch(Exception $e)
 	{
@@ -226,6 +241,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
+		<?php if($currentModule->hasErrorField())
+		{
+		?>
+		
+						
+		<div class="alert alert-danger">
+			<?php echo $currentModule->getErrorMessage(); ?>
+		</div>
+		
+						
+		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#createform");
+		}
+		?>
 		<form name="createform" id="createform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
@@ -286,6 +314,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
+		<?php if($currentModule->hasErrorField())
+		{
+		?>
+		
+						
+		<div class="alert alert-danger">
+			<?php echo $currentModule->getErrorMessage(); ?>
+		</div>
+		
+						
+		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#updateform");
+		}
+		?>
 		<form name="updateform" id="updateform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>

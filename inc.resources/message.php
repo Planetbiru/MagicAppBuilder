@@ -24,6 +24,7 @@ use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminMinImpl;
 use MagicAppTemplate\Entity\App\AppMessageFolderMinImpl;
 use MagicAppTemplate\Entity\App\AppMessageImpl;
+use MagicObject\Exceptions\InvalidValueException;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -72,6 +73,13 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 
 		$newId = $message->getMessageId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->message_id, $newId);
+	}
+	catch(InvalidValueException $e)
+	{
+		$currentModule->setErrorMessage($e->getMessage());
+		$currentModule->setErrorField($e->getPropertyName());
+		$currentModule->setCurrentAction(UserAction::CREATE);
+		$currentModule->setFormData($inputPost->formData());
 	}
 	catch(Exception $e)
 	{
@@ -279,6 +287,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 </script>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
+		<?php if($currentModule->hasErrorField())
+		{
+		?>
+		
+						
+		<div class="alert alert-danger">
+			<?php echo $currentModule->getErrorMessage(); ?>
+		</div>
+		
+						
+		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#createform");
+		}
+		?>
 		<form name="createform" id="createform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
@@ -500,6 +521,19 @@ try
 </script>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
+		<?php if($currentModule->hasErrorField())
+		{
+		?>
+		
+						
+		<div class="alert alert-danger">
+			<?php echo $currentModule->getErrorMessage(); ?>
+		</div>
+		
+						
+		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#createform");
+		}
+		?>
 		<form name="createform" id="createform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>

@@ -1,5 +1,5 @@
 application:
-    entityBaseNamespace: 'MagicAdmin\Entity'
+    entityBaseNamespace: 'MagicAppTemplate\Entity'
     name: 'MagicAppBuilder'
 data_limit: 20
 database:
@@ -11,7 +11,7 @@ database:
     database_name: ''
     database_schema: public
     time_zone: Asia/Jakarta
-    database_file_path: C:/bitbucket/MagicAppBuilder/inc.database/database.sqlite
+    database_file_path: ''
 role:
     bypass_role: true
 data:
