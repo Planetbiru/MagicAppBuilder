@@ -19,8 +19,7 @@ $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "about",
 $userPermission = new AppUserPermissionExtended($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
-if(!$userPermission->allowedAccess($inputGet, $inputPost))
-{
+if(!$userPermission->allowedAccess($inputGet, $inputPost)) {
 	require_once $appInclude->appForbiddenPage(__DIR__);
 	exit();
 }
@@ -58,6 +57,17 @@ foreach ($files as $file) {
 }
 
 require_once $appInclude->mainAppHeader(__DIR__);
+
+// Localized strings for JS
+$jsLang = [
+    'loading' => $appLanguage->getLoadingReleases(),
+    'loadSuccess' => $appLanguage->getReleaseListLoaded(),
+    'loadFailed' => $appLanguage->getErrorLoadingReleases(),
+    'downloading' => $appLanguage->getDownloadingRelease(),
+    'extracting' => $appLanguage->getExtracting(),
+    'downloadFailed' => $appLanguage->getDownloadFailed(),
+    'extractionFailed' => $appLanguage->getExtractionFailed()
+];
 ?>
 <div class="page page-jambi">
 	<table class="responsive responsive-two-cols">
@@ -92,66 +102,68 @@ require_once $appInclude->mainAppHeader(__DIR__);
 </div>
 
 <script>
-    function loadReleases() {
-      const statusEl = document.getElementById('status');
-      const select = document.getElementById('release-select');
-      const updateBtn = document.getElementById('update-btn');
+  const lang = <?php echo json_encode($jsLang, JSON_UNESCAPED_UNICODE); ?>;
 
-      statusEl.textContent = 'Loading releases...';
-      select.disabled = true;
-      updateBtn.disabled = true;
+  function loadReleases() {
+    const statusEl = document.getElementById('status');
+    const select = document.getElementById('release-select');
+    const updateBtn = document.getElementById('update-btn');
 
-      fetch('update/list-releases.php')
-        .then(response => response.json())
-        .then(data => {
-          if (!Array.isArray(data)) {
-            throw new Error('Invalid response');
-          }
-          select.innerHTML = '';
-          data.forEach(release => {
-            const opt = document.createElement('option');
-            opt.value = release.tag_name;
-            opt.textContent = release.name || release.tag_name;
-            select.appendChild(opt);
-          });
-          select.disabled = false;
-          updateBtn.disabled = false;
-          statusEl.textContent = '✅ Release list loaded.';
-        })
-        .catch(err => {
-          statusEl.textContent = '❌ Error loading releases.';
-          statusEl.classList.add('error');
-          select.innerHTML = '<option>-- Failed to load --</option>';
-          select.disabled = true;
+    statusEl.textContent = lang.loading;
+    select.disabled = true;
+    updateBtn.disabled = true;
+
+    fetch('update/list-releases.php')
+      .then(response => response.json())
+      .then(data => {
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid response');
+        }
+        select.innerHTML = '';
+        data.forEach(release => {
+          const opt = document.createElement('option');
+          opt.value = release.tag_name;
+          opt.textContent = release.name || release.tag_name;
+          select.appendChild(opt);
         });
-    }
+        select.disabled = false;
+        updateBtn.disabled = false;
+        statusEl.textContent = '✅ ' + lang.loadSuccess;
+      })
+      .catch(err => {
+        statusEl.textContent = '❌ ' + lang.loadFailed;
+        statusEl.classList.add('error');
+        select.innerHTML = '<option>-- ' + lang.loadFailed + ' --</option>';
+        select.disabled = true;
+      });
+  }
 
-    function startUpdate() {
-      const tag = document.getElementById('release-select').value;
-      const statusEl = document.getElementById('status');
-      statusEl.classList.remove('error', 'success');
-      statusEl.textContent = `⏬ Downloading release "${tag}"...`;
-      document.querySelector('#update-btn').disabled = true;
+  function startUpdate() {
+    const tag = document.getElementById('release-select').value;
+    const statusEl = document.getElementById('status');
+    statusEl.classList.remove('error', 'success');
+    statusEl.textContent = '⏬ ' + lang.downloading.replace('%s', tag);
+    document.querySelector('#update-btn').disabled = true;
 
-      fetch('update/download-release.php?tag=' + encodeURIComponent(tag))
-        .then(response => response.json())
-        .then(json => {
-          if (!json.success) throw new Error(json.message || 'Download failed');
-          statusEl.textContent = '⏳ Extracting...';
-          return fetch('update/extract-release.php');
-        })
-        .then(response => response.json())
-        .then(json => {
-          if (!json.success) throw new Error(json.message || 'Extraction failed');
-          statusEl.textContent = '✅ ' + json.message;
-          statusEl.classList.add('success');
-        })
-        .catch(err => {
-          statusEl.textContent = '❌ ' + err.message;
-          statusEl.classList.add('error');
-        });
-    }
-  </script>
+    fetch('update/download-release.php?tag=' + encodeURIComponent(tag))
+      .then(response => response.json())
+      .then(json => {
+        if (!json.success) throw new Error(json.message || lang.downloadFailed);
+        statusEl.textContent = '⏳ ' + lang.extracting;
+        return fetch('update/extract-release.php');
+      })
+      .then(response => response.json())
+      .then(json => {
+        if (!json.success) throw new Error(json.message || lang.extractionFailed);
+        statusEl.textContent = '✅ ' + json.message;
+        statusEl.classList.add('success');
+      })
+      .catch(err => {
+        statusEl.textContent = '❌ ' + err.message;
+        statusEl.classList.add('error');
+      });
+  }
+</script>
 
 <?php 
 require_once $appInclude->mainAppFooter(__DIR__);
