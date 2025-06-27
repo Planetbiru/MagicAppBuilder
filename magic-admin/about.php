@@ -29,7 +29,6 @@ $dataFilter = null;
 
 $ini = new MagicObject(null, $databaseBuilder);
 $ini->loadIniFile(dirname(__DIR__)."/app.ini");
-
 $files = [
     "AppUpdater.php",
     "extract-release.php",
@@ -44,11 +43,16 @@ if (!file_exists($targetDir)) {
     mkdir($targetDir, 0755, true);
 }
 
+$oneDayInSeconds = 86400;
+
 foreach ($files as $file) {
     $src = $sourceDir . $file;
     $dst = $targetDir . $file;
 
-    if (!file_exists($dst) || filemtime($src) > filemtime($dst)) {
+    if (
+        !file_exists($dst) || 
+        (filemtime($src) > filemtime($dst) && (time() - filemtime($src)) > $oneDayInSeconds)
+    ) {
         copy($src, $dst);
     }
 }
