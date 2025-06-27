@@ -146,6 +146,12 @@ class '.$validator.' extends MagicObject
         // Close the class definition
         $properties[] = "}";
 
+        // Prepare directory
+        if(!file_exists(dirname($path)))
+        {
+            mkdir(dirname($path), 0577, true);
+        }
+
         // Write the generated class to file
         file_put_contents($path, implode("\r\n", $properties));
     }
