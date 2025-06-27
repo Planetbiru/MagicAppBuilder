@@ -2,14 +2,16 @@
 
 use MagicObject\Util\PicoIniUtil;
 
+require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once __DIR__ . '/AppUpdater.php';
+
+
 header('Content-Type: application/json');
 
 try {
-    $updater = new AppUpdater('Planetbiru', 'MagicAppBuilder');
+    $updater = new \AppUpdater('Planetbiru', 'MagicAppBuilder');
     $updater->replaceFromZip();
     $updater->cleanUp();
-
 
     $date = (new DateTime())->setTimezone(new DateTimeZone('UTC'));
     $formatted = $date->format('Y-m-d\TH:i:s.u\Z');
@@ -21,13 +23,12 @@ try {
 
     echo json_encode([
         'success' => true,
-        'message' => 'Extraction and update completed.'
+        'message' => $appLanguage->getExtractionAndUpdateCompleted()
     ]);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => "Extraction failed: " . $e->getMessage()
+        'message' => $appLanguage->getExtractionFailed() . ': ' . $e->getMessage()
     ]);
 }
- 
