@@ -17,7 +17,7 @@ try
 
     $applicationToUpdate = new EntityApplication(null, $databaseBuilder);
 
-    $applicationToUpdate->findOneByApplicationId($appId);
+    $applicationToUpdate->find($appId);
 
 	$applicationName = $inputPost->getName();
 	$description = $inputPost->getDescription();
@@ -31,6 +31,11 @@ try
 	$sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
 
     $appConfig = new SecretObject(null);
+
+    $projectDirectory = $applicationToUpdate->getProjectDirectory();
+    $baseApplicationDirectory = $applicationToUpdate->getBaseApplicationDirectory();
+
+    $yml = $projectDirectory . "/default.yml";
 
     if(file_exists($yml))
     {
