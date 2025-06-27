@@ -56,8 +56,8 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$messageFolder->setIpEdit($currentAction->getIp());
 	try
 	{
-		$adminProfile->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
-		$adminProfile->insert();
+		$messageFolder->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
+		$messageFolder->insert();
 		$newId = $messageFolder->getMessageFolderId();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->message_folder_id, $newId);
 	}
