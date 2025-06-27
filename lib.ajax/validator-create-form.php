@@ -112,12 +112,6 @@ else if($inputPost->getUserAction() == 'update-form')
 $path = ValidatorUtil::getPath($appConfig, $inputPost);
 $data = ValidatorUtil::parseValidatorClass(file_get_contents($path));
 
-// JavaScript need object instead of associated array
-if(is_array($data['properties']) && empty($data['properties']))
-{
-    $data['properties'] = new stdClass;
-}
-
 $tableName = $data['tableName'];
 $validatorName = $data['className'];
 
