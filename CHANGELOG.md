@@ -823,7 +823,20 @@ These configurations are now stored alongside other project resources, making th
 This change ensures that the visual and structural designs built using the Entity Editor are **portable, persistent, and tightly coupled** with the project they belong to.
 
 
+
 ### Validator UI Fix
 
 -   Fixed a minor issue where the submit button in the **Validator Editor** was incorrectly labeled as **"Update Form"**. It now correctly displays **"Update"**, providing better clarity and consistency.
     
+
+
+
+### Bug Fixes: Application Info Update
+
+-   Fixed an issue where the **application info update** process incorrectly applied updates to outdated records.
+    
+-   Added validation to ensure that only applications created **within the last hour** are eligible for updates.
+    
+-   Improved query efficiency by eliminating unnecessary `SELECT` calls before `UPDATE`.
+    
+-   Ensured proper ownership checks to avoid cross-admin updates.

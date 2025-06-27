@@ -2596,6 +2596,7 @@ let initAll = function () {
       },
       error: function (xhr, status, error) {
         decreaseAjaxPending();
+        updateBtn[0].disabled = false;
       }
     });
   });
@@ -3825,7 +3826,7 @@ function checkWriretableDirectory(input)
     let container = $(input).closest('.directory-container');
     let isFile = container.attr('data-isfile') || '';
     let failedIfExists = container.attr('data-failed-if-exists') || '';
-    let directory = input.val();
+    let directory = input.val() || '';
     directory = directory.trim();
     
     if(directory != '' && directory != '/' && directory != '\\')
@@ -6795,14 +6796,16 @@ function loadMenu() {
 
       let $select = $('select[name="module_menu"]');
       $select.empty();
-
-      $.each(data.menu, function(index, item) {
-        $('<option>', {
-          text: item.title,
-          value: item.title,
-          selected: item.active === true
-        }).appendTo($select);
-      });
+      if(data.menu && data.menu.length > 0)
+      {
+        $.each(data.menu, function(index, item) {
+          $('<option>', {
+            text: item.title,
+            value: item.title,
+            selected: item.active === true
+          }).appendTo($select);
+        });
+      }
     },
     error: function() {
       decreaseAjaxPending();
