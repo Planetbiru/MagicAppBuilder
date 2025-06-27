@@ -74,11 +74,11 @@ $jsLang = [
         <tbody>
             <tr>
                 <td><?php echo $appLanguage->getApplicationVersion();?></td>
-                <td><?php echo $ini->getApplicationVersion();?></td>
+                <td><span id="application-version"><?php echo $ini->getApplicationVersion();?></span></td>
             </tr>
             <tr>
                 <td><?php echo $appLanguage->getLastUpdate();?></td>
-                <td><?php echo $ini->getLastUpdate();?></td>
+                <td><span id="last-update"><?php echo $ini->getLastUpdate();?></span></td>
             </tr>
             <tr>
                 <td><?php echo $appLanguage->getUpdateToVersion();?></td>
@@ -157,6 +157,8 @@ $jsLang = [
         if (!json.success) throw new Error(json.message || lang.extractionFailed);
         statusEl.textContent = '✅ ' + json.message;
         statusEl.classList.add('success');
+        document.querySelector('#application-version').textContent = json.new_version;
+        document.querySelector('#last-update').textContent = json.last_update;
       })
       .catch(err => {
         statusEl.textContent = '❌ ' + err.message;
