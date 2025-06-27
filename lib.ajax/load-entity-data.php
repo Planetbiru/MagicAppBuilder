@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
@@ -17,42 +18,62 @@ if ($inputPost->getDatabaseName() !== null) {
     $entities = $inputPost->getEntities();
     $diagrams = $inputPost->getDiagrams();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $activeWorkspace->getDirectory() . "/entity/data/$filename";
-    if (!file_exists(dirname($path))) {
-        mkdir(dirname($path), 0755, true);
-    }
 
-    if (file_exists($path)) {
-        $raw = file_get_contents($path);
-        $data = json_decode($raw, true);
-        if (!is_array($data)) {
+    $selectedApplication = new EntityApplication(null, $databaseBuilder);
+    try
+    {
+        $selectedApplication->find($applicationId);
+        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
+
+        $path = $basePath . "/$filename";
+        if (!file_exists(dirname($path))) {
+            mkdir(dirname($path), 0755, true);
+        }
+
+        if (file_exists($path)) {
+            $raw = file_get_contents($path);
+            $data = json_decode($raw, true);
+            if (!is_array($data)) {
+                $data = array('entities' => array(), 'diagrams' => array());
+            }
+        } else {
             $data = array('entities' => array(), 'diagrams' => array());
         }
-    } else {
-        $data = array('entities' => array(), 'diagrams' => array());
-    }
 
-    if (strlen($diagrams) > 10) {
-        $data['diagrams'] = json_decode($diagrams);
-        file_put_contents($path, json_encode($data));
+        if (strlen($diagrams) > 10) {
+            $data['diagrams'] = json_decode($diagrams);
+            file_put_contents($path, json_encode($data));
+        }
+        if (strlen($entities) > 10) {
+            $data['entities'] = json_decode($entities);
+            file_put_contents($path, json_encode($data));
+        }
     }
-    if (strlen($entities) > 10) {
-        $data['entities'] = json_decode($entities);
-        file_put_contents($path, json_encode($data));
+    catch(Exception $e)
+    {
+        // Do noting
     }
-
     ResponseUtil::sendJSON([]);
 } else {
     $applicationId = $inputGet->getApplicationId();
     $databaseType = $inputGet->getDatabaseType();
     $databaseName = $inputGet->getDatabaseName();
     $databaseSchema = $inputGet->getDatabaseSchema();
+    $json = json_encode(array('entities' => array(), 'diagrams' => array()));
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
-    $path = $activeWorkspace->getDirectory() . "/entity/data/$filename";
-    if (!file_exists($path)) {
-        $json = json_encode(array('entities' => array(), 'diagrams' => array()));
-    } else {
-        $json = file_get_contents($path);
+    $selectedApplication = new EntityApplication(null, $databaseBuilder);
+    try
+    {
+        $selectedApplication->find($applicationId);
+        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
+        $path = $basePath . "/$filename";
+        if (file_exists($path)) {
+            $json = file_get_contents($path);
+        }
+    }
+    catch(Exception $e)
+    {
+        // Do noting
     }
     ResponseUtil::sendJSON($json);
 }

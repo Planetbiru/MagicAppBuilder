@@ -788,3 +788,36 @@ A safeguard has been implemented to **prevent users from deleting their own user
 -   Minor issues affecting UI behavior, validation processing, and dynamic content rendering have been addressed.
     
 -   Codebase has been cleaned up to reduce edge case failures and improve maintainability.
+
+
+# MagicAppBuilder Version 1.5.2
+
+## What's Changed
+
+### Project-Based Entity Editor Data Storage
+
+MagicAppBuilder 1.5.2 introduces a major architectural change by relocating **Entity Editor configuration data** into the project directory. This includes:
+
+-   **Entity Designs**
+    
+-   **Diagram Layouts and Relationships**
+    
+-   **Column Templates**
+    
+-   **Column Type Settings**
+    
+
+These configurations are now stored alongside other project resources, making them part of the project’s file structure.
+
+#### Benefits:
+
+-   **Export/Import Friendly** – All design data is now bundled with the project. When a project is exported, these configurations are preserved and can be restored during import.
+    
+-   **Better Version Control** – Entity design changes can now be tracked via Git or other VCS tools as part of the project directory.
+    
+-   **Improved Portability** – Teams working across different environments can now safely move projects without losing editor context or metadata.
+    
+-   **Project Isolation** – Prevents accidental sharing of configuration between unrelated projects.
+    
+
+This change ensures that the visual and structural designs built using the Entity Editor are **portable, persistent, and tightly coupled** with the project they belong to.
