@@ -840,3 +840,45 @@ This change ensures that the visual and structural designs built using the Entit
 -   Improved query efficiency by eliminating unnecessary `SELECT` calls before `UPDATE`.
     
 -   Ensured proper ownership checks to avoid cross-admin updates.
+
+
+# MagicAppBuilder Version 1.6
+
+## What's New
+
+###  Built-in Application Updater
+
+MagicAppBuilder 1.6 introduces a **powerful new feature**: the **automatic application updater**.
+
+With this update, users can now seamlessly upgrade MagicAppBuilder to the latest version without needing to manually download and extract ZIP files.
+
+#### Key Features:
+
+-    **One-click update** from the web interface
+    
+-    **Automatic download** and safe extraction of updates
+    
+-    **Version skipping supported** – users can jump directly from older versions (e.g., 1.6) to the latest without applying intermediate updates
+    
+-    **Safe overwrite** – updater avoids replacing sensitive files like `.env` or custom scripts (e.g., `update.php`)
+    
+-    Integrated with the **Magic Admin** interface under the **"About"** menu
+    
+
+#### Requirements:
+
+-   This feature is available starting from **MagicAppBuilder 1.6**
+    
+-   PHP `ZipArchive` extension must be enabled
+    
+-   Internet connection is required to fetch updates from GitHub
+    
+
+## Other Improvements
+
+-   Stability and performance enhancements for background update operations
+    
+-   Improved modular structure to support future extensibility of the updater
+    
+
+Stay up-to-date effortlessly and enjoy the newest features and improvements with minimal effort!

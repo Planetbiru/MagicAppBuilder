@@ -6,3 +6,4 @@ tmp/*
 .cache/*
 inc.cfg/*
 inc.database/database.sqlite
+magic-admin/update/*
