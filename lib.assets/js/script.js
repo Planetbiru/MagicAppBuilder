@@ -590,7 +590,7 @@ function updateValidatorForm()
 {
   $('#validationMasterModal .modal-header .modal-title').text('Update Validator');
   $('#validationMasterModal .modal-body').empty();
-  $('#validationMasterModal .master-validation-modal-ok').text('Update Form');
+  $('#validationMasterModal .master-validation-modal-ok').text('Update');
   $('#validationMasterModal .master-validation-modal-ok').attr('onclick', "createValidator(this)");
   $.ajax({
     type: 'post',
