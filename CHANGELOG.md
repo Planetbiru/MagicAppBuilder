@@ -804,7 +804,7 @@ MagicAppBuilder 1.5.2 introduces a major architectural change by relocating **En
     
 -   **Column Templates**
     
--   **Column Type Settings**
+-   **Default Column Type Settings**
     
 
 These configurations are now stored alongside other project resources, making them part of the project’s file structure.
