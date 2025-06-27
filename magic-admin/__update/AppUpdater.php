@@ -53,7 +53,7 @@ class AppUpdater
     }
 
     /**
-     * Get a list of available releases from GitHub.
+     * Get a list of available releases from GitHub (version >= 1.5.1 only).
      *
      * @return array An array of releases with 'tag_name', 'name', and 'zipball_url'
      * @throws UpdateException
@@ -83,8 +83,15 @@ class AppUpdater
 
         $result = array();
         foreach ($releases as $release) {
+            $tag = isset($release['tag_name']) ? $release['tag_name'] : '';
+
+            // Skip if version is lower than 1.5.1
+            if (version_compare(ltrim($tag, 'v'), '1.6.0', '<')) {
+                continue;
+            }
+
             $result[] = array(
-                'tag_name'    => isset($release['tag_name']) ? $release['tag_name'] : '',
+                'tag_name'    => $tag,
                 'name'        => isset($release['name']) ? $release['name'] : '',
                 'zipball_url' => isset($release['zipball_url']) ? $release['zipball_url'] : ''
             );
@@ -92,6 +99,7 @@ class AppUpdater
 
         return $result;
     }
+
 
 
     /**
