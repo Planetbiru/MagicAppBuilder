@@ -903,9 +903,23 @@ MagicAppBuilder 1.7 introduces full support for **multi-level navigation menus w
 -   Parent items expand automatically if any of their descendants are active.
     
 
-**Menu hierarchy is now built using the `parentId` of each module**, enabling **true hierarchical structure**. This replaces the previous limitation where only two levels of menus were possible via module groupings.
+**Menu hierarchy is now built using the `parentId` of each module**, enabling a **true hierarchical structure**. This replaces the previous limitation where menus were restricted to only two levels via module groupings.
 
-This makes it easier than ever to build complex navigation structures for dashboards, content management systems, and admin panels.
+A new theme is also introduced that fully supports multi-level menus. Older themes remain compatible but are limited to two-level navigation only.
+
+### New Hierarchical Module Management
+
+This version also includes support for **nested module definitions**. You can now:
+
+-   Create **empty parent modules** (without implementation logic) to serve as containers for organizing nested modules.
+    
+-   Define module structures that mirror your desired menu hierarchy.
+    
+-   Enforce hierarchical access control: **users must have access to the parent module to view or access any of its children**.
+    
+
+This greatly improves flexibility and control when designing complex, role-based menu systems.
+
 
 ## Improvements
 
@@ -919,3 +933,5 @@ This makes it easier than ever to build complex navigation structures for dashbo
 ## Compatibility
 
 -   Fully backward compatible with previous menu structures.
+    
+-   Existing themes remain functional, with full support for legacy two-level menus.

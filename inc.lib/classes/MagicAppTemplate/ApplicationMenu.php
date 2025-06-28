@@ -18,6 +18,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
 use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
+use MagicAppTemplate\Entity\App\AppModuleMultiLevelImpl;
 
 /**
  * Class ApplicationMenu
@@ -653,6 +654,38 @@ class ApplicationMenu // NOSONAR
         }
         return $modules;
 	}
+
+    /**
+     * Loads active and menu-enabled modules from the database, ordered by module group and then by module sort order.
+     * This function specifically retrieves modules that are designed for multi-level menus.
+     *
+     * @return \MagicObject\MagicObject[] An array of `AppModuleMultiLevelImpl` objects (or `MagicObject` instances)
+     * representing the loaded modules. Returns an empty array if an error occurs
+     * during database retrieval.
+     */
+    public function loadModuleMultiLevel()
+	{
+        $modules = array();
+		$module = new AppModuleMultiLevelImpl(null, $this->database);
+        $specs = PicoSpecification::getInstance()
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->menu, true))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+        ;
+        $sorts = PicoSortable::getInstance()
+            ->addSortable(new PicoSort('moduleGroup.sortOrder', PicoSort::ORDER_TYPE_ASC))
+            ->addSortable(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+        ;
+        try
+        {
+            $pageData = $module->findAll($specs, null, $sorts);
+            $modules = $pageData->getResult();
+        }
+        catch(Exception $e)
+        {
+            $modules = array();
+        }
+        return $modules;
+	}
     
     /**
      * Loads the admin roles from the database.
@@ -714,37 +747,87 @@ class ApplicationMenu // NOSONAR
      */
     public function buildMenuHierarchy($modules, $parentId = null) {
         $branch = array();
+        $modulesUsedInThisLevel = array(); // Keep track of modules used as direct children in this call
+
         foreach ($modules as $module) {
             // Check if the current module's parent_id matches the requested parentId
-            // Also ensure it's marked as a 'menu' item if your design requires it
-            if ($module->getParentId() === $parentId && $module->isMenu()) {
+            // And ensure it's marked as a 'menu' item
+            if ($module->getParentModuleId() == $parentId && $module->isMenu()) {
                 // Recursively find children for the current module
                 $children = $this->buildMenuHierarchy($modules, $module->getModuleId());
+                
                 if (!empty($children)) {
                     $module->setChildren($children); // Add children to the module object
                 }
+                
                 $branch[] = $module; // Add the module (with its children) to the current branch
+                $modulesUsedInThisLevel[] = $module->getModuleId(); // Mark this module as used
             }
         }
+        
+        // At the end of the top-level call ($parentId === null),
+        // filter out any modules that became children of other modules.
+        // This prevents them from appearing at the root level if they were only supposed to be children.
+        if ($this->isBlank($parentId)) {
+            $filteredModules = [];
+            $allChildModuleIds = $this->collectAllChildModuleIds($branch);
+            
+            foreach ($modules as $module) {
+                // Only add to filteredModules if it's not a child of any other module,
+                // AND its parent_id matches the current parentId (which is null for root).
+                if (!in_array($module->getModuleId(), $allChildModuleIds) && $this->isBlank($module->getParentModuleId()) && $module->isMenu()) {
+                    $filteredModules[] = $module;
+                }
+            }
+            return $filteredModules;
+        }
+
         return $branch;
+    }
+
+    /**
+     * Checks if a given string is considered "blank".
+     * A string is considered blank if it is:
+     * - Not set (null).
+     * - Empty (e.g., "").
+     * - Contains only whitespace characters.
+     *
+     * @param string|null $string The string to check. Can be null.
+     * @return bool True if the string is blank, false otherwise.
+     */
+    public function isBlank($string)
+    {
+        return !isset($string) || empty($string) || trim($string) === '';
+    }
+
+    /**
+     * Helper function to collect all module IDs that are children of other modules in a hierarchy.
+     *
+     * @param array $menuItems A hierarchical array of menu items.
+     * @return array A flat array of all child module IDs.
+     */
+    private function collectAllChildModuleIds($menuItems) {
+        $childIds = [];
+        foreach ($menuItems as $item) {
+            if ($item->issetChildren() && !empty($item->getChildren())) {
+                foreach ($item->getChildren() as $child) {
+                    $childIds[] = $child->getModuleId();
+                }
+                $childIds = array_merge($childIds, $this->collectAllChildModuleIds($item->getChildren()));
+            }
+        }
+        return $childIds;
     }
     
     /**
-     * Renders a nested HTML menu structure based on hierarchical menu items.
+     * Renders the menu hierarchy as an unordered list (UL) using DOMDocument.
+     * Adds 'open' and 'selected' classes based on the active URL.
      *
-     * This method constructs an unordered list (`<ul>`) with list items (`<li>`) for each menu item.
-     * It supports recursive rendering for child menu items, applies appropriate Bootstrap classes
-     * for collapsed/expanded states, and marks active or open items based on the current URL.
-     *
-     * - Root menus get `id="sidebarMenu"` and `nav flex-column` class.
-     * - Child menus are rendered inside a `<div class="collapse">` for Bootstrap collapsible support.
-     * - Active and open states are visually indicated via `active`, `open`, and `show` classes.
-     *
-     * @param array $menuItems An array of menu items implementing methods like getName(), getUrl(), hasChildren(), getChildren(), and getIcon().
-     * @param string $activeUrl The current active URL used to mark menu items as active or open.
-     * @param int $level The depth level of the current menu (used to assign indentation classes). Default is 0.
-     * @param DOMDocument|null $dom The DOMDocument used to create elements. If null, a new instance is created.
-     * @return DOMElement|null The root <ul> element representing the menu structure, or null if menuItems is empty.
+     * @param MagicObject[] $menuItems The hierarchical array of menu items to render.
+     * @param string $activeUrl The URL of the currently active/selected page/module.
+     * @param int $level The current nesting level (for styling).
+     * @param DOMDocument|null $dom The DOMDocument instance for the main document.
+     * @return DOMElement|null The UL DOMElement representing the menu, or null if empty.
      */
     public function renderMenuHierarchy($menuItems, $activeUrl, $level = 0, $dom = null) // NOSONAR
     {
@@ -752,102 +835,70 @@ class ApplicationMenu // NOSONAR
             return null;
         }
 
+        // Initialize DOMDocument for the top-level call
         if ($dom === null) {
             $dom = new DOMDocument('1.0', 'UTF-8');
+            // This is crucial: we need to pass the initial DOM object through recursive calls
+            // For simplicity, we'll return the root UL and let the caller append it
+            // to a complete document if needed.
         }
 
-        $this->activeUrl = $activeUrl;
+        $this->activeUrl = $activeUrl; // Set the active URL for this rendering cycle
 
-        // Use 'nav flex-column' for level 0, 'nav flex-column pl-3' for deeper levels
-        $ulClass = ($level === 0) ? 'nav flex-column root-menu' : 'nav flex-column pl-3';
         $ul = $dom->createElement('ul');
+        // Add 'menu-root' class if level is 0
+        $ulClass = ($level === 0) ? 'menu-level-' . $level . ' menu-root' : 'menu-level-' . $level;
         $ul->setAttribute('class', $ulClass);
+
         if ($level === 0) {
             $ul->setAttribute('id', 'sidebarMenu'); // Only apply ID to the main root UL
         }
 
-
         foreach ($menuItems as $item) {
             $li = $dom->createElement('li');
-            $li->setAttribute('class', 'nav-item'); // All nav items
-            
-            // Add a custom class for root-level menu items if needed for specific styling or JS targeting
-            if ($level === 0) {
-                $li->setAttribute('class', $li->getAttribute('class') . ' root-menu-item');
-            }
-
             $a = $dom->createElement('a');
-            // Add 'collapsed' class for items that have children and are not currently active
-            $linkClasses = ['nav-link'];
-            if ($item->hasChildren() && stripos($item->getUrl(), $this->activeUrl) === false && $this->findActiveChild($item->getChildren())) {
-                $linkClasses[] = 'collapsed';
-            }
-            
-            $a->setAttribute('class', implode(' ', $linkClasses));
             $a->setAttribute('href', htmlspecialchars($item->getUrl()));
             $a->setAttribute('target', htmlspecialchars($item->getTarget() ?: '_self'));
 
-            // If it has children, add data-toggle
-            if ($item->hasChildren()) {
-                $collapseId = 'collapse-' . uniqid(); // Generate a unique ID for the collapse target
-                $a->setAttribute('data-toggle', 'collapse');
-                $a->setAttribute('href', '#' . $collapseId);
-                $a->setAttribute('aria-expanded', 'false'); // Default to collapsed
-            }
-
-
             if ($item->getIcon()) {
                 $i = $dom->createElement('i');
-                // Assume 'fas' prefix for Font Awesome 5+, adjust if using different versions
                 $i->setAttribute('class', 'fa ' . htmlspecialchars($item->getIcon()));
                 $a->appendChild($i);
-                $a->appendChild($dom->createTextNode(' '));
+                $a->appendChild($dom->createTextNode(' ')); // Add a space after icon
             }
 
             $a->appendChild($dom->createTextNode(htmlspecialchars($item->getName())));
             $li->appendChild($a);
 
-            $hasChildren = $item->hasChildren();
-            $liClasses = preg_split('/\s+/', $li->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY); // NOSONAR
+            $hasChildren = $item->issetChildren();
+            $liClasses = array(); // Array to build up classes for the LI
 
             if ($hasChildren) {
-                // If it has children, the parent <a> should have data-toggle, and the submenu should be a div with collapse
+                $liClasses[] = 'has-submenu';
+            }
+
+            // --- Logic for 'selected' and 'open' classes ---
+            $isItemSelected = (strcasecmp($item->getUrl(), $this->activeUrl) === 0);
+
+            if ($isItemSelected) {
+                $liClasses[] = 'open';
+                $liClasses[] = 'selected';
+            }
+
+            // Recursively render children if they exist
+            if ($hasChildren) {
                 $childUl = $this->renderMenuHierarchy($item->getChildren(), $this->activeUrl, $level + 1, $dom);
                 if ($childUl) {
-                    $submenuDiv = $dom->createElement('div');
-                    $submenuDiv->setAttribute('id', $collapseId); // Use the unique ID for the collapse target
-                    $submenuDiv->setAttribute('class', 'collapse'); // Default to collapsed
+                    $li->appendChild($childUl);
 
-                    // Check if any child is active, if so, add 'show' to collapse div and 'open' to parent li
-                    if ($this->hasOpenChild($childUl) || strcasecmp($item->getUrl(), $this->activeUrl) === 0) {
-                        $submenuDiv->setAttribute('class', 'collapse show');
-                        if (!in_array('open', $liClasses)) {
-                            $liClasses[] = 'open';
-                        }
-                        // For Bootstrap, if parent is open, its nav-link should not be 'collapsed'
-                        // Update the <a> tag's class if it was marked collapsed earlier
-                        $currentAClass = $a->getAttribute('class');
-                        $a->setAttribute('class', str_replace(' collapsed', '', $currentAClass));
-                        $a->setAttribute('aria-expanded', 'true');
+                    // If any child (or grandchild) is selected, this parent should be 'open'
+                    // We need to check the childUl's content for 'open' class on any of its LIs
+                    if ($this->hasOpenChild($childUl)) {
+                        $liClasses[] = 'open';
                     }
-                    $submenuDiv->appendChild($childUl);
-                    $li->appendChild($submenuDiv);
                 }
             }
-
-            // Mark 'selected' if current URL matches precisely (or starts with if it's a parent)
-            $isItemSelected = (strcasecmp($item->getUrl(), $this->activeUrl) === 0);
-            if ($isItemSelected) {
-                $liClasses[] = 'selected';
-                if (!in_array('open', $liClasses)) { // Also mark as open if selected
-                    $liClasses[] = 'open';
-                }
-                // For Bootstrap, if active, its nav-link should not be 'collapsed'
-                $currentAClass = $a->getAttribute('class');
-                $a->setAttribute('class', str_replace(' collapsed', '', $currentAClass) . ' active'); // Add 'active' class to nav-link
-            }
-
-
+            // Add collected classes to the LI
             if (!empty($liClasses)) {
                 $li->setAttribute('class', implode(' ', array_unique($liClasses)));
             }
@@ -859,42 +910,51 @@ class ApplicationMenu // NOSONAR
     }
 
     /**
-     * Recursively checks whether any child menu item (or sub-child) is active based on the current URL.
+     * Renders the complete menu hierarchy as an HTML string.
+     * This function retrieves module data, builds a hierarchical menu structure,
+     * renders it into a DOMDocument, marks the active parent menu items based on the current URL,
+     * and then returns the final HTML as a string.
      *
-     * This is used to determine whether a parent item should be expanded (opened) in the menu.
-     *
-     * @param array $menuItems Array of child menu items.
-     * @return bool True if any of the child items (recursively) matches the active URL, otherwise false.
+     * @param string|null $currentHref The current URL of the page. This is used to determine
+     * which menu items are active and their parent elements should be "open".
+     * If null, the previously set currentHref (if any) will be used.
+     * @return string The HTML string representation of the multi-level menu.
      */
-    private function findActiveChild($menuItems) // NOSONAR
+    public function renderHtmlMenu($currentHref = null)
     {
-        if (empty($menuItems)) {
-            return false;
+        $this->currentHref = $currentHref;
+
+        $modules = $this->loadModuleMultiLevel(); // Retrieve modules (this might need to be adjusted based on your menu data structure)
+        $menuHierarchy = $this->buildMenuHierarchy($modules); // Build the menu hierarchy
+                
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true; // For cleaner output
+
+        // Render the main menu hierarchy
+        $renderedUl = $this->renderMenuHierarchy($menuHierarchy, $this->currentHref, 0, $dom);
+
+        if ($renderedUl) {
+            // Important: Append the rendered UL element to the DOMDocument
+            $dom->appendChild($renderedUl);
+            // Call markParentsOpen after all menu elements are in the DOM
+            $this->markParentsOpen($dom);
         }
-        foreach ($menuItems as $item) {
-            if (strcasecmp($item->getUrl(), $this->activeUrl) === 0) {
-                return true;
-            }
-            if ($item->hasChildren() && $this->findActiveChild($item->getChildren())) {
-                return true;
-            }
-        }
-        return false;
+        
+        return $dom->saveHTML();
     }
 
     /**
-     * Checks if any child <li> element within the given <ul> has the 'open' class.
+     * Helper to check if any child LI element within a UL has the 'open' class.
+     * This is used to determine if a parent should also be 'open'.
      *
-     * This is used to decide whether a collapsible section should be shown (`collapse show`) by default.
-     *
-     * @param DOMElement $ulElement The <ul> element to search for open children.
-     * @return bool True if any <li> under this <ul> has the 'open' class, otherwise false.
+     * @param DOMElement $ulElement The UL element to check.
+     * @return bool
      */
-    private function hasOpenChild($ulElement) // NOSONAR
+    private function hasOpenChild($ulElement)
     {
         $lis = $ulElement->getElementsByTagName('li');
         foreach ($lis as $li) {
-            if ($li->hasAttribute('class') && str_contains($li->getAttribute('class'), 'open')) {
+            if ($li->hasAttribute('class') && $this->stringContains($li->getAttribute('class'), 'open')) {
                 return true;
             }
         }
@@ -902,81 +962,74 @@ class ApplicationMenu // NOSONAR
     }
 
     /**
-     * Traverses the DOM to mark all ancestor menu items as open for every selected <li> element.
+     * Traverses the menu DOM to mark all parent LIs of the 'selected' item with the 'open' class.
+     * The traversal stops when it reaches a <ul> element that has the 'menu-root' class,
+     * as these are top-level menu containers and their containing LIs are not collapsible parents in the same manner.
      *
-     * This function updates parent <li> elements by:
-     * - Adding the 'open' class to them.
-     * - Ensuring their <a> tags are expanded and not collapsed (adjusts class and aria-expanded attribute).
-     * It uses XPath queries to walk up the DOM tree from selected items and apply the changes accordingly.
-     * The traversal stops when it reaches a root menu `<ul>` element (identified by the `root-menu` class).
-     *
-     * @param DOMDocument $dom The DOM document that contains the menu structure.
+     * @param DOMDocument $dom The main DOMDocument object.
      * @return void
      */
     public function markParentsOpen($dom) // NOSONAR
     {
         $xpath = new DOMXPath($dom);
+        // Find all <li> elements that have the 'selected' class
         $selectedItems = $xpath->query("//li[contains(concat(' ', normalize-space(@class), ' '), ' selected ')]");
 
         foreach ($selectedItems as $selectedLi) {
-            $currentElement = $selectedLi;
+            $currentLi = $selectedLi; // Start traversal from the selected <li>
 
-            // Start from the selected LI and traverse upwards
-            while ($currentElement !== null) {
-                // Find the direct parent UL
-                $parentUl = $xpath->query("parent::ul[1]", $currentElement)->item(0);
+            // Continue moving upwards as long as there's a current <li>
+            while ($currentLi !== null) {
+                // Find the <ul> element that directly contains the current <li>
+                $parentUl = $xpath->query("parent::ul[1]", $currentLi)->item(0);
 
-                if ($parentUl instanceof DOMElement) {
-                    // If the parent UL has the 'root-menu' class, we stop marking its parent LI.
-                    // This UL is essentially the top-level menu.
-                    if ($parentUl->hasAttribute('class') && str_contains($parentUl->getAttribute('class'), 'root-menu')) {
-                        // We mark the LI that directly contains this root-menu UL's submenu if applicable.
-                        // However, the 'root-menu-item' class is on the LI, not the UL, so let's target the parent LI.
-                        $parentLiOfRootMenuUl = $xpath->query("parent::div/parent::li[1]", $parentUl)->item(0);
-                        if ($parentLiOfRootMenuUl instanceof DOMElement) {
-                             $classAttrLi = $parentLiOfRootMenuUl->getAttribute('class');
-                             $classesLi = preg_split('/\s+/', $classAttrLi, -1, PREG_SPLIT_NO_EMPTY);
-                             if (!in_array('open', $classesLi)) {
-                                 $classesLi[] = 'open';
-                                 $parentLiOfRootMenuUl->setAttribute('class', implode(' ', array_unique($classesLi)));
-                             }
-                             $parentAnchorLi = $xpath->query("a", $parentLiOfRootMenuUl)->item(0);
-                             if ($parentAnchorLi instanceof DOMElement) {
-                                 $anchorClassesLi = preg_split('/\s+/', $parentAnchorLi->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
-                                 $anchorClassesLi = array_diff($anchorClassesLi, ['collapsed']);
-                                 $parentAnchorLi->setAttribute('class', implode(' ', array_unique($anchorClassesLi)));
-                                 $parentAnchorLi->setAttribute('aria-expanded', 'true');
-                             }
+                // If no parent UL is found, or if we've reached the top of the document structure, break.
+                if (!($parentUl instanceof DOMElement)) {
+                    break;
+                }
+
+                // If the parent UL has the 'menu-root' class, we've reached the top of the menu hierarchy.
+                // We do not mark any further parents 'open' beyond this point, as 'menu-root' items
+                // are considered top-level and their direct containing <li> (if any)
+                // is not a collapsible parent in the same way.
+                if ($parentUl->hasAttribute('class') && $this->stringContains($parentUl->getAttribute('class'), 'menu-root')) {
+                    // Here, we could add optional logic if the <li> itself is a root item
+                    // that has a submenu and is active, but for the purpose of marking *ancestors* as 'open',
+                    // we stop here.
+                    break;
+                }
+
+                // For any other <ul> (i.e., a submenu <ul>), find its parent <li>,
+                // which is the actual menu item that needs to be marked 'open' to reveal this submenu.
+                // Assumption: submenu <ul>s are typically nested like: <li><div><ul>...</ul></div></li>
+                $parentLiToMark = $xpath->query("parent::div/parent::li[1]", $parentUl)->item(0);
+
+                if ($parentLiToMark instanceof DOMElement) {
+                    $classAttr = $parentLiToMark->getAttribute('class');
+                    // Split classes into an array
+                    $classes = preg_split('/\s+/', $classAttr, -1, PREG_SPLIT_NO_EMPTY);
+
+                    // Add 'open' class if not already present
+                    if (!in_array('open', $classes)) {
+                        $classes[] = 'open';
+                        $parentLiToMark->setAttribute('class', implode(' ', array_unique($classes)));
+
+                        // Also ensure the corresponding <a> tag is expanded and not 'collapsed'
+                        $parentAnchor = $xpath->query("a", $parentLiToMark)->item(0);
+                        if ($parentAnchor instanceof DOMElement) {
+                            $anchorClasses = preg_split('/\s+/', $parentAnchor->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
+                            // Remove the 'collapsed' class
+                            $anchorClasses = array_diff($anchorClasses, ['collapsed']);
+                            $parentAnchor->setAttribute('class', implode(' ', array_unique($anchorClasses)));
+                            $parentAnchor->setAttribute('aria-expanded', 'true');
                         }
-                        break; // Stop when we hit the root menu UL
                     }
-
-                    // If it's a regular submenu UL, find its parent LI
-                    $parentLi = $xpath->query("parent::div/parent::li[1]", $parentUl)->item(0);
-
-                    if ($parentLi instanceof DOMElement) {
-                        $classAttr = $parentLi->getAttribute('class');
-                        $classes = preg_split('/\s+/', $classAttr, -1, PREG_SPLIT_NO_EMPTY);
-
-                        if (!in_array('open', $classes)) {
-                            $classes[] = 'open';
-                            $parentLi->setAttribute('class', implode(' ', array_unique($classes)));
-
-                            // Also ensure the corresponding <a> tag is not 'collapsed' and has 'aria-expanded="true"'
-                            $parentAnchor = $xpath->query("a", $parentLi)->item(0);
-                            if ($parentAnchor instanceof DOMElement) {
-                                $anchorClasses = preg_split('/\s+/', $parentAnchor->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
-                                $anchorClasses = array_diff($anchorClasses, ['collapsed']); // Remove 'collapsed'
-                                $parentAnchor->setAttribute('class', implode(' ', array_unique($anchorClasses)));
-                                $parentAnchor->setAttribute('aria-expanded', 'true');
-                            }
-                        }
-                        $currentElement = $parentLi; // Move up to the next parent LI
-                    } else {
-                        break; // No more parent LI elements in the expected structure
-                    }
+                    // Move up to this newly marked parent <li> for the next iteration
+                    $currentLi = $parentLiToMark;
                 } else {
-                    break; // Reached the top of the DOM or unexpected structure
+                    // If no containing <li> is found for this <ul>,
+                    // something is structurally off or we're at an unexpected top level.
+                    break;
                 }
             }
         }
@@ -1022,6 +1075,20 @@ class ApplicationMenu // NOSONAR
     {        
         return self::generateSidebar($this->getMenuData(), $this->currentHref, $this->appLanguage);
     }
+
+    /**
+     * Checks if a string contains a specific substring.
+     * This function provides similar functionality to PHP 8's `str_contains()`
+     * for compatibility with earlier PHP versions (e.g., PHP 5).
+     *
+     * @param string $haystack The string to search within.
+     * @param string $needle The substring to search for.
+     * @return bool True if the $needle is found within the $haystack, false otherwise.
+     */
+    public function stringContains($haystack, $needle) {
+        return strpos($haystack, $needle) !== false;
+    }
+
     
     /**
      * Converts the AppMenu object to a string representation (renders the menu).
