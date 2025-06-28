@@ -133,6 +133,6 @@ if(file_exists($appMenuPath))
     $appMenuData->loadYamlFile($appMenuPath, false, true, true);
 }
 $curretHref = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-$appMenu = new ApplicationMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref, $appLanguage);
+$appMenu = new ApplicationMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref);
 
 $userActivityLogger = new AppUserActivityLogger($appConfig, new AppUserActivityImpl(null, $database));

@@ -66,13 +66,6 @@ class ApplicationMenu // NOSONAR
     private $currentHref;
     
     /**
-     * Current application language object.
-     *
-     * @var AppLanguage
-     */
-    private $appLanguage;
-    
-    /**
      * Active URL
      *
      * @var string
@@ -84,12 +77,10 @@ class ApplicationMenu // NOSONAR
      * This method uses the DOMDocument to dynamically create the sidebar HTML structure.
      *
      * @param array $jsonData The JSON data representing the menu structure, including menu items and their submenus.
-     * @param string $currentHref The current active page's href to determine the active menu and submenu items.
-     * @param object $appLanguage The application language object used to fetch localized menu item titles.
      *
      * @return string The generated HTML for the sidebar.
      */
-    public static function generateSidebar($jsonData, $currentHref, $appLanguage) // NOSONAR
+    public function generateSidebar($jsonData) // NOSONAR
     {
         // Create a new DOMDocument instance to build the sidebar HTML structure
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -155,7 +146,7 @@ class ApplicationMenu // NOSONAR
                     
                     // Loop through each submenu item and check if it's active
                     foreach ($item['submenu'] as $subItem) {
-                        if (stripos($currentHref, $subItem['href']) !== false) {
+                        if ($this->isMenuSelected($this->currentHref, $subItem['href'])) {
                             $isActive = true; // Set as active if currentHref matches the submenu item's href
                             break;
                         }
@@ -190,7 +181,7 @@ class ApplicationMenu // NOSONAR
                         $subLi = $dom->createElement('li');
                         
                         // Mark the submenu item as active if it matches the currentHref
-                        if (stripos($currentHref, $subItem['href']) !== false) {
+                        if ($this->isMenuSelected($this->currentHref, $subItem['href'])) {
                             $subLi->setAttribute('class', 'nav-item active'); // Set active class for the active submenu item
                         } else {
                             $subLi->setAttribute('class', 'nav-item'); // Set regular class for non-active items
@@ -233,6 +224,24 @@ class ApplicationMenu // NOSONAR
         // Return the generated sidebar HTML as a string
         return $dom->saveHTML();
     }
+
+    /**
+     * Determines whether a given menu item href is considered selected based on the current URL path.
+     * Comparison is done by ensuring the $href exists as a complete path segment in $currentHref,
+     * avoiding false positives caused by partial matches.
+     *
+     * @param string $currentHref The current URL path (e.g., '/dashboard/user/profile')
+     * @param string $href The href of the menu item to compare (e.g., '/user')
+     * @return boolean True if the menu item should be marked as selected.
+     */
+    public function isMenuSelected($currentHref, $href)
+    {
+        // Normalize both paths by ensuring leading and trailing slashes
+        $normalizedCurrent = '/' . trim($currentHref, '/') . '/';
+        $normalizedHref = '/' . trim($href, '/') . '/';
+
+        return strpos($normalizedCurrent, $normalizedHref) !== false;
+    }
     
     /**
      * Constructor for the AppMenu class.
@@ -242,16 +251,14 @@ class ApplicationMenu // NOSONAR
      * @param AppAdminImpl $currentUser Current logged-in user object.
      * @param array $jsonData Menu data in JSON format.
      * @param string $currentHref The current active page's href.
-     * @param AppLanguage $appLanguage Application language object.
      */
-    public function __construct($database, $appConfig, $currentUser, $jsonData, $currentHref, $appLanguage) // NOSONAR
+    public function __construct($database, $appConfig, $currentUser, $jsonData, $currentHref)
     {
         $this->database = $database;
         $this->appConfig = $appConfig;
         $this->currentUser = $currentUser;
         $this->jsonData = $jsonData;
         $this->currentHref = $currentHref;
-        $this->appLanguage = $appLanguage;
     }
     
     /**
@@ -894,7 +901,7 @@ class ApplicationMenu // NOSONAR
             }
 
             // Determine if the current item itself is selected
-            $isItemSelected = (strcasecmp($item->getUrl(), $this->activeUrl) === 0);
+            $isItemSelected = $this->isMenuSelected($this->activeUrl, $item->getUrl());
 
             if ($isItemSelected) {
                 $liClasses[] = 'selected'; // Mark the item itself as selected
@@ -1059,10 +1066,8 @@ class ApplicationMenu // NOSONAR
      *
      * @return string The HTML string representation of the menu.
      */
-    public function renderHtmlMenu($currentHref = null)
+    public function renderHtmlMenu()
     {
-        $this->currentHref = $currentHref;
-
         $menuHierarchy = $this->loadModuleMultiLevelCache();
         if(empty($menuHierarchy))
         {
@@ -1274,7 +1279,7 @@ class ApplicationMenu // NOSONAR
      */
     public function renderMenu()
     {        
-        return self::generateSidebar($this->getMenuData(), $this->currentHref, $this->appLanguage);
+        return $this->generateSidebar($this->getMenuData());
     }
 
     /**
