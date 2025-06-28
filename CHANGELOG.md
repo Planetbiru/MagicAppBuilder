@@ -919,9 +919,15 @@ This offers better flexibility and control when building role-based menu systems
 
 ## Improvements
 
-* Cleaner and more consistent DOM logic for rendering menu structures.
-* Improved handling of active and selected states in nested menus.
-* Internal refactoring for better readability and maintainability.
+
+-   Cleaner and more consistent DOM logic for rendering menu structures.
+    
+-   Improved handling of active and selected states in nested menus.
+    
+-   Internal refactoring for better readability and maintainability.
+    
+-   **Unused asset files** that were not required by the default theme have been **removed** to reduce the application’s overall bootstrap size.
+
 
 
 ## Compatibility
