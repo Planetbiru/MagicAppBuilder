@@ -899,7 +899,7 @@ MagicAppBuilder 1.7 introduces **full support for deeply nested navigation menus
 * Collapsible behavior is handled via Bootstrap’s `collapse` class and `aria-expanded` attributes.
 * Parent menus automatically expand if any of their children (or grandchildren) are active.
 
-Menu structure is now built based on each module’s **`parentId`**, replacing the old two-level `moduleGroup` limitation.
+Menu structure is now built based on each module’s **`parentModuleId`**, replacing the old two-level `moduleGroup` limitation.
 
 > A new default theme is included with full multi-level menu support. Older themes remain compatible but only support up to two levels.
 
