@@ -661,7 +661,7 @@ class ApplicationMenu // NOSONAR
      * Loads active and menu-enabled modules from the database, ordered by module group and then by module sort order.
      * This function specifically retrieves modules that are designed for multi-level menus.
      *
-     * @return \MagicObject\MagicObject[] An array of `AppModuleMultiLevelImpl` objects (or `MagicObject` instances)
+     * @return AppModuleMultiLevelImpl[] An array of `AppModuleMultiLevelImpl` objects (or `MagicObject` instances)
      * representing the loaded modules. Returns an empty array if an error occurs
      * during database retrieval.
      */
@@ -735,14 +735,14 @@ class ApplicationMenu // NOSONAR
     /**
      * Builds a hierarchical menu array from a flat list of modules.
      *
-     * This function recursively processes a flat list of Module objects (which are also MagicObjects),
+     * This function recursively processes a flat list of AppModuleMultiLevelImpl objects (which are also MagicObjects),
      * organizing them into a nested structure based on their parent_id. Only modules
      * explicitly marked as menu items (`isMenu()`) are included in the hierarchy.
      *
-     * @param MagicObject[] $modules A flat array of Module objects to be processed.
+     * @param AppModuleMultiLevelImpl[] $modules A flat array of Module objects to be processed.
      * @param string|null $parentId The ID of the parent module to filter by.
      * Use `null` to start building the top-level menu.
-     * @return MagicObject[] A hierarchical array of Module objects, where each parent module
+     * @return AppModuleMultiLevelImpl[] A hierarchical array of Module objects, where each parent module
      * might contain a 'children' property (or similar, set via `setChildren()`)
      * containing its sub-modules.
      */
@@ -805,8 +805,8 @@ class ApplicationMenu // NOSONAR
     /**
      * Helper function to collect all module IDs that are children of other modules in a hierarchy.
      *
-     * @param array $menuItems A hierarchical array of menu items.
-     * @return array A flat array of all child module IDs.
+     * @param AppModuleMultiLevelImpl[] $menuItems A hierarchical array of menu items.
+     * @return AppModuleMultiLevelImpl[] A flat array of all child module IDs.
      */
     private function collectAllChildModuleIds($menuItems) {
         $childIds = [];
@@ -923,7 +923,6 @@ class ApplicationMenu // NOSONAR
                 $a->setAttribute('class', $a->getAttribute('class') . ' collapsed'); // Add 'collapsed' if it's not active
             }
 
-
             // Append the anchor tag to the li
             $li->appendChild($a);
 
@@ -1015,7 +1014,6 @@ class ApplicationMenu // NOSONAR
 
         return $menuHierarchy;
     }
-
 
     /**
      * Renders the complete menu hierarchy as an HTML string.
@@ -1153,7 +1151,7 @@ class ApplicationMenu // NOSONAR
      * Renders a hierarchical menu as a flat list of <option> elements for a <select> dropdown.
      * Indentation is added based on the menu item's level to simulate hierarchy.
      *
-     * @param MagicObject[] $menuItems The hierarchical array of menu items (from buildMenuHierarchy).
+     * @param AppModuleMultiLevelImpl[] $menuItems The hierarchical array of menu items (from buildMenuHierarchy).
      * @param string $selectedValue The module_id of the currently selected option (optional).
      * @param int $level The current nesting level, used for indentation.
      * @param string $indentChar The character(s) to use for indentation (e.g., '&nbsp;&nbsp;', '--').
@@ -1182,7 +1180,7 @@ class ApplicationMenu // NOSONAR
     /**
      * Get multi level menu from database
      *
-     * @return array
+     * @return AppModuleMultiLevelImpl[]
      */
     public function getMultiLevelMenuFromDatabase()
     {
@@ -1218,7 +1216,6 @@ class ApplicationMenu // NOSONAR
 
         return $this->buildMenuHierarchy($allowedModules); // Build the menu hierarchy
     }
-
     
     /**
      * Renders the complete menu (either from Yaml file or database depending on the environment).
