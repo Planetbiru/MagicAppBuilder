@@ -35,7 +35,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <div class="sidebar" id="sidebar">
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <h4 class="text-white text-center"><a href="index.php"><?php echo $appLanguage->getDashboard();?></a></h4>
-        <?php echo $appMenu->renderHtmlMenu(basename($_SERVER['PHP_SELF']));?>
+        <?php echo $appMenu->renderHtmlMenu();?>
     </div>
 
     <!-- Main Content -->
