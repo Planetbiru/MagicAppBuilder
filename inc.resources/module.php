@@ -308,7 +308,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getModuleCode();?></td>
 						<td>
-							<input type="text" class="form-control" name="module_code" id="mmodule_code value="" autocomplete="off"/>
+							<input type="text" class="form-control" name="module_code" id="module_code" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -434,7 +434,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getModuleCode();?></td>
 						<td>
-							<input type="text" class="form-control" name="nmodule_code id="nmodule_code value="<?php echo $module->getModuleCode();?>" autocomplete="off"/>
+							<input type="text" class="form-control" name="module_code" id="module_code" value="<?php echo $module->getModuleCode();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
