@@ -882,3 +882,40 @@ With this update, users can now seamlessly upgrade MagicAppBuilder to the latest
     
 
 Stay up-to-date effortlessly and enjoy the newest features and improvements with minimal effort!
+
+
+# MagicAppBuilder Version 1.7.0
+
+## What's New
+
+### Unlimited Multi-Level Menu Support
+
+MagicAppBuilder 1.7 introduces full support for **multi-level navigation menus with unlimited nesting depth**.
+
+-   You can now define deeply nested menu hierarchies without limitation.
+    
+-   Each level is rendered with proper Bootstrap-compatible styling.
+    
+-   Active and open states are automatically handled based on the current URL.
+    
+-   Collapsible behavior is supported natively using dynamic `aria-expanded` and `collapse` classes.
+    
+-   Parent items expand automatically if any of their descendants are active.
+    
+
+**Menu hierarchy is now built using the `parentId` of each module**, enabling **true hierarchical structure**. This replaces the previous limitation where only two levels of menus were possible via module groupings.
+
+This makes it easier than ever to build complex navigation structures for dashboards, content management systems, and admin panels.
+
+## Improvements
+
+-   Improved DOM rendering logic for cleaner and more consistent menu generation.
+    
+-   Better handling of active and selected states for nested children.
+    
+-   Refactored internal methods for readability and maintainability.
+    
+
+## Compatibility
+
+-   Fully backward compatible with previous menu structures.
