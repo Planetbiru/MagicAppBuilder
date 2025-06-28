@@ -885,7 +885,7 @@ Stay up-to-date effortlessly and enjoy the newest features and improvements with
 
 
 
-# **MagicAppBuilder Version 1.7.0**
+# MagicAppBuilder Version 1.7.0
 
 ## What's New
 
