@@ -356,6 +356,7 @@ $ipForwarding->setHeaders(array(
 ));
 
 $newApp->setIpForwarding($ipForwarding);
+$newApp->setMultiLevelMenu(false);
 
 $configYaml = (new SecretObject($newApp))->dumpYaml();
 file_put_contents($path2, $configYaml);
