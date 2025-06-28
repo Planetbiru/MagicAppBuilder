@@ -16,6 +16,7 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
+use MagicObject\Util\ClassUtil\PicoObjectParser;
 use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
 use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
 use MagicAppTemplate\Entity\App\AppModuleMultiLevelImpl;
@@ -735,7 +736,7 @@ class ApplicationMenu // NOSONAR
     /**
      * Builds a hierarchical menu array from a flat list of modules.
      *
-     * This function recursively processes a flat list of AppModuleMultiLevelImpl objects (which are also MagicObjects),
+     * This function recursively processes a flat list of Module objects (which are also MagicObjects),
      * organizing them into a nested structure based on their parent_id. Only modules
      * explicitly marked as menu items (`isMenu()`) are included in the hierarchy.
      *
@@ -746,7 +747,7 @@ class ApplicationMenu // NOSONAR
      * might contain a 'children' property (or similar, set via `setChildren()`)
      * containing its sub-modules.
      */
-    public function buildMenuHierarchy($modules, $parentId = null)
+    public function buildMenuHierarchy($modules, $parentId = null) // NOSONAR
     {
         $branch = [];
         $modulesUsedInThisLevel = []; // Keep track of modules used as direct children in this call
@@ -759,7 +760,11 @@ class ApplicationMenu // NOSONAR
                 $children = $this->buildMenuHierarchy($modules, $module->getModuleId());
                 
                 if (!empty($children)) {
-                    $module->setChildren($children); // Add children to the module object
+                    foreach($children as $child)
+                    {
+                        $module->appendChildren($child); 
+                    }
+                    // Add children to the module object
                 }
                 
                 $branch[] = $module; // Add the module (with its children) to the current branch
@@ -805,8 +810,8 @@ class ApplicationMenu // NOSONAR
     /**
      * Helper function to collect all module IDs that are children of other modules in a hierarchy.
      *
-     * @param AppModuleMultiLevelImpl[] $menuItems A hierarchical array of menu items.
-     * @return AppModuleMultiLevelImpl[] A flat array of all child module IDs.
+     * @param array $menuItems A hierarchical array of menu items.
+     * @return array A flat array of all child module IDs.
      */
     private function collectAllChildModuleIds($menuItems) {
         $childIds = [];
@@ -863,6 +868,7 @@ class ApplicationMenu // NOSONAR
         if ($level === 0) {
             $ul->setAttribute('id', 'sidebarMenu'); // Only apply ID to the main root UL
         }
+
 
         foreach ($menuItems as $item) {
             $li = $dom->createElement('li');
@@ -923,6 +929,7 @@ class ApplicationMenu // NOSONAR
                 $a->setAttribute('class', $a->getAttribute('class') . ' collapsed'); // Add 'collapsed' if it's not active
             }
 
+
             // Append the anchor tag to the li
             $li->appendChild($a);
 
@@ -956,14 +963,17 @@ class ApplicationMenu // NOSONAR
      * The cache is stored as a JSON-encoded string in the `AppMenuCacheImpl` table,
      * associated with the current user's admin level and language.
      *
-     * @param AppModuleMultiLevelImpl[] $menuHierarchy An array of menu items to cache, expected to be serializable via (string) cast.
+     * The menu hierarchy supports unlimited nesting levels.
+     *
+     * @param AppModuleMultiLevelImpl[] $menuHierarchy An array of root menu items to cache.
      * @return void
      */
     private function saveModuleMultiLevelCache($menuHierarchy)
     {
         $cache = array();
+
         foreach ($menuHierarchy as $menu) {
-            $cache[] = json_decode((string) $menu);
+            $cache[] = $this->serializeMenuItem($menu);
         }
 
         $menuCache = new AppMenuCacheImpl(null, $this->database);
@@ -980,6 +990,30 @@ class ApplicationMenu // NOSONAR
             // Silently fail to avoid breaking flow
         }
     }
+
+    /**
+     * Recursively serializes a menu item and its children (if any) into a standard object
+     * for JSON encoding. Removes parent references to prevent circular structures.
+     *
+     * @param AppModuleMultiLevelImpl $menu
+     * @return stdClass
+     */
+    private function serializeMenuItem($menu)
+    {
+        $obj = json_decode((string) $menu);
+
+        if ($menu->issetChildren()) {
+            $obj->children = [];
+
+            foreach ($menu->getChildren() as $child) {
+                $child->unsetParentModule();
+                $obj->children[] = $this->serializeMenuItem($child); // recursive
+            }
+        }
+
+        return $obj;
+    }
+
 
     /**
      * Loads a multi-level menu structure from the cache for the current user context.
@@ -1008,12 +1042,13 @@ class ApplicationMenu // NOSONAR
 
         if (!empty($cache)) {
             foreach ($cache as $menu) {
-                $menuHierarchy[] = new AppModuleMultiLevelImpl($menu);
+                $menuHierarchy[] = new AppModuleMultiLevelImpl(PicoObjectParser::parseJsonRecursive($menu));
             }
         }
 
         return $menuHierarchy;
     }
+
 
     /**
      * Renders the complete menu hierarchy as an HTML string.
@@ -1032,8 +1067,7 @@ class ApplicationMenu // NOSONAR
         {
             $menuHierarchy = $this->getMultiLevelMenuFromDatabase();
             $this->saveModuleMultiLevelCache($menuHierarchy);
-        }
-        
+        }        
                 
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true; // For cleaner output
@@ -1151,7 +1185,7 @@ class ApplicationMenu // NOSONAR
      * Renders a hierarchical menu as a flat list of <option> elements for a <select> dropdown.
      * Indentation is added based on the menu item's level to simulate hierarchy.
      *
-     * @param AppModuleMultiLevelImpl[] $menuItems The hierarchical array of menu items (from buildMenuHierarchy).
+     * @param MagicObject[] $menuItems The hierarchical array of menu items (from buildMenuHierarchy).
      * @param string $selectedValue The module_id of the currently selected option (optional).
      * @param int $level The current nesting level, used for indentation.
      * @param string $indentChar The character(s) to use for indentation (e.g., '&nbsp;&nbsp;', '--').
@@ -1178,6 +1212,21 @@ class ApplicationMenu // NOSONAR
     }
 
     /**
+     * Renders a list of module options as HTML <option> tags for use in a <select> element.
+     * The modules are loaded, structured hierarchically, and rendered with proper nesting.
+     * This is typically used to present a dropdown menu of modules with support for parent-child relationships.
+     *
+     * @param string|null $selectedValue The value to be marked as selected in the rendered <option> list. Can be null if no selection is needed.
+     * @return string A string of HTML <option> tags representing the module hierarchy.
+     */
+    public function renderSelectOption($selectedValue = null)
+    {
+        $modules = $this->loadModuleMultiLevel();
+        $menuHierarchy = $this->buildMenuHierarchy($modules); 
+        return $this->renderMenuAsSelectOptions($menuHierarchy, $selectedValue);
+    }
+
+    /**
      * Get multi level menu from database
      *
      * @return AppModuleMultiLevelImpl[]
@@ -1199,7 +1248,7 @@ class ApplicationMenu // NOSONAR
         }
 
         $modules = $this->loadModuleMultiLevel(); // Retrieve modules (this might need to be adjusted based on your menu data structure)
-
+        
         $allowedModules = array();
 
         foreach($modules as $module)
@@ -1213,9 +1262,9 @@ class ApplicationMenu // NOSONAR
                 $allowedModules[] = $module;
             }   
         }
-
         return $this->buildMenuHierarchy($allowedModules); // Build the menu hierarchy
     }
+
     
     /**
      * Renders the complete menu (either from Yaml file or database depending on the environment).

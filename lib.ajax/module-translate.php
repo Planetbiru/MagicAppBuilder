@@ -56,6 +56,7 @@ function fixValue($original)
         'Button Show Waiting Approval Only' => 'Show Waiting Approval Only',
         'Button Update' => 'Update',
         'Button Login' => 'Login',
+        'Label Option Select One Or Leave It Blank' => 'Select One or Leave It Blank',
         'Label Option Select One' => 'Option Select One',
         'Label Select All' => 'Select All',
         'Label Select All Items' => 'Select All Items',
