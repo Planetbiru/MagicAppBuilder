@@ -10,16 +10,16 @@ use MagicApp\Field;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleMinImpl;
 use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
+use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
+use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
+use MagicAppTemplate\Entity\App\AppModuleMultiLevelMinImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\Util\ClassUtil\PicoObjectParser;
-use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
-use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
-use MagicAppTemplate\Entity\App\AppModuleMultiLevelImpl;
 
 /**
  * Class ApplicationMenu
@@ -662,14 +662,14 @@ class ApplicationMenu // NOSONAR
      * Loads active and menu-enabled modules from the database, ordered by module group and then by module sort order.
      * This function specifically retrieves modules that are designed for multi-level menus.
      *
-     * @return AppModuleMultiLevelImpl[] An array of `AppModuleMultiLevelImpl` objects (or `MagicObject` instances)
+     * @return AppModuleMultiLevelMinImpl[] An array of `AppModuleMultiLevelMinImpl` objects (or `MagicObject` instances)
      * representing the loaded modules. Returns an empty array if an error occurs
      * during database retrieval.
      */
     public function loadModuleMultiLevel()
 	{
         $modules = array();
-		$module = new AppModuleMultiLevelImpl(null, $this->database);
+		$module = new AppModuleMultiLevelMinImpl(null, $this->database);
         $specs = PicoSpecification::getInstance()
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->menu, true))
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
@@ -740,17 +740,17 @@ class ApplicationMenu // NOSONAR
      * organizing them into a nested structure based on their parent_id. Only modules
      * explicitly marked as menu items (`isMenu()`) are included in the hierarchy.
      *
-     * @param AppModuleMultiLevelImpl[] $modules A flat array of Module objects to be processed.
+     * @param MagicObject[] $modules A flat array of Module objects to be processed.
      * @param string|null $parentId The ID of the parent module to filter by.
      * Use `null` to start building the top-level menu.
-     * @return AppModuleMultiLevelImpl[] A hierarchical array of Module objects, where each parent module
+     * @return MagicObject[] A hierarchical array of Module objects, where each parent module
      * might contain a 'children' property (or similar, set via `setChildren()`)
      * containing its sub-modules.
      */
     public function buildMenuHierarchy($modules, $parentId = null) // NOSONAR
     {
-        $branch = [];
-        $modulesUsedInThisLevel = []; // Keep track of modules used as direct children in this call
+        $branch  = array();
+        $modulesUsedInThisLevel  = array(); // Keep track of modules used as direct children in this call
 
         foreach ($modules as $module) {
             // Check if the current module's parent_id matches the requested parentId
@@ -776,7 +776,7 @@ class ApplicationMenu // NOSONAR
         // filter out any modules that became children of other modules.
         // This prevents them from appearing at the root level if they were only supposed to be children.
         if ($this->isBlank($parentId)) {
-            $filteredModules = [];
+            $filteredModules  = array();
             $allChildModuleIds = $this->collectAllChildModuleIds($branch);
             
             foreach ($modules as $module) {
@@ -814,7 +814,7 @@ class ApplicationMenu // NOSONAR
      * @return array A flat array of all child module IDs.
      */
     private function collectAllChildModuleIds($menuItems) {
-        $childIds = [];
+        $childIds  = array();
         foreach ($menuItems as $item) {
             if ($item->issetChildren() && !empty($item->getChildren())) {
                 foreach ($item->getChildren() as $child) {
@@ -965,7 +965,7 @@ class ApplicationMenu // NOSONAR
      *
      * The menu hierarchy supports unlimited nesting levels.
      *
-     * @param AppModuleMultiLevelImpl[] $menuHierarchy An array of root menu items to cache.
+     * @param AppModuleMultiLevelMinImpl[] $menuHierarchy An array of root menu items to cache.
      * @return void
      */
     private function saveModuleMultiLevelCache($menuHierarchy)
@@ -995,7 +995,7 @@ class ApplicationMenu // NOSONAR
      * Recursively serializes a menu item and its children (if any) into a standard object
      * for JSON encoding. Removes parent references to prevent circular structures.
      *
-     * @param AppModuleMultiLevelImpl $menu
+     * @param AppModuleMultiLevelMinImpl $menu
      * @return stdClass
      */
     private function serializeMenuItem($menu)
@@ -1003,10 +1003,11 @@ class ApplicationMenu // NOSONAR
         $obj = json_decode((string) $menu);
 
         if ($menu->issetChildren()) {
-            $obj->children = [];
+            $obj->children  = array();
 
             foreach ($menu->getChildren() as $child) {
                 $child->unsetParentModule();
+
                 $obj->children[] = $this->serializeMenuItem($child); // recursive
             }
         }
@@ -1018,9 +1019,9 @@ class ApplicationMenu // NOSONAR
     /**
      * Loads a multi-level menu structure from the cache for the current user context.
      * If a matching cache is found based on admin level and language, it is decoded
-     * and returned as an array of `AppModuleMultiLevelImpl` instances.
+     * and returned as an array of `AppModuleMultiLevelMinImpl` instances.
      *
-     * @return AppModuleMultiLevelImpl[] An array representing the cached menu hierarchy, or an empty array if not found or decoding fails.
+     * @return AppModuleMultiLevelMinImpl[] An array representing the cached menu hierarchy, or an empty array if not found or decoding fails.
      */
     private function loadModuleMultiLevelCache()
     {
@@ -1042,7 +1043,7 @@ class ApplicationMenu // NOSONAR
 
         if (!empty($cache)) {
             foreach ($cache as $menu) {
-                $menuHierarchy[] = new AppModuleMultiLevelImpl(PicoObjectParser::parseJsonRecursive($menu));
+                $menuHierarchy[] = new AppModuleMultiLevelMinImpl(PicoObjectParser::parseJsonRecursive($menu));
             }
         }
 
@@ -1229,7 +1230,7 @@ class ApplicationMenu // NOSONAR
     /**
      * Get multi level menu from database
      *
-     * @return AppModuleMultiLevelImpl[]
+     * @return AppModuleMultiLevelMinImpl[]
      */
     public function getMultiLevelMenuFromDatabase()
     {

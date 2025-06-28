@@ -917,6 +917,20 @@ This release also adds support for **defining modules hierarchically**:
 This offers better flexibility and control when building role-based menu systems.
 
 
+### Application Setting Update: Multi-Level Menu Checkbox
+
+A new checkbox setting **“Multi-Level Menu”** has been added in **Application Settings**.
+
+-   When checked, the application will treat the module structure as hierarchical.
+    
+-   This determines how modules should be organized and how the menu hierarchy will be rendered.
+    
+-   If left unchecked, the system falls back to flat or two-level menu mode (for backward compatibility).
+    
+
+> This toggle helps ensure clarity between legacy setups and the new menu system, making module management more intuitive.
+
+
 ## Improvements
 
 
