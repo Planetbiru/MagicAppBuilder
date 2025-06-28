@@ -884,54 +884,76 @@ With this update, users can now seamlessly upgrade MagicAppBuilder to the latest
 Stay up-to-date effortlessly and enjoy the newest features and improvements with minimal effort!
 
 
-# MagicAppBuilder Version 1.7.0
+
+# **MagicAppBuilder Version 1.7.0**
 
 ## What's New
 
 ### Unlimited Multi-Level Menu Support
 
-MagicAppBuilder 1.7 introduces full support for **multi-level navigation menus with unlimited nesting depth**.
+MagicAppBuilder 1.7 introduces **full support for deeply nested navigation menus** with unlimited levels.
 
--   You can now define deeply nested menu hierarchies without limitation.
-    
--   Each level is rendered with proper Bootstrap-compatible styling.
-    
--   Active and open states are automatically handled based on the current URL.
-    
--   Collapsible behavior is supported natively using dynamic `aria-expanded` and `collapse` classes.
-    
--   Parent items expand automatically if any of their descendants are active.
-    
+* You can now define menu hierarchies with unlimited depth.
+* Each level is styled with Bootstrap-compatible classes.
+* **Active** and **open** states are automatically applied based on the current URL.
+* Collapsible behavior is handled via Bootstrap’s `collapse` class and `aria-expanded` attributes.
+* Parent menus automatically expand if any of their children (or grandchildren) are active.
 
-**Menu hierarchy is now built using the `parentId` of each module**, enabling a **true hierarchical structure**. This replaces the previous limitation where menus were restricted to only two levels via module groupings.
+Menu structure is now built based on each module’s **`parentId`**, replacing the old two-level `moduleGroup` limitation.
 
-A new theme is also introduced that fully supports multi-level menus. Older themes remain compatible but are limited to two-level navigation only.
+> A new default theme is included with full multi-level menu support. Older themes remain compatible but only support up to two levels.
+
 
 ### New Hierarchical Module Management
 
-This version also includes support for **nested module definitions**. You can now:
+This release also adds support for **defining modules hierarchically**:
 
--   Create **empty parent modules** (without implementation logic) to serve as containers for organizing nested modules.
-    
--   Define module structures that mirror your desired menu hierarchy.
-    
--   Enforce hierarchical access control: **users must have access to the parent module to view or access any of its children**.
-    
+* You can create **empty parent modules** that serve as containers for navigation only (no implementation needed).
+* The module structure now reflects the intended menu hierarchy.
+* Supports hierarchical access control:
 
-This greatly improves flexibility and control when designing complex, role-based menu systems.
+  > **A user must have access to a parent module in order to see or access any of its child modules.**
+
+This offers better flexibility and control when building role-based menu systems.
 
 
 ## Improvements
 
--   Improved DOM rendering logic for cleaner and more consistent menu generation.
+
+-   Cleaner and more consistent DOM logic for rendering menu structures.
     
--   Better handling of active and selected states for nested children.
+-   Improved handling of active and selected states in nested menus.
     
--   Refactored internal methods for readability and maintainability.
+-   Internal refactoring for better readability and maintainability.
     
+-   **Unused asset files** that were not required by the default theme have been **removed** to reduce the application’s overall bootstrap size.
+
+
 
 ## Compatibility
 
--   Fully backward compatible with previous menu structures.
+* Fully **backward compatible** with previous menu structures.
+* Older themes still work and will continue to support two-level menus.
+
+
+## Manual Migration for Older Versions
+
+If you're upgrading from MagicAppBuilder **version 1.6 or earlier**, you **must manually add the `multi_level` column** to the `menu_cache` table in your database — **regardless of whether you intend to use the multi-level menu feature or not**.
+
+**Migration steps:**
+
+1.  Open the **Query** tab in MagicAppBuilder.
     
--   Existing themes remain functional, with full support for legacy two-level menus.
+2.  Run the following SQL command:
+    
+
+```sql
+ALTER TABLE menu_cache ADD COLUMN multi_level BOOLEAN DEFAULT FALSE;
+
+```
+
+> This modification is **required** for compatibility with MagicAppBuilder 1.7, even if you don't plan to use multi-level menus.  
+> The system will automatically read and write this column during menu cache operations.
+
+
+Let me know if you'd like to generate a version checker or migration assistant for smoother upgrades.
