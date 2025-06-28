@@ -1260,6 +1260,7 @@ let initAll = function () {
       base_application_directory: form.find('[name="application_base_directory"]').val(),
       base_application_url: form.find('[name="application_url_directory"]').val(),
       description: form.find('[name="description"]').val(),
+      multi_level_menu: form.find('[name="multi_level_menu"]')[0].checked,
       database: {},
       sessions: {},
       entity_info: {},

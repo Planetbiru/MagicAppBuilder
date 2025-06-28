@@ -123,7 +123,7 @@ try
 	$appConfig->setDatabase($existingDatabase);
 	$appConfig->setSessions($existingSessions);
 	$appConfig->setEntityInfo($inputPost->getEntityInfo());
-
+    $appConfig->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
     $yamlData = $appConfig->dumpYaml();
 
     // Update application config in workspace direcory
@@ -152,7 +152,7 @@ try
     $appConfig2->getApplication()->setDescription($appConfig->getApplication()->getDescription());
     $appConfig2->getApplication()->setArchitecture($appConfig->getApplication()->getArchitecture());
     $appConfig2->getApplication()->setBaseModuleDirectory($appConfig->getApplication()->getBaseModuleDirectory());
-
+    $appConfig2->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
     $yamlData2 = $appConfig2->dumpYaml();
     file_put_contents($yml2, $yamlData2);
 
