@@ -267,7 +267,7 @@ class ApplicationMenu // NOSONAR
             // Find the menu cache by admin level ID
             if($this->currentUser->getLanguageId() != '')
             {
-                $cache->findOneByAdminLevelIdAndLanguageId($this->currentUser->getAdminLevelId(), $this->currentUser->getLanguageId());
+                $cache->findOneByAdminLevelIdAndLanguageIdAndMultiLevel($this->currentUser->getAdminLevelId(), $this->currentUser->getLanguageId(), false);
             }
             else
             {
@@ -329,14 +329,15 @@ class ApplicationMenu // NOSONAR
         $cacheSpecs = PicoSpecification::getInstance();
         if(isset($adminLevelId) && !empty($adminLevelId))
         {
-            $cacheSpecs->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId));   
+            $cacheSpecs->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->multiLevel, false));   
         }
         if(isset($languageId) && !empty($languageId))
         {
             $cacheSpecs->addAnd(PicoPredicate::getInstance()->equals(Field::of()->languageId, $languageId));   
         }
         
-        $now = date('Y-m-d H:i:s');
+        $now = $this->getCurrentTime();
         
         try
         {
@@ -360,6 +361,7 @@ class ApplicationMenu // NOSONAR
                 $cache = new AppMenuCacheImpl(null, $this->database);
                 $cache->setAdminLevelId($adminLevelId);
                 $cache->setLanguageId($languageId);
+                $cache->setMultiLevel(false);
                 $cache->setData($dataToStore);
                 $cache->setTimeCreate($now);
                 $cache->setTimeEdit($now);
@@ -672,7 +674,6 @@ class ApplicationMenu // NOSONAR
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
         ;
         $sorts = PicoSortable::getInstance()
-            ->addSortable(new PicoSort('moduleGroup.sortOrder', PicoSort::ORDER_TYPE_ASC))
             ->addSortable(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
         ;
         try
@@ -952,6 +953,71 @@ class ApplicationMenu // NOSONAR
     }
 
     /**
+     * Saves a multi-level menu structure into the cache for the current user context.
+     * The cache is stored as a JSON-encoded string in the `AppMenuCacheImpl` table,
+     * associated with the current user's admin level and language.
+     *
+     * @param AppModuleMultiLevelImpl[] $menuHierarchy An array of menu items to cache, expected to be serializable via (string) cast.
+     * @return void
+     */
+    private function saveModuleMultiLevelCache($menuHierarchy)
+    {
+        $cache = array();
+        foreach ($menuHierarchy as $menu) {
+            $cache[] = json_decode((string) $menu);
+        }
+
+        $menuCache = new AppMenuCacheImpl(null, $this->database);
+        $menuCache->setAdminLevelId($this->currentUser->getAdminLevelId());
+        $menuCache->setLanguageId($this->currentUser->getLanguageId());
+        $menuCache->setMultiLevel(true);
+        $menuCache->setData(json_encode($cache));
+        $menuCache->setTimeCreate($this->getCurrentTime());
+        $menuCache->setTimeEdit($this->getCurrentTime());
+
+        try {
+            $menuCache->insert();
+        } catch (Exception $e) {
+            // Silently fail to avoid breaking flow
+        }
+    }
+
+    /**
+     * Loads a multi-level menu structure from the cache for the current user context.
+     * If a matching cache is found based on admin level and language, it is decoded
+     * and returned as an array of `AppModuleMultiLevelImpl` instances.
+     *
+     * @return AppModuleMultiLevelImpl[] An array representing the cached menu hierarchy, or an empty array if not found or decoding fails.
+     */
+    private function loadModuleMultiLevelCache()
+    {
+        $specs = PicoSpecification::getInstance()
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $this->currentUser->getAdminLevelId()))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->languageId, $this->currentUser->getLanguageId()))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->multiLevel, true));
+
+        $menuCache = new AppMenuCacheImpl(null, $this->database);
+        $cache = array();
+        $menuHierarchy = array();
+
+        try {
+            $menuCache->findOne($specs);
+            $cache = json_decode($menuCache->getData(), true);
+        } catch (Exception $e) {
+            // Silently fail to avoid breaking flow
+        }
+
+        if (!empty($cache)) {
+            foreach ($cache as $menu) {
+                $menuHierarchy[] = new AppModuleMultiLevelImpl($menu);
+            }
+        }
+
+        return $menuHierarchy;
+    }
+
+
+    /**
      * Renders the complete menu hierarchy as an HTML string.
      * This function retrieves menu data, builds the hierarchy,
      * renders it into a DOMDocument, marks active parents, and then
@@ -963,8 +1029,13 @@ class ApplicationMenu // NOSONAR
     {
         $this->currentHref = $currentHref;
 
-        $modules = $this->loadModuleMultiLevel(); // Retrieve modules (this might need to be adjusted based on your menu data structure)
-        $menuHierarchy = $this->buildMenuHierarchy($modules); // Build the menu hierarchy
+        $menuHierarchy = $this->loadModuleMultiLevelCache();
+        if(empty($menuHierarchy))
+        {
+            $menuHierarchy = $this->getMultiLevelMenuFromDatabase();
+            $this->saveModuleMultiLevelCache($menuHierarchy);
+        }
+        
                 
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true; // For cleaner output
@@ -1108,6 +1179,46 @@ class ApplicationMenu // NOSONAR
         return $html;
     }
 
+    /**
+     * Get multi level menu from database
+     *
+     * @return array
+     */
+    public function getMultiLevelMenuFromDatabase()
+    {
+        $adminLevelId = $this->currentUser->getAdminLevelId();
+        $adminRoles = $this->loadAminRole($adminLevelId);
+        $specialAcess = false;
+        try
+        {
+            $adminLevel = new AppAdminLevelMinImpl(null, $this->database);
+            $adminLevel->findOneByAdminLevelId($adminLevelId);
+            $specialAcess = $adminLevel->getSpecialAccess();
+        }
+        catch(Exception $e)
+        {
+            // Handle exception if needed
+        }
+
+        $modules = $this->loadModuleMultiLevel(); // Retrieve modules (this might need to be adjusted based on your menu data structure)
+
+        $allowedModules = array();
+
+        foreach($modules as $module)
+        {
+            if((isset($this->appConfig) && $this->appConfig->getBypassRole()) 
+            || ($specialAcess && $module->isSpecialAccess()) 
+            || $this->isAllowedAccess($module, $adminRoles))
+            {
+                $moduleName = $this->translateModule($module->getName(), $module->getModuleId(), $this->currentUser->getLanguageId());
+                $module->setName($moduleName);
+                $allowedModules[] = $module;
+            }   
+        }
+
+        return $this->buildMenuHierarchy($allowedModules); // Build the menu hierarchy
+    }
+
     
     /**
      * Renders the complete menu (either from Yaml file or database depending on the environment).
@@ -1130,6 +1241,16 @@ class ApplicationMenu // NOSONAR
      */
     public function stringContains($haystack, $needle) {
         return strpos($haystack, $needle) !== false;
+    }
+
+    /**
+     * Get current time
+     *
+     * @return string
+     */
+    private function getCurrentTime()
+    {
+        return date('Y-m-d H:i:s');
     }
 
     

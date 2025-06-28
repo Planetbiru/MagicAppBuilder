@@ -54,6 +54,15 @@ class AppMenuCacheImpl extends MagicObject
 	protected $languageId;
 
 	/**
+	 * Multi Level
+	 * 
+	 * @Column(name="multi_level", type="tinyint(1)", length=1, nullable=true)
+	 * @Label(content="Multi Level")
+	 * @var bool
+	 */
+	protected $multiLevel;
+
+	/**
 	 * Data
 	 * 
 	 * @Column(name="data", type="text", nullable=true)

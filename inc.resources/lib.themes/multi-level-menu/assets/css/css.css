@@ -792,6 +792,37 @@ tr[data-active=false] td {
   display: block;
 }
 
+.dark-mode #sidebarMenu {
+  background-color: #1e1e2d;
+}
+.dark-mode #sidebarMenu li > a {
+  color: #e0e0e0;
+}
+.dark-mode #sidebarMenu li > a i.fa {
+  color: #c0c0c0;
+}
+.dark-mode #sidebarMenu li > a:hover {
+  background-color: #2c2c3a;
+  color: #ffffff;
+}
+.dark-mode #sidebarMenu li.has-submenu > a::after {
+  color: #bbbbbb;
+}
+.dark-mode #sidebarMenu li.selected > a {
+  background-color: #3b3b52;
+  color: #ffffff;
+}
+.dark-mode #sidebarMenu li.selected > a i.fa {
+  color: #ffffff;
+}
+.dark-mode #sidebarMenu li.open > a {
+  background-color: #444460;
+  color: #ffffff;
+}
+.dark-mode #sidebarMenu li.open > a::after {
+  content: "-";
+}
+
 select[multiple].form-control {
   height: 38px;
 }
