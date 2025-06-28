@@ -139,3 +139,61 @@ $arrow-color: #888;
 .collapse.show {
   display: block;
 }
+
+
+.dark-mode {
+  #sidebarMenu {
+    // Background sidebar
+    background-color: #1e1e2d;
+
+    li {
+      > a {
+        color: #e0e0e0; // Text color in dark mode
+
+        i.fa {
+          color: #c0c0c0; // Icon color in dark mode
+        }
+
+        &:hover {
+          background-color: #2c2c3a; // Hover background
+          color: #ffffff; // Hover text color
+        }
+      }
+
+      // Submenu background
+      .collapse > ul {
+        // background-color: #2a2a38; // Optional: slightly different background for submenus
+      }
+
+      &.has-submenu {
+        > a {
+          &::after {
+            color: #bbbbbb; // Arrow icon color
+          }
+        }
+      }
+
+      &.selected {
+        > a {
+          background-color: #3b3b52; // Active link background
+          color: #ffffff; // Active link text color
+
+          i.fa {
+            color: #ffffff; // Active icon color
+          }
+        }
+      }
+
+      &.open {
+        > a {
+          background-color: #444460; // Slightly darker than selected
+          color: #ffffff;
+
+          &::after {
+            content: '-'; // Override to ensure '-' in open state
+          }
+        }
+      }
+    }
+  }
+}
