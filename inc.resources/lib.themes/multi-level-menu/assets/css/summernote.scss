@@ -1,0 +1,41 @@
+.note-editor .note-toolbar .btn-light {
+    background-color: #fff;
+}
+
+.dark-mode {
+    .note-editor {
+        background-color: #333;
+        .note-dropdown-menu {
+            background-color: #3d3d3d;
+            color: #fff;
+            .dropdown-item:focus,
+            .dropdown-item:hover {
+                color: #fff;
+                text-decoration: none;
+                background-color: #575757;
+            }
+        }
+
+        .note-toolbar {
+            .btn-light {
+                background-color: #4f4f4f;
+                color: #FAFAFA;
+            }
+            .note-dropdown-menu.note-check a i {
+                color: #e0e0e0;
+                visibility: hidden;
+            }
+            .note-btn-group .note-table {
+                background-color: #535353;
+            }
+        }
+
+        &.note-frame .note-statusbar .note-resizebar {
+            background-color: #4a4a4a;
+
+            .note-icon-bar {
+                border-top: 1px solid #979797;
+            }
+        }
+    }
+}

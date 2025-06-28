@@ -1,0 +1,141 @@
+
+// Optional variables for customization
+$sidebar-width: 100%;
+$submenu-indent: 20px;
+$active-link-color: #007bff; // Bootstrap primary color
+$active-link-bg: #e9ecef; // Bootstrap light gray color
+$text-color: #333;
+$icon-color: #555;
+$arrow-color: #888;
+
+
+#sidebarMenu {
+  list-style-type: none;
+  margin: 0; // Remove default UL margin
+  padding: 0; // Remove default UL padding
+  width: $sidebar-width; // Adjust sidebar width
+  // background-color: #f8f9fa; // Sidebar background color, example
+  height: 100%; // If this is a full sidebar
+
+  li {
+    list-style-type: none; // Ensure no bullet points
+    margin: 0;
+    padding: 0;
+    position: relative; // For submenu icon positioning
+    ul{
+      margin-left: 0px;
+      padding-left: 20px;
+    }
+    // Base styles for all menu links
+    > a {
+      display: block; // Ensure the link fills the entire LI area
+      padding: 10px 15px; // Padding for the link
+      color: $text-color;
+      text-decoration: none; // Remove underline
+      white-space: nowrap; // Prevent text wrapping
+      overflow: hidden;
+      text-overflow: ellipsis; // Add ellipsis if text is too long
+
+      i.fa {
+        margin-right: 8px; // Space between icon and text
+        color: $icon-color;
+      }
+
+      &:hover {
+        background-color: #e2e6ea; // Hover color
+        color: $text-color; // Keep text color on hover
+      }
+    }
+
+    // Styles for UL submenus
+    // Bootstrap's .collapse will manage display property, so we only need padding/margin.
+    // The `div.collapse` wrapper holds the `ul`.
+    .collapse > ul {
+      list-style-type: none;
+      margin: 0;
+      padding-left: $submenu-indent; // Indentation for submenus
+      // background-color: lighten(#f8f9fa, 3%); // Submenu background, slightly darker
+    }
+
+    // LI that has a submenu
+    &.has-submenu {
+      > a {
+        // Add right padding to make space for the arrow icon
+        padding-right: 30px; 
+        position: relative;
+
+        // Arrow icon (default: '+' when collapsed)
+        &::after {
+          content: '+'; 
+          font-family: 'Font Awesome 5 Free'; // Use Font Awesome font-family
+          position: absolute;
+          right: 15px; // Arrow icon position
+          top: 50%;
+          transform: translateY(-50%);
+          color: $arrow-color;
+          transition: transform 0.2s ease-in-out, content 0.2s ease-in-out; 
+          font-size: 0.8em; // Icon size
+        }
+
+        // Arrow icon when the link is NOT in a 'collapsed' state (i.e., expanded by Bootstrap JS)
+        // This will override the default '+'
+        &:not(.collapsed)::after {
+          font-family: 'Font Awesome 5 Free'; // Use Font Awesome font-family
+          content: '-'; // '-' icon when expanded
+        }
+
+        // Arrow icon when the link explicitly has the 'collapsed' class
+        // This ensures '+' returns if it's collapsed again
+        &.collapsed::after {
+          font-family: 'Font Awesome 5 Free'; // Use Font Awesome font-family
+          content: '+';
+        }
+      }
+    }
+
+    // 'selected' class for the active menu item
+    &.selected {
+      > a {
+        background-color: $active-link-bg;
+        color: $active-link-color;
+
+        i.fa {
+            color: $active-link-color; // Active icon color
+        }
+      }
+    }
+
+    // 'open' class for menu items that are parents of a 'selected' item
+    // This ensures the submenu is open on load if there's a 'selected' item within it
+    &.open {
+      > a {
+        // Color and style for open parent
+        background-color: darken($active-link-bg, 3%); // Slightly darker than selected
+        color: $active-link-color;
+        // Optional: '-' icon for 'open' parent (this will override default '+',
+        // but will be overridden by `.collapsed` if Bootstrap closes it)
+        // If you want `.open` to always mean '-', remove `.collapsed` from 'a' in PHP when `.open` is present.
+        &::after {
+            content: '-'; // Ensures '-' when parent LI is 'open' (initially active branch)
+        }
+      }
+    }
+  }
+}
+
+
+// --- Basic Bootstrap Collapsible Rules (ensure these are in your stylesheet) ---
+// These are the classes added/removed by Bootstrap JavaScript
+.collapse:not(.show) {
+  display: none;
+}
+
+.collapsing {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.35s ease;
+}
+
+.collapse.show {
+  display: block;
+}
