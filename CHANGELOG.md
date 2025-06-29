@@ -1000,26 +1000,35 @@ Let me know if you'd like to generate a version checker or migration assistant f
 
 ## What's New
 
--   Automatic Parent Module Creation
-    
+-   **Automatic Parent Module Creation**  
     The system now automatically creates a parent module if one doesn't already exist.
     
-    -   Parent modules are created based on either the `parentModuleId` or the `moduleGroupId`.
+    -   Parent modules are generated based on either the `parentModuleId` or the `moduleGroupId`.
         
-    -   This simplifies hierarchical menu setup and improves compatibility with multi-level navigation.
+    -   This streamlines hierarchical menu setup and enhances compatibility with multi-level navigation.
         
--   Role Inheritance from Child to Parent
-    
-    You can now easily copy user role permissions from a module to its parent module.
+-   **Role Inheritance from Child to Parent**  
+    You can now easily copy user role permissions from a child module to its parent module.
     
     -   This ensures consistent permission structures across nested modules.
         
-    -   Only permissions set to `true` in the child will be applied to the parent.
+    -   Only permissions explicitly set to `true` in the child role will be applied to the parent.
         
--   Release Time Information for Release List
+-   **Release Time Information in Release List**  
+    When retrieving the list of releases, each entry now includes its release timestamp.
     
-    When fetching the release list, release time information is now included. This provides more comprehensive details for each release.
+    -   This provides more detailed and informative version history.
+        
+
+## UI Improvements
+
+-   **Column Sorting UI Simplification**  
+    The column reordering feature in the main form interface has been visually improved.
     
+    -   Instead of using a black background, a minimalist ⠿ icon (three-dot vertical drag handle) is now used.
+        
+    -   This results in a cleaner and more modern appearance.
+        
 
 ## What's Changed
 
@@ -1027,5 +1036,5 @@ Let me know if you'd like to generate a version checker or migration assistant f
     
     -   The `AppModuleMultiLevelImpl` entity now includes a `moduleGroupId` property.
         
-    -   This addition enables fallback logic for parent module generation when `parentModuleId` isn't set.
+    -   This addition enables fallback logic for parent module generation when `parentModuleId` is not defined.
         
