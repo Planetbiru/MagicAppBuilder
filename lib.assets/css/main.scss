@@ -61,7 +61,6 @@ body {
 		}
 
 		td.data-sort {
-			background-color: $background-color_1;
 			cursor: move;
 			width: 24px;
 		}
@@ -69,18 +68,19 @@ body {
 
 	tbody {
 		td.data-sort {
-			background-color: $background-color_1;
 			cursor: move;
+			&::before{
+				content: "⠿";
+				color: $color_1;
+				font-size: 16px;
+				margin-left: -4px;
+			}
 		}
 
 		tr {
 			&:hover {
 				td {
 					background-color: $background-color_2;
-				}
-
-				td.data-sort {
-					background-color: $background-color_1;
 				}
 			}
 
