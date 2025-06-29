@@ -1250,6 +1250,25 @@ let initAll = function () {
     );
   });
 
+  $(document).on("change", '[name="multi_level_menu"]', function(e) {
+    e.preventDefault();
+    
+    let isChecked = $(this).is(':checked');
+    let $activeThemeSelect = $('[name="active_theme"]');
+    
+    $activeThemeSelect.find('option').each(function() {
+        const supportsMultiLevel = $(this).data('multi-level-menu');
+        $(this).prop('disabled', isChecked ? !supportsMultiLevel : supportsMultiLevel);
+    });
+
+    // Find the first enabled option and set the select's value to it
+    let $firstEnabledOption = $activeThemeSelect.find('option:enabled').first();
+    if ($firstEnabledOption.length) { // Check if an enabled option was found
+        $activeThemeSelect.val($firstEnabledOption.val());
+    }
+  });
+
+
   $(document).on("click", ".button-save-application-config", function (e) {
     e.preventDefault();
     let form = $(this).closest(".modal").find('form');
@@ -1261,6 +1280,7 @@ let initAll = function () {
       base_application_url: form.find('[name="application_url_directory"]').val(),
       description: form.find('[name="description"]').val(),
       multi_level_menu: form.find('[name="multi_level_menu"]')[0].checked,
+      active_theme: form.find('[name="active_theme"]').val(),
       database: {},
       sessions: {},
       entity_info: {},

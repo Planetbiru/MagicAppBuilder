@@ -931,6 +931,22 @@ A new checkbox setting **“Multi-Level Menu”** has been added in **Applicatio
 > This toggle helps ensure clarity between legacy setups and the new menu system, making module management more intuitive.
 
 
+### Theme Filtering Based on Menu Type
+
+When the **Multi-Level Menu** setting is enabled in the application:
+
+-   Only **themes that support multi-level menus** will be available for selection.
+    
+-   When the setting is **disabled**, only **themes that support traditional two-level menus** will be shown.
+    
+-   The system automatically **filters theme options** based on each theme’s declared `multi_level_menu` capability.
+    
+-   The selected theme is also **automatically updated** to the first valid option to prevent UI mismatches.
+    
+
+> This ensures consistency between the selected menu structure and the theme’s capabilities, preventing any rendering issues or incompatibility.
+
+
 ## Improvements
 
 
