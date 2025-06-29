@@ -987,3 +987,32 @@ ALTER TABLE menu_cache ADD COLUMN multi_level BOOLEAN DEFAULT FALSE;
 
 
 Let me know if you'd like to generate a version checker or migration assistant for smoother upgrades.
+
+
+
+# MagicAppBuilder Version 1.8.0
+
+## What's New
+
+-   **Automatic Parent Module Creation**  
+    The system now automatically creates a parent module if one does not already exist.
+    
+    -   Parent modules are created based on either the `parentModuleId` or the `moduleGroupId`.
+        
+    -   This simplifies hierarchical menu setup and improves compatibility with multi-level navigation.
+        
+-   **Role Inheritance from Child to Parent**  
+    You can now easily **copy user role permissions from a module to its parent module**.
+    
+    -   This ensures consistent permission structures across nested modules.
+        
+    -   Only permissions set to `true` in the child will be applied to the parent.
+        
+
+## What's Changed
+
+-   **New Column: `moduleGroupId` in `AppModuleMultiLevelImpl`**
+    
+    -   The `AppModuleMultiLevelImpl` entity now includes a `moduleGroupId` property.
+        
+    -   This addition enables fallback logic for parent module generation when `parentModuleId` is not set.
