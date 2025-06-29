@@ -111,6 +111,7 @@ Even though MagicAppBuilder uses a high-level abstraction, developers can still 
 
 In short, **MagicAppBuilder is not only fast—it’s also self-reliant**. Perfect for teams and organizations who want full control, fast delivery, and future-proof flexibility.
 
+
 ## System Requirements
 
 To run **MagicAppBuilder**, your environment must meet the following minimum requirements:
@@ -138,6 +139,30 @@ To run **MagicAppBuilder**, your environment must meet the following minimum req
     -   **MySQL**
         
     -   **PostgreSQL**
+        
+
+### Docker Specific Requirements
+
+If you're deploying **MagicAppBuilder** using Docker, you **must** set up **volume mounts** for the following directories to ensure data persistence and prevent data loss when containers are stopped or removed:
+
+-   **`inc.cfg`**: This directory is used for configuration files.
+    
+-   **`inc.database`**: This directory is used for database files (e.g., SQLite databases).
+    
+
+**Example of Docker Volume Mounting:**
+
+When running your Docker container, you would typically use the `-v` flag to mount these directories. For example:
+
+Bash
+
+```
+docker run -p 80:80 \
+  -v /path/on/host/for/inc.cfg:/var/www/html/inc.cfg \
+  -v /path/on/host/for/inc.database:/var/www/html/inc.database \
+  your-magicappbuilder-image-name
+
+```
         
 
 > After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
