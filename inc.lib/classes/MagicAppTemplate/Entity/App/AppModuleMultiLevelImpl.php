@@ -54,6 +54,17 @@ class AppModuleMultiLevelImpl extends MagicObject
 	 * @var string
 	 */
 	protected $moduleCode;
+
+	/**
+	 * Module Group ID
+	 * 
+	 * @NotNull
+	 * @Column(name="module_group_id", type="varchar(40)", length=40, default_value=NULL, nullable=true)
+	 * @Label(content="Module Group ID")
+	 * @MaxLength(value=40)
+	 * @var string
+	 */
+	protected $moduleGroupId;
 	
 	/**
 	 * Parent Module ID
