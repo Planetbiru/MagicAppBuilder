@@ -141,6 +141,15 @@ To run **MagicAppBuilder**, your environment must meet the following minimum req
     -   **PostgreSQL**
         
 
+> After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
+> In this case, **optimizations or adjustments to the generated entity classes in MagicObject may be required** to ensure compatibility and performance.
+
+> After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
+> In this case, **optimizations or adjustments to the generated entity classes in MagicObject may be required** to ensure compatibility and performance.
+
+> **SQL Server (Microsoft SQL Server)** – May also be used during the production phase by optimizing MagicObject accordingly. **MagicAppBuilder includes a tool for converting your database structure to SQL Server format**, but users may also opt to use third-party applications or manual adjustments.
+
+
 ### Docker Specific Requirements
 
 If you're deploying **MagicAppBuilder** using Docker, you **must** set up **volume mounts** for the following directories to ensure data persistence and prevent data loss when containers are stopped or removed:
@@ -163,15 +172,7 @@ docker run -p 80:80 \
   your-magicappbuilder-image-name
 
 ```
-        
 
-> After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
-> In this case, **optimizations or adjustments to the generated entity classes in MagicObject may be required** to ensure compatibility and performance.
-
-> After your application has been successfully generated using SQLite, you may switch to a different SQL database server (such as MariaDB, MySQL, or PostgreSQL) for deployment.  
-> In this case, **optimizations or adjustments to the generated entity classes in MagicObject may be required** to ensure compatibility and performance.
-
-> **SQL Server (Microsoft SQL Server)** – May also be used during the production phase by optimizing MagicObject accordingly. **MagicAppBuilder includes a tool for converting your database structure to SQL Server format**, but users may also opt to use third-party applications or manual adjustments.
 
 ## Dependency
 
