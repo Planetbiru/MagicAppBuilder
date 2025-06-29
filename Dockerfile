@@ -3,14 +3,14 @@ FROM php:8.1-apache
 
 # Install required PHP extensions and utilities, including GD dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libzip-dev \
-    unzip \
     git \
-    sqlite3 \
-    libsqlite3-dev \
+    libfreetype6-dev \
     libjpeg-dev \
     libpng-dev \
-    libfreetype6-dev \
+    libsqlite3-dev \
+    libzip-dev \
+    sqlite3 \
+    unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) zip mysqli pdo pdo_mysql pdo_sqlite gd \
     && a2enmod rewrite \
