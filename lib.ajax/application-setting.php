@@ -46,6 +46,10 @@ $themeConfig = array();
 foreach($themes as $theme)
 {
     $themePath = $baseThemeDirectory."/$theme/info.yml";
+    if(!file_exists($themePath))
+    {
+        continue;
+    }
     $spicy = new Spicy();
     $themeConfig[$theme] = new MagicObject($spicy->load(file_get_contents($themePath)));
 }
