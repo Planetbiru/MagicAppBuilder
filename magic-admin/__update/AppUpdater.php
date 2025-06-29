@@ -55,7 +55,7 @@ class AppUpdater
     /**
      * Get a list of available releases from GitHub (version >= 1.5.1 only).
      *
-     * @return array An array of releases with 'tag_name', 'name', and 'zipball_url'
+     * @return array An array of releases with 'tag_name', 'name', 'published_at', and 'zipball_url'
      * @throws UpdateException
      */
     public function listReleases()
@@ -93,6 +93,7 @@ class AppUpdater
             $result[] = array(
                 'tag_name'    => $tag,
                 'name'        => isset($release['name']) ? $release['name'] : '',
+                'published_at'=> isset($release['published_at']) ? $release['published_at'] : '',
                 'zipball_url' => isset($release['zipball_url']) ? $release['zipball_url'] : ''
             );
         }

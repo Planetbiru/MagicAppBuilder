@@ -988,6 +988,12 @@ ALTER TABLE menu_cache ADD COLUMN multi_level BOOLEAN DEFAULT FALSE;
 
 Let me know if you'd like to generate a version checker or migration assistant for smoother upgrades.
 
+# MagicAppBuilder Version 1.7.1
+
+## What's New
+
+-   **Improved UI During New Application Creation** The user interface now **disables scrolling** while the "waiting screen" is active during new application creation. This enhancement provides a smoother, more perfect visual experience by preventing unwanted content movement.
+
 
 
 # MagicAppBuilder Version 1.8.0
@@ -1010,6 +1016,10 @@ Let me know if you'd like to generate a version checker or migration assistant f
         
     -   Only permissions set to `true` in the child will be applied to the parent.
         
+-   Release Time Information for Release List
+    
+    When fetching the release list, release time information is now included. This provides more comprehensive details for each release.
+    
 
 ## What's Changed
 
@@ -1019,6 +1029,3 @@ Let me know if you'd like to generate a version checker or migration assistant f
         
     -   This addition enables fallback logic for parent module generation when `parentModuleId` isn't set.
         
--   Improved UI During New Application Creation
-    
-    The user interface now disables scrolling while the "waiting screen" is active during new application creation. This enhancement provides a smoother, more perfect visual experience by preventing unwanted content movement.
