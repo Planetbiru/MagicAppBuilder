@@ -216,20 +216,33 @@ jQuery(function () {
 
 /**
  * Show waiting screen
+ *
+ * This function displays a waiting screen overlay, typically used to indicate
+ * that an asynchronous operation is in progress. It hides the main content's
+ * scrollbar and sets the waiting screen to be visible.
+ *
+ * @returns {void}
  */
-function showWaitingScreen()
-{
-  document.body.style.overflow = 'hidden';
-  document.querySelector('.waiting-screen').style.display = 'block';
+function showWaitingScreen() {
+    document.body.style.overflow = 'hidden';
+    document.querySelector('.waiting-screen').style.display = 'block';
+    document.querySelector('.all').style.height = 'calc(100vh - 32px)';
+    document.querySelector('.all').style.overflow = 'hidden';
 }
 
 /**
  * Hide waiting screen
+ *
+ * This function hides the waiting screen overlay, restoring the main content's
+ * scrollability. It should be called after the asynchronous operation has completed.
+ *
+ * @returns {void}
  */
-function hideWaitingScreen()
-{
-  document.body.style.overflow = 'auto';
-  document.querySelector('.waiting-screen').style.display = 'none';
+function hideWaitingScreen() {
+    document.body.style.overflow = 'auto';
+    document.querySelector('.waiting-screen').style.display = 'none';
+    document.querySelector('.all').style.height = 'auto';
+    document.querySelector('.all').style.overflow = 'auto';
 }
 
 /**
