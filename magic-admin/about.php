@@ -123,7 +123,7 @@ $jsLang = [
         data.forEach(release => {
           const opt = document.createElement('option');
           opt.value = release.tag_name;
-          opt.textContent = release.name || release.tag_name;
+          opt.textContent = (release.name || release.tag_name) + ' ('+release.published_at+')';
           select.appendChild(opt);
         });
         select.disabled = false;
