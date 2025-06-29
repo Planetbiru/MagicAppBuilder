@@ -389,7 +389,7 @@ composer dump-autoload --ignore-platform-reqs
 
 ## User Plan
 
-| Object                     | Community | Pro       |
+| Feature / Object           | Community | Pro       |
 | -------------------------- | --------- | --------- |
 | Application Starter        | Yes       | Yes       |
 | Module Generator           | Yes       | Yes       |
@@ -397,7 +397,7 @@ composer dump-autoload --ignore-platform-reqs
 | Entity Translator          | Yes       | Yes       |
 | Application Translator     | Yes       | Yes       |
 | Table Creator              | Yes       | Yes       |
-| Table Codifier             | Yes       | Yes       |
+| Table Modifier             | Yes       | Yes       |
 | File Manager               | Yes       | Yes       |
 | Number of Projects         | Unlimited | Unlimited |
 | Simultaneous Projects      | Unlimited | Unlimited |
@@ -407,13 +407,13 @@ composer dump-autoload --ignore-platform-reqs
 | Number of Validators       | Unlimited | Unlimited |
 | Number of Modules          | Unlimited | Unlimited |
 | Number of Users            | Unlimited | Unlimited |
-| Number of Themes           | 2         | 3         |
-| Number of Menu Levels      | 2         | Unlimited |
+| Number of Menu Levels      | Unlimited | Unlimited |
+| Built-in Themes            | 3         | 5         |
 | User Management            | Yes       | Yes       |
 | Monolith Application       | Yes       | Yes       |
+| Export Project             | Yes       | Yes       |
+| Import Project             | Yes       | Yes       |
 | Micro-Services Application | No        | Yes       |
-| Export Project             | No        | Yes       |
-| Import Project             | No        | Yes       |
 
 ## Browser Support
 
