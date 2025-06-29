@@ -2,7 +2,7 @@
 
 require_once __DIR__ . "/inc.app/auth.php";
 
-if($appConfig->isMultiLevelMenu())
+if($appConfig->issetApplication() && $appConfig->getApplication()->isMultiLevelMenu())
 {
     require_once __DIR__ . "/module-multi-level.php";
 }

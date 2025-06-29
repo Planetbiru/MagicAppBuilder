@@ -1,10 +1,12 @@
 <?php
 
 use AppBuilder\AppArchitecture;
+use AppBuilder\EntityInstaller\EntityApplication;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
+use MagicObject\Util\Spicy;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -13,8 +15,49 @@ $constSelected = ' selected';
 $constChecked = ' checked';
 $inputGet = new InputGet();
 $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+$applicationEntity = new EntityApplication(null, $databaseBuilder);
+try
+{
 
-$curApp = $builderConfig->getCurrentApplication();
+$applicationEntity->find($applicationId);
+
+// Replace applicationId
+$applicationId = $applicationEntity->getApplicationId();
+$baseApplicationDirectory = $applicationEntity->getBaseApplicationDirectory();
+
+// Load themes
+$baseThemeDirectory = $baseApplicationDirectory . '/lib.themes';
+$themes = [];
+if (file_exists($baseThemeDirectory) && is_dir($baseThemeDirectory)) {
+    // Fetch directory
+    $directories = scandir($baseThemeDirectory);
+    foreach ($directories as $dir) {
+        $path = $baseThemeDirectory . '/' . $dir;
+        if ($dir === '.' || $dir === '..') {
+            continue;
+        }
+        if (is_dir($path)) {
+            $themes[] = $dir;
+        }
+    }
+}
+
+$themeConfig = array();
+foreach($themes as $theme)
+{
+    $themePath = $baseThemeDirectory."/$theme/info.yml";
+    $spicy = new Spicy();
+    $themeConfig[$theme] = new MagicObject($spicy->load(file_get_contents($themePath)));
+}
+if(empty($themeConfig))
+{
+    $defaultThemeConfig = new MagicObject();
+    $defaultThemeConfig->setId("default");
+    $defaultThemeConfig->setName("Default");
+    $defaultThemeConfig->setMultiLevelMenu(false);
+    $themeConfig[] = $defaultThemeConfig;
+}
+
 $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
 $appConfig = new SecretObject();
 $appConfig->setDatabase(new SecretObject());
@@ -192,8 +235,42 @@ $nameInIndonesian = array(
                             </tr>
                             <tr>
                                 <td>Multi Level Menu</td>
-                                <td><label for="multi_level_menu"><input type="checkbox" name="multi_level_menu" id="multi_level_menu" value="1"<?php echo $appConfig->getMultiLevelMenu() ? $constChecked:'';?>> Multi Level Menu</label></td>
+                                <td><label for="multi_level_menu"><input type="checkbox" name="multi_level_menu" id="multi_level_menu" value="1"<?php echo $app->getMultiLevelMenu() ? $constChecked:'';?>> Multi Level Menu</label></td>
                             </tr>
+                            <tr>
+                                <td>Active Theme</td>
+                                <td>
+                                    <select class="form-control" name="active_theme" id="active_theme">
+                                        <?php
+                                        foreach($themeConfig as $index=>$theme)
+                                        {
+                                            if($theme->getId() == $app->getActiveTheme())
+                                            {
+                                                $selected = ' selected';
+                                            }
+                                            else
+                                            {
+                                                $selected = '';
+                                            }
+                                            $disabled = '';
+                                            if($app->getMultiLevelMenu() != $theme->getMultiLevelMenu())
+                                            {
+                                                $disabled = 'disabled';
+                                            }
+                                            ?>
+                                            <option 
+                                            value="<?php echo $theme->getId(); ?>" 
+                                            data-multi-level-menu="<?php echo $theme->getMultiLevelMenu() ? 'true' : 'false'; ?>"
+                                            <?php echo $selected;?>
+                                            <?php echo $disabled;?>
+                                            ><?php echo $theme->getName();?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -393,3 +470,9 @@ $nameInIndonesian = array(
         </div>
     </div>
 </form>
+<?php
+}
+catch(Exception $e)
+{
+    // Do nothing
+}

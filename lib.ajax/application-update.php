@@ -123,7 +123,8 @@ try
 	$appConfig->setDatabase($existingDatabase);
 	$appConfig->setSessions($existingSessions);
 	$appConfig->setEntityInfo($inputPost->getEntityInfo());
-    $appConfig->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
+    $appConfig->getApplication()->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
+    $appConfig->getApplication()->setActiveTheme($inputPost->getActiveTheme());
     $yamlData = $appConfig->dumpYaml();
 
     // Update application config in workspace direcory
@@ -152,7 +153,8 @@ try
     $appConfig2->getApplication()->setDescription($appConfig->getApplication()->getDescription());
     $appConfig2->getApplication()->setArchitecture($appConfig->getApplication()->getArchitecture());
     $appConfig2->getApplication()->setBaseModuleDirectory($appConfig->getApplication()->getBaseModuleDirectory());
-    $appConfig2->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
+    $appConfig2->getApplication()->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
+    $appConfig2->getApplication()->setActiveTheme($inputPost->getActiveTheme());
     $yamlData2 = $appConfig2->dumpYaml();
     file_put_contents($yml2, $yamlData2);
 
