@@ -238,8 +238,8 @@ $nameInIndonesian = array(
                                 </td>
                             </tr>
                             <tr>
-                                <td>Multi Level Menu</td>
-                                <td><label for="multi_level_menu"><input type="checkbox" name="multi_level_menu" id="multi_level_menu" value="1"<?php echo $app->getMultiLevelMenu() ? $constChecked:'';?>> Multi Level Menu</label></td>
+                                <td>Multi-Level Menu</td>
+                                <td><label for="multi_level_menu"><input type="checkbox" name="multi_level_menu" id="multi_level_menu" value="1"<?php echo $app->getMultiLevelMenu() ? $constChecked:'';?>> Multi-Level Menu</label></td>
                             </tr>
                             <tr>
                                 <td>Active Theme</td>
