@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\EntityInstaller\EntityApplication;
+use AppBuilder\EntityInstaller\EntityWorkspace;
 use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\AppMultiLevelMenuTool;
 use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
@@ -10,7 +11,6 @@ use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
-use MagicObject\SetterGetter;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -23,6 +23,18 @@ $superuser = 'superuser';
 $adminLevelId = 'superuser';
 $ip = $_SERVER['REMOTE_ADDR'];
 
+/**
+ * Get application config path
+ *
+ * @param EntityWorkspace $activeWorkspace
+ * @param string $applicationId
+ * @return string
+ */
+function getApplicationConfigPath($activeWorkspace, $applicationId)
+{
+    return $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
+}
+
 if($applicationId != null)
 {
     $menuAppConfig = new SecretObject();
@@ -32,7 +44,7 @@ if($applicationId != null)
         $application->findOneByApplicationId($applicationId);
         $menuPath = $application->getBaseApplicationDirectory()."/inc.cfg/menu.yml";
         
-        $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
+        $appConfigPath = getApplicationConfigPath($activeWorkspace, $applicationId);
         if(file_exists($appConfigPath))
         {
             $menuAppConfig->loadYamlFile($appConfigPath, false, true, true);
@@ -150,7 +162,7 @@ if($applicationId != null)
                 }
             }
             
-            $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
+            $appConfigPath = getApplicationConfigPath($activeWorkspace, $applicationId);
             if(file_exists($appConfigPath))
             {
                 $appConfig->loadYamlFile($appConfigPath, false, true, true);
@@ -186,7 +198,7 @@ if(!isset($applicationId) || empty($applicationId))
 if($applicationId != null)
 {
     $menuAppConfig = new SecretObject();
-    $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
+    $appConfigPath = getApplicationConfigPath($activeWorkspace, $applicationId);
     if(file_exists($appConfigPath))
     {
         $menuAppConfig->loadYamlFile($appConfigPath, false, true, true);

@@ -330,6 +330,24 @@ class AppMultiLevelMenuTool
 
         return $parentRole;
     }
+    
+    /**
+     * Determines whether a parent module needs to be created for the given module.
+     *
+     * This function returns true if the current module does not already have a parent module
+     * and either a parent module ID or a module group ID is provided.
+     *
+     * @param object $appModule The module object to check.
+     * @return bool True if a parent module needs to be created; false otherwise.
+     */
+    public function needToCreateParent($appModule)
+    {
+        return !$appModule->issetParentModule() &&
+            !(
+                ($appModule->getParentModuleId() === null || $appModule->getParentModuleId() === '') &&
+                ($appModule->getModuleGroupId() === null || $appModule->getModuleGroupId() === '')
+            );
+    }
 
     /**
      * Creates parent modules for child modules that are currently unassigned or orphaned.
@@ -366,13 +384,7 @@ class AppMultiLevelMenuTool
                 // If module already has a parent (object loaded or ID set), skip creation.
                 // The `issetParentModule()` checks if the object is already populated,
                 // and `issetParentModuleId()` checks if a parent ID is assigned (even if not loaded).
-                if (
-                    $appModule->issetParentModule() || 
-                    (
-                        ($appModule->getParentModuleId() === null || $appModule->getParentModuleId() === '') &&
-                        ($appModule->getModuleGroupId() === null || $appModule->getModuleGroupId() === '')
-                    )
-                ) {
+                if (!$this->needToCreateParent($appModule)) {
                     continue; // Skip if a parent is already linked OR both parent_module_id and group_module_id are empty
                 }           
 
