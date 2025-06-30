@@ -26,6 +26,7 @@ use MagicAppTemplate\Entity\App\AppModuleMultiLevelImpl;
 use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
+use MagicAppTemplate\AppMultiLevelMenuTool;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -274,6 +275,12 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
+}
+else if($inputGet->getUserAction() == 'generate-parent-module')
+{
+	$multiLevelMenuTool = new AppMultiLevelMenuTool($database);
+	$multiLevelMenuTool->createParentModule($currentAction);
+	$currentModule->redirectTo();
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
@@ -768,6 +775,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		
 				<span class="filter-group">
 					<button type="button" class="btn btn-primary" id="add_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
+				</span>
+		
+				<span class="filter-group">
+					<button type="button" class="btn btn-primary" id="add_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl('generate-parent-module');?>'"><?php echo $appLanguage->getButtonGenerateParent();?></button>
 				</span>
 				<?php } ?>
 			</form>
