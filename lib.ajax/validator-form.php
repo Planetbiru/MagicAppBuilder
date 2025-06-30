@@ -3,7 +3,6 @@
 use AppBuilder\Util\Error\ErrorChecker;
 use AppBuilder\Util\ValidatorUtil;
 use MagicObject\Request\InputPost;
-use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 

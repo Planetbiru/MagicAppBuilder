@@ -4,6 +4,7 @@ use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
+
 $response = new stdClass;
 $response->success = false;
 $inputPost = new InputPost();

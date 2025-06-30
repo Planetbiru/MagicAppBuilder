@@ -1,6 +1,5 @@
 <?php
 
-use MagicApp\AppMenuGroupItem;
 use MagicApp\Field;
 use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;

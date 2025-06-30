@@ -1,6 +1,5 @@
 <?php
 
-use MagicObject\MagicObject;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;

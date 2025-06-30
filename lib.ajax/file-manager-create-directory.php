@@ -1,12 +1,9 @@
 <?php
 
 use AppBuilder\Util\FileDirUtil;
-use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
-
-
 
 $separatorNLT = "\r\n\t";
 
