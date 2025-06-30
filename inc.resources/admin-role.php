@@ -20,6 +20,7 @@ use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\AppMultiLevelMenuTool;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
@@ -182,7 +183,16 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->setAllowedSortOrder($allowedSortOrder)
 			->setAllowedExport($allowedExport)
 			->update();
+
+			if($appConfig->getApplication()->isMultiLevelMenu())
+			{
+				$appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
+				$appMultiLevelMenuTool->updateParentRole($adminRoleId);
+			}
 		}
+
+		
+
 		$database->commit();
 		
 		// Update the application menu cache
