@@ -1038,9 +1038,12 @@ Let me know if you'd like to generate a version checker or migration assistant f
         
     -   This addition enables fallback logic for parent module generation when `parentModuleId` is not defined.
         
-        
 
 ## Bug Fixes
 
--   **Two-Level Menu Rendering**
+-   **Two-Level Menu Rendering**  
     Fixed an issue where nested menus (level 2) were not rendered properly in some navigation scenarios.
+    
+-   **Multi-Level Menu Theme Styling**  
+    Resolved a display issue affecting the visual consistency of menus under multi-level navigation themes.  
+    This ensures submenus are correctly aligned, indented, and styled across different levels.
