@@ -380,6 +380,20 @@ body {
 .tabs li:last-child {
   padding-right: 0px;
 }
+.tabs li.diagram-tab {
+  padding-left: 10px;
+  position: relative;
+  cursor: move;
+}
+.tabs li.diagram-tab::before {
+  content: "⠿";
+  position: absolute;
+  margin-left: -6px;
+  margin-top: 5px;
+}
+.tabs li a {
+  cursor: pointer;
+}
 
 .tab-link {
   display: inline-block;

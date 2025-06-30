@@ -1019,6 +1019,15 @@ Let me know if you'd like to generate a version checker or migration assistant f
     
     -   This provides more detailed and informative version history.
         
+-   **Diagram Tab Drag-and-Drop Sorting**  
+    You can now drag and drop to reorder diagram tabs within the **Entity Editor**.
+    
+    -   Tabs are sorted visually via mouse drag gesture.
+        
+    -   `All Entities` and `+` tabs are fixed in position and cannot be moved.
+        
+    -   This improves flexibility and control over diagram organization.
+        
 
 ## UI Improvements
 
@@ -1047,3 +1056,5 @@ Let me know if you'd like to generate a version checker or migration assistant f
 -   **Multi-Level Menu Theme Styling**  
     Resolved a display issue affecting the visual consistency of menus under multi-level navigation themes.  
     This ensures submenus are correctly aligned, indented, and styled across different levels.
+    
+
