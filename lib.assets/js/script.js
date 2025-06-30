@@ -861,6 +861,37 @@ function handleApplicationFileUpload(file, action, application_id, application_n
 }
 
 /**
+ * Generates a namespaced localStorage key based on the current URL path.
+ * 
+ * This function ensures that localStorage keys are unique per directory path
+ * within the same domain. This avoids collisions when multiple applications
+ * are hosted under different subpaths of the same domain.
+ * 
+ * Example:
+ * - Current URL: https://example.com/admin/dashboard
+ *   Original key: "userSettings"
+ *   Resulting key: "admin__userSettings"
+ * 
+ * @param {string} key - The original localStorage key to namespace.
+ * @returns {string} - A namespaced key based on the current path.
+ */
+function getLocalStorageKey(key) {
+    // Get the current URL path (e.g., /admin/dashboard)
+    const path = window.location.pathname;
+
+    // Determine the directory part of the path (e.g., /admin/)
+    const dirname = path.endsWith('/')
+        ? path
+        : path.substring(0, path.lastIndexOf('/') + 1);
+
+    // Convert slashes to underscores and remove leading/trailing underscores
+    const prefix = dirname.replace(/\/+/g, '_').replace(/^_+|_+$/g, '');
+
+    // If a valid prefix exists, prepend it to the key
+    return prefix ? `${prefix}__${key}` : key;
+}
+
+/**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
@@ -2952,7 +2983,7 @@ let initAll = function () {
         decreaseAjaxPending();
         onSetDefaultWorkspace();
         $('meta[name="workspace-id"]').attr('content', workspaceId);
-        window.localStorage.setItem('workspace-id', workspaceId);
+        window.localStorage.setItem(getLocalStorageKey('workspace-id'), workspaceId);
         resetCheckActiveWorkspace();
       }
     });
@@ -2971,7 +3002,7 @@ let initAll = function () {
         decreaseAjaxPending();
         onSetDefaultApplication();
         $('meta[name="application-id"]').attr('content', applicationId);
-        window.localStorage.setItem('application-id', applicationId);
+        window.localStorage.setItem(getLocalStorageKey('application-id'), applicationId);
         resetCheckActiveApplication();
       },
       error: function (xhr, status, error) {
@@ -3463,8 +3494,8 @@ let initAll = function () {
 
   let val1 = $('meta[name="workspace-id"]').attr('content') || '';
   let val2 = $('meta[name="application-id"]').attr('content') || '';
-  window.localStorage.setItem('workspace-id', val1);
-  window.localStorage.setItem('application-id', val2);
+  window.localStorage.setItem(getLocalStorageKey('workspace-id'), val1);
+  window.localStorage.setItem(getLocalStorageKey('application-id'), val2);
   loadAllResource();
   resetCheckActiveWorkspace();
   resetCheckActiveApplication();
@@ -4099,7 +4130,7 @@ let checkIntervalApplication = 12000;
 function resetCheckActiveWorkspace() {
   clearInterval(toCheckActiveWorkspace);
   toCheckActiveWorkspace = setInterval(function () {
-    let val1 = window.localStorage.getItem('workspace-id') || '';
+    let val1 = window.localStorage.getItem(getLocalStorageKey('workspace-id')) || '';
     let val2 = $('meta[name="workspace-id"]').attr('content');
     if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
@@ -4118,7 +4149,7 @@ function resetCheckActiveWorkspace() {
 function resetCheckActiveApplication() {
   clearInterval(toCheckActiveApplication);
   toCheckActiveApplication = setInterval(function () {
-    let val1 = window.localStorage.getItem('application-id') || '';
+    let val1 = window.localStorage.getItem(getLocalStorageKey('application-id')) || '';
     let val2 = $('meta[name="application-id"]').attr('content');
     if (val1 != '' && val2 != '' && val2 != val1) {
       loadAllResource();
@@ -4143,7 +4174,7 @@ function loadWorkspaceList() {
       decreaseAjaxPending();
       $('.workspace-card').empty().append(data);
       let val1 = $('.workspace-item[data-selected="true"]').attr('data-workspace-id') || '';
-      window.localStorage.setItem('workspace-id', val1);
+      window.localStorage.setItem(getLocalStorageKey('workspace-id'), val1);
       $('meta[name="workspace-id"]').attr('content', val1);
     }
   });
@@ -4167,7 +4198,7 @@ function loadApplicationList() {
       $('.application-card').empty().append(data);
       let applicationId = $('.application-item[data-selected="true"]').attr('data-application-id') || '';
       let applicationName = $('.application-item[data-selected="true"]').attr('data-application-name') || '';
-      window.localStorage.setItem('application-id', applicationId);
+      window.localStorage.setItem(getLocalStorageKey('application-id'), applicationId);
       $('meta[name="application-id"]').attr('content', applicationId);
       $('meta[name="application-name"]').attr('content', applicationName);
       let builderName = $('meta[name="builder-name"]').attr('content');
