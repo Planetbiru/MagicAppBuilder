@@ -2155,6 +2155,9 @@ let initAll = function () {
   $(document).on('click', '.create-new-application', function (e) {
     resetApplicationSearch();
     let modal = $('#modal-create-application');
+    if (modal.find('.alert').length > 0) {
+      modal.find('.alert').remove();
+    }
     let createBtn = modal.find('#create_new_app');
     createBtn[0].disabled = true;
     modal.find('[name="application_name"]').val('');
@@ -2175,11 +2178,8 @@ let initAll = function () {
       type: 'GET',
       url: 'lib.ajax/application-new.php',
       success: function (data) {
-        decreaseAjaxPending();
+        decreaseAjaxPending();       
         if (data.application_workspace.length == 0) {
-          if (modal.find('.alert').length > 0) {
-            modal.find('.alert').remove();
-          }
           let alertDiv = $('<div />');
           alertDiv.addClass('alert alert-warning');
           alertDiv.html('Please select a workspace before creating a new application.');
