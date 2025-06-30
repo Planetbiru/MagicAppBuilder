@@ -66,8 +66,9 @@ $arrow-color: #888;
 
         // Arrow icon (default: '+' when collapsed)
         &::after {
-          content: '+'; 
-          font-family: 'Font Awesome 5 Free'; // Use Font Awesome font-family
+          content: '\2b'; 
+          font-family: 'Font Awesome 6 Free'; // Use Font Awesome font-family
+          font-weight: bold;
           position: absolute;
           right: 15px; // Arrow icon position
           top: 50%;
@@ -80,15 +81,17 @@ $arrow-color: #888;
         // Arrow icon when the link is NOT in a 'collapsed' state (i.e., expanded by Bootstrap JS)
         // This will override the default '+'
         &:not(.collapsed)::after {
-          font-family: 'Font Awesome 5 Free'; // Use Font Awesome font-family
-          content: '-'; // '-' icon when expanded
+          font-family: 'Font Awesome 6 Free'; // Use Font Awesome font-family
+          content: '\f068'; // '-' icon when expanded
+          font-weight: bold;
         }
 
         // Arrow icon when the link explicitly has the 'collapsed' class
         // This ensures '+' returns if it's collapsed again
         &.collapsed::after {
-          font-family: 'Font Awesome 5 Free'; // Use Font Awesome font-family
-          content: '+';
+          font-family: 'Font Awesome 6 Free'; // Use Font Awesome font-family
+          content: '\2b';
+          font-weight: bold;
         }
       }
     }
@@ -113,7 +116,9 @@ $arrow-color: #888;
         // but will be overridden by `.collapsed` if Bootstrap closes it)
         // If you want `.open` to always mean '-', remove `.collapsed` from 'a' in PHP when `.open` is present.
         &::after {
-            content: '-'; // Ensures '-' when parent LI is 'open' (initially active branch)
+            content: '\f068'; // Ensures '-' when parent LI is 'open' (initially active branch)
+            font-family: 'Font Awesome 6 Free';
+            font-weight: bold;
         }
       }
     }
@@ -187,7 +192,9 @@ $arrow-color: #888;
           color: #ffffff;
 
           &::after {
-            content: '-'; // Override to ensure '-' in open state
+            content: '\f068'; // Override to ensure '-' in open state
+            font-family: 'Font Awesome 6 Free';
+            font-weight: bold;
           }
         }
       }

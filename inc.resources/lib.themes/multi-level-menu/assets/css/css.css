@@ -746,7 +746,8 @@ tr[data-active=false] td {
 }
 #sidebarMenu li.has-submenu > a::after {
   content: "+";
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
   position: absolute;
   right: 15px;
   top: 50%;
@@ -756,12 +757,14 @@ tr[data-active=false] td {
   font-size: 0.8em;
 }
 #sidebarMenu li.has-submenu > a:not(.collapsed)::after {
-  font-family: "Font Awesome 5 Free";
-  content: "-";
+  font-family: "Font Awesome 6 Free";
+  content: "\f068";
+  font-weight: bold;
 }
 #sidebarMenu li.has-submenu > a.collapsed::after {
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 6 Free";
   content: "+";
+  font-weight: bold;
 }
 #sidebarMenu li.selected > a {
   background-color: #e9ecef;
@@ -771,7 +774,9 @@ tr[data-active=false] td {
   color: #007bff;
 }
 #sidebarMenu li.open > a::after {
-  content: "-";
+  content: "\f068";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
 }
 
 .collapse:not(.show) {
@@ -816,7 +821,9 @@ tr[data-active=false] td {
   color: #ffffff;
 }
 .dark-mode #sidebarMenu li.open > a::after {
-  content: "-";
+  content: "\f068";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
 }
 
 select[multiple].form-control {

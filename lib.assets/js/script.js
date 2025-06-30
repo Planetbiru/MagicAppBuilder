@@ -2206,6 +2206,7 @@ let initAll = function () {
           $('#modal-create-application .modal-body :input').each(function(){
             $(this)[0].disabled = false;
           });
+          modal.find('[name="application_name"]')[0].select();
         }
       }
     });
