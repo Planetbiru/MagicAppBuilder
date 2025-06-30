@@ -3,6 +3,7 @@
 use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\Field;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\AppMultiLevelMenuTool;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
@@ -103,9 +104,11 @@ function setSuperuserRole($adminLevelId, $database)
  *
  * @param string $adminLevelId The ID of the admin level to generate roles for.
  * @param PicoDatabase $database The database connection instance.
+ * @param SecretObject $appConfig Application configuration
+ * @param SecretObject $currentAction Current action information, contains user ID, IP address, and time
  * @return void
  */
-function generateRole($adminLevelId, $database)
+function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 {
     // Generate admin role
 	// for all active modules
@@ -166,10 +169,21 @@ function generateRole($adminLevelId, $database)
 					->insert();
 				}
 			}
+            
+
+                
+            // Create parent module
+            if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
+            {
+                $appMultiLevelMenuTool = new AppMultiLevelMenuTool(null, $database);
+                $appMultiLevelMenuTool->createParentModule($currentAction);
+                $appMultiLevelMenuTool->updateRolesByAdminLevelId($adminLevelId, $currentAction);
+            }
+            
             // Update the application menu cache
             $applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
-            // Update the menu cache for the specified admin level ID
-            $applicationMenu->updateMenuCache($adminLevelId);
+            // Delete the menu cache for the specified admin level ID
+            $applicationMenu->deleteMenuCache($adminLevelId);
 		}
 		catch(Exception $e)
 		{
@@ -370,7 +384,7 @@ if($applicationId != null)
                             $userPassword = sha1(sha1($username));
                             $admin->setPassword($userPassword);
                             $admin->update();
-                            generateRole($adminLevelId, $database);
+                            generateRole($adminLevelId, $database, $menuAppConfig, $currentAction);
                         }
                         else if($inputPost->getUserAction() == "delete")
                         {
@@ -392,10 +406,8 @@ if($applicationId != null)
                         else if($inputPost->getUserAction() == "set-user-role")
                         {
                             $adminLevelId = $admin->getAdminLevelId();
-                            generateRole($adminLevelId, $database);
+                            generateRole($adminLevelId, $database, $menuAppConfig, $currentAction);
                         }
-                        
-                        
                     }
                 }
             }

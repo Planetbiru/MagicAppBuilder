@@ -5,6 +5,7 @@ use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use MagicObject\SecretObject;
+use MagicObject\SetterGetter;
 
 require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/database-builder.php";
@@ -61,3 +62,10 @@ if(!isset($databaseConfig))
 {
     $databaseConfig = new SecretObject();
 }
+
+// Initialize action context with user ID, IP address, and timestamp.
+// This context will be used when updating the application database.
+$currentAction = new SetterGetter();
+$currentAction->setUserId("superuser");
+$currentAction->setIp($_SERVER['REMOTE_ADDR']);
+$currentAction->setTime(date('Y-m-d H:i:s'));

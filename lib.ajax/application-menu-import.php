@@ -1,6 +1,8 @@
 <?php
 
 use AppBuilder\EntityInstaller\EntityApplication;
+use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\AppMultiLevelMenuTool;
 use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
 use MagicAppTemplate\Entity\App\AppModuleMinImpl;
 use MagicObject\Database\PicoDatabase;
@@ -8,6 +10,7 @@ use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
+use MagicObject\SetterGetter;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -16,6 +19,9 @@ $inputGet = new InputGet();
 $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
 $now = date("Y-m-d H:i:s");
+$superuser = 'superuser';
+$adminLevelId = 'superuser';
+$ip = $_SERVER['REMOTE_ADDR'];
 
 if($applicationId != null)
 {
@@ -45,107 +51,126 @@ if($applicationId != null)
         try
         {
             $database->connect();
-        }
-        catch(Exception $e)
-        {
-            error_log($e->getMessage());
-        }
+        
 
-        $menus = new SecretObject();
-        $menus->loadYamlFile($menuPath, false, true, true);
-        if($menus == null || $menus->getMenu() == null || !is_array($menus->getMenu()))
-        {
-            $menus->setMenu(array());
-        }
-        
-        $moduleGroupFinder = new AppModuleGroupMinImpl(null, $database);
-        $moduleFinder = new AppModuleMinImpl(null, $database);       
-        
-        foreach ($menus->getMenu() as $menuIndex => $menu) {
-            
-            if(isset($menu) && $menu instanceof SecretObject)
+            $menus = new SecretObject();
+            $menus->loadYamlFile($menuPath, false, true, true);
+            if($menus == null || $menus->getMenu() == null || !is_array($menus->getMenu()))
             {
+                $menus->setMenu(array());
+            }
+            
+            $moduleGroupFinder = new AppModuleGroupMinImpl(null, $database);
+            $moduleFinder = new AppModuleMinImpl(null, $database);       
+            
+            foreach ($menus->getMenu() as $menuIndex => $menu) {
                 
-                $isMenuExists = $moduleGroupFinder->existsByName($menu->getTitle());
-                if($isMenuExists)
+                if(isset($menu) && $menu instanceof SecretObject)
                 {
-                    // Do nothing
-                }
-                else
-                {
-                    $menuCreator = new AppModuleGroupMinImpl(null, $database);
-                    $menuCreator->setName($menu->getTitle());
-                    $menuCreator->setIcon($menu->getIcon());
-                    $menuCreator->setUrl($menu->getHref());
-                    $menuCreator->setSortOrder($menuIndex + 1);
-                    $menuCreator->setTimeCreate($now);
-                    $menuCreator->setTimeEdit($now);
-                    $menuCreator->setAdminCreate('superuser');
-                    $menuCreator->setAdminEdit('superuser');
-                    $menuCreator->setIpCreate($_SERVER['REMOTE_ADDR']);
-                    $menuCreator->setIpEdit($_SERVER['REMOTE_ADDR']);
-                    $menuCreator->setActive(true);
-                    $menuCreator->insert();
                     
+                    $isMenuExists = $moduleGroupFinder->existsByName($menu->getTitle());
+                    if($isMenuExists)
+                    {
+                        // Do nothing
+                    }
+                    else
+                    {
+                        $menuCreator = new AppModuleGroupMinImpl(null, $database);
+                        $menuCreator->setName($menu->getTitle());
+                        $menuCreator->setIcon($menu->getIcon());
+                        $menuCreator->setUrl($menu->getHref());
+                        $menuCreator->setSortOrder($menuIndex + 1);
+                        $menuCreator->setTimeCreate($now);
+                        $menuCreator->setTimeEdit($now);
+                        $menuCreator->setAdminCreate($superuser);
+                        $menuCreator->setAdminEdit($superuser);
+                        $menuCreator->setIpCreate($ip);
+                        $menuCreator->setIpEdit($ip);
+                        $menuCreator->setActive(true);
+                        $menuCreator->insert();
+                        
+                    }
                 }
             }
-        }
-        foreach ($menus->getMenu() as $menuIndex => $menu) {
-            
-            if(isset($menu) && $menu instanceof SecretObject)
-            {
-                // Check if there are submenus and add them
-                $submenus = $menu->getSubmenu();
-                if (is_array($submenus)) {
-                    foreach ($submenus as $submenuIndex => $submenuItem) {
-                        if(!isset($submenuItem) || !($submenuItem instanceof SecretObject)) {
-                            continue; // Skip if not a valid SecretObject
-                        }                        
-                        $isSubmenuExists = $moduleFinder->existsByNameAndUrl($submenuItem->getTitle(), $submenuItem->getHref());
-                        if($isSubmenuExists)
-                        {
-                            // Do nothing
-                        }
-                        else
-                        {
-                            $moduleGroupId = '';
-                            try
-                            {
-                                $moduleGroupFinder->findOneByName($menu->getTitle());
-                                $moduleGroupId = $moduleGroupFinder->getModuleGroupId();
-                            }
-                            catch(Exception $e)
+            foreach ($menus->getMenu() as $menuIndex => $menu) {
+                
+                if(isset($menu) && $menu instanceof SecretObject)
+                {
+                    // Check if there are submenus and add them
+                    $submenus = $menu->getSubmenu();
+                    if (is_array($submenus)) {
+                        foreach ($submenus as $submenuIndex => $submenuItem) {
+                            if(!isset($submenuItem) || !($submenuItem instanceof SecretObject)) {
+                                continue; // Skip if not a valid SecretObject
+                            }                        
+                            $isSubmenuExists = $moduleFinder->existsByNameAndUrl($submenuItem->getTitle(), $submenuItem->getHref());
+                            if($isSubmenuExists)
                             {
                                 // Do nothing
                             }
-                            
-                            $moduleCode = $submenuItem->getCode();
-                            if($moduleCode == null || $moduleCode == "")
+                            else
                             {
-                                $moduleCode = basename($submenuItem->getHref(), ".php");
+                                $moduleGroupId = '';
+                                try
+                                {
+                                    $moduleGroupFinder->findOneByName($menu->getTitle());
+                                    $moduleGroupId = $moduleGroupFinder->getModuleGroupId();
+                                }
+                                catch(Exception $e)
+                                {
+                                    // Do nothing
+                                }
+                                
+                                $moduleCode = $submenuItem->getCode();
+                                if($moduleCode == null || $moduleCode == "")
+                                {
+                                    $moduleCode = basename($submenuItem->getHref(), ".php");
+                                }
+                                
+                                $submenuCreator = new AppModuleMinImpl(null, $database);
+                                $submenuCreator->setName($submenuItem->getTitle());
+                                $submenuCreator->setMenu(true);
+                                $submenuCreator->setModuleGroupId($moduleGroupId);
+                                $submenuCreator->setSpecialAccess($submenuItem->getSpecialAccess());
+                                $submenuCreator->setIcon($submenuItem->getIcon());
+                                $submenuCreator->setModuleCode($moduleCode);
+                                $submenuCreator->setUrl($submenuItem->getHref());
+                                $submenuCreator->setSortOrder($submenuIndex + 1);
+                                $submenuCreator->setTimeCreate($now);
+                                $submenuCreator->setTimeEdit($now);
+                                $submenuCreator->setAdminCreate($superuser);
+                                $submenuCreator->setAdminEdit($superuser);
+                                $submenuCreator->setIpCreate($ip);
+                                $submenuCreator->setIpEdit($ip);
+                                $submenuCreator->setActive(true);
+                                $submenuCreator->insert();
                             }
-                            
-                            $submenuCreator = new AppModuleMinImpl(null, $database);
-                            $submenuCreator->setName($submenuItem->getTitle());
-                            $submenuCreator->setMenu(true);
-                            $submenuCreator->setModuleGroupId($moduleGroupId);
-                            $submenuCreator->setSpecialAccess($submenuItem->getSpecialAccess());
-                            $submenuCreator->setIcon($submenuItem->getIcon());
-                            $submenuCreator->setModuleCode($moduleCode);
-                            $submenuCreator->setUrl($submenuItem->getHref());
-                            $submenuCreator->setSortOrder($submenuIndex + 1);
-                            $submenuCreator->setTimeCreate($now);
-                            $submenuCreator->setTimeEdit($now);
-                            $submenuCreator->setAdminCreate('superuser');
-                            $submenuCreator->setAdminEdit('superuser');
-                            $submenuCreator->setIpCreate($_SERVER['REMOTE_ADDR']);
-                            $submenuCreator->setIpEdit($_SERVER['REMOTE_ADDR']);
-                            $submenuCreator->setActive(true);
-                            $submenuCreator->insert();
                         }
                     }
                 }
             }
+            
+            $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
+            if(file_exists($appConfigPath))
+            {
+                $appConfig->loadYamlFile($appConfigPath, false, true, true);
+                // Create parent module
+                if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
+                {
+                    $appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
+                    $appMultiLevelMenuTool->createParentModule($currentAction);
+                    $appMultiLevelMenuTool->updateRolesByAdminLevelId($adminLevelId, $currentAction);
+                    
+                    // Update the application menu cache
+                    $applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
+                    // Delete the menu cache for the specified admin level ID
+                    $applicationMenu->deleteMenuCache($adminLevelId);
+                }
+            }
+        }
+        catch(Exception $e)
+        {
+            error_log($e->getMessage());
         }
     }
     catch(Exception $e)

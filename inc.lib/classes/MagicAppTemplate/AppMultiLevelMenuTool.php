@@ -12,6 +12,7 @@ use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicObject\SetterGetter;
 
 /**
  * AppMultiLevelMenuTool
@@ -166,18 +167,21 @@ class AppMultiLevelMenuTool
      * necessary permissions from their children in the menu hierarchy.
      *
      * @param string $adminLevelId The ID of the admin level whose roles need to be updated.
+     * @param SetterGetter $currentAction Current action information, contains user ID, IP address, and time
      * @return array An empty array if an exception occurs during the process, otherwise implicitly void.
      * (Note: The method currently returns an empty array on exception; consider returning void or bool for clear success/failure).
      */
-    public function updateRolesByAdminLevelId($adminLevelId)
+    public function updateRolesByAdminLevelId($adminLevelId, $currentAction = null)
     {
+        if(!isset($currentAction))
+        {
+            $currentAction = new SetterGetter();
+        }
         try {
             $roles = $this->getRoles($adminLevelId);
             foreach ($roles as $role) {
                 $parentRole = $this->getParentRole($role);
-                if ($parentRole !== null) {
-                    $this->copyPermissionsFromChild($role, $parentRole);
-                }
+                $this->copyPermissionsFromChild($role, $parentRole, $currentAction);
             }
         } catch(Exception $e) {
             return array();
@@ -255,12 +259,17 @@ class AppMultiLevelMenuTool
      * @param AppAdminRoleMinImpl $childRole  The source role from which permissions are copied.
      * @param AppAdminRoleMinImpl|null $parentRole The target role to which permissions are copied.
      * If `null`, a new parent role is created.
+     * @param SetterGetter $currentAction Current action information, contains user ID, IP address, and time
      * @return AppAdminRoleMinImpl The resulting parent role instance, which is either the
      * updated existing parent role or the newly created one.
      * @throws Exception If database operations fail during insert or update of the parent role.
      */
-    public function copyPermissionsFromChild($childRole, $parentRole = null)
+    public function copyPermissionsFromChild($childRole, $parentRole = null, $currentAction = null)
     {
+        if(!isset($currentAction))
+        {
+            $currentAction = new SetterGetter();
+        }
         $createNew = false;
         if ($parentRole === null) {
             $parentRole = new AppAdminRoleMinImpl(null, $this->database);
@@ -297,13 +306,13 @@ class AppMultiLevelMenuTool
                 $parentRole->setModuleId($parentModule->getModuleId());
                 $parentRole->setAdminLevelId($childRole->getAdminLevelId());
 
-                $now = date('Y-m-d H:i:s');
+                $now = $this->getCurrentTime();
                 $parentRole->setTimeCreate($now);
                 $parentRole->setTimeEdit($now);
-                $parentRole->setAdminCreate($childRole->getAdminCreate());
-                $parentRole->setAdminEdit($childRole->getAdminEdit());
-                $parentRole->setIpCreate($childRole->getIpCreate());
-                $parentRole->setIpEdit($childRole->getIpEdit());
+                $parentRole->setAdminCreate($currentAction->getUserId());
+                $parentRole->setAdminEdit($currentAction->getUserId());
+                $parentRole->setIpCreate($currentAction->getIp());
+                $parentRole->setIpEdit($currentAction->getIp());
                 $parentRole->setActive(true);
 
                 $parentRole->insert();
@@ -335,7 +344,7 @@ class AppMultiLevelMenuTool
      * is updated to link it to the newly created parent. This helps maintain a
      * complete hierarchical menu structure.
      *
-     * @param object $currentAction An object containing user/action context,
+     * @param SetterGetter $currentAction An object containing user/action context,
      * for example, an instance with `getUserId()` and `getIp()` methods
      * to record creation/edit metadata for new parent modules.
      * @return int The total number of new parent modules successfully created during this operation.
@@ -352,12 +361,20 @@ class AppMultiLevelMenuTool
             $pageData = $appModuleFinder->findAll(null, null, $sortable);
 
             foreach ($pageData->getResult() as $appModule) {
+                    
+
                 // If module already has a parent (object loaded or ID set), skip creation.
                 // The `issetParentModule()` checks if the object is already populated,
                 // and `issetParentModuleId()` checks if a parent ID is assigned (even if not loaded).
-                if ($appModule->issetParentModule() || $appModule->issetParentModuleId() == null || $appModule->issetParentModuleId() == '') {
-                    continue; // Skip if a parent is already linked or specified
-                }
+                if (
+                    $appModule->issetParentModule() || 
+                    (
+                        ($appModule->getParentModuleId() === null || $appModule->getParentModuleId() === '') &&
+                        ($appModule->getModuleGroupId() === null || $appModule->getModuleGroupId() === '')
+                    )
+                ) {
+                    continue; // Skip if a parent is already linked OR both parent_module_id and group_module_id are empty
+                }           
 
                 $parentModule = new AppModuleImpl(null, $this->database);
                 $moduleGroupId = $appModule->getModuleGroupId();
@@ -383,7 +400,7 @@ class AppMultiLevelMenuTool
                         $parentModule->setUrl('#'.$parentModule->getModuleCode());
                         $parentModule->setTarget('_self');
 
-                        $now = date('Y-m-d H:i:s');
+                        $now = $this->getCurrentTime();
                         $parentModule->setTimeCreate($now);
                         $parentModule->setTimeEdit($now);
                         $parentModule->setAdminCreate($currentAction->getUserId());
@@ -402,7 +419,7 @@ class AppMultiLevelMenuTool
                     } catch (Exception $e) {
                         // If module group lookup or insert fails, fall back to using module info
                         // This creates a generic parent based on the child module's own name/code.
-                        $parentModule->setModuleId($appModule->getGroupModuleId()); // Use a distinct ID
+                        $parentModule->setModuleId($appModule->getModuleGroupId()); // Use a distinct ID
                         $parentModule->setName('Parent of ' . $appModule->getName());
                         $parentModule->setModuleCode('g-' . strtolower(str_replace(' ', '-', $appModule->getName())));
                         $parentModule->setMenu(true);
@@ -413,7 +430,7 @@ class AppMultiLevelMenuTool
                         $parentModule->setUrl('#'.$parentModule->getModuleCode());
                         $parentModule->setTarget('_self');
 
-                        $now = date('Y-m-d H:i:s');
+                        $now = $this->getCurrentTime();
                         $parentModule->setTimeCreate($now);
                         $parentModule->setTimeEdit($now);
                         $parentModule->setAdminCreate($currentAction->getUserId());
@@ -444,4 +461,15 @@ class AppMultiLevelMenuTool
 
         return $created;
     }
+    
+    /**
+     * Returns the current date and time in 'Y-m-d H:i:s' format.
+     *
+     * @return string The current timestamp in the format 'YYYY-MM-DD HH:MM:SS'.
+     */
+    public function getCurrentTime()
+    {
+        return date('Y-m-d H:i:s');
+    }
+
 }

@@ -153,6 +153,9 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 
 	try {
 		// Mulai transaksi untuk memastikan data konsisten
+		
+		$multiLevelMenuTool = new AppMultiLevelMenuTool($database);
+		$multiLevelMenuTool->createParentModule($currentAction);
 
 		foreach ($_POST['admin_role_id'] as $index => $adminRoleId) {
 			// Cek dan ambil nilai dari setiap checkbox
@@ -185,7 +188,6 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->update();
 
 			// Update parent role
-			$appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
 			$appMultiLevelMenuTool->updateParentRole($adminRoleId);	
 		}
 
