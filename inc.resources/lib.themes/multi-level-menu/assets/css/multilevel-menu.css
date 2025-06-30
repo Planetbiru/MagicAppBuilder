@@ -67,10 +67,6 @@
 #sidebarMenu li.selected > a i.fa {
   color: #007bff;
 }
-#sidebarMenu li.open > a {
-  background-color: #e0e4e9;
-  color: #007bff;
-}
 #sidebarMenu li.open > a::after {
   content: "-";
 }

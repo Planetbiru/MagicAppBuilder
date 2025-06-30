@@ -14,7 +14,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <title><?php echo $appDocumentTitle;?></title>
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/font-awesome/all.min.css">
-    <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/css.css">
+    <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/css.min.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.css">
@@ -24,7 +24,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <script src="<?php echo $themeAssetsPath;?>vendors/moment/min/moment.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>vendors/sortable/Sortable.min.js"></script>
-    <script src="<?php echo $themeAssetsPath;?>js/MultiSelect.js"></script>
+    <script src="<?php echo $themeAssetsPath;?>js/MultiSelect.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/PicoTagEditor.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/custom.min.js"></script>
 </head>
