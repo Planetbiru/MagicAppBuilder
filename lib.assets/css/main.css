@@ -213,13 +213,7 @@ td .btn.btn-remove-row, td .btn.btn-move-up, td .btn.btn-move-down, td .btn.path
 .modal-md .config-table td.paths table tr td:nth-child(1), .modal-md .config-table td.languages table tr td:nth-child(1),
 .modal-sm .config-table td.paths table tr td:nth-child(1),
 .modal-sm .config-table td.languages table tr td:nth-child(1) {
-  width: calc(50% - 40px);
   padding-left: 0;
-}
-.modal-md .config-table td.paths table tr td:nth-child(2), .modal-md .config-table td.languages table tr td:nth-child(2),
-.modal-sm .config-table td.paths table tr td:nth-child(2),
-.modal-sm .config-table td.languages table tr td:nth-child(2) {
-  width: calc(50% - 40px);
 }
 .modal-md .config-table td.paths table tr td:nth-child(4), .modal-md .config-table td.languages table tr td:nth-child(4),
 .modal-sm .config-table td.paths table tr td:nth-child(4),

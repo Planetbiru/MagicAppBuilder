@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.add-diagram').addEventListener('click', function(e){
         e.preventDefault();
         let ul = e.target.closest('ul');
-        let diagramName = "New Diagram";
+        let diagramName = editor.getNewDiagramName();
         let randomId = (new Date()).getTime();
         let id = 'diagram-'+randomId;
         editor.addDiagram(ul, diagramName, id, [], false);
