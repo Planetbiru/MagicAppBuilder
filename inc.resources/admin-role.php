@@ -184,11 +184,10 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->setAllowedExport($allowedExport)
 			->update();
 
-			if($appConfig->getApplication()->isMultiLevelMenu())
-			{
-				$appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
-				$appMultiLevelMenuTool->updateParentRole($adminRoleId);
-			}
+			// Update parent role
+			$appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
+			$appMultiLevelMenuTool->updateParentRole($adminRoleId);
+			
 		}
 
 		
