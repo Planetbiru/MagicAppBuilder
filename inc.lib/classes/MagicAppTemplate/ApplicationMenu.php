@@ -9,11 +9,11 @@ use Exception;
 use MagicApp\Field;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleMinImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
+use MagicAppTemplate\Entity\App\AppModuleMultiLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppMenuCacheImpl;
 use MagicAppTemplate\Entity\App\AppMenuGroupTranslationImpl;
 use MagicAppTemplate\Entity\App\AppMenuTranslationImpl;
-use MagicAppTemplate\Entity\App\AppModuleImpl;
-use MagicAppTemplate\Entity\App\AppModuleMultiLevelMinImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
@@ -442,16 +442,22 @@ class ApplicationMenu // NOSONAR
             {
                 foreach($moduleGroup->getModules() as $module)
                 {
-                    $submenus[] = array(
-                        'title' => $module->getName(),
-                        'icon' => $module->getIcon(),
-                        'href' => $module->getUrl(),
-                        'target' => $module->getTarget()
-                    );
+                    if(strpos($module->getUrl(), '#') === false)
+                    {                   
+                        $submenus[] = array(
+                            'title' => $module->getName(),
+                            'icon' => $module->getIcon(),
+                            'href' => $module->getUrl(),
+                            'target' => $module->getTarget()
+                        );
+                    }
                 }
             }
-            $menu['submenu'] = $submenus;
-            $menuList['menu'][] = $menu;
+            if(!empty($submenus))
+            {
+                $menu['submenu'] = $submenus;
+                $menuList['menu'][] = $menu;
+            }
         }
         return $menuList;
     }
