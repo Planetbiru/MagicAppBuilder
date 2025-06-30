@@ -43,7 +43,8 @@
 }
 #sidebarMenu li.has-submenu > a::after {
   content: "+";
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
   position: absolute;
   right: 15px;
   top: 50%;
@@ -53,12 +54,14 @@
   font-size: 0.8em;
 }
 #sidebarMenu li.has-submenu > a:not(.collapsed)::after {
-  font-family: "Font Awesome 5 Free";
-  content: "-";
+  font-family: "Font Awesome 6 Free";
+  content: "\f068";
+  font-weight: bold;
 }
 #sidebarMenu li.has-submenu > a.collapsed::after {
-  font-family: "Font Awesome 5 Free";
+  font-family: "Font Awesome 6 Free";
   content: "+";
+  font-weight: bold;
 }
 #sidebarMenu li.selected > a {
   background-color: #e9ecef;
@@ -68,7 +71,9 @@
   color: #007bff;
 }
 #sidebarMenu li.open > a::after {
-  content: "-";
+  content: "\f068";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
 }
 
 .collapse:not(.show) {
@@ -113,5 +118,7 @@
   color: #ffffff;
 }
 .dark-mode #sidebarMenu li.open > a::after {
-  content: "-";
+  content: "\f068";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
 }/*# sourceMappingURL=multilevel-menu.css.map */
