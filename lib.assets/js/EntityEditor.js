@@ -1775,6 +1775,18 @@ class EntityEditor {
             });
             
         });
+        
+        if(tabDragger === null)
+        {
+            tabDragger = new TabDragger(ul, function(){
+                let diagrams = _this.getDiagrams();
+                _this.callbackSaveDiagram(diagrams);
+            });
+            tabDragger.initAll();
+        }
+        
+        tabDragger.makeDraggable(newTab);
+        
         let move = -10 - newTab.offsetWidth;
         updateMarginLeft(move)
     }
@@ -2659,3 +2671,8 @@ class EntityEditor {
     }
 
 }
+
+
+// Global instance variable for TabDragger, initialized to null.
+// This allows external access to the TabDragger instance once it's created.
+let tabDragger = null;

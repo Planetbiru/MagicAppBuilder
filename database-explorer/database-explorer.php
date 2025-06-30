@@ -37,6 +37,7 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
     <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
+    <script src="../lib.assets/js/TabDragger.min.js"></script>
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
     <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
 </head>
@@ -143,7 +144,7 @@ if(!isset($databaseName))
                                     <div class="tabs-link-container">
                                         <ul class="diagram-list tabs">
                                             <li class="all-entities active"><a href="javascript:" class="tab-link elected-entity" data-id="all-entities" data-name="">All Entities</a></li>
-                                            <li><a href="javascript:" class="tab-link add-diagram">+</a></li>
+                                            <li class="add-tab"><a href="javascript:" class="tab-link add-diagram">+</a></li>
                                         </ul>
                                     </div>
 

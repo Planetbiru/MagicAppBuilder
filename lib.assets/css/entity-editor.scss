@@ -464,6 +464,21 @@ body {
         &:last-child {
             padding-right: 0px;
         }
+        
+        &.diagram-tab{
+            padding-left: 10px;
+            position: relative;
+            cursor: move;
+            &::before{
+                content: "⠿";
+                position: absolute;
+                margin-left: -6px;
+                margin-top: 5px;
+            }
+        }
+        a{
+            cursor: pointer;
+        }
     }
 }
 
