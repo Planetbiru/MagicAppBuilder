@@ -109,9 +109,6 @@ $arrow-color: #888;
     // This ensures the submenu is open on load if there's a 'selected' item within it
     &.open {
       > a {
-        // Color and style for open parent
-        background-color: darken($active-link-bg, 3%); // Slightly darker than selected
-        color: $active-link-color;
         // Optional: '-' icon for 'open' parent (this will override default '+',
         // but will be overridden by `.collapsed` if Bootstrap closes it)
         // If you want `.open` to always mean '-', remove `.collapsed` from 'a' in PHP when `.open` is present.
