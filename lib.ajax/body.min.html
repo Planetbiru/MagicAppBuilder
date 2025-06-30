@@ -1133,9 +1133,9 @@
 <thead>
 <tr>
 <td>Name</td>
-<td>Code</td>
+<td width="35">Code</td>
 <td width="20"></td>
-<td width="35"></td>
+<td width="90"></td>
 </tr>
 </thead>
 <tbody>
@@ -1143,7 +1143,11 @@
 <td><input type="text" class="form-control language-name" name="language_name[0]" value="" autocomplete="off"></td>
 <td><input type="text" class="form-control language-code" name="language_code[0]" value="" autocomplete="off"></td>
 <td><input type="checkbox" name="checked[0]" checked></td>
-<td><button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button></td>
+<td nowrap="nowrap">
+<button type="button" class="btn btn-danger language-remover"><i class="fa-regular fa-trash-can"></i></button>
+<button type="button" class="btn btn-primary btn-move-up"><i class="fa-solid fa-arrow-up"></i></button>
+<button type="button" class="btn btn-primary btn-move-down"><i class="fa-solid fa-arrow-down"></i></button>
+</td>
 </tr>
 </tbody>
 <tfoot>

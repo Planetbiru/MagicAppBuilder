@@ -1810,6 +1810,48 @@ class EntityEditor {
     }
 
     /**
+     * Generates a unique name for a new diagram, based on existing diagram names.
+     *
+     * If the base name (e.g., "New Diagram") already exists, it appends a number
+     * (e.g., "New Diagram 1", "New Diagram 2", and so on) until a unique name is found.
+     *
+     * @returns {string} The unique name for the new diagram.
+     */
+    getNewDiagramName() {
+        // Define the base name for new diagrams.
+        let baseName = "New Diagram";
+        // Retrieve the list of existing diagrams from the current context.
+        let existingDiagrams = this.getDiagrams();
+        // Initialize the new name with the base name.
+        let newName = baseName;
+        // Initialize a counter for numeric suffixes.
+        let counter = 0;
+        // Flag to control the loop, initially true to start checking.
+        let nameExists = true;
+
+        // Loop until a unique name is found.
+        while (nameExists) {
+            // Assume the current newName is unique at the start of each iteration.
+            nameExists = false;
+
+            // Iterate through all existing diagrams to check for name collisions.
+            for (const diagram of existingDiagrams) {
+                // If a diagram with the current newName already exists:
+                if (diagram.name === newName) {
+                    nameExists = true; // Set flag to true to continue the outer loop.
+                    counter++; // Increment the counter for the next suffix.
+                    // Construct the new name with the updated counter.
+                    newName = `${baseName} ${counter}`;
+                    // Break from the inner loop as a collision is found; the outer loop will re-check the newName.
+                    break;
+                }
+            }
+        }
+        // Return the unique name that was found.
+        return newName;
+    }
+
+    /**
      * Collects and returns a list of diagrams with their metadata.
      *
      * This function retrieves all diagram tabs from the DOM and constructs an array

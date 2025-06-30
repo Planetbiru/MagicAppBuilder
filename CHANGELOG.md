@@ -1028,6 +1028,17 @@ Let me know if you'd like to generate a version checker or migration assistant f
         
     -   This improves flexibility and control over diagram organization.
         
+-   **Customizable Language Priority**
+    
+    Users can now set the order of languages according to their preference, allowing for a personalized and prioritized language display within the application.
+    
+-   **Automatic New Diagram Naming**
+    
+    When creating new diagrams in the Entity Editor, the system now intelligently suggests unique names.
+    
+    -   If a diagram name like "New Diagram" already exists, the system will automatically append a number (e.g., "New Diagram 1", "New Diagram 2") to ensure uniqueness.
+        
+
 
 ## UI Improvements
 
