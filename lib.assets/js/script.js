@@ -6796,7 +6796,8 @@ function updateCurrentApplivation(dataToPost) {
  *
  * This function requests the list of database tables and populates
  * the source table dropdown. It also sets data attributes for primary keys
- * on the options if available.
+ * on the options if available, and groups tables using <optgroup> based on their type.
+ * Custom tables are shown before system tables.
  */
 function loadTable() {
   increaseAjaxPending();
@@ -6810,30 +6811,55 @@ function loadTable() {
       const $select = $('select[name="source_table"]');
       $select.empty();
 
+      // Placeholder option
       $('<option>', {
         text: '- Select Table -',
         value: ''
       }).appendTo($select);
 
-      $.each(data, function (index, item) {
-        $('<option>', {
-          text: item.table_name,
-          value: item.table_name
-        }).appendTo($select);
+      // Prepare grouping by table_group
+      const grouped = {
+        custom: [],
+        system: []
+      };
+
+      $.each(data, function (key, table) {
+        const group = table.table_group === 'system' ? 'system' : 'custom';
+
+        const $option = $('<option>', {
+          text: table.table_name,
+          value: table.table_name
+        });
+
+        if (Array.isArray(table.primary_key) && table.primary_key.length > 0) {
+          $option.attr("data-primary-key", table.primary_key[0]);
+        }
+
+        grouped[group].push($option);
       });
 
-      $select.find("option").each(function () {
-        const val = $(this).val();
-        if (
-          val &&
-          data[val] &&
-          Array.isArray(data[val].primary_key) &&
-          data[val].primary_key.length > 0
-        ) {
-          $(this).attr("data-primary-key", data[val].primary_key[0]);
+      // Label mapping
+      const groupLabels = {
+        custom: 'Custom Tables',
+        system: 'System Tables'
+      };
+
+      // Render <optgroup> in desired order: custom first
+      ['custom', 'system'].forEach(groupKey => {
+        if (grouped[groupKey].length > 0) {
+          const $optgroup = $('<optgroup>', {
+            label: groupLabels[groupKey]
+          });
+
+          grouped[groupKey].forEach(option => {
+            $optgroup.append(option);
+          });
+
+          $select.append($optgroup);
         }
       });
 
+      // Restore selected value if present
       const selectedVal = $select.attr("data-value");
       if (selectedVal) {
         $select.val(selectedVal);

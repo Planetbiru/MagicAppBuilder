@@ -104,6 +104,7 @@ class AppDatabase
                 }
                 $tables[$tableName] = [
                     'table_name' => $tableName,
+                    'table_group' => self::getTableGroup($tableName),
                     'primary_key' => $primaryKeys
                 ];
             }
@@ -120,6 +121,7 @@ class AppDatabase
                     $pks = isset($data['column_name']) ? [$data['column_name']] : [];
                     $tables[$tableName] = [
                         'table_name' => $tableName,
+                        'table_group' => self::getTableGroup($tableName),
                         'primary_key' => $pks
                     ];
                 }
@@ -132,6 +134,39 @@ class AppDatabase
             }
         }
         return $tables;
+    }
+    
+    /**
+     * List of system-defined tables used by the application.
+     * These are considered core tables and should not be modified by users.
+     * @var string[]
+     */
+    const SYSTEM_TABLES = [
+            'admin',
+            'admin_level',
+            'admin_profile',
+            'admin_role',
+            'menu_cache',
+            'menu_group_translation',
+            'menu_translation',
+            'message',
+            'message_folder',
+            'module',
+            'module_group',
+            'notification',
+            'user_activity',
+            'user_password_history',
+    ];
+    
+    /**
+     * Determines the group of a given table: either 'system' or 'custom'.
+     *
+     * @param string $tableName The name of the table to check.
+     * @return string 'system' if the table is a built-in system table, otherwise 'custom'.
+     */
+    public static function getTableGroup($tableName)
+    {
+        return in_array($tableName, self::SYSTEM_TABLES) ? 'system' : 'custom';
     }
 
     /**
@@ -281,7 +316,6 @@ class AppDatabase
                 'skipped_insert_edit' => $skipped
             );
         } catch (Exception $e) {
-            error_log($e->getMessage());
             return array(
                 'fields' => array(),
                 'columns' => array(),

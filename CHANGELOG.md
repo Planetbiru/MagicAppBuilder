@@ -1069,3 +1069,18 @@ Let me know if you'd like to generate a version checker or migration assistant f
     This ensures submenus are correctly aligned, indented, and styled across different levels.
     
 
+
+# MagicAppBuilder Version 1.8.1
+
+## What's New
+
+-   **Grouped Table List in Module Creation**  
+    When creating a new module, the table list is now grouped into **System Tables** and **Custom Tables** for better clarity and organization.
+    
+    -   Built-in tables such as `admin`, `module`, and `notification` are listed under _System Tables_.
+        
+    -   User-created tables are displayed under _Custom Tables_ and appear at the top of the dropdown.
+        
+    -   This enhancement makes it easier to distinguish between core and user-defined database structures.
+        
+
