@@ -3,11 +3,7 @@
 use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputGet;
 
-
-
 require_once dirname(__DIR__) . "/inc.app/auth.php";
-
-
 
 $separatorNLT = "\r\n\t";
 

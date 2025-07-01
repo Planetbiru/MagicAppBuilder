@@ -52,7 +52,14 @@ if(!isset($databaseName))
             }
 
             // Show the sidebar with tables
-            echo DatabaseExplorer::showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table);
+            if($applicationId == '')
+            {
+                echo DatabaseExplorer::showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table);
+            }
+            else
+            {
+                echo DatabaseExplorer::showSidebarTablesSithGroup($pdo, $applicationId, $databaseName, $schemaName, $table);
+            }
         } catch (PDOException $e) {
             // Handle connection errors
             if ($e->getCode() == 0x3D000 || strpos($e->getMessage(), '1046') !== false) {

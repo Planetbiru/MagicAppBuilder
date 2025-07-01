@@ -2,6 +2,7 @@
 
 namespace DatabaseExplorer;
 
+use AppBuilder\Util\DatabaseUtil;
 use DataException;
 use DOMDocument;
 use Exception;
@@ -177,6 +178,87 @@ class DatabaseExplorer // NOSONAR
         $dom->appendChild($form);
 
         // Output the HTML
+        return $dom->saveHTML();
+    }
+    
+    /**
+     * Displays a sidebar with tables in the selected database.
+     *
+     * This function retrieves and displays the list of tables in the selected database.
+     * The tables are displayed as links, and the selected table is highlighted in bold.
+     * 
+     * Supports MySQL, PostgreSQL, and SQLite databases.
+     *
+     * @param PDO $pdo A PDO instance connected to the database.
+     * @param string $applicationId The application identifier.
+     * @param string $databaseName The name of the selected database.
+     * @param string $schemaName The name of the selected schema.
+     * @param string $table The currently selected table.
+     * @return string The generated HTML.
+     */
+    public static function showSidebarTablesSithGroup($pdo, $applicationId, $databaseName, $schemaName, $table)
+    {
+        $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+        $dom = new DOMDocument('1.0', 'utf-8');
+
+        $h3 = $dom->createElement('h3', 'Table List');
+        $a = $dom->createElement('a');
+        $a->appendChild($h3);
+        $a->setAttribute('class', 'all-table');
+        $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=");
+        $dom->appendChild($a);
+
+        $ul = $dom->createElement('ul');
+        $ul->setAttribute('class', 'table-list');
+
+        $tables = [];
+
+        if (in_array($dbType, [PicoDatabaseType::DATABASE_TYPE_MYSQL, PicoDatabaseType::DATABASE_TYPE_MARIADB, PicoDatabaseType::DATABASE_TYPE_PGSQL])) {
+            $sql = $dbType === PicoDatabaseType::DATABASE_TYPE_PGSQL
+                ? "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC"
+                : ConstantText::SHOW_TABLES;
+
+            $stmt = $pdo->query($sql);
+            while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+                $tables[] = $row[0];
+            }
+        } elseif ($dbType === 'sqlite') {
+            $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'");
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $tables[] = $row['name'];
+            }
+        }
+
+        // Grupkan tabel menjadi system dan custom
+        $grouped = ['custom' => [], 'system' => []];
+        foreach ($tables as $tbl) {
+            $group = in_array($tbl, DatabaseUtil::SYSTEM_TABLES) ? 'system' : 'custom';
+            $grouped[$group][] = $tbl;
+        }
+
+        foreach (['custom', 'system'] as $group) {
+            if (count($grouped[$group]) > 0) {
+                $groupLi = $dom->createElement('li', ucfirst($group) . ' Tables');
+                $groupLi->setAttribute('class', 'table-group');
+                $ul->appendChild($groupLi);
+
+                foreach ($grouped[$group] as $tblName) {
+                    $li = $dom->createElement('li');
+                    $a = $dom->createElement('a', $tblName);
+                    $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$tblName");
+
+                    if ($table === $tblName) {
+                        $a->setAttribute('class', 'active');
+                    }
+
+                    $li->appendChild($a);
+                    $ul->appendChild($li);
+                }
+            }
+        }
+
+        $dom->appendChild($ul);
         return $dom->saveHTML();
     }
 

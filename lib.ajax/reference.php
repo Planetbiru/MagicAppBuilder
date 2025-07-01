@@ -42,6 +42,10 @@ try
         }
     }
     $reference = $referenceConfig->getReferenceData();
+    if(!isset($reference))
+    {
+        $reference = new MagicObject();
+    }
     $fieldName = $inputGet->getFieldName();
     $camelFieldName = PicoStringUtil::camelize($fieldName);
     if(PicoStringUtil::endsWith($fieldName, "_id"))
@@ -78,7 +82,11 @@ try
         $reference->set($fieldName, $fieldReference);
 
         $referenceConfig->setReferenceData($reference);
-        file_put_contents($referenceConfigPath, $referenceConfig->dumpYaml());
+        if(file_exists($referenceConfigPath))
+        {
+            file_put_contents($referenceConfigPath, $referenceConfig->dumpYaml());
+        }
+        
     }
     ResponseUtil::sendJSON($fieldReference);
 }

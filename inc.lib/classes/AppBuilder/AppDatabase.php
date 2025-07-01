@@ -2,6 +2,7 @@
 
 namespace AppBuilder;
 
+use AppBuilder\Util\DatabaseUtil;
 use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
@@ -137,28 +138,6 @@ class AppDatabase
     }
     
     /**
-     * List of system-defined tables used by the application.
-     * These are considered core tables and should not be modified by users.
-     * @var string[]
-     */
-    const SYSTEM_TABLES = [
-            'admin',
-            'admin_level',
-            'admin_profile',
-            'admin_role',
-            'menu_cache',
-            'menu_group_translation',
-            'menu_translation',
-            'message',
-            'message_folder',
-            'module',
-            'module_group',
-            'notification',
-            'user_activity',
-            'user_password_history',
-    ];
-    
-    /**
      * Determines the group of a given table: either 'system' or 'custom'.
      *
      * @param string $tableName The name of the table to check.
@@ -166,7 +145,7 @@ class AppDatabase
      */
     public static function getTableGroup($tableName)
     {
-        return in_array($tableName, self::SYSTEM_TABLES) ? 'system' : 'custom';
+        return in_array($tableName, DatabaseUtil::SYSTEM_TABLES) ? 'system' : 'custom';
     }
 
     /**
