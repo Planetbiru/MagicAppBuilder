@@ -1416,8 +1416,7 @@ let initAll = function () {
     $(this).attr('checked', 'checked');
     // Call an additional function to process further data
     prepareReferenceData(checkedValue, $(this));
-});
-
+  });
 
   $(document).on("click", ".reference_button_data", function (e) {
     e.preventDefault();
