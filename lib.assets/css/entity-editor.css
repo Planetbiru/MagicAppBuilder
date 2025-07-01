@@ -107,6 +107,12 @@ body {
 .entity-editor .resize-bar {
   width: 10px;
   cursor: ew-resize;
+  position: relative;
+}
+.entity-editor .resize-bar::before {
+  content: "⠿";
+  position: absolute;
+  top: calc(50% - 9px);
 }
 .entity-editor .right-panel {
   overflow: auto;

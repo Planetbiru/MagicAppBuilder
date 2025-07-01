@@ -134,6 +134,12 @@ body {
     .resize-bar {
         width: 10px;
         cursor: ew-resize;
+        position: relative;
+        &::before{
+            content: '⠿';
+            position: absolute;
+            top: calc(50% - 9px);
+        }
     }
 
     .right-panel {

@@ -1096,3 +1096,12 @@ Let me know if you'd like to generate a version checker or migration assistant f
 -   **Table Group Labels**  
     Visual separation between table groups is handled using labeled headings such as **Custom Tables** and **System Tables** in the UI.
     
+
+## What's Changed
+
+-   **"Table List" Renamed to "Entity List" in Entity Editor**  
+    The label previously shown as **"Table List"** within the Entity Editor has been renamed to **"Entity List"**.
+    
+    -   This change helps clarify that the list refers to entity representations in the diagram editor, not raw database tables.
+        
+
