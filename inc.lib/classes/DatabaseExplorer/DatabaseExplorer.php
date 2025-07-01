@@ -2,6 +2,7 @@
 
 namespace DatabaseExplorer;
 
+use AppBuilder\Util\DatabaseUtil;
 use DataException;
 use DOMDocument;
 use Exception;
@@ -195,80 +196,72 @@ class DatabaseExplorer // NOSONAR
      * @param string $table The currently selected table.
      * @return string The generated HTML.
      */
-    public static function showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table) //NOSONAR
+    public static function showSidebarTables($pdo, $applicationId, $databaseName, $schemaName, $table)
     {
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-        // Create the DOM document
         $dom = new DOMDocument('1.0', 'utf-8');
-        
-        // Create heading
-        $h3 = $dom->createElement('h3', 'Table List');
 
+        $h3 = $dom->createElement('h3', 'Table List');
         $a = $dom->createElement('a');
         $a->appendChild($h3);
         $a->setAttribute('class', 'all-table');
         $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=");
-
         $dom->appendChild($a);
 
-        // Create unordered list
         $ul = $dom->createElement('ul');
         $ul->setAttribute('class', 'table-list');
 
-        if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
-            // Query for MySQL and PostgreSQL to retrieve table list
-            $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? ConstantText::SHOW_TABLES : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
+        $tables = [];
+
+        if (in_array($dbType, [PicoDatabaseType::DATABASE_TYPE_MYSQL, PicoDatabaseType::DATABASE_TYPE_MARIADB, PicoDatabaseType::DATABASE_TYPE_PGSQL])) {
+            $sql = $dbType === PicoDatabaseType::DATABASE_TYPE_PGSQL
+                ? "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC"
+                : ConstantText::SHOW_TABLES;
+
             $stmt = $pdo->query($sql);
-            
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-                $tableName = $row[0];
-
-                // Create list item and link
-                $li = $dom->createElement('li');
-                $a = $dom->createElement('a', $tableName);
-                $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$tableName");
-
-                // Highlight the selected table
-                if ($table == $tableName) {
-                    $a->setAttribute('class', 'active'); //NOSONAR
-                }
-
-                $li->appendChild($a);
-                $ul->appendChild($li);
+                $tables[] = $row[0];
             }
-        } elseif ($dbType == 'sqlite') {
-            // Query for SQLite to retrieve table list
+        } elseif ($dbType === 'sqlite') {
             $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'");
-            
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $tableName = $row['name'];
-
-                // Create list item and link
-                $li = $dom->createElement('li');
-                $a = $dom->createElement('a', $tableName);
-                $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$tableName");
-
-                // Highlight the selected table
-                if ($table == $tableName) {
-                    $a->setAttribute('class', 'active'); //NOSONAR
-                }
-
-                $li->appendChild($a);
-                $ul->appendChild($li);
+                $tables[] = $row['name'];
             }
-        } else {
-            // Unsupported database type
-            $li = $dom->createElement('li', 'No tables found for this database.');
-            $ul->appendChild($li);
         }
 
-        // Append unordered list to DOM
-        $dom->appendChild($ul);
+        // Grupkan tabel menjadi system dan custom
+        $grouped = ['custom' => [], 'system' => []];
+        foreach ($tables as $tbl) {
+            $group = in_array($tbl, DatabaseUtil::SYSTEM_TABLES) ? 'system' : 'custom';
+            $grouped[$group][] = $tbl;
+        }
 
-        // Output the HTML
+        foreach (['custom', 'system'] as $group) {
+            if (count($grouped[$group]) > 0) {
+                $groupLi = $dom->createElement('li', ucfirst($group) . ' Tables');
+                $groupLi->setAttribute('class', 'table-group');
+                $ul->appendChild($groupLi);
+
+                foreach ($grouped[$group] as $tblName) {
+                    $li = $dom->createElement('li');
+                    $a = $dom->createElement('a', $tblName);
+                    $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$tblName");
+
+                    if ($table === $tblName) {
+                        $a->setAttribute('class', 'active');
+                    }
+
+                    $li->appendChild($a);
+                    $ul->appendChild($li);
+                }
+            }
+        }
+
+        $dom->appendChild($ul);
         return $dom->saveHTML();
     }
+
 
     /**
      * Generates a SQL query to retrieve the columns and structure of a table based on the database type (MySQL, PostgreSQL, or SQLite).

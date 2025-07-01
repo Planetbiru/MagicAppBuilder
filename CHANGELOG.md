@@ -1083,4 +1083,16 @@ Let me know if you'd like to generate a version checker or migration assistant f
         
     -   This enhancement makes it easier to distinguish between core and user-defined database structures.
         
+-   **Grouped Table List in Database Explorer Sidebar**  
+    The **Database Explorer** sidebar now also groups tables by type.
+    
+    -   Tables are split into _Custom Tables_ and _System Tables_ sections for quicker navigation.
+        
+    -   This improves readability when working with large databases.
+        
 
+## UI Improvements
+
+-   **Table Group Labels**  
+    Visual separation between table groups is handled using labeled headings such as **Custom Tables** and **System Tables** in the UI.
+    
