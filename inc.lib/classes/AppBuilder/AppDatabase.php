@@ -2,6 +2,7 @@
 
 namespace AppBuilder;
 
+use AppBuilder\Util\DatabaseUtil;
 use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseQueryBuilder;
@@ -104,6 +105,7 @@ class AppDatabase
                 }
                 $tables[$tableName] = [
                     'table_name' => $tableName,
+                    'table_group' => self::getTableGroup($tableName),
                     'primary_key' => $primaryKeys
                 ];
             }
@@ -120,6 +122,7 @@ class AppDatabase
                     $pks = isset($data['column_name']) ? [$data['column_name']] : [];
                     $tables[$tableName] = [
                         'table_name' => $tableName,
+                        'table_group' => self::getTableGroup($tableName),
                         'primary_key' => $pks
                     ];
                 }
@@ -132,6 +135,17 @@ class AppDatabase
             }
         }
         return $tables;
+    }
+    
+    /**
+     * Determines the group of a given table: either 'system' or 'custom'.
+     *
+     * @param string $tableName The name of the table to check.
+     * @return string 'system' if the table is a built-in system table, otherwise 'custom'.
+     */
+    public static function getTableGroup($tableName)
+    {
+        return in_array($tableName, DatabaseUtil::SYSTEM_TABLES) ? 'system' : 'custom';
     }
 
     /**
@@ -281,7 +295,6 @@ class AppDatabase
                 'skipped_insert_edit' => $skipped
             );
         } catch (Exception $e) {
-            error_log($e->getMessage());
             return array(
                 'fields' => array(),
                 'columns' => array(),
