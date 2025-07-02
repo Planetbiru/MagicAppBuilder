@@ -1038,42 +1038,6 @@ Let me know if you'd like to generate a version checker or migration assistant f
     
     -   If a diagram name like "New Diagram" already exists, the system will automatically append a number (e.g., "New Diagram 1", "New Diagram 2") to ensure uniqueness.
         
-
-
-## UI Improvements
-
--   **Column Sorting UI Simplification**  
-    The column reordering feature in the main form interface has been visually improved.
-    
-    -   Instead of using a black background, a minimalist ⠿ icon (three-dot vertical drag handle) is now used.
-        
-    -   This results in a cleaner and more modern appearance.
-        
-
-## What's Changed
-
--   **New Column: `moduleGroupId` in `AppModuleMultiLevelImpl`**
-    
-    -   The `AppModuleMultiLevelImpl` entity now includes a `moduleGroupId` property.
-        
-    -   This addition enables fallback logic for parent module generation when `parentModuleId` is not defined.
-        
-
-## Bug Fixes
-
--   **Two-Level Menu Rendering**  
-    Fixed an issue where nested menus (level 2) were not rendered properly in some navigation scenarios.
-    
--   **Multi-Level Menu Theme Styling**  
-    Resolved a display issue affecting the visual consistency of menus under multi-level navigation themes.  
-    This ensures submenus are correctly aligned, indented, and styled across different levels.
-    
-
-
-# MagicAppBuilder Version 1.8.1
-
-## What's New
-
 -   **Grouped Table List in Module Creation**  
     When creating a new module, the table list is now grouped into **System Tables** and **Custom Tables** for better clarity and organization.
     
@@ -1089,19 +1053,39 @@ Let me know if you'd like to generate a version checker or migration assistant f
     -   Tables are split into _Custom Tables_ and _System Tables_ sections for quicker navigation.
         
     -   This improves readability when working with large databases.
-        
 
 ## UI Improvements
 
+-   **Column Sorting UI Simplification**  
+    The column reordering feature in the main form interface has been visually improved.
+    
+    -   Instead of using a black background, a minimalist ⠿ icon (three-dot vertical drag handle) is now used.
+        
+    -   This results in a cleaner and more modern appearance.
+        
 -   **Table Group Labels**  
     Visual separation between table groups is handled using labeled headings such as **Custom Tables** and **System Tables** in the UI.
     
-
 ## What's Changed
 
+-   **New Column: `moduleGroupId` in `AppModuleMultiLevelImpl`**
+    
+    -   The `AppModuleMultiLevelImpl` entity now includes a `moduleGroupId` property.
+        
+    -   This addition enables fallback logic for parent module generation when `parentModuleId` is not defined.
+        
 -   **"Table List" Renamed to "Entity List" in Entity Editor**  
     The label previously shown as **"Table List"** within the Entity Editor has been renamed to **"Entity List"**.
     
     -   This change helps clarify that the list refers to entity representations in the diagram editor, not raw database tables.
         
 
+## Bug Fixes
+
+-   **Two-Level Menu Rendering**  
+    Fixed an issue where nested menus (level 2) were not rendered properly in some navigation scenarios.
+    
+-   **Multi-Level Menu Theme Styling**  
+    Resolved a display issue affecting the visual consistency of menus under multi-level navigation themes.  
+    This ensures submenus are correctly aligned, indented, and styled across different levels.
+    
