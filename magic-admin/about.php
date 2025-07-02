@@ -82,7 +82,7 @@ $jsLang = [
             </tr>
             <tr>
                 <td><?php echo $appLanguage->getUpdateToVersion();?></td>
-                <td><select id="release-select" class="form-control" disabled>
+                <td><select id="release-select" class="form-control" style="display: inline-block;width: auto;padding-right: 32px;max-width: 100%;" disabled>
                     <option><?php echo $appLanguage->getPleaseLoadReleasesFirst();?></option>
                 </select></td>
             </tr>
