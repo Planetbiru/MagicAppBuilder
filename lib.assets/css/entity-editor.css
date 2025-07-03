@@ -242,7 +242,7 @@ body {
 .entity-editor .editor-form table td select {
   display: block;
   margin: 0;
-  border: 1px solid transparent;
+  border: none;
   width: 100%;
   box-sizing: border-box;
   padding: 2px 8px;
