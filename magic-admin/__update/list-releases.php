@@ -1,8 +1,9 @@
 <?php
+
 require_once __DIR__ . '/AppUpdater.php';
 
 try {
-    $updater = new AppUpdater('Planetbiru', 'MagicAppBuilder');
+    $updater = new \AppUpdater('Planetbiru', 'MagicAppBuilder');
     header('Content-Type: application/json');
     echo json_encode($updater->listReleases());
 } catch (Exception $e) {
