@@ -110,9 +110,12 @@ body {
   position: relative;
 }
 .entity-editor .resize-bar::before {
-  content: "⠿";
+  content: "||";
   position: absolute;
   top: calc(50% - 9px);
+  color: #444;
+  width: 10px;
+  text-align: center;
 }
 .entity-editor .right-panel {
   overflow: auto;

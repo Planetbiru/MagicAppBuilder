@@ -136,9 +136,12 @@ body {
         cursor: ew-resize;
         position: relative;
         &::before{
-            content: '⠿';
+            content: "||";
             position: absolute;
             top: calc(50% - 9px);
+            color: #444;
+            width: 10px;
+            text-align: center;
         }
     }
 

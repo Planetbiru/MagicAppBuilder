@@ -91,7 +91,7 @@ if(!isset($databaseName))
         }
 
         // Display the query executor form and results
-        echo DatabaseExplorer::createQueryExecutorForm($lastQueries, $dbType);
+        echo DatabaseExplorer::createQueryExecutorForm($lastQueries, $dbType, $applicationId);
         echo $queryResult;
         ?>
     </div>
