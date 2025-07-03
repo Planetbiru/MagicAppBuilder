@@ -91,6 +91,14 @@ By combining low-code development speed with open, portable, and self-manageable
 
 -   Users can perform horizontal scaling for both the application and the database without requiring application upgrades or modifications.
 
+### 🔔 Built-in Notifications
+
+-   Provides integrated notification functionalities for users.
+
+### 💬 Built-in User Messaging
+
+-   Enables direct communication between users within the application.
+
 This project must be completed within a very short time—less than 3 months.
 
 In this situation, the project owner definitely needs a tool that can build applications very quickly, without compromising on accuracy.
