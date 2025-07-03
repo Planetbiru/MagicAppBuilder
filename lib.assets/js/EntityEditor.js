@@ -937,33 +937,43 @@ class EntityEditor {
      */
     initDraggableRow(row) {
         let _this = this;
-        if(typeof _this.tbody == 'undefined' || _this.tbody === null)
-        {
+
+        // Determine tbody only once
+        if (typeof _this.tbody === 'undefined' || _this.tbody === null) {
             _this.tbody = row.closest('tbody');
         }
-        // Enable native HTML5 drag support
-        row.setAttribute("draggable", "true");
+
+        // Prevent re-initialization
+        if (row.dataset.hasDragEvent === 'true') return;
+        row.dataset.hasDragEvent = 'true';
+
+        // Set draggable attribute based on the clicked element
+        row.addEventListener("mousedown", function (e) {
+            const tag = e.target.tagName;
+            const isInteractive = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag);
+            row.setAttribute("draggable", isInteractive ? "false" : "true");
+        });
 
         // When dragging starts
         row.addEventListener("dragstart", function (e) {
-            _this.dragSrcRow = this; // Store the source row globally
-            this.classList.add("dragging"); // Add visual cue
-            e.dataTransfer.effectAllowed = "move"; // Set allowed operation
+            _this.dragSrcRow = this;
+            this.classList.add("dragging");
+            e.dataTransfer.effectAllowed = "move";
         });
 
         // When dragging ends
         row.addEventListener("dragend", function () {
-            this.classList.remove("dragging"); // Remove visual cue
+            this.classList.remove("dragging");
         });
 
         // When a dragged item is moved over another row
         row.addEventListener("dragover", function (e) {
-            e.preventDefault(); // Allow dropping
+            e.preventDefault();
             e.dataTransfer.dropEffect = "move";
-            this.classList.add("over"); // Highlight potential drop target
+            this.classList.add("over");
         });
 
-        // When a dragged item leaves a row without dropping
+        // When the pointer leaves the row without dropping
         row.addEventListener("dragleave", function () {
             this.classList.remove("over");
         });
@@ -971,25 +981,27 @@ class EntityEditor {
         // When the dragged row is dropped on another row
         row.addEventListener("drop", function (e) {
             e.preventDefault();
-            if (_this.dragSrcRow !== this) {
-                const draggedIndex = Array.from(_this.tbody.children).indexOf(_this.dragSrcRow);
-                const targetIndex = Array.from(_this.tbody.children).indexOf(this);
 
-                // Insert the dragged row before or after the drop target based on position
+            if (_this.dragSrcRow !== this) {
+                const rows = Array.from(_this.tbody.children);
+                const draggedIndex = rows.indexOf(_this.dragSrcRow);
+                const targetIndex = rows.indexOf(this);
+
                 if (draggedIndex < targetIndex) {
                     _this.tbody.insertBefore(_this.dragSrcRow, this.nextSibling);
                 } else {
                     _this.tbody.insertBefore(_this.dragSrcRow, this);
                 }
 
+                // (Optional) call updateRowNumbers if it exists
+                if (typeof _this.updateRowNumbers === 'function') {
+                    _this.updateRowNumbers();
+                }
             }
+
             this.classList.remove("over");
         });
-
-        // Prevent multiple initialization
-        row.dataset.hasDragEvent = 'true';
     }
-
 
     /**
      * Adds a new column to the entity being edited.
