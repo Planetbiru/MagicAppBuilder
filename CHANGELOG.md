@@ -1089,3 +1089,6 @@ Let me know if you'd like to generate a version checker or migration assistant f
     Resolved a display issue affecting the visual consistency of menus under multi-level navigation themes.  
     This ensures submenus are correctly aligned, indented, and styled across different levels.
     
+-   **Entity Editor**
+    Fixed a bug where text input fields became read-only as a side effect of the draggable column sorting feature introduced in the previous version.
+    This ensures input fields remain fully editable and the cursor behaves as expected.
