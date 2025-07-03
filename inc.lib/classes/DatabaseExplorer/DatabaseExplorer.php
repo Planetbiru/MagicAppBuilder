@@ -1412,10 +1412,11 @@ class DatabaseExplorer // NOSONAR
      *
      * @param string $lastQueries The last executed SQL queries to be pre-populated in the textarea.
      * @param string $dbType The type of the database (e.g., 'pgsql', 'sqlite', 'mysql').
+     * @param string $applicationId The application ID
      * 
      * @return string The generated HTML of the form as a string.
      */
-    public static function createQueryExecutorForm($lastQueries, $dbType)
+    public static function createQueryExecutorForm($lastQueries, $dbType, $applicationId)
     {
         if($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL)
         {
@@ -1496,26 +1497,30 @@ class DatabaseExplorer // NOSONAR
         // Add space between buttons
         $space = $dom->createTextNode(' ');
         $form2->appendChild($space);
+
+        if(!empty($applicationId))
+        {
         
-        // Create importStructure button
-        $importStructure = $dom->createElement('button');
-        $importStructure->setAttribute('type', 'button');
-        $importStructure->setAttribute('value', 'Import Structure');
-        $importStructure->setAttribute('class', 'btn btn-primary import-structure');
-        $importStructure->appendChild($dom->createTextNode('Import Structure'));
-        $form2->appendChild($importStructure);
+            // Create importStructure button
+            $importStructure = $dom->createElement('button');
+            $importStructure->setAttribute('type', 'button');
+            $importStructure->setAttribute('value', 'Import Structure');
+            $importStructure->setAttribute('class', 'btn btn-primary import-structure');
+            $importStructure->appendChild($dom->createTextNode('Import Structure'));
+            $form2->appendChild($importStructure);
+            
+            // Add space between buttons
+            $space = $dom->createTextNode(' ');
+            $form2->appendChild($space);
         
-        // Add space between buttons
-        $space = $dom->createTextNode(' ');
-        $form2->appendChild($space);
-        
-        // Create entityEditor button
-        $entityEditor = $dom->createElement('button');
-        $entityEditor->setAttribute('type', 'button');
-        $entityEditor->setAttribute('value', 'Entity Editor');
-        $entityEditor->setAttribute('class', 'btn btn-primary open-entity-editor');
-        $entityEditor->appendChild($dom->createTextNode('Entity Editor'));
-        $form2->appendChild($entityEditor);
+            // Create entityEditor button
+            $entityEditor = $dom->createElement('button');
+            $entityEditor->setAttribute('type', 'button');
+            $entityEditor->setAttribute('value', 'Entity Editor');
+            $entityEditor->setAttribute('class', 'btn btn-primary open-entity-editor');
+            $entityEditor->appendChild($dom->createTextNode('Entity Editor'));
+            $form2->appendChild($entityEditor);
+        }
 
         // Add space between buttons
         $space = $dom->createTextNode(' ');

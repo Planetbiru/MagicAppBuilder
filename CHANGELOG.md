@@ -1092,3 +1092,12 @@ Let me know if you'd like to generate a version checker or migration assistant f
 -   **Entity Editor**
     Fixed a bug where text input fields became read-only as a side effect of the draggable column sorting feature introduced in the previous version.
     This ensures input fields remain fully editable and the cursor behaves as expected.
+
+
+# MagicAppBuilder Version 1.9.0
+
+## What's New
+
+-   **Automatic Database Structure Update After File Extraction** The system now automatically updates the database structure after extracting update files if there are any changes in entity definitions. This ensures your database schema is always in sync with the latest application version without manual intervention.
+    
+-   **Restricted Database Explorer Features for MagicAppBuilder Database** The **Import Structure** and **Entity Editor** buttons are now hidden in the Database Explorer when you're viewing the MagicAppBuilder's internal database. This prevents unintended errors and maintains the integrity of the core system.

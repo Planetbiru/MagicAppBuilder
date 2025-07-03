@@ -5,13 +5,15 @@ use MagicObject\Util\PicoIniUtil;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once __DIR__ . '/AppUpdater.php';
 
-
 header('Content-Type: application/json');
 
 try {
     $updater = new \AppUpdater('Planetbiru', 'MagicAppBuilder');
     $updater->replaceFromZip();
     $updater->cleanUp();
+
+    // Update database structre (if needed)
+    require_once __DIR__ . '/update-database.php';
 
     $date = (new DateTime())->setTimezone(new DateTimeZone('UTC'));
     $formatted = $date->format('Y-m-d\TH:i:s.u\Z');

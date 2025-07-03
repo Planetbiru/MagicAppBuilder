@@ -109,10 +109,21 @@ body {
   cursor: ew-resize;
   position: relative;
 }
-.entity-editor .resize-bar::before {
-  content: "⠿";
+.entity-editor .resize-bar::before, .entity-editor .resize-bar::after {
+  content: "";
+  width: 0px;
+  height: 20px;
+  background-color: #ccc;
   position: absolute;
-  top: calc(50% - 9px);
+  top: calc(50% - 10px);
+}
+.entity-editor .resize-bar::before {
+  left: 3px;
+  border-left: 1px solid #777777;
+}
+.entity-editor .resize-bar::after {
+  right: 3px;
+  border-right: 1px solid #777777;
 }
 .entity-editor .right-panel {
   overflow: auto;
