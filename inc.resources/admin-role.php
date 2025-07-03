@@ -188,7 +188,7 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->update();
 
 			// Update parent role
-			$appMultiLevelMenuTool->updateParentRole($adminRoleId);	
+			$multiLevelMenuTool->updateParentRole($adminRoleId);	
 		}
 
 		$database->commit();
