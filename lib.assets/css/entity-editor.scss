@@ -135,13 +135,23 @@ body {
         width: 10px;
         cursor: ew-resize;
         position: relative;
-        &::before{
-            content: "||";
+        &::before, &::after{
+            content: "";
+            width: 0px;
+            height: 20px;
+            background-color: #ccc;
             position: absolute;
-            top: calc(50% - 9px);
-            color: #444;
-            width: 10px;
-            text-align: center;
+            top: calc(50% - 10px);
+        }
+
+        &::before{
+            left: 3px;
+            border-left: 1px solid #777777;
+        }
+
+        &::after{
+            right: 3px;
+            border-right: 1px solid #777777;
         }
     }
 
