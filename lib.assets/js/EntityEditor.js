@@ -620,6 +620,7 @@ class EntityEditor {
         this.clearBeforeImport = true;
         this.dragSrcRow = null;
         this.tbody = null;
+        this.operation = 'create';
     }
 
     /**
@@ -833,12 +834,14 @@ class EntityEditor {
      */
     showEditor(entityIndex = -1) {
         if (entityIndex >= 0) {
+            this.operation = 'update';
             this.currentEntityIndex = entityIndex;
             const entity = this.entities[entityIndex];
             document.querySelector(this.selector+" .entity-name").value = entity.name;
             document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
             entity.columns.forEach(col => this.addColumnToTable(col));
         } else {
+            this.operation = 'create';
             this.currentEntityIndex = -1;
             let newTableName = 'new_table';
             for (let i in this.entities) {
@@ -1004,41 +1007,112 @@ class EntityEditor {
     }
 
     /**
-     * Adds a new column to the entity being edited.
-     * 
-     * @param {boolean} [focus=false] - Whether to focus on the new column's name input.
+     * Adds a new column to the entity currently being edited.
+     * If the entity name (table name) is detected as a duplicate, a confirmation dialog will prompt
+     * the user to rename it to avoid conflicts.
+     *
+     * @param {boolean} [focus=false] - Whether to automatically focus on the newly added column's name input field.
      */
     addColumn(focus = false) {
-        let entityName = document.querySelector(this.selector+" .entity-container .entity-name").value;
-        let count = document.querySelectorAll(this.selector+" .entity-container .column-name").length;
-        let countStr = count <= 0 ? '' : count + 1;
-        let columnName = count == 0 ? `${entityName}_id` : `${entityName}_col${countStr}`;
-        let column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
-        column.nullable = true;
-        this.addColumnToTable(column, focus);
-        const element = document.querySelector(this.selector+' .entity-container .table-container');
-        element.scrollTop = element.scrollHeight;
+        const selector = this.selector + " .entity-container .entity-name";
+        const entityNameInput = document.querySelector(selector);
+        const entityName = entityNameInput.value;
 
+        // Check if an entity with the same name already exists.
+        if (this.operation == 'create' && this.isEntityExists(entityName)) {
+            this.showConfirmationDialog(
+                `Entity '${entityName}' already exists.`, // Using single quotes for entity name for clarity
+                'Duplicate Entity Detected', // More descriptive title
+                'Rename',
+                'Close',
+                (isOk) => {
+                    if(isOk)
+                    {
+                        // If user chooses 'Rename', append '_new' and select the text for easy editing.
+                        entityNameInput.value = `${entityName}_new`;
+                        entityNameInput.select();
+                    }
+                }
+            );
+            return; // Stop function execution if entity name is a duplicate.
+        }
+
+        // Determine the new column's name based on existing columns.
+        const columnCount = document.querySelectorAll(this.selector + " .entity-container .column-name").length;
+        const countSuffix = columnCount === 0 ? '' : columnCount + 1; // Use count + 1 for subsequent columns
+        
+        // If it's the first column, name it `${entityName}_id`, otherwise `${entityName}_colX`.
+        const columnName = columnCount === 0 ? `${entityName}_id` : `${entityName}_col${countSuffix}`;
+        
+        // Create a new Column instance with default data type and length.
+        const column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
+        column.nullable = true; // Set the new column as nullable by default.
+
+        // Add the column to the table in the UI.
+        this.addColumnToTable(column, focus);
+        
+        // Scroll to the bottom of the table container to show the newly added column.
+        const element = document.querySelector(this.selector + ' .entity-container .table-container');
+        element.scrollTop = element.scrollHeight;
     }
-    
+
     /**
-     * Saves the currently edited entity and updates the diagram if needed.
-     * 
-     * This method serves as the main handler for saving an entity. It first calls
-     * `doSaveEntity()` to either create a new entity or update an existing one
-     * based on the current form data. After saving:
-     * 
-     * - It checks if there is an active diagram tab in `.tabs-link-container`.
-     * - If a diagram tab is active, it re-selects it by calling `selectDiagram()`,
-     *   which will re-render the associated diagram with the updated entity data.
-     * 
-     * This function ensures that both the data and visual representation stay in sync.
+     * Checks if an entity with the given name already exists in the current list of entities.
+     *
+     * @param {string} entityName - The name of the entity to check for existence.
+     * @returns {boolean} - True if an entity with the name exists, false otherwise.
+     */
+    isEntityExists(entityName) {
+        for (const entity of this.entities) { 
+            if (entity.name === entityName) { 
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Saves the currently edited entity, either creating a new one or updating an existing one.
+     *
+     * This method is the primary handler for saving an entity.
+     * 1. It first checks for duplicate entity names and prompts the user to rename if found.
+     * 2. If the name is unique or has been resolved, it calls `doSaveEntity()` to persist the data.
+     * 3. After saving, it checks for an active diagram tab (`.tabs-link-container li.diagram-tab.active`).
+     * 4. If an active diagram tab exists, it re-selects it by calling `selectDiagram()`, which ensures
+     * the associated diagram is re-rendered to reflect any updated entity data.
+     *
+     * This function guarantees that both the underlying data and its visual representation in the diagram remain synchronized.
      */
     saveEntity() {
+        const selector = this.selector + " .entity-container .entity-name";
+        const entityNameInput = document.querySelector(selector);
+        const entityName = entityNameInput.value;
+
+        // Check if an entity with the same name already exists.
+        if (this.operation == 'create' && this.isEntityExists(entityName)) {
+            this.showConfirmationDialog(
+                `Entity '${entityName}' already exists.`, // Using single quotes for entity name for clarity
+                'Duplicate Entity Detected', // More descriptive title
+                'Rename',
+                'Close',
+                (isOk) => {
+                    if(isOk)
+                    {
+                        // If user chooses 'Rename', append '_new' and select the text for easy editing.
+                        entityNameInput.value = `${entityName}_new`;
+                        entityNameInput.select();
+                    }
+                }
+            );
+            return; // Stop function execution if entity name is a duplicate.
+        }
+        
+        // Proceed to save the entity if no duplicate name issue or if resolved.
         this.doSaveEntity();
-        let activeDiagram = document.querySelector('.tabs-link-container li.diagram-tab.active');
-        if(activeDiagram)
-        {
+        
+        // Check for an active diagram tab and re-select it to refresh the diagram.
+        const activeDiagram = document.querySelector('.tabs-link-container li.diagram-tab.active');
+        if (activeDiagram) {
             this.selectDiagram(activeDiagram);
         }
     }
@@ -1253,6 +1327,28 @@ class EntityEditor {
      * Adds columns from the template to the table, ensuring that only columns not already present are added.
      */
     addColumnFromTemplate() {
+        const selector = this.selector + " .entity-container .entity-name";
+        const entityNameInput = document.querySelector(selector);
+        const entityName = entityNameInput.value;
+
+        // Check if an entity with the same name already exists.
+        if (this.operation == 'create' && this.isEntityExists(entityName)) {
+            this.showConfirmationDialog(
+                `Entity '${entityName}' already exists.`, // Using single quotes for entity name for clarity
+                'Duplicate Entity Detected', // More descriptive title
+                'Rename',
+                'Close',
+                (isOk) => {
+                    if(isOk)
+                    {
+                        // If user chooses 'Rename', append '_new' and select the text for easy editing.
+                        entityNameInput.value = `${entityName}_new`;
+                        entityNameInput.select();
+                    }
+                }
+            );
+            return; // Stop function execution if entity name is a duplicate.
+        }
         const existingColumnNames = [];
         const columnNames = document.querySelectorAll(this.selector + " #table-entity-editor .column-name");
         for (const columnName of columnNames) {
@@ -2039,7 +2135,7 @@ class EntityEditor {
             const temp = this.entities[index];
             this.entities[index] = this.entities[index + 1];
             this.entities[index + 1] = temp;
-
+            this.updateEntityIndex();
             // Re-render the entities after the change
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
@@ -2066,7 +2162,7 @@ class EntityEditor {
             const temp = this.entities[index];
             this.entities[index] = this.entities[index - 1];
             this.entities[index - 1] = temp;
-
+            this.updateEntityIndex();
             // Re-render the entities after the change
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
@@ -2095,7 +2191,7 @@ class EntityEditor {
             }
             return 0;  // a and b are equal, no change
         });
-
+        this.updateEntityIndex();
         // Re-render the sorted list of entities
         this.renderEntities();
         this.restoreCheckedEntitiesFromCurrentDiagram();
@@ -2148,6 +2244,7 @@ class EntityEditor {
 
         // Combine the sorted groups: custom entities first, then system entities
         this.entities = [...customGroup, ...systemGroup];
+        this.updateEntityIndex();
 
         // Re-render the sorted list of entities in the UI
         this.renderEntities();
@@ -2156,6 +2253,19 @@ class EntityEditor {
         if(typeof this.callbackSaveEntity === 'function') {
             this.callbackSaveEntity(this.entities);
         }
+    }
+
+    /**
+     * Updates the 'index' property for each entity in the `this.entities` array.
+     * This method iterates through the `entities` array and assigns each entity's
+     * `index` property based on its current position in the array. This is useful
+     * for maintaining a consistent order or reference for entities, especially
+     * after sorting or reordering operations.
+     */
+    updateEntityIndex() {
+         this.entities.forEach((entity, index) => {
+            entity.index = index;
+         });
     }
 
     /**
