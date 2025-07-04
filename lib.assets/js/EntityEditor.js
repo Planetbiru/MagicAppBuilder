@@ -2373,6 +2373,26 @@ class EntityEditor {
         });
         document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
     }
+    
+    /**
+     * Generates a base filename based on the provided data object.
+     * The priority for naming is:
+     * 1. databaseName-databaseSchema (if both exist)
+     * 2. databaseName (if only databaseName exists)
+     * 3. applicationId (as a fallback if databaseName is not present)
+     *
+     * @param {Object} data - The data object containing naming information (e.g., databaseName, databaseSchema, applicationId).
+     * @returns {string} The generated base filename string.
+     */
+    generateFileName(data) {
+        if (data.databaseName && data.databaseSchema) {
+            return `${data.databaseName}-${data.databaseSchema}`;
+        } else if (data.databaseName) {
+            return `${data.databaseName}`;
+        } else {
+            return `${data.applicationId}`;
+        }
+    }
 
     /**
      * Exports the given data object as a JSON file.
@@ -2386,7 +2406,7 @@ class EntityEditor {
      */
     exportJSON(data) {
         // Get the base filename from the data object
-        const fileName = `${data.databaseName}-${data.databaseSchema}`;
+        const fileName = this.generateFileName(data);
 
         // Get current date and time in the format YYYY-MM-DD_HH-MM-SS
         const now = new Date();
@@ -2442,7 +2462,7 @@ class EntityEditor {
         };
 
         // Get the base filename from the data object
-        const fileName = `${data.databaseName}-${data.databaseSchema}`;
+        const fileName = this.generateFileName(data);
 
         // Get current date and time in the format YYYY-MM-DD_HH-MM-SS
         const now = new Date();

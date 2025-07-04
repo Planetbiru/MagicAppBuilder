@@ -1128,5 +1128,8 @@ Let me know if you'd like to generate a version checker or migration assistant f
         
     3.  Manual reordering via "move up" and "move down" icons.
         
+-   **Improved Entity and SQL Export for SQLite Databases** 
+    
+    Addressed issues with exporting entities and SQL in the Entity Editor, specifically for **SQLite databases** that do not have explicit database names and schemas. The export functionality now handles these cases correctly, ensuring successful exports regardless of the SQLite database configuration.
 
 
