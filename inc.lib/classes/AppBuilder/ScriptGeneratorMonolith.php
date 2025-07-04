@@ -3,7 +3,6 @@
 namespace AppBuilder;
 
 use MagicObject\Generator\PicoEntityGenerator;
-use stdClass;
 
 class ScriptGeneratorMonolith extends ScriptGenerator
 {
