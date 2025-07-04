@@ -32,7 +32,8 @@ $files = [
     "AppUpdater.php",
     "extract-release.php",
     "download-release.php",
-    "list-releases.php"
+    "list-releases.php",
+    "update-database.php"
 ];
 
 $sourceDir = __DIR__ . "/__update/";
