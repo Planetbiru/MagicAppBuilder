@@ -1101,3 +1101,6 @@ Let me know if you'd like to generate a version checker or migration assistant f
 -   **Automatic Database Structure Update After File Extraction** The system now automatically updates the database structure after extracting update files if there are any changes in entity definitions. This ensures your database schema is always in sync with the latest application version without manual intervention.
     
 -   **Restricted Database Explorer Features for MagicAppBuilder Database** The **Import Structure** and **Entity Editor** buttons are now hidden in the Database Explorer when you're viewing the MagicAppBuilder's internal database. This prevents unintended errors and maintains the integrity of the core system.
+
+-   **"Sort Entity by Type" Button Added to Entity Editor** A new button, **"Sort Entity by Type,"** has been added to the Entity Editor. This allows users to reorder entities by placing **custom entities at the top**, followed by specific system entities (e.g., `admin`, `module`, `notification`). Both groups are then sorted alphabetically, providing a more organized and intuitive view of your database entities.
+

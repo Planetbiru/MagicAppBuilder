@@ -2107,6 +2107,58 @@ class EntityEditor {
     }
 
     /**
+     * Sorts entities by grouping them into 'Custom' and 'System' categories.
+     * 'Custom' entities (those not in a predefined system list) are placed first,
+     * followed by 'System' entities (a predefined list).
+     * Both groups are then sorted alphabetically by their 'name' property.
+     */
+    sortAndGroupEntities() {
+        const systemEntities = [
+            'admin',
+            'admin_level',
+            'admin_profile',
+            'admin_role',
+            'menu_cache',
+            'menu_group_translation',
+            'menu_translation',
+            'message',
+            'message_folder',
+            'module',
+            'module_group',
+            'notification',
+            'user_activity',
+            'user_password_history',
+        ];
+
+        // Separate entities into system and custom groups
+        let customGroup = [];
+        let systemGroup = [];
+
+        this.entities.forEach(entity => {
+            if (systemEntities.includes(entity.name)) {
+                systemGroup.push(entity);
+            } else {
+                customGroup.push(entity);
+            }
+        });
+
+        // Sort both groups alphabetically
+        customGroup.sort((a, b) => a.name.localeCompare(b.name));
+        systemGroup.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Combine the sorted groups: custom entities first, then system entities
+        this.entities = [...customGroup, ...systemGroup];
+
+        // Re-render the sorted list of entities in the UI
+        this.renderEntities();
+        this.restoreCheckedEntitiesFromCurrentDiagram();
+        this.exportToSQL();
+        if(typeof this.callbackSaveEntity === 'function') {
+            this.callbackSaveEntity(this.entities);
+        }
+    }
+
+    /**
      * Edits the specified entity based on its index in the entities array.
      * 
      * @param {number} index - The index of the entity to edit.
