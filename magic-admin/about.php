@@ -43,15 +43,13 @@ if (!file_exists($targetDir)) {
     mkdir($targetDir, 0755, true);
 }
 
-$oneDayInSeconds = 86400;
-
 foreach ($files as $file) {
     $src = $sourceDir . $file;
     $dst = $targetDir . $file;
 
     if (
         !file_exists($dst) || 
-        (filemtime($src) > filemtime($dst) && (time() - filemtime($src)) > $oneDayInSeconds)
+        (filemtime($src) > filemtime($dst) && (time() - filemtime($src)) > 3600)
     ) {
         copy($src, $dst);
     }
