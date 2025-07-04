@@ -509,15 +509,25 @@ class EntityRenderer {
     {
         let ul = document.querySelector('.diagram-list.tabs');
         let input = ul.querySelector('.diagram-tab.active input[type="text"]');
+        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');;
         let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');;
         let fileName = '';
-        if(input != null)
+        let name = '';
+        if(databaseName != '')
         {
-            fileName = databaseName + ' - ' + input.value;
+            name = databaseName;
         }
         else
         {
-            fileName = databaseName;
+            name = applicationId;
+        }
+        if(input != null)
+        {
+            fileName = name + ' - ' + input.value;
+        }
+        else
+        {
+            fileName = name;
         }
         return fileName;
     }
