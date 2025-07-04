@@ -182,7 +182,8 @@ if(!isset($databaseName))
                             <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
                             <button class="btn" onclick="downloadSVG()">Export SVG</button>
                             <button class="btn" onclick="downloadPNG()">Export PNG</button>
-                            <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>              
+                            <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>    
+                            <button class="btn" onclick="editor.sortAndGroupEntities()">Sort Entity by Type</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />

@@ -1094,10 +1094,39 @@ Let me know if you'd like to generate a version checker or migration assistant f
     This ensures input fields remain fully editable and the cursor behaves as expected.
 
 
+
 # MagicAppBuilder Version 1.9.0
 
 ## What's New
 
--   **Automatic Database Structure Update After File Extraction** The system now automatically updates the database structure after extracting update files if there are any changes in entity definitions. This ensures your database schema is always in sync with the latest application version without manual intervention.
+-   **Automatic Database Structure Update After File Extraction**
     
--   **Restricted Database Explorer Features for MagicAppBuilder Database** The **Import Structure** and **Entity Editor** buttons are now hidden in the Database Explorer when you're viewing the MagicAppBuilder's internal database. This prevents unintended errors and maintains the integrity of the core system.
+    The system now automatically updates the database structure after extracting update files if there are any changes in entity definitions. This ensures your database schema is always in sync with the latest application version without manual intervention.
+    
+-   **Restricted Database Explorer Features for MagicAppBuilder Database**
+    
+    The Import Structure and Entity Editor buttons are now hidden in the Database Explorer when you're viewing the MagicAppBuilder's internal database. This prevents unintended errors and maintains the integrity of the core system.
+    
+-   **"Sort Entity by Type" Button Added to Entity Editor**
+    
+    A new button, "Sort Entity by Type," has been added to the Entity Editor. This allows users to reorder entities by placing custom entities at the top, followed by specific system entities (e.g., admin, module, notification). Both groups are then sorted alphabetically, providing a more organized and intuitive view of your database entities.
+    
+-   **Duplicate Entity Prevention in Entity Editor**
+    
+    To enhance data integrity, MagicAppBuilder now prevents the creation or saving of duplicate entities. When attempting to create a new entity or save an existing one with a name that already exists, the system will prompt you to resolve the conflict, ensuring all entity names remain unique.
+    
+
+## Bug Fixes
+
+-   **Entity Indexing Issues During Reordering Operation**
+    
+    Fixed several bugs related to incorrect entity indexing after reordering operations. The system now correctly maintains entity indices during:
+    
+    1.  Alphabetical sorting.
+        
+    2.  Grouped alphabetical sorting (Custom entities first, then System entities).
+        
+    3.  Manual reordering via "move up" and "move down" icons.
+        
+
+
