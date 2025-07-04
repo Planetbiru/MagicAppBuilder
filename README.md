@@ -36,6 +36,15 @@ In many cases, rapid development is not the only challenge. **Organizations toda
 -   Some inputs support **multiple values**.
     
 
+### 📄 Data List Management
+
+-   Supports **data list pagination**, allowing efficient Browse of large datasets.
+    
+-   Includes **filtering capabilities** to narrow down data based on specific criteria.
+    
+-   Provides **ordering (sorting) functionality** by selected columns for organized data display.
+
+
 ### 📤 Exporting Capabilities
 
 -   Built-in export to **Microsoft Excel** and **CSV** formats
@@ -74,17 +83,21 @@ In many cases, rapid development is not the only challenge. **Organizations toda
 
 -   Supports uploading images, audio, video, and documents.
 
+
 ### 🗄️ Database Flexibility
 
 -   Supports MySQL, MariaDB, and PostgreSQL databases, allowing users to switch between them without needing application upgrades or modifications.
+
 
 ### ⬆️ Scalability
 
 -   Users can perform horizontal scaling for both the application and the database without requiring application upgrades or modifications.
 
+
 ### 🔔 Built-in Notifications
 
 -   Provides integrated notification functionalities for users.
+
 
 ### 💬 Built-in User Messaging
 
