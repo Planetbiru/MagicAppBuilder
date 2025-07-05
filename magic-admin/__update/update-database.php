@@ -59,6 +59,7 @@ foreach($paths as $idx=>$path)
     }
 }
 
+$errors = 0;
 // Loop through the collected entities, grouped by table name.
 foreach($entities as $tableName=>$entityObjects) // Renamed $entity to $entityObjects for clarity as it's an array of entities for the same table
 {
@@ -83,7 +84,18 @@ foreach($entities as $tableName=>$entityObjects) // Renamed $entity to $entityOb
             {
                 // If an error occurs during execution, log the error message.
                 error_log($e->getMessage());
+                $errors++;
             }
         }
     }           
+}
+if($errors == 0)
+{
+    header('Content-Type: application/json');
+    echo json_encode(['success'=>true]);
+}
+else
+{
+    header('Content-Type: application/json');
+    echo json_encode(['success'=>false]);
 }
