@@ -56,7 +56,7 @@ class AppUpdater
      * Get a list of available releases from GitHub (version >= 1.5.1 only).
      *
      * @return array An array of releases with 'tag_name', 'name', 'published_at', and 'zipball_url'
-     * @throws UpdateException
+     * @throws \UpdateException
      */
     public function listReleases()
     {
@@ -73,12 +73,12 @@ class AppUpdater
         $response = file_get_contents($url, false, $context);
 
         if ($response === false) {
-            throw new UpdateException("Failed to fetch release list from GitHub.");
+            throw new \UpdateException("Failed to fetch release list from GitHub.");
         }
 
         $releases = json_decode($response, true);
         if (!is_array($releases)) {
-            throw new UpdateException("Invalid response format from GitHub.");
+            throw new \UpdateException("Invalid response format from GitHub.");
         }
 
         $result = array();
@@ -101,8 +101,6 @@ class AppUpdater
         return $result;
     }
 
-
-
     /**
      * Run the update process.
      */
@@ -120,7 +118,7 @@ class AppUpdater
     {
         $data = file_get_contents($this->zipUrl);
         if ($data === false) {
-            throw new UpdateException("Failed to download ZIP file.");
+            throw new \UpdateException("Failed to download ZIP file.");
         }
         file_put_contents($this->zipFile, $data);
     }
@@ -128,13 +126,13 @@ class AppUpdater
     /**
      * Extract and replace application files by reading them directly from ZIP.
      *
-     * @throws UpdateException
+     * @throws \UpdateException
      */
     public function replaceFromZip()
     {
         $zip = new ZipArchive();
         if ($zip->open($this->zipFile) !== true) {
-            throw new UpdateException("Unable to open ZIP archive.");
+            throw new \UpdateException("Unable to open ZIP archive.");
         }
 
         // Detect the base folder (e.g., myrepo-main/)
@@ -144,7 +142,7 @@ class AppUpdater
         if (count($parts) > 1) {
             $baseFolder = $parts[0] . '/';
         } else {
-            throw new UpdateException("Unexpected ZIP structure.");
+            throw new \UpdateException("Unexpected ZIP structure.");
         }
 
         // Loop through each file in the ZIP
@@ -179,7 +177,7 @@ class AppUpdater
             // Extract and write file
             $content = $zip->getFromIndex($i);
             if ($content === false) {
-                throw new UpdateException("Failed to extract $entry from ZIP.");
+                throw new \UpdateException("Failed to extract $entry from ZIP.");
             }
 
             file_put_contents($targetPath, $content);
@@ -196,5 +194,3 @@ class AppUpdater
         @unlink($this->zipFile);
     }
 }
-
-

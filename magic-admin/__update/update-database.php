@@ -89,6 +89,7 @@ foreach($entities as $tableName=>$entityObjects) // Renamed $entity to $entityOb
         }
     }           
 }
+
 if($errors == 0)
 {
     header('Content-Type: application/json');
@@ -96,6 +97,7 @@ if($errors == 0)
 }
 else
 {
+    http_response_code(500);
     header('Content-Type: application/json');
     echo json_encode(['success'=>false]);
 }

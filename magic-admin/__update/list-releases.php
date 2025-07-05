@@ -8,5 +8,6 @@ try {
     echo json_encode($updater->listReleases());
 } catch (Exception $e) {
     http_response_code(500);
+    header('Content-Type: application/json');
     echo json_encode(['error' => $e->getMessage()]);
 }
