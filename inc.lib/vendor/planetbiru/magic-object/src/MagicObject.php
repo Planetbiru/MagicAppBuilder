@@ -2987,8 +2987,8 @@ class MagicObject extends stdClass // NOSONAR
             if(isset($params[0]))
             {
                 $param0 = $params[0];
-                $param1 = $params[1];
-                $param2 = $params[2];
+                $param1 = isset($params[1]) ? $params[1] : null;
+                $param2 = isset($params[2]) ? $params[2] : null;
                 return number_format($this->get(substr($method, 12)), $param0, $param1, $param2);
             }
             else

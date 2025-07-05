@@ -1032,3 +1032,49 @@ class UserValidator extends MagicObject
 ```
 
 This enhancement makes the validator generator more expressive and future-proof, especially when building layered architectures or generating documentation automatically.
+
+
+# MagicObject Version 3.14.4
+
+## What's Fixed
+
+### Bug Fix: `numberFormat*` Methods Accept Single Parameter
+
+In version 3.14.4, a bug has been fixed in the internal magic method handling for `numberFormat*` methods (such as `numberFormatPercent`, `numberFormatTotal`, etc.).
+
+#### Previous Behavior (Before 3.14.4)
+
+Calling a `numberFormat*` method with **only one argument** would trigger warnings:
+
+```php
+$data = new MagicObject();
+$data->setPercent(2.123456);
+echo $data->numberFormatPercent(2);
+```
+
+**Result:**
+
+```txt
+Warning: Undefined index 1
+Warning: Undefined index 2
+```
+
+This occurred because the internal handler expected three parameters and did not check for their existence properly.
+
+#### New Behavior (Since 3.14.4)
+
+These methods now safely accept **a single argument**, defaulting the missing parameters to reasonable values internally. The example above now works as expected and outputs:
+
+```txt
+2.12
+```
+
+#### Benefits:
+
+-   Improved developer experience when formatting numbers.
+    
+-   No need to always pass three parameters for simple formatting.
+    
+-   Prevents PHP warnings in production environments.
+
+This bug fix enhances robustness and backward compatibility for developers using dynamic number formatting features in MagicObject.
