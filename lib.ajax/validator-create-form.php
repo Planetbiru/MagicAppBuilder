@@ -31,6 +31,17 @@ if($inputPost->getUserAction() == 'select-table')
     {
         // Do nothing
     }
+
+
+    $groupedTables = [
+        'custom' => [],
+        'system' => []
+    ];
+
+    foreach ($tables as $tableName => $tableInfo) {
+        $group = isset($tableInfo['table_group']) ? strtolower($tableInfo['table_group']) : 'custom';
+        $groupedTables[$group][$tableName] = $tableInfo;
+    }
     ?>
     <table class="config-table">
     <tbody>
@@ -40,12 +51,20 @@ if($inputPost->getUserAction() == 'select-table')
                 <select name="tableName" class="form-control" onchange="this.form.querySelector('[name=validatorName]').value = this.options[this.selectedIndex].dataset.validatorClassName">
                     <option value="" data-validator-class-name="">- Select One -</option>
                     <?php
-                    foreach($tables as $tableName=>$tableInfo)
-                    {
-                        $validatorName = PicoStringUtil::upperCamelize($tableName)."Validator";
-                        ?>
-                        <option value="<?php echo $tableName;?>" data-validator-class-name="<?php echo $validatorName;?>"><?php echo $tableName;?></option>
-                        <?php
+                    foreach (['custom', 'system'] as $group) {
+                        if (!empty($groupedTables[$group])) {
+                            echo '<optgroup label="' . ucfirst($group) . '">';
+                            foreach ($groupedTables[$group] as $tableName => $tableInfo) {
+                                $validatorName = PicoStringUtil::upperCamelize($tableInfo['table_name']) . "Validator";
+                                ?>
+                                <option value="<?php echo $tableInfo['table_name']; ?>"
+                                        data-validator-class-name="<?php echo $validatorName; ?>">
+                                    <?php echo $tableInfo['table_name']; ?>
+                                </option>
+                                <?php
+                            }
+                            echo '</optgroup>';
+                        }
                     }
                     ?>
                 </select>

@@ -1156,3 +1156,93 @@ MagicAppBuilder has been updated to use **MagicObject version 3.14.4**.
     This improvement ensures better compatibility and fewer runtime warnings when formatting numbers dynamically within MagicAppBuilder.
 
 This version contains no UI or functional changes beyond the library update but improves backend reliability through enhanced MagicObject behavior.
+
+
+# MagicAppBuilder Version 1.9.2
+
+## What's Changed
+
+### Enhancement: Filter Control for `getTableList()` Method
+
+The `AppDatabase::getTableList()` method now supports two additional parameters: `withApv` and `withTrash`.
+
+#### New Parameters:
+
+- `withApv` *(bool, default: false)* – If set to `true`, tables ending with `_apv` will be included.
+- `withTrash` *(bool, default: false)* – If set to `true`, tables ending with `_trash` will be included.
+
+#### Why This Matters:
+
+Previously, the method always excluded tables that ended with `_apv` or `_trash`. Now developers have more control over filtering behavior when retrieving the list of tables and primary keys from the database.
+
+#### Example Usage:
+
+```php
+// Fetch all tables, including `_apv` and `_trash` tables
+$tables = AppDatabase::getTableList($database, $databaseName, $schemaName, true, true);
+
+// Fetch tables excluding `_trash`, but including `_apv`
+$tables = AppDatabase::getTableList($database, $databaseName, $schemaName, true, false);
+```
+
+### UI Enhancements
+
+#### `Edit Entity` Tab
+
+-   Tables are now grouped into **Custom** and **System** categories when creating or editing entities.
+    
+-   Tables ending in `_apv` and `_trash` are now shown (if applicable), giving users full visibility of approval and trash tables.
+    
+-   Improves clarity and reduces clutter in the dropdown list of tables.
+
+#### `Edit Validator` Tab
+
+-   Similar grouping is applied when creating or modifying validator classes.
+    
+-   Tables in the dropdown are now categorized into **Custom** and **System** using visual `<optgroup>` labels.
+    
+-   This helps users quickly locate relevant tables when working with validator generation.
+    
+### Library Update: MagicObject 3.14.5
+
+MagicAppBuilder now uses **MagicObject version 3.14.5**.
+
+#### Key Improvements in MagicObject 3.14.5:
+
+- **New Feature:** Support for parsing database credentials from a URL using `importFromUrl()`
+  Example:
+
+  ```php
+  $url = 'mysql://user:pass@localhost:3306/mydb?schema=public&charset=utf8&timezone=Asia/Jakarta';
+  $credentials = new PicoDatabaseCredentials();
+  $credentials->importFromUrl($url);
+  ```
+
+- **Bug Fix:** Compatibility with **PHP 5**
+  Fixed fatal error caused by default parameters with class type hint in the `validate()` method:
+
+  Before (incompatible with PHP 5):
+
+  ```php
+  public function validate($a, $b, MagicObject $c = null, bool $d = true)
+  ```
+
+  After (PHP 5 compatible):
+
+  ```php
+  public function validate($a, $b, $c = null, $d = true)
+  ```
+
+  Ensures compatibility with older environments while retaining behavior in newer PHP versions.
+
+### Impact Summary
+
+-   Improves flexibility in table listing and entity generation.
+    
+-   Supports advanced workflows such as approval (`_apv`) and soft-deletion (`_trash`) logic.
+    
+-   Enhances user experience through clearer grouping and visibility in dropdowns.
+    
+-   Fixes compatibility issue in `MagicObject` that could affect older PHP installations.
+    
+-   Fully backward-compatible with previous versions.

@@ -21,7 +21,7 @@ $primaryKey = "";
 try {
     $databaseType = $database->getDatabaseType();
 
-    $tables = AppDatabase::getTableList($database, $databaseName, $schemaName);
+    $tables = AppDatabase::getTableList($database, $databaseName, $schemaName, true, true);
 
     ?>
         <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -32,20 +32,45 @@ try {
                         <select class="form-control" name="entity_generator_table_name">
                             <option value="">Select One</option>
                             <?php
-                            foreach($tables as $table)
-                            {
-                                $selected = "";
-                                if($table['table_name'] == $currentTableName)
-                                {
-                                    $selected = " selected";
-                                    $primaryKey = isset($table['primary_key']) && isset($table['primary_key'][0]) ? $table['primary_key'][0] : '';
+                            // Kelompokkan tabel berdasarkan table_group
+                            $groupedTables = [
+                                'custom' => [],
+                                'system' => []
+                            ];
+
+                            foreach ($tables as $table) {
+                                $group = isset($table['table_group']) ? strtolower($table['table_group']) : 'custom';
+                                $groupedTables[$group][] = $table;
+                            }
+
+                            // Urutkan: custom dulu, baru system
+                            foreach (['custom', 'system'] as $group) {
+                                if (!empty($groupedTables[$group])) {
+                                    ?>
+                                    <optgroup label="<?php echo ucfirst($group); ?>">
+                                        <?php
+                                        foreach ($groupedTables[$group] as $table) {
+                                            $selected = "";
+                                            if ($table['table_name'] == $currentTableName) {
+                                                $selected = " selected";
+                                            }
+                                            $primaryKey = isset($table['primary_key'][0]) ? $table['primary_key'][0] : '';
+                                            
+                                            ?>
+                                            <option value="<?php echo $table['table_name']; ?>"
+                                                    data-primary-keys="<?php echo implode(",", $table['primary_key']); ?>"<?php echo $selected; ?>>
+                                                <?php echo $table['table_name']; ?>
+                                            </option>
+                                            <?php
+                                        }
+                                        ?>
+                                    </optgroup>
+                                    <?php
                                 }
-                                ?>
-                                <option value="<?php echo $table['table_name'];?>" data-primary-keys="<?php echo implode(",", $table['primary_key']);?>"<?php echo $selected;?>><?php echo $table['table_name'];?></option>
-                                <?php
                             }
                             ?>
                         </select>
+
                     </td>
                 </tr>
                 <tr>
