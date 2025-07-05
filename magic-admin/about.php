@@ -43,15 +43,13 @@ if (!file_exists($targetDir)) {
     mkdir($targetDir, 0755, true);
 }
 
-$oneDayInSeconds = 86400;
-
 foreach ($files as $file) {
     $src = $sourceDir . $file;
     $dst = $targetDir . $file;
 
     if (
         !file_exists($dst) || 
-        (filemtime($src) > filemtime($dst) && (time() - filemtime($src)) > $oneDayInSeconds)
+        (filemtime($src) > filemtime($dst) && (time() - filemtime($src)) > 3600)
     ) {
         copy($src, $dst);
     }
@@ -67,7 +65,10 @@ $jsLang = [
     'downloading' => $appLanguage->getDownloadingRelease(),
     'extracting' => $appLanguage->getExtracting(),
     'downloadFailed' => $appLanguage->getDownloadFailed(),
-    'extractionFailed' => $appLanguage->getExtractionFailed()
+    'extractionFailed' => $appLanguage->getExtractionFailed(),
+    'updatingDatabase' => $appLanguage->getUpdatingDatabase(),
+    'updateDatabaseFailed' => $appLanguage->getUpdateDatabaseFailed(),
+    'updateDatabaseSuccessfully' => $appLanguage->getUpdateDatabaseSuccessfully()
 ];
 ?>
 <div class="page page-jambi">
@@ -85,13 +86,13 @@ $jsLang = [
                 <td><?php echo $appLanguage->getUpdateToVersion();?></td>
                 <td><select id="release-select" class="form-control" style="display: inline-block;width: auto;padding-right: 32px;max-width: 100%;" disabled>
                     <option><?php echo $appLanguage->getPleaseLoadReleasesFirst();?></option>
-                </select></td>
+                </select> <button type="button" class="btn btn-primary" onclick="loadReleases()"><i class="fa fa-refresh"></i></button></td>
             </tr>
             <tr>
                 <td></td>
-                <td>
-                    <button type="button" class="btn btn-primary" onclick="loadReleases()"><?php echo $appLanguage->getLoadReleases();?></button>
+                <td>           
                     <button type="button" class="btn btn-success" onclick="startUpdate()" id="update-btn" disabled><?php echo $appLanguage->getUpdateNow();?></button>
+                    <button type="button" class="btn btn-success" onclick="updateDatabase()"><?php echo $appLanguage->getUpdateDatabase();?></button>
                 </td>
             </tr>
             <tr>
@@ -166,6 +167,24 @@ $jsLang = [
         statusEl.classList.add('error');
       });
   }
+  function updateDatabase() {
+    const statusEl = document.getElementById('status');
+    statusEl.classList.remove('error', 'success');
+    statusEl.textContent = '🛠️ ' + lang.updatingDatabase;
+
+    fetch('update/update-database.php?response=true')
+      .then(response => response.json())
+      .then(json => {
+        if (!json.success) throw new Error(lang.updateDatabaseFailed);
+        statusEl.textContent = '✅ ' + lang.updateDatabaseSuccessfully;
+        statusEl.classList.add('success');
+      })
+      .catch(err => {
+        statusEl.textContent = lang.updateDatabaseFailed;
+        statusEl.classList.add('error');
+      });
+  }
+
 </script>
 
 <?php 
