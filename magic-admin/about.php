@@ -175,7 +175,7 @@ $jsLang = [
     fetch('update/update-database.php?response=true')
       .then(response => response.json())
       .then(json => {
-        if (!json.success) throw new Error(json.message || lang.updateDatabaseFailed);
+        if (!json.success) throw new Error(lang.updateDatabaseFailed);
         statusEl.textContent = '✅ ' + lang.updateDatabaseSuccessfully;
         statusEl.classList.add('success');
       })
