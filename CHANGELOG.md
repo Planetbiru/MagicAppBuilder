@@ -1133,3 +1133,26 @@ Let me know if you'd like to generate a version checker or migration assistant f
     Addressed issues with exporting entities and SQL in the Entity Editor, specifically for **SQLite databases** that do not have explicit database names and schemas. The export functionality now handles these cases correctly, ensuring successful exports regardless of the SQLite database configuration.
 
 
+# MagicAppBuilder Version 1.9.1
+
+## What's Changed
+
+### Library Update: MagicObject 3.14.4
+
+MagicAppBuilder has been updated to use **MagicObject version 3.14.4**.
+
+#### Notable Improvements from MagicObject 3.14.4:
+
+-   **Bug Fix: `numberFormat*` Methods Now Accept Single Parameter**
+    
+    Previously, calling methods like `numberFormatPercent(2)` would trigger warnings due to missing parameters. This issue has been fixed in MagicObject 3.14.4, enabling safe and clean formatting with a single argument:
+    
+    ```php
+    $data = new MagicObject();
+    $data->setPercent(2.123456);
+    echo $data->numberFormatPercent(2); // Output: 2.12
+    ```
+
+    This improvement ensures better compatibility and fewer runtime warnings when formatting numbers dynamically within MagicAppBuilder.
+
+This version contains no UI or functional changes beyond the library update but improves backend reliability through enhanced MagicObject behavior.
