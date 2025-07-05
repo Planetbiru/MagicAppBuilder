@@ -2,6 +2,7 @@
 
 namespace MagicObject\Database;
 
+use InvalidArgumentException;
 use MagicObject\SecretObject;
 
 /**
@@ -17,9 +18,12 @@ use MagicObject\SecretObject;
  * ```php
  * <?php
  * $credentials = new PicoDatabaseCredentials();
+ * $credentials->setDriver('mysql');
  * $credentials->setHost('localhost');
+ * $credentials->setPort(3306);
  * $credentials->setUsername('user');
  * $credentials->setPassword('password');
+ * $credentials->setDatabaseName('app');
  * ```
  * 
  * The attributes are automatically encrypted when set, providing a secure way to handle sensitive
@@ -112,5 +116,84 @@ class PicoDatabaseCredentials extends SecretObject
      * @var string
      */
     protected $charset;
+
+    /**
+     * Import database credentials from a URL datasource string.
+     *
+     * Supported format:
+     * scheme://username:password@host:port/database?schema=public&charset=utf8&timezone=Asia/Jakarta
+     *
+     * @param string $url The datasource URL
+     * @param string|null $username Optional username to override the one from URL
+     * @param string|null $password Optional password to override the one from URL
+     * @return self Returns the current instance for method chaining.
+     */
+    public function importFromUrl($url, $username = null, $password = null) // NOSONAR
+    {
+        $parts = parse_url($url);
+        
+        if (!$parts) {
+            throw new InvalidArgumentException("Invalid database URL");
+        }
+
+        // Basic connection parts
+        if (isset($parts['scheme'])) {
+            $this->setDriver($parts['scheme']);
+        }
+
+        if ($this->getDriver() === 'sqlite' && isset($parts['path'])) {
+            $this->setDatabaseFilePath($parts['path']);
+            return;
+        }
+
+        if (isset($parts['host'])) {
+            $this->setHost($parts['host']);
+        }
+
+        if (isset($parts['port'])) {
+            $port = (int) $parts['port'];
+            if ($port < 0) {
+                throw new InvalidArgumentException("Invalid port: must be a non-negative integer");
+            }
+            $this->setPort($port);
+        }
+
+        // Username and password
+        if ($username !== null) {
+            $this->setUsername($username);
+        } elseif (isset($parts['user'])) {
+            $this->setUsername($parts['user']);
+        }
+
+        if ($password !== null) {
+            $this->setPassword($password);
+        } elseif (isset($parts['pass'])) {
+            $this->setPassword($parts['pass']);
+        }
+
+        if (isset($parts['path'])) {
+            $dbName = ltrim($parts['path'], '/');
+            $this->setDatabaseName($dbName);
+        }
+
+        // Optional query parameters
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $query);
+
+            if (isset($query['schema'])) {
+                $this->setDatabaseSchema($query['schema']);
+            }
+
+            if (isset($query['timezone'])) {
+                $this->setTimeZone($query['timezone']);
+            }
+
+            if (isset($query['charset'])) {
+                $this->setCharset($query['charset']);
+            }
+        }
+        return $this;
+    }
+
 
 }

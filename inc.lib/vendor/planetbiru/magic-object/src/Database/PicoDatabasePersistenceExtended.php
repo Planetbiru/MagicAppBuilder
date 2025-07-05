@@ -125,7 +125,7 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
         $parentPropertyName = null,
         $messageTemplate = null,
         $reference = null,
-        bool $validateIfReferenceEmpty = true // Changed default to true and type hint to bool
+        $validateIfReferenceEmpty = true // Changed default to true and type hint to bool
     ) {
         $objectToValidate = $this->object; // Default: validate this object
         $shouldValidate = true; // Flag to determine if validation should proceed

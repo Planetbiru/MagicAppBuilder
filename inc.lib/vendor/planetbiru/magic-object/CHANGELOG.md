@@ -1078,3 +1078,96 @@ These methods now safely accept **a single argument**, defaulting the missing pa
 -   Prevents PHP warnings in production environments.
 
 This bug fix enhances robustness and backward compatibility for developers using dynamic number formatting features in MagicObject.
+
+
+# MagicObject Version 3.14.5
+
+## What's Changed
+
+### New Feature: URL-Based Database Credential Parsing
+
+MagicObject now supports importing database credentials from a **datasource URL** string using the new method `PicoDatabaseCredentials::importFromUrl()`.
+
+This enhancement simplifies configuration and integration with environment-based or externalized connection settings (e.g., `DATABASE_URL`).
+
+#### Supported URL Format
+
+driver://username:password@host:port/database?schema=public&charset=utf8&timezone=Asia/Jakarta
+
+
+#### Example
+
+```php
+$credentials = new PicoDatabaseCredentials();
+$credentials->importFromUrl(
+    'mysql://user:secret@localhost:3306/myapp?schema=public&charset=utf8mb4&timezone=Asia/Jakarta'
+);
+```
+
+#### Optional Override
+
+Username and password can be passed directly to override the values in the URL:
+
+```php
+$credentials->importFromUrl($url, 'realuser', 'realpass');
+```
+
+This is useful when credentials are stored separately from the connection string.
+
+#### Special Handling for SQLite
+
+When using sqlite:///path/to/database.db, the file path is automatically mapped to databaseFilePath instead of host/port.
+
+```php
+$url = 'sqlite:///path/to/database.db';
+$credentials->importFromUrl($url);
+```
+
+### Why It Matters
+
+-   Makes deployment and configuration more flexible in containerized or cloud environments.
+
+-   Simplifies integration with .env files, environment variables, or external secrets managers.
+
+-   Supports both traditional and SQLite-based databases.
+
+### Backward Compatibility
+
+This update is fully backward-compatible and does not change any existing behavior unless the new method is used explicitly.
+
+
+### Bug Fix: Class-Typed Default Parameters Now Compatible with PHP 5
+
+Fixed a **fatal error** caused by the use of default parameters with a class type hint (`MagicObject`, `SecretObject`, `SetterGetter`, `MagicDto`) and non-null default values in the `validate()` method.
+
+#### Before (Problematic in PHP 5):
+
+```php
+public function validate(
+    $parentPropertyName = null,
+    $messageTemplate = null,
+    MagicObject $reference = null,
+    bool $validateIfReferenceEmpty = true // ❌ Causes error in PHP 5
+)
+```
+
+After (PHP 5 Compatible):
+
+```php
+public function validate(
+    $parentPropertyName = null,
+    $messageTemplate = null,
+    MagicObject $reference = null,
+    $validateIfReferenceEmpty = true // ✅ Compatible with PHP 5
+)
+```
+
+> This change ensures full compatibility with legacy environments running PHP 5, while maintaining functionality in modern PHP versions.
+
+### Backward Compatibility
+
+-   This version is **fully backward-compatible**.
+    
+-   No breaking changes were introduced.
+    
+-   Existing codebases will continue to function as-is unless the new functionality is explicitly invoked.

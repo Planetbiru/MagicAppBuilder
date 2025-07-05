@@ -443,7 +443,7 @@ class SetterGetter extends stdClass
         $parentPropertyName = null,
         $messageTemplate = null,
         $reference = null,
-        bool $validateIfReferenceEmpty = true
+        $validateIfReferenceEmpty = true
     ) {
         $objectToValidate = $this; // Default: validate this object
         $shouldValidate = true; // Flag to determine if validation should proceed
