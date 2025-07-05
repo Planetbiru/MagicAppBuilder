@@ -5,8 +5,6 @@ use MagicObject\Util\PicoIniUtil;
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 require_once __DIR__ . '/AppUpdater.php';
 
-header('Content-Type: application/json');
-
 try {
     $updater = new \AppUpdater('Planetbiru', 'MagicAppBuilder');
     $updater->replaceFromZip();
@@ -23,6 +21,7 @@ try {
     $ini['last_update'] = $formatted;
     PicoIniUtil::writeIniFile($ini, $iniPath);
 
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
         'message' => $appLanguage->getExtractionAndUpdateCompleted(),
@@ -31,6 +30,7 @@ try {
     ]);
 } catch (Exception $e) {
     http_response_code(500);
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => false,
         'message' => $appLanguage->getExtractionFailed() . ': ' . $e->getMessage()
