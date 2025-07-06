@@ -308,6 +308,36 @@ td {
 				}
 			}
 		}
+
+		&.config-language-table{
+			tbody {
+				>tr {
+					&:nth-child(1) {
+						>td {
+							&:nth-child(1) {
+								width: 25%;
+							}
+						}
+					}
+					td 
+					{
+						.language-manager{
+							tbody{
+								>tr {
+									&:nth-child(1) {
+									>td {
+										&:nth-child(1) {
+											width: 45%;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 

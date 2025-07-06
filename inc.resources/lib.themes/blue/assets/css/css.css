@@ -1,4 +1,3 @@
-@charset "UTF-8";
 body {
   overflow-x: hidden;
   transition: background-color 0.1s, color 0.1s;
@@ -355,7 +354,9 @@ tbody.data-table-manual-sort .data-sort-body {
   cursor: move;
 }
 tbody.data-table-manual-sort .data-sort-body::before {
-  content: "⠿";
+  content: "\f58e";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
   margin-left: -1px;
   width: 16px;
   box-sizing: border-box;
@@ -368,7 +369,9 @@ thead .data-sort-header {
   cursor: move;
 }
 thead .data-sort-header::before {
-  content: "⠿";
+  content: "\f58e";
+  font-family: "Font Awesome 6 Free";
+  font-weight: bold;
   margin-left: -1px;
   width: 16px;
   box-sizing: border-box;

@@ -238,6 +238,14 @@ td .btn.btn-remove-row, td .btn.btn-move-up, td .btn.btn-move-down, td .btn.path
 .modal-sm .config-table tbody > tr:nth-child(1) > td:nth-child(1) {
   width: 35%;
 }
+.modal-md .config-table.config-language-table tbody > tr:nth-child(1) > td:nth-child(1),
+.modal-sm .config-table.config-language-table tbody > tr:nth-child(1) > td:nth-child(1) {
+  width: 25%;
+}
+.modal-md .config-table.config-language-table tbody > tr td .language-manager tbody > tr:nth-child(1) > td:nth-child(1),
+.modal-sm .config-table.config-language-table tbody > tr td .language-manager tbody > tr:nth-child(1) > td:nth-child(1) {
+  width: 45%;
+}
 
 .modal-table {
   width: 100%;
