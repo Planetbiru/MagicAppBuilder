@@ -1303,3 +1303,54 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 - Developers can now preview and navigate full menu structures during development without needing to import menu data into the database.
 
+
+# MagicAppBuilder Version 1.10.0
+
+## What's Changed
+
+### Enhancement: Improved Sortable Handler UI
+
+The sortable handler in data tables has been updated for a cleaner and more consistent user experience.
+
+#### Changes:
+
+-   Previously, the sortable feature used a dark-colored column background to indicate draggable areas.
+    
+-   This approach has been replaced with a minimalist **⠿ (three-dot vertical)** character to clearly mark sortable rows without affecting the column layout or color scheme.
+    
+
+#### Benefits:
+
+-   Visually cleaner and more intuitive interface.
+    
+-   Consistent across different themes or background colors.
+    
+-   Easier for users to identify and interact with the sortable elements.
+    
+
+### Bug Fix: Multi-Level Menu Display in Development Mode
+
+-   Fixed an issue where multi-level menus were not displayed when `developmentMode=true`.
+    
+-   Previously, the application would fail to show menus in development mode because the menu data did not exist in the database and was only available in `application.yml`.
+    
+
+#### Benefits:
+
+-   Developers can now preview and navigate full menu structures during development without needing to import menu data into the database.
+    
+
+### New Feature: Import Entities from XLSX and CSV
+
+-   Added support for importing entity structures directly from `.xlsx` and `.csv` files in the Entity Editor.
+    
+-   The import feature reads column headers and sample data to automatically infer table schema, including data types.
+    
+
+#### Benefits:
+
+-   Speeds up entity creation by allowing developers to generate database tables directly from spreadsheet data.
+    
+-   Supports drag-and-drop or file input, making it convenient to convert structured data into database-ready formats.
+    
+

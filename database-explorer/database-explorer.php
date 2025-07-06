@@ -40,6 +40,8 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/TabDragger.min.js"></script>
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
     <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
+    <script src="../lib.assets/xlsx/xlsx.full.min.js"></script>
+    <script src="../lib.assets/papaparse/papaparse.min.js"></script>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -179,6 +181,7 @@ if(!isset($databaseName))
                             <button class="btn" onclick="editor.downloadEntities()">Export Entity</button>
                             <button class="btn" onclick="editor.importSQL()">Import SQL</button>
                             <button class="btn" onclick="editor.appendFromSQL()">Append Entity from SQL</button>
+                            <button class="btn" onclick="editor.importSheet()">Import Sheet</button>
                             <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
                             <button class="btn" onclick="downloadSVG()">Export SVG</button>
                             <button class="btn" onclick="downloadPNG()">Export PNG</button>
@@ -187,6 +190,7 @@ if(!isset($databaseName))
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
+                            <input class="import-file-sheet" type="file" accept=".xlsx,.csv" style="display: none;" />
                         </div>
 
                         <!-- Entity Editor Form -->

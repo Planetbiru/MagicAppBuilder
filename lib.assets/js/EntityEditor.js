@@ -729,6 +729,15 @@ class EntityEditor {
                 console.log("Please select a JSON file first.");
             }
         });
+
+        document.querySelector(this.selector+" .import-file-sheet").addEventListener("change", function () {
+            const file = this.files[0]; // Get the selected file
+            if (file) {
+                editor.importSheetFile(file); 
+            } else {
+                console.log("Please select a JSON file first.");
+            }
+        });
         
         document.querySelector(this.selector).addEventListener('keypress', function(event){
             if(event.key == 'Enter') 
@@ -843,19 +852,7 @@ class EntityEditor {
         } else {
             this.operation = 'create';
             this.currentEntityIndex = -1;
-            let newTableName = 'new_table';
-            for (let i in this.entities) {
-                let duplicated = false;
-                for (let j in this.entities) {
-                    newTableName = `new_table_${parseInt(i) + 2}`;
-                    if (newTableName.toLowerCase() == this.entities[j].name.toLowerCase()) {
-                        duplicated = true;
-                    }
-                }
-                if (!duplicated) {
-                    break;
-                }
-            }
+            let newTableName = this.getNewTableName();
             document.querySelector(this.selector+" .entity-name").value = newTableName;
             document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
         }
@@ -870,6 +867,60 @@ class EntityEditor {
     }
 
     /**
+     * Generates a unique new table name that does not conflict with existing entities.
+     *
+     * The method starts with "new_table" and appends a numeric suffix if necessary
+     * to ensure uniqueness against existing entity names (case-insensitive).
+     *
+     * @returns {string} A unique table name like "new_table", "new_table_1", "new_table_2", etc.
+     */
+    getNewTableName() {
+        let index = 0;
+        let newTableName = 'new_table';
+
+        const existingNames = this.entities.map(e => e.name.toLowerCase());
+
+        while (existingNames.includes(newTableName.toLowerCase())) {
+            index++;
+            newTableName = `new_table_${index}`;
+        }
+
+        return newTableName;
+    }
+
+
+    /**
+     * Imports column definitions from a spreadsheet or external source
+     * and initializes a new entity for table creation.
+     *
+     * This method sets the application state to "create" mode,
+     * resets the current entity selection, generates a new unique table name,
+     * clears existing columns in the UI, adds new columns from the given array,
+     * and updates the UI to display the entity editor form.
+     *
+     * @param {Array<Object>} columns - An array of column definitions to be added.
+     * Each object should represent a column with necessary attributes (e.g., name, type).
+     */
+    importFromSheet(columns) {
+        this.operation = 'create';
+        this.currentEntityIndex = -1;
+
+        let newTableName = this.getNewTableName();
+        document.querySelector(this.selector + " .entity-name").value = newTableName;
+        document.querySelector(this.selector + " .entity-columns-table-body").innerHTML = '';
+
+        columns.forEach(column => {
+            this.addColumnToTable(column);
+        });
+
+        document.querySelector(this.selector + " .button-container").style.display = "none";
+        document.querySelector(this.selector + " .entity-container").style.display = "block";
+        document.querySelector(this.selector + " .template-container").style.display = "none";
+        document.querySelector(this.selector + " .editor-form").style.display = "block";
+        document.querySelector(this.selector + " .entity-name").select();
+    }
+
+    /**
      * Adds a column to the columns table for editing.
      * 
      * @param {Column} column - The column to add.
@@ -878,7 +929,7 @@ class EntityEditor {
     addColumnToTable(column, focus = false) {
         const tableBody = document.querySelector(this.selector+" .entity-columns-table-body");
         const row = document.createElement("tr");
-        let columnLength = column.length == null ? '' : column.length.replace(/\D/g,'');
+        let columnLength = column.length == null ? '' : column.length.toString().replace(/\D/g,'');
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
         let nullable = '';
@@ -2591,6 +2642,129 @@ class EntityEditor {
     }
 
     /**
+     * Imports and parses a spreadsheet file (CSV, XLSX, or XLS),
+     * then generates and loads column definitions into the entity editor.
+     *
+     * Supports both text-based CSV and binary spreadsheet formats.
+     * Uses FileReader and XLSX/PapaParse libraries to extract data.
+     *
+     * @param {File} file - The uploaded file to be imported.
+     */
+    importSheetFile(file) {
+        const _this = this;
+        const ext = file.name.split('.').pop().toLowerCase();
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const contents = e.target.result;
+
+            if (ext === 'csv') {
+                const parsed = Papa.parse(contents, { header: true });
+                const headers = parsed.meta.fields;
+                const rows = parsed.data;
+                const columns = _this.generateCreateTable(headers, rows);
+                _this.importFromSheet(columns);
+            } else if (ext === 'xlsx' || ext === 'xls') {
+                const uint8Array = new Uint8Array(contents);
+                const workbook = XLSX.read(uint8Array, { type: "array" });
+                const sheetName = workbook.SheetNames[0];
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
+
+                if (json.length > 0) {
+                    const headers = Object.keys(json[0]);
+                    const columns = _this.generateCreateTable(headers, json);
+                    _this.importFromSheet(columns);
+                }
+            } else {
+                alert("Unsupported file format: " + ext);
+            }
+        };
+
+        if (ext === 'csv') {
+            reader.readAsText(file); // for CSV
+        } else {
+            reader.readAsArrayBuffer(file); // instead of deprecated readAsBinaryString
+        }
+    }
+
+
+    /**
+     * Infers the most appropriate SQL data type from a sample array of values.
+     *
+     * The function tests whether values appear to be:
+     * - Integers (BIGINT)
+     * - Floats (FLOAT)
+     * - Booleans (BOOLEAN)
+     * - Timestamps/Dates (TIMESTAMP)
+     * - Otherwise defaults to TEXT.
+     *
+     * Only the first 10 values are evaluated for performance.
+     *
+     * @param {Array<any>} values - An array of sample values to analyze.
+     * @returns {string} The inferred SQL data type as a string.
+     */
+    guessType(values) // NOSONAR
+    {
+        let isInt = true, isFloat = true, isBool = true, isDate = true;
+
+        for (let val of values.slice(0, 10)) {
+            // Safely normalize to string
+            if (val === undefined || val === null) {
+                continue;
+            } else if (typeof val !== "string") {
+                val = String(val).trim(); // NOSONAR
+            } else {
+                val = val.trim(); // NOSONAR
+            }
+
+            if (val === "") continue;
+
+            if (!/^[-+]?\d+$/.test(val)) isInt = false;
+            if (!/^[-+]?\d+(\.\d+)?$/.test(val)) isFloat = false;
+            if (!/^(true|false|yes|no|1|0)$/i.test(val)) isBool = false;
+            if (isNaN(Date.parse(val))) isDate = false;
+        }
+
+        if (isFloat) return "FLOAT";
+        if (isInt) return "BIGINT";
+        if (isBool) return "BOOLEAN";
+        if (isDate) return "TIMESTAMP";
+        return "TEXT";
+    }
+
+
+    /**
+     * Generates an array of column definitions based on headers and data rows.
+     *
+     * This function:
+     * - Cleans and normalizes column names (spaces and special characters removed).
+     * - Uses sample data from each column to infer the appropriate SQL data type.
+     * - Creates a `Column` instance for each header with inferred properties.
+     *
+     * @param {string[]} headers - The list of column headers (field names) from the data source.
+     * @param {Array<Object>} rows - The data rows used to sample values for type inference.
+     * @returns {Column[]} An array of `Column` objects representing the inferred table schema.
+     */
+    generateCreateTable(headers, rows) {
+        let _this = this;
+
+        const cols = headers.map(header => {
+            const cleanName = header
+                .replace(/\s+/g, "_")
+                .replace(/[^\w]/g, "")
+                .toLowerCase();
+
+            const values = rows.map(row => row[header]);
+            const type = _this.guessType(values);
+
+            return new Column(cleanName, type, null, true, null, false, false, null);
+        });
+
+        return cols;
+    }
+
+
+    /**
      * Triggers the import action for JSON entities by simulating a click
      * on the file input element associated with JSON import.
      * 
@@ -2615,6 +2789,11 @@ class EntityEditor {
     importSQL() {
         this.clearBeforeImport = true;
         document.querySelector(this.selector + " .import-file-sql").click();
+    }
+
+    importSheet() {
+        this.clearBeforeImport = true;
+        document.querySelector(this.selector + " .import-file-sheet").click();
     }
 
     /**
