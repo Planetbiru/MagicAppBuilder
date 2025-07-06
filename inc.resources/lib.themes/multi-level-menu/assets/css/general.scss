@@ -403,14 +403,28 @@ table.responsive-three-cols {
 
 tbody.data-table-manual-sort .data-sort-body {
   width: 8px;
-  background-color: #8b97bd;
   cursor: move;
+  &::before{
+    content: '⠿';
+    margin-left: -1px;
+    width: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    display: block;
+  }
 }
 
 thead .data-sort-header {
   width: 8px;
-  background-color: #abadb6;
   cursor: move;
+  &::before{
+    content: '⠿';
+    margin-left: -1px;
+    width: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    display: block;
+  }
 }
 
 .table-row {
@@ -439,7 +453,7 @@ thead .data-sort-header {
   }
 
   &.data-sort {
-    padding: 0.5rem 0.5rem;
+    padding: 0.24rem 0 0.24rem 0.2rem;
   }
 }
 
@@ -664,14 +678,6 @@ body .content h2 {
     
   }
 
-  thead .data-sort-header {
-    background-color: #6a6a6a;
-  }
-
-  tbody .data-sort-body {
-    background-color: #6a6a6a;
-  }
-
   .btn-success {
     color: #e8e8e8;
     background-color: #135b24;
@@ -842,6 +848,5 @@ tr[data-active="false"] td{
     background-color: #312e2e;
 }
 .dark-mode tbody tr[data-active="false"] td.data-sort-body, .dark-mode thead tr[data-active="false"] td.data-sort-header {
-  background-color: #6a6a6a;
 }
 
