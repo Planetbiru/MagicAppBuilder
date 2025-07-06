@@ -1319,7 +1319,7 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 -   Speeds up entity creation by allowing developers to generate database tables directly from spreadsheet data.
     
--   Supports drag-and-drop or file input, making it convenient to convert structured data into database-ready formats.
+-   Simplifies the conversion of structured spreadsheet content into database-ready formats using file input.
     
 
 ## What's Changed
