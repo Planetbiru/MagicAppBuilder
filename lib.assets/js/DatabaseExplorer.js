@@ -180,6 +180,25 @@ function init() {
         editor.refreshEntities();
         editor.updateDiagram();
     });
+
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('check-group-structure')) {
+            const group = e.target.dataset.group;
+            const checked = e.target.checked;
+            document.querySelectorAll('.check-structure-' + group).forEach(cb => {
+                cb.checked = checked;
+            });
+        }
+
+        if (e.target.classList.contains('check-group-data')) {
+            const group = e.target.dataset.group;
+            const checked = e.target.checked;
+            document.querySelectorAll('.check-data-' + group).forEach(cb => {
+                cb.checked = checked;
+            });
+        }
+    });
+
     
 }
 
