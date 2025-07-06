@@ -405,7 +405,9 @@ tbody.data-table-manual-sort .data-sort-body {
   width: 8px;
   cursor: move;
   &::before{
-    content: '⠿';
+    content: '\f58e';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: bold;
     width: 16px;
     margin-left: -1px;
     box-sizing: border-box;
@@ -418,7 +420,9 @@ thead .data-sort-header {
   width: 8px;
   cursor: move;
   &::before{
-    content: '⠿';
+    content: '\f58e';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: bold;
     margin-left: -1px;
     width: 16px;
     box-sizing: border-box;
