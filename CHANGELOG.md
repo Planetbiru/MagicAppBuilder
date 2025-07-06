@@ -1273,6 +1273,8 @@ MagicAppBuilder now uses **MagicObject version 3.14.5**.
     
 -   Fully backward-compatible with previous versions.
 
+
+
 # MagicAppBuilder Version 1.9.3
 
 ## What's Changed
@@ -1282,12 +1284,22 @@ MagicAppBuilder now uses **MagicObject version 3.14.5**.
 The sortable handler in data tables has been updated for a cleaner and more consistent user experience.
 
 #### Changes:
+
 - Previously, the sortable feature used a dark-colored column background to indicate draggable areas.
 - This approach has been replaced with a minimalist **⠿ (three-dot vertical)** character to clearly mark sortable rows without affecting the column layout or color scheme.
 
 #### Benefits:
+
 - Visually cleaner and more intuitive interface.
 - Consistent across different themes or background colors.
 - Easier for users to identify and interact with the sortable elements.
 
-No backend or library changes were introduced in this version.
+### Bug Fix: Multi-Level Menu Display in Development Mode
+
+- Fixed an issue where multi-level menus were not displayed when `developmentMode=true`.
+- Previously, the application would fail to show menus in development mode because the menu data did not exist in the database and was only available in `application.yml`.
+
+#### Benefits:
+
+- Developers can now preview and navigate full menu structures during development without needing to import menu data into the database.
+
