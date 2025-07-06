@@ -1306,6 +1306,22 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 # MagicAppBuilder Version 1.10.0
 
+## What's New
+
+### New Feature: Import Entities from XLSX and CSV
+
+-   Added support for importing entity structures directly from `.xlsx` and `.csv` files in the Entity Editor.
+    
+-   The import feature reads column headers and sample data to automatically infer table schema, including data types.
+    
+
+#### Benefits:
+
+-   Speeds up entity creation by allowing developers to generate database tables directly from spreadsheet data.
+    
+-   Supports drag-and-drop or file input, making it convenient to convert structured data into database-ready formats.
+    
+
 ## What's Changed
 
 ### Enhancement: Improved Sortable Handler UI
@@ -1339,18 +1355,3 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 -   Developers can now preview and navigate full menu structures during development without needing to import menu data into the database.
     
-
-### New Feature: Import Entities from XLSX and CSV
-
--   Added support for importing entity structures directly from `.xlsx` and `.csv` files in the Entity Editor.
-    
--   The import feature reads column headers and sample data to automatically infer table schema, including data types.
-    
-
-#### Benefits:
-
--   Speeds up entity creation by allowing developers to generate database tables directly from spreadsheet data.
-    
--   Supports drag-and-drop or file input, making it convenient to convert structured data into database-ready formats.
-    
-
