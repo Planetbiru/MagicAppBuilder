@@ -1074,28 +1074,35 @@ class ApplicationMenu // NOSONAR
      */
     public function renderHtmlMenu()
     {
-        $menuHierarchy = $this->loadModuleMultiLevelCache();
-        if(empty($menuHierarchy))
+        if($this->appConfig->developmentMode)
         {
-            $menuHierarchy = $this->getMultiLevelMenuFromDatabase();
-            $this->saveModuleMultiLevelCache($menuHierarchy);
-        }        
-                
-        $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true; // For cleaner output
-
-        // Render the main menu hierarchy
-        $renderedUl = $this->renderMenuHierarchy($menuHierarchy, $this->currentHref, 0, $dom);
-
-        if ($renderedUl) {
-            // Important: Append the rendered UL element to the DOMDocument
-            $dom->appendChild($renderedUl);
-            // Call markParentsOpen after all menu elements are in the DOM
-            // This function needs to handle Bootstrap classes as well
-            $this->markParentsOpen($dom);
+            return $this->renderMenu();
         }
-        
-        return $dom->saveHTML();
+        else
+        {
+            $menuHierarchy = $this->loadModuleMultiLevelCache();
+            if(empty($menuHierarchy))
+            {
+                $menuHierarchy = $this->getMultiLevelMenuFromDatabase();
+                $this->saveModuleMultiLevelCache($menuHierarchy);
+            }        
+                    
+            $dom = new DOMDocument('1.0', 'UTF-8');
+            $dom->formatOutput = true; // For cleaner output
+
+            // Render the main menu hierarchy
+            $renderedUl = $this->renderMenuHierarchy($menuHierarchy, $this->currentHref, 0, $dom);
+
+            if ($renderedUl) {
+                // Important: Append the rendered UL element to the DOMDocument
+                $dom->appendChild($renderedUl);
+                // Call markParentsOpen after all menu elements are in the DOM
+                // This function needs to handle Bootstrap classes as well
+                $this->markParentsOpen($dom);
+            }
+            
+            return $dom->saveHTML();
+        }
     }
 
     /**
