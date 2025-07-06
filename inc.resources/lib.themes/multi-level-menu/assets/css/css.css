@@ -1,3 +1,4 @@
+@charset "UTF-8";
 body {
   overflow-x: hidden;
   transition: background-color 0.1s, color 0.1s;
@@ -324,14 +325,28 @@ table.responsive-three-cols > tbody > tr > td:nth-child(1) {
 
 tbody.data-table-manual-sort .data-sort-body {
   width: 8px;
-  background-color: #8b97bd;
   cursor: move;
+}
+tbody.data-table-manual-sort .data-sort-body::before {
+  content: "⠿";
+  margin-left: -1px;
+  width: 16px;
+  box-sizing: border-box;
+  text-align: center;
+  display: block;
 }
 
 thead .data-sort-header {
   width: 8px;
-  background-color: #abadb6;
   cursor: move;
+}
+thead .data-sort-header::before {
+  content: "⠿";
+  margin-left: -1px;
+  width: 16px;
+  box-sizing: border-box;
+  text-align: center;
+  display: block;
 }
 
 .table-row td {
@@ -354,7 +369,7 @@ thead .data-sort-header {
   padding-right: 6px;
 }
 .table-row thead td.data-sort {
-  padding: 0.5rem 0.5rem;
+  padding: 0.24rem 0 0.24rem 0.2rem;
 }
 
 td[data-order-method=asc],
@@ -536,12 +551,6 @@ body .content h2 a:hover {
   border: 1px solid #555;
   line-height: 1.25;
 }
-.dark-mode thead .data-sort-header {
-  background-color: #6a6a6a;
-}
-.dark-mode tbody .data-sort-body {
-  background-color: #6a6a6a;
-}
 .dark-mode .btn-success {
   color: #e8e8e8;
   background-color: #135b24;
@@ -695,10 +704,6 @@ tr[data-active=false] td {
 
 .dark-mode tr[data-active=false] td {
   background-color: #312e2e;
-}
-
-.dark-mode tbody tr[data-active=false] td.data-sort-body, .dark-mode thead tr[data-active=false] td.data-sort-header {
-  background-color: #6a6a6a;
 }
 
 #sidebarMenu {
