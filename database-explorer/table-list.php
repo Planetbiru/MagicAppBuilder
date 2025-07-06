@@ -1,5 +1,6 @@
 <?php
 
+use AppBuilder\AppDatabase;
 use DatabaseExplorer\ConstantText;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Request\InputGet;
@@ -9,29 +10,21 @@ require_once __DIR__ . "/inc.db/config.php";
 
 $inputGet = new InputGet();
 $pdo = $database->getDatabaseConnection();
-
 $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-$tableList = array();
 
-if ($dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
-    // Query for MySQL and PostgreSQL to retrieve table list
-    $sql = $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB ? ConstantText::SHOW_TABLES : "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = '$schemaName' ORDER BY table_name ASC";
-    $stmt = $pdo->query($sql);
-    
-    while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-        $tableName = $row[0];
-        $tableList[] = $tableName;
+$schemaName = $databaseConfig->getDatabaseSchema();
+$databaseName = $databaseConfig->getDatabaseName();
+
+$tables = AppDatabase::getTableList($database, $databaseName, $schemaName);
+
+$customTables = [];
+$systemTables = [];
+foreach ($tables as $tableName => $tableData) {
+    if ($tableData['table_group'] === 'system') {
+        $systemTables[] = $tableName;
+    } else {
+        $customTables[] = $tableName;
     }
-} elseif ($dbType == 'sqlite') {
-    // Query for SQLite to retrieve table list
-    $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'");
-    
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $tableName = $row['name'];
-        $tableList[] = $tableName;
-    }
-} else {
-    // Unsupported database type
 }
 
 $selected =' selected';
@@ -65,26 +58,47 @@ $selected =' selected';
         </tr>
     </thead>
     <tbody>
-        <?php 
+        <?php
         $no = 0;
-        foreach($tableList as $table)
-        {
-            $ecodedTableName = htmlspecialchars($table);
-            $no++;
-        ?>
-        <tr data-table-name="<?php echo $ecodedTableName; ?>">
-            <td align="right"><?php echo $no;?></td>
-            <td>
-                <input type="checkbox" name="structure_export[]" value="<?php echo $ecodedTableName; ?>" id="structure_<?php echo $ecodedTableName; ?>" class="check-for-structure">
-                <label for="structure_<?php echo $ecodedTableName; ?>">Structure</label>
-            </td>
-            <td>
-                <input type="checkbox" name="data_export[]" value="<?php echo $ecodedTableName; ?>" id="data_<?php echo $ecodedTableName; ?>" class="check-for-data">
-                <label for="data_<?php echo $ecodedTableName; ?>">Data</label>
-            </td>
-            <td class="table-name"><?php echo $ecodedTableName; ?></td>
-        </tr>
-        <?php 
+        foreach ([['label' => 'Custom Tables', 'tables' => $customTables, 'group' => 'custom'],
+                  ['label' => 'System Tables', 'tables' => $systemTables, 'group' => 'system']] as $group) {
+            if (!empty($group['tables'])) {
+                $groupId = htmlspecialchars($group['group']);
+                echo '<tr class="group-header">
+                        <td>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="check-group-structure-' . $groupId . '" class="check-group-structure" data-group="' . $groupId . '">
+                            <label for="check-group-structure-' . $groupId . '">Structure</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="check-group-data-' . $groupId . '" class="check-group-data" data-group="' . $groupId . '">
+                            <label for="check-group-data-' . $groupId . '">Data</label>
+                        </td>
+                        <td>
+                            ' . htmlspecialchars($group['label']) . '
+                        </td>
+                      </tr>';
+
+                foreach ($group['tables'] as $table) {
+                    $ecodedTableName = htmlspecialchars($table);
+                    $no++;
+                    ?>
+                    <tr data-table-name="<?php echo $ecodedTableName; ?>" data-group="<?php echo $groupId; ?>">
+                        <td align="right"><?php echo $no;?></td>
+                        <td>
+                            <input type="checkbox" name="structure_export[]" value="<?php echo $ecodedTableName; ?>" id="structure_<?php echo $ecodedTableName; ?>" class="check-for-structure check-structure-<?php echo $groupId; ?>">
+                            <label for="structure_<?php echo $ecodedTableName; ?>">Structure</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="data_export[]" value="<?php echo $ecodedTableName; ?>" id="data_<?php echo $ecodedTableName; ?>" class="check-for-data check-data-<?php echo $groupId; ?>">
+                            <label for="data_<?php echo $ecodedTableName; ?>">Data</label>
+                        </td>
+                        <td class="table-name"><?php echo $ecodedTableName; ?></td>
+                    </tr>
+                    <?php
+                }
+            }
         }
         ?>
     </tbody>

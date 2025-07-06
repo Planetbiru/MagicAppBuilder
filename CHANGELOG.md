@@ -1185,6 +1185,32 @@ $tables = AppDatabase::getTableList($database, $databaseName, $schemaName, true,
 $tables = AppDatabase::getTableList($database, $databaseName, $schemaName, true, false);
 ```
 
+
+### Feature: Table Grouping in **Database Explorer Export View**
+
+Tables are now **visually grouped** into two categories when exporting structure and data in the **Database Explorer**:
+
+-   **Custom Tables** – Tables specific to your application domain.
+    
+-   **System Tables** – Tables used internally by the platform (e.g., `admin`, `module`, `notification`, etc.).
+    
+
+Each group includes its own **checkbox controls** to bulk-select structure and/or data:
+
+```txt
+[✓] Structure   [✓] Data   Custom Tables
+[ ] Structure   [ ] Data   System Tables
+```
+
+#### Benefits:
+
+-   Simplifies table selection, especially in large databases.
+    
+-   Prevents accidental export of system tables.
+    
+-   Works seamlessly with dynamic AJAX loading (uses event delegation).
+
+
 ### UI Enhancements
 
 #### `Edit Entity` Tab
