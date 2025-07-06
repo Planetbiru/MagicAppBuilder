@@ -403,13 +403,39 @@ table.responsive-three-cols {
 
 tbody.data-table-manual-sort .data-sort-body {
   width: 8px;
-  background-color: #8b97bd;
+  &::before{
+    content: '\f58e';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: bold;
+    margin-left: -1px;
+    width: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    display: block;
+  }
   cursor: move;
+}
+
+.light-mode{
+  tbody.data-table-manual-sort .data-sort-body {
+  &::before{
+    color: #2964a4
+  }
+  }
 }
 
 thead .data-sort-header {
   width: 8px;
-  background-color: #abadb6;
+  &::before{
+    content: '\f58e';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: bold;
+    margin-left: -1px;
+    width: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    display: block;
+  }
   cursor: move;
 }
 
@@ -439,7 +465,7 @@ thead .data-sort-header {
   }
 
   &.data-sort {
-    padding: 0.5rem 0.5rem;
+    padding: 0.24rem 0 0.24rem 0.2rem;
   }
 }
 
@@ -656,14 +682,6 @@ select:focus {
       line-height: 1.25;
     }
     
-  }
-
-  thead .data-sort-header {
-    background-color: #6a6a6a;
-  }
-
-  tbody .data-sort-body {
-    background-color: #6a6a6a;
   }
 
   .btn-success {
