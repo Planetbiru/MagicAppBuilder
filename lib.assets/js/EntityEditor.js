@@ -893,20 +893,24 @@ class EntityEditor {
      * Imports column definitions from a spreadsheet or external source
      * and initializes a new entity for table creation.
      *
-     * This method sets the application state to "create" mode,
-     * resets the current entity selection, generates a new unique table name,
-     * clears existing columns in the UI, adds new columns from the given array,
-     * and updates the UI to display the entity editor form.
+     * This method performs the following:
+     * - Sets the application state to "create" mode.
+     * - Resets the current entity selection.
+     * - Uses the provided table name or generates a new one if not given.
+     * - Clears existing columns from the UI.
+     * - Adds new columns from the given array.
+     * - Updates the UI to display the entity editor form.
      *
      * @param {Array<Object>} columns - An array of column definitions to be added.
-     * Each object should represent a column with necessary attributes (e.g., name, type).
+     *   Each object should represent a column with necessary attributes (e.g., name, type).
+     * @param {string} [tableName] - (Optional) A custom table name to use. If omitted, a new name is auto-generated.
      */
-    importFromSheet(columns) {
+    importFromSheet(columns, tableName) {
         this.operation = 'create';
         this.currentEntityIndex = -1;
 
-        let newTableName = this.getNewTableName();
-        document.querySelector(this.selector + " .entity-name").value = newTableName;
+        tableName = tableName || this.getNewTableName();
+        document.querySelector(this.selector + " .entity-name").value = tableName;
         document.querySelector(this.selector + " .entity-columns-table-body").innerHTML = '';
 
         columns.forEach(column => {
@@ -2640,6 +2644,26 @@ class EntityEditor {
         };
         reader.readAsText(file); // Read the file as text
     }
+    
+    /**
+     * Converts a string (e.g., file or sheet name) into a valid entity/table name.
+     *
+     * This function ensures the result is compatible with database naming conventions by:
+     * - Removing file extensions (e.g., `.csv`, `.xlsx`).
+     * - Replacing non-alphanumeric characters with underscores.
+     * - Converting the entire string to lowercase.
+     * - Trimming leading and trailing underscores.
+     *
+     * @param {string} str - The original name (e.g., file name or sheet name).
+     * @returns {string} A sanitized and valid table name in lowercase with underscores.
+     */
+    toValidTableName(str) {
+        return str
+            .replace(/\.[^/.]+$/, '') // NOSONAR
+            .replace(/[^a-zA-Z0-9]+/g, '_') // NOSONAR
+            .toLowerCase()
+            .replace(/^_+|_+$/g, ''); // NOSONAR
+    }
 
     /**
      * Imports and parses a spreadsheet file (CSV, XLSX, or XLS),
@@ -2662,56 +2686,52 @@ class EntityEditor {
                 const parsed = Papa.parse(contents, { header: true });
                 const headers = parsed.meta.fields;
                 const rows = parsed.data;
+
+                const entityName = _this.toValidTableName(file.name);
                 const columns = _this.generateCreateTable(headers, rows);
-                _this.importFromSheet(columns);
+                _this.importFromSheet(columns, entityName);
             } else if (ext === 'xlsx' || ext === 'xls') {
                 const uint8Array = new Uint8Array(contents);
                 const workbook = XLSX.read(uint8Array, { type: "array" });
-                if(workbook.SheetNames.length > 1)
-                {            
-                    let message = `
-                    <table class="two-side-table">
-                        <tbody>
-                            <tr>
-                                <td>Sheet to Import</td>
-                                <td>
-                                    <select id="sheet-index" class="form-control">
-                                        ${workbook.SheetNames.map((name, index) => 
-                                            `<option value="${index}">${index + 1}. ${name}</option>`
-                                        ).join('')}
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    `;
-                    _this.showConfirmationDialog(message, 'Select Sheet', 'OK', 'Cancel', function(isOk){
-                        if(isOk)
-                        {
-                            let sheetIndex = parseInt(document.querySelector('#sheet-index').value);
-                            const sheetName = workbook.SheetNames[sheetIndex];
-                            const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
 
-                            if (json.length > 0) {
-                                const headers = Object.keys(json[0]);
-                                const columns = _this.generateCreateTable(headers, json);
-                                _this.importFromSheet(columns);
-                            }
-                        }
-                    });
-                }
-                else
-                {
-                    const sheetName = workbook.SheetNames[0];
+                const selectSheetAndImport = (sheetIndex) => {
+                    const sheetName = workbook.SheetNames[sheetIndex];
                     const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
 
                     if (json.length > 0) {
                         const headers = Object.keys(json[0]);
+                        const entityName = _this.toValidTableName(file.name)+'_'+_this.toValidTableName(sheetName);
                         const columns = _this.generateCreateTable(headers, json);
-                        _this.importFromSheet(columns);
+                        _this.importFromSheet(columns, entityName);
                     }
+                };
+
+                if (workbook.SheetNames.length > 1) {
+                    let message = `
+                        <table class="two-side-table">
+                            <tbody>
+                                <tr>
+                                    <td>Sheet to Import</td>
+                                    <td>
+                                        <select id="sheet-index" class="form-control">
+                                            ${workbook.SheetNames.map((name, index) => 
+                                                `<option value="${index}">${index + 1}. ${name}</option>`
+                                            ).join('')}
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    _this.showConfirmationDialog(message, 'Select Sheet', 'OK', 'Cancel', function(isOk){
+                        if (isOk) {
+                            let sheetIndex = parseInt(document.querySelector('#sheet-index').value);
+                            selectSheetAndImport(sheetIndex);
+                        }
+                    });
+                } else {
+                    selectSheetAndImport(0);
                 }
-                
             } else {
                 alert("Unsupported file format: " + ext);
             }
@@ -2720,9 +2740,10 @@ class EntityEditor {
         if (ext === 'csv') {
             reader.readAsText(file); // for CSV
         } else {
-            reader.readAsArrayBuffer(file); // instead of deprecated readAsBinaryString
+            reader.readAsArrayBuffer(file); // for Excel
         }
     }
+
 
 
     /**
