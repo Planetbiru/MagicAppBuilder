@@ -1308,7 +1308,7 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 ## What's New
 
-### New Feature: Import Entities from XLSX and CSV
+### New Feature: Import Entities from Excel and CSV
 
 -   Added support for importing entity structures directly from `.xlsx`, `xls` and `.csv` files in the Entity Editor.
     
