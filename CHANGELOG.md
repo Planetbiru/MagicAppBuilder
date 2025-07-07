@@ -1310,10 +1310,12 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 ### New Feature: Import Entities from XLSX and CSV
 
--   Added support for importing entity structures directly from `.xlsx` and `.csv` files in the Entity Editor.
+-   Added support for importing entity structures directly from `.xlsx`, `xls` and `.csv` files in the Entity Editor.
     
 -   The import feature reads column headers and sample data to automatically infer table schema, including data types.
     
+-   When importing Excel files (`.xlsx` or `.xls`), users will be prompted to select the sheet they want to import before the entity structure is generated.
+
 
 #### Benefits:
 
