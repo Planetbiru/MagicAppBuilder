@@ -2667,14 +2667,38 @@ class EntityEditor {
             } else if (ext === 'xlsx' || ext === 'xls') {
                 const uint8Array = new Uint8Array(contents);
                 const workbook = XLSX.read(uint8Array, { type: "array" });
-                const sheetName = workbook.SheetNames[0];
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
+                
+                let message = `
+                <table class="two-side-table">
+                    <tbody>
+                        <tr>
+                            <td>Sheet to Import</td>
+                            <td>
+                                <select id="sheet-index" class="form-control">
+                                    ${workbook.SheetNames.map((name, index) => 
+                                        `<option value="${index}">${index + 1}. ${name}</option>`
+                                    ).join('')}
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                `;
+                _this.showConfirmationDialog(message, 'Select Sheet', 'OK', 'Cancel', function(isOk){
+                    if(isOk)
+                    {
+                        let sheetIndex = parseInt(document.querySelector('#sheet-index').value);
+                        const sheetName = workbook.SheetNames[sheetIndex];
+                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
 
-                if (json.length > 0) {
-                    const headers = Object.keys(json[0]);
-                    const columns = _this.generateCreateTable(headers, json);
-                    _this.importFromSheet(columns);
-                }
+                        if (json.length > 0) {
+                            const headers = Object.keys(json[0]);
+                            const columns = _this.generateCreateTable(headers, json);
+                            _this.importFromSheet(columns);
+                        }
+                    }
+                });
+                
             } else {
                 alert("Unsupported file format: " + ext);
             }

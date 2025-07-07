@@ -190,7 +190,7 @@ if(!isset($databaseName))
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
-                            <input class="import-file-sheet" type="file" accept=".xlsx,.csv" style="display: none;" />
+                            <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.csv" style="display: none;" />
                         </div>
 
                         <!-- Entity Editor Form -->
