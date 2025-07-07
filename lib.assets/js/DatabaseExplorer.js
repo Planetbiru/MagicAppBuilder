@@ -466,7 +466,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
         updateMarginLeft(delta > 0 ? -step : step);
     });
-
+    
+    document.querySelector('.add-data-entity').addEventListener('click', function(){
+       editor.addData(); 
+    });
+    
+    document.querySelector('.save-data-entity').addEventListener('click', function(){
+       editor.saveData(); 
+    });
 
     init();
 

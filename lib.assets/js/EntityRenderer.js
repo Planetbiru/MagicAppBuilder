@@ -219,10 +219,11 @@ class EntityRenderer {
         const headerRect = this.createSvgRect(1, 1, this.tableWidth - 2, 24, this.headerBackgroundColor);
         group.appendChild(headerRect);
 
-        const titleGroup = this.createSvgForeignText(10, 5, this.tableWidth - 80, 18, entity.name);
+        const titleGroup = this.createSvgForeignText(10, 5, this.tableWidth - 95, 18, entity.name);
         group.appendChild(titleGroup);
 
         const controlButtons = [
+            { icon: "📄", offset: 5, className: "view-data-icon" },
             { icon: "⬅️", offset: 4, className: "move-up-icon" },
             { icon: "➡️", offset: 3, className: "move-down-icon" },
             { icon: "✏️", offset: 2, className: "edit-icon" },

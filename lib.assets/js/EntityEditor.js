@@ -437,6 +437,7 @@ class Entity {
         this.index = index;
         this.name = name;
         this.columns = [];
+        this.data = [];
     }
 
     /**
@@ -455,6 +456,11 @@ class Entity {
      */
     removeColumn(index) {
         this.columns.splice(index, 1);
+    }
+    
+    setData(data)
+    {
+        this.data = data || [];
     }
 
     /**
@@ -602,7 +608,6 @@ class EntityEditor {
         this.callbackLoadTemplate = this.setting.callbackLoadTemplate;
         this.callbackSaveTemplate = this.setting.callbackSaveTemplate;
         this.callbackSaveConfig = this.setting.callbackSaveConfig;
- 
         this.defaultDataType = this.setting.defaultDataType + '';
         this.defaultDataLength = this.setting.defaultDataLength + '';
         this.primaryKeyDataType = this.setting.primaryKeyDataType + '';
@@ -621,6 +626,7 @@ class EntityEditor {
         this.dragSrcRow = null;
         this.tbody = null;
         this.operation = 'create';
+        this.currentEntityData = [];
     }
 
     /**
@@ -820,6 +826,9 @@ class EntityEditor {
     {
         let _this = this;
         entityRenderer.svg.addEventListener('click', function(e) {
+            if (e.target.closest('.erd-svg .view-data-icon')) {
+                _this.viewData(parseInt(e.target.dataset.index))
+            }
             if (e.target.closest('.erd-svg .move-down-icon')) {
                 _this.moveEntityUp(parseInt(e.target.dataset.index))
             }
@@ -1210,6 +1219,7 @@ class EntityEditor {
             // Add a new entity
             const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
+            newEntity.setData(this.snakeize(this.currentEntityData, columns));
             this.entities.push(newEntity);
         }
         this.renderEntities();
@@ -1486,7 +1496,9 @@ class EntityEditor {
                 
                 // Add the column to the entity
                 entity.addColumn(column);
+                
             });
+            entity.setData(entityData.data);
 
             // Add the entity to the entities array
             entities.push(entity);
@@ -1762,31 +1774,34 @@ class EntityEditor {
      */
     selectDiagram(li) {
         let diagramContainer = document.querySelector('.diagram-container');
+        let entities = [];
+        if(li)
+        {
+            // Remove active class from all diagram tabs
+            li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab) => {
+                tab.classList.remove('active');
+            });
 
-        // Remove active class from all diagram tabs
-        li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab) => {
-            tab.classList.remove('active');
-        });
+            // Remove active class from the "All Entities" tab
+            li.closest('ul').querySelector('li.all-entities').classList.remove('active');
 
-        // Remove active class from the "All Entities" tab
-        li.closest('ul').querySelector('li.all-entities').classList.remove('active');
+            // Remove active class from all diagram containers
+            diagramContainer.querySelectorAll('div.diagram').forEach((tab) => {
+                tab.classList.remove('active');
+            });
 
-        // Remove active class from all diagram containers
-        diagramContainer.querySelectorAll('div.diagram').forEach((tab) => {
-            tab.classList.remove('active');
-        });
+            // Activate the selected tab
+            li.classList.add('active');
 
-        // Activate the selected tab
-        li.classList.add('active');
+            // Get the selected diagram ID and activate the corresponding diagram
+            let selector = li.dataset.id;
+            let diagram = diagramContainer.querySelector('#' + selector);
+            diagram.classList.add('active');
 
-        // Get the selected diagram ID and activate the corresponding diagram
-        let selector = li.dataset.id;
-        let diagram = diagramContainer.querySelector('#' + selector);
-        diagram.classList.add('active');
-
-        // Retrieve associated entities for the selected diagram
-        let dataEntity = diagram.dataset.entities || '';
-        let entities = dataEntity.split(',');
+            // Retrieve associated entities for the selected diagram
+            let dataEntity = diagram.dataset.entities || '';
+            entities = dataEntity.split(',');
+        }
 
         // Update entity checkboxes based on selected diagram's entities
         document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2) => {
@@ -2108,6 +2123,10 @@ class EntityEditor {
     editEventListener(e)
     {
         let _this = this;
+        if (e.target.closest('.erd-svg .view-data-icon')) {
+            let index = parseInt(e.target.dataset.index);
+            _this.viewData(index);
+        }
         if (e.target.closest('.erd-svg .move-down-icon')) {
             let haystack = e.target.closest('.diagram-entity').dataset.entities;
             let needle = e.target.closest('.svg-entity').dataset.entity;
@@ -2174,6 +2193,12 @@ class EntityEditor {
         [array[index], array[newIndex]] = [array[newIndex], array[index]];
         
         return array.join(',');
+    }
+    
+    viewData(index)
+    {
+        this.currentEntityIndex = index;
+        this.showEntityDataDialog(this.entities[index], 'Entity Data', 'Close');
     }
 
     /**
@@ -2690,6 +2715,7 @@ class EntityEditor {
                 const entityName = _this.toValidTableName(file.name);
                 const columns = _this.generateCreateTable(headers, rows);
                 _this.importFromSheet(columns, entityName);
+                _this.currentEntityData = rows;
             } else if (ext === 'xlsx' || ext === 'xls') {
                 const uint8Array = new Uint8Array(contents);
                 const workbook = XLSX.read(uint8Array, { type: "array" });
@@ -2697,7 +2723,7 @@ class EntityEditor {
                 const selectSheetAndImport = (sheetIndex) => {
                     const sheetName = workbook.SheetNames[sheetIndex];
                     const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
-
+                    _this.currentEntityData = json;
                     if (json.length > 0) {
                         const headers = Object.keys(json[0]);
                         const entityName = _this.toValidTableName(file.name)+'_'+_this.toValidTableName(sheetName);
@@ -2744,7 +2770,35 @@ class EntityEditor {
         }
     }
 
+    /**
+     * Converts all keys in each row object to `snake_case`, but only includes keys that match column definitions.
+     *
+     * This function ensures that only columns defined in the `columns` array will be included in the result,
+     * and their keys will be converted to snake_case using the `cleanColumnName()` helper.
+     *
+     * @param {Array<Object>} rows - Array of data row objects with camelCase or PascalCase keys.
+     * @param {Array<Object>} columns - Array of column metadata, each with a `name` property.
+     * @returns {Array<Object>} A new array of objects with keys converted to snake_case.
+     */
+    snakeize(rows, columns) {
+        const columnNames = columns.map(col => col.name);
+        const result = [];
 
+        if (Array.isArray(rows)) {
+            for (const row of rows) {
+                const snakeRow = {};
+                for (const key of Object.keys(row)) {
+                    const snakeKey = this.cleanColumnName(key);
+                    if (columnNames.includes(snakeKey)) {
+                        snakeRow[snakeKey] = row[key];
+                    }
+                }
+                result.push(snakeRow);
+            }
+        }
+
+        return result;
+    }
 
     /**
      * Infers the most appropriate SQL data type from a sample array of values.
@@ -2807,10 +2861,7 @@ class EntityEditor {
         let _this = this;
 
         const cols = headers.map(header => {
-            const cleanName = header
-                .replace(/\s+/g, "_")
-                .replace(/[^\w]/g, "")
-                .toLowerCase();
+            const cleanName = _this.cleanColumnName(header)
 
             const values = rows.map(row => row[header]);
             const type = _this.guessType(values);
@@ -2819,6 +2870,14 @@ class EntityEditor {
         });
 
         return cols;
+    }
+    
+    cleanColumnName(header)
+    {
+        return header
+            .replace(/\s+/g, "_")
+            .replace(/[^\w]/g, "")
+            .toLowerCase();
     }
 
 
@@ -3142,6 +3201,200 @@ class EntityEditor {
         okBtn.addEventListener('click', handleOkConfig);
         cancelBtn.addEventListener('click', handleCancelConfig);
     }
+    
+    /**
+     * Displays a dialog showing editable tabular data for a given entity.
+     *
+     * @param {Object} entity - The entity metadata containing column definitions and data.
+     * @param {string} title - The title to be displayed on the modal dialog.
+     *
+     * @returns {void}
+     */
+    showEntityDataDialog(entity, title) {
+        const modal = document.querySelector('#entityDataEditorModal');
+        const modalHeader = modal.querySelector('.modal-header h3');
+        const modalBody = modal.querySelector('.modal-body');
+        const data = entity.data || [];
+
+        modalHeader.innerHTML = title || 'Entity Data';
+        modalBody.innerHTML = ''; // Clear previous content
+
+        // Create scrollable wrapper
+        const wrapper = document.createElement('div');
+        wrapper.style.overflow = 'auto';
+        wrapper.style.maxHeight = '400px';
+
+        // Create table
+        const table = document.createElement('table');
+        table.className = 'data-preview-table';
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+
+        // Create thead
+        const thead = document.createElement('thead');
+        const headRow = document.createElement('tr');
+
+        const emptyTh = document.createElement('th'); // For delete button column
+        emptyTh.classList.add('td-remover');
+        headRow.appendChild(emptyTh);
+
+        entity.columns.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col.name;
+            th.style.padding = '6px';
+            th.style.background = '#f8f8f8';
+            headRow.appendChild(th);
+        });
+
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        // Create tbody
+        const tbody = document.createElement('tbody');
+
+        data.forEach((row, rowIndex) => {
+            const tr = document.createElement('tr');
+
+            // Delete button column
+            const deleteTd = document.createElement('td');
+            deleteTd.classList.add('td-remover');
+            const deleteLink = document.createElement('a');
+            deleteLink.className = 'delete-row';
+            deleteLink.href = 'javascript:';
+            deleteLink.textContent = '❌';
+            
+            deleteTd.appendChild(deleteLink);
+            tr.appendChild(deleteTd);
+
+            entity.columns.forEach((col, colIndex) => {
+                const td = this.createEntityDataCell(rowIndex, colIndex, col, row[col.name] ?? '');
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+            
+            deleteLink.addEventListener('click', function(e){
+               e.preventDefault();
+               tbody.removeChild(tr);
+            });
+        });
+
+        table.appendChild(tbody);
+        wrapper.appendChild(table);
+        modalBody.appendChild(wrapper);
+
+        // Show modal
+        modal.style.display = 'block';
+    }
+    
+    /**
+     * Creates a <td> element containing an editable input for entity data.
+     *
+     * @param {number} rowIndex - The row index in the table.
+     * @param {number} colIndex - The column index in the table.
+     * @param {Object} col - Column definition object with at least `name` and `type` properties.
+     * @param {string} [value=""] - Optional value to prefill the input field.
+     * @returns {HTMLTableCellElement} The created <td> element.
+     */
+    createEntityDataCell(rowIndex, colIndex, col, value = "") {
+        const td = document.createElement('td');
+        const input = document.createElement('input');
+
+        input.type = 'text';
+        input.classList.add('entity-data-cell');
+        input.name = `cell-${rowIndex}-${colIndex}`;
+        input.dataset.row = rowIndex;
+        input.dataset.col = col.name;
+        input.dataset.type = col.type;
+        input.value = value ?? '';
+        input.style.width = '100%';
+        input.style.boxSizing = 'border-box';
+
+        td.appendChild(input);
+        return td;
+    }
+
+
+    /**
+     * Adds a new empty row to the editable entity data table.
+     * 
+     * @returns {void}
+     */
+    addData() {
+        const entity = this.entities[this.currentEntityIndex];
+        const modal = document.querySelector('#entityDataEditorModal');
+        const tableBody = modal.querySelector('.data-preview-table tbody');
+
+        if (!tableBody) return;
+
+        const rowIndex = tableBody.rows.length;
+        const row = document.createElement('tr');
+
+        // Kolom untuk tombol delete
+        const deleteTd = document.createElement('td');
+        deleteTd.classList.add('td-remover');
+        const deleteLink = document.createElement('a');
+        deleteLink.className = 'delete-row';
+        deleteLink.href = 'javascript:';
+        deleteLink.textContent = '❌';
+        deleteTd.appendChild(deleteLink);
+        row.appendChild(deleteTd);
+
+        // Tambahkan input sel berdasarkan kolom entity
+        entity.columns.forEach((col, colIndex) => {
+            const td = this.createEntityDataCell(rowIndex, colIndex, col, '');
+            row.appendChild(td);
+            deleteLink.addEventListener('click', function(e){
+               e.preventDefault();
+               tbody.removeChild(tr);
+            });
+        });
+
+        tableBody.appendChild(row);
+    }
+
+    
+    /**
+     * Saves the current editable data from the entity data table
+     * into the corresponding entity's data structure.
+     * 
+     * @returns {void}
+     */
+    saveData() {
+        const entity = this.entities[this.currentEntityIndex];
+        const modal = document.querySelector('#entityDataEditorModal');
+        const inputs = modal.querySelectorAll('.data-preview-table input');
+
+        const rowDataMap = {};
+
+        // Kelompokkan input berdasarkan baris
+        inputs.forEach(input => {
+            const row = input.dataset.row;
+            const col = input.dataset.col;
+
+            if (!rowDataMap[row]) {
+                rowDataMap[row] = {};
+            }
+
+            rowDataMap[row][col] = input.value;
+        });
+
+        // Konversi ke array
+        const newData = Object.keys(rowDataMap)
+            .sort((a, b) => parseInt(a) - parseInt(b))
+            .map(rowKey => rowDataMap[rowKey]);
+
+        // Update entity data
+        entity.data = newData;
+        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
+        modal.style.display = 'none';
+    }
+
+
 
 }
 

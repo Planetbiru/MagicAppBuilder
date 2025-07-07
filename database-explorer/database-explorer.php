@@ -330,6 +330,28 @@ if(!isset($databaseName))
             </div>
         </div>
     </div>
+    
+    <div class="modal modal-xl" id="entityDataEditorModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Entity Data Editor</h3>
+                <span class="close-btn cancel-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success add-data-entity">Add</button>
+                &nbsp;
+                <button class="btn btn-primary save-data-entity">Save</button>
+                &nbsp;
+                <button class="btn btn-secondary cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
 
     <div id="context-menu" class="context-menu context-menu-relation" style="display: none; position: absolute; z-index: 1000;">
         <ul>
