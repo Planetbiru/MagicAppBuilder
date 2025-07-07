@@ -1355,3 +1355,26 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 -   Developers can now preview and navigate full menu structures during development without needing to import menu data into the database.
     
+
+## Library Update: MagicObject 3.14.5
+
+### Enhancement: Flexible Nested Retrieval in `retrieve()` Method
+
+The `retrieve(...$keys)` method now supports multiple input formats for accessing nested object properties:
+
+- Dot notation: `$obj->retrieve('user.profile.name')`
+- Arrow notation: `$obj->retrieve('user->profile->name')`
+- Multiple arguments: `$obj->retrieve('user', 'profile', 'name')`
+
+Each key is automatically camelized for consistent property access.  
+If any key in the chain does not exist or returns `null`, the method will return `null`.
+
+This enhancement improves developer ergonomics when working with deeply nested data structures.
+
+### Improvement: `@TimeRange` Validation Now Supports Both `HH:MM` and `HH:MM:SS`
+
+- The `@TimeRange` validator now accepts time formats in either `HH:MM` or `HH:MM:SS`.
+- Input values are automatically normalized to `HH:MM:SS` before comparison.
+- Developers can now write annotations like `@TimeRange(min="08:00", max="17:00")` or `@TimeRange(min="08:00:00", max="17:00:00")` interchangeably.
+
+This improvement ensures more flexibility while maintaining precision down to the second.

@@ -1034,140 +1034,40 @@ class UserValidator extends MagicObject
 This enhancement makes the validator generator more expressive and future-proof, especially when building layered architectures or generating documentation automatically.
 
 
-# MagicObject Version 3.14.4
-
-## What's Fixed
-
-### Bug Fix: `numberFormat*` Methods Accept Single Parameter
-
-In version 3.14.4, a bug has been fixed in the internal magic method handling for `numberFormat*` methods (such as `numberFormatPercent`, `numberFormatTotal`, etc.).
-
-#### Previous Behavior (Before 3.14.4)
-
-Calling a `numberFormat*` method with **only one argument** would trigger warnings:
-
-```php
-$data = new MagicObject();
-$data->setPercent(2.123456);
-echo $data->numberFormatPercent(2);
-```
-
-**Result:**
-
-```txt
-Warning: Undefined index 1
-Warning: Undefined index 2
-```
-
-This occurred because the internal handler expected three parameters and did not check for their existence properly.
-
-#### New Behavior (Since 3.14.4)
-
-These methods now safely accept **a single argument**, defaulting the missing parameters to reasonable values internally. The example above now works as expected and outputs:
-
-```txt
-2.12
-```
-
-#### Benefits:
-
--   Improved developer experience when formatting numbers.
-    
--   No need to always pass three parameters for simple formatting.
-    
--   Prevents PHP warnings in production environments.
-
-This bug fix enhances robustness and backward compatibility for developers using dynamic number formatting features in MagicObject.
 
 
 # MagicObject Version 3.14.5
 
-## What's Changed
+## Improvements
 
-### New Feature: URL-Based Database Credential Parsing
+### Enhancement: Flexible Nested Retrieval in `retrieve()` Method
 
-MagicObject now supports importing database credentials from a **datasource URL** string using the new method `PicoDatabaseCredentials::importFromUrl()`.
+The `retrieve(...$keys)` method now supports multiple input formats for accessing nested object properties:
 
-This enhancement simplifies configuration and integration with environment-based or externalized connection settings (e.g., `DATABASE_URL`).
+- Dot notation: `$obj->retrieve('user.profile.name')`
+- Arrow notation: `$obj->retrieve('user->profile->name')`
+- Multiple arguments: `$obj->retrieve('user', 'profile', 'name')`
 
-#### Supported URL Format
+Each key is automatically camelized for consistent property access.  
+If any key in the chain does not exist or returns `null`, the method will return `null`.
 
-driver://username:password@host:port/database?schema=public&charset=utf8&timezone=Asia/Jakarta
+This enhancement improves developer ergonomics when working with deeply nested data structures.
 
+### Validation: New `@TimeRange` Annotation
 
-#### Example
+Added support for the `@TimeRange` validation annotation to validate time values within a specific range.
 
+**Usage Example:**
 ```php
-$credentials = new PicoDatabaseCredentials();
-$credentials->importFromUrl(
-    'mysql://user:secret@localhost:3306/myapp?schema=public&charset=utf8mb4&timezone=Asia/Jakarta'
-);
-```
+/**
+ * @TimeRange(min="08:00", max="17:00")
+ */
+public $attendanceIn;
+````
 
-#### Optional Override
+* Accepts time strings in `HH:MM` or `HH:MM:SS` format.
+* Ensures the value falls within the defined range (inclusive).
+* Useful for scheduling, availability windows, or working hours validation.
 
-Username and password can be passed directly to override the values in the URL:
+This new validation rule strengthens form-level data validation where time constraints are critical.
 
-```php
-$credentials->importFromUrl($url, 'realuser', 'realpass');
-```
-
-This is useful when credentials are stored separately from the connection string.
-
-#### Special Handling for SQLite
-
-When using sqlite:///path/to/database.db, the file path is automatically mapped to databaseFilePath instead of host/port.
-
-```php
-$url = 'sqlite:///path/to/database.db';
-$credentials->importFromUrl($url);
-```
-
-### Why It Matters
-
--   Makes deployment and configuration more flexible in containerized or cloud environments.
-
--   Simplifies integration with .env files, environment variables, or external secrets managers.
-
--   Supports both traditional and SQLite-based databases.
-
-### Backward Compatibility
-
-This update is fully backward-compatible and does not change any existing behavior unless the new method is used explicitly.
-
-
-### Bug Fix: Class-Typed Default Parameters Now Compatible with PHP 5
-
-Fixed a **fatal error** caused by the use of default parameters with a class type hint (`MagicObject`, `SecretObject`, `SetterGetter`, `MagicDto`) and non-null default values in the `validate()` method.
-
-#### Before (Problematic in PHP 5):
-
-```php
-public function validate(
-    $parentPropertyName = null,
-    $messageTemplate = null,
-    MagicObject $reference = null,
-    bool $validateIfReferenceEmpty = true // ❌ Causes error in PHP 5
-)
-```
-
-After (PHP 5 Compatible):
-
-```php
-public function validate(
-    $parentPropertyName = null,
-    $messageTemplate = null,
-    MagicObject $reference = null,
-    $validateIfReferenceEmpty = true // ✅ Compatible with PHP 5
-)
-```
-
-> This change ensures full compatibility with legacy environments running PHP 5, while maintaining functionality in modern PHP versions.
-
-### Backward Compatibility
-
--   This version is **fully backward-compatible**.
-    
--   No breaking changes were introduced.
-    
--   Existing codebases will continue to function as-is unless the new functionality is explicitly invoked.
