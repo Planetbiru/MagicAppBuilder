@@ -1392,3 +1392,26 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 * Adds flexibility while maintaining second-level precision.
 
+
+
+# MagicAppBuilder Version 1.10.1
+
+## What's Fixed
+
+### Bug Fix: Database Download Issue
+
+* Fixed an issue where downloading the database from MagicAppBuilder would fail or return incomplete data.
+
+#### Benefits:
+
+* Ensures reliable and consistent export of database contents for backup, migration, or inspection purposes.
+
+### Bug Fix: Permission Enforcement for Superuser
+
+* Improved permission handling to ensure that **only administrators with `superuser` level** can access MagicAppBuilder and all of its features.
+
+#### Benefits:
+
+* Prevents unauthorized access to core application builder tools.
+* Strengthens security in multi-role environments where admin access is scoped.
+
