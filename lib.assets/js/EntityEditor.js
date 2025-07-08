@@ -1683,7 +1683,8 @@ class EntityEditor {
     viewData(index)
     {
         this.currentEntityIndex = index;
-        this.showEntityDataDialog(this.entities[index], 'Entity Data', 'Close');
+        let entity = this.entities[index];
+        this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
     }
 
     /**
