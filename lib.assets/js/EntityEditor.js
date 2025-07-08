@@ -1,3 +1,55 @@
+const DIALECT_TYPE_MAP = {
+        mysql: {
+            int: 'INT',
+            bigint: 'BIGINT',
+            varchar: 'VARCHAR',
+            boolean: 'TINYINT(1)',
+            text: 'TEXT',
+            datetime: 'DATETIME',
+            timestamp: 'TIMESTAMP',
+            decimal: 'DECIMAL',
+            enum: 'ENUM',
+            set: 'SET',
+        },
+        postgresql: {
+            int: 'INTEGER',
+            bigint: 'BIGINT',
+            varchar: 'CHARACTER VARYING',
+            boolean: 'BOOLEAN',
+            tinyint1: 'BOOLEAN',
+            text: 'TEXT',
+            datetime: 'TIMESTAMP',
+            timestamp: 'TIMESTAMP',
+            decimal: 'NUMERIC',
+            enum: 'TEXT', // PostgreSQL doesn't support native ENUM in simple SQL
+            set: 'TEXT', // no native SET type
+        },
+        sqlite: {
+            int: 'INTEGER',
+            bigint: 'INTEGER',
+            varchar: 'NVARCHAR',
+            boolean: 'BOOLEAN',
+            tinyint1: 'BOOLEAN',
+            text: 'TEXT',
+            datetime: 'DATETIME',
+            timestamp: 'TIMESTAMP',
+            decimal: 'REAL',
+            enum: 'TEXT',
+            set: 'TEXT',
+        },
+        sqlserver: {
+            int: 'INT',
+            bigint: 'BIGINT',
+            varchar: 'NVARCHAR',
+            boolean: 'BIT',
+            tinyint1: 'BIT',
+            text: 'TEXT',
+            datetime: 'DATETIME',
+            decimal: 'DECIMAL',
+            enum: 'NVARCHAR',
+            set: 'NVARCHAR',
+        },
+    };
 /**
  * Represents a column in a database table.
  * 
@@ -31,6 +83,32 @@ class Column {
         this.autoIncrement = autoIncrement;
         this.values = values;
     }
+    
+    /**
+     * Normalizes SQL column type by removing length parameter for BOOLEAN types only.
+     *
+     * Examples:
+     * - BOOLEAN(1) → BOOLEAN
+     * - bool(1) → bool
+     * - VARCHAR(255) → VARCHAR(255) (unchanged)
+     *
+     * @param {string} type - The original SQL column type (may include parameters).
+     * @returns {string} - The cleaned column type.
+     */
+    fixColumnType(type) {
+        if (!type) return '';
+
+        const match = type.match(/^(\w+)\s*\((\d+)\)$/i);
+        if (match) {
+            const baseType = match[1].toLowerCase();
+            if (baseType === 'boolean' || baseType === 'bool') {
+                return baseType.toUpperCase(); // Normalize to uppercase if preferred
+            }
+        }
+
+        return type;
+    }
+
 
     /**
      * Converts the column definition into a valid SQL column definition string.
@@ -45,80 +123,70 @@ class Column {
      * 
      * @returns {string} The SQL column definition.
      */
-    toSQL() // NOSONAR
+    toSQL(dialect = 'mysql') // NOSONAR
     {
-        let withValueTypes = ['ENUM', 'SET'];
-        let withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
-        let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
-        let withLengthTypes = [
-            'VARCHAR', 'CHAR', 
-            'VARBINARY', 'BINARY',
-            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT',
-            'BIT'
-        ];
-
-        let columnDef = "";
+        let typeKey = this.type.toLowerCase();
+        if(typeKey == 'tinyint' && this.length == 1)
+        {
+            typeKey = 'tinyint1';
+        }
+        let typeMap = DIALECT_TYPE_MAP[dialect] || DIALECT_TYPE_MAP.mysql;
+        let mappedType = typeMap[typeKey] || this.type;
         
-        if (this.hasValue(withValueTypes)) 
-        {
-            // Handle ENUM and SET types
-            let enumList = this.values.split(',').map(val => `'${val.trim()}'`).join(', ');
-            columnDef = `${this.name} ${this.type}(${enumList})`;
-        }     
-        else if (this.hasRange(withRangeTypes)) 
-        {
-            // Handle range types like NUMERIC, DECIMAL, DOUBLE, FLOAT
-            let rangeList = this.values.split(',').map(val => val.trim());
+        mappedType = this.fixColumnType(mappedType);
 
-            // Filter only integer values, remove non-integer values
-            rangeList = rangeList.filter(val => Number.isInteger(parseFloat(val)));
+        const isEnumOrSet = ['enum', 'set'].includes(typeKey);
+        const isRangeType = ['numeric', 'decimal', 'double', 'float'].includes(typeKey);
+        const isLengthType = ['varchar', 'char', 'binary', 'varbinary', 'bit', 'tinyint', 'smallint', 'mediumint', 'int', 'bigint'].includes(typeKey);
 
-            // Join the valid integer values back into a range string
-            let rangeString = rangeList.join(', ');
+        let columnDef = `${this.name} ${mappedType}`;
 
-            // Set the column definition
-            if (rangeList.length < 2) {
-                // If no valid integer values are present, don't set a range
-                columnDef = `${this.name} ${this.type}`;
-            } else {
-                // If there are valid integer values, include the range in the column definition
-                columnDef = `${this.name} ${this.type}(${rangeString})`;
+        // ENUM/SET
+        if (isEnumOrSet && this.values) {
+            const enums = this.values.split(',').map(v => `'${v.trim()}'`).join(', ');
+            if (dialect === 'mysql') {
+                columnDef = `${this.name} ${mappedType}(${enums})`;
             }
-        } 
-        else if (this.hasLength(withLengthTypes)) 
-        {
-            // Handle types that support length, like VARCHAR, CHAR, etc.
-            columnDef = `${this.name} ${this.type}(${this.length})`;
         }
-        else
-        {
-            columnDef = `${this.name} ${this.type}`;
+        // Range types
+        else if (isRangeType && this.values) {
+            const range = this.values.split(',').map(v => v.trim()).filter(v => /^\d+$/.test(v)).join(', ');
+            if (range) columnDef += `(${range})`;
         }
-        
+        // Length types
+        else if (isLengthType && this.length) {
+            columnDef += `(${this.length})`;
+        }
+
+        // NOT NULL / NULL
         if (!this.primaryKey) {
-            // Nullable
-            columnDef += this.nullable ? " NULL" : " NOT NULL";
+            columnDef += this.nullable ? ' NULL' : ' NOT NULL';
         } else {
-            columnDef += " NOT NULL PRIMARY KEY";
+            columnDef += ' NOT NULL PRIMARY KEY';
         }
-        // Auto increment logic
+
+        // AUTO_INCREMENT
         if (this.autoIncrement) {
-            columnDef += " AUTO_INCREMENT";
+            if (dialect === 'mysql') columnDef += ' AUTO_INCREMENT';
+            else if (dialect === 'postgresql') columnDef = `${this.name} SERIAL PRIMARY KEY`;
+            else if (dialect === 'sqlite') columnDef += ' AUTOINCREMENT';
+            else if (dialect === 'sqlserver') columnDef += ' IDENTITY(1,1)';
         }
-        // Default value logic
+
+        // DEFAULT
         if (this.hasDefault()) {
-            if(this.isTypeBoolean(this.type, this.length)) {
-                columnDef += ` DEFAULT ${this.toBoolean(this.default)}`; // No quotes for boolean values
-            } else if(this.isTypeNumeric(this.type, numericTypes)) {
-                columnDef += ` DEFAULT ${this.toNumeric(this.default)}`; // No quotes for boolean values
-            } else if (numericTypes.includes(this.type) && !isNaN(this.default)) {
-                columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
+            if (this.isTypeBoolean(this.type, this.length)) {
+                columnDef += ` DEFAULT ${this.toBoolean(this.default)}`;
+            } else if (this.isTypeNumeric(this.type, Object.values(DIALECT_TYPE_MAP[dialect])) && !isNaN(this.default)) {
+                columnDef += ` DEFAULT ${this.default}`;
             } else {
-                columnDef += ` DEFAULT ${this.fixDefaultColumnValue(this.default)}`; // Default is a string, so use quotes
+                columnDef += ` DEFAULT ${this.fixDefaultColumnValue(this.default)}`;
             }
         }
+
         return columnDef;
     }
+
 
     /**
      * Converts a string with quotes into a numeric string without quotes.
@@ -470,12 +538,13 @@ class Entity {
     /**
      * Converts the entity (with its columns) into a valid SQL `CREATE TABLE` statement.
      * 
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
      * @returns {string} The SQL statement for creating the entity (table).
      */
-    toSQL() {
+    toSQL(dialect = "mysql") {
         let sql = `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
         this.columns.forEach(col => {
-            sql += `\t${col.toSQL()},\r\n`;
+            sql += `\t${col.toSQL(dialect)},\r\n`;
         });
         sql = sql.slice(0, -3); // Remove trailing comma
         sql += "\r\n);\r\n\r\n";
@@ -485,18 +554,23 @@ class Entity {
     /**
      * Generates a single SQL INSERT statement with multiple rows.
      *
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
      * @returns {string} SQL INSERT statement.
      */
-    toSQLInsert() {
+    toSQLInsert(dialect = "mysql") {
         if (!this.data || this.data.length === 0) return '';
 
         const columnNames = this.columns.map(col => col.name);
         const valuesList = this.data.map(row => {
-            return '(' + columnNames.map(name => this.formatValue(row[name])).join(', ') + ')';
+            return '(' + columnNames.map(name => {
+                const column = this.columns.find(col => col.name === name);
+                return this.formatValue(row[name], column, dialect);
+            }).join(', ') + ')';
         });
 
-        return `INSERT INTO ${this.name} (${columnNames.join(', ')}) VALUES\n${valuesList.join(',\n')};`+'\r\n';
+        return `INSERT INTO ${this.name} (${columnNames.join(', ')}) VALUES\n${valuesList.join(',\n')};\r\n`;
     }
+
 
     /**
      * Generates a single SQL INSERT statement for the given row.
@@ -512,24 +586,82 @@ class Entity {
     }
 
     /**
-     * Formats a value for SQL insertion, handling strings, nulls, and escaping.
+     * Formats a value for SQL insertion based on column type and SQL dialect.
      * 
      * @param {*} value - The value to format.
+     * @param {Column} column - The Column object associated with the value.
+     * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", "sql server".
      * @returns {string} SQL-safe representation of the value.
      */
-    formatValue(value) {
-        if (value === null || value === undefined) {
-            return 'NULL';
-        } else if (typeof value === 'number') {
-            return value.toString();
-        } else if (typeof value === 'boolean') {
-            return value ? '1' : '0';
-        } else {
-            // Escape single quotes by doubling them
-            const escaped = String(value).replace(/'/g, "''");
-            return `'${escaped}'`;
+    formatValue(value, column, dialect = 'mysql') {
+        const type = column.type.toLowerCase();
+        const length = column.length;
+        let formatted = 'null';
+
+        const isText = column.isTypeText(type);
+
+        const isNullLike = (
+            value === null ||
+            value === undefined ||
+            (typeof value === 'string' && value.trim() === '') ||
+            (!isText && String(value).toLowerCase() === 'null') // allow 'null' literal only if not text
+        );
+
+        if (isNullLike) {
+            return formatted;
         }
+
+        const isInteger = column.isTypeInteger(type);
+        const isFloat = column.isTypeFloat(type);
+        const isBoolean = column.isTypeBoolean(type, length);
+
+        if (isInteger || isFloat) {
+            formatted = value.toString();
+        } else if (isBoolean) {
+            formatted = this.formatBoolean(value, dialect);
+        } else {
+            formatted = this.quoteString(value); // all text types including 'null'
+        }
+
+        return formatted;
     }
+
+
+
+    /**
+     * Formats a boolean value for SQL based on the given dialect.
+     * 
+     * @param {*} value - The value to format as boolean.
+     * @param {string} dialect - The SQL dialect (e.g., 'postgresql').
+     * @returns {string} - Boolean value as SQL string.
+     */
+    formatBoolean(value, dialect) {
+        const truthy = ['1', 'true', 'yes'];
+        const falsy = ['0', 'false', 'no'];
+
+        const normalized = String(value).toLowerCase();
+
+        if (dialect === 'postgresql') {
+            if (truthy.includes(normalized)) return 'true';
+            if (falsy.includes(normalized)) return 'false';
+            return 'null';
+        }
+
+        return truthy.includes(normalized) ? '1' : '0';
+    }
+
+    /**
+     * Escapes and quotes a string value for SQL.
+     * 
+     * @param {string} value - The string value to escape and quote.
+     * @returns {string} - Escaped and quoted string.
+     */
+    quoteString(value) {
+        const escaped = String(value).replace(/'/g, "''");
+        return `'${escaped}'`;
+    }
+
+
 }
 
 function Diagram(name, sortOrder, originalEntities)
@@ -2513,8 +2645,10 @@ class EntityEditor {
 
     /**
      * Exports the selected entities as a MySQL SQL statement for creating the tables.
+     * 
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
      */
-    exportToSQL() {
+    exportToSQL(dialect = "mysql") {
         let sql = [];       
         
         const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");  
@@ -2522,7 +2656,7 @@ class EntityEditor {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
             if (entity) {
-                sql.push(entity.toSQL());
+                sql.push(entity.toSQL(dialect));
             }
         });
         
@@ -2531,7 +2665,7 @@ class EntityEditor {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
             if (entity) {
-                let query = entity.toSQLInsert();
+                let query = entity.toSQLInsert(dialect);
                 if(query != '')
                 {
                     sql.push(query);

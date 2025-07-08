@@ -188,7 +188,7 @@ if(!isset($databaseName))
                                 </tbody>
                             </table>
                             </div>
-                            <textarea class="query-generated" spellcheck="false" autocomplete="off"></textarea>
+                            <textarea class="query-generated" spellcheck="false" autocomplete="off" readonly></textarea>
                         </div>
                     </div>
                     
