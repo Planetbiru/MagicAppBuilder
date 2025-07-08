@@ -2,11 +2,15 @@
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-// Polyfill for PHP < 8.0
-if (!function_exists('str_starts_with')) {
-    function str_starts_with($haystack, $needle) {
-        return substr($haystack, 0, strlen($needle)) === $needle;
-    }
+require_once dirname(__DIR__) . "/inc.app/auth-core.php";
+
+if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
+{
+    exit(); // Bye non superuser
+}
+
+function startsWith($haystack, $needle) {
+    return substr($haystack, 0, strlen($needle)) === $needle;
 }
 
 $baseDirectory = realpath(dirname(__DIR__) . '/tmp/'); // Ensure real path
@@ -29,7 +33,7 @@ if(empty($downloadName))
 $filePath = realpath($baseDirectory . DIRECTORY_SEPARATOR . basename($fileName));
 
 // Validate the resolved path is within the base directory
-if ($filePath !== false && str_starts_with($filePath, $baseDirectory) && is_file($filePath)) {
+if ($filePath !== false && startsWith($filePath, $baseDirectory) && is_file($filePath)) {
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename="' . basename($downloadName) . '"');
     header('Content-Length: ' . filesize($filePath));
