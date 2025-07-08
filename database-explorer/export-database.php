@@ -6,11 +6,6 @@ use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
-{
-    exit(); // Bye non superuser
-}
-
 $inputPost = new InputPost();
 
 $batchSize = 100;
