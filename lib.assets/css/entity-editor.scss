@@ -472,27 +472,7 @@ body {
             }
         }
     }
-    .data-preview-table{
-        td
-        {
-            padding: 0 !important;
-            .entity-data-cell{
-                border: 1px solid transparent;
-                padding: 4px 6px;
-                display: block;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            .entity-data-cell:focus-visible{
-                outline: none;
-            }
-
-        }
-        .td-remover{
-            width: 20px;
-            text-align: center;
-        }
-    }
+    
 
 
 }
@@ -672,4 +652,24 @@ label {
     white-space: nowrap;
 }
 
+.data-preview-table{
+    td
+    {
+        padding: 0 !important;
+        .entity-data-cell{
+            border: 1px solid transparent;
+            padding: 4px 6px;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .entity-data-cell:focus-visible{
+            outline: none;
+        }
 
+    }
+    .td-remover{
+        width: 20px;
+        text-align: center;
+    }
+}
