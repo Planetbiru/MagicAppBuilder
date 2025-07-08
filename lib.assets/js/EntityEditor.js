@@ -119,30 +119,13 @@ class EntityEditor {
             
             if(allEntities)
             {
-                allEntities.forEach((entity, index) => {
+                allEntities.forEach(entity => {
                     entity.checked = checked;
                 })
             }       
             _this.exportToSQL();
         });
-        document.querySelector(".check-all-entity-data").addEventListener('change', (event) => {
-            let checked = event.target.checked;
-            let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-data");
-            
-            if(allEntities)
-            {
-                allEntities.forEach((entity, index) => {
-                    entity.checked = checked;
-                })
-            }
-            _this.exportToSQL();
-        });
         
-        document.querySelector(this.selector+" .right-panel .table-list-for-export").addEventListener('change', (event) => {
-            if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
-                this.exportToSQL();
-            }
-        });
         
         document.addEventListener('change', function (event) {
             
@@ -714,7 +697,7 @@ class EntityEditor {
     {
         let _this = this;
         let diagramContainer = document.querySelector('.diagram-container');
-        diagramContainer.querySelectorAll('.diagram-entity').forEach((diagram, index) => {
+        diagramContainer.querySelectorAll('.diagram-entity').forEach(diagram => {
             let id = diagram.getAttribute('id');
             let updatedWidth = diagram.closest('.left-panel').offsetWidth;
             let dataEntities = diagram.dataset.entities || '';
@@ -1126,16 +1109,23 @@ class EntityEditor {
         const container = document.querySelector(this.selector+" .entities-container");
 
         // Create an array to hold the names of selected entities
-        const selectedEntity = [];
+        const selectedEntityStructure = [];
+        const selectedEntityData = [];
 
         // Get all selected entity checkboxes (those that are checked)
-        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");
+        const selectedEntitiesStructure = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");
+        const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");
 
         // If there are selected checkboxes, add their data-name to the selectedEntity array
         
-        if (selectedEntities) {
-            selectedEntities.forEach(checkbox => {
-                selectedEntity.push(checkbox.dataset.name);
+        if (selectedEntitiesStructure) {
+            selectedEntitiesStructure.forEach(checkbox => {
+                selectedEntityStructure.push(checkbox.dataset.name);
+            });
+        }
+        if (selectedEntitiesData) {
+            selectedEntitiesData.forEach(checkbox => {
+                selectedEntityData.push(checkbox.dataset.name);
             });
         }
 
@@ -1194,16 +1184,24 @@ class EntityEditor {
 
         // Ensure that previously selected entities are checked
         
-        selectedEntity.forEach(value => {
+        selectedEntityStructure.forEach(value => {
             // Find the checkbox corresponding to the selected entity name
-            let cb = document.querySelector(`.right-panel input[data-name="${value}"]`);
+            let cb = document.querySelector(`.right-panel input[data-name="${value}"].selected-entity-structure`);
             if (cb) {
                 // Check the checkbox if found
                 cb.checked = true;
             }
         });
         
-
+        selectedEntityData.forEach(value => {
+            // Find the checkbox corresponding to the selected entity name
+            let cb = document.querySelector(`.right-panel input[data-name="${value}"].selected-entity-data`);
+            if (cb) {
+                // Check the checkbox if found
+                cb.checked = true;
+            }
+        });
+        
         // Calculate the updated width of the SVG container
         let updatedWidth = container.closest('.left-panel').offsetWidth;
 
@@ -1350,14 +1348,14 @@ class EntityEditor {
             }
         });
 
-        ul.querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+        ul.querySelectorAll('li.diagram-tab').forEach(tab => {
             tab.classList.remove('active');
         });
         newTab.classList.add('active');
 
         let diagramContainer = document.querySelector('.diagram-container');
 
-        diagramContainer.querySelectorAll('.diagram').forEach((tab, index) => {
+        diagramContainer.querySelectorAll('.diagram').forEach(tab => {
             tab.classList.remove('active');
         });
 
@@ -1951,7 +1949,7 @@ class EntityEditor {
         let sql = [];       
         
         const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");  
-        selectedEntities.forEach((checkbox, index) => {
+        selectedEntities.forEach(checkbox => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
             if (entity) {
@@ -1960,7 +1958,7 @@ class EntityEditor {
         });
         
         const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");  
-        selectedEntitiesData.forEach((checkbox, index) => {
+        selectedEntitiesData.forEach(checkbox => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
             if (entity) {
@@ -2598,7 +2596,7 @@ class EntityEditor {
     {
         let html = '';
         html += `<select name="${name}" onchange="editor.setDefaultLength(this, '${selectorLength}')">\r\n`;
-        this.mysqlDataTypes.forEach((type, index) => {
+        this.mysqlDataTypes.forEach(type => {
             html += `<option value="${type}">${type}</option>\r\n`;
         });
         html += `</select>`;

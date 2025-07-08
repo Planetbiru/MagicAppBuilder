@@ -190,6 +190,25 @@ function init() {
         }
     });
 
+    document.querySelector(".check-all-entity-data").addEventListener('change', (event) => {
+        let checked = event.target.checked;
+        let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-data");
+        
+        if(allEntities)
+        {
+            allEntities.forEach(entity => {
+                entity.checked = checked;
+            })
+        }
+        editor.exportToSQL();
+    });
+    
+    document.querySelector(".right-panel .table-list-for-export").addEventListener('change', (event) => {
+        if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
+            editor.exportToSQL();
+        }
+    });
+
     
 }
 
@@ -383,16 +402,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let li = e.target.parentNode;
         let diagramContainer = document.querySelector('.diagram-container');
 
-        li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+        li.closest('ul').querySelectorAll('li.diagram-tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        diagramContainer.querySelectorAll('.diagram').forEach((tab, index) => {
+        diagramContainer.querySelectorAll('.diagram').forEach(tab => {
             tab.classList.remove('active');
         });
         li.classList.add('active');
         let selector = 'all-entities';
         diagramContainer.querySelector('#'+selector).classList.add('active');
-        document.querySelector('.entity-editor .left-panel .table-list').querySelectorAll('li').forEach((li, index) => {
+        document.querySelector('.entity-editor .left-panel .table-list').querySelectorAll('li').forEach(li => {
             let input = li.querySelector('input[type="checkbox"]');
             input.checked = false;
             input.disabled = true;

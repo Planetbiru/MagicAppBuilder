@@ -21,6 +21,10 @@ class ResizablePanels {
         this.lastDownX = 0;
         this.localStorageKey = this.selector + 'leftPanelWidth';
         this.init();
+
+        this._boundHandleMouseMove = this.handleMouseMove.bind(this);
+        this._boundStopResizing = this.stopResizing.bind(this);
+
     }
 
     /**
@@ -40,8 +44,11 @@ class ResizablePanels {
      * @param {MouseEvent} e - The mouse move event.
      */
     handleMouseMove(e) {
-        if (this.isResizing) {
-            let offset = e.clientX - this.lastDownX; // Calculate the change in position
+       if (this.isResizing) {
+            let offset = e.clientX - this.lastDownX;
+            if (offset !== 0) {
+                this.hasResized = true; // Set flag jika ada pergerakan
+            }
             let leftPanelWidth = this.leftPanel.offsetWidth + offset;
 
             // Ensure the left panel's width is within the minWidth and max bounds
@@ -99,11 +106,13 @@ class ResizablePanels {
      */
     startResizing(e) {
         this.isResizing = true;
+        this.hasResized = false; // Reset flag
         this.lastDownX = e.clientX;
         this.disableSelection(this.leftPanel);
         this.disableSelection(this.rightPanel);
-        this.element.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        this.element.addEventListener('mouseup', () => this.stopResizing());
+
+        this.element.addEventListener('mousemove', this._boundHandleMouseMove);
+        this.element.addEventListener('mouseup', this._boundStopResizing);
     }
 
     /**
@@ -111,14 +120,18 @@ class ResizablePanels {
      */
     stopResizing() {
         this.isResizing = false;
-        this.element.removeEventListener('mousemove', (e) => this.handleMouseMove(e));
-        this.element.removeEventListener('mouseup', () => this.stopResizing());
 
-        editor.refreshEntities();
+        this.element.removeEventListener('mousemove', this._boundHandleMouseMove);
+        this.element.removeEventListener('mouseup', this._boundStopResizing);
+
+        if (this.hasResized) {
+            editor.refreshEntities();
+        }
 
         this.enableSelection(this.leftPanel);
         this.enableSelection(this.rightPanel);
     }
+
 
     /**
      * Resize the panels based on the saved width for the left panel.

@@ -1,20 +1,15 @@
 # Use the official PHP image with Apache
 FROM php:8.1-apache
 
-# Install required PHP extensions and utilities, including GD dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    libfreetype6-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libsqlite3-dev \
+# Install required PHP extensions and utilities
+RUN apt-get update && apt-get install -y \
     libzip-dev \
-    sqlite3 \
     unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) zip mysqli pdo pdo_mysql pdo_sqlite gd \
-    && a2enmod rewrite \
-    && rm -rf /var/lib/apt/lists/*
+    git \
+    sqlite3 \
+    libsqlite3-dev \
+    && docker-php-ext-install zip mysqli pdo pdo_mysql pdo_sqlite \
+    && a2enmod rewrite
 
 # Set the working directory
 WORKDIR /var/www/html
@@ -24,8 +19,10 @@ COPY . /var/www/html
 
 # Set permissions for the project files
 RUN chown -R www-data:www-data /var/www/html \
-    && find /var/www/html -type d -exec chmod 755 {} \; \
-    && find /var/www/html -type f -exec chmod 644 {} \;
+    && chmod -R 755 /var/www/html
+
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
 
 # Expose port 80
 EXPOSE 80

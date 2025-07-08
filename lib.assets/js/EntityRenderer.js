@@ -81,7 +81,7 @@ class EntityRenderer {
         let mod = 0; // Modulo to help with table wrapping
 
         // Loop through each entity (table) and create it
-        this.data.entities.forEach((entity, index) => {
+        this.data.entities.forEach(entity => {
             const tableGroup = this.createTable(entity, entity.index, xPos, yPos);
             this.tables[entity.name] = { 
                 table: tableGroup, 
