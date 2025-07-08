@@ -89,15 +89,17 @@ foreach($entities as $tableName=>$entityObjects) // Renamed $entity to $entityOb
         }
     }           
 }
-
-if($errors == 0)
+if(basename(__FILE__) == basename($_SERVER['PHP_SELF']))
 {
-    header('Content-Type: application/json');
-    echo json_encode(['success'=>true]);
-}
-else
-{
-    http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode(['success'=>false]);
+    if($errors == 0)
+    {
+        header('Content-Type: application/json');
+        echo json_encode(['success'=>true]);
+    }
+    else
+    {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['success'=>false]);
+    }
 }
