@@ -89,7 +89,6 @@ function init() {
     let importFromEntityButton = document.querySelector('.import-from-entity');
     let clearButton  = document.querySelector(".clear");
     let original = document.querySelector('.original');
-    let queryGenerated = document.querySelector('.query-generated');
     let query = document.querySelector('[name="query"]');
     let deleteCells = document.querySelectorAll('.cell-delete a');
 
@@ -207,7 +206,41 @@ function init() {
         if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
             editor.exportToSQL();
         }
+
+        if (event.target.classList.contains('export-structure-system')) {
+            let seletion = document.querySelectorAll('.entity-structure-system');
+            seletion.forEach(checkbox => {
+                checkbox.checked = event.target.checked;
+            });
+            editor.exportToSQL();
+        }
+
+        if (event.target.classList.contains('export-structure-custom')) {
+            let seletion = document.querySelectorAll('.entity-structure-custom');
+            seletion.forEach(checkbox => {
+                checkbox.checked = event.target.checked;
+            });
+            editor.exportToSQL();
+        }
+
+        if (event.target.classList.contains('export-structure-system')) {
+            let seletion = document.querySelectorAll('.entity-structure-system');
+            seletion.forEach(checkbox => {
+                checkbox.checked = event.target.checked;
+            });
+            editor.exportToSQL();
+        }
+
+        if (event.target.classList.contains('export-data-system')) {
+            let seletion = document.querySelectorAll('.entity-data-system');
+            seletion.forEach(checkbox => {
+                checkbox.checked = event.target.checked;
+            });
+            editor.exportToSQL();
+        }
     });
+
+    
 
     
 }

@@ -1,8 +1,6 @@
 <?php
 
 use AppBuilder\AppDatabase;
-use DatabaseExplorer\ConstantText;
-use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -42,7 +40,7 @@ $selected =' selected';
     </select>
 </div>
 
-<table width="100%" border="1" class="table-export-database">
+<table width="100%" border="1" class="table-export-database sql-table-export">
     <thead>
         <tr>
             <td width="20">No</td>

@@ -91,6 +91,23 @@ class EntityEditor {
         this.tbody = null;
         this.operation = 'create';
         this.currentEntityData = [];
+
+        this.systemEntities = [
+            'admin',
+            'admin_level',
+            'admin_profile',
+            'admin_role',
+            'menu_cache',
+            'menu_group_translation',
+            'menu_translation',
+            'message',
+            'message_folder',
+            'module',
+            'module_group',
+            'notification',
+            'user_activity',
+            'user_password_history',
+        ];
     }
 
     /**
@@ -1095,126 +1112,136 @@ class EntityEditor {
 
     /**
      * Renders the entities to the DOM.
-     * This method updates the UI by rendering a list of entities as checkboxes,
-     * allowing users to select or deselect entities. It also ensures that previously
-     * selected entities are checked when the list is re-rendered.
      * 
-     * The method also updates the width of the ERD (Entity-Relationship Diagram) based on 
-     * the available space in the container and re-renders the ERD with the updated width.
+     * This method updates the UI by rendering two sections:
+     * - Build table checkboxes grouped into "Custom Entities" and "System Entities".
+     * - Table editor list (with edit/delete) shown as a flat list.
+     * 
+     * Previously selected checkboxes will be preserved. This function also recalculates
+     * the Entity Relationship Diagram (ERD) width and triggers a re-render.
      * 
      * @returns {void}
      */
     renderEntities() {
-        // Get the container element for the entities
-        const container = document.querySelector(this.selector+" .entities-container");
+        let _this = this;
 
-        // Create an array to hold the names of selected entities
+        const container = document.querySelector(this.selector + " .entities-container");
         const selectedEntityStructure = [];
         const selectedEntityData = [];
 
-        // Get all selected entity checkboxes (those that are checked)
-        const selectedEntitiesStructure = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");
-        const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");
+        const selectedEntitiesStructure = document.querySelectorAll(this.selector + " .right-panel .selected-entity-structure:checked");
+        const selectedEntitiesData = document.querySelectorAll(this.selector + " .right-panel .selected-entity-data:checked");
 
-        // If there are selected checkboxes, add their data-name to the selectedEntity array
-        
-        if (selectedEntitiesStructure) {
-            selectedEntitiesStructure.forEach(checkbox => {
-                selectedEntityStructure.push(checkbox.dataset.name);
-            });
-        }
-        if (selectedEntitiesData) {
-            selectedEntitiesData.forEach(checkbox => {
-                selectedEntityData.push(checkbox.dataset.name);
-            });
-        }
+        selectedEntitiesStructure.forEach(checkbox => selectedEntityStructure.push(checkbox.dataset.name));
+        selectedEntitiesData.forEach(checkbox => selectedEntityData.push(checkbox.dataset.name));
 
-        // Get the list element where the entities will be rendered
-        const tabelListForExport = document.querySelector(this.selector+" .table-list-for-export");
-        const tabelListMain = document.querySelector(this.selector+" .left-panel .table-list");
-        let drawRelationship = document.querySelector(this.selector+" .draw-relationship").checked;
+        const tabelListForExport = document.querySelector(this.selector + " .table-list-for-export");
+        const tabelListMain = document.querySelector(this.selector + " .left-panel .table-list");
+        let drawRelationship = document.querySelector(this.selector + " .draw-relationship").checked;
 
-
-        // Clear any existing content in the table list
         tabelListMain.innerHTML = '';
         tabelListForExport.innerHTML = '';
 
-        // Iterate over the entities and create a checkbox for each entity
+
+        // Custom Entity Separator
+        if (this.entities.some(e => !_this.systemEntities.includes(e.name.toLowerCase()))) {
+            const sep = document.createElement('tr');
+            sep.classList.add('group-header');
+            sep.innerHTML = `<td>
+                    <label><input type="checkbox" class="export-structure-custom" /> S</label>
+                </td>
+                <td>
+                    <label><input type="checkbox" class="export-data-custom"/> D</label>
+                </td>
+                <td>[Custom Entities]</td>`;
+            tabelListForExport.appendChild(sep);
+        }
+
+        // Custom Entities First
         this.entities.forEach((entity, index) => {
-            // Create a new list item for each entity
-            let entityCbForExport = document.createElement('tr');
-            entityCbForExport.innerHTML = `
-            <td>
-                <label><input type="checkbox" class="selected-entity-structure" data-name="${entity.name}" value="${index}" /> S</label>
-            </td>
-            <td>
-                <label><input type="checkbox" class="selected-entity-data" data-name="${entity.name}" value="${index}" /> D</label>
-            </td>
-            <td>
-            ${entity.name}
-            </td>
-            `;
-            
+            if (!_this.systemEntities.includes(entity.name.toLowerCase())) {
+                _this.appendBuildTableRow(tabelListForExport, entity, index, "custom");
+            }
+        });
+
+        // System Entity Separator
+        if (this.entities.some(e => _this.systemEntities.includes(e.name.toLowerCase()))) {
+            const sep = document.createElement('tr');
+            sep.classList.add('group-header');
+            sep.innerHTML = `<td>
+                    <label><input type="checkbox" class="export-structure-system" /> S</label>
+                </td>
+                <td>
+                    <label><input type="checkbox" class="export-data-system"/> D</label>
+                </td>
+                <td>[Systen Entities]</td>`;
+            tabelListForExport.appendChild(sep);
+        }
+
+        // System Entities After
+        this.entities.forEach((entity, index) => {
+            if (_this.systemEntities.includes(entity.name.toLowerCase())) {
+                _this.appendBuildTableRow(tabelListForExport, entity, index, "system");
+            }
+        });
+
+        // Table Editor List (flat list)
+        this.entities.forEach((entity, index) => {
             let entityCbMain = document.createElement('li');
-            
-
-            entityCbMain.innerHTML = `<input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" 
-            /><a class="edit-table" href="javascript:">✏️</a><a class="delete-table" href="javascript:">❌</a> ${entity.name}`
-            
-            // Append the created list item to the table list   
-
+            entityCbMain.innerHTML = `
+                <input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />
+                <a class="edit-table" href="javascript:">✏️</a>
+                <a class="delete-table" href="javascript:">❌</a> ${entity.name}
+            `;
             entityCbMain.setAttribute('data-index', index);
             entityCbMain.setAttribute('title', entity.name);
             tabelListMain.appendChild(entityCbMain);
 
-            entityCbMain.querySelector('a.edit-table').addEventListener('click', function(e){
-                editor.editEntity(parseInt(e.target.parentNode.dataset.index))
+            entityCbMain.querySelector('a.edit-table').addEventListener('click', e => {
+                editor.editEntity(parseInt(e.target.parentNode.dataset.index));
             });
-            entityCbMain.querySelector('a.delete-table').addEventListener('click', function(e){
-                editor.deleteEntity(parseInt(e.target.parentNode.dataset.index))
+            entityCbMain.querySelector('a.delete-table').addEventListener('click', e => {
+                editor.deleteEntity(parseInt(e.target.parentNode.dataset.index));
             });
-
-
-            tabelListForExport.appendChild(entityCbForExport);
         });
-        
-        let count = this.entities.length;
-        let countStr = count > 0 ? `(${count})` : ``;
-        document.querySelector(this.selector + " .entity-count").textContent = countStr;
 
-        // Ensure that previously selected entities are checked
-        
-        selectedEntityStructure.forEach(value => {
-            // Find the checkbox corresponding to the selected entity name
-            let cb = document.querySelector(`.right-panel input[data-name="${value}"].selected-entity-structure`);
-            if (cb) {
-                // Check the checkbox if found
-                cb.checked = true;
-            }
+        // Update entity count
+        const count = this.entities.length;
+        document.querySelector(this.selector + " .entity-count").textContent = count > 0 ? `(${count})` : ``;
+
+        // Restore previously selected checkboxes
+        selectedEntityStructure.forEach(name => {
+            const cb = document.querySelector(`.right-panel input[data-name="${name}"].selected-entity-structure`);
+            if (cb) cb.checked = true;
         });
-        
-        selectedEntityData.forEach(value => {
-            // Find the checkbox corresponding to the selected entity name
-            let cb = document.querySelector(`.right-panel input[data-name="${value}"].selected-entity-data`);
-            if (cb) {
-                // Check the checkbox if found
-                cb.checked = true;
-            }
+        selectedEntityData.forEach(name => {
+            const cb = document.querySelector(`.right-panel input[data-name="${name}"].selected-entity-data`);
+            if (cb) cb.checked = true;
         });
-        
-        // Calculate the updated width of the SVG container
+
+        // Resize and redraw ERD
         let updatedWidth = container.closest('.left-panel').offsetWidth;
-
-        // If the width is 0 (meaning it's not set), fallback to the left panel width
-        if (updatedWidth == 0) {
+        if (updatedWidth === 0) {
             updatedWidth = resizablePanels.getLeftPanelWidth();
         }
-        
         updatedWidth = updatedWidth - 200;
-
-        // Re-render the ERD with the updated width (subtracting 40 for padding/margin)
         entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
     }
+
+    appendBuildTableRow(tabelListForExport, entity, index, group) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <label><input type="checkbox" class="selected-entity-structure entity-structure-${group}" data-name="${entity.name}" value="${index}" /> S</label>
+            </td>
+            <td>
+                <label><input type="checkbox" class="selected-entity-data entity-data-${group}" data-name="${entity.name}" value="${index}" /> D</label>
+            </td>
+            <td>${entity.name}</td>
+        `;
+        tabelListForExport.appendChild(row);
+    }
+    
     
     /**
      * Refreshes the entities by re-rendering and restoring checked entities.
@@ -1773,29 +1800,14 @@ class EntityEditor {
      * Both groups are then sorted alphabetically by their 'name' property.
      */
     sortAndGroupEntities() {
-        const systemEntities = [
-            'admin',
-            'admin_level',
-            'admin_profile',
-            'admin_role',
-            'menu_cache',
-            'menu_group_translation',
-            'menu_translation',
-            'message',
-            'message_folder',
-            'module',
-            'module_group',
-            'notification',
-            'user_activity',
-            'user_password_history',
-        ];
+        let _this = this;
 
         // Separate entities into system and custom groups
         let customGroup = [];
         let systemGroup = [];
 
         this.entities.forEach(entity => {
-            if (systemEntities.includes(entity.name)) {
+            if (_this.systemEntities.includes(entity.name)) {
                 systemGroup.push(entity);
             } else {
                 customGroup.push(entity);
