@@ -16,7 +16,8 @@ let tableIndex = 0;
 let maxTableIndex = 0;
 let exportConfig = {};
 let exportTableList = [];
-let exportFileName = '';
+let fileName = '';
+let downloadName = '';
 let timeoutDownload = setTimeout('', 100);
 let isExporting = false;
 
@@ -94,68 +95,92 @@ function init() {
 
     initTableScrollPosition();
 
-    openModalQuertTranslatorButton.onclick = function() {
-        modalQueryTranslator.style.display = "block";
-        original.focus();
-    };
-
-    openModalEntityEditorButton.onclick = function() {
-        modalEntityEditor.style.display = "block";
-        resizablePanels.loadPanelWidth();
-        editor.updateDiagram();
-
-    };
-    
-    closeModalButton.forEach(function(cancelButton) {
-        cancelButton.onclick = function(e) {
-            e.target.closest('.modal').style.display = "none";
-        }
-    });
-    
-    clearButton.onclick = function() {
-        original.value = "";
-    };
-    
-    translateButton.onclick = function()
+    if(openModalQuertTranslatorButton)
     {
-        let sql = original.value;
-        let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        let converted = converter.translate(sql, type);
-        document.querySelector('[name="query"]').value = converted;
-        modalQueryTranslator.style.display = "none";
-    };
+        openModalQuertTranslatorButton.onclick = function() {
+            modalQueryTranslator.style.display = "block";
+            original.focus();
+        };
+    }
 
-    openFileButton.onclick = function()
+    if(openModalEntityEditorButton)
     {
-        document.querySelector('.structure-sql').click();
+        openModalEntityEditorButton.onclick = function() {
+            modalEntityEditor.style.display = "block";
+            resizablePanels.loadPanelWidth();
+            editor.updateDiagram();
+
+        };
     }
     
-    importFromEntityButton.onclick = function()
+    if(closeModalButton)
     {
-        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');        
-        let sql = editor.generateSQL(dialect);
-        document.querySelector('[name="query"]').value = sql.join("\r\n");
-        modalEntityEditor.style.display = "none";
-    };
-
-    deleteCells.forEach(function(cell) {
-        cell.addEventListener('click', function(event) {
-            event.preventDefault();
-            let schema = event.target.getAttribute('data-schema');
-            let table = event.target.getAttribute('data-table');
-            let primaryKey = event.target.getAttribute('data-primary-key');
-            let value = event.target.getAttribute('data-value');
-            let queryString = "";
-            let tableName = schema != "" ? `${schema}.${table}` : table;
-            queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}';\r\n`;
-            let originalQuery = query.value;
-            if(originalQuery.startsWith('DELETE FROM '))
-            {
-                queryString = query.value + queryString;
+        closeModalButton.forEach(function(cancelButton) {
+            cancelButton.onclick = function(e) {
+                e.target.closest('.modal').style.display = "none";
             }
-            query.value = queryString;
         });
-    });
+    }
+
+    if(clearButton)
+    {
+        clearButton.onclick = function() {
+            original.value = "";
+        };
+    }
+    
+    if(translateButton)
+    {
+        translateButton.onclick = function()
+        {
+            let sql = original.value;
+            let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
+            let converted = converter.translate(sql, type);
+            document.querySelector('[name="query"]').value = converted;
+            modalQueryTranslator.style.display = "none";
+        };
+    }
+
+    if(openFileButton)
+    {
+        openFileButton.onclick = function()
+        {
+            document.querySelector('.structure-sql').click();
+        }
+    }
+    
+    if(importFromEntityButton)
+    {
+        importFromEntityButton.onclick = function()
+        {
+            let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');        
+            let sql = editor.generateSQL(dialect);
+            document.querySelector('[name="query"]').value = sql.join("\r\n");
+            modalEntityEditor.style.display = "none";
+        };
+    }
+
+    if(deleteCells && deleteCells.length > 0)
+    {
+        deleteCells.forEach(function(cell) {
+            cell.addEventListener('click', function(event) {
+                event.preventDefault();
+                let schema = event.target.getAttribute('data-schema');
+                let table = event.target.getAttribute('data-table');
+                let primaryKey = event.target.getAttribute('data-primary-key');
+                let value = event.target.getAttribute('data-value');
+                let queryString = "";
+                let tableName = schema != "" ? `${schema}.${table}` : table;
+                queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}';\r\n`;
+                let originalQuery = query.value;
+                if(originalQuery.startsWith('DELETE FROM '))
+                {
+                    queryString = query.value + queryString;
+                }
+                query.value = queryString;
+            });
+        });
+    }
 
     window.onclick = function(event) {
         if (event.target == modalQueryTranslator) {
@@ -548,12 +573,12 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {string} selector - A CSS selector targeting the HTML element(s) 
  *                            to export data from (e.g., a table row).
  */
-function startExportDatabase(selector, onFinish)
+function startExportDatabase(selector, onFinishCallback)
 {
     if (!isExporting)
     {
         isExporting = true;
-        exportDatabase(selector, onFinish);
+        exportDatabase(selector, onFinishCallback);
     }
 }
 
@@ -577,7 +602,15 @@ function exportDatabase(selector, onFinish) {
     tableIndex = 0;
     
     // Generate a timestamped export filename
-    exportFileName = (new Date()).getTime() + '.sql';
+    fileName = (new Date()).getTime() + '.sql';
+    if(applicationId != '')
+    {
+        downloadName = applicationId + "-" + fileName;
+    }
+    else
+    {
+        downloadName = "magicappbuilder-" + fileName;
+    }
 
     // Collect selected tables with structure/data checkboxes
     $(selector).find('tbody').find('tr').each(function () {
@@ -628,7 +661,7 @@ function exportTable(selector, onFinish) {
         // redirecting the current page.
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none'; // Make the iframe invisible
-        iframe.src = 'export-download.php?fileName=' + encodeURIComponent(exportFileName);
+        iframe.src = 'export-download.php?fileName=' + encodeURIComponent(fileName) + '&downloadName=' + encodeURIComponent(downloadName);
         document.body.appendChild(iframe); // Append the iframe to the document body
 
         // Remove the iframe after a short delay to clean up the DOM.
@@ -658,7 +691,7 @@ function exportTable(selector, onFinish) {
                 tableName: currentTable.tableName,
                 includeStructure: currentTable.structure ? 1 : 0, // Convert boolean to 1 or 0
                 includeData: currentTable.data ? 1 : 0,           // Convert boolean to 1 or 0
-                fileName: exportFileName,
+                fileName: fileName,
                 targetDatabaseType: targetDatabaseType
             },
             dataType: 'json', // Expecting a JSON response from the server
@@ -1094,30 +1127,33 @@ function sendTemplateToServer(applicationId, databaseType, databaseName, databas
  */
 function fetchTemplateFromServer(applicationId, databaseType, databaseName, databaseSchema, template, callback) {
     
-    const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
-    const url = buildUrl('template', applicationId, databaseType, databaseName, databaseSchema, '');
-    // Construct the URL with query parameters
+    if(applicationId != '')
+    {
+        const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
+        const url = buildUrl('template', applicationId, databaseType, databaseName, databaseSchema, '');
+        // Construct the URL with query parameters
 
-    xhr.open('GET', url, true); // Open a GET connection to the server
-    // Handle the server response
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {  // Check if the request is complete
-            if (xhr.status === 200) {  // Check if the response is successful (status 200)
-                const response = xhr.responseText;  // Get the response from the server
-                try {
-                    const parsedData = JSON.parse(response);  // Try to parse the JSON response
-                    editor.template = editor.createTemplateFromJSON(parsedData); // Insert the received data into editor.entities
-                } catch (err) {
-                    console.error(err)
+        xhr.open('GET', url, true); // Open a GET connection to the server
+        // Handle the server response
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {  // Check if the request is complete
+                if (xhr.status === 200) {  // Check if the response is successful (status 200)
+                    const response = xhr.responseText;  // Get the response from the server
+                    try {
+                        const parsedData = JSON.parse(response);  // Try to parse the JSON response
+                        editor.template = editor.createTemplateFromJSON(parsedData); // Insert the received data into editor.entities
+                    } catch (err) {
+                        console.error(err)
+                    }
+                } else {
+                    console.error('An error occurred while fetching data from the server. Status:', xhr.status); // Log error if status is not 200
                 }
-            } else {
-                console.error('An error occurred while fetching data from the server. Status:', xhr.status); // Log error if status is not 200
             }
-        }
-    };
+        };
 
-    // Send the GET request to the server
-    xhr.send();
+        // Send the GET request to the server
+        xhr.send();
+    }
 }
 
 
