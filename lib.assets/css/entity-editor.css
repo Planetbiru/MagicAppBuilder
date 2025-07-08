@@ -377,23 +377,6 @@ body {
   margin-left: 0;
   margin-right: 0px;
 }
-.entity-editor .data-preview-table td {
-  padding: 0 !important;
-}
-.entity-editor .data-preview-table td .entity-data-cell {
-  border: 1px solid transparent;
-  padding: 4px 6px;
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-}
-.entity-editor .data-preview-table td .entity-data-cell:focus-visible {
-  outline: none;
-}
-.entity-editor .data-preview-table .td-remover {
-  width: 20px;
-  text-align: center;
-}
 
 .entity-name {
   width: 200px;
@@ -544,4 +527,22 @@ body {
 
 label {
   white-space: nowrap;
+}
+
+.data-preview-table td {
+  padding: 0 !important;
+}
+.data-preview-table td .entity-data-cell {
+  border: 1px solid transparent;
+  padding: 4px 6px;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+.data-preview-table td .entity-data-cell:focus-visible {
+  outline: none;
+}
+.data-preview-table .td-remover {
+  width: 20px;
+  text-align: center;
 }/*# sourceMappingURL=entity-editor.css.map */
