@@ -444,6 +444,57 @@ body {
             line-height: 1.5;
         }
     }
+    
+        
+    .table-export-sql-container{
+        height: 120px;
+        overflow: auto;
+        margin-bottom: 10px;
+        table
+        {
+            thead
+            {
+                tr{
+                    th:nth-child(1), th:nth-child(2),
+                    td:nth-child(1), td:nth-child(2)
+                    {
+                        width: 16px;
+                        text-align: center;
+                    }
+                }
+            }
+            th, td{
+                input[type="checkbox"] {
+                    margin-left: 0;
+                    margin-right: 0px;
+                }
+                font-size: 12px;
+            }
+        }
+    }
+    .data-preview-table{
+        td
+        {
+            padding: 0 !important;
+            .entity-data-cell{
+                border: 1px solid transparent;
+                padding: 4px 6px;
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .entity-data-cell:focus-visible{
+                outline: none;
+            }
+
+        }
+        .td-remover{
+            width: 20px;
+            text-align: center;
+        }
+    }
+
+
 }
 
 .entity-name {
@@ -620,3 +671,5 @@ body {
 label {
     white-space: nowrap;
 }
+
+

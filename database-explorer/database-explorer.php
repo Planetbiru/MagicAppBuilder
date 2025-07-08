@@ -32,6 +32,9 @@ if(!isset($databaseName))
     <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.min.js"></script>
     <script src="../lib.assets/js/TableParser.min.js"></script>
     <script src="../lib.assets/js/SQLConverter.min.js"></script>
+    <script src="../lib.assets/js/Column.min.js"></script>
+    <script src="../lib.assets/js/Entity.min.js"></script>
+    <script src="../lib.assets/js/Diagram.min.js"></script>
     <script src="../lib.assets/js/EntityEditor.min.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
@@ -168,9 +171,27 @@ if(!isset($databaseName))
                         </div>
                         <div class="resize-bar"></div>
                         <div class="right-panel">
-                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all <span class="entity-count"></span></label></div>
-                            <ul class="table-list-for-export"></ul>
-                            <textarea class="query-generated" spellcheck="false" autocomplete="off"></textarea>
+                            <div class="table-export-sql-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>
+                                            <label><input type="checkbox" class="check-all-entity-structure"> S</label> 
+                                        </td>
+                                        <td>
+                                            <label><input type="checkbox" class="check-all-entity-data"> D</label>
+                                        </td>
+                                        <td>
+                                            Entity Name <span class="entity-count"></span>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-list-for-export">
+                                    <!-- data -->
+                                </tbody>
+                            </table>
+                            </div>
+                            <textarea class="query-generated" spellcheck="false" autocomplete="off" readonly></textarea>
                         </div>
                     </div>
                     
@@ -330,6 +351,28 @@ if(!isset($databaseName))
             </div>
         </div>
     </div>
+    
+    <div class="modal modal-xl" id="entityDataEditorModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Entity Data Editor</h3>
+                <span class="close-btn cancel-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success add-data-entity">Add</button>
+                &nbsp;
+                <button class="btn btn-primary save-data-entity">Save</button>
+                &nbsp;
+                <button class="btn btn-secondary cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
 
     <div id="context-menu" class="context-menu context-menu-relation" style="display: none; position: absolute; z-index: 1000;">
         <ul>

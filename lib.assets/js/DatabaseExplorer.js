@@ -133,18 +133,9 @@ function init() {
     
     importFromEntityButton.onclick = function()
     {
-        let sql = queryGenerated.value;
-        let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        let converted = '';
-        if(type.toLowerCase() != 'mysql' && type.toLowerCase() != 'mariadb')
-        {
-            converted = converter.translate(sql, type);
-        }
-        else
-        {
-            converted = sql;
-        }
-        document.querySelector('[name="query"]').value = converted;
+        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');        
+        let sql = editor.generateSQL(dialect);
+        document.querySelector('[name="query"]').value = sql.join("\r\n");
         modalEntityEditor.style.display = "none";
     };
 
@@ -466,7 +457,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
         updateMarginLeft(delta > 0 ? -step : step);
     });
-
+    
+    document.querySelector('.add-data-entity').addEventListener('click', function(){
+       editor.addData(); 
+    });
+    
+    document.querySelector('.save-data-entity').addEventListener('click', function(){
+       editor.saveData(); 
+    });
 
     init();
 

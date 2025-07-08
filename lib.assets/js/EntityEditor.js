@@ -1,534 +1,4 @@
-/**
- * Represents a column in a database table.
- * 
- * The Column class is used to define the properties of a column in a database table. 
- * This includes the column's name, type, length, nullable status, default value, 
- * primary key status, auto-increment behavior, and valid values for ENUM or SET types.
- * 
- * @class
- */
-class Column {
-    /**
-     * Creates an instance of the Column class.
-     * 
-     * @param {string} name - The name of the column.
-     * @param {string} [type="VARCHAR"] - The data type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
-     * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
-     * @param {boolean} [nullable=false] - Whether the column can be NULL (default is false).
-     * @param {string} [defaultValue=""] - The default value for the column (optional).
-     * @param {boolean} [primaryKey=false] - Whether the column is a primary key (default is false).
-     * @param {boolean} [autoIncrement=false] - Whether the column auto-increments (default is false).
-     * @param {string} [values=""] - The valid values for ENUM or SET types, or the range of values for types like DECIMAL, NUMERIC, FLOAT, and DOUBLE (optional, comma-separated).
-     */
-    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "") //NOSONAR
-    {
-        this.name = name;
-        this.type = type;
-        this.length = length;
-        this.nullable = nullable;
-        this.default = defaultValue;
-        this.primaryKey = primaryKey;
-        this.autoIncrement = autoIncrement;
-        this.values = values;
-    }
 
-    /**
-     * Converts the column definition into a valid SQL column definition string.
-     * 
-     * This method generates the SQL column definition based on the column's properties such as:
-     * - data type (e.g., VARCHAR, INT, ENUM, etc.)
-     * - nullable status
-     * - primary key status
-     * - auto-increment behavior
-     * - default value
-     * - valid values for ENUM/SET types or range values for DECIMAL, NUMERIC, FLOAT, and DOUBLE.
-     * 
-     * @returns {string} The SQL column definition.
-     */
-    toSQL() // NOSONAR
-    {
-        let withValueTypes = ['ENUM', 'SET'];
-        let withRangeTypes = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
-        let numericTypes = ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'];
-        let withLengthTypes = [
-            'VARCHAR', 'CHAR', 
-            'VARBINARY', 'BINARY',
-            'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT',
-            'BIT'
-        ];
-
-        let columnDef = "";
-        
-        if (this.hasValue(withValueTypes)) 
-        {
-            // Handle ENUM and SET types
-            let enumList = this.values.split(',').map(val => `'${val.trim()}'`).join(', ');
-            columnDef = `${this.name} ${this.type}(${enumList})`;
-        }     
-        else if (this.hasRange(withRangeTypes)) 
-        {
-            // Handle range types like NUMERIC, DECIMAL, DOUBLE, FLOAT
-            let rangeList = this.values.split(',').map(val => val.trim());
-
-            // Filter only integer values, remove non-integer values
-            rangeList = rangeList.filter(val => Number.isInteger(parseFloat(val)));
-
-            // Join the valid integer values back into a range string
-            let rangeString = rangeList.join(', ');
-
-            // Set the column definition
-            if (rangeList.length < 2) {
-                // If no valid integer values are present, don't set a range
-                columnDef = `${this.name} ${this.type}`;
-            } else {
-                // If there are valid integer values, include the range in the column definition
-                columnDef = `${this.name} ${this.type}(${rangeString})`;
-            }
-        } 
-        else if (this.hasLength(withLengthTypes)) 
-        {
-            // Handle types that support length, like VARCHAR, CHAR, etc.
-            columnDef = `${this.name} ${this.type}(${this.length})`;
-        }
-        else
-        {
-            columnDef = `${this.name} ${this.type}`;
-        }
-        
-        if (!this.primaryKey) {
-            // Nullable
-            columnDef += this.nullable ? " NULL" : " NOT NULL";
-        } else {
-            columnDef += " NOT NULL PRIMARY KEY";
-        }
-        // Auto increment logic
-        if (this.autoIncrement) {
-            columnDef += " AUTO_INCREMENT";
-        }
-        // Default value logic
-        if (this.hasDefault()) {
-            if(this.isTypeBoolean(this.type, this.length)) {
-                columnDef += ` DEFAULT ${this.toBoolean(this.default)}`; // No quotes for boolean values
-            } else if(this.isTypeNumeric(this.type, numericTypes)) {
-                columnDef += ` DEFAULT ${this.toNumeric(this.default)}`; // No quotes for boolean values
-            } else if (numericTypes.includes(this.type) && !isNaN(this.default)) {
-                columnDef += ` DEFAULT ${this.default}`; // No quotes for numeric values
-            } else {
-                columnDef += ` DEFAULT ${this.fixDefaultColumnValue(this.default)}`; // Default is a string, so use quotes
-            }
-        }
-        return columnDef;
-    }
-
-    /**
-     * Converts a string with quotes into a numeric string without quotes.
-     * 
-     * This function removes leading and trailing quotes from the input string.
-     * If the resulting string is empty, it returns the string '0'.
-     *
-     * @param {string} value - The input string that may contain quotes.
-     * @returns {string} - The numeric string without quotes, or '0' if the string is empty after removing quotes.
-     */
-    toNumeric(value)
-    {
-        let result = value;
-        result = result.replace(/^"(.*)"$/, '$1');
-        result = result.replace(/^'(.*)'$/, '$1');
-        if(result == '')
-        {
-            return '0';
-        }
-        return result;
-    }
-
-    /**
-     * Checks if the given type is included in the list of numeric types.
-     *
-     * This function takes a `type` and checks if it is included in the provided
-     * `numericTypes` array. The comparison is case-insensitive.
-     *
-     * @param {string} type - The type to check (e.g., 'BIGINT', 'FLOAT', etc.).
-     * @param {string[]} numericTypes - The list of valid numeric types (e.g., ['BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT']).
-     * @returns {boolean} - Returns `true` if `type` is included in `numericTypes`, otherwise returns `false`.
-     */
-    isTypeNumeric(type, numericTypes)
-    {
-        return numericTypes.includes(type.toUpperCase());
-    }
-
-    /**
-     * Fixes and normalizes default values in SQL column definitions to ensure they are in the correct format.
-     * This function handles various cases, including:
-     * - NULL values
-     * - Numeric literals (integers and floats)
-     * - SQL functions such as CURRENT_TIMESTAMP and NOW()
-     * - Date literals (e.g., '2021-01-01')
-     * - DateTime literals (e.g., '2021-01-01 00:00:00')
-     * - DateTime with microseconds literals (e.g., '2021-01-01 00:00:00.000000')
-     * - Boolean literals (TRUE/FALSE)
-     * - SQL expressions like CURRENT_TIMESTAMP ON UPDATE and CURRENT_TIMESTAMP ON INSERT
-     * - String literals (e.g., 'some text')
-     *
-     * The function ensures that the value is normalized and consistent with SQL standards.
-     *
-     * @param {string} defaultValue - The input default value as a string to be fixed and normalized.
-     * @returns {string|null} - A normalized default value string or null if no valid default value is provided.
-     */
-    fixDefaultColumnValue(defaultValue)
-    {
-        if (defaultValue) {
-            // Case 1: Handle 'DEFAULT NULL'
-            if (defaultValue.toUpperCase().indexOf('NULL') != -1) {
-                defaultValue = 'NULL'; // Correctly treat it as a string "NULL" without quotes
-            }
-            // Case 2: Handle numbers (integers or floats) and ensure no quotes
-            else if (this.isNumber(defaultValue)) {
-                defaultValue = "'"+defaultValue.toString()+"'"; // Numeric values are valid as-is (no quotes needed)
-            }
-            // Case 3: Handle SQL functions like CURRENT_TIMESTAMP
-            else if (/^(CURRENT_TIMESTAMP|NOW\(\))$/i.test(defaultValue)) {
-                defaultValue = defaultValue.toUpperCase(); // Normalize SQL functions to uppercase
-            }
-            // Case 4: Handle date/time literals (e.g., '2021-01-01')
-            else if (defaultValue.startsWith("'") && defaultValue.endsWith("'") && /\d{4}-\d{2}-\d{2}/.test(defaultValue.slice(1, -1))) {
-                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; // Normalize date literals (date only)
-            }
-            // Case 5: Handle datetime literals (e.g., '2021-01-01 00:00:00')
-            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/.test(defaultValue)) {
-                defaultValue = "'"+defaultValue+"'" // Normalize datetime literals
-            }
-            // Case 6: Handle datetime with microseconds (e.g., '2021-01-01 00:00:00.000000')
-            else if (/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/.test(defaultValue)) {
-                defaultValue = "'"+defaultValue+"'" // Normalize datetime with microseconds
-            }
-            // Case 7: Handle other possible types (e.g., boolean TRUE/FALSE)
-            else if (/^(TRUE|FALSE)$/i.test(defaultValue)) {
-                defaultValue = defaultValue.toUpperCase(); // Normalize booleans
-            }
-            // Case 8: Handle CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            else if (/^CURRENT_TIMESTAMP\s+ON\s+UPDATE\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
-                defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
-            }
-            // Case 9: Handle CURRENT_TIMESTAMP ON INSERT CURRENT_TIMESTAMP
-            else if (/^CURRENT_TIMESTAMP\s+ON\s+INSERT\s+CURRENT_TIMESTAMP$/i.test(defaultValue)) {
-                defaultValue = defaultValue.toUpperCase(); // Normalize the entire expression
-            }
-            // Case 10: Handle string literals (e.g., 'some text')
-            else if (this.isInQuotes(defaultValue)) {
-                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
-            }
-        } else {
-            defaultValue = null; // If no default value, set it to null
-        }
-        return defaultValue;
-    }
-
-    /**
-     * Checks if the given string is enclosed in single quotes.
-     * 
-     * @param {string} defaultValue - The string to check.
-     * @returns {boolean} - Returns true if the string starts and ends with single quotes, otherwise false.
-     */
-    isInQuotes(defaultValue)
-    {
-        return defaultValue.startsWith("'") && defaultValue.endsWith("'");
-    }
-
-    /**
-     * Checks if the given value is a valid number.
-     * 
-     * @param {string|any} defaultValue - The value to check.
-     * @returns {boolean} - Returns true if the value is a number (not NaN) and not an empty string, otherwise false.
-     */
-    isNumber(defaultValue)
-    {
-        return !isNaN(defaultValue) && defaultValue !== '';
-    }
-
-    /**
-     * Converts a given value to a boolean-like string representation.
-     * 
-     * This function evaluates the input value and converts it to either 'TRUE' or 'FALSE'.
-     * It interprets values such as:
-     * - Any string containing 'false' (case-insensitive) will return 'FALSE'.
-     * - Any non-zero integer or string 'true' (case-insensitive) will return 'TRUE'.
-     * - Any other value will return 'FALSE'.
-     *
-     * @param {string} value - The value to be converted to a boolean-like string.
-     * @returns {string} 'TRUE' or 'FALSE' based on the value.
-     */
-    toBoolean(value) {
-        if (value.toLowerCase().indexOf('false') !== -1) {
-            return 'FALSE';
-        }
-        return (parseInt(value) !== 0 || value.toLowerCase() === 'true') ? 'TRUE' : 'FALSE';
-    }
-
-    /**
-     * Fixes the default value based on the column's type and length.
-     * 
-     * This method adjusts the default value depending on the column's data type:
-     * - For BOOLEAN types, converts values to 'true' or 'false'.
-     * - For text types, escapes single quotes.
-     * - For numeric types (INTEGER and FLOAT), parses the value accordingly.
-     * 
-     * @param {string} defaultValue - The default value to fix.
-     * @param {string} type - The type of the column.
-     * @param {string} length - The length of the column.
-     * @returns {string|number} The fixed default value.
-     */
-    fixDefaultValue(defaultValue, type, length) {
-        let result = defaultValue;
-    
-        if (this.isTypeBoolean(type, length)) {
-            result = (defaultValue != 0 && defaultValue.toString().toLowerCase() === 'true') ? 'true' : 'false';
-        } else if (this.isNativeValue(defaultValue)) {
-            result = defaultValue;
-        } else if (this.isTypeText(type)) {
-            result = `'${defaultValue.replace(/'/g, "\\'")}'`;
-        } else if (this.isTypeInteger(type)) {
-            result = parseInt(defaultValue.replace(/[^\d]/g, ''), 10);
-        } else if (this.isTypeFloat(type)) {
-            result = parseFloat(defaultValue.replace(/[^\d.]/g, ''));
-        }
-    
-        return result;
-    }
-    
-    /**
-     * Checks if the given type is a boolean type in MySQL.
-     * 
-     * @param {string} type - The type to check.
-     * @param {string} length - The length of the column (used for TINYINT with length 1).
-     * @returns {boolean} True if the type is BOOLEAN, BIT, or TINYINT(1), false otherwise.
-     */
-    isTypeBoolean(type, length) {
-        return type.toLowerCase() === 'boolean' || type.toLowerCase() === 'bool' || type.toLowerCase() === 'bit' || (type.toLowerCase() === 'tinyint' && length == 1);
-    }
-    
-    /**
-     * Checks if the given value is a native value (true, false, or null).
-     *
-     * This function checks if the provided `defaultValue` is a string representing
-     * one of the native values: "true", "false", or "null".
-     *
-     * @param {string} defaultValue The value to check.
-     * @return {boolean} True if the value is "true", "false", or "null", false otherwise.
-     */
-    isNativeValue(defaultValue) {
-        return defaultValue.toLowerCase() === 'true' || defaultValue.toLowerCase() === 'false' || defaultValue.toLowerCase() === 'null';
-    }
-
-    /**
-     * Checks if the given type is a text/string type in MySQL.
-     * This includes all text-related types like CHAR, VARCHAR, TEXT, etc.
-     *
-     * @param {string} type The type to check.
-     * @return {boolean} True if the type is a text type, false otherwise.
-     */
-    isTypeText(type) {
-        const textTypes = ['char', 'varchar', 'text', 'tinytext', 'mediumtext', 'longtext', 'enum', 'set'];
-        return textTypes.includes(type.toLowerCase());
-    }
-
-    /**
-     * Checks if the given type is a numeric/integer type in MySQL.
-     * This includes all integer-like types such as TINYINT, SMALLINT, INT, BIGINT, etc.
-     *
-     * @param {string} type The type to check.
-     * @return {boolean} True if the type is a numeric type, false otherwise.
-     */
-    isTypeInteger(type) {
-        const integerTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'integer'];
-        return integerTypes.includes(type.toLowerCase());
-    }
-
-    /**
-     * Checks if the given type is a floating-point type in MySQL.
-     * This includes types like FLOAT, DOUBLE, and DECIMAL.
-     *
-     * @param {string} type The type to check.
-     * @return {boolean} True if the type is a floating-point type, false otherwise.
-     */
-    isTypeFloat(type) {
-        const floatTypes = ['float', 'double', 'decimal', 'numeric'];
-        return floatTypes.includes(type.toLowerCase());
-    }
-
-    /**
-     * Checks if the given type is a date/time type in MySQL.
-     * This includes types like DATE, DATETIME, TIMESTAMP, TIME, and YEAR.
-     *
-     * @param {string} type The type to check.
-     * @return {boolean} True if the type is a date/time type, false otherwise.
-     */
-    isTypeDate(type) {
-        const dateTypes = ['date', 'datetime', 'timestamp', 'time', 'year'];
-        return dateTypes.includes(type.toLowerCase());
-    }
-
-    /**
-     * Checks if the given type is a binary/blob type in MySQL.
-     * This includes types like BLOB, TINYBLOB, MEDIUMBLOB, LONGBLOB.
-     *
-     * @param {string} type The type to check.
-     * @return {boolean} True if the type is a binary/blob type, false otherwise.
-     */
-    isTypeBinary(type) {
-        const binaryTypes = ['blob', 'tinyblob', 'mediumblob', 'longblob'];
-        return binaryTypes.includes(type.toLowerCase());
-    }
-
-    /**
-     * Checks if the column type is one of the range types like NUMERIC, DECIMAL, DOUBLE, FLOAT, and has a value.
-     * 
-     * @param {Array} withRangeTypes - The list of types that support range values (e.g., NUMERIC, DECIMAL, etc.).
-     * @returns {boolean} True if the column type is one of the range types and has a value.
-     */
-    hasRange(withRangeTypes) {
-        return withRangeTypes.includes(this.type) && this.values;
-    }
-
-    /**
-     * Checks if the column type is one of the value types like ENUM or SET, and has a value.
-     * 
-     * @param {Array} withValueTypes - The list of types that support specific values (e.g., ENUM, SET).
-     * @returns {boolean} True if the column type is one of the value types and has a value.
-     */
-    hasValue(withValueTypes) {
-        return withValueTypes.includes(this.type) && this.values;
-    }
-
-    /**
-     * Checks if the column type supports length (e.g., VARCHAR, CHAR, etc.) and has a defined length.
-     * 
-     * @param {Array} withLengthTypes - The list of types that support length (e.g., VARCHAR, CHAR).
-     * @returns {boolean} True if the column type supports length and a length is defined.
-     */
-    hasLength(withLengthTypes) {
-        return this.length && withLengthTypes.includes(this.type);
-    }
-
-    /**
-     * Checks if the column has a valid default value.
-     * 
-     * @returns {boolean} True if the column has a default value that is not 'null'.
-     */
-    hasDefault() {
-        return this.default && this.default.toLowerCase() !== 'null';
-    }
-}
-
-/**
- * Class representing an entity (table) in a database.
- * 
- * The Entity class is used to define a database table, its name, and the columns 
- * that belong to that table. It allows for adding, removing, and converting 
- * the entity (with its columns) into a valid SQL `CREATE TABLE` statement.
- */
-class Entity {
-    /**
-     * Creates an instance of the Entity class.
-     * 
-     * @param {string} name - The name of the entity (table).
-     * @param {number} index - The index of the entity (table).
-     */
-    constructor(name, index) {
-        this.index = index;
-        this.name = name;
-        this.columns = [];
-    }
-
-    /**
-     * Adds a column to the entity.
-     * 
-     * @param {Column} column - An instance of the Column class to be added to the entity.
-     */
-    addColumn(column) {
-        this.columns.push(column);
-    }
-
-    /**
-     * Removes a column from the entity.
-     * 
-     * @param {number} index - The index of the column to be removed from the entity's column list.
-     */
-    removeColumn(index) {
-        this.columns.splice(index, 1);
-    }
-
-    /**
-     * Converts the entity (with its columns) into a valid SQL `CREATE TABLE` statement.
-     * 
-     * This method generates the SQL statement for creating a table, including the
-     * table's name and each of its columns' definitions as provided by the `Column` class.
-     * 
-     * @returns {string} The SQL statement for creating the entity (table).
-     */
-    toSQL() {
-        let sql = `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
-        this.columns.forEach(col => {
-            sql += `\t${col.toSQL()},\r\n`;
-        });
-        sql = sql.slice(0, -3); // Remove last comma
-        sql += "\r\n);\r\n\r\n";
-        return sql;
-    }
-}
-
-function Diagram(name, sortOrder, originalEntities)
-{
-    /**
-     * Array of entity names included in this diagram.
-     * @type {string[]}
-     */
-    this.entitieNames = [];
-    /**
-     * Name of the diagram.
-     * @type {string}
-     */
-    this.name = name;
-    /**
-     * Sort order of the diagram.
-     * @type {number}
-     */
-    this.sortOrder = sortOrder;
-    /**
-     * Original entities available for the diagram.
-     * @type {Entity[]}
-     */
-    this.originalEntities = originalEntities;
-    /**
-     * Whether this diagram is active.
-     * @type {boolean}
-     */
-    this.active = false;
-    /**
-     * Creates the ERD for this diagram.
-     * @param {number} updatedWidth - The width for rendering.
-     * @param {boolean} drawRelationship - Whether to draw relationships.
-     */
-    this.createERD = function(updatedWidth, drawRelationship)
-    {
-        this.entityRenderer.createERD(this.getData(), updatedWidth, drawRelationship);
-    }
-    /**
-     * Gets the entities included in this diagram.
-     * @returns {Entity[]} The entities in the diagram.
-     */
-    this.getData = function()
-    {
-        let entities = [];
-        for(let entity of this.originalEntities)
-        {
-            if(this.entitieNames.includes(entity.name))
-            {
-                entities.push(entity);
-            }
-        }
-        return entities;
-    }
-}
 
 /**
  * Class to manage the creation, editing, and deletion of database entities (tables),
@@ -602,7 +72,6 @@ class EntityEditor {
         this.callbackLoadTemplate = this.setting.callbackLoadTemplate;
         this.callbackSaveTemplate = this.setting.callbackSaveTemplate;
         this.callbackSaveConfig = this.setting.callbackSaveConfig;
- 
         this.defaultDataType = this.setting.defaultDataType + '';
         this.defaultDataLength = this.setting.defaultDataLength + '';
         this.primaryKeyDataType = this.setting.primaryKeyDataType + '';
@@ -621,6 +90,7 @@ class EntityEditor {
         this.dragSrcRow = null;
         this.tbody = null;
         this.operation = 'create';
+        this.currentEntityData = [];
     }
 
     /**
@@ -643,9 +113,21 @@ class EntityEditor {
      */
     addDomListeners() {
         let _this = this;
-        document.querySelector(".check-all-entity").addEventListener('change', (event) => {
+        document.querySelector(".check-all-entity-structure").addEventListener('change', (event) => {
             let checked = event.target.checked;
-            let allEntities = event.target.closest('.right-panel').querySelectorAll(".selected-entity");
+            let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-structure");
+            
+            if(allEntities)
+            {
+                allEntities.forEach((entity, index) => {
+                    entity.checked = checked;
+                })
+            }       
+            _this.exportToSQL();
+        });
+        document.querySelector(".check-all-entity-data").addEventListener('change', (event) => {
+            let checked = event.target.checked;
+            let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-data");
             
             if(allEntities)
             {
@@ -653,12 +135,11 @@ class EntityEditor {
                     entity.checked = checked;
                 })
             }
-            
-            this.exportToSQL();
+            _this.exportToSQL();
         });
         
         document.querySelector(this.selector+" .right-panel .table-list-for-export").addEventListener('change', (event) => {
-            if (event.target.classList.contains('selected-entity')) {
+            if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
                 this.exportToSQL();
             }
         });
@@ -820,6 +301,9 @@ class EntityEditor {
     {
         let _this = this;
         entityRenderer.svg.addEventListener('click', function(e) {
+            if (e.target.closest('.erd-svg .view-data-icon')) {
+                _this.viewData(parseInt(e.target.dataset.index))
+            }
             if (e.target.closest('.erd-svg .move-down-icon')) {
                 _this.moveEntityUp(parseInt(e.target.dataset.index))
             }
@@ -893,20 +377,24 @@ class EntityEditor {
      * Imports column definitions from a spreadsheet or external source
      * and initializes a new entity for table creation.
      *
-     * This method sets the application state to "create" mode,
-     * resets the current entity selection, generates a new unique table name,
-     * clears existing columns in the UI, adds new columns from the given array,
-     * and updates the UI to display the entity editor form.
+     * This method performs the following:
+     * - Sets the application state to "create" mode.
+     * - Resets the current entity selection.
+     * - Uses the provided table name or generates a new one if not given.
+     * - Clears existing columns from the UI.
+     * - Adds new columns from the given array.
+     * - Updates the UI to display the entity editor form.
      *
      * @param {Array<Object>} columns - An array of column definitions to be added.
-     * Each object should represent a column with necessary attributes (e.g., name, type).
+     *   Each object should represent a column with necessary attributes (e.g., name, type).
+     * @param {string} [tableName] - (Optional) A custom table name to use. If omitted, a new name is auto-generated.
      */
-    importFromSheet(columns) {
+    importFromSheet(columns, tableName) {
         this.operation = 'create';
         this.currentEntityIndex = -1;
 
-        let newTableName = this.getNewTableName();
-        document.querySelector(this.selector + " .entity-name").value = newTableName;
+        tableName = tableName || this.getNewTableName();
+        document.querySelector(this.selector + " .entity-name").value = tableName;
         document.querySelector(this.selector + " .entity-columns-table-body").innerHTML = '';
 
         columns.forEach(column => {
@@ -1206,6 +694,7 @@ class EntityEditor {
             // Add a new entity
             const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
+            newEntity.setData(this.snakeize(this.currentEntityData, columns));
             this.entities.push(newEntity);
         }
         this.renderEntities();
@@ -1482,7 +971,9 @@ class EntityEditor {
                 
                 // Add the column to the entity
                 entity.addColumn(column);
+                
             });
+            entity.setData(entityData.data);
 
             // Add the entity to the entities array
             entities.push(entity);
@@ -1638,7 +1129,7 @@ class EntityEditor {
         const selectedEntity = [];
 
         // Get all selected entity checkboxes (those that are checked)
-        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");
 
         // If there are selected checkboxes, add their data-name to the selectedEntity array
         
@@ -1661,11 +1152,21 @@ class EntityEditor {
         // Iterate over the entities and create a checkbox for each entity
         this.entities.forEach((entity, index) => {
             // Create a new list item for each entity
-            let entityCbForExport = document.createElement('li');
-            let entityCbMain = document.createElement('li');
+            let entityCbForExport = document.createElement('tr');
             entityCbForExport.innerHTML = `
-            <label><input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />${entity.name}</label>
+            <td>
+                <label><input type="checkbox" class="selected-entity-structure" data-name="${entity.name}" value="${index}" /> S</label>
+            </td>
+            <td>
+                <label><input type="checkbox" class="selected-entity-data" data-name="${entity.name}" value="${index}" /> D</label>
+            </td>
+            <td>
+            ${entity.name}
+            </td>
             `;
+            
+            let entityCbMain = document.createElement('li');
+            
 
             entityCbMain.innerHTML = `<input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" 
             /><a class="edit-table" href="javascript:">✏️</a><a class="delete-table" href="javascript:">❌</a> ${entity.name}`
@@ -1758,31 +1259,34 @@ class EntityEditor {
      */
     selectDiagram(li) {
         let diagramContainer = document.querySelector('.diagram-container');
+        let entities = [];
+        if(li)
+        {
+            // Remove active class from all diagram tabs
+            li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab) => {
+                tab.classList.remove('active');
+            });
 
-        // Remove active class from all diagram tabs
-        li.closest('ul').querySelectorAll('li.diagram-tab').forEach((tab) => {
-            tab.classList.remove('active');
-        });
+            // Remove active class from the "All Entities" tab
+            li.closest('ul').querySelector('li.all-entities').classList.remove('active');
 
-        // Remove active class from the "All Entities" tab
-        li.closest('ul').querySelector('li.all-entities').classList.remove('active');
+            // Remove active class from all diagram containers
+            diagramContainer.querySelectorAll('div.diagram').forEach((tab) => {
+                tab.classList.remove('active');
+            });
 
-        // Remove active class from all diagram containers
-        diagramContainer.querySelectorAll('div.diagram').forEach((tab) => {
-            tab.classList.remove('active');
-        });
+            // Activate the selected tab
+            li.classList.add('active');
 
-        // Activate the selected tab
-        li.classList.add('active');
+            // Get the selected diagram ID and activate the corresponding diagram
+            let selector = li.dataset.id;
+            let diagram = diagramContainer.querySelector('#' + selector);
+            diagram.classList.add('active');
 
-        // Get the selected diagram ID and activate the corresponding diagram
-        let selector = li.dataset.id;
-        let diagram = diagramContainer.querySelector('#' + selector);
-        diagram.classList.add('active');
-
-        // Retrieve associated entities for the selected diagram
-        let dataEntity = diagram.dataset.entities || '';
-        let entities = dataEntity.split(',');
+            // Retrieve associated entities for the selected diagram
+            let dataEntity = diagram.dataset.entities || '';
+            entities = dataEntity.split(',');
+        }
 
         // Update entity checkboxes based on selected diagram's entities
         document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2) => {
@@ -2104,6 +1608,10 @@ class EntityEditor {
     editEventListener(e)
     {
         let _this = this;
+        if (e.target.closest('.erd-svg .view-data-icon')) {
+            let index = parseInt(e.target.dataset.index);
+            _this.viewData(index);
+        }
         if (e.target.closest('.erd-svg .move-down-icon')) {
             let haystack = e.target.closest('.diagram-entity').dataset.entities;
             let needle = e.target.closest('.svg-entity').dataset.entity;
@@ -2170,6 +1678,12 @@ class EntityEditor {
         [array[index], array[newIndex]] = [array[newIndex], array[index]];
         
         return array.join(',');
+    }
+    
+    viewData(index)
+    {
+        this.currentEntityIndex = index;
+        this.showEntityDataDialog(this.entities[index], 'Entity Data', 'Close');
     }
 
     /**
@@ -2411,18 +1925,52 @@ class EntityEditor {
 
     /**
      * Exports the selected entities as a MySQL SQL statement for creating the tables.
+     * 
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
      */
-    exportToSQL() {
+    exportToSQL(dialect = "mysql") {
+        let sql = this.generateSQL(dialect);
+        document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
+    }
+    
+    /**
+     * Generates an array of SQL statements based on selected entities.
+     *
+     * This function will:
+     * 1. Generate `CREATE TABLE` statements for all checked entity structures.
+     * 2. Generate corresponding `INSERT INTO` statements for all checked entity data.
+     *
+     * The statements generated will use the currently selected SQL dialect (MySQL, PostgreSQL, SQLite).
+     *
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
+     * @returns {string[]} Array of SQL statements to be exported.
+     */
+    generateSQL(dialect)
+    {
         let sql = [];       
-        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");  
+        
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");  
         selectedEntities.forEach((checkbox, index) => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
             if (entity) {
-                sql.push(entity.toSQL());
+                sql.push(entity.toSQL(dialect));
             }
         });
-        document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
+        
+        const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");  
+        selectedEntitiesData.forEach((checkbox, index) => {
+            const entityIndex = parseInt(checkbox.value); 
+            const entity = this.entities[entityIndex]; 
+            if (entity) {
+                let query = entity.toSQLInsert(dialect);
+                if(query != '')
+                {
+                    sql.push(query);
+                }
+            }
+        });
+        return sql;
     }
     
     /**
@@ -2640,6 +2188,26 @@ class EntityEditor {
         };
         reader.readAsText(file); // Read the file as text
     }
+    
+    /**
+     * Converts a string (e.g., file or sheet name) into a valid entity/table name.
+     *
+     * This function ensures the result is compatible with database naming conventions by:
+     * - Removing file extensions (e.g., `.csv`, `.xlsx`).
+     * - Replacing non-alphanumeric characters with underscores.
+     * - Converting the entire string to lowercase.
+     * - Trimming leading and trailing underscores.
+     *
+     * @param {string} str - The original name (e.g., file name or sheet name).
+     * @returns {string} A sanitized and valid table name in lowercase with underscores.
+     */
+    toValidTableName(str) {
+        return str
+            .replace(/\.[^/.]+$/, '') // NOSONAR
+            .replace(/[^a-zA-Z0-9]+/g, '_') // NOSONAR
+            .toLowerCase()
+            .replace(/^_+|_+$/g, ''); // NOSONAR
+    }
 
     /**
      * Imports and parses a spreadsheet file (CSV, XLSX, or XLS),
@@ -2662,43 +2230,53 @@ class EntityEditor {
                 const parsed = Papa.parse(contents, { header: true });
                 const headers = parsed.meta.fields;
                 const rows = parsed.data;
+
+                const entityName = _this.toValidTableName(file.name);
                 const columns = _this.generateCreateTable(headers, rows);
-                _this.importFromSheet(columns);
+                _this.importFromSheet(columns, entityName);
+                _this.currentEntityData = rows;
             } else if (ext === 'xlsx' || ext === 'xls') {
                 const uint8Array = new Uint8Array(contents);
                 const workbook = XLSX.read(uint8Array, { type: "array" });
-                
-                let message = `
-                <table class="two-side-table">
-                    <tbody>
-                        <tr>
-                            <td>Sheet to Import</td>
-                            <td>
-                                <select id="sheet-index" class="form-control">
-                                    ${workbook.SheetNames.map((name, index) => 
-                                        `<option value="${index}">${index + 1}. ${name}</option>`
-                                    ).join('')}
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                `;
-                _this.showConfirmationDialog(message, 'Select Sheet', 'OK', 'Cancel', function(isOk){
-                    if(isOk)
-                    {
-                        let sheetIndex = parseInt(document.querySelector('#sheet-index').value);
-                        const sheetName = workbook.SheetNames[sheetIndex];
-                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
 
-                        if (json.length > 0) {
-                            const headers = Object.keys(json[0]);
-                            const columns = _this.generateCreateTable(headers, json);
-                            _this.importFromSheet(columns);
-                        }
+                const selectSheetAndImport = (sheetIndex) => {
+                    const sheetName = workbook.SheetNames[sheetIndex];
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
+                    _this.currentEntityData = json;
+                    if (json.length > 0) {
+                        const headers = Object.keys(json[0]);
+                        const entityName = _this.toValidTableName(file.name)+'_'+_this.toValidTableName(sheetName);
+                        const columns = _this.generateCreateTable(headers, json);
+                        _this.importFromSheet(columns, entityName);
                     }
-                });
-                
+                };
+
+                if (workbook.SheetNames.length > 1) {
+                    let message = `
+                        <table class="two-side-table">
+                            <tbody>
+                                <tr>
+                                    <td>Sheet to Import</td>
+                                    <td>
+                                        <select id="sheet-index" class="form-control">
+                                            ${workbook.SheetNames.map((name, index) => 
+                                                `<option value="${index}">${index + 1}. ${name}</option>`
+                                            ).join('')}
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    _this.showConfirmationDialog(message, 'Select Sheet', 'OK', 'Cancel', function(isOk){
+                        if (isOk) {
+                            let sheetIndex = parseInt(document.querySelector('#sheet-index').value);
+                            selectSheetAndImport(sheetIndex);
+                        }
+                    });
+                } else {
+                    selectSheetAndImport(0);
+                }
             } else {
                 alert("Unsupported file format: " + ext);
             }
@@ -2707,10 +2285,39 @@ class EntityEditor {
         if (ext === 'csv') {
             reader.readAsText(file); // for CSV
         } else {
-            reader.readAsArrayBuffer(file); // instead of deprecated readAsBinaryString
+            reader.readAsArrayBuffer(file); // for Excel
         }
     }
 
+    /**
+     * Converts all keys in each row object to `snake_case`, but only includes keys that match column definitions.
+     *
+     * This function ensures that only columns defined in the `columns` array will be included in the result,
+     * and their keys will be converted to snake_case using the `cleanColumnName()` helper.
+     *
+     * @param {Array<Object>} rows - Array of data row objects with camelCase or PascalCase keys.
+     * @param {Array<Object>} columns - Array of column metadata, each with a `name` property.
+     * @returns {Array<Object>} A new array of objects with keys converted to snake_case.
+     */
+    snakeize(rows, columns) {
+        const columnNames = columns.map(col => col.name);
+        const result = [];
+
+        if (Array.isArray(rows)) {
+            for (const row of rows) {
+                const snakeRow = {};
+                for (const key of Object.keys(row)) {
+                    const snakeKey = this.cleanColumnName(key);
+                    if (columnNames.includes(snakeKey)) {
+                        snakeRow[snakeKey] = row[key];
+                    }
+                }
+                result.push(snakeRow);
+            }
+        }
+
+        return result;
+    }
 
     /**
      * Infers the most appropriate SQL data type from a sample array of values.
@@ -2773,10 +2380,7 @@ class EntityEditor {
         let _this = this;
 
         const cols = headers.map(header => {
-            const cleanName = header
-                .replace(/\s+/g, "_")
-                .replace(/[^\w]/g, "")
-                .toLowerCase();
+            const cleanName = _this.cleanColumnName(header)
 
             const values = rows.map(row => row[header]);
             const type = _this.guessType(values);
@@ -2785,6 +2389,14 @@ class EntityEditor {
         });
 
         return cols;
+    }
+    
+    cleanColumnName(header)
+    {
+        return header
+            .replace(/\s+/g, "_")
+            .replace(/[^\w]/g, "")
+            .toLowerCase();
     }
 
 
@@ -3108,6 +2720,200 @@ class EntityEditor {
         okBtn.addEventListener('click', handleOkConfig);
         cancelBtn.addEventListener('click', handleCancelConfig);
     }
+    
+    /**
+     * Displays a dialog showing editable tabular data for a given entity.
+     *
+     * @param {Object} entity - The entity metadata containing column definitions and data.
+     * @param {string} title - The title to be displayed on the modal dialog.
+     *
+     * @returns {void}
+     */
+    showEntityDataDialog(entity, title) {
+        const modal = document.querySelector('#entityDataEditorModal');
+        const modalHeader = modal.querySelector('.modal-header h3');
+        const modalBody = modal.querySelector('.modal-body');
+        const data = entity.data || [];
+
+        modalHeader.innerHTML = title || 'Entity Data';
+        modalBody.innerHTML = ''; // Clear previous content
+
+        // Create scrollable wrapper
+        const wrapper = document.createElement('div');
+        wrapper.style.overflow = 'auto';
+        wrapper.style.maxHeight = '400px';
+
+        // Create table
+        const table = document.createElement('table');
+        table.className = 'data-preview-table';
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+
+        // Create thead
+        const thead = document.createElement('thead');
+        const headRow = document.createElement('tr');
+
+        const emptyTh = document.createElement('th'); // For delete button column
+        emptyTh.classList.add('td-remover');
+        headRow.appendChild(emptyTh);
+
+        entity.columns.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col.name;
+            th.style.padding = '6px';
+            th.style.background = '#f8f8f8';
+            headRow.appendChild(th);
+        });
+
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        // Create tbody
+        const tbody = document.createElement('tbody');
+
+        data.forEach((row, rowIndex) => {
+            const tr = document.createElement('tr');
+
+            // Delete button column
+            const deleteTd = document.createElement('td');
+            deleteTd.classList.add('td-remover');
+            const deleteLink = document.createElement('a');
+            deleteLink.className = 'delete-row';
+            deleteLink.href = 'javascript:';
+            deleteLink.textContent = '❌';
+            
+            deleteTd.appendChild(deleteLink);
+            tr.appendChild(deleteTd);
+
+            entity.columns.forEach((col, colIndex) => {
+                const td = this.createEntityDataCell(rowIndex, colIndex, col, row[col.name] ?? '');
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+            
+            deleteLink.addEventListener('click', function(e){
+               e.preventDefault();
+               tbody.removeChild(tr);
+            });
+        });
+
+        table.appendChild(tbody);
+        wrapper.appendChild(table);
+        modalBody.appendChild(wrapper);
+
+        // Show modal
+        modal.style.display = 'block';
+    }
+    
+    /**
+     * Creates a <td> element containing an editable input for entity data.
+     *
+     * @param {number} rowIndex - The row index in the table.
+     * @param {number} colIndex - The column index in the table.
+     * @param {Object} col - Column definition object with at least `name` and `type` properties.
+     * @param {string} [value=""] - Optional value to prefill the input field.
+     * @returns {HTMLTableCellElement} The created <td> element.
+     */
+    createEntityDataCell(rowIndex, colIndex, col, value = "") {
+        const td = document.createElement('td');
+        const input = document.createElement('input');
+
+        input.type = 'text';
+        input.classList.add('entity-data-cell');
+        input.name = `cell-${rowIndex}-${colIndex}`;
+        input.dataset.row = rowIndex;
+        input.dataset.col = col.name;
+        input.dataset.type = col.type;
+        input.value = value ?? '';
+        input.style.width = '100%';
+        input.style.boxSizing = 'border-box';
+
+        td.appendChild(input);
+        return td;
+    }
+
+
+    /**
+     * Adds a new empty row to the editable entity data table.
+     * 
+     * @returns {void}
+     */
+    addData() {
+        const entity = this.entities[this.currentEntityIndex];
+        const modal = document.querySelector('#entityDataEditorModal');
+        const tableBody = modal.querySelector('.data-preview-table tbody');
+
+        if (!tableBody) return;
+
+        const rowIndex = tableBody.rows.length;
+        const row = document.createElement('tr');
+
+        // Kolom untuk tombol delete
+        const deleteTd = document.createElement('td');
+        deleteTd.classList.add('td-remover');
+        const deleteLink = document.createElement('a');
+        deleteLink.className = 'delete-row';
+        deleteLink.href = 'javascript:';
+        deleteLink.textContent = '❌';
+        deleteTd.appendChild(deleteLink);
+        row.appendChild(deleteTd);
+
+        // Tambahkan input sel berdasarkan kolom entity
+        entity.columns.forEach((col, colIndex) => {
+            const td = this.createEntityDataCell(rowIndex, colIndex, col, '');
+            row.appendChild(td);
+            deleteLink.addEventListener('click', function(e){
+               e.preventDefault();
+               tbody.removeChild(tr);
+            });
+        });
+
+        tableBody.appendChild(row);
+    }
+
+    
+    /**
+     * Saves the current editable data from the entity data table
+     * into the corresponding entity's data structure.
+     * 
+     * @returns {void}
+     */
+    saveData() {
+        const entity = this.entities[this.currentEntityIndex];
+        const modal = document.querySelector('#entityDataEditorModal');
+        const inputs = modal.querySelectorAll('.data-preview-table input');
+
+        const rowDataMap = {};
+
+        // Kelompokkan input berdasarkan baris
+        inputs.forEach(input => {
+            const row = input.dataset.row;
+            const col = input.dataset.col;
+
+            if (!rowDataMap[row]) {
+                rowDataMap[row] = {};
+            }
+
+            rowDataMap[row][col] = input.value;
+        });
+
+        // Konversi ke array
+        const newData = Object.keys(rowDataMap)
+            .sort((a, b) => parseInt(a) - parseInt(b))
+            .map(rowKey => rowDataMap[rowKey]);
+
+        // Update entity data
+        entity.data = newData;
+        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
+        modal.style.display = 'none';
+    }
+
+
 
 }
 

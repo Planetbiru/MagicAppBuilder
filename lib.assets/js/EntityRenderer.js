@@ -171,18 +171,36 @@ class EntityRenderer {
     }
 
     /**
-     * Creates an SVG representation of a table for a given entity.
-     * This method generates a table with a rectangle for the table body, adds the table name at the top, and lists the columns with their respective types.
-     * It also provides interactive "Edit" and "Delete" icons for the table, and buttons for moving the table up or down.
-     * 
-     * @param {Object} entity - The entity representing the table. It should contain:
-     *   - {string} name - The name of the table.
-     *   - {Array} columns - An array of column objects, where each column has a name and type.
-     * @param {number} index - The index of the entity within the collection of entities. This index is used when calling the `editEntity` or `deleteEntity` methods.
-     * @param {number} x - The x-coordinate for the table's position in the SVG canvas.
-     * @param {number} y - The y-coordinate for the table's position in the SVG canvas.
-     * 
-     * @returns {SVGElement} The SVG `<g>` (group) element that represents the table, containing all the SVG elements (rectangles, text, lines, etc.).
+     * Creates an SVG representation of a database table entity for visual modeling.
+     *
+     * This method generates a visual block representing a table, including:
+     * - The table body and header rendered as <rect> elements.
+     * - The table name rendered with <foreignObject> for proper overflow handling (ellipsis on overflow).
+     * - A list of columns, each rendered with their name and type.
+     * - Visual distinction for primary key columns.
+     * - Action buttons (⬅️, ➡️, ✏️, ❌) as text+rect elements for moving, editing, and deleting the table.
+     *
+     * Each generated table group (`<g>`) can be positioned freely on the SVG canvas via the `x` and `y` parameters.
+     * This method uses helper functions (`createSvgRect`, `createSvgForeignText`, `getFormattedType`) to modularize rendering logic.
+     *
+     * @param {Object} entity - The entity object representing the table schema.
+     * @param {string} entity.name - The name of the entity/table to display.
+     * @param {Array<Object>} entity.columns - List of column definitions for the table.
+     * @param {string} entity.columns[].name - The name of the column.
+     * @param {string} entity.columns[].type - The data type of the column (e.g., "TEXT", "INTEGER").
+     * @param {number} [entity.columns[].length] - Optional column length (for types like VARCHAR).
+     * @param {string} [entity.columns[].values] - Optional range or enum values.
+     * @param {boolean} [entity.columns[].primaryKey=false] - Whether the column is a primary key.
+     *
+     * @param {number} index - The index of the entity in the overall entity list (used for action buttons).
+     * @param {number} x - The X-coordinate to place the table on the SVG canvas.
+     * @param {number} y - The Y-coordinate to place the table on the SVG canvas.
+     *
+     * @returns {SVGGElement} An SVG `<g>` group element containing the rendered table and its interactive parts.
+     *
+     * @see createSvgRect
+     * @see createSvgForeignText
+     * @see getFormattedType
      */
     createTable(entity, index, x, y) {
         let yOffset = 40;
@@ -193,128 +211,59 @@ class EntityRenderer {
         group.classList.add('svg-entity');
         group.setAttribute("transform", `translate(${x}, ${y})`);
 
-        // Table Rectangle
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("width", this.tableWidth);
-        rect.setAttribute("height", (entity.columns.length * this.columnHeight) + 26);
-        rect.setAttribute("fill", "#ffffff");
-        rect.setAttribute("stroke", this.stroke);
-        rect.setAttribute("stroke-width", this.entityStrokeWidth);
+        const tableHeight = (entity.columns.length * this.columnHeight) + 26;
+
+        const rect = this.createSvgRect(0, 0, this.tableWidth, tableHeight, "#ffffff", this.stroke, this.entityStrokeWidth);
         group.appendChild(rect);
 
-        // Header background rectangle
-        const headerRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        headerRect.setAttribute("x", 1);
-        headerRect.setAttribute("y", 1);
-        headerRect.setAttribute("width", this.tableWidth - 2);
-        headerRect.setAttribute("height", 24);
-        headerRect.setAttribute("fill", this.headerBackgroundColor);
+        const headerRect = this.createSvgRect(1, 1, this.tableWidth - 2, 24, this.headerBackgroundColor);
         group.appendChild(headerRect);
 
-        // Table Name (header text)
-        const tableName = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        tableName.setAttribute("x", 10);
-        tableName.setAttribute("y", 17);
-        tableName.setAttribute("font-size", this.tableFontSize);
-        tableName.setAttribute("text-anchor", "left");
-        tableName.setAttribute("fill", "#1d3c86");
-        tableName.textContent = entity.name;
-        group.appendChild(tableName);
+        const titleGroup = this.createSvgForeignText(10, 5, this.tableWidth - 95, 18, entity.name);
+        group.appendChild(titleGroup);
 
-        const moveUpText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        moveUpText.setAttribute("x", this.tableWidth - this.createOffset(4));
-        moveUpText.setAttribute("y", 17);
-        moveUpText.setAttribute("font-size", this.buttonFontSize);
-        moveUpText.textContent = "⬅️"; // Up arrow symbol
-        group.appendChild(moveUpText);
+        const controlButtons = [
+            { icon: "📄", offset: 5, className: "view-data-icon" },
+            { icon: "⬅️", offset: 4, className: "move-up-icon" },
+            { icon: "➡️", offset: 3, className: "move-down-icon" },
+            { icon: "✏️", offset: 2, className: "edit-icon" },
+            { icon: "❌", offset: 1, className: "delete-icon" }
+        ];
 
-        // Move Up Button (rectangle + text)
-        const moveUpBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        moveUpBtn.setAttribute("x", this.tableWidth - this.createOffset(4)); // Position to the left of the Delete button
-        moveUpBtn.setAttribute("y", 7); // Vertically center
-        moveUpBtn.setAttribute("width", this.buttonWidth);
-        moveUpBtn.setAttribute("height", this.buttonHeight);
-        moveUpBtn.setAttribute("fill", "transparent"); 
-        moveUpBtn.setAttribute("class", "move-up-icon");
-        moveUpBtn.setAttribute("data-index", index);
-        group.appendChild(moveUpBtn);
+        controlButtons.forEach(({ icon, offset, className }) => {
+            const xOffset = this.tableWidth - this.createOffset(offset);
 
-        const moveDownText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        moveDownText.setAttribute("x", this.tableWidth - this.createOffset(3));
-        moveDownText.setAttribute("y", 17);
-        moveDownText.setAttribute("font-size", this.buttonFontSize);
-        moveDownText.textContent = "➡️"; // Down arrow symbol
-        group.appendChild(moveDownText);
+            const iconText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            iconText.setAttribute("x", xOffset);
+            iconText.setAttribute("y", 17);
+            iconText.setAttribute("font-size", this.buttonFontSize);
+            iconText.textContent = icon;
+            group.appendChild(iconText);
 
-        // Move Down Button (rectangle + text)
-        const moveDownBtn = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        moveDownBtn.setAttribute("x", this.tableWidth - this.createOffset(3)); // Position to the left of the Edit button
-        moveDownBtn.setAttribute("y", 7); // Vertically center
-        moveDownBtn.setAttribute("width", this.buttonWidth);
-        moveDownBtn.setAttribute("height", this.buttonHeight);
-        moveDownBtn.setAttribute("fill", "transparent"); 
-        moveDownBtn.setAttribute("class", "move-down-icon");
-        moveDownBtn.setAttribute("data-index", index);
-        group.appendChild(moveDownBtn);    
+            const iconRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            iconRect.setAttribute("x", xOffset);
+            iconRect.setAttribute("y", 7);
+            iconRect.setAttribute("width", this.buttonWidth);
+            iconRect.setAttribute("height", this.buttonHeight);
+            iconRect.setAttribute("fill", "transparent");
+            iconRect.setAttribute("class", className);
+            iconRect.setAttribute("data-index", index);
+            iconRect.style.cursor = "pointer";
+            group.appendChild(iconRect);
+        });
 
-        // Create Edit and Delete icons
-        const editIconText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        editIconText.setAttribute("x", this.tableWidth - this.createOffset(2));
-        editIconText.setAttribute("y", 17);
-        editIconText.setAttribute("font-size", this.buttonFontSize);
-        editIconText.textContent = "✏️"; // Edit text
-        group.appendChild(editIconText);
+        entity.columns.forEach((col, i) => {
+            const yPosition = yOffset + (i * this.columnHeight);
+            const yLine = yOffsetCol + (i * this.columnHeight);
 
-        const editIconRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        editIconRect.setAttribute("x", this.tableWidth - this.createOffset(2));
-        editIconRect.setAttribute("y", 7);
-        editIconRect.setAttribute("width", this.buttonWidth);
-        editIconRect.setAttribute("height", this.buttonHeight);
-        editIconRect.setAttribute("fill", "transparent");
-        editIconRect.setAttribute("class", "edit-icon");
-        editIconRect.setAttribute("data-index", index);
-        group.appendChild(editIconRect);
-
-        const deleteIconText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        deleteIconText.setAttribute("x", this.tableWidth - this.createOffset(1));
-        deleteIconText.setAttribute("y", 17);
-        deleteIconText.setAttribute("font-size", this.buttonFontSize);
-        deleteIconText.textContent = "❌"; // Delete text
-        group.appendChild(deleteIconText);
-
-        const deleteIconRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        deleteIconRect.setAttribute("x", this.tableWidth - this.createOffset(1));
-        deleteIconRect.setAttribute("y", 7);
-        deleteIconRect.setAttribute("width", this.buttonWidth);
-        deleteIconRect.setAttribute("height", this.buttonHeight);
-        deleteIconRect.setAttribute("fill", "transparent");
-        deleteIconRect.setAttribute("class", "delete-icon");
-        deleteIconRect.setAttribute("data-index", index);
-        group.appendChild(deleteIconRect);
-
-        // Set cursor to pointer for icons
-        moveUpBtn.style.cursor = "pointer";
-        moveDownBtn.style.cursor = "pointer";
-        editIconRect.style.cursor = "pointer";
-        deleteIconRect.style.cursor = "pointer";
-
-        // Table Columns with their types
-        entity.columns.forEach((col, index) => {
-
-            if(col.primaryKey)
-            {
-                const pkRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                pkRect.setAttribute("x", 1);
-                pkRect.setAttribute("y", yOffsetCol + (index * this.columnHeight) + 1);
-                pkRect.setAttribute("width", this.tableWidth - 2);
-                pkRect.setAttribute("height", this.columnHeight - 2);
-                pkRect.setAttribute("fill", "#f4f8ff");
+            if (col.primaryKey) {
+                const pkRect = this.createSvgRect(1, yLine + 1, this.tableWidth - 2, this.columnHeight - 2, "#f4f8ff");
                 group.appendChild(pkRect);
             }
 
             const columnText = document.createElementNS("http://www.w3.org/2000/svg", "text");
             columnText.setAttribute("x", 10);
-            columnText.setAttribute("y", yOffset + (index * this.columnHeight));
+            columnText.setAttribute("y", yPosition);
             columnText.setAttribute("font-size", this.columnFontSize);
             columnText.setAttribute("fill", this.columnTextColor);
             columnText.textContent = col.name;
@@ -323,34 +272,122 @@ class EntityRenderer {
 
             const typeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
             typeText.setAttribute("x", this.tableWidth - 10);
-            typeText.setAttribute("y", yOffset + (index * this.columnHeight));
+            typeText.setAttribute("y", yPosition);
             typeText.setAttribute("font-size", this.columnTypeFontSize);
             typeText.setAttribute("fill", this.columnTextColor);
-
-            let colType;
-            if (this.withLengthTypes.includes(col.type) && col.length > 0) {
-                colType = `${col.type}(${col.length})`;
-            } else if (this.withRangeTypes.includes(col.type) && col.values != null) {
-                colType = `${col.type}(${col.values})`;
-            } else {
-                colType = `${col.type}`;
-            }
-
-            typeText.textContent = colType;
             typeText.setAttribute("text-anchor", "end");
+
+            const colType = this.getFormattedType(col);
+            typeText.textContent = colType;
             group.appendChild(typeText);
 
-            const borderLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            borderLine.setAttribute("x1", 0);
-            borderLine.setAttribute("y1", yOffsetCol + (index * this.columnHeight));
-            borderLine.setAttribute("x2", this.tableWidth);
-            borderLine.setAttribute("y2", yOffsetCol + (index * this.columnHeight));
-            borderLine.setAttribute("stroke", this.stroke);
-            borderLine.setAttribute("stroke-width", this.entityStrokeWidth);
-            group.appendChild(borderLine);
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", 0);
+            line.setAttribute("y1", yLine);
+            line.setAttribute("x2", this.tableWidth);
+            line.setAttribute("y2", yLine);
+            line.setAttribute("stroke", this.stroke);
+            line.setAttribute("stroke-width", this.entityStrokeWidth);
+            group.appendChild(line);
         });
-        this.svg.appendChild(group); // Append the table group to the SVG
+
+        this.svg.appendChild(group);
         return group;
+    }
+
+    /**
+     * Creates an SVG `<rect>` element with the specified position, size, and styling.
+     *
+     * This helper method simplifies the creation of rectangular SVG shapes by encapsulating
+     * attribute assignment for position, size, fill color, stroke color, and stroke width.
+     *
+     * Commonly used for drawing table containers, headers, and cell highlights in SVG-based diagrams.
+     *
+     * @param {number} x - The x-coordinate of the rectangle's top-left corner.
+     * @param {number} y - The y-coordinate of the rectangle's top-left corner.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} [fill="transparent"] - The fill color of the rectangle (any valid CSS/SVG color).
+     * @param {string} [stroke="none"] - The stroke (border) color of the rectangle.
+     * @param {number} [strokeWidth=0] - The width of the stroke in pixels.
+     *
+     * @returns {SVGRectElement} An SVG `<rect>` element ready to be appended to an SVG group or canvas.
+     */
+    createSvgRect(x, y, width, height, fill = "transparent", stroke = "none", strokeWidth = 0) {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("width", width);
+        rect.setAttribute("height", height);
+        rect.setAttribute("fill", fill);
+        rect.setAttribute("stroke", stroke);
+        rect.setAttribute("stroke-width", strokeWidth);
+        return rect;
+    }
+
+    /**
+     * Creates an SVG `<foreignObject>` element containing a styled HTML `<div>` to render text
+     * with ellipsis overflow behavior (similar to CSS `text-overflow: ellipsis`).
+     *
+     * This helper is typically used to display table names or labels within a constrained width,
+     * ensuring that long text does not overflow or disrupt the layout of surrounding SVG elements.
+     *
+     * The HTML `<div>` inside the `<foreignObject>` uses the following styles:
+     * - Font: 12px sans-serif
+     * - Color: #1d3c86
+     * - No wrapping (`white-space: nowrap`)
+     * - Hidden overflow with ellipsis (`overflow: hidden; text-overflow: ellipsis`)
+     *
+     * @param {number} x - The x-coordinate of the `<foreignObject>` container in the SVG.
+     * @param {number} y - The y-coordinate of the `<foreignObject>` container in the SVG.
+     * @param {number} width - The width of the container area (used for overflow constraint).
+     * @param {number} height - The height of the container area.
+     * @param {string} text - The plain text content to be rendered inside the div.
+     *
+     * @returns {SVGForeignObjectElement} An SVG `<foreignObject>` element containing a styled div.
+     */
+    createSvgForeignText(x, y, width, height, text) {
+        const foreign = document.createElementNS("http://www.w3.org/2000/svg", "foreignObject");
+        foreign.setAttribute("x", x);
+        foreign.setAttribute("y", y);
+        foreign.setAttribute("width", width);
+        foreign.setAttribute("height", height);
+
+        const div = document.createElement("div");
+        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        div.style.cssText = `font-size: 12px; font-family: sans-serif; color: #1d3c86; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: ${height}px;`;
+        div.textContent = text;
+        foreign.appendChild(div);
+
+        return foreign;
+    }
+
+    /**
+     * Formats the data type of a column into a string representation suitable for display.
+     *
+     * This method checks if the column's type supports length (e.g., VARCHAR, CHAR)
+     * or range/values (e.g., ENUM, SET) and appends the appropriate length or values
+     * in parentheses. If neither applies, it simply returns the type as-is.
+     *
+     * Examples:
+     * - { type: "VARCHAR", length: 100 } → "VARCHAR(100)"
+     * - { type: "ENUM", values: "'A','B','C'" } → "ENUM('A','B','C')"
+     * - { type: "TEXT" } → "TEXT"
+     *
+     * @param {Object} col - The column definition object.
+     * @param {string} col.type - The base data type of the column.
+     * @param {number} [col.length] - The optional length (used with types like VARCHAR).
+     * @param {string|Array} [col.values] - The optional values (used with types like ENUM).
+     *
+     * @returns {string} A formatted string representing the column type.
+     */
+    getFormattedType(col) {
+        if (this.withLengthTypes.includes(col.type) && col.length > 0) {
+            return `${col.type}(${col.length})`;
+        } else if (this.withRangeTypes.includes(col.type) && col.values != null) {
+            return `${col.type}(${col.values})`;
+        }
+        return `${col.type}`;
     }
 
     /**
