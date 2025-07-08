@@ -172,7 +172,7 @@ if(!isset($databaseName))
                         <div class="resize-bar"></div>
                         <div class="right-panel">
                             <div class="table-export-sql-container">
-                            <table>
+                            <table class="sql-table-export">
                                 <thead>
                                     <tr>
                                         <td>

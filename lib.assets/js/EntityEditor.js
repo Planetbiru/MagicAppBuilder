@@ -1146,6 +1146,7 @@ class EntityEditor {
         // Custom Entity Separator
         if (this.entities.some(e => !_this.systemEntities.includes(e.name.toLowerCase()))) {
             const sep = document.createElement('tr');
+            sep.classList.add('group-header');
             sep.innerHTML = `<td>
                     <label><input type="checkbox" class="export-structure-custom" /> S</label>
                 </td>
@@ -1166,6 +1167,7 @@ class EntityEditor {
         // System Entity Separator
         if (this.entities.some(e => _this.systemEntities.includes(e.name.toLowerCase()))) {
             const sep = document.createElement('tr');
+            sep.classList.add('group-header');
             sep.innerHTML = `<td>
                     <label><input type="checkbox" class="export-structure-system" /> S</label>
                 </td>

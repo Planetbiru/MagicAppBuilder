@@ -231,8 +231,8 @@ function init() {
             editor.exportToSQL();
         }
 
-        if (event.target.classList.contains('export-data-custom')) {
-            let seletion = document.querySelectorAll('.entity-data-custom');
+        if (event.target.classList.contains('export-data-system')) {
+            let seletion = document.querySelectorAll('.entity-data-system');
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
