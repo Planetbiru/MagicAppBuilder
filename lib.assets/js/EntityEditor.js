@@ -457,17 +457,18 @@ class Entity {
     removeColumn(index) {
         this.columns.splice(index, 1);
     }
-    
-    setData(data)
-    {
+
+    /**
+     * Sets the entity's data (rows of values).
+     * 
+     * @param {Array<Object>} data - Array of data objects representing rows.
+     */
+    setData(data) {
         this.data = data || [];
     }
 
     /**
      * Converts the entity (with its columns) into a valid SQL `CREATE TABLE` statement.
-     * 
-     * This method generates the SQL statement for creating a table, including the
-     * table's name and each of its columns' definitions as provided by the `Column` class.
      * 
      * @returns {string} The SQL statement for creating the entity (table).
      */
@@ -476,9 +477,58 @@ class Entity {
         this.columns.forEach(col => {
             sql += `\t${col.toSQL()},\r\n`;
         });
-        sql = sql.slice(0, -3); // Remove last comma
+        sql = sql.slice(0, -3); // Remove trailing comma
         sql += "\r\n);\r\n\r\n";
         return sql;
+    }
+
+    /**
+     * Generates a single SQL INSERT statement with multiple rows.
+     *
+     * @returns {string} SQL INSERT statement.
+     */
+    toSQLInsert() {
+        if (!this.data || this.data.length === 0) return '';
+
+        const columnNames = this.columns.map(col => col.name);
+        const valuesList = this.data.map(row => {
+            return '(' + columnNames.map(name => this.formatValue(row[name])).join(', ') + ')';
+        });
+
+        return `INSERT INTO ${this.name} (${columnNames.join(', ')}) VALUES\n${valuesList.join(',\n')};`+'\r\n';
+    }
+
+    /**
+     * Generates a single SQL INSERT statement for the given row.
+     * 
+     * @param {Object} row - An object representing a row of data.
+     * @param {string[]} columnNames - Array of column names to be inserted.
+     * @returns {string} A SQL INSERT statement.
+     */
+    createInsert(row, columnNames) {
+        const columnsPart = columnNames.join(', ');
+        const valuesPart = columnNames.map(name => this.formatValue(row[name])).join(', ');
+        return `INSERT INTO ${this.name} (${columnsPart}) VALUES (${valuesPart});`;
+    }
+
+    /**
+     * Formats a value for SQL insertion, handling strings, nulls, and escaping.
+     * 
+     * @param {*} value - The value to format.
+     * @returns {string} SQL-safe representation of the value.
+     */
+    formatValue(value) {
+        if (value === null || value === undefined) {
+            return 'NULL';
+        } else if (typeof value === 'number') {
+            return value.toString();
+        } else if (typeof value === 'boolean') {
+            return value ? '1' : '0';
+        } else {
+            // Escape single quotes by doubling them
+            const escaped = String(value).replace(/'/g, "''");
+            return `'${escaped}'`;
+        }
     }
 }
 
@@ -649,9 +699,22 @@ class EntityEditor {
      */
     addDomListeners() {
         let _this = this;
-        document.querySelector(".check-all-entity").addEventListener('change', (event) => {
+        document.querySelector(".check-all-entity-structure").addEventListener('change', (event) => {
             let checked = event.target.checked;
-            let allEntities = event.target.closest('.right-panel').querySelectorAll(".selected-entity");
+            let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-structure");
+            
+            if(allEntities)
+            {
+                allEntities.forEach((entity, index) => {
+                    entity.checked = checked;
+                })
+            }
+            
+            this.exportToSQL();
+        });
+        document.querySelector(".check-all-entity-data").addEventListener('change', (event) => {
+            let checked = event.target.checked;
+            let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-data");
             
             if(allEntities)
             {
@@ -664,7 +727,7 @@ class EntityEditor {
         });
         
         document.querySelector(this.selector+" .right-panel .table-list-for-export").addEventListener('change', (event) => {
-            if (event.target.classList.contains('selected-entity')) {
+            if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
                 this.exportToSQL();
             }
         });
@@ -1654,7 +1717,7 @@ class EntityEditor {
         const selectedEntity = [];
 
         // Get all selected entity checkboxes (those that are checked)
-        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");
 
         // If there are selected checkboxes, add their data-name to the selectedEntity array
         
@@ -1677,11 +1740,21 @@ class EntityEditor {
         // Iterate over the entities and create a checkbox for each entity
         this.entities.forEach((entity, index) => {
             // Create a new list item for each entity
-            let entityCbForExport = document.createElement('li');
-            let entityCbMain = document.createElement('li');
+            let entityCbForExport = document.createElement('tr');
             entityCbForExport.innerHTML = `
-            <label><input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />${entity.name}</label>
+            <td>
+                <label><input type="checkbox" class="selected-entity-structure" data-name="${entity.name}" value="${index}" /> S</label>
+            </td>
+            <td>
+                <label><input type="checkbox" class="selected-entity-data" data-name="${entity.name}" value="${index}" /> D</label>
+            </td>
+            <td>
+            ${entity.name}
+            </td>
             `;
+            
+            let entityCbMain = document.createElement('li');
+            
 
             entityCbMain.innerHTML = `<input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" 
             /><a class="edit-table" href="javascript:">✏️</a><a class="delete-table" href="javascript:">❌</a> ${entity.name}`
@@ -2443,7 +2516,8 @@ class EntityEditor {
      */
     exportToSQL() {
         let sql = [];       
-        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity:checked");  
+        
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");  
         selectedEntities.forEach((checkbox, index) => {
             const entityIndex = parseInt(checkbox.value); 
             const entity = this.entities[entityIndex]; 
@@ -2451,6 +2525,20 @@ class EntityEditor {
                 sql.push(entity.toSQL());
             }
         });
+        
+        const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");  
+        selectedEntitiesData.forEach((checkbox, index) => {
+            const entityIndex = parseInt(checkbox.value); 
+            const entity = this.entities[entityIndex]; 
+            if (entity) {
+                let query = entity.toSQLInsert();
+                if(query != '')
+                {
+                    sql.push(query);
+                }
+            }
+        });
+        
         document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
     }
     

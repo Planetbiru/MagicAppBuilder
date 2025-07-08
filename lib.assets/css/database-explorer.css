@@ -892,22 +892,4 @@ tr.over {
 
 tr.group-header td {
   background-color: #f1f8ff;
-}
-
-.data-preview-table td {
-  padding: 0 !important;
-}
-.data-preview-table td .entity-data-cell {
-  border: 1px solid transparent;
-  padding: 4px 6px;
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-}
-.data-preview-table td .entity-data-cell:focus-visible {
-  outline: none;
-}
-.data-preview-table .td-remover {
-  width: 20px;
-  text-align: center;
 }/*# sourceMappingURL=database-explorer.css.map */

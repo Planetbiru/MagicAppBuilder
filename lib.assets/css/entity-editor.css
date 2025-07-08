@@ -360,6 +360,40 @@ body {
 .entity-editor .table-list-for-export li label {
   padding: 0;
 }
+.entity-editor .table-export-sql-container {
+  height: 120px;
+  overflow: auto;
+  margin-bottom: 10px;
+}
+.entity-editor .table-export-sql-container table thead tr th:nth-child(1), .entity-editor .table-export-sql-container table thead tr th:nth-child(2),
+.entity-editor .table-export-sql-container table thead tr td:nth-child(1), .entity-editor .table-export-sql-container table thead tr td:nth-child(2) {
+  width: 16px;
+  text-align: center;
+}
+.entity-editor .table-export-sql-container table th, .entity-editor .table-export-sql-container table td {
+  font-size: 12px;
+}
+.entity-editor .table-export-sql-container table th input[type=checkbox], .entity-editor .table-export-sql-container table td input[type=checkbox] {
+  margin-left: 0;
+  margin-right: 0px;
+}
+.entity-editor .data-preview-table td {
+  padding: 0 !important;
+}
+.entity-editor .data-preview-table td .entity-data-cell {
+  border: 1px solid transparent;
+  padding: 4px 6px;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+.entity-editor .data-preview-table td .entity-data-cell:focus-visible {
+  outline: none;
+}
+.entity-editor .data-preview-table .td-remover {
+  width: 20px;
+  text-align: center;
+}
 
 .entity-name {
   width: 200px;

@@ -168,8 +168,26 @@ if(!isset($databaseName))
                         </div>
                         <div class="resize-bar"></div>
                         <div class="right-panel">
-                            <div class="entity-selector"><label><input type="checkbox" class="check-all-entity">Check all <span class="entity-count"></span></label></div>
-                            <ul class="table-list-for-export"></ul>
+                            <div class="table-export-sql-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>
+                                            <label><input type="checkbox" class="check-all-entity-structure"> S</label> 
+                                        </td>
+                                        <td>
+                                            <label><input type="checkbox" class="check-all-entity-data"> D</label>
+                                        </td>
+                                        <td>
+                                            Entity Name <span class="entity-count"></span>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-list-for-export">
+                                    <!-- data -->
+                                </tbody>
+                            </table>
+                            </div>
                             <textarea class="query-generated" spellcheck="false" autocomplete="off"></textarea>
                         </div>
                     </div>
