@@ -1,6 +1,11 @@
 <?php
 
-require_once dirname(__DIR__) . "/inc.app/auth.php";
+require_once dirname(__DIR__) . "/inc.app/auth-core.php";
+
+if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
+{
+    exit(); // Bye non superuser
+}
 
 $baseDirectory = realpath(dirname(__DIR__) . '/tmp/'); 
 

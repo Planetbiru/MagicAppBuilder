@@ -2,6 +2,13 @@
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+require_once dirname(__DIR__) . "/inc.app/auth-core.php";
+
+if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
+{
+    exit(); // Bye non superuser
+}
+
 // Polyfill for PHP < 8.0
 if (!function_exists('str_starts_with')) {
     function str_starts_with($haystack, $needle) {
