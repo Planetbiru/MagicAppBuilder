@@ -344,22 +344,6 @@ body {
 .entity-editor .entity .entity-footer button {
   margin-bottom: 0;
 }
-.entity-editor .table-list-for-export {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  margin: 2px 0 10px 0;
-  height: 100px;
-  overflow: auto;
-}
-.entity-editor .table-list-for-export li {
-  padding: 0;
-  margin: 0;
-  line-height: 1.5;
-}
-.entity-editor .table-list-for-export li label {
-  padding: 0;
-}
 .entity-editor .table-export-sql-container {
   height: 120px;
   overflow: auto;
