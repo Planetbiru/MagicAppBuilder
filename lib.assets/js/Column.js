@@ -180,7 +180,12 @@ class Column {
                 columnDef += ` DEFAULT ${this.toBoolean(this.default, dialect)}`;
             } else if (this.isTypeNumeric(this.type, Object.values(DIALECT_TYPE_MAP[dialect])) && !isNaN(this.default)) {
                 columnDef += ` DEFAULT ${this.default}`;
-            } else {
+            } 
+            else if(isNaN(this.default))
+            {
+                columnDef += '';
+            }
+            else {
                 columnDef += ` DEFAULT ${this.fixDefaultColumnValue(this.default, dialect)}`;
             }
         }
