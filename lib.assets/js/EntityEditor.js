@@ -109,6 +109,7 @@ class EntityEditor {
             'user_password_history',
         ];
         this.db = null; // SQL.js database instance
+        this.parsedTableData = {};
     }
 
     /**
@@ -2190,63 +2191,79 @@ class EntityEditor {
     }
 
     /**
-     * Imports SQL file content, translates it to MySQL-compatible syntax, and parses the structure.
-     * The result is converted to entity definitions and rendered in the interface.
+     * Imports an SQL file, translates its content to MySQL-compatible syntax, parses the table structures and data,
+     * and updates the entity editor with the parsed entities and rows.
      *
-     * @param {File} file - The SQL file to import.
-     * @param {Function} [callback] - Optional callback function to invoke after import is complete.
+     * @param {File} file - The SQL file to be imported.
+     * @param {Function} [callback] - Optional callback to execute after the import process is completed.
      * @returns {void}
      */
     importSQLQuery(file, callback) {
         let _this = this;
-        const reader = new FileReader(); // Create a FileReader instance
+        const reader = new FileReader(); // Initialize FileReader to read the file contents
+
         reader.onload = function (e) {
-            let contents = e.target.result; // Get the content of the file
+            let contents = e.target.result; // Extract text content from the file
+
             try {
-                let translator = new SQLConverter();
-                contents = translator.translate(contents, 'mysql').split('`').join('');
-                let parser = new TableParser(contents);
+                const translator = new SQLConverter(); // Create an instance to handle SQL dialect conversion
+                const translatedContents = translator.translate(contents, 'mysql').replace(/`/g, ''); // Translate and clean backticks
 
+                const tableParser = new TableParser(translatedContents); // Parse translated SQL structure (CREATE TABLE)
+                tableParser.parseData(contents); // Parse original SQL content (INSERT INTO) to extract row data
 
-                let importedEntities = editor.createEntitiesFromSQL(parser.tableInfo); // Insert the received data into editor.entities  
-                if(_this.clearBeforeImport)
-                {
-                    _this.entities = importedEntities;    
-                    _this.clearEntities(); // Clear the existing entities
-                    _this.clearDiagrams(); // Clear the existing diagrams
-                    _this.renderEntities(); // Update the view with the fetched entities
-                }
-                else
-                {
-                    let existing = [];
-                    _this.entities.forEach((entity) => {
-                        existing.push(entity.name);
-                    });
+                const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
+
+                if (_this.clearBeforeImport) {
+                    // Replace current entities with imported ones
+                    _this.entities = importedEntities;
+
                     importedEntities.forEach((entity) => {
-                        if(!existing.includes(entity.name))
-                        {
+                        const tableName = entity.name;
+                        if (tableParser.data?.[tableName]) {
+                            entity.setData(tableParser.data[tableName]); // Assign row data if available
+                        }
+                    });
+
+                    _this.clearEntities();  // Remove all existing entities from editor
+                    _this.clearDiagrams();  // Remove all diagrams
+                    _this.renderEntities(); // Render the imported entities in the interface
+                } else {
+                    // Merge imported entities with existing ones
+                    const existing = _this.entities.map(e => e.name);
+
+                    importedEntities.forEach((entity) => {
+                        if (!existing.includes(entity.name)) {
                             entity.index = _this.entities.length;
+
+                            if (tableParser.data?.[entity.name]) {
+                                entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                            }
+
                             _this.entities.push(entity);
                         }
-                    });    
-                    _this.renderEntities(); // Update the view with the fetched entities
-                }
-                
-                if (typeof callback === 'function') {
-                    callback(_this.entities); // Execute callback with the updated entities
+                    });
+
+                    _this.renderEntities(); // Refresh UI to reflect changes
                 }
 
-                _this.restoreCheckedEntitiesFromCurrentDiagram(); // Restore checked entities from the current diagram
-                
+                if (typeof callback === 'function') {
+                    callback(_this.entities); // Invoke callback with updated entity list
+                }
+
+                _this.restoreCheckedEntitiesFromCurrentDiagram(); // Reapply previous diagram selections
             } catch (err) {
-                console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
+                console.log("Error parsing SQL: " + err.message); // Log error if parsing fails
             }
         };
+
         reader.onerror = () => {
-            _this.showAlertDialog("Failed to read file.", "Alert", "OK");
+            _this.showAlertDialog("Failed to read file.", "Alert", "OK"); // Display error dialog if reading fails
         };
-        reader.readAsText(file); // Read the file as text
+
+        reader.readAsText(file); // Begin reading the file as plain text
     }
+
 
     /**
      * Imports a SQLite database file and extracts table structures and data using SQL.js.
@@ -2285,7 +2302,7 @@ class EntityEditor {
                         const values = tableData[0].values;
 
                         // Map array of values to array of objects for easier access
-                        entity.data = values.map(rowValues => {
+                        entity.data = values.map(rowValues => /*NOSONAR*/ {
                             const rowObject = {};
                             columns.forEach((colName, colIndex) => {
                                 const snakeKey = _this.snakeize(colName);
@@ -2395,8 +2412,8 @@ class EntityEditor {
             return 1; // Boolean types are typically 1 byte in MySQL
         }
 
-        const match = sqliteType.match(/\((\d+)\)/);
-        if (match && match[1]) {
+        const match = sqliteType.match(/\((\d+)\)/); // NOSONAR
+        if (match && match[1]) /*NOSONAR*/ {
             return parseInt(match[1]);
         }
         return null;
@@ -2646,7 +2663,7 @@ class EntityEditor {
             .replace(/\s+/g, "_") // Replaces spaces with underscores
             .replace(/[^\w]/g, "") // Removes non-alphanumeric characters (excluding underscores)
             .toLowerCase() // Converts everything to lowercase
-            .replace(/^_+|_+$/g, ""); // Trims leading/trailing underscores
+            .replace(/^_+|_+$/g, ""); // NOSONAR // Trims leading/trailing underscores
     }
 
     /**

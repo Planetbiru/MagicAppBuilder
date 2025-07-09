@@ -3,15 +3,14 @@
  * It handles various SQL types and constraints such as primary keys, data types, not null, default values, and more.
  */
 class TableParser {
-
     /**
      * Constructor initializes the type list and parses the given SQL if provided.
      * @param {string} [sql] Optional SQL string to parse upon initialization.
      */
     constructor(sql) {
         this.tableInfo = [];
+        this.data = {};
         this.init();
-
         if (sql != null) {
             this.parseAll(sql);
         }
@@ -23,6 +22,249 @@ class TableParser {
     init() {
         const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,LONGTEXT,MEDIUMTEXT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME2,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL,TIME,UUID,MONEY,BLOB,BIT,JSON';
         this.typeList = typeList.split(',');
+    }
+
+    /**
+     * Parses a single SQL INSERT query string.
+     * Supports column names quoted with backticks (` `), square brackets (`[ ]`), or double quotes (`" "`).
+     * Handles both single-row and multi-row INSERT statements.
+     * Accurately extracts complex values, including HTML, CSS, JavaScript, and properly escaped
+     * single quotes (`''`) and double quotes (`""`). This method provides a robust
+     * mechanism for parsing all value types and ensuring all rows are extracted.
+     *
+     * @param {string} query The SQL INSERT query string to parse.
+     * @returns {object|null} An object with `tableName` (string), `columns` (string[]), and `rows` (Array<Array<string|number|boolean|null>>).
+     * Returns `null` if the query format is invalid or cannot be parsed.
+     */
+    parseInsertQuery(query) {
+        // Trim leading/trailing whitespace from the query.
+        const trimmedQuery = query.trim();
+        // Regex to extract table name, column list (optional), and the VALUES section.
+        // `is` flag enables dotall mode (s) and case-insensitivity (i).
+        const insertRegex = /INSERT INTO\s+(`[^`]+`|\[[^\]]+\]|"[^"]+"|[\w.]+)\s*(?:\(([^)]*?)\))?\s*VALUES\s*(.*)/is; // NOSONAR
+        const match = trimmedQuery.match(insertRegex); // NOSONAR
+
+        // If the query does not match the INSERT format, return null.
+        if (!match) {
+            return null;
+        }
+
+        // Extract and clean the table name, removing any surrounding quotes/brackets.
+        const tableName = match[1].replace(/^[`\["]|[`\]"]$/g, ''); // NOSONAR
+        // Extract and clean column names, if provided.
+        // It handles different quoting styles for column names.
+        const columns = match[2] ? match[2].match(/(`[^`]+`|\[[^\]]+\]|"[^"]+"|[^,]+)/g).map(c => c.trim().replace(/^[`\["]|[`\]"]$/g, '')) : []; // NOSONAR // If no columns are explicitly listed, return an empty array.
+
+        // Get the raw string section containing all row values.
+        const valueSection = match[3];
+        // Extract individual row strings from the value section, handling nested parentheses and quoted values.
+        const rowStrings = this.extractRowStrings(valueSection);
+        const rawRows = rowStrings.map(row => this.parseRow(row));
+        // Parse each row string into an array of typed values.
+        const rows = rawRows.map(values => {
+            const obj = {};
+            for (let i = 0; i < columns.length; i++) {
+                obj[columns[i]] = values[i];
+            }
+            return obj;
+        });
+
+
+        // Return the parsed query structure.
+        return { tableName, columns, rows };
+    }
+
+    /**
+     * Extracts individual row content strings from the overall VALUES section.
+     * This method is designed to correctly separate rows, even when values contain
+     * nested parentheses or commas within quoted strings.
+     *
+     * @param {string} valueSection The part of the query after `VALUES`.
+     * @returns {string[]} An array of strings, where each string represents the content of one row (without the outer parentheses).
+     */
+    extractRowStrings(valueSection) // NOSONAR 
+    {
+        const rows = [];
+        let buffer = ''; // Accumulates characters for the current row.
+        let inSingle = false; // Flag to track if currently inside a single-quoted string.
+        let inDouble = false; // Flag to track if currently inside a double-quoted string.
+        let escape = false; // Flag to track if the next character is escaped.
+        let depth = 0; // Tracks the nesting depth of parentheses, crucial for distinguishing row boundaries.
+
+        // Iterate through each character of the valueSection.
+        for (let i = 0; i < valueSection.length; i++) {
+            const char = valueSection[i];
+            const next = valueSection[i + 1]; // Lookahead to check for escaped quotes.
+
+            // Handle escaped characters (e.g., `\` followed by any char).
+            if (escape) {
+                buffer += char;
+                escape = false; // Reset escape flag.
+            } else if (char === '\\') {
+                // If a backslash is encountered, the next char is escaped.
+                buffer += char;
+                escape = true;
+            } else if (char === "'" && !inDouble) {
+                // Handle single quotes, only if not inside a double-quoted string.
+                buffer += char;
+                if (inSingle && next === "'") {
+                    // Handle SQL-style escaped single quote (two single quotes).
+                    buffer += next;
+                    i++; // NOSONAR // Skip the next character.
+                } else {
+                    // Toggle inSingle state.
+                    inSingle = !inSingle;
+                }
+            } else if (char === '"' && !inSingle) {
+                // Handle double quotes, only if not inside a single-quoted string.
+                buffer += char;
+                if (inDouble && next === '"') {
+                    // Handle SQL-style escaped double quote (two double quotes, less common but supported).
+                    buffer += next;
+                    i++; // NOSONAR // Skip the next character.
+                } else {
+                    // Toggle inDouble state.
+                    inDouble = !inDouble;
+                }
+            } else if (char === '(' && !inSingle && !inDouble) {
+                // Handle opening parenthesis for a row.
+                // Only consider it a new row start if at depth 0.
+                if (depth === 0) buffer = ''; // Clear buffer for a new row.
+                buffer += char;
+                depth++; // Increase depth.
+            } else if (char === ')' && !inSingle && !inDouble) {
+                // Handle closing parenthesis for a row.
+                buffer += char;
+                depth--; // Decrease depth.
+                // If depth returns to 0, it means a full row block `(...)` has been parsed.
+                if (depth === 0) {
+                    // Ensure the buffer starts and ends with parentheses, then extract content.
+                    if (buffer.startsWith('(') && buffer.endsWith(')')) {
+                        rows.push(buffer.substring(1, buffer.length - 1)); // Remove outer parentheses.
+                    } else {
+                        rows.push(buffer); // Fallback, though this case should ideally not be hit with correct logic.
+                    }
+                    buffer = ''; // Reset buffer for the next row.
+                }
+            } else {
+                // Append other characters to the current buffer.
+                buffer += char;
+            }
+        }
+
+        return rows;
+    }
+
+    /**
+     * A simple trim function, ensuring consistency if a custom trim behavior is needed.
+     * @param {string} str The string to trim.
+     * @returns {string} The trimmed string.
+     */
+    customTrim(str) {
+        return str.trim();
+    }
+
+    /**
+     * Parses a single row content string into an array of JavaScript values (strings, numbers, booleans, null).
+     * This method handles commas as value delimiters and correctly parses different SQL literal types.
+     *
+     * @param {string} rowContent The string content of a single row (e.g., "1, 'Alice', NULL").
+     * @returns {(string|number|boolean|null)[]} An array of parsed values for the row.
+     */
+    parseRow(rowContent) // NOSONAR 
+    {
+        const values = [];
+        let current = ''; // Accumulates characters for the current value.
+        let inSingle = false; // Flag: inside single-quoted string.
+        let inDouble = false; // Flag: inside double-quoted string.
+        let escape = false; // Flag: next character is escaped.
+
+        /**
+         * Helper function to process and push the accumulated `current` value into the `values` array.
+         * Handles type conversion (null, boolean, number) and string unescaping.
+         */
+        const pushValue = () => {
+            // Do not trim `current` entirely to preserve whitespace within the string (e.g., if it's '  ').
+            const raw = current;
+            const trimmed = this.customTrim(raw); // Use customTrim for type detection and initial processing.
+            let parsed;
+
+            // Determine the actual type and parse the value.
+            if (!trimmed) {
+                // Handle empty string or string containing only whitespace.
+                parsed = '';
+            } else if (/^null$/i.test(trimmed)) {
+                // Parse NULL literal.
+                parsed = null;
+            } else if (/^true$/i.test(trimmed)) {
+                // Parse TRUE boolean literal.
+                parsed = true;
+            } else if (/^false$/i.test(trimmed)) {
+                // Parse FALSE boolean literal.
+                parsed = false;
+            } else if (trimmed.startsWith("'") && trimmed.endsWith("'")) {
+                // Handle SQL-style single-quoted string.
+                parsed = trimmed.slice(1, -1) // Remove outer quotes.
+                    .replace(/''/g, "'") // Unescape doubled single quotes (`''` -> `'`).
+                    .replace(/\\(["'\\])/g, '$1'); // Unescape `\"`, `\'`, `\\` inside single quotes (common in some dialects).
+            } else if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+                parsed = trimmed.slice(1, -1)
+                    .replace(/''/g, "'")            // handle '' as single quote (even in double quotes!)
+                    .replace(/\\\\/g, '\\')         // unescape backslash
+                    .replace(/\\"/g, '"');          // unescape double quote
+            } else if (!isNaN(trimmed) && trimmed !== '') { // Check if it's a valid number.
+                // Parse numeric literal.
+                parsed = Number(trimmed);
+            } else {
+                // Default to string for unquoted values.
+                parsed = trimmed;
+            }
+
+            values.push(parsed); // Add the parsed value to the array.
+            current = ''; // Reset `current` for the next value.
+        };
+
+        // Iterate through each character in the row content to parse individual values.
+        for (let i = 0; i < rowContent.length; i++) {
+            const char = rowContent[i];
+            const next = rowContent[i + 1]; // Lookahead for escaped/doubled quotes.
+
+            // Handle escape sequences (`\`).
+            if (escape) {
+                current += char;
+                escape = false;
+            } else if (char === '\\') {
+                current += char;
+                escape = true;
+            } else if (char === "'" && !inDouble) {
+                // Handle single quotes, respecting double quotes.
+                current += char;
+                if (inSingle && next === "'") {
+                    current += next; 
+                    i++; // NOSONAR // Consume the second single quote for escape.
+                } else {
+                    inSingle = !inSingle; // Toggle single quote state.
+                }
+            } else if (char === '"' && !inSingle) {
+                // Handle double quotes, respecting single quotes.
+                current += char;
+                if (inDouble && next === '"') {
+                    current += next; 
+                    i++; // NOSONAR // Consume the second double quote for escape.
+                } else {
+                    inDouble = !inDouble; // Toggle double quote state.
+                }
+            } else if (char === ',' && !inSingle && !inDouble) {
+                // If a comma is encountered outside of any quoted string, it's a value delimiter.
+                pushValue(); // Process the accumulated value.
+            } else {
+                // Append other characters to the current value buffer.
+                current += char;
+            }
+        }
+
+        pushValue(); // Push the last value after the loop finishes.
+        return values;
     }
 
     /**
@@ -449,7 +691,6 @@ class TableParser {
      * @param {string} sql The SQL string containing multiple CREATE TABLE statements.
      */
     parseAll(sql) {
-
         let inf = [];
         const parsedResult = this.parseSQL(sql);
         for(let i in parsedResult)
@@ -463,9 +704,39 @@ class TableParser {
             catch(e)
             {
                 console.log(e.message);
-            }
+            }   
         }
         this.tableInfo = inf;
+    }
+
+    /**
+     * Parses INSERT INTO statements from a SQL string and extracts row data into a structured object.
+     * 
+     * The extracted data is stored in the `this.data` property, where each key is the table name,
+     * and the value is an array of row objects inserted into that table.
+     * 
+     * @param {string} sql - The SQL string containing one or more INSERT INTO statements.
+     */
+    parseData(sql) {
+        this.data = {};
+        const parsedResult = this.parseSQL(sql);
+        for (let i in parsedResult) {
+            let data = this.parseInsertQuery(parsedResult[i].query);
+            if (
+                data != null &&
+                data.tableName != null &&
+                data.tableName !== '' &&
+                typeof data.rows !== 'undefined' &&
+                Array.isArray(data.rows) &&
+                data.rows.length > 0
+            ) {
+                if (typeof this.data[data.tableName] === 'undefined') {
+                    this.data[data.tableName] = [];
+                }
+                // Merge the extracted rows into the corresponding table's array
+                this.data[data.tableName].push(...data.rows);
+            }
+        }
     }
     
     /**

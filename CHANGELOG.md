@@ -1420,26 +1420,28 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 ## What's New
 
-### New Feature: Import SQLite Database in Database Explorer
+### New Feature: Import SQLite Database in **Database Explorer**
 
-* Added support for importing SQLite `.db` or `.sqlite` files in the **Database Explorer** during structure import.
-* Automatically extracts the schema and generates table structures.
+* You can now import SQLite `.db` or `.sqlite` files directly in the **Database Explorer** during structure import.
+* The schema is automatically extracted and transformed into internal table definitions.
 
-### New Feature: Import SQLite Database in Entity Editor
+### New Feature: Import SQLite Database in **Entity Editor**
 
-* Entity Editor now supports importing table structures directly from SQLite database files.
-* Structures are read and converted into entities compatible with MagicAppBuilder’s internal format.
+* The **Entity Editor** now supports importing table structures directly from SQLite database files.
+* Table definitions are read and converted into entities compatible with MagicAppBuilder.
 
 ### Enhancement: Permission Enforcement for Superuser
 
-* Improved permission handling to ensure that **only administrators with `superuser` level** can access MagicAppBuilder and all of its features.
+* Only administrators with the `superuser` level are allowed to access all features in MagicAppBuilder.
+* This enhances security in multi-role admin environments and protects core application builder features.
 
 #### Benefits:
 
-* Simplifies transition from SQLite-based prototypes or legacy systems.
-* Speeds up development by eliminating manual schema conversion.
-* Prevents unauthorized access to core application builder tools.
-* Strengthens security in multi-role environments where admin access is scoped.
+* Simplifies migration from SQLite-based prototypes or legacy systems.
+* Speeds up development by eliminating the need for manual schema conversion.
+* Prevents unauthorized access to sensitive builder features.
+* Enforces stricter access control in admin environments.
+
 
 ## What's Fixed
 
@@ -1447,11 +1449,42 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 * Fixed an issue where downloading the database from MagicAppBuilder would fail or return incomplete data.
 
-### Bug Fix: Data Format by Nullable Column Capability
+### Bug Fix: Data Formatting Based on Nullable Columns
 
-* Resolved an issue where data was not being formatted correctly based on the nullable property of a column.
-* Now ensures that null-like values are properly handled, defaulting to `0` for numeric, `'0'` or `'false'` for boolean, and `''` for text types when a column is marked as `NOT NULL`.
+* Resolved an issue where data was not formatted correctly based on the `nullable` property of columns.
+* Now ensures:
+
+  * `0` for numeric types,
+  * `'0'` or `'false'` for boolean types,
+  * `''` (empty string) for text types
+    when a column is marked as `NOT NULL`.
 
 ### General Bug Fixes
 
-* Minor bug fixes and internal stability improvements related to file import parsing and structure rendering.
+* Minor internal improvements and bug fixes related to file parsing and structure rendering.
+
+
+## Structure & Data Import Support (as of Version 1.11.0)
+
+Starting from this version, **MagicAppBuilder supports importing data alongside table structures**.
+When importing SQL files that contain `INSERT INTO` statements, the data will be parsed and attached to the corresponding entities—ready for insertion into the target database.
+
+**Supported import sources for structure and data:**
+
+1. **SQL Files**
+
+   * Supported dialects: MySQL, MariaDB, PostgreSQL, SQLite, SQL Server
+   * Includes `CREATE TABLE` and `INSERT INTO` statements
+
+2. **SQLite Database Files (`.db`, `.sqlite`)**
+
+   * Supports full schema and data import from binary SQLite database files.
+
+3. **CSV Files**
+
+   * Column headers are auto-mapped, and data types are inferred from sample values.
+
+4. **Excel Files (`.xlsx`, `.xls`)**
+
+   * Each sheet is treated as a table (entity), with automatic column type detection.
+
