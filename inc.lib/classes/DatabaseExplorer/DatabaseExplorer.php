@@ -196,7 +196,7 @@ class DatabaseExplorer // NOSONAR
      * @param string $table The currently selected table.
      * @return string The generated HTML.
      */
-    public static function showSidebarTablesSithGroup($pdo, $applicationId, $databaseName, $schemaName, $table)
+    public static function showSidebarTablesSithGroup($pdo, $applicationId, $databaseName, $schemaName, $table) // NOSONAR
     {
         $dbType = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
