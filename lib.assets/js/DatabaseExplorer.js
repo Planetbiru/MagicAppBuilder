@@ -358,9 +358,9 @@ function openSQLiteStructure(file) {
                 tableNames.forEach(tableName => {
                     const tableStructureRes = db.exec(`PRAGMA table_info(${tableName});`);
                     if (tableStructureRes.length > 0) {
-                        const columns = tableStructureRes[0].values.map(col => {
-                            const columnName = col[1];                      // Column name
-                            const dataType = col[2];                         // Data type (e.g., INTEGER, TEXT)
+                        const columns = tableStructureRes[0].values.map(col => /*NOSONAR*/{
+                            const columnName = col[1];                        // Column name
+                            const dataType = col[2];                          // Data type (e.g., INTEGER, TEXT)
                             const isNotNull = col[3] === 1 ? "NOT NULL" : ""; // NOT NULL constraint
                             const defaultValue = col[4] != null ? `DEFAULT ${col[4]}` : ""; // Default value
                             const primaryKey = col[5] === 1 ? "PRIMARY KEY" : ""; // Primary key
