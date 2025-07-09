@@ -695,7 +695,7 @@ class EntityEditor {
             // Add a new entity
             const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
-            newEntity.setData(this.snakeize(this.currentEntityData, columns));
+            newEntity.setData(this.snakeizeData(this.currentEntityData, columns));
             this.entities.push(newEntity);
         }
         this.renderEntities();
@@ -2249,15 +2249,14 @@ class EntityEditor {
     }
 
     /**
-     * Imports a SQLite database file and extracts table structures using SQL.js.
-     * Converts each table into an Entity with MySQL-compatible column definitions.
+     * Imports a SQLite database file and extracts table structures and data using SQL.js.
+     * Converts each table into an Entity with MySQL-compatible column definitions and populates its 'data' property.
      *
      * @param {File} file - The SQLite database file to import.
      * @param {Function} [callback] - Optional callback function to invoke after import is complete.
      * @returns {void}
      */
-    importSQLite(file, callback)
-    {
+    importSQLite(file, callback) {
         if (!file) {
             return; // Exit if no file is selected
         }
@@ -2276,12 +2275,34 @@ class EntityEditor {
                 let importedEntities = [];
                 res1[0].values.forEach((row, index) => {
                     const tableName = row[0]; // Extract table name
-                    const entity = new Entity(tableName, index);
+                    const entity = new Entity(_this.snakeize(tableName), index);
+
+                    // --- Start: Add data import capability ---
+                    let tableData = _this.db.exec(`SELECT * FROM ${tableName};`);
+                    if (tableData.length > 0) {
+                        // Assuming tableData[0].columns contains column names and tableData[0].values contains rows
+                        const columns = tableData[0].columns;
+                        const values = tableData[0].values;
+
+                        // Map array of values to array of objects for easier access
+                        entity.data = values.map(rowValues => {
+                            const rowObject = {};
+                            columns.forEach((colName, colIndex) => {
+                                const snakeKey = _this.snakeize(colName);
+                                rowObject[snakeKey] = rowValues[colIndex];
+                            });
+                            return rowObject;
+                        });
+                    } else {
+                        entity.setData(null); // If no data, initialize as null
+                    }
+                    // --- End: Add data import capability ---
+
                     let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info
                     if (tableInfo.length > 0) {
                         tableInfo[0].values.forEach(columnInfo => {
                             const column = new Column(
-                                columnInfo[1],
+                                _this.snakeize(columnInfo[1]),
                                 _this.toMySqlType(columnInfo[2]),
                                 _this.getColumnSize(columnInfo[2]),
                                 columnInfo[3] === 1,
@@ -2297,29 +2318,25 @@ class EntityEditor {
                     }
                 });
 
-                if(_this.clearBeforeImport)
-                {
-                    _this.entities = importedEntities;    
+                if (_this.clearBeforeImport) {
+                    _this.entities = importedEntities;
                     _this.clearEntities(); // Clear the existing entities
                     _this.clearDiagrams(); // Clear the existing diagrams
                     _this.renderEntities(); // Update the view with the fetched entities
-                }
-                else
-                {
+                } else {
                     let existing = [];
                     _this.entities.forEach((entity) => {
                         existing.push(entity.name);
                     });
                     importedEntities.forEach((entity) => {
-                        if(!existing.includes(entity.name))
-                        {
+                        if (!existing.includes(entity.name)) {
                             entity.index = _this.entities.length;
                             _this.entities.push(entity);
                         }
-                    });    
+                    });
                     _this.renderEntities(); // Update the view with the fetched entities
                 }
-                
+
                 if (typeof callback === 'function') {
                     callback(_this.entities); // Execute callback with the updated entities
                 }
@@ -2495,7 +2512,7 @@ class EntityEditor {
      * @param {Array<Object>} columns - Array of column metadata, each with a `name` property.
      * @returns {Array<Object>} A new array of objects with keys converted to snake_case.
      */
-    snakeize(rows, columns) {
+    snakeizeData(rows, columns) {
         const columnNames = columns.map(col => col.name);
         const result = [];
 
@@ -2503,7 +2520,7 @@ class EntityEditor {
             for (const row of rows) {
                 const snakeRow = {};
                 for (const key of Object.keys(row)) {
-                    const snakeKey = this.cleanColumnName(key);
+                    const snakeKey = this.snakeize(key);
                     if (columnNames.includes(snakeKey)) {
                         snakeRow[snakeKey] = row[key];
                     }
@@ -2512,6 +2529,31 @@ class EntityEditor {
             }
         }
 
+        return result;
+    }
+
+    /**
+     * Converts the keys of each object in an array from camelCase to snake_case.
+     * 
+     * This function iterates over an array of objects and transforms all keys in each object
+     * to snake_case using the `this.snakeize()` method. The original values are preserved.
+     * 
+     * @param {Object[]} rows - An array of objects with camelCase keys.
+     * @returns {Object[]} - A new array of objects with snake_case keys.
+     */
+    snakeizeKey(rows)
+    {
+        let result = [];
+        if (Array.isArray(rows)) {
+            for (const row of rows) {
+                const snakeRow = {};
+                for (const key of Object.keys(row)) {
+                    const snakeKey = this.snakeize(key);
+                    snakeRow[snakeKey] = row[key];
+                }
+                result.push(snakeRow);
+            }
+        }
         return result;
     }
 
@@ -2574,27 +2616,38 @@ class EntityEditor {
      */
     generateCreateTable(headers, rows) {
         let _this = this;
-
         const cols = headers.map(header => {
-            const cleanName = _this.cleanColumnName(header)
-
+            const cleanName = _this.snakeize(header)
             const values = rows.map(row => row[header]);
             const type = _this.guessType(values);
-
             return new Column(cleanName, type, null, true, null, false, false, null);
         });
-
         return cols;
     }
     
-    cleanColumnName(header)
-    {
+    /**
+     * Converts a string into snake_case format, trimming any leading or trailing underscores.
+     * This function handles spaces, non-alphanumeric characters, and conversions from camelCase or PascalCase.
+     *
+     * @param {string} header - The input string to be converted.
+     * @returns {string} The string in snake_case format, with leading/trailing underscores removed.
+     *
+     * @example
+     * snakeize("  This Is A Header  ");     // Returns "this_is_a_header"
+     * snakeize("firstName");                // Returns "first_name"
+     * snakeize("_User ID_");                // Returns "user_id"
+     * snakeize("HeaderTitleExample");       // Returns "header_title_example"
+     * snakeize("anotherTestString__");      // Returns "another_test_string"
+     * snakeize(" _with!Special@Chars#_  "); // Returns "withspecialchars"
+     */
+    snakeize(header) {
         return header
-            .replace(/\s+/g, "_")
-            .replace(/[^\w]/g, "")
-            .toLowerCase();
+            .replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1_$2") // Handles camelCase/PascalCase conversion
+            .replace(/\s+/g, "_") // Replaces spaces with underscores
+            .replace(/[^\w]/g, "") // Removes non-alphanumeric characters (excluding underscores)
+            .toLowerCase() // Converts everything to lowercase
+            .replace(/^_+|_+$/g, ""); // Trims leading/trailing underscores
     }
-
 
     /**
      * Triggers the import action for JSON entities by simulating a click
