@@ -4,10 +4,10 @@
 
 The following versions of this project are currently supported with security updates:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.9.x   | :white_check_mark: |
-| < 1.9.0 | :x:                |
+| Version    | Supported          |
+| ---------- | ------------------ |
+| >= 1.10.1  | :white_check_mark: |
+| < 1.10.1   | :x:                |
 
 ## Reporting a Vulnerability
 
