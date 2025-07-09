@@ -1,3 +1,18 @@
+# Set proper MIME type for .wasm
+AddType application/wasm .wasm
+
+<FilesMatch "\.wasm$">
+    # Enable caching for .wasm files (cache for 3 months)
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresDefault "access plus 3 months"
+    </IfModule>
+
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=7884000"
+    </IfModule>
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
 
     RewriteEngine On

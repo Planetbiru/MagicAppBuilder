@@ -108,6 +108,7 @@ class EntityEditor {
             'user_activity',
             'user_password_history',
         ];
+        this.db = null; // SQL.js database instance
     }
 
     /**
@@ -2153,6 +2154,50 @@ class EntityEditor {
      * @returns {void} - This function does not return a value.
      */
     importSQLFile(file, callback) {
+        const _this = this;
+        const reader = new FileReader();
+
+        // Baca 512 byte pertama
+        const blob = file.slice(0, 512);
+        reader.onload = function (e) {
+            const buffer = new Uint8Array(e.target.result);
+            if (_this.looksLikeSQLite(buffer)) {
+                _this.importSQLite(file, callback);
+            } else {
+                _this.importSQLQuery(file, callback);
+            }
+        };
+
+        reader.onerror = () => _this.showAlertDialog("Failed to read file.", "Alert", "OK");
+        reader.readAsArrayBuffer(blob);
+    }
+
+    /**
+     * Checks whether the given buffer starts with the standard SQLite file header.
+     * SQLite database files begin with the following 16-byte header: "SQLite format 3\0".
+     *
+     * @param {Uint8Array} buffer - The byte buffer to check.
+     * @returns {boolean} - Returns true if the buffer matches the SQLite header signature.
+     */
+    looksLikeSQLite(buffer) {
+        const sqliteHeader = [
+            0x53, 0x51, 0x4C, 0x69,
+            0x74, 0x65, 0x20, 0x66,
+            0x6F, 0x72, 0x6D, 0x61,
+            0x74, 0x20, 0x33, 0x00
+        ];
+        return sqliteHeader.every((byte, i) => buffer[i] === byte);
+    }
+
+    /**
+     * Imports SQL file content, translates it to MySQL-compatible syntax, and parses the structure.
+     * The result is converted to entity definitions and rendered in the interface.
+     *
+     * @param {File} file - The SQL file to import.
+     * @param {Function} [callback] - Optional callback function to invoke after import is complete.
+     * @returns {void}
+     */
+    importSQLQuery(file, callback) {
         let _this = this;
         const reader = new FileReader(); // Create a FileReader instance
         reader.onload = function (e) {
@@ -2197,7 +2242,147 @@ class EntityEditor {
                 console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
             }
         };
+        reader.onerror = () => {
+            _this.showAlertDialog("Failed to read file.", "Alert", "OK");
+        };
         reader.readAsText(file); // Read the file as text
+    }
+
+    /**
+     * Imports a SQLite database file and extracts table structures using SQL.js.
+     * Converts each table into an Entity with MySQL-compatible column definitions.
+     *
+     * @param {File} file - The SQLite database file to import.
+     * @param {Function} [callback] - Optional callback function to invoke after import is complete.
+     * @returns {void}
+     */
+    importSQLite(file, callback)
+    {
+        if (!file) {
+            return; // Exit if no file is selected
+        }
+        let _this = this;
+        const reader = new FileReader(); // Create a FileReader object
+        reader.onload = function (event) {
+            const arrayBuffer = event.target.result; // Get file data as an ArrayBuffer
+            const uint8Array = new Uint8Array(arrayBuffer); // Convert ArrayBuffer to Uint8Array
+
+            // Initialize SQL.js and load the database
+            initSqlJs({ locateFile: file => `../lib.assets/wasm/sql-wasm.wasm` }).then(SQL => {
+                _this.db = new SQL.Database(uint8Array); // Create a new database instance
+
+                // Get the names of all tables in the database
+                let res1 = _this.db.exec("SELECT name FROM sqlite_master WHERE type='table';");
+                let importedEntities = [];
+                res1[0].values.forEach((row, index) => {
+                    const tableName = row[0]; // Extract table name
+                    const entity = new Entity(tableName, index);
+                    let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info
+                    if (tableInfo.length > 0) {
+                        tableInfo[0].values.forEach(columnInfo => {
+                            const column = new Column(
+                                columnInfo[1],
+                                _this.toMySqlType(columnInfo[2]),
+                                _this.getColumnSize(columnInfo[2]),
+                                columnInfo[3] === 1,
+                                columnInfo[4],
+                                columnInfo[5],
+                                false,
+                                null,
+                            );
+                            // Add the column to the entity
+                            entity.addColumn(column);
+                        });
+                        importedEntities.push(entity); // Add the entity to the imported entities
+                    }
+                });
+
+                if(_this.clearBeforeImport)
+                {
+                    _this.entities = importedEntities;    
+                    _this.clearEntities(); // Clear the existing entities
+                    _this.clearDiagrams(); // Clear the existing diagrams
+                    _this.renderEntities(); // Update the view with the fetched entities
+                }
+                else
+                {
+                    let existing = [];
+                    _this.entities.forEach((entity) => {
+                        existing.push(entity.name);
+                    });
+                    importedEntities.forEach((entity) => {
+                        if(!existing.includes(entity.name))
+                        {
+                            entity.index = _this.entities.length;
+                            _this.entities.push(entity);
+                        }
+                    });    
+                    _this.renderEntities(); // Update the view with the fetched entities
+                }
+                
+                if (typeof callback === 'function') {
+                    callback(_this.entities); // Execute callback with the updated entities
+                }
+
+                _this.restoreCheckedEntitiesFromCurrentDiagram(); // Restore checked entities from the current diagram
+            });
+        };
+        reader.readAsArrayBuffer(file); // Read the selected file
+    }
+
+    /**
+     * Converts SQLite data type to MySQL equivalent without length or default values.
+     * The mapping is done in order of priority using a predefined list of patterns.
+     * 
+     * @param {string} sqliteType - The original SQLite column type.
+     * @returns {string} - Corresponding MySQL data type.
+     */
+    toMySqlType(sqliteType) {
+        if (!sqliteType) return 'TEXT';
+
+        const type = sqliteType.trim().toUpperCase();
+
+        // Ordered map of patterns to MySQL types
+        const typeMap = [
+            [/NVARCHAR/, "VARCHAR"],
+            [/INT/, "BIGINT"],
+            [/(CHAR|CLOB|TEXT)/, "TEXT"],
+            [/BLOB/, "BLOB"],
+            [/(REAL|FLOA|DOUB)/, "DOUBLE"],
+            [/(NUMERIC|DECIMAL)/, "DECIMAL"],
+            [/BOOLEAN/, "TINYINT"],
+            [/TIMESTAMP/, "TIMESTAMP"],
+            [/(DATE|TIME)/, "DATETIME"]
+        ];
+
+        for (const [pattern, mysqlType] of typeMap) {
+            if (pattern.test(type)) {
+                return mysqlType;
+            }
+        }
+
+        return sqliteType; // Default fallback
+    }
+
+    /**
+     * Extracts size/length value from a SQLite column type.
+     * 
+     * @param {string} sqliteType - The original SQLite column type.
+     * @returns {number|null} - The size if available, otherwise null.
+     */
+    getColumnSize(sqliteType) {
+        if (!sqliteType) return null;
+
+        if(sqliteType.toUpperCase().indexOf('BOOL') !== -1)
+        {
+            return 1; // Boolean types are typically 1 byte in MySQL
+        }
+
+        const match = sqliteType.match(/\((\d+)\)/);
+        if (match && match[1]) {
+            return parseInt(match[1]);
+        }
+        return null;
     }
     
     /**
@@ -2289,7 +2474,7 @@ class EntityEditor {
                     selectSheetAndImport(0);
                 }
             } else {
-                alert("Unsupported file format: " + ext);
+                _this.showAlertDialog(`Unsupported file format: ${ext}`, "Alert", "OK");
             }
         };
 

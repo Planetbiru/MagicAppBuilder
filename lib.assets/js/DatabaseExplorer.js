@@ -264,31 +264,134 @@ function init() {
             editor.exportToSQL();
         }
     });
-
-    
-
-    
 }
-
 /**
- * Opens the structure of the provided file and reads its content.
- * The content is then displayed in the element with the class 'original'.
+ * Opens the structure of the provided file.
+ * If the file is a SQLite database, it delegates to `openSQLiteStructure`.
+ * Otherwise, it reads the file as text and displays the content in `.original`.
  * 
  * @param {File} file - The file to be read.
  */
-function openStructure(file)
-{
-    const reader = new FileReader(); // Create a FileReader instance
+function openStructure(file) {
+    const reader = new FileReader();
+
+    const headerBlob = file.slice(0, 512);
+    reader.onload = function (e) {
+        const buffer = new Uint8Array(e.target.result);
+        if (looksLikeSQLite(buffer)) {
+            openSQLiteStructure(file); 
+        } else {
+            readAsText(file);
+        }
+    };
+
+    reader.onerror = () => console.error("Failed to read file header.");
+    reader.readAsArrayBuffer(headerBlob);
+}
+
+/**
+ * Reads a text file and displays its content in the .original textarea.
+ * 
+ * @param {File} file - The file to read as plain text.
+ */
+function readAsText(file) {
+    const reader = new FileReader();
     reader.onload = function (e) {
         try {
             document.querySelector('.original').value = e.target.result;
-            
         } catch (err) {
-            console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
+            console.error("Error displaying file content: " + err.message);
         }
     };
-    reader.readAsText(file); // Read the file as text
+    reader.onerror = () => console.error("Failed to read file content.");
+    reader.readAsText(file);
 }
+
+/**
+ * Checks whether the given buffer starts with the standard SQLite file header.
+ * SQLite database files begin with the following 16-byte header: "SQLite format 3\0".
+ *
+ * @param {Uint8Array} buffer - The byte buffer to check.
+ * @returns {boolean} - Returns true if the buffer matches the SQLite header signature.
+ */
+function looksLikeSQLite(buffer) {
+    const sqliteHeader = [
+        0x53, 0x51, 0x4C, 0x69,
+        0x74, 0x65, 0x20, 0x66,
+        0x6F, 0x72, 0x6D, 0x61,
+        0x74, 0x20, 0x33, 0x00
+    ];
+    return sqliteHeader.every((byte, i) => buffer[i] === byte);
+}
+
+/**
+ * Reads a SQLite database file and exports its table structures as SQL CREATE TABLE statements.
+ * 
+ * This function uses SQL.js to load and parse a `.sqlite` or `.db` file in the browser.
+ * It extracts all user-defined tables and generates the corresponding CREATE TABLE syntax using PRAGMA data.
+ * The result is inserted into a <textarea> with class `.original`.
+ * 
+ * @param {File} file - The SQLite database file selected by the user.
+ */
+function openSQLiteStructure(file) {
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+        try {
+            const arrayBuffer = event.target.result;
+            const uint8Array = new Uint8Array(arrayBuffer);
+
+            initSqlJs({ locateFile: file => `../lib.assets/wasm/sql-wasm.wasm` }).then(SQL => {
+                const db = new SQL.Database(uint8Array);
+
+                // Fetch user-defined tables only (exclude sqlite internal tables)
+                const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
+
+                if (res.length === 0 || res[0].values.length === 0) {
+                    document.querySelector('.original').value = '-- No tables found in database.';
+                    return;
+                }
+
+                const tableNames = res[0].values.map(row => row[0]);
+                let sqlContent = "-- SQL Structure Export\n\n";
+
+                tableNames.forEach(tableName => {
+                    const tableStructureRes = db.exec(`PRAGMA table_info(${tableName});`);
+                    if (tableStructureRes.length > 0) {
+                        const columns = tableStructureRes[0].values.map(col => {
+                            const columnName = col[1];                      // Column name
+                            const dataType = col[2];                         // Data type (e.g., INTEGER, TEXT)
+                            const isNotNull = col[3] === 1 ? "NOT NULL" : ""; // NOT NULL constraint
+                            const defaultValue = col[4] != null ? `DEFAULT ${col[4]}` : ""; // Default value
+                            const primaryKey = col[5] === 1 ? "PRIMARY KEY" : ""; // Primary key
+
+                            return `\t${columnName} ${dataType} ${isNotNull} ${defaultValue} ${primaryKey}`.replace(/\s+/g, ' ').trim();
+                        }).join(",\n");
+
+                        sqlContent += `-- Table: ${tableName}\n`;
+                        sqlContent += `CREATE TABLE ${tableName} (\n${columns}\n);\n\n`;
+                    }
+                });
+
+                document.querySelector('.original').value = sqlContent;
+            }).catch(err => {
+                console.error("SQL.js initialization error:", err);
+                document.querySelector('.original').value = '-- Failed to initialize SQL.js.';
+            });
+        } catch (err) {
+            console.error("Error processing SQLite file:", err);
+            document.querySelector('.original').value = '-- Error reading SQLite database.';
+        }
+    };
+
+    reader.onerror = () => {
+        console.error("Failed to read SQLite file.");
+        document.querySelector('.original').value = '-- Unable to read file.';
+    };
+
+    reader.readAsArrayBuffer(file); // Important: reads binary content
+}
+
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
