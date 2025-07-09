@@ -53,11 +53,12 @@ class Entity {
      * @returns {string} The SQL statement for creating the entity (table).
      */
     toSQL(dialect = "mysql") {
+        let cols = [];
         let sql = `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
         this.columns.forEach(col => {
-            sql += `\t${col.toSQL(dialect)},\r\n`;
+            cols.push(`\t${col.toSQL(dialect)}`);
         });
-        sql = sql.slice(0, -3); // Remove trailing comma and newline
+        sql += cols.join(",\r\n"); // Remove trailing comma and newline
         sql += "\r\n);\r\n\r\n";
         return sql;
     }
