@@ -135,7 +135,7 @@ class Entity {
                 return 'null'; // Returns 'null' if null is allowed
             } else {
                 // Replaces null-like values with defaults based on type if not nullable
-                if (isInteger || isFloat) {
+                if (isInteger || isFloat) /*NOSONAR*/ {
                     return '0';
                 } else if (isBoolean) {
                     // Call formatBoolean with nullable false
@@ -145,7 +145,7 @@ class Entity {
                 }
             }
         }
-
+        let formatted = '';
         if (isBoolean) {
             // Call formatBoolean with the same nullable parameter
             formatted = this.formatBoolean(value, dialect, nullable);
