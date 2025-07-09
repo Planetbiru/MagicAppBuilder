@@ -1415,3 +1415,39 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 * Prevents unauthorized access to core application builder tools.
 * Strengthens security in multi-role environments where admin access is scoped.
 
+
+# MagicAppBuilder Version 1.11.0
+
+## What's New
+
+### New Feature: Import SQLite Database in Database Explorer
+
+* Added support for importing SQLite `.db` or `.sqlite` files in the **Database Explorer** during structure import.
+* Automatically extracts the schema and generates table structures.
+
+### New Feature: Import SQLite Database in Entity Editor
+
+* Entity Editor now supports importing table structures directly from SQLite database files.
+* Structures are read and converted into entities compatible with MagicAppBuilder’s internal format.
+
+### Enhancement: Permission Enforcement for Superuser
+
+* Improved permission handling to ensure that **only administrators with `superuser` level** can access MagicAppBuilder and all of its features.
+
+#### Benefits:
+
+* Simplifies transition from SQLite-based prototypes or legacy systems.
+* Speeds up development by eliminating manual schema conversion.
+* Prevents unauthorized access to core application builder tools.
+* Strengthens security in multi-role environments where admin access is scoped.
+
+## What's Fixed
+
+### Bug Fix: Database Download Issue
+
+* Fixed an issue where downloading the database from MagicAppBuilder would fail or return incomplete data.
+
+### General Bug Fixes
+
+* Minor bug fixes and internal stability improvements related to file import parsing and structure rendering.
+
