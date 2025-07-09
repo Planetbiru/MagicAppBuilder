@@ -1447,7 +1447,11 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 * Fixed an issue where downloading the database from MagicAppBuilder would fail or return incomplete data.
 
+### Bug Fix: Data Format by Nullable Column Capability
+
+* Resolved an issue where data was not being formatted correctly based on the nullable property of a column.
+* Now ensures that null-like values are properly handled, defaulting to `0` for numeric, `'0'` or `'false'` for boolean, and `''` for text types when a column is marked as `NOT NULL`.
+
 ### General Bug Fixes
 
 * Minor bug fixes and internal stability improvements related to file import parsing and structure rendering.
-
