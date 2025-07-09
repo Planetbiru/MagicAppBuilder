@@ -41,6 +41,7 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
+    <script src="../lib.assets/js/sql-wasm.min.js"></script>
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
     <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
     <script src="../lib.assets/xlsx/xlsx.full.min.js"></script>
@@ -122,7 +123,7 @@ if(!isset($databaseName))
                 <button class="btn btn-warning clear">Clear</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
-                <input class="structure-sql" type="file" accept=".sql" style="display: none;" />
+                <input class="structure-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
             </div>
         </div>
     </div>
@@ -210,7 +211,7 @@ if(!isset($databaseName))
                             <button class="btn" onclick="editor.sortAndGroupEntities()">Sort Entity by Type</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
-                            <input class="import-file-sql" type="file" accept=".sql" style="display: none;" />
+                            <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
                             <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.csv" style="display: none;" />
                         </div>
 
