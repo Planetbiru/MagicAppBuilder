@@ -2300,7 +2300,7 @@ class EntityEditor {
 
                     let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info
                     if (tableInfo.length > 0) {
-                        tableInfo[0].values.forEach(columnInfo => {
+                        tableInfo[0].values.forEach(columnInfo => /*NOSONAR*/{
                             const column = new Column(
                                 _this.snakeize(columnInfo[1]),
                                 _this.toMySqlType(columnInfo[2]),
