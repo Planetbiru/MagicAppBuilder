@@ -703,7 +703,7 @@ class TableParser {
             }
             catch(e)
             {
-                console.log(e.message);
+                // If parsing fails, log the error and continue.
             }   
         }
         this.tableInfo = inf;

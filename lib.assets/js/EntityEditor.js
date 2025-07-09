@@ -334,7 +334,7 @@ class EntityEditor {
             const entity = this.entities[entityIndex];
             document.querySelector(this.selector+" .entity-name").value = entity.name;
             document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
-            entity.columns.forEach(col => this.addColumnToTable(col));
+            entity.columns.forEach(col => this.addColumnToTable(col, false, false));
         } else {
             this.operation = 'create';
             this.currentEntityIndex = -1;
@@ -400,7 +400,7 @@ class EntityEditor {
         document.querySelector(this.selector + " .entity-columns-table-body").innerHTML = '';
 
         columns.forEach(column => {
-            this.addColumnToTable(column);
+            this.addColumnToTable(column, false, true);
         });
 
         document.querySelector(this.selector + " .button-container").style.display = "none";
@@ -415,8 +415,9 @@ class EntityEditor {
      * 
      * @param {Column} column - The column to add.
      * @param {boolean} [focus=false] - Whether to focus on the new column's name input.
+     * @param {boolean} [newColumn=false] - Whether this is a new column being added.
      */
-    addColumnToTable(column, focus = false) {
+    addColumnToTable(column, focus = false, newColumn = false) {
         const tableBody = document.querySelector(this.selector+" .entity-columns-table-body");
         const row = document.createElement("tr");
         let columnLength = column.length == null ? '' : column.length.toString().replace(/\D/g,'');
@@ -431,6 +432,11 @@ class EntityEditor {
         {
             nullable = 'checked';
         }
+        let originalName = '';
+        if(!newColumn)
+        {
+            originalName = column.name;
+        }
         
         row.innerHTML = `
             <td class="drag-handle"></td>
@@ -439,7 +445,7 @@ class EntityEditor {
                 <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
                 <button onclick="editor.moveDown(this)" class="icon-move-down"></button>    
             </td>
-            <td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
+            <td><input type="text" class="column-name" value="${column.name}" data-roginal-name="${originalName}" placeholder="Column Name"></td>
             <td>
                 <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
                     ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
@@ -590,7 +596,7 @@ class EntityEditor {
         column.nullable = true; // Set the new column as nullable by default.
 
         // Add the column to the table in the UI.
-        this.addColumnToTable(column, focus);
+        this.addColumnToTable(column, focus, true);
         
         // Scroll to the bottom of the table container to show the newly added column.
         const element = document.querySelector(this.selector + ' .entity-container .table-container');
@@ -673,6 +679,8 @@ class EntityEditor {
         const columnLengths = document.querySelectorAll(this.selector+" #table-entity-editor .column-length");
         const columnEnums = document.querySelectorAll(this.selector+" #table-entity-editor .column-enum");
 
+        let modifiedColumnNames = [];
+
         for (let i = 0; i < columnNames.length; i++) {
             let column = new Column(
                 columnNames[i].value,
@@ -684,8 +692,28 @@ class EntityEditor {
                 columnAutoIncrements[i].checked,
                 columnEnums[i].value || null,
             );
+
+            if(columnNames[i].dataset.roginalName && columnNames[i].dataset.roginalName != column.name)
+            {
+                // If the column name has been modified, store the original name
+                modifiedColumnNames.push({
+                    original: columnNames[i].dataset.roginalName,
+                    new: column.name
+                });
+            }
+
             columns.push(column);
         }
+
+        modifiedColumnNames.forEach(modified => {
+            // Update the column names in the current entity data
+            this.entities[this.currentEntityIndex].data.forEach(row => {
+                if (row.hasOwnProperty(modified.original)) {
+                    row[modified.new] = row[modified.original]; // Copy the value to the new name
+                    delete row[modified.original]; // Remove the old name
+                }
+            });
+        });
 
         if (this.currentEntityIndex >= 0) {
             // Update existing entity
@@ -898,7 +926,7 @@ class EntityEditor {
         }
         this.template.columns.forEach(column => {
             if (!existingColumnNames.includes(column.name)) {
-                this.addColumnToTable(column, focus);
+                this.addColumnToTable(column, focus, true);
             }
         });
         const element = document.querySelector(this.selector+' .entity-container .table-container');
