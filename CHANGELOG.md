@@ -1435,13 +1435,20 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 * Only administrators with the `superuser` level are allowed to access all features in MagicAppBuilder.
 * This enhances security in multi-role admin environments and protects core application builder features.
 
+### Enhancement: Preserve Data When Renaming Columns in Entity Editor
+
+* When renaming a column in the **Entity Editor**, the data stored in that column will now be preserved.
+* Previously, renaming a column could result in loss of existing data tied to the old column name.
+
 #### Benefits:
 
 * Simplifies migration from SQLite-based prototypes or legacy systems.
 * Speeds up development by eliminating the need for manual schema conversion.
 * Prevents unauthorized access to sensitive builder features.
 * Enforces stricter access control in admin environments.
-
+* Safer structure editing in the **Entity Editor**.
+* Reduces accidental data loss when making adjustments to entity definitions.
+* Improves reliability when working with test data or sample imports.
 
 ## What's Fixed
 
@@ -1462,7 +1469,6 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 ### General Bug Fixes
 
 * Minor internal improvements and bug fixes related to file parsing and structure rendering.
-
 
 ## Structure & Data Import Support (as of Version 1.11.0)
 
