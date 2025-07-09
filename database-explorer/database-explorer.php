@@ -30,7 +30,7 @@ if(!isset($databaseName))
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
     <script src="../lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
     <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.min.js"></script>
-    <script src="../lib.assets/js/TableParser.min.js"></script>
+    <script src="../lib.assets/js/TableParser.js"></script>
     <script src="../lib.assets/js/SQLConverter.min.js"></script>
     <script src="../lib.assets/js/Column.min.js"></script>
     <script src="../lib.assets/js/Entity.min.js"></script>
