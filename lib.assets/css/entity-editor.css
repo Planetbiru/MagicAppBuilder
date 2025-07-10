@@ -409,6 +409,15 @@ body {
   margin-left: -6px;
   margin-top: 5px;
 }
+.tabs li.diagram-tab .icon-emoji::before, .tabs li.diagram-tab .icon-emoji::after {
+  font-size: 10px;
+}
+.tabs li.diagram-tab input[type=text] {
+  padding-right: 2px !important;
+}
+.tabs li.diagram-tab input[type=text]:focus-visible {
+  outline: none;
+}
 .tabs li a {
   cursor: pointer;
 }

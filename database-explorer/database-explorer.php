@@ -30,7 +30,7 @@ if(!isset($databaseName))
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
     <script src="../lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
     <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.min.js"></script>
-    <script src="../lib.assets/js/TableParser.js"></script>
+    <script src="../lib.assets/js/TableParser.min.js"></script>
     <script src="../lib.assets/js/SQLConverter.min.js"></script>
     <script src="../lib.assets/js/Column.min.js"></script>
     <script src="../lib.assets/js/Entity.min.js"></script>
@@ -207,6 +207,7 @@ if(!isset($databaseName))
                             <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
                             <button class="btn" onclick="downloadSVG()">Export SVG</button>
                             <button class="btn" onclick="downloadPNG()">Export PNG</button>
+                            <button class="btn" onclick="downloadMD()">Export MD</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>    
                             <button class="btn" onclick="editor.sortAndGroupEntities()">Sort Entity by Type</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
@@ -222,6 +223,7 @@ if(!isset($databaseName))
                                 <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
                                 <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
                                 <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
+                                <button class="btn" onclick="editor.showDescriptionDialog()">Description</button>
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
                                 <button class="btn" onclick="editor.preference()">Preferences</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
@@ -297,6 +299,24 @@ if(!isset($databaseName))
                 <button class="btn btn-primary button-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary button-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-sm" id="descriptionModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Title</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+                <textarea class="description-textarea" placeholder="Enter description here..." spellcheck="false" autocomplete="off"></textarea>
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary description-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary description-cancel">Cancel</button>
             </div>
         </div>
     </div>

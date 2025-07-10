@@ -982,6 +982,24 @@ function downloadPNG()
     }
 }
 
+function downloadMD()
+{
+    let diagramContainer = document.querySelector('.diagram-container');
+    let diagram = diagramContainer.querySelector('.diagram.active');
+    if(diagram)
+    {
+        let id = diagram.getAttribute('id');
+        if(id == 'all-entities')
+        {
+            entityRenderer.downloadMD();
+        }
+        else
+        {
+            diagramRenderer[id].downloadMD();
+        }
+    }
+}
+
 /**
  * Displays a confirmation dialog with OK and Cancel buttons.
  * Executes the provided callback with `true` if OK is clicked, or `false` if Cancel is clicked.
