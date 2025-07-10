@@ -684,11 +684,11 @@ class EntityRenderer {
             }
             if(entity.modificationDate)
             {
-                mdContent += `**Last modified on:** ${_this.formatDate(entity.modificationDate)}\n`;
+                mdContent += `**Updated on:** ${_this.formatDate(entity.modificationDate)}\n`;
             }
             if(entity.modifier && entity.modifier !== "" && entity.modifier !== "{{userName}}")
             {
-                mdContent += `**Last modified by:** ${entity.modifier}\n`;
+                mdContent += `**Updated by:** ${entity.modifier}\n`;
             }
 
             mdContent += `\n`;

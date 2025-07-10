@@ -1494,3 +1494,48 @@ When importing SQL files that contain `INSERT INTO` statements, the data will be
 
    * Each sheet is treated as a table (entity), with automatic column type detection.
 
+
+Berikut adalah **changelog lengkap MagicAppBuilder Version 1.11.1** setelah ditambahkan fitur ekspor dokumen Markdown:
+
+
+# MagicAppBuilder Version 1.11.1
+
+## What's New
+
+### Entity Metadata Support
+
+* Each entity now stores additional metadata to improve traceability and auditing:
+
+  * **Description** – A short description of the entity's purpose.
+  * **Created At** – Timestamp of when the entity was created.
+  * **Updated At** – Timestamp of the most recent modification.
+  * **Created By** – Administrator who initially created the entity.
+  * **Updated By** – Administrator who last modified the entity.
+
+This metadata is visible in both the **Entity Editor** and exported files, providing better context and history tracking.
+
+### Markdown Documentation Export
+
+* You can now **export entity structure and metadata as a Markdown document**.
+* The exported file contains:
+
+  * Entity names
+  * List of columns with types and constraints (e.g., nullable, primary key)
+  * Descriptions (if available)
+* This feature is especially useful during development, team collaboration, and long-term project maintenance.
+
+
+## What's Changed
+
+### Export Entity Uses Server-Stored Definition
+
+* Exporting entities now **downloads the JSON directly from the server**, instead of building the data from the in-memory editor state.
+* This ensures that exported files always reflect the **latest saved version**, guaranteeing consistency and preventing accidental mismatches between edited and saved data.
+
+
+## Improvements
+
+### UI Enhancement in Entity Editor
+
+* The icon size in the **Diagram** tab has been slightly adjusted for better alignment and visual consistency with the rest of the interface.
+

@@ -2763,30 +2763,50 @@ class EntityEditor {
     }
 
     /**
-     * Gathers metadata from the HTML document and exports the entities data as a JSON file.
-     * The function retrieves application-specific details such as `application-id`, 
-     * `database-name`, `database-schema`, and `database-type` from the meta tags in the document.
-     * Then, it constructs a data object containing these values and the current list of entities from
-     * the editor, and passes it to the `exportJSON` method to export the data as a JSON file.
+     * Downloads entity data as a JSON file from a dynamically constructed URL.
      * 
-     * @returns {void} - This function does not return a value. 
+     * This function retrieves application metadata such as `application-id`, `database-name`,
+     * `database-schema`, and `database-type` from `<meta>` tags in the HTML document.
+     * It then uses these values to construct an API URL via `buildUrl(...)` and fetches
+     * the entity JSON data from that endpoint.
+     * 
+     * The response is saved as a `.json` file named after the `application-id`, and the download
+     * is triggered programmatically using a Blob and an anchor element.
+     * 
+     * If the request fails, an error message is logged to the console and an alert is shown to the user.
+     * 
+     * @async
+     * @function
+     * @returns {Promise<void>} - This function does not return a value but performs a download side-effect.
      */
-    downloadEntities() {
+    async downloadEntities() {
         let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
         let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
         let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
         let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-        
-        const data = {
-            applicationId: applicationId,
-            databaseType: databaseType,
-            databaseName: databaseName,
-            databaseSchema: databaseSchema,
-            entities: this.entities,  // Converting the entities array into a JSON string
-            diagrams: this.getDiagrams() // Converting the diagrams array into a JSON string
-        };
-        
-        this.exportJSON(data); // Export the sample object to a JSON file
+
+        let url = buildUrl('entity', applicationId, databaseType, databaseName, databaseSchema, []);
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+            }
+
+            const jsonString = await response.text();
+
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const downloadUrl = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = applicationId + ".json";
+            link.click();
+
+            URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            console.error("Error downloading entities:", error);
+        }
     }
 
     /**
