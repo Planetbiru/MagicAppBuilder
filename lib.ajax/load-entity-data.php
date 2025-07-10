@@ -45,7 +45,21 @@ if ($inputPost->getDatabaseName() !== null) {
             file_put_contents($path, json_encode($data));
         }
         if (strlen($entities) > 10) {
-            $data['entities'] = json_decode($entities);
+
+            
+
+            $data['entities'] = json_decode($entities, true);
+
+            // Update entity->creator and entity->modifier
+            foreach($data['entities'] as $index => $entity) {
+                if (isset($entity['creator']) && $entity['creator'] == '{{userName}}') {
+                    $data['entities'][$index]['creator'] = $entityAdmin->getName();
+                }
+                if (isset($entity['modifier']) && $entity['modifier'] == '{{userName}}') {
+                    $data['entities'][$index]['modifier'] = $entityAdmin->getName();
+                }
+            }
+            
             file_put_contents($path, json_encode($data));
         }
     }

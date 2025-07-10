@@ -820,7 +820,11 @@ td.cell-delete a {
   font-size: 11px;
 }
 
-[data-no-table=true] textarea {
+textarea.description-textarea {
+  height: 200px;
+}
+
+[data-no-table=true] textarea[name=query] {
   height: calc(100vh - 100px);
 }
 

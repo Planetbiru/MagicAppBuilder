@@ -533,6 +533,11 @@ class EntityRenderer {
         this.exportToPNG(this.svg, fileName);
     }
 
+    downloadMD() {
+        let fileName = this.getFileName() + '.md';
+        this.exportToMD(fileName);
+    }
+
     /**
      * Retrieves the filename of the currently active diagram or the database name.
      *
@@ -653,6 +658,92 @@ class EntityRenderer {
         };
 
         img.src = svgUrl;
+    }
+
+    exportToMD(fileName = "exported-image.md") {
+        let _this = this;
+        let mdContent = `# Entity-Relationship Diagram\n\n`;
+        mdContent += `This diagram represents the entities and their relationships in the database.\n\n`;
+        mdContent += `## Entities\n\n`;
+
+        this.data.entities.forEach(entity => {
+            mdContent += `### ${entity.name}\n\n`;
+
+            if(entity.description)
+            {
+                mdContent += `**Description:** ${entity.description}\n\n`;
+            }
+
+            if(entity.creationDate)
+            {
+                mdContent += `**Created on:** ${_this.formatDate(entity.creationDate)}\n`;
+            }
+            if(entity.creator && entity.creator !== "" && entity.creator !== "{{userName}}")
+            {
+                mdContent += `**Created by:** ${entity.creator}\n`;
+            }
+            if(entity.modificationDate)
+            {
+                mdContent += `**Last modified on:** ${_this.formatDate(entity.modificationDate)}\n`;
+            }
+            if(entity.modifier && entity.modifier !== "" && entity.modifier !== "{{userName}}")
+            {
+                mdContent += `**Last modified by:** ${entity.modifier}\n`;
+            }
+
+            mdContent += `\n`;
+
+            // Header labels
+            const nameHeader = "Column Name";
+            const typeHeader = "Type";
+            const nullableHeader = "Null";
+            const pkHeader = "Key";
+            const aiHeader = "AI";
+
+            // Determine max width for padding
+            let colNameWidth = Math.max(...entity.columns.map(col => col.name.length), nameHeader.length);
+            let typeWidth = Math.max(...entity.columns.map(col => this.getFormattedType(col).length), typeHeader.length);
+            const nullableWidth = Math.max(nullableHeader.length, 4);
+            const pkWidth = Math.max(pkHeader.length, 3);
+            const aiWidth = Math.max(aiHeader.length, 3);
+
+            if (colNameWidth < 30) colNameWidth = 30;
+            if (typeWidth < 13) typeWidth = 13;
+
+            // Header row
+            mdContent += `| ${nameHeader.padEnd(colNameWidth)} | ${typeHeader.padEnd(typeWidth)} | ${nullableHeader.padEnd(nullableWidth)} | ${pkHeader.padEnd(pkWidth)} | ${aiHeader.padEnd(aiWidth)} |\n`;
+
+            // Divider row
+            mdContent += `| ${'-'.repeat(colNameWidth)} | ${'-'.repeat(typeWidth)} | ${'-'.repeat(nullableWidth)} | ${'-'.repeat(pkWidth)} | ${'-'.repeat(aiWidth)} |\n`;
+
+            // Data rows
+            entity.columns.forEach(col => {
+                const colType = this.getFormattedType(col);
+                const nullable = col.nullable ? "YES" : "NO";
+                const primaryKey = col.primaryKey ? "YES" : "NO";
+                const autoIncrement = col.autoIncrement ? "YES" : "NO";
+
+                mdContent += `| ${col.name.padEnd(colNameWidth)} | ${colType.padEnd(typeWidth)} | ${nullable.padEnd(nullableWidth)} | ${primaryKey.padEnd(pkWidth)} | ${autoIncrement.padEnd(aiWidth)} |\n`;
+            });
+
+            mdContent += `\n`;
+        });
+
+        mdContent += `\n`;
+
+        const blob = new Blob([mdContent], { type: "text/markdown" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    formatDate(timestamp) {
+        const date = new Date(timestamp);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        return date.toLocaleDateString('en-US', options).replace(',', '');
     }
 
     /**

@@ -17,6 +17,9 @@ class Entity {
         this.name = name;
         this.columns = [];
         this.data = [];
+        this.description = ''; // Description of the entity
+        this.creationDate = null; // Timestamp of creation
+        this.modificationDate = null; // Timestamp of last modification
     }
 
     /**
@@ -84,7 +87,6 @@ class Entity {
 
         return `INSERT INTO ${this.name} (${columnNames.join(', ')}) VALUES\n${valuesList.join(',\n')};\r\n`;
     }
-
 
     /**
      * Generates a single SQL INSERT statement for the given row.

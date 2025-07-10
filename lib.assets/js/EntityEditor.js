@@ -441,9 +441,9 @@ class EntityEditor {
         row.innerHTML = `
             <td class="drag-handle"></td>
             <td class="column-action">
-                <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
-                <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
-                <button onclick="editor.moveDown(this)" class="icon-move-down"></button>    
+                <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
+                <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
+                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>    
             </td>
             <td><input type="text" class="column-name" value="${column.name}" data-roginal-name="${originalName}" placeholder="Column Name"></td>
             <td>
@@ -720,13 +720,20 @@ class EntityEditor {
             this.entities[this.currentEntityIndex].name = entityName;
             this.entities[this.currentEntityIndex].index = this.currentEntityIndex;
             this.entities[this.currentEntityIndex].columns = columns;
+            this.entities[this.currentEntityIndex].modificationDate = (new Date()).getTime();
+            this.entities[this.currentEntityIndex].modifier = '{{userName}}'; // Replace with actual user name if available
         } else {
             // Add a new entity
             const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
             newEntity.setData(this.snakeizeData(this.currentEntityData, columns));
+            newEntity.modificationDate = (new Date()).getTime();
+            newEntity.creationDate = newEntity.modificationDate;
+            newEntity.creator = '{{userName}}'; // Replace with actual user name if available
+            newEntity.modifier = '{{userName}}'; // Replace with actual user name if available
             this.entities.push(newEntity);
         }
+
         this.renderEntities();
         this.updateDiagram();
         this.cancelEdit();
@@ -831,9 +838,9 @@ class EntityEditor {
         row.innerHTML = `
             <td class="drag-handle"></td>
             <td class="column-action">
-                <button onclick="editor.removeColumn(this)" class="icon-delete"></button>
-                <button onclick="editor.moveUp(this)" class="icon-move-up"></button>
-                <button onclick="editor.moveDown(this)" class="icon-move-down"></button>    
+                <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
+                <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
+                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>    
             </td>
             <td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
             <td>
@@ -1003,6 +1010,12 @@ class EntityEditor {
                 entity.addColumn(column);
                 
             });
+            entity.creationDate = entityData.creationDate || null;
+            entity.modificationDate = entityData.modificationDate || null;
+            entity.creator = entityData.creator; // Replace with actual user name if available
+            entity.modifier = entityData.modifier; // Replace with actual user name if available
+            entity.description = entityData.description || '';
+
             entity.setData(entityData.data);
 
             // Add the entity to the entities array
@@ -1053,7 +1066,7 @@ class EntityEditor {
         // Iterate over each entity in the JSON data
         tables.forEach((table, index) => {
             // Create a new Entity instance
-            const entity = new Entity(table.tableName, index);
+            let entity = new Entity(table.tableName, index);
             
             // Iterate over each column in the entity's columns array
             table.columns.forEach(columnData => {
@@ -1072,6 +1085,11 @@ class EntityEditor {
                 // Add the column to the entity
                 entity.addColumn(column);
             });
+
+            entity.creationDate = (new Date()).getTime();
+            entity.modificationDate = entity.creationDate;
+            entity.creator = '{{userName}}'; // Replace with actual user name if available
+            entity.modifier = '{{userName}}'; // Replace with actual user name if available
 
             // Add the entity to the entities array
             entities.push(entity);
@@ -1376,9 +1394,9 @@ class EntityEditor {
         <input type="text" value="${diagramName}">
         <a href="#tab1" class="tab-link select-diagram">${diagramName}</a> 
         <a 
-            href="javascript:" class="update-diagram"><span class="icon-ok"></span></a><a 
-            href="javascript:" class="edit-diagram"><span class="icon-edit"></span></a><a 
-            href="javascript:" class="delete-diagram"><span class="icon-delete"></span></a>
+            href="javascript:" class="update-diagram"><span class="icon-emoji icon-ok"></span></a><a 
+            href="javascript:" class="edit-diagram"><span class="icon-emoji icon-edit"></span></a><a 
+            href="javascript:" class="delete-diagram"><span class="icon-emoji icon-delete"></span></a>
         `;
 
 
@@ -2320,7 +2338,7 @@ class EntityEditor {
                 let importedEntities = [];
                 res1[0].values.forEach((row, index) => {
                     const tableName = row[0]; // Extract table name
-                    const entity = new Entity(_this.snakeize(tableName), index);
+                    let entity = new Entity(_this.snakeize(tableName), index);
 
                     // --- Start: Add data import capability ---
                     let tableData = _this.db.exec(`SELECT * FROM ${tableName};`);
@@ -2328,6 +2346,11 @@ class EntityEditor {
                         // Assuming tableData[0].columns contains column names and tableData[0].values contains rows
                         const columns = tableData[0].columns;
                         const values = tableData[0].values;
+
+                        entity.creationDate = (new Date()).getTime();
+                        entity.modificationDate = entity.creationDate;
+                        entity.creator = '{{userName}}'; // Replace with actual user name if available
+                        entity.modifier = '{{userName}}'; // Replace with actual user name if available
 
                         // Map array of values to array of objects for easier access
                         entity.data = values.map(rowValues => /*NOSONAR*/ {
@@ -2862,6 +2885,30 @@ class EntityEditor {
         // Add event listeners for OK and Cancel buttons
         okBtn.addEventListener('click', handleOkClick);
         cancelBtn.addEventListener('click', handleCancelClick);
+    }
+
+    showDescriptionDialog()
+    {
+        let _this = this;
+        let entityName = _this.entities[_this.currentEntityIndex].name;
+        let description = _this.entities[_this.currentEntityIndex].description || '';
+
+        let selector = '#exportModal';
+        showExprtDialog(selector, 
+            '<textarea class="description-textarea" placeholder="Enter description here..." spellcheck="false" autocomplete="off"></textarea>', 
+            `Entity Description - ${entityName}`, 'Save', 'Cancel', function(isOk) {
+            if (isOk) 
+            {
+                _this.entities[_this.currentEntityIndex].description = document.querySelector(selector + ' .description-textarea').value;
+                _this.callbackSaveEntity(_this.entities);
+                document.querySelector(selector).style.display = 'none' 
+            }
+            else 
+            {
+                document.querySelector(selector).style.display = 'none' 
+            } 
+        });
+        document.querySelector(selector + ' .description-textarea').value = description;
     }
 
     /**

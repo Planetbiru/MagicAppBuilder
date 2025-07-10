@@ -504,6 +504,15 @@ body {
                 margin-left: -6px;
                 margin-top: 5px;
             }
+            .icon-emoji::before, .icon-emoji::after{
+                font-size: 10px;
+            }
+            input[type="text"] {
+                padding-right: 2px !important;
+                &:focus-visible {
+                    outline: none;
+                }
+            }
         }
         a{
             cursor: pointer;
