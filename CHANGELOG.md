@@ -1495,9 +1495,6 @@ When importing SQL files that contain `INSERT INTO` statements, the data will be
    * Each sheet is treated as a table (entity), with automatic column type detection.
 
 
-Berikut adalah **changelog lengkap MagicAppBuilder Version 1.11.1** setelah ditambahkan fitur ekspor dokumen Markdown:
-
-
 # MagicAppBuilder Version 1.11.1
 
 ## What's New
