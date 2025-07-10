@@ -1276,6 +1276,19 @@ class EntityEditor {
         entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
     }
 
+    /**
+     * Appends a table row to the export list for a given entity.
+     *
+     * @param {HTMLElement} tabelListForExport - The table body element where the row will be appended.
+     * @param {Object} entity - The entity object containing metadata (e.g., `name`).
+     * @param {number} index - The index of the entity in the entities array.
+     * @param {string} group - A group identifier used for class names to group related checkboxes.
+     *
+     * The row contains two checkboxes:
+     * - One for selecting the entity's structure (labeled "S")
+     * - One for selecting the entity's data (labeled "D")
+     * along with the entity name.
+     */
     appendBuildTableRow(tabelListForExport, entity, index, group) {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -1753,6 +1766,14 @@ class EntityEditor {
         return array.join(',');
     }
     
+    /**
+     * Sets the currently selected entity index and opens a dialog to view its data.
+     *
+     * @param {number} index - The index of the entity in the `entities` array to view.
+     *
+     * This method updates `currentEntityIndex`, retrieves the entity at the specified index,
+     * and opens a data dialog using `showEntityDataDialog`.
+     */
     viewData(index)
     {
         this.currentEntityIndex = index;
@@ -2907,6 +2928,16 @@ class EntityEditor {
         cancelBtn.addEventListener('click', handleCancelClick);
     }
 
+    /**
+     * Displays a modal dialog for editing the description of the currently selected entity.
+     *
+     * This method shows a textarea inside a modal (referenced by `#exportModal`)
+     * allowing the user to enter or update the entity description.
+     * When the user confirms (clicks 'Save'), the description is saved to the entity object
+     * and `callbackSaveEntity` is triggered with the updated entities array.
+     * 
+     * The modal is hidden whether the user clicks 'Save' or 'Cancel'.
+     */
     showDescriptionDialog()
     {
         let _this = this;
