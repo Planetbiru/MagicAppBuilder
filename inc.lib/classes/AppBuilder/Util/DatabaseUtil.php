@@ -2,6 +2,13 @@
 
 namespace AppBuilder\Util;
 
+/**
+ * Utility class for database-related operations, particularly for identifying
+ * and managing system-defined tables within the application.
+ * This class provides a centralized list of core tables that are essential
+ * for the application's functionality and should not be altered or deleted
+ * by end-users or through typical application interfaces.
+ */
 class DatabaseUtil
 {
     /**

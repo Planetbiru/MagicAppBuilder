@@ -1494,6 +1494,9 @@ When importing SQL files that contain `INSERT INTO` statements, the data will be
 
    * Each sheet is treated as a table (entity), with automatic column type detection.
 
+Berikut adalah versi final dari changelog **MagicAppBuilder Version 1.11.1** yang sudah ditambahkan fitur **Export Database to Excel**:
+
+
 
 # MagicAppBuilder Version 1.11.1
 
@@ -1519,7 +1522,18 @@ This metadata is visible in both the **Entity Editor** and exported files, provi
   * Entity names
   * List of columns with types and constraints (e.g., nullable, primary key)
   * Descriptions (if available)
-* This feature is especially useful during development, team collaboration, and long-term project maintenance.
+
+This feature is especially useful during development, team collaboration, and long-term project maintenance.
+
+### Excel Export for Database Content
+
+* A new feature has been added to **export the actual database content to an Excel (`.xlsx`) file**.
+* Each table is stored as a separate sheet in the exported file.
+* Column types are inferred and formatted to match Excel types (e.g., text, number, date).
+* Supports multiple databases: **MySQL**, **PostgreSQL**, **SQLite**, and **SQL Server**.
+
+This enables easier reporting, data sharing, and external data review workflows.
+
 
 
 ## What's Changed

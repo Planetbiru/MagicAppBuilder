@@ -2,6 +2,7 @@
 
 use DatabaseExplorer\DatabaseExplorer;
 use DatabaseExplorer\DatabaseExporter;
+use MagicApp\XLSX\DatabaseXLSXExporter;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -56,6 +57,13 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // Initialize variables for query processing
 $queries = array();
 $lastQueries = "";
+
+if(isset($_POST['___export_excel___']))
+{
+    $exporter = new DatabaseXLSXExporter($pdo);
+    $exporter->export("File-".date("Y-m-d-H-i-s").".xlsx");
+    exit();
+}
 
 if(isset($_POST['___export_database___']) || isset($_POST['___export_table___']))
 {

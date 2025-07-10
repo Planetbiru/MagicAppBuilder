@@ -2547,7 +2547,7 @@ class EntityEditor {
                     _this.currentEntityData = json;
                     if (json.length > 0) {
                         const headers = Object.keys(json[0]);
-                        const entityName = _this.toValidTableName(file.name)+'_'+_this.toValidTableName(sheetName);
+                        const entityName = _this.toValidTableName(sheetName);
                         const columns = _this.generateCreateTable(headers, json);
                         _this.importFromSheet(columns, entityName);
                     }

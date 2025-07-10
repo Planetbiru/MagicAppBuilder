@@ -1618,6 +1618,24 @@ class DatabaseExplorer // NOSONAR
             }
         }
 
+        if(!empty($applicationId))
+        {
+            // Add space between buttons
+            $space = $dom->createTextNode(' ');
+
+            $form2->appendChild($space);
+
+            // Create exportDatabase button
+            $exportExcel = $dom->createElement('button');
+            $exportExcel->setAttribute('type', 'submit');
+            $exportExcel->setAttribute('name', '___export_excel___');
+            $exportExcel->setAttribute('value', $databaseName);
+            $exportExcel->setAttribute('class', ConstantText::BTN_SUCCESS);
+            $exportExcel->appendChild($dom->createTextNode('Export to Excel'));
+            $form2->appendChild($exportExcel);
+        }
+        
+
         // Append form to DOM
         $dom->appendChild($form);
 
