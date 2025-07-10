@@ -660,34 +660,48 @@ class EntityRenderer {
         img.src = svgUrl;
     }
 
-    exportToMD(fileName = "exported-image.md") {
+    /**
+     * Export the list of entities and their structure into a Markdown (.md) file.
+     *
+     * The generated Markdown document includes:
+     * - A document title and introduction.
+     * - Metadata for each entity (description, creation/modification info).
+     * - A Markdown-formatted table listing all columns of each entity, including:
+     *     - Column name
+     *     - Data type
+     *     - Nullability
+     *     - Primary key flag
+     *     - Auto-increment flag
+     * - A footer indicating the export date.
+     *
+     * @param {string} [fileName="exported.md"] - The name of the Markdown file to be downloaded.
+     */
+    exportToMD(fileName = "exported.md") {
         let _this = this;
-        let mdContent = `# Entity-Relationship Diagram\n\n`;
-        mdContent += `This diagram represents the entities and their relationships in the database.\n\n`;
+        let mdContent = `# Entity Documentation\n\n`;
+
+        mdContent += `This document provides an overview of all entity structures in the system, including table metadata and column definitions.\n\n`;
+        mdContent += `---\n\n`;
+
         mdContent += `## Entities\n\n`;
 
         this.data.entities.forEach(entity => {
             mdContent += `### ${entity.name}\n\n`;
 
-            if(entity.description)
-            {
+            if (entity.description) {
                 mdContent += `**Description:** ${entity.description}\n\n`;
             }
 
-            if(entity.creationDate)
-            {
+            if (entity.creationDate) {
                 mdContent += `**Created on:** ${_this.formatDate(entity.creationDate)}\n`;
             }
-            if(entity.creator && entity.creator !== "" && entity.creator !== "{{userName}}")
-            {
+            if (entity.creator && entity.creator !== "" && entity.creator !== "{{userName}}") {
                 mdContent += `**Created by:** ${entity.creator}\n`;
             }
-            if(entity.modificationDate)
-            {
+            if (entity.modificationDate) {
                 mdContent += `**Updated on:** ${_this.formatDate(entity.modificationDate)}\n`;
             }
-            if(entity.modifier && entity.modifier !== "" && entity.modifier !== "{{userName}}")
-            {
+            if (entity.modifier && entity.modifier !== "" && entity.modifier !== "{{userName}}") {
                 mdContent += `**Updated by:** ${entity.modifier}\n`;
             }
 
@@ -729,7 +743,10 @@ class EntityRenderer {
             mdContent += `\n`;
         });
 
-        mdContent += `\n`;
+        // Tambahkan catatan penutup
+        mdContent += `---\n\n`;
+        mdContent += `*Generated automatically by MagicAppBuilder.*\n`;
+        mdContent += `*This file reflects the current state of the data entities in the system as of ${_this.formatDate(new Date())}.*\n`;
 
         const blob = new Blob([mdContent], { type: "text/markdown" });
         const url = URL.createObjectURL(blob);
@@ -739,6 +756,7 @@ class EntityRenderer {
         link.click();
         URL.revokeObjectURL(url);
     }
+
 
     formatDate(timestamp) {
         const date = new Date(timestamp);

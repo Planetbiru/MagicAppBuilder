@@ -374,7 +374,6 @@ class EntityEditor {
         return newTableName;
     }
 
-
     /**
      * Imports column definitions from a spreadsheet or external source
      * and initializes a new entity for table creation.
@@ -769,7 +768,6 @@ class EntityEditor {
             _this.removeDiagramEventListener(svg);
             _this.addDiagramEventListener(svg);
         });
-        
     }
     
     /**
@@ -3304,9 +3302,6 @@ class EntityEditor {
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
         modal.style.display = 'none';
     }
-
-
-
 }
 
 
