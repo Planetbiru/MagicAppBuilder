@@ -110,7 +110,6 @@ class ResizablePanels {
         this.lastDownX = e.clientX;
         this.disableSelection(this.leftPanel);
         this.disableSelection(this.rightPanel);
-
         this.element.addEventListener('mousemove', this._boundHandleMouseMove);
         this.element.addEventListener('mouseup', this._boundStopResizing);
     }
@@ -131,7 +130,6 @@ class ResizablePanels {
         this.enableSelection(this.leftPanel);
         this.enableSelection(this.rightPanel);
     }
-
 
     /**
      * Resize the panels based on the saved width for the left panel.

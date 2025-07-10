@@ -1,6 +1,5 @@
 let selectedElement = null;
 document.addEventListener('DOMContentLoaded', function () {
-
     // Hide context menu when clicking elsewhere
     document.addEventListener("click", function (e) {
         const contextMenu = document.querySelector('#context-menu');

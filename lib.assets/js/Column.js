@@ -1,55 +1,56 @@
 const DIALECT_TYPE_MAP = {
-        mysql: {
-            int: 'INT',
-            bigint: 'BIGINT',
-            varchar: 'VARCHAR',
-            boolean: 'TINYINT(1)',
-            text: 'TEXT',
-            datetime: 'DATETIME',
-            timestamp: 'TIMESTAMP',
-            decimal: 'DECIMAL',
-            enum: 'ENUM',
-            set: 'SET',
-        },
-        postgresql: {
-            int: 'INTEGER',
-            bigint: 'BIGINT',
-            varchar: 'CHARACTER VARYING',
-            boolean: 'BOOLEAN',
-            tinyint1: 'BOOLEAN',
-            text: 'TEXT',
-            datetime: 'TIMESTAMP',
-            timestamp: 'TIMESTAMP',
-            decimal: 'NUMERIC',
-            enum: 'TEXT', // PostgreSQL doesn't support native ENUM in simple SQL
-            set: 'TEXT', // no native SET type
-        },
-        sqlite: {
-            int: 'INTEGER',
-            bigint: 'INTEGER',
-            varchar: 'NVARCHAR',
-            boolean: 'BOOLEAN',
-            tinyint1: 'BOOLEAN',
-            text: 'TEXT',
-            datetime: 'DATETIME',
-            timestamp: 'TIMESTAMP',
-            decimal: 'REAL',
-            enum: 'TEXT',
-            set: 'TEXT',
-        },
-        sqlserver: {
-            int: 'INT',
-            bigint: 'BIGINT',
-            varchar: 'NVARCHAR',
-            boolean: 'BIT',
-            tinyint1: 'BIT',
-            text: 'TEXT',
-            datetime: 'DATETIME',
-            decimal: 'DECIMAL',
-            enum: 'NVARCHAR',
-            set: 'NVARCHAR',
-        },
-    };
+    mysql: {
+        int: 'INT',
+        bigint: 'BIGINT',
+        varchar: 'VARCHAR',
+        boolean: 'TINYINT(1)',
+        text: 'TEXT',
+        datetime: 'DATETIME',
+        timestamp: 'TIMESTAMP',
+        decimal: 'DECIMAL',
+        enum: 'ENUM',
+        set: 'SET',
+    },
+    postgresql: {
+        int: 'INTEGER',
+        bigint: 'BIGINT',
+        varchar: 'CHARACTER VARYING',
+        boolean: 'BOOLEAN',
+        tinyint1: 'BOOLEAN',
+        text: 'TEXT',
+        datetime: 'TIMESTAMP',
+        timestamp: 'TIMESTAMP',
+        decimal: 'NUMERIC',
+        enum: 'TEXT', // PostgreSQL doesn't support native ENUM in simple SQL
+        set: 'TEXT', // no native SET type
+    },
+    sqlite: {
+        int: 'INTEGER',
+        bigint: 'INTEGER',
+        varchar: 'NVARCHAR',
+        boolean: 'BOOLEAN',
+        tinyint1: 'BOOLEAN',
+        text: 'TEXT',
+        datetime: 'DATETIME',
+        timestamp: 'TIMESTAMP',
+        decimal: 'REAL',
+        enum: 'TEXT', // SQLite does not have native ENUM type, using TEXT instead
+        set: 'TEXT', // SQLite does not have native SET type, using TEXT instead
+    },
+    sqlserver: {
+        int: 'INT',
+        bigint: 'BIGINT',
+        varchar: 'NVARCHAR',
+        boolean: 'BIT',
+        tinyint1: 'BIT',
+        text: 'TEXT',
+        datetime: 'DATETIME',
+        decimal: 'DECIMAL',
+        enum: 'NVARCHAR', // SQL Server does not have native ENUM type, using NVARCHAR instead
+        set: 'NVARCHAR', // SQL Server does not have native SET type, using NVARCHAR instead
+        timestamp: 'DATETIME2', // SQL Server uses DATETIME2 for better precision
+    },
+};
 /**
  * Represents a column in a database table.
  * 

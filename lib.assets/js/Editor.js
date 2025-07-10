@@ -691,7 +691,6 @@ function hilightLine6() {
     }
 }
 
-
 /**
  * Initializes the CodeMirror editor for the file manager.
  *
@@ -761,6 +760,4 @@ function focusOnLine(editor, lineNumber) {
     } catch (e) {
         console.log(e.getMessage());
     }
-
-    
 }

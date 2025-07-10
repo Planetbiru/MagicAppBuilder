@@ -20,6 +20,8 @@ class Entity {
         this.description = ''; // Description of the entity
         this.creationDate = null; // Timestamp of creation
         this.modificationDate = null; // Timestamp of last modification
+        this.creator = null; // User who created the entity
+        this.modifier = null; // User who last modified the entity
     }
 
     /**
