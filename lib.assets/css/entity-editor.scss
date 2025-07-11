@@ -452,6 +452,15 @@ body {
         }
     }
     
+    .btn-data{
+        display: none;
+    }
+    
+    &[data-state="update"] {
+        .btn-data {
+            display: inline;
+        }
+    }
 
 
 }

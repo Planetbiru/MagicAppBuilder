@@ -332,6 +332,7 @@ class EntityEditor {
             this.operation = 'update';
             this.currentEntityIndex = entityIndex;
             const entity = this.entities[entityIndex];
+            document.querySelector(this.selector).dataset.state = 'update';
             document.querySelector(this.selector+" .entity-name").value = entity.name;
             document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
             entity.columns.forEach(col => this.addColumnToTable(col, false, false));
@@ -339,6 +340,7 @@ class EntityEditor {
             this.operation = 'create';
             this.currentEntityIndex = -1;
             let newTableName = this.getNewTableName();
+            document.querySelector(this.selector).dataset.state = 'create';
             document.querySelector(this.selector+" .entity-name").value = newTableName;
             document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
         }
@@ -1772,9 +1774,16 @@ class EntityEditor {
      * This method updates `currentEntityIndex`, retrieves the entity at the specified index,
      * and opens a data dialog using `showEntityDataDialog`.
      */
-    viewData(index)
+    viewData(index = -1)
     {
-        this.currentEntityIndex = index;
+        if(index < 0)
+        {
+            index = this.currentEntityIndex;
+        }
+        else
+        {
+            this.currentEntityIndex = index;
+        }
         let entity = this.entities[index];
         this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
     }
@@ -3146,6 +3155,16 @@ class EntityEditor {
         const emptyTh = document.createElement('th'); // For delete button column
         emptyTh.classList.add('td-remover');
         headRow.appendChild(emptyTh);
+        
+        // Create tbody
+        const tbody = document.createElement('tbody');
+        
+        table.appendChild(tbody);
+        wrapper.appendChild(table);
+        modalBody.appendChild(wrapper);
+
+        // Show modal
+        modal.style.display = 'block';
 
         entity.columns.forEach(col => {
             const th = document.createElement('th');
@@ -3157,9 +3176,6 @@ class EntityEditor {
 
         thead.appendChild(headRow);
         table.appendChild(thead);
-
-        // Create tbody
-        const tbody = document.createElement('tbody');
 
         data.forEach((row, rowIndex) => {
             const tr = document.createElement('tr');
@@ -3188,12 +3204,7 @@ class EntityEditor {
             });
         });
 
-        table.appendChild(tbody);
-        wrapper.appendChild(table);
-        modalBody.appendChild(wrapper);
-
-        // Show modal
-        modal.style.display = 'block';
+        
     }
     
     /**
