@@ -323,6 +323,21 @@ class AppDatabase
         }
 
     }
+    
+    /**
+     * Extracts only the column names from the column list output.
+     *
+     * @param array $columns Output from getColumnList(...) function.
+     * @return string[] Array of column names.
+     */
+    public static function getColumName($columns)
+    {
+        if (is_array($columns) && isset($columns['columns']) && is_array($columns['columns'])) {
+            return $columns['columns'];
+        }
+        return [];
+    }
+
 
     /**
      * Retrieves column details for a SQLite table, excluding specified columns.
@@ -332,7 +347,7 @@ class AppDatabase
      * @param array $excludeColumns List of column names to exclude from the result.
      * @return array Returns an array of column details.
      */
-    private function sqliteColumnDetails($database, $tableName, $excludeColumns)
+    private static function sqliteColumnDetails($database, $tableName, $excludeColumns)
     {
         $queryBuilder = "PRAGMA table_info('$tableName')";
         $rs = $database->executeQuery($queryBuilder);
