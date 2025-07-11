@@ -1534,8 +1534,6 @@ This feature is especially useful during development, team collaboration, and lo
 
 This enables easier reporting, data sharing, and external data review workflows.
 
-
-
 ## What's Changed
 
 ### Export Entity Uses Server-Stored Definition
@@ -1543,10 +1541,26 @@ This enables easier reporting, data sharing, and external data review workflows.
 * Exporting entities now **downloads the JSON directly from the server**, instead of building the data from the in-memory editor state.
 * This ensures that exported files always reflect the **latest saved version**, guaranteeing consistency and preventing accidental mismatches between edited and saved data.
 
-
 ## Improvements
 
 ### UI Enhancement in Entity Editor
 
 * The icon size in the **Diagram** tab has been slightly adjusted for better alignment and visual consistency with the rest of the interface.
+
+### Improved Developer Experience in Validator Classes
+
+* Added **class-level docblocks** to validator classes to clearly list:
+
+  * Which input properties are validated.
+  * What validation rules are applied to each property (e.g., `@Required`, `@Email`, `@Min`, etc.).
+* These annotations can now be seen **directly from IDE tooltips or documentation panels**, helping developers understand validation logic without opening the full file.
+* Enables **faster development and easier debugging**, especially when integrating validation into controllers or services.
+
+## Bug Fixes
+
+### PHP 5 Compatibility for ValidatorUtil
+
+* Fixed arrow function usage in `ValidatorUtil` that caused fatal errors on PHP 5.
+* Rewritten using traditional anonymous functions to ensure compatibility with older PHP environments.
+* Ensures smoother operation for legacy systems still running PHP 5.x.
 

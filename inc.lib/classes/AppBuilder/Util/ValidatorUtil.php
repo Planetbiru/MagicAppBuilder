@@ -131,7 +131,9 @@ class ValidatorUtil
                             if (preg_match('/^\{.*\}$/s', $val)) {
                                 $val = trim($val, '{}');
                                 $items = array_map('trim', explode(',', $val));
-                                $items = array_map(fn($v) => trim($v, '"\''), $items);
+                                $items = array_map(function($v) {
+                                    return trim($v, '"\'');
+                                }, $items);
                                 $attributes[$key] = $items;
                             } else {
                                 $attributes[$key] = $val;
@@ -141,13 +143,16 @@ class ValidatorUtil
                             // Unquoted array syntax
                             $val = trim($val, '{}');
                             $items = array_map('trim', explode(',', $val));
-                            $items = array_map(fn($v) => trim($v, '"\''), $items);
+                            $items = array_map(function($v) {
+                                return trim($v, '"\'');
+                            }, $items);
                             $attributes[$key] = $items;
 
                         } else {
                             // Raw fallback
                             $attributes[$key] = trim($val, '"\'');
                         }
+
                     }
                 }
 
