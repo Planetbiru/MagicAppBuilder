@@ -44,6 +44,7 @@ catch(Exception $e)
 }
 
 $response = array(
+    'success' => true,
     'error_validator' => $count_validator,
     'error_count_entity' => $count_entity,
     'error_count' => $count

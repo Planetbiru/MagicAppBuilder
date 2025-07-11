@@ -24,7 +24,6 @@ try
     {
         $menuAppConfig->loadYamlFile($appConfigPath, false, true, true);
     }
-
     
     // Database connection for the application
     $database = new PicoDatabase(new SecretObject($menuAppConfig->getDatabase()));
@@ -82,16 +81,22 @@ try
         }
         // Return JSON response with primary and trash tables
         ResponseUtil::sendJSON([
+            "success" => true,
+            "message" => "Valid trash tables retrieved successfully.",
             "pair" => $validTrashTables,
             "primaryTables" => array_keys($validTrashTables),
             "trashTables" => array_values($validTrashTables),
         ]);
+        exit();
     
     }
     catch(Exception $e) {
         // Log the error for debugging purposes
         error_log("Error: " . $e->getMessage());
-        ResponseUtil::sendJSON(["error" => "An error occurred while processing your request."]);
+        ResponseUtil::sendJSON([
+            "success" => false,
+            "message" => "An error occurred while processing your request."
+        ]);
         exit();
     }
 }
@@ -99,6 +104,9 @@ catch(Exception $e)
 {
     // Log the error for debugging purposes
     error_log("Error: " . $e->getMessage());
-    ResponseUtil::sendJSON(["error" => "An error occurred while processing your request."]);
+    ResponseUtil::sendJSON([
+        "success" => false,
+        "message" => "An error occurred while processing your request."
+    ]);
     exit();
 }  

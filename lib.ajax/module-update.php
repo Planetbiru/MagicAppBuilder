@@ -25,3 +25,4 @@ catch(Exception $e)
     // do nothing
 }
 ResponseUtil::sendJSON(new stdClass);
+exit();
