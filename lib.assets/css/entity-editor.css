@@ -361,6 +361,12 @@ body {
   margin-left: 0;
   margin-right: 0px;
 }
+.entity-editor .btn-data {
+  display: none;
+}
+.entity-editor[data-state=update] .btn-data {
+  display: inline;
+}
 
 .entity-name {
   width: 200px;

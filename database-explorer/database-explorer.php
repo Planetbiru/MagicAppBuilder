@@ -222,11 +222,12 @@ if(!isset($databaseName))
                                 <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
                                 <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
                                 <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
-                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
-                                <button class="btn" onclick="editor.showDescriptionDialog()">Description</button>
+                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>                    
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
                                 <button class="btn" onclick="editor.preference()">Preferences</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
+                                <button class="btn btn-data" onclick="editor.showDescriptionDialog()">Description</button>
+                                <button class="btn btn-data" onclick="editor.viewData()">Data</button>
                                 <div class="table-container">
                                     <table id="table-entity-editor">
                                         <thead>
