@@ -73,6 +73,54 @@ if($inputPost->getUserAction() == 'create')
         $tableColumnInfo = AppDatabase::getColumnList($appConfig, $databaseConfig, $database, $tableName);
         $fields = $tableColumnInfo['fields'];
         $dataTypes = array();
+        $valProps = array();
+        
+        foreach($fields as $field)
+        {
+            $fieldName = $field['column_name'];
+            $maximumLength = $field['maximum_length'];
+            $dataType = $gen->convertType($field['column_type']);
+            $dataTypes[$fieldName] = $dataType;
+
+            // Only generate properties for fields with validation definitions
+            $number = 1;
+            if(isset($data[$fieldName]))
+            {
+                $vals = array();
+                $validations = $data[$fieldName];
+                foreach($validations as $validation)
+                {
+                    $validationType = $validation['type'];
+                    unset($validation['type']);
+                    $attributes = $validation;
+
+                    // Format validation attributes as annotation parameters
+                    $attributeParts = [];
+                    foreach ($attributes as $k => $v) {
+                        if (isset($v) && !empty($v)) {
+                            if (is_string($v) && $validationType != 'Enum') {
+                                $attributeParts[] = "$k=\"" . addslashes($v) . "\"";
+                            } else {
+                                $attributeParts[] = "$k=$v";
+                            }
+                        }
+                    }
+                    $attrs = "(".implode(", ", $attributeParts).")";
+                    if($attrs == "()")
+                    {
+                        $attrs = "";
+                    }
+                    // Add validation annotation line
+                    $vals[] = "**$validationType**$attrs";
+                }
+
+                // Add property type annotation and declaration
+                $valProps[] = " * $number. `$" . PicoStringUtil::camelize($fieldName) . "` ( ".implode(", ", $vals)." )";
+                
+                $number++;
+            }
+        }
+        
         $properties = array();
 
         // Begin PHP class definition for the validator
@@ -89,7 +137,10 @@ use MagicObject\MagicObject;
  * It is generated based on the structure of the table and the JSON definition provided.
  *
  * You may add additional validation rules or modify the generated annotations as needed.
- *
+ * 
+ * Validated properties:
+'.implode("\r\n", $valProps).'
+ * 
  * @Validator
  * @Table(name="'.$tableName.'")
  * @package '.$baseApplicationNamespace.'\\'.$validator.'
