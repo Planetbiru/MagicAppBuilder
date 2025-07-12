@@ -1606,4 +1606,13 @@ table.table.table-enum
 	margin-bottom: 0.75rem;
 }
 
-
+.table-row-container{
+	overflow: auto;
+	max-height: 300px;
+	table
+	{
+		td, th{
+			white-space: nowrap;
+		}
+	}
+}

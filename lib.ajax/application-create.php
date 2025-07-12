@@ -171,6 +171,7 @@ $application->setBaseApplicationUrl($baseApplicationUrl);
 $application->setBaseEntityNamespace($appBaseNamespace . "\\Entity");
 $application->setBaseEntityDataNamespace($appBaseNamespace . "\\Entity\\Data");
 $application->setBaseEntityAppNamespace($appBaseNamespace . "\\Entity\\App");
+$application->setBaseEntityTrashNamespace($appBaseNamespace . "\\Entity\\Trash");
 $application->setBaseEntityDirectory($baseApplicationDirectory . "/inc.lib/classes");
 $application->setBaseLanguageDirectory($baseApplicationDirectory . "/inc.lang");
 
