@@ -89,15 +89,15 @@ try
                     }
                 }
                 $trash->setTrashEntity($newTrashEntities);
-            }
-            
+            }   
             file_put_contents($path, $trash->dumpYaml());
         }    
         else if($inputPost->getUserAction() == 'update' && $inputPost->countableTable())
         {
             $tables = $inputPost->getTable();
-
+            $trash = new SecretObject();
             $trashEntity = array();
+            $addedTrashEntities = array();
             foreach($tables as $table)
             {
                 list($primaryTable, $trashTable) = explode("|", $table);
@@ -115,13 +115,9 @@ try
 
                     $primaryEntityName = PicoStringUtil::upperCamelize($primaryTable);
                     $trashEntityName = PicoStringUtil::upperCamelize($trashTable);
-
                     
-
                     $baseDir = $baseDirectory;
                     $baseEntity = $baseEntity."\\Trash";
-
-
 
                     // Generate the entity files for the primary table
                     $generator = new PicoEntityGenerator($database, $baseDir, $primaryTable, $baseEntity, $primaryEntityName, true);
@@ -137,12 +133,34 @@ try
                         'description' => $trashEntityName,
                         'namespace' => $baseEntity
                     ]);
+                    $addedTrashEntities[] = $trashEntityName;
                 }
             }
-            $trash = new SecretObject();
-            $trash->setTrashEntity($trashEntity);
-
             $path = $application->getBaseApplicationDirectory()."/inc.cfg/trash.yml";
+            if(file_exists($path))
+            {
+                $trash->loadYamlFile($path, false, true, true);
+            }
+            $existingTrashEntities = array();
+            if($trash->issetTrashEntity() && is_array($trash->getTrashEntity()))
+            {                
+                foreach($trash->getTrashEntity() as $item)
+                {
+                    $existingTrashEntities[] = $item->getName();
+                }
+            }
+            else
+            {
+                $trash->setTrashEntity([]);
+            }
+            foreach($trashEntity as $item)
+            {
+                
+                if(!in_array($item->getName(), $existingTrashEntities))
+                {
+                    $trash->pushTrashEntity($item);
+                }
+            }     
             file_put_contents($path, $trash->dumpYaml());
         }
     }
