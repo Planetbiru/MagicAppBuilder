@@ -473,6 +473,11 @@ menu:
         href: message-folder.php
         icon: fa fa-folder
         specialAccess: false
+      - 
+        title: Data Restoration
+        href: data-restoration.php
+        icon: fa fa-trash-restore
+        specialAccess: true
     active: false
 
 ");
