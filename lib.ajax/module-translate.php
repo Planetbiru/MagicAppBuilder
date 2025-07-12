@@ -57,6 +57,7 @@ function fixValue($original)
         'Button Show Waiting Approval Only' => 'Show Waiting Approval Only',
         'Button Update' => 'Update',
         'Button Login' => 'Login',
+        'Button Restore' => 'Restore',
         'Label Option Select One Or Leave It Blank' => 'Select One or Leave It Blank',
         'Label Option Select One' => 'Option Select One',
         'Label Option Show All' => 'Show All',
@@ -81,6 +82,7 @@ function fixValue($original)
         'Message Password Has Been Used' => 'Password has been used. Please create a new one.',
         'Message Reset Password Failed' => 'Reset password failed',
         'Message Remember Me' => 'Remember me',
+        'Message Entity Trash Not Found' => 'Trash Not Found',
         'No' => 'No',
         'Numero' => 'No',
         'Option Select All' => 'Select All',
@@ -105,6 +107,7 @@ function fixValue($original)
         'Short Waiting For Sort Order' => 'Sort',
         'Short Waiting For Update' => 'Update',
         'Warning Delete Confirmation' => 'Delete Confirmation',
+        'Warning Restore Confirmation' => 'Restore Confirmation',
         'Yes' => 'Yes',
     );
 

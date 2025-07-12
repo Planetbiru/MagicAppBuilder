@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\Util\FileDirUtil;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\File\PicoUploadFile;
 use MagicObject\Request\InputPost;
 
@@ -16,7 +17,6 @@ if ($appConfig->getApplication() == null) {
 
 $inputPost = new InputPost();
 
-header('Content-type: application/json; charset=utf-8');
 // Set the response header to return JSON
 header('Access-Control-Allow-Origin: *');
 
@@ -48,7 +48,8 @@ try {
         'dirs' => FileDirUtil::getDirTree($dir, $baseDirectory, 1)
     ];
     // Return the response as JSON
-    echo json_encode($response);
+    ResponseUtil::sendJSON($response);
+    exit();
 
 } catch (Exception $e) {
     // Log any errors that occur
@@ -58,5 +59,6 @@ try {
         'message' => $e->getMessage()
     ];
     // Return the error response as JSON
-    echo json_encode($response);
+    ResponseUtil::sendJSON($response);
+    exit();
 }

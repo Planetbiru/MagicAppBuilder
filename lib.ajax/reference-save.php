@@ -23,3 +23,4 @@ if($inputPost->getFieldName() != null && $inputPost->getKey() != null && $inputP
     file_put_contents($path, $inputPost->getValue());
 }
 ResponseUtil::sendJSON(new stdClass);
+exit();

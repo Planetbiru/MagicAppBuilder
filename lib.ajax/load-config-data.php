@@ -68,4 +68,5 @@ else
         // Do noting
     }
     ResponseUtil::sendJSON($json);
+    exit();
 }

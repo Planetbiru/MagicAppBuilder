@@ -1564,3 +1564,34 @@ This enables easier reporting, data sharing, and external data review workflows.
 * Rewritten using traditional anonymous functions to ensure compatibility with older PHP environments.
 * Ensures smoother operation for legacy systems still running PHP 5.x.
 
+
+# MagicAppBuilder Version 1.12.0
+
+## What's New
+
+### Data Restoration Feature
+
+* MagicAppBuilder now supports **restoring deleted data from trash tables**.
+* This feature consists of two main components:
+
+#### 1. Application Options – Data Restoration Setup
+
+* In the **Application Options** panel of each app card, there is a new accordion section titled **"Data Restoration"**.
+* MagicAppBuilder automatically detects tables that support trash functionality.
+* Users can:
+
+  * View the list of trash-supported tables.
+  * Select which tables should be restorable.
+  * Automatically generate the required **Primary Entities** and **Trash Entities** for restoration purposes.
+
+#### 2. Data Restoration Module in Generated Applications
+
+* Applications built with MagicAppBuilder now include a **Data Restoration** module.
+* This module allows users to:
+
+  * View a list of entities that support restoration.
+  * Select specific entities and browse deleted data entries.
+  * Restore selected records back into their original (primary) tables.
+
+This feature enhances **data safety and recovery** by providing an intuitive interface for managing soft-deleted records.
+

@@ -9,6 +9,7 @@ $applicationId = isset($activeApplication) ? $activeApplication->getApplicationI
 $activeApplicationName = isset($activeApplication) ? $activeApplication->getName() : "";
 $builderName = $builderConfig->getApplication()->getName();
 $adminLevelId = isset($entityAdmin) ? $entityAdmin->getAdminLevelId() : "";
+$adminName = isset($entityAdmin) ? $entityAdmin->getName() : "";
 
 $pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? $activeApplication->getName() . " | " . $builderName : $builderName;
 
@@ -22,6 +23,7 @@ $pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? 
   <meta name="application-id" content="<?php echo $applicationId; ?>" />
   <meta name="application-name" content="<?php echo $activeApplicationName; ?>" />
   <meta name="builder-name" content="<?php echo $builderName; ?>" />
+  <meta name="admin-name" content="<?php echo $adminName; ?>" />
   <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>" />
   <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']); ?>" />
   <title><?php echo htmlspecialchars($pageTitle); ?></title>
