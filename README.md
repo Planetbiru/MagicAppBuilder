@@ -452,6 +452,7 @@ composer dump-autoload --ignore-platform-reqs
 | Export Project             | Yes       | Yes       |
 | Import Project             | Yes       | Yes       |
 | Micro-Services Application | No        | Yes       |
+| Data Restoration           | No        | Yes       |
 
 ## Browser Support
 

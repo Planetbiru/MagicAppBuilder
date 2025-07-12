@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\Util\FileDirUtil;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -38,23 +39,29 @@ try {
         if ($type == "file") {
             // If it's a file, delete it
             if (unlink($name)) {
+                $response['success'] = true;
                 $response['status'] = 'success';
                 $response['message'] = 'File deleted successfully';
             } else {
+                $response['success'] = false;
                 $response['status'] = 'error';
                 $response['message'] = 'Error deleting file';
             }
         } else if ($type == "dir") {
             // If it's a directory, delete it
             if (rmdir($name)) {
+                $response['success'] = true;
                 $response['status'] = 'success';
                 $response['message'] = 'Directory deleted successfully';
             } else {
+                $response['success'] = false;
                 $response['status'] = 'error';
                 $response['message'] = 'Error deleting directory';
             }
         }
     } else {
+        // If the file or directory does not exist, return a message
+        $response['success'] = false;
         $response['status'] = 'error';
         $response['message'] = 'File not found';
     }
@@ -64,9 +71,10 @@ try {
 } catch (Exception $e) {
     // Log any errors that occur
     
+    $response['success'] = false;
     $response['status'] = 'error';
     $response['message'] = 'An unexpected error occurred';
 }
 
 // Return the response as JSON
-echo json_encode($response);
+echo ResponseUtil::sendJSON($response);

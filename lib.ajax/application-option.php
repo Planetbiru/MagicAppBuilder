@@ -1,10 +1,12 @@
 <?php
 
+use AppBuilder\AppDatabase;
 use AppBuilder\EntityInstaller\EntityApplication;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SecretObject;
+use MagicObject\Util\PicoStringUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -165,6 +167,37 @@ try
          </div>
       </div>
       <!-- END Application Icon -->
+
+      <!-- BEGIN Trash -->
+      <div class="card">
+         <div class="card-header" id="heading4">
+            <h5 class="mb-0">
+               <button type="button" class="btn" data-toggle="collapse" data-target="#collapse4" aria-expanded="true" aria-controls="collapse4">
+                  Data Restoration
+               </button>
+            </h5>
+         </div>
+         <div id="collapse4" class="collapse collapsed" aria-labelledby="heading4" data-parent="#accordion-option">
+            <div class="card-body">
+               <div class="data-container">
+                  <form method="post" action="">
+                     <div class="table-row-container entity-trash-list-container">
+                        <?php
+                        require_once __DIR__ ."/entity-trash-list.php";
+                        ?>
+                     </div>
+                     <div class="button-area">
+                        <button type="button" class="btn btn-success update-trash-entity" value="update-trash-entity">Update</button>
+                        <button type="button" class="btn btn-danger delete-trash-entity" value="delete-trash-entity">Delete</button>
+                     </div>
+                  </form>
+                  <?php
+                  ?>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- END Trash -->
 
    </div>
    <!-- END Accordion Wrapper -->

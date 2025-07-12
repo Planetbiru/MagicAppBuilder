@@ -37,6 +37,7 @@ if($inputPost->getDatabaseType() != null || $inputPost->getDatabaseName() !== nu
         // Do noting
     }
     ResponseUtil::sendJSON([]);
+    exit();
 }
 else
 {
@@ -203,4 +204,5 @@ else
         // Do noting
     }
     ResponseUtil::sendJSON($json);
+    exit();
 }

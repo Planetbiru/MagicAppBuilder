@@ -36,6 +36,7 @@ try {
     file_put_contents($file, $content);
     
     $response = [
+        'success' => true,
         'status' => 'success',
         'message' => 'File saved successfully.',
         'file' => $file,
@@ -48,6 +49,7 @@ try {
     // Log any errors that occur
     error_log($e->getMessage());
     $response = [
+        'success' => false,
         'status' => 'error',
         'message' => $e->getMessage()
     ];

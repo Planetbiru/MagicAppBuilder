@@ -27,3 +27,4 @@ catch(Exception $e)
     // do nothing
 }
 ResponseUtil::sendJSON($response);
+exit();

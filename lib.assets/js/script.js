@@ -896,6 +896,55 @@ function getLocalStorageKey(key) {
  */
 let initAll = function () {
 
+  $(document).on('click', '.update-trash-entity', function(e){
+    let applicationId = $(this).closest('form').find('[name="application_id"]').val();
+    let tables = [];
+    $(this).closest('form').find('.select-trash-table').each(function(e){
+      if($(this)[0].checked)
+      {
+        tables.push($(this).val());
+      }
+    });
+    let data = {
+      applicationId: applicationId,
+      userAction: 'update',
+      table: tables
+    };
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/entity-trash-update.php',
+      data: data,
+      dataType: 'html',
+      success: function(response){
+        $('.entity-trash-list-container').empty().append(response);
+      }
+    });
+  });
+  $(document).on('click', '.delete-trash-entity', function(e){
+    let applicationId = $(this).closest('form').find('[name="application_id"]').val();  
+    let tables = [];
+    $(this).closest('form').find('.select-trash-table').each(function(e){
+      if($(this)[0].checked)
+      {
+        tables.push($(this).val());
+      }
+    });
+    let data = {
+      applicationId: applicationId,
+      userAction: 'delete',
+      table: tables
+    };
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/entity-trash-update.php',
+      data: data,
+      dataType: 'html',
+      success: function(response){
+        $('.entity-trash-list-container').empty().append(response);
+      }
+    });
+  });
+
   $(document).on('hidden.bs.modal', '.modal', function () {
     setTimeout(() => {
       const anyModalShown = document.querySelector('.modal.show');

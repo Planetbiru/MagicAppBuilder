@@ -68,6 +68,7 @@ if ($inputPost->getDatabaseName() !== null) {
         // Do noting
     }
     ResponseUtil::sendJSON([]);
+    exit();
 } else {
     $applicationId = $inputGet->getApplicationId();
     $databaseType = $inputGet->getDatabaseType();
@@ -90,4 +91,5 @@ if ($inputPost->getDatabaseName() !== null) {
         // Do noting
     }
     ResponseUtil::sendJSON($json);
+    exit();
 }
