@@ -48,7 +48,7 @@ try
                         <table class="table table-striped table-bordered">
                            <thead>
                               <tr>
-                                 <th><input type="checkbox" id="select-all-trash-tables" onchange="this.closest('table').querySelectorAll('.select-trash-table').forEach(cb => cb.checked = this.checked)" /></th>
+                                 <th><input type="checkbox" id="select-all-trash-tables" onchange="this.closest('table').querySelectorAll('.select-trash-table').forEach(cb => cb.checked = this.checked)" style="margin: 0;" /></th>
                                  <th>No</th>
                                  <th>Primary Table</th>
                                  <th>Trash Table</th>
@@ -75,7 +75,7 @@ try
 
                               ?>
                               <tr>
-                                 <td><input type="checkbox" name="table[]" class="select-trash-table" value="<?php echo "$primaryTableName|$trashTableName";?>" data-primary-table="<?php echo $primaryTableName;?>" data-trash-table="<?php echo $trashTableName;?>" /></td>
+                                 <td><input type="checkbox" name="table[]" class="select-trash-table" value="<?php echo "$primaryTableName|$trashTableName";?>" data-primary-table="<?php echo $primaryTableName;?>" data-trash-table="<?php echo $trashTableName;?>" style="margin: 0;" /></td>
                                  <td align="right"><?php echo $i;?></td>
                                  <td><?php echo $primaryTableName;?></td>
                                  <td><?php echo $trashTableName;?></td>
