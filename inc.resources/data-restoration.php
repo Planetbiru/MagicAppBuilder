@@ -171,26 +171,29 @@ if($inputGet->getTrashEntity() != "")
             // Find the entity trash object by ID
             try
             {
-                $specification = PicoSpecification::getInstance()
-                	->addAnd(
+				$specification = PicoSpecification::getInstance()
+					->addAnd(
 						PicoSpecification::getInstance()
 							->addOr(PicoPredicate::getInstance()->equals(Field::of()->restored, null))
 							->addOr(PicoPredicate::getInstance()->equals(Field::of()->restored, false))
 					)
-                ;
-                if($inputGet->getTimeFrom() != "")
-                {
-                    $specification->addAnd(PicoPredicate::getInstance()
+				;
+				if($inputGet->getTimeFrom() != "")
+				{
+					$specification->addAnd(PicoPredicate::getInstance()
 						->greaterThanOrEquals(Field::of()->timeDelete, $inputGet->getTimeFrom(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true)));
-                }
-                if($inputGet->getTimeTo() != "")
-                {
-                    $specification->addAnd(PicoPredicate::getInstance()
+				}
+				if($inputGet->getTimeTo() != "")
+				{
+					$specification->addAnd(PicoPredicate::getInstance()
 						->lessThanOrEquals(Field::of()->timeDelete, $inputGet->getTimeTo(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true)));
-                }
-                $sortable = PicoSortable::getInstance()
-                	->addSortable(new PicoSort(Field::of()->timeDelete, PicoSort::ORDER_TYPE_DESC));
-                $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
+				}
+				$defaultSortable = PicoSortable::getInstance()
+					->addSortable(new PicoSort(Field::of()->timeDelete, PicoSort::ORDER_TYPE_DESC));
+
+				$sortable = PicoSortable::fromUserInput($inputGet, array_combine($columns, $columns), $defaultSortable);
+
+				$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 ?>
 
 
