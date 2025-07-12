@@ -99,3 +99,4 @@ $response = array(
 );
 
 ResponseUtil::sendJSON($response);
+exit();

@@ -68,12 +68,14 @@ try {
                     "message" => nl2br("<p>" . $errorMessage . "</p>"),
                     "error_line" => $lineNumber
                 ));
+                exit();
             } else {
                 ResponseUtil::sendJSON(array(
                     "success" => true,
                     "message" => "Success",
                     "error_line" => 0
                 ));
+                exit();
             }
         }
     }
@@ -81,4 +83,5 @@ try {
     error_log($e->getMessage());
     // do nothing
     ResponseUtil::sendJSON(new stdClass);
+    exit();
 }

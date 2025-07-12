@@ -1365,6 +1365,14 @@ table.table.table-enum tr > td:last-child {
   margin-bottom: 0.75rem;
 }
 
+.table-row-container {
+  overflow: auto;
+  max-height: 300px;
+}
+.table-row-container table td, .table-row-container table th {
+  white-space: nowrap;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;

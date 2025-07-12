@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\Util\FileDirUtil;
+use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -13,9 +14,6 @@ if ($appConfig->getApplication() == null) {
 }
 
 $inputPost = new InputPost();
-
-// Set the response header to return JSON
-header('Content-Type: application/json');
 
 $response = [];
 
@@ -37,19 +35,24 @@ try {
     if (file_exists($name)) {
         // Check if the new name already exists
         if (file_exists($newName)) {
+            $response['success'] = false;
             $response['status'] = 'error';
             $response['message'] = 'File already exists';
         } else {
             // Rename the file
             if (rename($name, $newName)) {
+                $response['success'] = true;
                 $response['status'] = 'success';
                 $response['message'] = 'File renamed successfully';
             } else {
+                $response['success'] = false;
                 $response['status'] = 'error';
                 $response['message'] = 'Error renaming file';
             }
         }
     } else {
+        // If the file does not exist, return a message
+        $response['success'] = false;
         $response['status'] = 'error';
         $response['message'] = 'File not found';
     }
@@ -59,9 +62,10 @@ try {
 } catch (Exception $e) {
     // Log any errors that occur
     
+    $response['success'] = false;
     $response['status'] = 'error';
     $response['message'] = 'An unexpected error occurred';
 }
 
 // Return the response as JSON
-echo json_encode($response);
+ResponseUtil::sendJSON($response);

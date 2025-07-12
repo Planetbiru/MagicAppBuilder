@@ -323,6 +323,21 @@ class AppDatabase
         }
 
     }
+    
+    /**
+     * Extracts only the column names from the column list output.
+     *
+     * @param array $columns Output from getColumnList(...) function.
+     * @return string[] Array of column names.
+     */
+    public static function getColumName($columns)
+    {
+        if (is_array($columns) && isset($columns['columns']) && is_array($columns['columns'])) {
+            return $columns['columns'];
+        }
+        return [];
+    }
+
 
     /**
      * Retrieves column details for a SQLite table, excluding specified columns.
@@ -332,7 +347,7 @@ class AppDatabase
      * @param array $excludeColumns List of column names to exclude from the result.
      * @return array Returns an array of column details.
      */
-    private function sqliteColumnDetails($database, $tableName, $excludeColumns)
+    private static function sqliteColumnDetails($database, $tableName, $excludeColumns)
     {
         $queryBuilder = "PRAGMA table_info('$tableName')";
         $rs = $database->executeQuery($queryBuilder);
@@ -351,5 +366,83 @@ class AppDatabase
             }
         }
         return $rows;
+    }
+
+    /**
+     * Retrieves a list of valid trash tables that have a corresponding primary table
+     * with matching columns.
+     *
+     * This method identifies all tables ending in `_trash` and compares them
+     * with their corresponding primary table (with the same name excluding `_trash`).
+     * A trash table is considered valid if all columns in the primary table
+     * exist in the trash table.
+     *
+     * @param SecretObject $appConfig Application configuration object.
+     * @param SecretObject $databaseConfig Database configuration object.
+     * @param PicoDatabase $database Database connection object.
+     * @param string $databaseName Name of the database (for MySQL/MariaDB).
+     * @param string $schemaName Schema name (for PostgreSQL).
+     * @return array An associative array where keys are primary table names and values are their corresponding valid trash table names.
+     */
+    public static function getValidTashTable($appConfig, $databaseConfig, $database, $databaseName, $schemaName)
+    {
+        $tables = AppDatabase::getTableList($database, $databaseName, $schemaName, false, true);        
+        $trashTables = array();
+        $primaryTableColumns = array();
+        $trashTableColumns = array();
+        
+        foreach($tables as $tableName=>$table)
+        {            
+            if(PicoStringUtil::endsWith($tableName, "_trash"))
+            {
+                $trashTables[] = $tableName;
+                $trashTableColumns[$tableName] = AppDatabase::getColumnList($appConfig, $databaseConfig, $database, $tableName);
+            }
+            else
+            {
+                $primaryTableColumns[$tableName] = AppDatabase::getColumnList($appConfig, $databaseConfig, $database, $tableName);
+            }
+        }
+        return self::findValidTrashTables($trashTables, $primaryTableColumns, $trashTableColumns);
+    }
+
+    /**
+     * Finds valid trash tables based on primary table columns.
+     *
+     * This method checks each trash table against its corresponding primary table
+     * to ensure that all columns in the primary table exist in the trash table.
+     *
+     * @param array $trashTables List of trash table names.
+     * @param array $primaryTableColumns Associative array of primary table columns.
+     * @param array $trashTableColumns Associative array of trash table columns.
+     * @return array An associative array where keys are primary table names and values are their corresponding valid trash table names.
+     */
+    private static function findValidTrashTables($trashTables, $primaryTableColumns, $trashTableColumns)
+    {
+        $validTrashTables = array();
+        // Create list that tash table is in primary table list and column in trash table is in primary table
+        foreach($trashTables as $trashTable)
+        {
+            $primaryTableName = substr($trashTable, 0, strlen($trashTable) - 6);
+            if(!in_array($primaryTableName, $trashTables))
+            {
+                $primaryColumns = AppDatabase::getColumName($primaryTableColumns[$primaryTableName]);
+                $trashColumns = AppDatabase::getColumName($trashTableColumns[$trashTable]);
+                $validTrash = true;
+                foreach($primaryColumns as $primaryColumn)
+                {
+                    if(!in_array($primaryColumn, $trashColumns))
+                    {
+                        $validTrash = false;
+                        break;
+                    }
+                }
+                if($validTrash)
+                {
+                    $validTrashTables[$primaryTableName] = $trashTable;
+                }
+            }
+        }
+        return $validTrashTables;
     }
 }

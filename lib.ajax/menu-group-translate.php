@@ -60,6 +60,7 @@ if($inputGet->getUserAction() == 'get')
     }
 
     PicoResponse::sendJSON($response);
+    exit();
 }
 else if($inputPost->getUserAction() == 'set')
 {
@@ -99,4 +100,6 @@ else if($inputPost->getUserAction() == 'set')
     {
         error_log($e->getMessage());
     }
+    PicoResponse::sendJSON([]);
+    exit();
 }

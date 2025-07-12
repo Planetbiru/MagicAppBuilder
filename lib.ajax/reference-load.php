@@ -82,9 +82,11 @@ if ($inputGet->getFieldName() != null && $inputGet->getKey() != null) {
             "onezero" => null
             );
         ResponseUtil::sendJSON($data);
+        exit();
     }
 }
 else
 {
     ResponseUtil::sendJSON(new stdClass);
+    exit();
 }

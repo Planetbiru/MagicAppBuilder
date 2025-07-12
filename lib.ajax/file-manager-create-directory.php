@@ -34,22 +34,27 @@ try {
         // Check if the file is not exists and enable to create new directory
         $created = mkdir($name, 0755, true);
         if ($created) {
+            $response['success'] = true;
             $response['status'] = 'success';
             $response['message'] = 'Directory created successfully';
         } else {
+            $response['success'] = false;
             $response['status'] = 'error';
             $response['message'] = 'Failed to create directory';
         }
     } else if (is_dir($name)) {
         // If the directory already exists, return a message
+        $response['success'] = false;
         $response['status'] = 'error';
         $response['message'] = 'Directory already exists';
     } else if (is_file($name)) {
         // If the file already exists, return a message
+        $response['success'] = false;
         $response['status'] = 'error';
         $response['message'] = 'File already exists';
         
     } else {
+        $response['success'] = false;
         $response['status'] = 'error';
         $response['message'] = 'File not found';
     }
@@ -58,7 +63,7 @@ try {
 
 } catch (Exception $e) {
     // Log any errors that occur
-    
+    $response['success'] = false;
     $response['status'] = 'error';
     $response['message'] = 'An unexpected error occurred';
 }

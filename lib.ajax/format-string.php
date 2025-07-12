@@ -61,3 +61,4 @@ else
 }
 
 PicoResponse::sendJSON($response);
+exit();
