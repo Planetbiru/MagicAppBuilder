@@ -49,6 +49,8 @@ if($inputPost->getUserAction() === "restore")
     $primaryEntity = substr($trashEntity, 0, strlen($trashEntity) - 5);
     $file1 = $directory . DIRECTORY_SEPARATOR . $primaryEntity . ".php";
     $file2 = $directory . DIRECTORY_SEPARATOR . $trashEntity . ".php";
+
+	// Check if file is exists
 	if(file_exists($file1) && file_exists($file2))
     {
         require_once $file1;
@@ -57,6 +59,7 @@ if($inputPost->getUserAction() === "restore")
         $primaryEntityClass = $baseEntityNamespace . "\\" . $primaryEntity;    
         $trashEntityClass = $baseEntityNamespace . "\\" . $trashEntity;
 
+		// Check if class is exists
 		if(class_exists($primaryEntityClass) && class_exists($trashEntityClass) && $inputPost->countableCheckedRowId())
         {
             $dataToRestore = $inputPost->getCheckedRowId();
@@ -68,16 +71,19 @@ if($inputPost->getUserAction() === "restore")
                 {
                     $trashEntityObject->find($value);
 
-                    // Restore the entity trash object
-                    $primaryEntityObject = new $primaryEntityClass($trashEntityObject, $database);
-                    $primaryEntityObject->insert();
+					if(!$trashEntityObject->isRestored())
+					{
+						// Restore the entity trash object
+						$primaryEntityObject = new $primaryEntityClass($trashEntityObject, $database);
+						$primaryEntityObject->insert();
 
-                    // Update the entity trash object to mark it as restored
-                    $trashEntityObject->setRestored(true);
-                    $trashEntityObject->setAdminRestore($currentAction->getUserId());
-                    $trashEntityObject->setTimeRestore($currentAction->getTime());
-                    $trashEntityObject->setIpRestore($currentAction->getIp());
-                    $trashEntityObject->update();
+						// Update the entity trash object to mark it as restored
+						$trashEntityObject->setRestored(true);
+						$trashEntityObject->setAdminRestore($currentAction->getUserId());
+						$trashEntityObject->setTimeRestore($currentAction->getTime());
+						$trashEntityObject->setIpRestore($currentAction->getIp());
+						$trashEntityObject->update();
+					}
                 }
                 catch(Exception $e)
                 {
