@@ -396,7 +396,6 @@ function customConfirm({
  * - `sortDataByDrag()` must re-bind drag-sort functionality after AJAX reloads
  */
 function initAjaxSupport() {
-
   // Inject the Bootstrap modal for confirmation if not present
   let modal = document.createElement('div');
   modal.innerHTML = `
@@ -435,12 +434,12 @@ function initAjaxSupport() {
     const isAjax = section && section.dataset.ajaxSupport === "true";
     const needsConfirmation = target.dataset.confirmation === 'true';
 
-    // Encapsulate logic to submit the form (AJAX or standard)
+    // Encapsulated form submission logic (AJAX or standard)
     const submitForm = () => {
       if (isAjax) {
         const formData = new FormData(form);
 
-        // Append the clicked button’s name/value to FormData
+        // Append clicked button name/value to FormData
         if (target.name) {
           formData.append(target.name, target.value);
         }
@@ -455,14 +454,13 @@ function initAjaxSupport() {
         .then(response => response.text())
         .then(html => {
           section.innerHTML = html;
-          // Re-initialize sorting if necessary
-          sortDataByDrag(section.querySelector('table tbody'));
+          sortDataByDrag(section.querySelector('table tbody')); // reinitialize drag-sort
         })
         .catch(error => {
           console.error('AJAX form error:', error);
         });
       } else {
-        // Submit form using a temporary hidden button
+        // Submit form using hidden button
         const hiddenSubmit = document.createElement('button');
         hiddenSubmit.type = 'submit';
         hiddenSubmit.style.display = 'none';
@@ -475,34 +473,24 @@ function initAjaxSupport() {
     };
 
     if (needsConfirmation) {
-      e.preventDefault(); // Delay actual submission until confirmed
+      e.preventDefault(); // Wait for confirmation
 
-      // Read confirmation attributes
+      // Read confirmation dialog attributes
       const title = target.dataset.onclikTitle || "Confirmation";
       const message = target.dataset.onclikMessage || "Are you sure?";
       const okText = target.dataset.okButtonLabel || "OK";
       const cancelText = target.dataset.cancelButtonLabel || "Cancel";
 
-      // Show confirmation modal
-      customConfirm({
-        title,
-        message,
-        okText,
-        cancelText
-      }).then(result => {
-        if (result) {
-          submitForm();
-        }
-        // Do nothing if cancelled
+      customConfirm({ title, message, okText, cancelText }).then(result => {
+        if (result) submitForm();
       });
     } else {
-      // No confirmation needed, proceed directly
       e.preventDefault();
       submitForm();
     }
   });
 
-  // Handle AJAX pagination link clicks
+  // Handle AJAX pagination
   document.addEventListener('click', function(e) {
     const dataSection = e.target.closest('.data-section');
     if (!dataSection) return;
@@ -512,7 +500,7 @@ function initAjaxSupport() {
     const section = link.closest('.data-section');
     if (!section || section.dataset.ajaxSupport !== "true") return;
 
-    e.preventDefault(); // Prevent normal page reload
+    e.preventDefault(); // Prevent default page reload
 
     const url = link.getAttribute('href');
 
@@ -526,13 +514,12 @@ function initAjaxSupport() {
     .then(html => {
       section.innerHTML = html;
 
-      // Re-bind drag sort functionality
       const table = section.querySelector('table tbody');
       if (table) {
         sortDataByDrag(table);
       }
 
-      // Update URL in browser without reload
+      // Push new URL into browser history
       history.pushState(null, '', url);
     })
     .catch(error => {
@@ -540,7 +527,85 @@ function initAjaxSupport() {
     });
   });
 
-  // Handle browser Back/Forward using popstate and reload with AJAX
+  // Intercept filter form submission
+  const getForm = document.querySelector('.filter-section form');
+  if(getForm)
+  {
+    getForm.addEventListener('submit', function(e) {
+      const section = e.target.closest('.page.page-list').querySelector('.data-section[data-ajax-support="true"]');
+      if (!section) return;
+      const target = e.target;
+      const form = target.closest('form');
+      if (!form) return;
+
+      const isAjax = section && section.dataset.ajaxSupport === "true";
+      const needsConfirmation = target.dataset.confirmation === 'true';
+
+      const submitForm = () => {
+        if (isAjax) {
+          const formData = new FormData(form);
+
+          if (target.name) {
+            formData.append(target.name, target.value);
+          }
+
+          const params = new URLSearchParams();
+          for (const [key, value] of formData.entries()) {
+            params.append(key, value);
+          }
+
+          const url = `${window.location.pathname}?${params.toString()}`;
+
+          fetch(url, {
+            method: 'GET',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => response.text())
+          .then(html => {
+            section.innerHTML = html;
+            sortDataByDrag(section.querySelector('table tbody'));
+
+            // Update browser URL without reload
+            history.pushState(null, '', url);
+          })
+          .catch(error => {
+            console.error('AJAX form error:', error);
+          });
+
+        } else {
+          if (target.name && !form.querySelector(`input[name="${target.name}"]`)) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = target.name;
+            hiddenInput.value = target.value;
+            form.appendChild(hiddenInput);
+          }
+
+          form.submit();
+        }
+      };
+
+      if (needsConfirmation) {
+        e.preventDefault();
+
+        const title = target.dataset.onclikTitle || "Confirmation";
+        const message = target.dataset.onclikMessage || "Are you sure?";
+        const okText = target.dataset.okButtonLabel || "OK";
+        const cancelText = target.dataset.cancelButtonLabel || "Cancel";
+
+        customConfirm({ title, message, okText, cancelText }).then(result => {
+          if (result) submitForm();
+        });
+      } else {
+        e.preventDefault();
+        submitForm();
+      }
+    });
+  }
+
+  // Handle back/forward navigation with AJAX
   window.addEventListener('popstate', function () {
     const section = document.querySelector('.data-section[data-ajax-support="true"]');
     if (!section) return;
@@ -557,7 +622,6 @@ function initAjaxSupport() {
     .then(html => {
       section.innerHTML = html;
 
-      // Re-initialize any dynamic features
       const table = section.querySelector('table tbody');
       if (table) {
         sortDataByDrag(table);
@@ -568,6 +632,7 @@ function initAjaxSupport() {
     });
   });
 }
+
 
 /**
  * Initializes multiple select dropdowns using the MultiSelect library.
