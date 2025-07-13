@@ -73,11 +73,10 @@ if($inputPost->getUserAction() === "restore")
 
                     // Update the entity trash object to mark it as restored
                     $trashEntityObject->setRestored(true);
-                    $trashEntityObject->setAdminResrore($currentAction->getUserId());
+                    $trashEntityObject->setAdminRestore($currentAction->getUserId());
                     $trashEntityObject->setTimeRestore($currentAction->getTime());
                     $trashEntityObject->setIpRestore($currentAction->getIp());
                     $trashEntityObject->update();
-
                 }
                 catch(Exception $e)
                 {
