@@ -277,7 +277,7 @@ if($inputGet->getTrashEntity() != "")
 				<div class="button-wrapper">
 					<div class="button-area">
 						<input type="hidden" name="trash_entity" value="<?php echo $inputGet->getTrashEntity(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>">
-						<button type="submit" class="btn btn-success" name="user_action" id="restore_selected" value="restore" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningRestoreConfirmation());?>"><?php echo $appLanguage->getButtonRestore();?></button>
+						<button type="submit" class="btn btn-success" name="user_action" id="restore_selected" value="restore" data-confirmation="true" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningRestoreConfirmation());?>"><?php echo $appLanguage->getButtonRestore();?></button>
 					</div>
 				</div>
 			</form>
