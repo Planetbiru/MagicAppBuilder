@@ -461,8 +461,9 @@ function initAjaxSupport() {
         });
       } else {
         // Submit form using hidden button
-        const hiddenSubmit = document.createElement('button');
-        hiddenSubmit.type = 'submit';
+        const hiddenSubmit = document.createElement('input');
+        hiddenSubmit.type = 'hidden';
+        hiddenSubmit.classList.add('hidden-user-action');
         hiddenSubmit.style.display = 'none';
         hiddenSubmit.name = target.name;
         hiddenSubmit.value = target.value;
@@ -581,6 +582,7 @@ function initAjaxSupport() {
             hiddenInput.name = target.name;
             hiddenInput.value = target.value;
             form.appendChild(hiddenInput);
+            
           }
 
           form.submit();
