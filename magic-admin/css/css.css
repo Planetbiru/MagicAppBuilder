@@ -634,6 +634,55 @@ blockquote {
   border-left: 10px solid #7b7b7b;
 }
 
+tr[data-active=false] td {
+  background-color: #f3f3f3;
+}
+
+.dark-mode tr[data-active=false] td {
+  background-color: #312e2e;
+}
+
+.dark-mode .modal-content {
+  background-color: #2c2f33;
+  color: #f1f1f1;
+  border-color: #444;
+}
+.dark-mode .modal-header,
+.dark-mode .modal-footer {
+  border-color: #444;
+}
+.dark-mode .modal-header .close {
+  color: #f1f1f1;
+  text-shadow: none;
+  opacity: 0.8;
+}
+.dark-mode .modal-header .close:hover {
+  opacity: 1;
+}
+.dark-mode .modal-header .modal-title {
+  color: #ffffff;
+}
+.dark-mode .modal-body {
+  color: #e0e0e0;
+}
+.dark-mode .btn-primary {
+  background-color: #4a90e2;
+  border-color: #4a90e2;
+}
+.dark-mode .btn-primary:hover {
+  background-color: #357ab8;
+  border-color: #357ab8;
+}
+.dark-mode .btn-secondary {
+  background-color: #555;
+  border-color: #555;
+  color: #fff;
+}
+.dark-mode .btn-secondary:hover {
+  background-color: #444;
+  border-color: #444;
+}
+
 select[multiple].form-control {
   height: 38px;
 }
