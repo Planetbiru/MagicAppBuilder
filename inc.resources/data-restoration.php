@@ -94,6 +94,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 
 if($inputGet->getTrashEntity() != "")
 {
+	$dataStatus = $inputGet->getDataStatus(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);
 	?>
 	<div class="page page-jambi page-list">
 		<div class="jambi-wrapper">
@@ -121,6 +122,7 @@ if($inputGet->getTrashEntity() != "")
                         </select>
 					</span>
 				</span>
+				
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appLanguage->getTimeDeletion();?></span>
 					<span class="filter-control">
@@ -131,6 +133,17 @@ if($inputGet->getTrashEntity() != "")
                 
                     <span class="filter-control">
 						<input type="datetime-local" class="form-control" name="time_to" value="<?php echo $inputGet->getTimeTo(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>" autocomplete="off"/>
+					</span>
+				</span>
+
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appLanguage->getDataStatus();?></span>
+                    <span class="filter-control">
+						<select name="data_status" class="form-control" id="data_status" onchange="this.form.submit();">
+                            <option value=""><?php echo $appLanguage->getDeleted();?></option>
+                            <option value="restored"<?php echo $dataStatus == 'restored' ? ' selected="selected"' : '';?>><?php echo $appLanguage->getRestored();?></option>
+							<option value="all"<?php echo $dataStatus == 'all' ? ' selected="selected"' : '';?>><?php echo $appLanguage->getAllStatus();?></option>
+                        </select>
 					</span>
 				</span>
 				
@@ -144,6 +157,7 @@ if($inputGet->getTrashEntity() != "")
     // Check if the entity exists
     $trashEntity = $inputGet->getTrashEntity();
     $file2 = $directory . DIRECTORY_SEPARATOR . $trashEntity . ".php";
+	
     if(file_exists($file2))
     {
         require_once $file2;
@@ -170,13 +184,26 @@ if($inputGet->getTrashEntity() != "")
             // Find the entity trash object by ID
             try
             {
-				$specification = PicoSpecification::getInstance()
-					->addAnd(
+				
+				$specification = PicoSpecification::getInstance();
+				if($dataStatus == 'restored')
+				{
+					// Restored
+					$specification->addAnd(
+						PicoSpecification::getInstance()
+							->addOr(PicoPredicate::getInstance()->equals(Field::of()->restored, true))
+					);
+				}
+				else if($dataStatus == '')
+				{
+					// Deleted
+					$specification->addAnd(
 						PicoSpecification::getInstance()
 							->addOr(PicoPredicate::getInstance()->equals(Field::of()->restored, null))
 							->addOr(PicoPredicate::getInstance()->equals(Field::of()->restored, false))
-					)
-				;
+					);
+				}
+
 				if($inputGet->getTimeFrom() != "")
 				{
 					$specification->addAnd(PicoPredicate::getInstance()
@@ -338,7 +365,6 @@ else
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appLanguage->getTrashEntity();?></span>
-					
                 
                     <span class="filter-control">
 						<select name="trash_entity" class="form-control" id="trash_entity" onchange="this.form.submit();">
