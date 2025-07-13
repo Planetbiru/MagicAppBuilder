@@ -358,7 +358,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		if($inputGet->getAdminLevelId() != "")
 		{
 		?>
-		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
+		<div class="data-section" data-ajax-name="main-data">
 			<?php try{
 				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true);
 				if($pageData->getTotalResult() > 0)
