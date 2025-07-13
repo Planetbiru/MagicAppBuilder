@@ -158,6 +158,15 @@ class AppAdminRoleImpl extends MagicObject
     protected $allowedExport;
 
     /**
+     * Allowed restore
+     *
+     * @Column(name="allowed_restore", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
+     * @Label(content="Allowed Restore")
+     * @var bool
+     */
+    protected $allowedRestore;
+
+    /**
      * Module Group
      *
      * @Label(content="Module Group")
@@ -228,6 +237,14 @@ class AppAdminRoleImpl extends MagicObject
      * @var bool
      */
     protected $export;
+
+    /**
+     * Allowed restore
+     *
+     * @Label(content="Restore")
+     * @var bool
+     */
+    protected $restore;
     
     /**
 	 * Time Create

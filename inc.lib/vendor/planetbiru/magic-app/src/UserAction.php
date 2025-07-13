@@ -28,6 +28,7 @@ class UserAction
     const NEXT_ACTION       = "next_action";
     const SPECIAL_ACTION    = "special_action";
     const EXPORT            = "export";
+    const RESTORE           = "restore";
 
     /**
      * Determine if an action requires approval.
