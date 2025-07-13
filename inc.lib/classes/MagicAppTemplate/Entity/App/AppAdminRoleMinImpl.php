@@ -156,6 +156,15 @@ class AppAdminRoleMinImpl extends MagicObject
      * @var bool
      */
     protected $allowedExport;
+
+    /**
+     * Allowed restore
+     *
+     * @Column(name="allowed_restore", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
+     * @Label(content="Allowed Restore")
+     * @var bool
+     */
+    protected $allowedRestore;
     
     /**
 	 * Time Create

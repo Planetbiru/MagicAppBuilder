@@ -1571,54 +1571,70 @@ This enables easier reporting, data sharing, and external data review workflows.
 
 ### Data Restoration Feature
 
-MagicAppBuilder now supports **restoring deleted data from trash tables**, improving safety and traceability of data operations. This feature consists of two main components:
+MagicAppBuilder now supports **restoring deleted data from trash tables**, enhancing data recovery, traceability, and operational safety. This feature consists of two main components:
 
 #### 1. Application Options – Data Restoration Setup
 
-* In the **Application Options** panel of each app card, there is a new accordion section titled **"Data Restoration"**.
+* Within each application's **Application Options** panel, a new accordion section titled **"Data Restoration"** is available.
 * MagicAppBuilder automatically detects tables that support trash functionality.
 * Users can:
 
-  * View the list of trash-supported tables.
+  * View a list of trash-enabled tables.
   * Select which tables should support data restoration.
-  * Automatically generate the required **Primary Entities** and **Trash Entities** for restoration purposes.
+  * Auto-generate the necessary **Primary Entities** and **Trash Entities** for seamless restoration operations.
 
 #### 2. Data Restoration Module in Generated Applications
 
-* Applications generated with MagicAppBuilder now include a **Data Restoration** module.
-* This module allows users to:
+* All applications generated with MagicAppBuilder now include a built-in **Data Restoration** module.
+* This module enables users to:
 
-  * View a list of entities that support data restoration.
-  * Select specific entities and browse soft-deleted (trashed) records.
-  * Restore selected records back into their original (primary) tables.
+  * View a list of entities eligible for data restoration.
+  * Browse and search soft-deleted (trashed) records.
+  * Restore selected entries back into their original tables.
 
-This feature enhances **data safety, recovery, and auditability** by providing an intuitive UI to manage soft-deleted records.
+This feature provides a robust mechanism for managing soft-deleted records via an intuitive UI, significantly improving **data safety, recovery, and auditability**.
 
 
 ## Improvements
 
-### Optimized AJAX Requests
+### Optimized AJAX Request Handling
 
-* Optimized AJAX requests for:
+Significant improvements have been made to the responsiveness of the UI by optimizing AJAX handling for:
 
-  * **Filter operations** – filtering data lists is now more efficient and lightweight.
-  * **Pagination** – navigating pages within list views triggers faster, optimized AJAX loads.
+* **Filter operations** – data filtering is now faster and consumes fewer resources.
+* **Pagination** – list navigation now loads more efficiently, even on large datasets.
 
-These optimizations reduce network load and improve responsiveness, especially on large datasets.
+These enhancements reduce server load and improve user experience.
 
 
 ## UX Enhancements
 
-### Confirmation Dialogs for All Actions
+### Confirmation Dialogs for All Form Actions
 
-* All critical actions performed via forms now include **confirmation dialogs**, including:
+All sensitive actions triggered from forms now feature **confirmation dialogs**, including:
 
-  * Activate
-  * Deactivate
-  * Delete
-  * Sort
-  * Approve
-  * Reject
+* Activate
+* Deactivate
+* Delete
+* Sort
+* Approve
+* Reject
 
-This ensures users are explicitly aware of irreversible or sensitive operations, improving **user safety and interaction clarity**.
+This ensures that users are clearly warned before performing critical operations, increasing interaction clarity and reducing accidental modifications.
+
+
+## Access Control
+
+### New Permission: `allowedRestore`
+
+A new permission, `allowed_restore`, has been introduced to provide finer control over who can **actually restore** deleted data:
+
+* A new column `allowed_restore` has been added to the `admin_role` table.
+* Users **must** have this permission explicitly enabled to perform data restoration.
+* This separation of privileges ensures that:
+
+  * Users with access to the Data Restoration module **can view** deleted/restored entries,
+  * But **cannot restore data** unless they have `allowed_restore` enabled.
+
+This gives administrators the flexibility to grant view-only access for auditing, while restricting actual data restoration to authorized roles.
 

@@ -159,14 +159,15 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 
 		foreach ($_POST['admin_role_id'] as $index => $adminRoleId) {
 			// Cek dan ambil nilai dari setiap checkbox
-			$allowedList = isset($_POST['allowed_list']) && isset($_POST['allowed_list'][$adminRoleId]) ? 1 : 0;
-			$allowedDetail = isset($_POST['allowed_detail']) && isset($_POST['allowed_detail'][$adminRoleId]) ? 1 : 0;
-			$allowedCreate = isset($_POST['allowed_create']) && isset($_POST['allowed_create'][$adminRoleId]) ? 1 : 0;
-			$allowedUpdate = isset($_POST['allowed_update']) && isset($_POST['allowed_update'][$adminRoleId]) ? 1 : 0;
-			$allowedDelete = isset($_POST['allowed_delete']) && isset($_POST['allowed_delete'][$adminRoleId]) ? 1 : 0;
-			$allowedApprove = isset($_POST['allowed_approve']) && isset($_POST['allowed_approve'][$adminRoleId]) ? 1 : 0;
-			$allowedSortOrder = isset($_POST['allowed_sort_order']) && isset($_POST['allowed_sort_order'][$adminRoleId]) ? 1 : 0;
-			$allowedExport = isset($_POST['allowed_export']) && isset($_POST['allowed_export'][$adminRoleId]) ? 1 : 0;
+			$allowedList = isset($_POST['allowed_list']) && isset($_POST['allowed_list'][$adminRoleId]);
+			$allowedDetail = isset($_POST['allowed_detail']) && isset($_POST['allowed_detail'][$adminRoleId]);
+			$allowedCreate = isset($_POST['allowed_create']) && isset($_POST['allowed_create'][$adminRoleId]);
+			$allowedUpdate = isset($_POST['allowed_update']) && isset($_POST['allowed_update'][$adminRoleId]);
+			$allowedDelete = isset($_POST['allowed_delete']) && isset($_POST['allowed_delete'][$adminRoleId]);
+			$allowedApprove = isset($_POST['allowed_approve']) && isset($_POST['allowed_approve'][$adminRoleId]);
+			$allowedSortOrder = isset($_POST['allowed_sort_order']) && isset($_POST['allowed_sort_order'][$adminRoleId]);
+			$allowedExport = isset($_POST['allowed_export']) && isset($_POST['allowed_export'][$adminRoleId]);
+			$allowedRestore = isset($_POST['allowed_restore']) && isset($_POST['allowed_restore'][$adminRoleId]);
 			
 			// Create a new instance of AppAdminRoleImpl
 			// and set the database connection
@@ -185,6 +186,7 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->setAllowedApprove($allowedApprove)
 			->setAllowedSortOrder($allowedSortOrder)
 			->setAllowedExport($allowedExport)
+			->setAllowedRestore($allowedRestore)
 			->update();
 
 			// Update parent role
@@ -246,15 +248,16 @@ if($inputGet->getUserAction() == 'generate')
 					$adminRole->setModuleId($moduleId)
 					->setAdminLevelId($adminLevelId)
 					->setModuleCode($moduleCode)
-					->setAllowedList(1)
-					->setAllowedDetail(0)
-					->setAllowedCreate(0)
-					->setAllowedUpdate(0)
-					->setAllowedDelete(0)
-					->setAllowedApprove(0)
-					->setAllowedSortOrder(0)
-					->setAllowedExport(0)
-					->setActive(1)
+					->setAllowedList(true)
+					->setAllowedDetail(false)
+					->setAllowedCreate(false)
+					->setAllowedUpdate(false)
+					->setAllowedDelete(false)
+					->setAllowedApprove(false)
+					->setAllowedSortOrder(false)
+					->setAllowedExport(false)
+					->setAllowedRestore(false)
+					->setActive(true)
 					->insert();
 				}
 			}
@@ -267,8 +270,6 @@ if($inputGet->getUserAction() == 'generate')
 	header("Location: " . $currentModule->getSelf() . "?admin_level_id=" . $adminLevelId);
 	exit();
 }
-
-
 
 $appEntityLanguage = new AppEntityLanguageImpl(new AppAdminRoleImpl(), $appConfig, $currentUser->getLanguageId());
 
@@ -318,7 +319,6 @@ $subqueryMap = array(
 	"propertyName" => "name"
 )
 );
-
 
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
@@ -397,6 +397,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_approve" class="order-controll"><label for="allowed_approve"><input id="allowed_approve" type="checkbox" class="checkbox check-master" data-selector=".allowed_approve"> <?php echo $appEntityLanguage->getApprove();?></label></td>
 								<td data-col-name="allowed_sort_order" class="order-controll"><label for="allowed_sort_order"><input id="allowed_sort_order" type="checkbox" class="checkbox check-master" data-selector=".allowed_sort_order"> <?php echo $appEntityLanguage->getSortOrder();?></label></td>
 								<td data-col-name="allowed_export" class="order-controll"><label for="allowed_export"><input id="allowed_export" type="checkbox" class="checkbox check-master" data-selector=".allowed_export"> <?php echo $appEntityLanguage->getExport();?></label></td>
+								<td data-col-name="allowed_restore" class="order-controll"><label for="allowed_restore"><input id="allowed_restore" type="checkbox" class="checkbox check-master" data-selector=".allowed_restore"> <?php echo $appEntityLanguage->getRestore();?></label></td>
 								<td data-col-name="allowed_all" class="order-controll"><label for="allowed_all"><input id="allowed_all" type="checkbox" class="checkbox check-master" data-selector=".allowed_all"> <?php echo $appEntityLanguage->getAll();?></label></td>
 							</tr>
 						</thead>
@@ -504,6 +505,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<label>
 										<input type="checkbox" class="checkbox check-slave allowed_all allowed_export <?php echo $moduleClass;?>" name="allowed_export[<?php echo $id;?>]" value="1" 
 											<?php echo $adminRole->optionAllowedExport($attributeChecked, "");?>> 
+										<?php echo $appLanguage->getYes();?>
+									</label>
+								</td>
+
+								<!-- Allowed Restore (checkbox) -->
+								<td data-col-name="allowed_restore">
+									<label>
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_restore <?php echo $moduleClass;?>" name="allowed_restore[<?php echo $id;?>]" value="1" 
+											<?php echo $adminRole->optionAllowedRestore($attributeChecked, "");?>> 
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>

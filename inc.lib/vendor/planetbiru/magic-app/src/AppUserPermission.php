@@ -94,6 +94,13 @@ class AppUserPermission
     private $allowedExport;
 
     /**
+     * Allowed restore
+     *
+     * @var bool
+     */
+    private $allowedRestore;
+
+    /**
      * Allowed batch action
      *
      * @var bool
@@ -184,6 +191,7 @@ class AppUserPermission
             $this->allowedApprove =  true;
             $this->allowedSortOrder =  true;
             $this->allowedExport =  true;
+            $this->allowedRestore =  true;
         }
         else
         {
@@ -200,6 +208,7 @@ class AppUserPermission
                     $this->allowedApprove = $this->entity->getAllowedApprove();
                     $this->allowedSortOrder = $this->entity->getAllowedSortOrder();
                     $this->allowedExport = $this->entity->getAllowedExport();
+                    $this->allowedRestore = $this->entity->getAllowedRestore();
                 }
                 
                 $this->initialized = true;
@@ -317,6 +326,7 @@ class AppUserPermission
             $this->allowedApprove =  true;
             $this->allowedSortOrder =  true;
             $this->allowedExport =  true;
+            $this->allowedRestore =  true;
             return true;
         }
         else
@@ -336,6 +346,7 @@ class AppUserPermission
                 || ($userAction == UserAction::APPROVE && !$this->isAllowedApprove())
                 || ($userAction == UserAction::REJECT && !$this->isAllowedApprove())
                 || ($userAction == UserAction::EXPORT && !$this->isAllowedExport())
+                || ($userAction == UserAction::RESTORE && !$this->isAllowedRestore())
                 )
                 ;  
             }
@@ -463,6 +474,20 @@ class AppUserPermission
             $this->loadPermission();
         }
         return $this->allowedExport;
+    }
+
+    /**
+     * Get allowed restore permission.
+     *
+     * @return boolean True if the user is allowed to perform restore, false otherwise.
+     */
+    public function isAllowedRestore()
+    {
+        if(!$this->initialized)
+        {
+            $this->loadPermission();
+        }
+        return $this->allowedRestore;
     }
 
     /**
