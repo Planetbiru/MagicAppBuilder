@@ -3,6 +3,7 @@
 use MagicApp\AppUserPermission;
 use MagicApp\Field;
 use MagicApp\PicoModule;
+use MagicApp\UserAction;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
@@ -43,7 +44,7 @@ if(file_exists($trashConfigPath))
     $trashConfig->loadYamlFile($trashConfigPath, false, true, true);
 }
 
-if($inputPost->getUserAction() === "restore")
+if($inputPost->getUserAction() === UserAction::RESTORE)
 {
     $trashEntity = $inputPost->getTrashEntity();
     $primaryEntity = substr($trashEntity, 0, strlen($trashEntity) - 5);
