@@ -1571,8 +1571,7 @@ This enables easier reporting, data sharing, and external data review workflows.
 
 ### Data Restoration Feature
 
-* MagicAppBuilder now supports **restoring deleted data from trash tables**.
-* This feature consists of two main components:
+MagicAppBuilder now supports **restoring deleted data from trash tables**, improving safety and traceability of data operations. This feature consists of two main components:
 
 #### 1. Application Options – Data Restoration Setup
 
@@ -1581,17 +1580,45 @@ This enables easier reporting, data sharing, and external data review workflows.
 * Users can:
 
   * View the list of trash-supported tables.
-  * Select which tables should be restorable.
+  * Select which tables should support data restoration.
   * Automatically generate the required **Primary Entities** and **Trash Entities** for restoration purposes.
 
 #### 2. Data Restoration Module in Generated Applications
 
-* Applications built with MagicAppBuilder now include a **Data Restoration** module.
+* Applications generated with MagicAppBuilder now include a **Data Restoration** module.
 * This module allows users to:
 
-  * View a list of entities that support restoration.
-  * Select specific entities and browse deleted data entries.
+  * View a list of entities that support data restoration.
+  * Select specific entities and browse soft-deleted (trashed) records.
   * Restore selected records back into their original (primary) tables.
 
-This feature enhances **data safety and recovery** by providing an intuitive interface for managing soft-deleted records.
+This feature enhances **data safety, recovery, and auditability** by providing an intuitive UI to manage soft-deleted records.
+
+
+## Improvements
+
+### Optimized AJAX Requests
+
+* Optimized AJAX requests for:
+
+  * **Filter operations** – filtering data lists is now more efficient and lightweight.
+  * **Pagination** – navigating pages within list views triggers faster, optimized AJAX loads.
+
+These optimizations reduce network load and improve responsiveness, especially on large datasets.
+
+
+## UX Enhancements
+
+### Confirmation Dialogs for All Actions
+
+* All critical actions performed via forms now include **confirmation dialogs**, including:
+
+  * Activate
+  * Deactivate
+  * Delete
+  * Sort
+  * Approve
+  * Reject
+
+This ensures users are explicitly aware of irreversible or sensitive operations, improving **user safety and interaction clarity**.
 

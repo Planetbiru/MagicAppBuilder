@@ -410,11 +410,19 @@ class AppBuilder extends AppBuilderBase
         
         if($activationValue)
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", true))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."PicoSpecification::getInstance()";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addOr(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", null))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addOr(PicoPredicate::getInstance()->notEquals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", true))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
         }
         else
         {
-            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(PicoPredicate::getInstance()->notEquals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", false))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."PicoSpecification::getInstance()";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addOr(PicoPredicate::getInstance()->equals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", null))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addOr(PicoPredicate::getInstance()->notEquals(".AppBuilderBase::getStringOf(PicoStringUtil::camelize($this->entityInfo->getActive())).", false))";
+            $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.")";
         }
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."->addAnd(\$dataFilter)";
 

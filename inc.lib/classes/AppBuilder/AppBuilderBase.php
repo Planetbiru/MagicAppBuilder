@@ -2122,6 +2122,12 @@ $subqueryMap = '.$referece.';
             $activate->setAttribute('name', 'user_action');
             $activate->setAttribute('id', 'activate_selected');
             $activate->setAttribute('value', 'activate');
+            $activate->setAttribute('data-confirmation', 'true');
+            $activate->setAttribute('data-event', 'false');
+            $activate->setAttribute('data-onclik-title', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getTitleActivateConfirmation());'.self::PHP_CLOSE_TAG);
+            $activate->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningActivateConfirmation());'.self::PHP_CLOSE_TAG);
+            $activate->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG);
+            $activate->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG);
             $activate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonActivate();'.self::PHP_CLOSE_TAG));
 
             $deactivate = $dom->createElement('button');
@@ -2130,6 +2136,12 @@ $subqueryMap = '.$referece.';
             $deactivate->setAttribute('name', 'user_action');
             $deactivate->setAttribute('id', 'deactivate_selected');
             $deactivate->setAttribute('value', 'deactivate');
+            $deactivate->setAttribute('data-confirmation', 'true');
+            $deactivate->setAttribute('data-event', 'false');
+            $deactivate->setAttribute('data-onclik-title', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getTitleDeactivateConfirmation());'.self::PHP_CLOSE_TAG);
+            $deactivate->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningDeactivateConfirmation());'.self::PHP_CLOSE_TAG);
+            $deactivate->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG);
+            $deactivate->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG);
             $deactivate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonDeactivate();'.self::PHP_CLOSE_TAG));
 
             
@@ -2147,7 +2159,12 @@ $subqueryMap = '.$referece.';
         $delete->setAttribute('name', 'user_action');
         $delete->setAttribute('id', 'delete_selected');
         $delete->setAttribute('value', 'delete');
+        $delete->setAttribute('data-confirmation', 'true');
+        $delete->setAttribute('data-event', 'false');
+        $delete->setAttribute('data-onclik-title', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getTitleDeleteConfirmation());'.self::PHP_CLOSE_TAG);
         $delete->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());'.self::PHP_CLOSE_TAG);
+        $delete->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG);
+        $delete->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG);
         $delete->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonDelete();'.self::PHP_CLOSE_TAG));
 
         $wrapper->appendChild($dom->createTextNode(self::N_TAB4)); 
@@ -2163,6 +2180,12 @@ $subqueryMap = '.$referece.';
             $approve->setAttribute('name', 'user_action');
             $approve->setAttribute('id', 'approve_selected');
             $approve->setAttribute('value', 'approve');
+            $approve->setAttribute('data-confirmation', 'true');
+            $approve->setAttribute('data-event', 'false');
+            $approve->setAttribute('data-onclik-title', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getTitleApproveConfirmation());'.self::PHP_CLOSE_TAG);
+            $approve->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningApproveConfirmation());'.self::PHP_CLOSE_TAG);
+            $approve->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG);
+            $approve->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG);
             $approve->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->'.'getButtonApprove();'.self::PHP_CLOSE_TAG));
 
             $reject = $dom->createElement('button');
@@ -2171,6 +2194,12 @@ $subqueryMap = '.$referece.';
             $reject->setAttribute('name', 'user_action');
             $reject->setAttribute('id', 'reject_selected');
             $reject->setAttribute('value', 'reject');
+            $reject->setAttribute('data-confirmation', 'true');
+            $reject->setAttribute('data-event', 'false');
+            $reject->setAttribute('data-onclik-title', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getTitleRejectConfirmation());'.self::PHP_CLOSE_TAG);
+            $reject->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningRejectConfirmation());'.self::PHP_CLOSE_TAG);
+            $reject->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG);
+            $reject->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG);
             $reject->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->'.'getButtonReject();'.self::PHP_CLOSE_TAG));
 
             
@@ -2190,6 +2219,12 @@ $subqueryMap = '.$referece.';
             $order->setAttribute('name', 'user_action');
             $order->setAttribute('id', 'save_current_order');
             $order->setAttribute('value', 'sort_order');
+            $order->setAttribute('data-confirmation', 'true');
+            $order->setAttribute('data-event', 'false');
+            $order->setAttribute('data-onclik-title', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getTitleSortOrderConfirmation());'.self::PHP_CLOSE_TAG);
+            $order->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningSortOrderConfirmation());'.self::PHP_CLOSE_TAG);
+            $order->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG);
+            $order->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG);
             $order->setAttribute('disabled', 'disabled');
             $order->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonSaveCurrentOrder();'.self::PHP_CLOSE_TAG));
 

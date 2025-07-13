@@ -75,8 +75,8 @@ function initDateTimePicker() {
  * - Allows sorting columns by clicking on headers.
  * - Modifies the URL with updated sorting parameters.
  */
-function initSortTable() {
-  const tables = document.querySelectorAll("table.table-sort-by-column");
+function initSortTable(selector = "table.table-sort-by-column") {
+  const tables = document.querySelectorAll(selector);
   
   tables.forEach(function (thisTable) {
     let originalURL = document.location.toString();
@@ -137,20 +137,36 @@ function initSortTable() {
 
 /**
  * Initializes sortable rows for tables with manual sorting.
- * - Allows drag-and-drop sorting of rows.
+ *
+ * This function selects all <tbody> elements with the class "data-table-manual-sort"
+ * and applies drag-and-drop sorting behavior to them using Sortable.js.
+ * Each row must include a handle element with class "data-sort-handler".
+ * After sorting ends, the row numbers are updated via updateNumber().
  */
-function initSortData()
-{
+function initSortData() {
   document.querySelectorAll("tbody.data-table-manual-sort").forEach(function(dataToSort) {
-    Sortable.create(dataToSort, {
-      animation: 150,
-      scroll: true,
-      handle: ".data-sort-handler",
-      onEnd: function () {
-        // do nothing
-        updateNumber($(dataToSort));
-      },
-    });
+    sortDataByDrag(dataToSort);
+  });
+}
+
+/**
+ * Applies drag-and-drop sorting behavior to a specific table body.
+ *
+ * @param {HTMLElement} dataToSort - The <tbody> element to make sortable.
+ *
+ * This function uses Sortable.js to allow dragging rows using the
+ * element with class "data-sort-handler". When sorting ends, the
+ * updateNumber() function is called to refresh the order numbers.
+ */
+function sortDataByDrag(dataToSort) {
+  Sortable.create(dataToSort, {
+    animation: 150,
+    scroll: true,
+    handle: ".data-sort-handler",
+    onEnd: function () {
+      // do nothing
+      updateNumber($(dataToSort));
+    },
   });
 }
 
@@ -159,20 +175,17 @@ function initSortData()
  * - Selects or deselects all checkboxes when the master checkbox is toggled.
  */
 function initCheckAll() {
-  const masterCheckbox = document.querySelectorAll(".check-master");  
-  masterCheckbox.forEach(function(masterCheckbox) {
-    
-    if (masterCheckbox) {
-      masterCheckbox.addEventListener("change", function() {
-        const checked = masterCheckbox.checked;
-        const selector = masterCheckbox.dataset.selector;
-        
-        // Find all checkboxes matching the selector
-        document.querySelectorAll(".check-slave" + selector).forEach(function(slaveCheckbox) {
-          slaveCheckbox.checked = checked;
-        });
-      });
-    }
+  document.addEventListener("change", function(e) {
+    const masterCheckbox = e.target.closest(".check-master");
+    if (!masterCheckbox) return;
+
+    const checked = masterCheckbox.checked;
+    const selector = masterCheckbox.dataset.selector;
+
+    // Temukan semua slave checkbox sesuai selector
+    document.querySelectorAll(".check-slave" + selector).forEach(function(slaveCheckbox) {
+      slaveCheckbox.checked = checked;
+    });
   });
 }
 
@@ -301,29 +314,259 @@ function getDatePickerOptions(inpuElement, debug) {
   return Object.keys(options).length ? options : null;
 }
 
+/**
+ * Displays a non-blocking Bootstrap modal confirmation dialog.
+ *
+ * This function shows a modal with a custom title, message, and button labels.
+ * It returns a Promise that resolves to:
+ * - `true` if the user clicks OK
+ * - `false` if the user clicks Cancel
+ *
+ * Requires:
+ * - An HTML modal element with ID `customConfirmModal`
+ * - Elements inside the modal:
+ *   - `#customConfirmTitle`: for the modal title
+ *   - `#customConfirmMessage`: for the confirmation message
+ *   - `#customConfirmOk`: the OK button
+ *   - `#customConfirmCancel`: the Cancel button
+ * - Bootstrap's modal plugin (jQuery-based)
+ *
+ * @param {Object} options - Configuration options for the dialog.
+ * @param {string} [options.title="Confirmation"] - The dialog title.
+ * @param {string} [options.message="Are you sure?"] - The confirmation message.
+ * @param {string} [options.okText="OK"] - Label for the OK button.
+ * @param {string} [options.cancelText="Cancel"] - Label for the Cancel button.
+ * @returns {Promise<boolean>} Resolves to true if confirmed, false if cancelled.
+ */
+function customConfirm({
+  title = "Confirmation",
+  message = "Are you sure?",
+  okText = "OK",
+  cancelText = "Cancel"
+}) {
+  return new Promise((resolve) => {
+    document.getElementById('customConfirmTitle').innerText = title;
+    document.getElementById('customConfirmMessage').innerText = message;
+    document.getElementById('customConfirmOk').innerText = okText;
+    document.getElementById('customConfirmCancel').innerText = cancelText;
 
+    const okBtn = document.getElementById('customConfirmOk');
+    const cancelBtn = document.getElementById('customConfirmCancel');
+
+    const cleanup = () => {
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+    };
+
+    const onOk = () => {
+      cleanup();
+      $('#customConfirmModal').modal('hide');
+      resolve(true);
+    };
+
+    const onCancel = () => {
+      cleanup();
+      $('#customConfirmModal').modal('hide');
+      resolve(false);
+    };
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+
+    $('#customConfirmModal').modal('show');
+  });
+}
 
 /**
- * Initializes AJAX support for form submissions.
- * - Attaches a confirmation prompt for delete actions if the element has data-ajax-support="true".
+ * Initializes AJAX support for form submissions, pagination, and confirmation dialogs.
+ *
+ * Features:
+ * - Automatically intercepts <button type="submit"> inside forms.
+ *   - If the button has `data-confirmation="true"`, a confirmation dialog will appear.
+ *   - If the surrounding `.data-section` has `data-ajax-support="true"`, the form is submitted via AJAX.
+ *   - Otherwise, it falls back to standard form submission.
+ * - Adds support for AJAX pagination in `.pagination-number` inside `.data-section[data-ajax-support="true"]`.
+ * - Uses `history.pushState()` to update the URL after AJAX pagination.
+ * - Handles browser Back/Forward navigation via `popstate` and reloads content using AJAX.
+ * - Dynamically injects the Bootstrap modal structure for confirmations if not already present.
+ *
+ * Requirements:
+ * - Bootstrap modal (jQuery-based)
+ * - `customConfirm()` function must be defined and handle modal display
+ * - `sortDataByDrag()` must re-bind drag-sort functionality after AJAX reloads
  */
 function initAjaxSupport() {
-  // Check if there are elements with the attribute data-ajax-support="true"
-  if (document.querySelectorAll('[data-ajax-support="true"]').length === 0) {
-    // Attach a click event listener to the submit buttons with specific attributes
-    document.addEventListener("click", function(e2) {
-      const target = e2.target;
 
-      if (target && target.type === "submit" && target.name === "user_action" && target.value === "delete") {
-        // Check for confirmation before proceeding with the action
-        const confirmationMessage = target.getAttribute("data-onclik-message");
-        if (!confirm(confirmationMessage)) {
-          e2.preventDefault();
-          e2.stopPropagation();
+  // Inject the Bootstrap modal for confirmation if not present
+  let modal = document.createElement('div');
+  modal.innerHTML = `
+  <div class="modal fade" id="customConfirmModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="customConfirmTitle">Confirm</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body" id="customConfirmMessage">Are you sure?</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="customConfirmOk">OK</button>
+          <button type="button" class="btn btn-secondary" id="customConfirmCancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+  document.querySelector('body').appendChild(modal);
+
+  // Intercept all submit buttons
+  document.addEventListener('click', function (e) {
+    const dataSection = e.target.closest('.data-section');
+    if (!dataSection) return;
+
+    const target = e.target.closest('button[type="submit"]');
+    if (!target) return;
+
+    const form = target.closest('form');
+    if (!form) return;
+
+    const section = form.closest('.data-section');
+    const isAjax = section && section.dataset.ajaxSupport === "true";
+    const needsConfirmation = target.dataset.confirmation === 'true';
+
+    // Encapsulate logic to submit the form (AJAX or standard)
+    const submitForm = () => {
+      if (isAjax) {
+        const formData = new FormData(form);
+
+        // Append the clicked button’s name/value to FormData
+        if (target.name) {
+          formData.append(target.name, target.value);
         }
+
+        fetch(window.location.href, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+          section.innerHTML = html;
+          // Re-initialize sorting if necessary
+          sortDataByDrag(section.querySelector('table tbody'));
+        })
+        .catch(error => {
+          console.error('AJAX form error:', error);
+        });
+      } else {
+        // Submit form using a temporary hidden button
+        const hiddenSubmit = document.createElement('button');
+        hiddenSubmit.type = 'submit';
+        hiddenSubmit.style.display = 'none';
+        hiddenSubmit.name = target.name;
+        hiddenSubmit.value = target.value;
+        form.appendChild(hiddenSubmit);
+        form.submit();
+        form.removeChild(hiddenSubmit);
       }
+    };
+
+    if (needsConfirmation) {
+      e.preventDefault(); // Delay actual submission until confirmed
+
+      // Read confirmation attributes
+      const title = target.dataset.onclikTitle || "Confirmation";
+      const message = target.dataset.onclikMessage || "Are you sure?";
+      const okText = target.dataset.okButtonLabel || "OK";
+      const cancelText = target.dataset.cancelButtonLabel || "Cancel";
+
+      // Show confirmation modal
+      customConfirm({
+        title,
+        message,
+        okText,
+        cancelText
+      }).then(result => {
+        if (result) {
+          submitForm();
+        }
+        // Do nothing if cancelled
+      });
+    } else {
+      // No confirmation needed, proceed directly
+      e.preventDefault();
+      submitForm();
+    }
+  });
+
+  // Handle AJAX pagination link clicks
+  document.addEventListener('click', function(e) {
+    const dataSection = e.target.closest('.data-section');
+    if (!dataSection) return;
+    const link = e.target.closest('.pagination-number .page-selector a');
+    if (!link) return;
+
+    const section = link.closest('.data-section');
+    if (!section || section.dataset.ajaxSupport !== "true") return;
+
+    e.preventDefault(); // Prevent normal page reload
+
+    const url = link.getAttribute('href');
+
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.text())
+    .then(html => {
+      section.innerHTML = html;
+
+      // Re-bind drag sort functionality
+      const table = section.querySelector('table tbody');
+      if (table) {
+        sortDataByDrag(table);
+      }
+
+      // Update URL in browser without reload
+      history.pushState(null, '', url);
+    })
+    .catch(error => {
+      console.error('Pagination AJAX error:', error);
     });
-  }
+  });
+
+  // Handle browser Back/Forward using popstate and reload with AJAX
+  window.addEventListener('popstate', function () {
+    const section = document.querySelector('.data-section[data-ajax-support="true"]');
+    if (!section) return;
+
+    const url = window.location.href;
+
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.text())
+    .then(html => {
+      section.innerHTML = html;
+
+      // Re-initialize any dynamic features
+      const table = section.querySelector('table tbody');
+      if (table) {
+        sortDataByDrag(table);
+      }
+    })
+    .catch(error => {
+      console.error('Failed to reload content on popstate:', error);
+    });
+  });
 }
 
 /**
@@ -669,13 +912,30 @@ function doRestoreFormData(formData, errorField, formSelector) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize general page setup (e.g., tabs, tooltips, etc.)
   initPage();
+
+  // Enable "check all / uncheck all" checkbox functionality
   initCheckAll();
+
+  // Enable AJAX support for form submissions, pagination, and back/forward navigation
   initAjaxSupport();
+
+  // Activate support for dynamic/multiple input fields
   initMultipleInput();
+
+  // Initialize date/time picker widgets (e.g., flatpickr or bootstrap-datepicker)
   initDateTimePicker();
+
+  // Initialize multiple-select dropdowns (e.g., select2 or choices.js)
   initMultipleSelect();
+
+  // Enable clickable table headers for sorting via query parameters
   initSortTable();
+
+  // Enable drag-and-drop sorting for manually sortable tables
   initSortData();
+
+  // Apply sorting state (highlighting, arrows, etc.) based on URL query params
   initOrderUrl(window.location.search);
 });
