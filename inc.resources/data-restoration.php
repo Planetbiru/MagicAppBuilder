@@ -23,6 +23,7 @@ $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "data-restoration", $appLanguage->getDataRestoration());
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
+
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 if(!$userPermission->allowedAccess($inputGet, $inputPost))
@@ -112,7 +113,7 @@ if($inputGet->getTrashEntity() != "")
 								$trashEntities = $trashConfig->getTrashEntity();
 								foreach($trashEntities as $primaryEntity)
 								{
-									$selected = ($inputGet->getTrashEntity() == $primaryEntity->getName()) ? ' selected="selected"' : '';
+									$selected = ($inputGet->getTrashEntity() == $primaryEntity->getName()) ? ' selected="selected"' : ''; // NOSONAR
 									?>
 									<option value="<?php echo $primaryEntity->getName();?>"<?php echo $selected;?>><?php echo $primaryEntity->getName();?></option>
 									<?php
@@ -247,9 +248,13 @@ if($inputGet->getTrashEntity() != "")
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
+								<?php if($userPermission->isAllowedRestore()){ ?>
 								<td class="data-controll data-selector" data-key="trash_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-trash-id"/>
 								</td>
+								<?php
+								}
+								?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="time_delete" class="order-controll"><a href="#"><?php echo $dataLoader->labelTimeDelete();?></a></td>
                                 <?php
@@ -276,9 +281,13 @@ if($inputGet->getTrashEntity() != "")
 							?>
 		
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
+								<?php if($userPermission->isAllowedRestore()){ ?>
 								<td class="data-selector" data-key="trash_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-trash-id" name="checked_row_id[]" value="<?php echo $trashData->get($camelPrimaryKey);?>"/>
 								</td>
+								<?php
+								}
+								?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="time_delete"><?php echo $trashData->getTimeDelete();?></td>
 								<?php
@@ -303,7 +312,11 @@ if($inputGet->getTrashEntity() != "")
 				<div class="button-wrapper">
 					<div class="button-area">
 						<input type="hidden" name="trash_entity" value="<?php echo $inputGet->getTrashEntity(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>">
+						<?php if($userPermission->isAllowedRestore()){ ?>
 						<button type="submit" class="btn btn-success" name="user_action" id="restore_selected" value="restore" data-confirmation="true" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningRestoreConfirmation());?>"><?php echo $appLanguage->getButtonRestore();?></button>
+						<?php
+						}
+						?>
 					</div>
 				</div>
 			</form>
