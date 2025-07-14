@@ -1567,6 +1567,9 @@ This enables easier reporting, data sharing, and external data review workflows.
 
 # MagicAppBuilder Version 1.12.0
 
+MagicAppBuilder has just rolled out version 1.12.0, packed with features and improvements designed to give you more control, better performance, and enhanced data safety.
+
+
 ## What's New
 
 ### Data Restoration Feature
@@ -1592,6 +1595,16 @@ Every application you generate with MagicAppBuilder will now have a built-in **D
 * **Restore selected entries** back to their original tables with ease.
 
 This complete solution provides an intuitive way to manage soft-deleted records, drastically improving **data safety, recovery, and auditability**.
+
+
+### Entity Data Import/Export in Entity Editor
+
+The Entity Editor now offers powerful new tools for managing your entity data, significantly enhancing the entity definition phase. Users can now easily **export and import entity data** to streamline workflows and improve reusability.
+
+* **Export Entity Data**: You can now export the data currently in your Entity Editor's table to a **JSON file**. This includes data imported from SQL, SQLite database files, Excel, CSV, or even data you've entered manually. This feature is invaluable for saving your progress, creating templates, or sharing data with other entities that have similar column structures.
+* **Import Entity Data**: Seamlessly import data back into your Entity Editor from a **JSON file**. This allows you to quickly load previously exported data, or data prepared externally, directly into your entity's table for further editing or definition.
+
+These features are particularly beneficial during the entity definition phase, allowing users to export data for later re-import or for use with other entities that share common columns.
 
 
 ## Improvements

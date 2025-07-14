@@ -209,6 +209,7 @@ class EntityRenderer {
         const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
         group.setAttribute('data-entity', entity.name);
         group.classList.add('svg-entity');
+        group.setAttribute('data-index', index);
         group.setAttribute("transform", `translate(${x}, ${y})`);
 
         const tableHeight = (entity.columns.length * this.columnHeight) + 26;

@@ -35,7 +35,7 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/Column.min.js"></script>
     <script src="../lib.assets/js/Entity.min.js"></script>
     <script src="../lib.assets/js/Diagram.min.js"></script>
-    <script src="../lib.assets/js/EntityEditor.min.js"></script>
+    <script src="../lib.assets/js/EntityEditor.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
     <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
@@ -303,6 +303,33 @@ if(!isset($databaseName))
             </div>
         </div>
     </div>
+    
+    <div class="modal modal-xl" id="entityDataEditorModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Entity Data Editor</h3>
+                <span class="close-btn cancel-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger clear-data-entity">Clear</button>
+                &nbsp;
+                <button class="btn btn-success export-data-entity">Export</button>
+                &nbsp;
+                <button class="btn btn-success import-data-entity">Import</button>
+                &nbsp;
+                <button class="btn btn-success add-data-entity">Add</button>
+                &nbsp;
+                <button class="btn btn-primary save-data-entity">Save</button>
+                &nbsp;
+                <button class="btn btn-secondary cancel-button">Cancel</button>
+                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+            </div>
+        </div>
+    </div>
 
     <div class="modal modal-sm" id="descriptionModal">
         <div class="modal-backdrop"></div>
@@ -374,25 +401,7 @@ if(!isset($databaseName))
         </div>
     </div>
     
-    <div class="modal modal-xl" id="entityDataEditorModal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Entity Data Editor</h3>
-                <span class="close-btn cancel-button">&times;</span>
-            </div>
-            <div class="modal-body">
-                
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-success add-data-entity">Add</button>
-                &nbsp;
-                <button class="btn btn-primary save-data-entity">Save</button>
-                &nbsp;
-                <button class="btn btn-secondary cancel-button">Cancel</button>
-            </div>
-        </div>
-    </div>
+    
 
 
 

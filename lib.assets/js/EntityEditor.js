@@ -1229,11 +1229,14 @@ class EntityEditor {
                 <td>[Custom Entities]</td>`;
             tabelListForExport.appendChild(sep);
         }
+        
+        let entityIndex = 0;
 
         // Custom Entities First
         this.entities.forEach((entity, index) => {
             if (!_this.systemEntities.includes(entity.name.toLowerCase())) {
-                _this.appendBuildTableRow(tabelListForExport, entity, index, "custom");
+                _this.appendBuildTableRow(tabelListForExport, entity, entityIndex, "custom");
+                entityIndex++;
             }
         });
 
@@ -1254,7 +1257,8 @@ class EntityEditor {
         // System Entities After
         this.entities.forEach((entity, index) => {
             if (_this.systemEntities.includes(entity.name.toLowerCase())) {
-                _this.appendBuildTableRow(tabelListForExport, entity, index, "system");
+                _this.appendBuildTableRow(tabelListForExport, entity, entityIndex, "system");
+                entityIndex++;
             }
         });
 
@@ -1966,6 +1970,8 @@ class EntityEditor {
         _this.showConfirmationDialog(`<p>Are you sure you want to delete the entity &quot;${entityName}&quot;?</p>`, 'Delete Confirmation', 'Yes', 'No', function(isConfirmed) {
             if (isConfirmed) {
                 _this.entities.splice(index, 1);
+                // Update entity index
+                _this.updateEntityIndex();              
                 _this.renderEntities();
                 _this.restoreCheckedEntitiesFromCurrentDiagram();
                 _this.exportToSQL();
@@ -1976,7 +1982,7 @@ class EntityEditor {
             } 
         });
     }
-
+    
     /**
      * Cancels the entity editing process and hides the editor form.
      */
@@ -3189,6 +3195,7 @@ class EntityEditor {
         // Create tbody
         const tbody = document.createElement('tbody');
         
+        table.appendChild(thead);
         table.appendChild(tbody);
         wrapper.appendChild(table);
         modalBody.appendChild(wrapper);
@@ -3198,14 +3205,14 @@ class EntityEditor {
 
         entity.columns.forEach(col => {
             const th = document.createElement('th');
+            th.classList.add('entity-column');
             th.textContent = col.name;
-            th.style.padding = '6px';
-            th.style.background = '#f8f8f8';
+            th.dataset.name = col.name;
             headRow.appendChild(th);
         });
 
         thead.appendChild(headRow);
-        table.appendChild(thead);
+        
 
         data.forEach((row, rowIndex) => {
             const tr = document.createElement('tr');
@@ -3248,6 +3255,7 @@ class EntityEditor {
      */
     createEntityDataCell(rowIndex, colIndex, col, value = "") {
         const td = document.createElement('td');
+        td.classList.add('entity-column');
         const input = document.createElement('input');
 
         input.type = 'text';
@@ -3263,44 +3271,140 @@ class EntityEditor {
         td.appendChild(input);
         return td;
     }
+    
+    exportData() {
+        let columns = [];
+        let data = [];
 
+        // Get column names from thead
+        document.querySelector('.data-preview-table').querySelector('thead').querySelectorAll('th.entity-column').forEach((th) => {
+            columns.push(th.dataset.name);
+        });
+
+        // Get data from tbody rows
+        let trs = document.querySelector('.data-preview-table').querySelector('tbody').querySelectorAll('tr');
+        if (trs) {
+            trs.forEach((tr) => {
+                let row = {};
+                tr.querySelectorAll('td.entity-column').forEach((td) => {
+                    let input = td.querySelector('input');
+                    // Ensure input and its name property exist before accessing
+                    if (input && input.name) {
+                        row[input.dataset.col] = input.value;
+                    }
+                });
+                data.push(row);
+            });
+        }
+
+        // Construct the data object to be exported
+        let content = {
+            columns: columns,
+            data: data
+        };
+
+        // --- Add JSON download logic here ---
+
+        // Convert the content object to a JSON string
+        const jsonString = JSON.stringify(content, null, 2); // 'null, 2' for pretty-printing JSON
+
+        // Create a Blob from the JSON string
+        const blob = new Blob([jsonString], { type: 'application/json' });
+
+        // Create a URL for the Blob
+        const url = URL.createObjectURL(blob);
+
+        // Create a temporary anchor element
+        const a = document.createElement('a');
+        a.href = url;
+        // Set the download attribute to specify the filename
+        a.download = 'entity_data.json'; // You can make this dynamic, e.g., 'entity_data_' + Date.now() + '.json'
+
+        // Append the anchor to the body (it doesn't need to be visible)
+        document.body.appendChild(a);
+
+        // Programmatically click the anchor to trigger the download
+        a.click();
+
+        // Clean up: remove the anchor element and revoke the object URL
+        // Revoking the URL is crucial for performance and memory management
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        console.log("Data exported as JSON:", content); // For debugging
+    }
+    
+    clearData()
+    {
+        this.showConfirmationDialog(
+                `Are you sure you want to delete all data?`, // Using single quotes for entity name for clarity
+                'Clear Entity Data Confirmation', // More descriptive title
+                'Yes',
+                'No',
+                (isOk) => {
+                    if(isOk)
+                    {
+                        document.querySelector('.data-preview-table tbody').innerHTML = '';
+                    }
+                }
+            );
+        
+    }
 
     /**
-     * Adds a new empty row to the editable entity data table.
-     * 
-     * @returns {void}
+     * Adds a new empty row to the editable entity data table within the modal.
+     * Each cell in the new row will contain an input field, allowing users to enter new data.
+     * A delete button is also included in the first column of the new row, enabling
+     * the user to remove this newly added row from the table.
+     *
+     * @returns {HTMLTableRowElement|null} The newly created HTML table row element (<tr>),
+     * or null if the table body is not found.
      */
     addData() {
         const entity = this.entities[this.currentEntityIndex];
         const modal = document.querySelector('#entityDataEditorModal');
         const tableBody = modal.querySelector('.data-preview-table tbody');
 
-        if (!tableBody) return;
+        // If the table body is not found, exit the function.
+        if (!tableBody) {
+            console.warn('Table body for entity data editor not found.');
+            return null;
+        }
 
-        const rowIndex = tableBody.rows.length;
-        const row = document.createElement('tr');
+        const rowIndex = tableBody.rows.length; // Get the index for the new row
+        const row = document.createElement('tr'); // Create the new table row element
 
-        // Kolom untuk tombol delete
+        // Create the delete button column for the new row
         const deleteTd = document.createElement('td');
-        deleteTd.classList.add('td-remover');
+        deleteTd.classList.add('td-remover'); // Add a class for styling/identification
         const deleteLink = document.createElement('a');
-        deleteLink.className = 'delete-row';
-        deleteLink.href = 'javascript:';
-        deleteLink.textContent = '❌';
+        deleteLink.className = 'delete-row'; // Add a class for styling/identification
+        deleteLink.href = 'javascript:void(0);'; // Prevent default link behavior
+        deleteLink.textContent = '❌'; // Unicode character for a cross/delete icon
         deleteTd.appendChild(deleteLink);
         row.appendChild(deleteTd);
 
-        // Tambahkan input sel berdasarkan kolom entity
+        // Add input cells based on the entity's column definitions
         entity.columns.forEach((col, colIndex) => {
+            // 'this.createEntityDataCell' is assumed to be a method that creates
+            // and returns a <td> element with an input field inside it.
+            // The last argument '' indicates an empty initial value for the new row.
             const td = this.createEntityDataCell(rowIndex, colIndex, col, '');
             row.appendChild(td);
-            deleteLink.addEventListener('click', function(e){
-               e.preventDefault();
-               tbody.removeChild(tr);
-            });
         });
 
+        // --- IMPORTANT: The event listener for the delete button MUST be outside the forEach loop ---
+        // If placed inside the forEach, it would be attached multiple times (once for each column),
+        // leading to unexpected behavior (e.g., multiple removals or incorrect 'tr' reference).
+        deleteLink.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent the default action of the link
+            row.remove(); // Remove the entire row (the <tr> element) from the DOM
+        });
+
+        // Append the newly created row to the table body
         tableBody.appendChild(row);
+
+        return row; // Return the created row for potential further manipulation
     }
 
     
