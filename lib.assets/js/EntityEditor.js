@@ -433,11 +433,7 @@ class EntityEditor {
         {
             nullable = 'checked';
         }
-        let originalName = '';
-        if(!newColumn)
-        {
-            originalName = column.name;
-        }
+        let originalName = column.name;
         
         row.innerHTML = `
             <td class="drag-handle"></td>
@@ -446,7 +442,7 @@ class EntityEditor {
                 <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
                 <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>    
             </td>
-            <td><input type="text" class="column-name" value="${column.name}" data-roginal-name="${originalName}" placeholder="Column Name"></td>
+            <td><input type="text" class="column-name" value="${column.name}" data-original-name="${originalName}" placeholder="Column Name"></td>
             <td>
                 <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
                     ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
@@ -671,6 +667,7 @@ class EntityEditor {
     doSaveEntity() {
         const entityName = document.querySelector(this.selector+" .entity-name").value;
         const columns = [];
+        const originalColumnReference = [];
         const columnNames = document.querySelectorAll(this.selector+" #table-entity-editor .column-name");
         const columnTypes = document.querySelectorAll(this.selector+" #table-entity-editor .column-type");
         const columnNullables = document.querySelectorAll(this.selector+" #table-entity-editor .column-nullable");
@@ -694,26 +691,43 @@ class EntityEditor {
                 columnEnums[i].value || null,
             );
 
-            if(columnNames[i].dataset.roginalName && columnNames[i].dataset.roginalName != column.name)
+            if(columnNames[i].dataset.originalName && columnNames[i].dataset.originalName != columnNames[i].value)
             {
                 // If the column name has been modified, store the original name
                 modifiedColumnNames.push({
-                    original: columnNames[i].dataset.roginalName,
-                    new: column.name
+                    original: columnNames[i].dataset.originalName,
+                    new: columnNames[i].value
                 });
             }
 
             columns.push(column);
+            originalColumnReference.push(
+                new Column(
+                    columnNames[i].dataset.originalName,
+                    columnTypes[i].value,
+                    columnLengths[i].value || null,
+                    columnNullables[i].checked,
+                    columnDefaults[i].value || null,
+                    columnPrimaryKeys[i].checked,
+                    columnAutoIncrements[i].checked,
+                    columnEnums[i].value || null,
+                )
+            );
         }
 
         modifiedColumnNames.forEach(modified => {
             // Update the column names in the current entity data
-            this.entities[this.currentEntityIndex].data.forEach(row => {
-                if (row.hasOwnProperty(modified.original)) {
-                    row[modified.new] = row[modified.original]; // Copy the value to the new name
-                    delete row[modified.original]; // Remove the old name
-                }
-            });
+            
+            if(this.entities[this.currentEntityIndex] && this.entities[this.currentEntityIndex].data && this.entities[this.currentEntityIndex])
+            {
+                this.entities[this.currentEntityIndex].data.forEach(row => {
+                    if (row.hasOwnProperty(modified.original)) {
+                        row[modified.new] = row[modified.original]; // Copy the value to the new name
+                        delete row[modified.original]; // Remove the old name
+                    }
+                });
+            }
+            
         });
 
         if (this.currentEntityIndex >= 0) {
@@ -727,7 +741,18 @@ class EntityEditor {
             // Add a new entity
             const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
-            newEntity.setData(this.snakeizeData(this.currentEntityData, columns));
+            
+            let entityData = this.snakeizeData(this.currentEntityData, originalColumnReference);
+            modifiedColumnNames.forEach(modified => {
+                entityData.forEach(row => {
+                    if (row.hasOwnProperty(modified.original)) {
+                        row[modified.new] = row[modified.original]; // Copy the value to the new name
+                        delete row[modified.original]; // Remove the old name
+                    }
+                });
+            });
+            
+            newEntity.setData(entityData);
             newEntity.modificationDate = (new Date()).getTime();
             newEntity.creationDate = newEntity.modificationDate;
             newEntity.creator = '{{userName}}'; // Replace with actual user name if available
@@ -2724,25 +2749,30 @@ class EntityEditor {
     /**
      * Converts a string into snake_case format, trimming any leading or trailing underscores.
      * This function handles spaces, non-alphanumeric characters, and conversions from camelCase or PascalCase.
+     * It also replaces multiple consecutive underscores with a single underscore.
      *
      * @param {string} header - The input string to be converted.
-     * @returns {string} The string in snake_case format, with leading/trailing underscores removed.
+     * @returns {string} The string in snake_case format, with leading/trailing underscores removed and multiple underscores collapsed.
      *
      * @example
-     * snakeize("  This Is A Header  ");     // Returns "this_is_a_header"
-     * snakeize("firstName");                // Returns "first_name"
-     * snakeize("_User ID_");                // Returns "user_id"
-     * snakeize("HeaderTitleExample");       // Returns "header_title_example"
-     * snakeize("anotherTestString__");      // Returns "another_test_string"
-     * snakeize(" _with!Special@Chars#_  "); // Returns "withspecialchars"
+     * snakeize("   This Is A Header   ");        // Returns "this_is_a_header"
+     * snakeize("firstName");                     // Returns "first_name"
+     * snakeize("_User ID_");                     // Returns "user_id"
+     * snakeize("HeaderTitleExample");            // Returns "header_title_example"
+     * snakeize("anotherTestString__");           // Returns "another_test_string"
+     * snakeize(" _with!Special@Chars#_   ");    // Returns "with_special_chars"
+     * snakeize("multiple___underscores");        // Returns "multiple_underscores"
      */
     snakeize(header) {
-        return header
+        let name = header
             .replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1_$2") // Handles camelCase/PascalCase conversion
             .replace(/\s+/g, "_") // Replaces spaces with underscores
             .replace(/[^\w]/g, "") // Removes non-alphanumeric characters (excluding underscores)
             .toLowerCase() // Converts everything to lowercase
-            .replace(/^_+|_+$/g, ""); // NOSONAR // Trims leading/trailing underscores
+            .replace(/^_+|_+$/g, "") // Trims leading/trailing underscores
+            .replace(/__+/g, "_"); // Replaces multiple underscores with a single one
+
+        return name;
     }
 
     /**
