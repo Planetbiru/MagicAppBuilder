@@ -829,6 +829,10 @@ class EntityEditor {
                     data.push(entity);
                 }
             });
+            if(isNaN(updatedWidth) || updatedWidth < 240)
+            {
+                updatedWidth = 240;
+            }
             diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, document.querySelector('#draw-relationship').checked);
             let svg = diagram.querySelector('svg');
             _this.removeDiagramEventListener(svg);
@@ -1337,11 +1341,15 @@ class EntityEditor {
 
         // Resize and redraw ERD
         let updatedWidth = container.closest('.left-panel').offsetWidth;
-        if (updatedWidth === 0) {
-            updatedWidth = resizablePanels.getLeftPanelWidth();
+        if (isNaN(updatedWidth) || updatedWidth == 0) {
+            updatedWidth = parseInt(resizablePanels.getLeftPanelWidth());
         }
-        updatedWidth = updatedWidth - 200;
-        entityRenderer.createERD(editor.getData(), updatedWidth - 40, drawRelationship);
+        if (isNaN(updatedWidth) || updatedWidth == 0)
+        {
+            updatedWidth = 240;
+        }
+        updatedWidth = updatedWidth - 240;
+        entityRenderer.createERD(editor.getData(), updatedWidth, drawRelationship);
     }
 
     /**
