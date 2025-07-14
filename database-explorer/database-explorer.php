@@ -275,7 +275,6 @@ if(!isset($databaseName))
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
