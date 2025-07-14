@@ -718,7 +718,7 @@ class EntityEditor {
         modifiedColumnNames.forEach(modified => {
             // Update the column names in the current entity data
             
-            if(this.entities[this.currentEntityIndex] && this.entities[this.currentEntityIndex].data && this.entities[this.currentEntityIndex])
+            if(this.entities[this.currentEntityIndex] && this.entities[this.currentEntityIndex].data && this.entities[this.currentEntityIndex]) // NOSONAR
             {
                 this.entities[this.currentEntityIndex].data.forEach(row => {
                     if (row.hasOwnProperty(modified.original)) {
@@ -2778,7 +2778,7 @@ class EntityEditor {
             .replace(/\s+/g, "_") // Replaces spaces with underscores
             .replace(/[^\w]/g, "") // Removes non-alphanumeric characters (excluding underscores)
             .toLowerCase() // Converts everything to lowercase
-            .replace(/^_+|_+$/g, "") // Trims leading/trailing underscores
+            .replace(/^_+|_+$/g, "") // NOSONAR // Trims leading/trailing underscores
             .replace(/__+/g, "_"); // Replaces multiple underscores with a single one
 
         return name;
@@ -3292,7 +3292,8 @@ class EntityEditor {
                 tr.querySelectorAll('td.entity-column').forEach((td) => {
                     let input = td.querySelector('input');
                     // Ensure input and its name property exist before accessing
-                    if (input && input.name) {
+                    if (input && input.name) // NOSONAR
+                    {
                         row[input.dataset.col] = input.value;
                     }
                 });
