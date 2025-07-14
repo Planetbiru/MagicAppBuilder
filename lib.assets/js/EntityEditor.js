@@ -23,8 +23,47 @@ class EntityEditor {
             primaryKeyDataType: 'VARCHAR',
             primaryKeyDataLength: '40'
         };
-        this.keyWords = 'absolute,action,add,after,aggregate,alias,all,allocate,alter,analyse,analyze,and,any,are,array,as,asc,assertion,at,authorization,avg,before,begin,between,binary,bit,bit_length,blob,boolean,both,breadth,by,call,cascade,cascaded,case,cast,catalog,char,character,character_length,char_length,check,class,clob,close,coalesce,collate,collation,column,commit,completion,connect,connection,constraint,constraints,constructor,continue,convert,corresponding,count,create,cross,cube,current,current_date,current_path,current_role,current_time,current_timestamp,current_user,cursor,cycle,data,date,day,deallocate,dec,decimal,declare,default,deferrable,deferred,delete,depth,deref,desc,describe,descriptor,destroy,destructor,deterministic,diagnostics,dictionary,disconnect,distinct,do,domain,double,drop,dynamic,each,else,end,end-exec,equals,escape,every,except,exception,exec,execute,exists,external,extract,false,fetch,first,float,for,foreign,found,free,from,full,function,general,get,global,go,goto,grant,group,grouping,having,host,hour,identity,ignore,immediate,in,indicator,initialize,initially,inner,inout,input,insensitive,insert,int,integer,intersect,interval,into,is,isolation,iterate,join,key,language,large,last,lateral,leading,left,less,level,like,limit,local,localtime,localtimestamp,locator,lower,map,match,max,min,minute,modifies,modify,month,names,national,natural,nchar,nclob,new,next,no,none,not,null,nullif,numeric,object,octet_length,of,off,offset,old,on,only,open,operation,option,or,order,ordinality,out,outer,output,overlaps,pad,parameter,parameters,partial,path,placing,position,postfix,precision,prefix,preorder,prepare,preserve,primary,prior,privileges,procedure,public,read,reads,real,recursive,ref,references,referencing,relative,restrict,result,return,returns,revoke,right,role,rollback,rollup,routine,row,rows,savepoint,schema,scope,scroll,search,second,section,select,sequence,session,session_user,set,sets,size,smallint,some,space,specific,specifictype,sql,sqlcode,sqlerror,sqlexception,sqlstate,sqlwarning,start,state,statement,static,structure,substring,sum,system_user,table,temporary,terminate,than,then,time,timestamp,timezone_hour,timezone_minute,to,trailing,transaction,translate,translation,treat,trigger,trim,true,under,union,unique,unknown,unnest,update,upper,usage,user,using,value,values,varchar,variable,varying,view,when,whenever,where,with,without,work,write,year,zone'.split(',');
-
+        this.keyWords = [
+            'absolute', 'action', 'add', 'after', 'aggregate', 'alias', 'all', 'allocate', 'alter',
+            'analyse', 'analyze', 'and', 'any', 'are', 'array', 'as', 'asc', 'assertion', 'at',
+            'authorization', 'avg', 'before', 'begin', 'between', 'binary', 'bit', 'bit_length',
+            'blob', 'boolean', 'both', 'breadth', 'by', 'call', 'cascade', 'cascaded', 'case',
+            'cast', 'catalog', 'char', 'character', 'character_length', 'char_length', 'check',
+            'class', 'clob', 'close', 'coalesce', 'collate', 'collation', 'column', 'commit',
+            'completion', 'connect', 'connection', 'constraint', 'constraints', 'constructor',
+            'continue', 'convert', 'corresponding', 'count', 'create', 'cross', 'cube', 'current',
+            'current_date', 'current_path', 'current_role', 'current_time', 'current_timestamp',
+            'current_user', 'cursor', 'cycle', 'data', 'date', 'day', 'deallocate', 'dec',
+            'decimal', 'declare', 'default', 'deferrable', 'deferred', 'delete', 'depth', 'deref',
+            'desc', 'describe', 'descriptor', 'destroy', 'destructor', 'deterministic', 'diagnostics',
+            'dictionary', 'disconnect', 'distinct', 'do', 'domain', 'double', 'drop', 'dynamic',
+            'each', 'else', 'end', 'end-exec', 'equals', 'escape', 'every', 'except', 'exception',
+            'exec', 'execute', 'exists', 'external', 'extract', 'false', 'fetch', 'first', 'float',
+            'for', 'foreign', 'found', 'free', 'from', 'full', 'function', 'general', 'get', 'global',
+            'go', 'goto', 'grant', 'group', 'grouping', 'having', 'host', 'hour', 'identity', 'ignore',
+            'immediate', 'in', 'indicator', 'initialize', 'initially', 'inner', 'inout', 'input',
+            'insensitive', 'insert', 'int', 'integer', 'intersect', 'interval', 'into', 'is',
+            'isolation', 'iterate', 'join', 'key', 'language', 'large', 'last', 'lateral', 'leading',
+            'left', 'less', 'level', 'like', 'limit', 'local', 'localtime', 'localtimestamp',
+            'locator', 'lower', 'map', 'match', 'max', 'min', 'minute', 'modifies', 'modify', 'month',
+            'names', 'national', 'natural', 'nchar', 'nclob', 'new', 'next', 'no', 'none', 'not',
+            'null', 'nullif', 'numeric', 'object', 'octet_length', 'of', 'off', 'offset', 'old', 'on',
+            'only', 'open', 'operation', 'option', 'or', 'order', 'ordinality', 'out', 'outer', 'output',
+            'overlaps', 'pad', 'parameter', 'parameters', 'partial', 'path', 'placing', 'position',
+            'postfix', 'precision', 'prefix', 'preorder', 'prepare', 'preserve', 'primary', 'prior',
+            'privileges', 'procedure', 'public', 'read', 'reads', 'real', 'recursive', 'ref',
+            'references', 'referencing', 'relative', 'restrict', 'result', 'return', 'returns',
+            'revoke', 'right', 'role', 'rollback', 'rollup', 'routine', 'row', 'rows', 'savepoint',
+            'schema', 'scope', 'scroll', 'search', 'second', 'section', 'select', 'sequence', 'session',
+            'session_user', 'set', 'sets', 'size', 'smallint', 'some', 'space', 'specific', 'specifictype',
+            'sql', 'sqlcode', 'sqlerror', 'sqlexception', 'sqlstate', 'sqlwarning', 'start', 'state',
+            'statement', 'static', 'structure', 'substring', 'sum', 'system_user', 'table', 'temporary',
+            'terminate', 'than', 'then', 'time', 'timestamp', 'timezone_hour', 'timezone_minute', 'to',
+            'trailing', 'transaction', 'translate', 'translation', 'treat', 'trigger', 'trim', 'true',
+            'under', 'union', 'unique', 'unknown', 'unnest', 'update', 'upper', 'usage', 'user', 'using',
+            'value', 'values', 'varchar', 'variable', 'varying', 'view', 'when', 'whenever', 'where',
+            'with', 'without', 'work', 'write', 'year', 'zone'
+        ];
 
         // Copy properties from options to setting object
         Object.assign(this.setting, options);
