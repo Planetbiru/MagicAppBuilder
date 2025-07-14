@@ -679,18 +679,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Parse the JSON string from the file into a JavaScript object.
                 loadedJsonData = JSON.parse(e.target.result);
 
-                // Log the loaded data to the console for debugging purposes.
-                console.log(loadedJsonData);
-
                 // Validate the format of the loaded JSON data.
                 // It must be an object containing 'columns' and 'data' properties, both of which must be arrays.
                 if (!loadedJsonData || !Array.isArray(loadedJsonData.columns) || !Array.isArray(loadedJsonData.data)) {
                     console.error('Invalid JSON file format. Expected an object with "columns" and "data" arrays.');
                     return; // Stop if the format is invalid.
                 }
-
-                // Log success message to the console.
-                console.log('JSON file loaded successfully. Populating table with data...');
 
                 // If the 'data' array exists and contains items.
                 if (loadedJsonData.data) {
