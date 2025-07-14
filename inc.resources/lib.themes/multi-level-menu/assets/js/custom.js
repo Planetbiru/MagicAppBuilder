@@ -695,7 +695,7 @@ function initAjaxSupport() {
         if (isAjax) {
           const formData = new FormData(form);
 
-          if (target.name) {
+          if (target.name && typeof target.value === 'string') {
             formData.append(target.name, target.value);
           }
 
