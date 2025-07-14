@@ -1653,3 +1653,5 @@ This flexibility allows administrators to grant view-only access for auditing pu
 We've also squashed a bug related to importing entities from spreadsheets. Specifically, an issue where multiple consecutive underscores (`__`) were not correctly converted to single underscores has now been **resolved**, ensuring cleaner entity and column names.
 
 Additionally, a bug that prevented columns from being correctly renamed *before* saving an entity during the spreadsheet import process has been fixed. This ensures your imported data's structure is accurately preserved.
+
+Furthermore, we've fixed an issue with **column type inference** during data import from **Excel and CSV files**. The system now more accurately determines the appropriate column type based on the actual data content, leading to more reliable schema generation and data handling.

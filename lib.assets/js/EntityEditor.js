@@ -2686,48 +2686,51 @@ class EntityEditor {
 
     /**
      * Infers the most appropriate SQL data type from a sample array of values.
+     * This function is designed to handle various data representations and prioritize
+     * string (TEXT) type for numeric-like values that might signify codes or identifiers
+     * (e.g., numbers with leading zeros).
      *
-     * The function tests whether values appear to be:
-     * - Integers (BIGINT)
-     * - Floats (FLOAT)
-     * - Booleans (BOOLEAN)
-     * - Timestamps/Dates (TIMESTAMP)
-     * - Otherwise defaults to TEXT.
+     * The inference hierarchy checks for:
+     * - Floating-point numbers (FLOAT)
+     * - Large integers (BIGINT)
+     * - Boolean values (BOOLEAN)
+     * - Otherwise, it defaults to a generic text type (TEXT).
      *
-     * Only the first 10 values are evaluated for performance.
+     * Only the first 24 values from the input array are evaluated for performance
+     * optimization and to quickly determine a representative type.
      *
-     * @param {Array<any>} values - An array of sample values to analyze.
-     * @returns {string} The inferred SQL data type as a string.
+     * @param {Array<any>} values - An array of sample values (strings, numbers, booleans, null, undefined) to analyze.
+     * @returns {string} The inferred SQL data type as a string (e.g., "BIGINT", "FLOAT", "BOOLEAN", "TEXT").
      */
     guessType(values) // NOSONAR
     {
-        let isInt = true, isFloat = true, isBool = true, isDate = true;
-
-        for (let val of values.slice(0, 10)) {
+        let isInt = true, isFloat = true, isBool = true;
+        for (let val of values.slice(0, 24)) {
             // Safely normalize to string
             if (val === undefined || val === null) {
-                continue;
+                return 'TEXT';
             } else if (typeof val !== "string") {
                 val = String(val).trim(); // NOSONAR
             } else {
                 val = val.trim(); // NOSONAR
             }
 
-            if (val === "") continue;
 
+            if (/^0\d+/.test(val)) {
+                isInt = false;
+                isFloat = false;
+            }
+            
             if (!/^[-+]?\d+$/.test(val)) isInt = false;
             if (!/^[-+]?\d+(\.\d+)?$/.test(val)) isFloat = false;
             if (!/^(true|false|yes|no|1|0)$/i.test(val)) isBool = false;
-            if (isNaN(Date.parse(val))) isDate = false;
         }
 
         if (isFloat) return "FLOAT";
         if (isInt) return "BIGINT";
         if (isBool) return "BOOLEAN";
-        if (isDate) return "TIMESTAMP";
         return "TEXT";
     }
-
 
     /**
      * Generates an array of column definitions based on headers and data rows.
