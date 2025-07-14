@@ -133,7 +133,7 @@ use MagicObject\MagicObject;
 /**
  * Auto-generated validator class for the "'.$tableName.'" table.
  *
- * This class defines validation rules for updating data related to the "'.$tableName.'" table.
+ * This class defines validation rules for data related to the "'.$tableName.'" table.
  * It is generated based on the structure of the table and the JSON definition provided.
  *
  * You may add additional validation rules or modify the generated annotations as needed.
