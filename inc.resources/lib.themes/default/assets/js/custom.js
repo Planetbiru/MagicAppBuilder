@@ -1,4 +1,141 @@
 /**
+ * Class to handle URL parsing and sorting parameters (orderby and ordertype).
+ */
+class UrlSorter {
+    /**
+     * Initializes the URL parser with the current or specified URL.
+     * Parses the URL parameters and sets initial orderby and ordertype values.
+     *
+     * @param {string} [url=window.location.toString()] - The URL to parse. Defaults to the current window URL.
+     */
+    constructor(url = window.location.toString()) {
+        this.originalUrl = url;
+        this.originalQueryParams = {};
+        this.currentOrderBy = '';
+        this.currentOrderType = '';
+
+        this.newOrderBy = '';
+        this.newOrderType = '';
+
+        this._parseUrl();
+    }
+
+    /**
+     * Parses the URL and extracts base name and query parameters.
+     * Sets current and new orderby and ordertype values.
+     * @private
+     */
+    _parseUrl() {
+        let cleanUrl = this.originalUrl.split("#")[0];
+        let parts = cleanUrl.split("?");
+        this.baseURL = parts[0];
+        const queryString = parts[1] || "";
+
+        const pathSegments = this.baseURL.split('/');
+        this.baseName = pathSegments[pathSegments.length - 1] || '';
+
+        let argArray = queryString.split("&");
+        argArray.forEach(param => {
+            let pair = param.split("=");
+            if (pair[0] !== "") {
+                this.originalQueryParams[pair[0]] = pair[1];
+            }
+        });
+
+        this.currentOrderBy = this.originalQueryParams.orderby || '';
+        this.currentOrderType = this.originalQueryParams.ordertype || '';
+
+        this.newOrderBy = this.currentOrderBy;
+        this.newOrderType = this.currentOrderType;
+    }
+
+    /**
+     * Gets the current orderby value from the original URL.
+     * @returns {string}
+     */
+    getOrderBy() {
+        return this.currentOrderBy;
+    }
+
+    /**
+     * Gets the current ordertype value from the original URL.
+     * @returns {string}
+     */
+    getOrderType() {
+        return this.currentOrderType;
+    }
+
+    /**
+     * Sets a new orderby value.
+     * @param {string} orderBy
+     */
+    setOrderBy(orderBy) {
+        this.newOrderBy = orderBy;
+    }
+
+    /**
+     * Sets a new ordertype value.
+     * @param {string} orderType
+     */
+    setOrderType(orderType) {
+        this.newOrderType = orderType;
+    }
+
+    /**
+     * Returns original query parameters excluding orderby and ordertype.
+     * @returns {Object}
+     */
+    getOriginalQueryParams() {
+        const paramsWithoutOrder = { ...this.originalQueryParams };
+        delete paramsWithoutOrder.orderby;
+        delete paramsWithoutOrder.ordertype;
+        return paramsWithoutOrder;
+    }
+
+    /**
+     * Builds a relative URL using the base name and updated query parameters.
+     * @returns {string}
+     */
+    buildRelativeUrl() {
+        const finalQueryParams = { ...this.originalQueryParams };
+
+        if (this.newOrderBy) {
+            finalQueryParams.orderby = this.newOrderBy;
+        } else {
+            delete finalQueryParams.orderby;
+        }
+
+        if (this.newOrderType) {
+            finalQueryParams.ordertype = this.newOrderType;
+        } else {
+            delete finalQueryParams.ordertype;
+        }
+
+        let queryParts = [];
+        for (const key in finalQueryParams) {
+            if (
+                finalQueryParams.hasOwnProperty(key) &&
+                finalQueryParams[key] !== undefined &&
+                finalQueryParams[key] !== null &&
+                finalQueryParams[key] !== ''
+            ) {
+                queryParts.push(`${key}=${finalQueryParams[key]}`);
+            }
+        }
+
+        let queryString = queryParts.join("&");
+        let finalUrl = this.baseName;
+
+        if (queryString) {
+            finalUrl += "?" + queryString;
+        }
+
+        return finalUrl;
+    }
+}
+
+
+/**
  * Initializes datetime pickers for various input fields (date, time, datetime-local).
  * - Converts the input types to text and applies respective classes.
  * - Initializes datetime pickers with configurable min and max date options.
@@ -84,114 +221,48 @@ function initSortTable(selector = "table.table-sort-by-column") {
   });
 }
 
+
 /**
- * Applies sorting functionality to a given HTML table.
- * It parses existing URL query parameters for sorting,
- * updates the sort order based on user clicks, and
- * modifies the 'href' attribute of sortable column links
- * to reflect the new sorting parameters.
+ * Adds sorting functionality to an HTML table header.
  *
- * This function is designed to prepare the links for page reload-based sorting.
- * If you intend to use `history.pushState` for AJAX-like sorting without page reloads,
- * this function's approach to updating `href` attributes should be replaced
- * with an event listener that prevents default link behavior and uses `history.pushState`.
+ * This function updates the sort links in the table header based on the current URL state.
  *
- * @param {HTMLTableElement} thisTable - The table element to which sorting functionality will be applied.
+ * @param {HTMLTableElement} thisTable - The table element to apply sorting functionality to.
  */
 function makeTableSortable(thisTable) {
-    // Determine the base URL without query parameters or hash.
-    // 'lastUrl' is assumed to be a globally accessible variable if defined,
-    // otherwise, it defaults to the current window location.
-    let originalURL = window.location.href; // Start with the current URL
+    const originalURL = document.location.toString();
 
-    // Remove hash fragment if present (e.g., #section)
-    let arr0 = originalURL.split("#");
-    originalURL = arr0[0];
+    const head = thisTable.querySelector('thead tr');
+    if (head) {
+        const cells = head.querySelectorAll("td.order-controll");
 
-    // Separate base URL from query string
-    let arr1 = originalURL.split("?");
-    const baseURL = arr1[0]; // The URL path without any query parameters
-    const queryString = arr1[1] || ""; // The existing query string, or empty if none
+        cells.forEach(function (thisCel) {
+            let columnName = thisCel.getAttribute("data-col-name");
 
-    // Parse existing query parameters into an object
-    let argArray = queryString.split("&");
-    let queryObject = {};
+            if (columnName) {
+                let sorter = new UrlSorter(originalURL);
 
-    argArray.forEach(function(param) {
-        let arr2 = param.split("=");
-        if (arr2[0] !== "") { // Ensure the parameter key is not empty
-            queryObject[arr2[0]] = arr2[1]; // Store key-value pair
-        }
-    });
+                if (columnName === sorter.getOrderBy()) {
+                    // Toggle order type between asc and desc if already sorted by this column
+                    let newOrderType = sorter.getOrderType() === 'desc' ? 'asc' : 'desc';
+                    sorter.setOrderType(newOrderType);
+                    thisCel.setAttribute("data-order-method", sorter.getOrderType());
+                } else {
+                    // Set sorting to ascending for a newly selected column
+                    sorter.setOrderBy(columnName);
+                    sorter.setOrderType('asc');
+                }
 
-    // Get current sorting parameters from the parsed URL
-    let currentOrderMethod = queryObject.ordertype || ""; // 'asc' or 'desc'
-    let lastColumn = queryObject.orderby || ""; // The name of the currently sorted column
-
-    // Select all table cells that control sorting (defined by class 'order-controll')
-    const cells = thisTable.querySelectorAll("td.order-controll");
-
-    // Iterate over each sortable header cell
-    cells.forEach(function (thisCel) {
-        // Get the column name from the 'data-col-name' attribute
-        let columnName = thisCel.getAttribute("data-col-name");
-
-        // Logic to determine the next sort order
-        if (lastColumn === columnName) {
-            // If the same column is clicked, toggle the sort order
-            if (currentOrderMethod === "asc") {
-                queryObject.ordertype = "desc";
-                // Optionally, update a data attribute for visual indication (e.g., for CSS)
-                thisCel.setAttribute("data-order-method", "desc");
-            } else {
-                queryObject.ordertype = "asc";
-                // Optionally, update a data attribute for visual indication
-                thisCel.setAttribute("data-order-method", "asc");
+                let link = thisCel.querySelector('a');
+                if (link) {
+                    link.href = sorter.buildRelativeUrl();
+                    console.log(link.href);
+                }
             }
-        } else {
-            // If a different column is clicked, default to ascending order
-            queryObject.ordertype = "asc";
-            // Optionally, update a data attribute for visual indication
-            thisCel.setAttribute("data-order-method", "asc"); // New column always starts with 'asc'
-        }
-
-        // Set the 'orderby' parameter to the current column name
-        queryObject.orderby = columnName;
-
-        // Reconstruct the query string from the updated queryObject
-        let newQueryParamParts = [];
-        for (let key in queryObject) {
-            // Ensure the property belongs to the object itself and has a value
-            if (queryObject.hasOwnProperty(key) && queryObject[key] !== undefined && queryObject[key] !== null) {
-                newQueryParamParts.push(`${key}=${queryObject[key]}`);
-            }
-        }
-
-        // Join the query parameter parts to form the new query string
-        let newQueryString = newQueryParamParts.join("&");
-
-        // Construct the final URL with the new query parameters
-        let finalURL = baseURL;
-        if (newQueryString) { // Only append '?' if there are parameters
-            finalURL += "?" + newQueryString;
-        }
-
-        // Find the anchor (<a>) tag within the current header cell
-        let link = thisCel.querySelector("a");
-
-        // If a link is found, update its 'href' attribute
-        if (link) {
-            link.setAttribute("href", finalURL);
-        }
-
-        // Note: This function only updates the 'href' attribute.
-        // For dynamic sorting without page reloads (using history.pushState),
-        // you would typically attach an event listener to 'link' that:
-        // 1. Prevents the default click behavior (event.preventDefault()).
-        // 2. Calls history.pushState(stateObject, title, finalURL).
-        // 3. Triggers your JavaScript sorting logic to reorder table rows.
-    });
+        });
+    }
 }
+
 
 /**
  * Initializes sortable rows for tables with manual sorting.
@@ -585,6 +656,9 @@ function initAjaxSupport() {
     .then(response => response.text())
     .then(html => {
       section.innerHTML = html;
+      // Push new URL into browser history
+      history.pushState(null, '', url);
+      
       const table = section.querySelector('table');
       if(table)
       {
@@ -595,8 +669,7 @@ function initAjaxSupport() {
         sortDataByDrag(tbody);
       }
 
-      // Push new URL into browser history
-      history.pushState(null, '', url);
+      
       
     })
     .catch(error => {
@@ -642,6 +715,8 @@ function initAjaxSupport() {
           .then(response => response.text())
           .then(html => {
             section.innerHTML = html;
+            // Update browser URL without reload
+            history.pushState(null, '', url);
             const table = section.querySelector('table');
             if(table)
             {
@@ -652,8 +727,7 @@ function initAjaxSupport() {
             {
               sortDataByDrag(tbody);
             }
-            // Update browser URL without reload
-            history.pushState(null, '', url);
+            
           })
           .catch(error => {
             console.error('AJAX form error:', error);
