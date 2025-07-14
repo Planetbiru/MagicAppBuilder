@@ -9,6 +9,7 @@ use MagicObject\SecretObject;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f9fa">
     <title>MagicAppBuilder - <?php echo $currentModule->getModuleTitle();?></title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/font-awesome/all.min.css">
