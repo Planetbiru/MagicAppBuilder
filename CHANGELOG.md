@@ -1565,10 +1565,7 @@ This enables easier reporting, data sharing, and external data review workflows.
 * Ensures smoother operation for legacy systems still running PHP 5.x.
 
 
-# MagicAppBuilder Version 1.12.0: What's New
-
-MagicAppBuilder has just rolled out version 1.12.0, packed with features and improvements designed to give you more control, better performance, and enhanced data safety.
-
+# MagicAppBuilder Version 1.12.0
 
 ## What's New
 
@@ -1640,4 +1637,6 @@ This flexibility allows administrators to grant view-only access for auditing pu
 
 ### Bug Fixes
 
-We've also squashed a bug related to importing entities from spreadsheets. Specifically, an issue where multiple consecutive underscores (`__`) were not correctly converted to single underscores has now been resolved, ensuring cleaner entity and column names.
+We've also squashed a bug related to importing entities from spreadsheets. Specifically, an issue where multiple consecutive underscores (`__`) were not correctly converted to single underscores has now been **resolved**, ensuring cleaner entity and column names.
+
+Additionally, a bug that prevented columns from being correctly renamed *before* saving an entity during the spreadsheet import process has been fixed. This ensures your imported data's structure is accurately preserved.
