@@ -638,12 +638,104 @@ document.addEventListener('DOMContentLoaded', () => {
         updateMarginLeft(delta > 0 ? -step : step);
     });
     
+    document.querySelector('.export-data-entity').addEventListener('click', function(){
+       editor.exportData(); 
+    });
+    
+    document.querySelector('.import-data-entity').addEventListener('click', function(){
+       document.querySelector('#jsonFileInput').click();
+    });
+    
     document.querySelector('.add-data-entity').addEventListener('click', function(){
        editor.addData(); 
     });
     
+    document.querySelector('.clear-data-entity').addEventListener('click', function(){
+       editor.clearData(); 
+    });
+    
     document.querySelector('.save-data-entity').addEventListener('click', function(){
        editor.saveData(); 
+    });
+    
+    document.querySelector('#jsonFileInput').addEventListener('change', (event) => {
+        // Get the first file selected by the user.
+        const file = event.target.files[0];
+
+        // If no file is selected, stop the process.
+        if (!file) {
+            return;
+        }
+
+        // Initialize a variable to store the parsed JSON data.
+        let loadedJsonData = null;
+
+        // Create a new FileReader instance to read the file content.
+        const reader = new FileReader();
+
+        // Define the callback function to execute when the file has been successfully loaded.
+        reader.onload = (e) => {
+            try {
+                // Parse the JSON string from the file into a JavaScript object.
+                loadedJsonData = JSON.parse(e.target.result);
+
+                // Log the loaded data to the console for debugging purposes.
+                console.log(loadedJsonData);
+
+                // Validate the format of the loaded JSON data.
+                // It must be an object containing 'columns' and 'data' properties, both of which must be arrays.
+                if (!loadedJsonData || !Array.isArray(loadedJsonData.columns) || !Array.isArray(loadedJsonData.data)) {
+                    console.error('Invalid JSON file format. Expected an object with "columns" and "data" arrays.');
+                    return; // Stop if the format is invalid.
+                }
+
+                // Log success message to the console.
+                console.log('JSON file loaded successfully. Populating table with data...');
+
+                // If the 'data' array exists and contains items.
+                if (loadedJsonData.data) {
+                    // Iterate over each row object in the loaded JSON data.
+                    loadedJsonData.data.forEach((rowData, index) => {
+                        // Call the 'addData' method of the 'editor' object to create a new empty table row (<tr>).
+                        // This method is assumed to return the newly created <tr> element.
+                        let tr = editor.addData();
+
+                        // If a new row was successfully created and returned.
+                        if (tr) {
+                            // Select all input elements within the newly created row that have the class 'entity-data-cell'.
+                            const inputCells = tr.querySelectorAll('input.entity-data-cell');
+
+                            // Iterate over each input cell found in the new row.
+                            inputCells.forEach(inputElement => {
+                                // Retrieve the column name for the current input from its 'data-col' attribute.
+                                const columnName = inputElement.dataset.col;
+
+                                // Set the value of the input element using the corresponding data from 'rowData'.
+                                // The nullish coalescing operator (?? '') ensures that if the data for a column is null or undefined,
+                                // the input's value defaults to an empty string.
+                                inputElement.value = rowData[columnName] ?? '';
+                            });
+                        }
+                    });
+                }
+
+            } catch (error) {
+                // Catch and log any errors that occur during JSON parsing.
+                console.error('JSON parsing error:', error);
+                // An alert could be added here to notify the user directly.
+            }
+        };
+
+        // Define the callback function to execute if an error occurs during file reading.
+        reader.onerror = (e) => {
+            // Alert the user about the file reading error.
+            alert('Error reading file: ' + reader.error);
+            // Log the FileReader error to the console for debugging.
+            console.error('FileReader error:', reader.error);
+        };
+
+        // Start reading the content of the selected file as text.
+        reader.readAsText(file);
     });
 
     init();
