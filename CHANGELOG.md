@@ -1655,3 +1655,5 @@ We've also squashed a bug related to importing entities from spreadsheets. Speci
 Additionally, a bug that prevented columns from being correctly renamed *before* saving an entity during the spreadsheet import process has been fixed. This ensures your imported data's structure is accurately preserved.
 
 Furthermore, we've fixed an issue with **column type inference** during data import from **Excel and CSV files**. The system now more accurately determines the appropriate column type based on the actual data content, leading to more reliable schema generation and data handling.
+
+Lastly, we've resolved a bug causing **NaN (Not a Number) width values** in the entity renderer, ensuring proper display and layout of entities.
