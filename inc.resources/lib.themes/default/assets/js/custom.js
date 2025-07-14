@@ -69,6 +69,7 @@ function initDateTimePicker() {
   }
 }
 
+let lastUrl = null;
 
 /**
  * Initializes table sorting functionality based on query parameters.
@@ -79,60 +80,117 @@ function initSortTable(selector = "table.table-sort-by-column") {
   const tables = document.querySelectorAll(selector);
   
   tables.forEach(function (thisTable) {
-    let originalURL = document.location.toString();
+    makeTableSortable(thisTable);
+  });
+}
+
+/**
+ * Applies sorting functionality to a given HTML table.
+ * It parses existing URL query parameters for sorting,
+ * updates the sort order based on user clicks, and
+ * modifies the 'href' attribute of sortable column links
+ * to reflect the new sorting parameters.
+ *
+ * This function is designed to prepare the links for page reload-based sorting.
+ * If you intend to use `history.pushState` for AJAX-like sorting without page reloads,
+ * this function's approach to updating `href` attributes should be replaced
+ * with an event listener that prevents default link behavior and uses `history.pushState`.
+ *
+ * @param {HTMLTableElement} thisTable - The table element to which sorting functionality will be applied.
+ */
+function makeTableSortable(thisTable) {
+    // Determine the base URL without query parameters or hash.
+    // 'lastUrl' is assumed to be a globally accessible variable if defined,
+    // otherwise, it defaults to the current window location.
+    let originalURL = window.location.href; // Start with the current URL
+
+    // Remove hash fragment if present (e.g., #section)
     let arr0 = originalURL.split("#");
     originalURL = arr0[0];
+
+    // Separate base URL from query string
     let arr1 = originalURL.split("?");
-    originalURL = arr1[0];
-    let args = arr1[1] || "";
-    let argArray = args.split("&");
+    const baseURL = arr1[0]; // The URL path without any query parameters
+    const queryString = arr1[1] || ""; // The existing query string, or empty if none
+
+    // Parse existing query parameters into an object
+    let argArray = queryString.split("&");
     let queryObject = {};
 
     argArray.forEach(function(param) {
-      let arr2 = param.split("=");
-      if (arr2[0] !== "") {
-        queryObject[arr2[0]] = arr2[1];
-      }
+        let arr2 = param.split("=");
+        if (arr2[0] !== "") { // Ensure the parameter key is not empty
+            queryObject[arr2[0]] = arr2[1]; // Store key-value pair
+        }
     });
 
-    let currentOrderMethod = queryObject.ordertype || "";
-    let lastColumn = queryObject.orderby || "";
+    // Get current sorting parameters from the parsed URL
+    let currentOrderMethod = queryObject.ordertype || ""; // 'asc' or 'desc'
+    let lastColumn = queryObject.orderby || ""; // The name of the currently sorted column
 
+    // Select all table cells that control sorting (defined by class 'order-controll')
     const cells = thisTable.querySelectorAll("td.order-controll");
 
+    // Iterate over each sortable header cell
     cells.forEach(function (thisCel) {
-      let columnName = thisCel.getAttribute("data-col-name");
+        // Get the column name from the 'data-col-name' attribute
+        let columnName = thisCel.getAttribute("data-col-name");
 
-      if (lastColumn === columnName) {
-        if (currentOrderMethod === "asc") {
-          queryObject.ordertype = "desc";
-          thisCel.setAttribute("data-order-method", "asc");
+        // Logic to determine the next sort order
+        if (lastColumn === columnName) {
+            // If the same column is clicked, toggle the sort order
+            if (currentOrderMethod === "asc") {
+                queryObject.ordertype = "desc";
+                // Optionally, update a data attribute for visual indication (e.g., for CSS)
+                thisCel.setAttribute("data-order-method", "desc");
+            } else {
+                queryObject.ordertype = "asc";
+                // Optionally, update a data attribute for visual indication
+                thisCel.setAttribute("data-order-method", "asc");
+            }
         } else {
-          queryObject.ordertype = "asc";
-          thisCel.setAttribute("data-order-method", "desc");
+            // If a different column is clicked, default to ascending order
+            queryObject.ordertype = "asc";
+            // Optionally, update a data attribute for visual indication
+            thisCel.setAttribute("data-order-method", "asc"); // New column always starts with 'asc'
         }
-      } else {
-        queryObject.ordertype = "asc";
-      }
 
-      queryObject.orderby = columnName;
+        // Set the 'orderby' parameter to the current column name
+        queryObject.orderby = columnName;
 
-      let arr3 = [];
-      for (let key in queryObject) {
-        if (queryObject.hasOwnProperty(key)) {
-          arr3.push(key + "=" + queryObject[key]);
+        // Reconstruct the query string from the updated queryObject
+        let newQueryParamParts = [];
+        for (let key in queryObject) {
+            // Ensure the property belongs to the object itself and has a value
+            if (queryObject.hasOwnProperty(key) && queryObject[key] !== undefined && queryObject[key] !== null) {
+                newQueryParamParts.push(`${key}=${queryObject[key]}`);
+            }
         }
-      }
 
-      let args3 = arr3.join("&");
-      let finalURL = originalURL + "?" + args3;
-      let link = thisCel.querySelector("a");
-      
-      if (link) {
-        link.setAttribute("href", finalURL);
-      }
+        // Join the query parameter parts to form the new query string
+        let newQueryString = newQueryParamParts.join("&");
+
+        // Construct the final URL with the new query parameters
+        let finalURL = baseURL;
+        if (newQueryString) { // Only append '?' if there are parameters
+            finalURL += "?" + newQueryString;
+        }
+
+        // Find the anchor (<a>) tag within the current header cell
+        let link = thisCel.querySelector("a");
+
+        // If a link is found, update its 'href' attribute
+        if (link) {
+            link.setAttribute("href", finalURL);
+        }
+
+        // Note: This function only updates the 'href' attribute.
+        // For dynamic sorting without page reloads (using history.pushState),
+        // you would typically attach an event listener to 'link' that:
+        // 1. Prevents the default click behavior (event.preventDefault()).
+        // 2. Calls history.pushState(stateObject, title, finalURL).
+        // 3. Triggers your JavaScript sorting logic to reorder table rows.
     });
-  });
 }
 
 /**
@@ -454,7 +512,16 @@ function initAjaxSupport() {
         .then(response => response.text())
         .then(html => {
           section.innerHTML = html;
-          sortDataByDrag(section.querySelector('table tbody')); // reinitialize drag-sort
+          const table = section.querySelector('table');
+          if(table)
+          {
+            makeTableSortable(table);
+          }
+          const tbody = section.querySelector('table tbody');
+          if(tbody)
+          {
+          sortDataByDrag(tbody); // reinitialize drag-sort
+          }
         })
         .catch(error => {
           console.error('AJAX form error:', error);
@@ -495,16 +562,20 @@ function initAjaxSupport() {
   document.addEventListener('click', function(e) {
     const dataSection = e.target.closest('.data-section');
     if (!dataSection) return;
-    const link = e.target.closest('.pagination-number .page-selector a');
+    let link = e.target.closest('.pagination-number .page-selector a');
+    if(!link)
+    {
+      link = e.target.closest('.order-controll a');
+    }
     if (!link) return;
-
+    
     const section = link.closest('.data-section');
     if (!section || section.dataset.ajaxSupport !== "true") return;
 
     e.preventDefault(); // Prevent default page reload
 
     const url = link.getAttribute('href');
-
+    lastUrl = url;
     fetch(url, {
       method: 'GET',
       headers: {
@@ -514,14 +585,19 @@ function initAjaxSupport() {
     .then(response => response.text())
     .then(html => {
       section.innerHTML = html;
-
-      const table = section.querySelector('table tbody');
-      if (table) {
-        sortDataByDrag(table);
+      const table = section.querySelector('table');
+      if(table)
+      {
+        makeTableSortable(table);
+      }
+      const tbody = section.querySelector('table tbody');
+      if (tbody) {
+        sortDataByDrag(tbody);
       }
 
       // Push new URL into browser history
       history.pushState(null, '', url);
+      
     })
     .catch(error => {
       console.error('Pagination AJAX error:', error);
@@ -566,8 +642,16 @@ function initAjaxSupport() {
           .then(response => response.text())
           .then(html => {
             section.innerHTML = html;
-            sortDataByDrag(section.querySelector('table tbody'));
-
+            const table = section.querySelector('table');
+            if(table)
+            {
+              makeTableSortable(table);
+            }
+            const tbody = section.querySelector('table tbody');
+            if(tbody)
+            {
+              sortDataByDrag(tbody);
+            }
             // Update browser URL without reload
             history.pushState(null, '', url);
           })
@@ -623,10 +707,14 @@ function initAjaxSupport() {
     .then(response => response.text())
     .then(html => {
       section.innerHTML = html;
-
-      const table = section.querySelector('table tbody');
-      if (table) {
-        sortDataByDrag(table);
+      const table = section.querySelector('table');
+      if(table)
+      {
+        makeTableSortable(table);
+      }
+      const tbody = section.querySelector('table tbody');
+      if (tbody) {
+        sortDataByDrag(tbody);
       }
     })
     .catch(error => {
