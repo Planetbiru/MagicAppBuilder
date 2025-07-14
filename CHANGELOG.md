@@ -1565,76 +1565,79 @@ This enables easier reporting, data sharing, and external data review workflows.
 * Ensures smoother operation for legacy systems still running PHP 5.x.
 
 
-# MagicAppBuilder Version 1.12.0
+# MagicAppBuilder Version 1.12.0: What's New
+
+MagicAppBuilder has just rolled out version 1.12.0, packed with features and improvements designed to give you more control, better performance, and enhanced data safety.
+
 
 ## What's New
 
 ### Data Restoration Feature
 
-MagicAppBuilder now supports **restoring deleted data from trash tables**, enhancing data recovery, traceability, and operational safety. This feature consists of two main components:
+Say goodbye to accidental data loss! MagicAppBuilder now includes a **robust data restoration feature** that lets you recover deleted information from your trash tables. This significantly boosts your data recovery capabilities, traceability, and overall operational safety.
+
+This feature comes in two key parts:
 
 #### 1. Application Options – Data Restoration Setup
 
-* Within each application's **Application Options** panel, a new accordion section titled **"Data Restoration"** is available.
-* MagicAppBuilder automatically detects tables that support trash functionality.
-* Users can:
+You'll find a new "Data Restoration" section in each application's **Application Options** panel. MagicAppBuilder intelligently detects which of your tables support trash functionality. From here, you can:
 
-  * View a list of trash-enabled tables.
-  * Select which tables should support data restoration.
-  * Auto-generate the necessary **Primary Entities** and **Trash Entities** for seamless restoration operations.
+* See a list of all tables that have trash enabled.
+* **Select which specific tables** should support data restoration.
+* Automatically generate the necessary **Primary Entities** and **Trash Entities** for seamless restoration.
 
 #### 2. Data Restoration Module in Generated Applications
 
-* All applications generated with MagicAppBuilder now include a built-in **Data Restoration** module.
-* This module enables users to:
+Every application you generate with MagicAppBuilder will now have a built-in **Data Restoration module**. This intuitive interface empowers users to:
 
-  * View a list of entities eligible for data restoration.
-  * Browse and search soft-deleted (trashed) records.
-  * Restore selected entries back into their original tables.
+* View a comprehensive list of entities eligible for restoration.
+* Easily browse and search through soft-deleted (trashed) records.
+* **Restore selected entries** back to their original tables with ease.
 
-This feature provides a robust mechanism for managing soft-deleted records via an intuitive UI, significantly improving **data safety, recovery, and auditability**.
+This complete solution provides an intuitive way to manage soft-deleted records, drastically improving **data safety, recovery, and auditability**.
 
 
 ## Improvements
 
 ### Optimized AJAX Request Handling
 
-Significant improvements have been made to the responsiveness of the UI by optimizing AJAX handling for:
+We've made significant under-the-hood improvements to make your UI feel even snappier. AJAX requests for **filter operations** and **pagination** are now highly optimized. This means:
 
-* **Filter operations** – data filtering is now faster and consumes fewer resources.
-* **Pagination** – list navigation now loads more efficiently, even on large datasets.
+* Data filtering is **faster** and uses fewer resources.
+* Navigating through lists loads **more efficiently**, even with large datasets.
 
-These enhancements reduce server load and improve user experience.
+These enhancements work to reduce your server load and provide a smoother user experience.
 
 
 ## UX Enhancements
 
 ### Confirmation Dialogs for All Form Actions
 
-All sensitive actions triggered from forms now feature **confirmation dialogs**, including:
+To prevent accidental changes, all sensitive actions initiated from forms now trigger **clear confirmation dialogs**. This includes actions like:
 
-* Activate
-* Deactivate
-* Delete
-* Sort
-* Approve
-* Reject
+* **Activate**
+* **Deactivate**
+* **Delete**
+* **Sort**
+* **Approve**
+* **Reject**
 
-This ensures that users are clearly warned before performing critical operations, increasing interaction clarity and reducing accidental modifications.
+You'll always be warned before performing critical operations, making interactions clearer and reducing errors.
 
 
 ## Access Control
 
 ### New Permission: `allowedRestore`
 
-A new permission, `allowed_restore`, has been introduced to provide finer control over who can **actually restore** deleted data:
+We've introduced a new permission, `allowed_restore`, to give you granular control over data restoration.
 
-* A new column `allowed_restore` has been added to the `admin_role` table.
-* Users **must** have this permission explicitly enabled to perform data restoration.
-* This separation of privileges ensures that:
+* A dedicated `allowed_restore` column has been added to the `admin_role` table.
+* Users **must have this permission explicitly enabled** to perform any data restoration actions.
+* This ensures a clear separation of privileges: users with access to the Data Restoration module can *view* deleted/restored entries, but they **cannot restore data** unless `allowed_restore` is enabled for their role.
 
-  * Users with access to the Data Restoration module **can view** deleted/restored entries,
-  * But **cannot restore data** unless they have `allowed_restore` enabled.
+This flexibility allows administrators to grant view-only access for auditing purposes, while tightly restricting actual data recovery to authorized personnel.
 
-This gives administrators the flexibility to grant view-only access for auditing, while restricting actual data restoration to authorized roles.
 
+### Bug Fixes
+
+We've also squashed a bug related to importing entities from spreadsheets. Specifically, an issue where multiple consecutive underscores (`__`) were not correctly converted to single underscores has now been resolved, ensuring cleaner entity and column names.

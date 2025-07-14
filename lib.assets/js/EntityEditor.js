@@ -2724,25 +2724,30 @@ class EntityEditor {
     /**
      * Converts a string into snake_case format, trimming any leading or trailing underscores.
      * This function handles spaces, non-alphanumeric characters, and conversions from camelCase or PascalCase.
+     * It also replaces multiple consecutive underscores with a single underscore.
      *
      * @param {string} header - The input string to be converted.
-     * @returns {string} The string in snake_case format, with leading/trailing underscores removed.
+     * @returns {string} The string in snake_case format, with leading/trailing underscores removed and multiple underscores collapsed.
      *
      * @example
-     * snakeize("  This Is A Header  ");     // Returns "this_is_a_header"
-     * snakeize("firstName");                // Returns "first_name"
-     * snakeize("_User ID_");                // Returns "user_id"
-     * snakeize("HeaderTitleExample");       // Returns "header_title_example"
-     * snakeize("anotherTestString__");      // Returns "another_test_string"
-     * snakeize(" _with!Special@Chars#_  "); // Returns "withspecialchars"
+     * snakeize("   This Is A Header   ");        // Returns "this_is_a_header"
+     * snakeize("firstName");                     // Returns "first_name"
+     * snakeize("_User ID_");                     // Returns "user_id"
+     * snakeize("HeaderTitleExample");            // Returns "header_title_example"
+     * snakeize("anotherTestString__");           // Returns "another_test_string"
+     * snakeize(" _with!Special@Chars#_   ");    // Returns "with_special_chars"
+     * snakeize("multiple___underscores");        // Returns "multiple_underscores"
      */
     snakeize(header) {
-        return header
+        let name = header
             .replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1_$2") // Handles camelCase/PascalCase conversion
             .replace(/\s+/g, "_") // Replaces spaces with underscores
             .replace(/[^\w]/g, "") // Removes non-alphanumeric characters (excluding underscores)
             .toLowerCase() // Converts everything to lowercase
-            .replace(/^_+|_+$/g, ""); // NOSONAR // Trims leading/trailing underscores
+            .replace(/^_+|_+$/g, "") // Trims leading/trailing underscores
+            .replace(/__+/g, "_"); // Replaces multiple underscores with a single one
+
+        return name;
     }
 
     /**
