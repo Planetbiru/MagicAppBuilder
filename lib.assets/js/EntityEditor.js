@@ -653,24 +653,48 @@ class EntityEditor {
         }
         return false;
     }
+    
+    /**
+     * Checks whether any column in the entity editor is marked as a primary key.
+     *
+     * This function scans all checkboxes with the class `.column-primary-key`
+     * inside the `#table-entity-editor` container and returns `true` if at least
+     * one of them is checked, indicating that a primary key is defined.
+     *
+     * @returns {boolean} True if a primary key exists; otherwise, false.
+     */
+    hasPrimaryKey() {
+        const columnPrimaryKeys = document.querySelectorAll(this.selector + " #table-entity-editor .column-primary-key");
+        for (const pkCheck of columnPrimaryKeys) {
+            if (pkCheck.checked) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
-     * Saves the currently edited entity, either creating a new one or updating an existing one.
+     * Saves the currently edited entity by either creating a new one or updating an existing one.
      *
-     * This method is the primary handler for saving an entity.
-     * 1. It first checks for duplicate entity names and prompts the user to rename if found.
-     * 2. If the name is unique or has been resolved, it calls `doSaveEntity()` to persist the data.
+     * This method serves as the primary handler for entity persistence:
+     * 1. It first checks for duplicate entity names and prompts the user to rename the entity if a duplicate is found.
+     * 2. If the name is unique or the conflict is resolved, it calls `doSaveEntity()` to persist the data.
      * 3. After saving, it checks for an active diagram tab (`.tabs-link-container li.diagram-tab.active`).
-     * 4. If an active diagram tab exists, it re-selects it by calling `selectDiagram()`, which ensures
-     * the associated diagram is re-rendered to reflect any updated entity data.
+     * 4. If an active diagram tab is present, it calls `selectDiagram()` to re-render the associated diagram
+     *    and reflect any updates to the entity data.
      *
-     * This function guarantees that both the underlying data and its visual representation in the diagram remain synchronized.
+     * This function ensures that both the underlying entity data and its visual representation in the diagram remain synchronized.
      */
     saveEntity() {
         const selector = this.selector + " .entity-container .entity-name";
         const entityNameInput = document.querySelector(selector);
         const entityName = entityNameInput.value;
-
+        
+        if (!this.hasPrimaryKey()) {
+            this.showAlertDialog("A primary key is required before saving the entity.", "Primary Key Required", "OK");
+            return;
+        }
+        
         // Check if an entity with the same name already exists.
         if (this.operation == 'create' && this.isEntityExists(entityName)) {
             this.showConfirmationDialog(
