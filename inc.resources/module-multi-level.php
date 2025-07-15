@@ -143,7 +143,11 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 			{
 				$module->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, true))
+					->addAnd(
+						PicoSpecification::getInstance()
+							->addOr(PicoPredicate::getInstance()->equals(Field::of()->active, null))
+							->addOr(PicoPredicate::getInstance()->notEquals(Field::of()->active, true))
+					)
 					->addAnd($dataFilter)
 				)
 				->setAdminEdit($currentAction->getUserId())
@@ -177,7 +181,11 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				// Find active module
 				$module->findOne(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
+					->addAnd(
+						PicoSpecification::getInstance()
+							->addOr(PicoPredicate::getInstance()->equals(Field::of()->active, null))
+							->addOr(PicoPredicate::getInstance()->notEquals(Field::of()->active, false))
+					)
 					->addAnd($dataFilter)
 				);
 			
