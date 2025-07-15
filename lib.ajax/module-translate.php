@@ -204,6 +204,7 @@ if($inputPost->getUserAction() == 'get')
         'button_search',
         'button_add',
         'button_delete',
+        'button_ok',
         'button_save_current_order',
         'button_send_email',
         'button_send_link',
@@ -260,7 +261,9 @@ if($inputPost->getUserAction() == 'get')
         'placeholder_enter_password',
         'reset_password',
         'username',
-        'show_all'
+        'show_all',
+        'title_delete_confitmation',
+        
     );
 
     $response = array();
