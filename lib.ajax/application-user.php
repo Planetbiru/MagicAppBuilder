@@ -169,13 +169,11 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 					->insert();
 				}
 			}
-            
-
                 
             // Create parent module
             if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
             {
-                $appMultiLevelMenuTool = new AppMultiLevelMenuTool(null, $database);
+                $appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
                 $appMultiLevelMenuTool->createParentModule($currentAction);
                 $appMultiLevelMenuTool->updateRolesByAdminLevelId($adminLevelId, $currentAction);
             }
