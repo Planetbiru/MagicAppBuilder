@@ -10,8 +10,16 @@ $inputPost = new InputPost();
 
 $batchSize = 100;
 $maxQuerySize = 524288;
-
-$baseDirectory = realpath(dirname(__DIR__) . '/tmp'); // Ensure absolute path to base directory
+$tmpDir = dirname(__DIR__) . '/tmp';
+if(!file_exists($tmpDir))
+{
+    mkdir($tmpDir, 0755, true);
+}
+else
+{
+    chmod($tmpDir, 0755);
+}
+$baseDirectory = realpath($tmpDir); // Ensure absolute path to base directory
 if ($baseDirectory === false) {
     http_response_code(500);
     exit(json_encode(["success" => false, "error" => "Base directory not found."]));

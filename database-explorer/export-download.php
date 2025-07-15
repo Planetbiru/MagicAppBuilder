@@ -5,8 +5,16 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 function startsWith($haystack, $needle) {
     return substr($haystack, 0, strlen($needle)) === $needle;
 }
-
-$baseDirectory = realpath(dirname(__DIR__) . '/tmp/'); // Ensure real path
+$tmpDir = dirname(__DIR__) . '/tmp';
+if(!file_exists($tmpDir))
+{
+    mkdir($tmpDir, 0755, true);
+}
+else
+{
+    chmod($tmpDir, 0755);
+}
+$baseDirectory = realpath($tmpDir); // Ensure real path
 if ($baseDirectory === false) {
     http_response_code(500);
     exit;

@@ -315,7 +315,8 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         $result = $defaultValue;
         if(self::isTypeBoolean($type))
         {
-            $result = ($defaultValue != 0 || strtolower($defaultValue) == 'true') ? 'TRUE' : 'FALSE';
+            $normalized = strtolower(trim((string)$defaultValue));
+            $result = in_array($normalized, ['1', 'true', 'yes'], true) ? 'TRUE' : 'FALSE';
         }
         else if(self::isNativeValue($defaultValue)) {
             $result = $defaultValue;
