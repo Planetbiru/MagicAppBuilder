@@ -201,7 +201,6 @@ if($applicationId != null)
     $application = new EntityApplication(null, $databaseBuilder);
     try
     {
-        
         $application->findOneByApplicationId($applicationId);
         
         $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
