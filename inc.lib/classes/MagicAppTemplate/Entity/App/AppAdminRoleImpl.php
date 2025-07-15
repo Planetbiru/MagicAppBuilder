@@ -3,7 +3,7 @@
 namespace MagicAppTemplate\Entity\App;
 
 use MagicObject\MagicObject;
-
+    
 /**
  * The AppAdminRoleImpl class represents an entity in the "admin_role" table.
  *
@@ -75,15 +75,15 @@ class AppAdminRoleImpl extends MagicObject
     protected $module;
 
     /**
-	 * Module Code
-	 * 
-	 * @NotNull
-	 * @Column(name="module_code", type="varchar(255)", length=255, default_value=NULL, nullable=true)
-	 * @Label(content="Module Code")
+     * Module Code
+     * 
+     * @NotNull
+     * @Column(name="module_code", type="varchar(255)", length=255, default_value=NULL, nullable=true)
+     * @Label(content="Module Code")
      * @MaxLength(value=255)
-	 * @var string
-	 */
-	protected $moduleCode;
+     * @var string
+     */
+    protected $moduleCode;
 
     /**
      * Allowed show list
@@ -245,69 +245,69 @@ class AppAdminRoleImpl extends MagicObject
      * @var bool
      */
     protected $restore;
-    
+
     /**
-	 * Time Create
-	 * 
-	 * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
-	 * @Label(content="Time Create")
-	 * @var string
-	 */
-	protected $timeCreate;
+     * Time Create
+     * 
+     * @Column(name="time_create", type="timestamp", length=26, nullable=true, updatable=false)
+     * @Label(content="Time Create")
+     * @var string
+     */
+    protected $timeCreate;
 
-	/**
-	 * Time Edit
-	 * 
-	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
-	 * @Label(content="Time Edit")
-	 * @var string
-	 */
-	protected $timeEdit;
+    /**
+     * Time Edit
+     * 
+     * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
+     * @Label(content="Time Edit")
+     * @var string
+     */
+    protected $timeEdit;
 
-	/**
-	 * Admin Create
-	 * 
-	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
-	 * @Label(content="Admin Create")
-	 * @MaxLength(value=40)
-	 * @var string
-	 */
-	protected $adminCreate;
+    /**
+     * Admin Create
+     * 
+     * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+     * @Label(content="Admin Create")
+     * @MaxLength(value=40)
+     * @var string
+     */
+    protected $adminCreate;
 
-	/**
-	 * Admin Edit
-	 * 
-	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Edit")
-	 * @MaxLength(value=40)
-	 * @var string
-	 */
-	protected $adminEdit;
+    /**
+     * Admin Edit
+     * 
+     * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+     * @Label(content="Admin Edit")
+     * @MaxLength(value=40)
+     * @var string
+     */
+    protected $adminEdit;
 
-	/**
-	 * IP Create
-	 * 
-	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
-	 * @Label(content="IP Create")
-	 * @MaxLength(value=50)
-	 * @var string
-	 */
-	protected $ipCreate;
+    /**
+     * IP Create
+     * 
+     * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
+     * @Label(content="IP Create")
+     * @MaxLength(value=50)
+     * @var string
+     */
+    protected $ipCreate;
 
-	/**
-	 * IP Edit
-	 * 
-	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
-	 * @Label(content="IP Edit")
-	 * @MaxLength(value=50)
-	 * @var string
-	 */
-	protected $ipEdit;
+    /**
+     * IP Edit
+     * 
+     * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
+     * @Label(content="IP Edit")
+     * @MaxLength(value=50)
+     * @var string
+     */
+    protected $ipEdit;
 
     /**
      * Active
      *
-     * @Column(name="active", type="tinyint(1)", length=1, default_value=TRUE, nullable=true)
+     * @Column(name="active", type="tinyint(1)", length=1, default_value=true, nullable=true)
      * @Label(content="Active")
      * @var bool
      */
