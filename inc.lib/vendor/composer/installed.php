@@ -38,12 +38,12 @@
             'dev_requirement' => false,
         ),
         'planetbiru/magic-app' => array(
-            'pretty_version' => '3.15.0',
-            'version' => '3.15.0.0',
+            'pretty_version' => '3.14.7',
+            'version' => '3.14.7.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../planetbiru/magic-app',
             'aliases' => array(),
-            'reference' => 'fbc16b2a10a932f982221dfd7324143b5776b6e4',
+            'reference' => 'feaaef0ac3e94e2278e3748ee931953598e03f98',
             'dev_requirement' => false,
         ),
         'planetbiru/magic-object' => array(

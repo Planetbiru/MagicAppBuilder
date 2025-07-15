@@ -361,6 +361,10 @@ class AppUserPermission
      */
     public function isAllowedBatchAction()
     {
+        if(!$this->initialized)
+        {
+            $this->loadPermission();
+        }
         return $this->allowedBatchAction;
     }
 
