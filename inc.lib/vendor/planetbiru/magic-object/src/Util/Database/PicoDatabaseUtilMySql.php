@@ -176,7 +176,8 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         $result = $defaultValue;
         if(stripos($type, 'tinyint(1)') !== false || self::isTypeBoolean($type))
         {
-            $result = ($defaultValue != 0 || strtolower($defaultValue) == 'true') ? 'TRUE' : 'FALSE';
+            $normalized = strtolower(trim((string)$defaultValue));
+            $result = in_array($normalized, ['1', 'true', 'yes'], true) ? 'TRUE' : 'FALSE';
         }
         else if(self::isNativeValue($defaultValue))
         {
