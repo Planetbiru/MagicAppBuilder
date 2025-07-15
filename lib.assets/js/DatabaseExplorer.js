@@ -461,6 +461,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
+    document.addEventListener('paste', function(event) {
+      const target = event.target;
+      if (target && target.closest('.entity-editor')) // NOSONAR
+      {
+        event.preventDefault();
+        let text = '';
+        if (event.clipboardData) {
+          text = event.clipboardData.getData('text/plain');
+        } else if (window.clipboardData) {
+          text = window.clipboardData.getData('Text');
+        }
+        editor.importFromClipboard(text);
+      }
+    });
+
     document.querySelector('[type="submit"].execute').addEventListener('click', function(event) {
         event.preventDefault();
         showConfirmationDialog('Are you sure you want to execute the query?', 'Execute Query Confirmation', 'Yes', 'No', function(isConfirmed) {
@@ -723,7 +738,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Define the callback function to execute if an error occurs during file reading.
         reader.onerror = (e) => {
             // Alert the user about the file reading error.
-            alert('Error reading file: ' + reader.error);
             // Log the FileReader error to the console for debugging.
             console.error('FileReader error:', reader.error);
         };
