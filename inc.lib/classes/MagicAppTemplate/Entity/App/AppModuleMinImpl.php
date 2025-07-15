@@ -113,7 +113,7 @@ class AppModuleMinImpl extends MagicObject
 	 * Menu
 	 * 
 	 * @NotNull
-	 * @Column(name="menu", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
+	 * @Column(name="menu", type="tinyint(1)", length=1, default_value=false, nullable=true)
 	 * @Label(content="Menu")
 	 * @var bool
 	 */
@@ -123,7 +123,7 @@ class AppModuleMinImpl extends MagicObject
 	 * Special Access
 	 * 
 	 * @NotNull
-	 * @Column(name="special_access", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
+	 * @Column(name="special_access", type="tinyint(1)", length=1, default_value=false, nullable=true)
 	 * @Label(content="Special Access")
 	 * @var bool
 	 */
@@ -143,7 +143,7 @@ class AppModuleMinImpl extends MagicObject
 	 * Default Data
 	 * 
 	 * @NotNull
-	 * @Column(name="default_data", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
+	 * @Column(name="default_data", type="tinyint(1)", length=1, default_value=false, nullable=true)
 	 * @Label(content="Default Data")
 	 * @var bool
 	 */
