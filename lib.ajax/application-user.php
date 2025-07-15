@@ -240,6 +240,7 @@ if($applicationId != null)
         $userFullName = "Super User";
         $userLanguageId = "en";
         $userActive = true;
+        $userBlocked = false;
         $adminLevel = new AppAdminLevelImpl(null, $database);
         
         try
@@ -300,6 +301,7 @@ if($applicationId != null)
             $userFinder->setName($userFullName);
             $userFinder->setLanguageId($userLanguageId);
             $userFinder->setActive($userActive);
+            $userFinder->setBlocked($userBlocked);
             $userFinder->setTimeCreate($now);
             $userFinder->setTimeUpdate($now);
             $userFinder->setIpCreate($ip);

@@ -153,7 +153,7 @@ class AppAdminImpl extends MagicObject
 	/**
 	 * Blocked
 	 * 
-	 * @Column(name="blocked", type="tinyint(1)", length=1, default_value=FALSE, nullable=true)
+	 * @Column(name="blocked", type="tinyint(1)", length=1, default_value=false, nullable=true)
 	 * @DefaultColumn(value="false")
 	 * @Label(content="Blocked")
 	 * @var bool
