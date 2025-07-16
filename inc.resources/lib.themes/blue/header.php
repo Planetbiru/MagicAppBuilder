@@ -26,6 +26,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
     <script src="<?php echo $themeAssetsPath;?>vendors/sortable/Sortable.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/MultiSelect.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/PicoTagEditor.min.js"></script>
+    <script src="<?php echo $themeAssetsPath;?>js/UrlSorter.min.js"></script>
     <script src="<?php echo $themeAssetsPath;?>js/custom.min.js"></script>
 </head>
 
