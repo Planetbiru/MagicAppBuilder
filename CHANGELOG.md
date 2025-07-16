@@ -1699,3 +1699,15 @@ For example:
 
 This enhancement ensures cleaner, more predictable column names during schema generation — especially when dealing with technical or acronym-heavy datasets.
 
+### Button Caption Update: "Import Sheet" → "Import Spreadsheet"
+
+To improve clarity and consistency, the button previously labeled **"Import Sheet"** has been renamed to **"Import Spreadsheet"**.
+
+This small but meaningful change helps better communicate the supported file types (Excel, CSV, etc.) and aligns with common terminology used by spreadsheet users.
+
+### Button Caption Update: "Append Entity from SQL" → "Append Entity"
+
+To reduce visual clutter and accommodate layout constraints, the button previously labeled **"Append Entity from SQL"** is now simply called **"Append Entity"**.
+
+This change maintains clarity while keeping the UI clean and space-efficient.
+
