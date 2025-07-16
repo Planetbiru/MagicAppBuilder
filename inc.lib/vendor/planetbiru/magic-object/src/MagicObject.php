@@ -2538,6 +2538,32 @@ class MagicObject extends stdClass // NOSONAR
     }
 
     /**
+     * Deletes a record from the database using its primary key value(s).
+     *
+     * This method delegates the delete operation to the persistence layer and ensures
+     * that the database connection is available before proceeding. It supports both
+     * single-column and composite primary keys.
+     *
+     * @param mixed $primaryKeyValue The value(s) of the primary key to identify the record.
+     *                                - For single-column primary key: a scalar value (e.g., 5).
+     *                                - For composite primary key: an **indexed array** of values
+     *                                  in the same order as defined in the table (e.g., [1, 2]).
+     *
+     * @return int The number of deleted records (1 if successful, 0 if no matching record found).
+     *
+     * @throws NoDatabaseConnectionException If no database connection is available.
+     */
+    public function deleteRecordByPrimaryKey($primaryKeyValue)
+    {
+        if ($this->_databaseConnected()) {
+            $persist = new PicoDatabasePersistence($this->_database, $this);
+            return $persist->deleteByPrimaryKey($primaryKeyValue);
+        } else {
+            throw new NoDatabaseConnectionException(self::MESSAGE_NO_DATABASE_CONNECTION);
+        }
+    }
+
+    /**
      * Magic method called when a user calls any undefined method. 
      * The __call method checks the prefix of the called method and 
      * invokes the appropriate method according to its name and parameters.

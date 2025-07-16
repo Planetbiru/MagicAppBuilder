@@ -97,6 +97,44 @@ if($inputPost->getUserAction() === UserAction::RESTORE)
     $currentModule->redirectToItself();
     exit();
 }
+else if($inputPost->getUserAction() === UserAction::DELETE)
+{
+    $trashEntity = $inputPost->getTrashEntity();
+    $primaryEntity = substr($trashEntity, 0, strlen($trashEntity) - 5);
+    $file1 = $directory . DIRECTORY_SEPARATOR . $primaryEntity . ".php";
+    $file2 = $directory . DIRECTORY_SEPARATOR . $trashEntity . ".php";
+
+	// Check if file is exists
+	if(file_exists($file1) && file_exists($file2))
+    {
+        require_once $file1;
+        require_once $file2;
+
+        $primaryEntityClass = $baseEntityNamespace . "\\" . $primaryEntity;    
+        $trashEntityClass = $baseEntityNamespace . "\\" . $trashEntity;
+
+		// Check if class is exists
+		if(class_exists($primaryEntityClass) && class_exists($trashEntityClass) && $inputPost->countableCheckedRowId())
+        {
+            $dataToRestore = $inputPost->getCheckedRowId();
+            foreach($dataToRestore as $value)
+            {
+                $trashEntityObject = new $trashEntityClass(null, $database);
+                // Find the entity trash object by ID
+                try
+                {
+                    $trashEntityObject->deleteRecordByPrimaryKey($value);
+				}
+				catch(Exception $e)
+				{
+					// Do nothing
+				}
+			}
+		}
+	}
+	$currentModule->redirectToItself();
+    exit();
+}
 
 require_once $appInclude->mainAppHeader(__DIR__);
 
@@ -320,7 +358,12 @@ if($inputGet->getTrashEntity() != "")
 					<div class="button-area">
 						<input type="hidden" name="trash_entity" value="<?php echo $inputGet->getTrashEntity(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>">
 						<?php if($userPermission->isAllowedRestore()){ ?>
-						<button type="submit" class="btn btn-success" name="user_action" id="restore_selected" value="restore" data-confirmation="true" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningRestoreConfirmation());?>"><?php echo $appLanguage->getButtonRestore();?></button>
+						<button type="submit" class="btn btn-success" name="user_action" id="restore_selected" value="restore" data-confirmation="true"  data-onclik-title="<?php echo htmlspecialchars($appLanguage->getTitleRestoreConfirmation());?>" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningRestoreConfirmation());?>"><?php echo $appLanguage->getButtonRestore();?></button>
+						<?php
+						}
+						?>
+						<?php if($userPermission->isAllowedDelete()){ ?>
+						<button type="submit" class="btn btn-danger" name="user_action" id="delete_selected" value="delete" data-confirmation="true"  data-onclik-title="<?php echo htmlspecialchars($appLanguage->getTitleDeletePermanentConfirmation());?>" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeletePermanentConfirmation());?>"><?php echo $appLanguage->getButtonDeletePermanent();?></button>
 						<?php
 						}
 						?>
