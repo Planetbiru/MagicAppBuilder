@@ -203,7 +203,7 @@ if(!isset($databaseName))
                             <button class="btn" onclick="editor.downloadEntities()">Export Entity</button>
                             <button class="btn" onclick="editor.importSQL()">Import SQL</button>
                             <button class="btn" onclick="editor.appendFromSQL()">Append Entity from SQL</button>
-                            <button class="btn" onclick="editor.importSheet()">Import Sheet</button>
+                            <button class="btn" onclick="editor.importSheet()">Import Spreadsheet</button>
                             <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
                             <button class="btn" onclick="downloadSVG()">Export SVG</button>
                             <button class="btn" onclick="downloadPNG()">Export PNG</button>
