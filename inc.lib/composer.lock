@@ -142,12 +142,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "85253f8b902fa24ad2c1084fdafcb88b6f643318"
+                "reference": "c963e4b83eb4c78a08b41cea7cf8e40c9c3205db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/85253f8b902fa24ad2c1084fdafcb88b6f643318",
-                "reference": "85253f8b902fa24ad2c1084fdafcb88b6f643318",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/c963e4b83eb4c78a08b41cea7cf8e40c9c3205db",
+                "reference": "c963e4b83eb4c78a08b41cea7cf8e40c9c3205db",
                 "shasum": ""
             },
             "require": {
@@ -174,7 +174,7 @@
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
                 "source": "https://github.com/Planetbiru/MagicApp/tree/3.16.1"
             },
-            "time": "2025-07-16T04:56:18+00:00"
+            "time": "2025-07-16T15:22:24+00:00"
         },
         {
             "name": "planetbiru/magic-object",
@@ -182,12 +182,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "1072815c0ac617def78ee347c797b332aa3ee002"
+                "reference": "8aa8d0b7167af458e2b84d6b6493ae4a81fc3b53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/1072815c0ac617def78ee347c797b332aa3ee002",
-                "reference": "1072815c0ac617def78ee347c797b332aa3ee002",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/8aa8d0b7167af458e2b84d6b6493ae4a81fc3b53",
+                "reference": "8aa8d0b7167af458e2b84d6b6493ae4a81fc3b53",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
                 "source": "https://github.com/Planetbiru/MagicObject/tree/3.16.0"
             },
-            "time": "2025-07-16T04:53:41+00:00"
+            "time": "2025-07-16T15:16:55+00:00"
         }
     ],
     "packages-dev": [],
