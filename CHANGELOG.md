@@ -1683,6 +1683,12 @@ This feature drastically improves speed during prototyping and data modeling. It
 
 Combined with the **Entity Data Export/Import** feature introduced in version 1.12.0, this offers a complete, frictionless workflow for managing external tabular data.
 
+### Permanently Delete Trash Data
+
+You can now **permanently delete** entries from trash tables. This feature allows full cleanup of previously "soft-deleted" records that are no longer needed — ensuring better database hygiene and reducing unnecessary data retention.
+
+Just select the data and choose the **Delete Permanently** option. A confirmation dialog will prevent accidental removal.
+
 ## Improvements
 
 ### Improved Snake Case Conversion During Data Import
@@ -1710,4 +1716,8 @@ This small but meaningful change helps better communicate the supported file typ
 To reduce visual clutter and accommodate layout constraints, the button previously labeled **"Append Entity from SQL"** is now simply called **"Append Entity"**.
 
 This change maintains clarity while keeping the UI clean and space-efficient.
+
+### Localization Language Refinements
+
+Improved the **phrasing and word choice** across multiple confirmation dialogs and messages throughout the application to ensure greater clarity and consistency. These changes enhance the overall user experience, especially in multilingual environments.
 
