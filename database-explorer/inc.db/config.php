@@ -68,7 +68,7 @@ if (file_exists($appConfigPath)) {
             $databaseName = "";
         }
     } catch (Exception $e) {
-        require_once __DIR__ . "/error.php";
+        require_once dirname(__DIR__) . "/error.php";
         exit();
     }
 } else {
