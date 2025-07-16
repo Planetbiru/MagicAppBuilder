@@ -1657,3 +1657,45 @@ Additionally, a bug that prevented columns from being correctly renamed *before*
 Furthermore, we've fixed an issue with **column type inference** during data import from **Excel and CSV files**. The system now more accurately determines the appropriate column type based on the actual data content, leading to more reliable schema generation and data handling.
 
 Lastly, we've resolved a bug causing **NaN (Not a Number) width values** in the entity renderer, ensuring proper display and layout of entities.
+
+
+# MagicAppBuilder Version 1.13.0
+
+Version 1.13.0 brings an exciting productivity enhancement that makes defining new entities faster and more intuitive — especially when working with existing table data from other sources.
+
+## What's New
+
+### Create Entities from Clipboard
+
+Defining entities has never been easier! MagicAppBuilder now supports **pasting tabular data directly from your clipboard** into the Entity Editor — whether it comes from **Excel, Word, or tables on the web**.
+
+When you paste this data:
+
+* MagicAppBuilder will **automatically parse the content** into rows and columns.
+* A new **entity will be created on the fly**, with column names derived from the first row.
+* All table data will be instantly available for editing or saving — no manual setup required.
+
+This feature drastically improves speed during prototyping and data modeling. It’s perfect for:
+
+* Quickly testing ideas based on real-world data.
+* Copying small datasets from spreadsheets or reports into your application.
+* Reusing structured data from external tools and websites.
+
+Combined with the **Entity Data Export/Import** feature introduced in version 1.12.0, this offers a complete, frictionless workflow for managing external tabular data.
+
+## Improvements
+
+### Improved Snake Case Conversion During Data Import
+
+We've improved how column names are converted to `snake_case` when importing data from **Excel**, **CSV**, **SQLite Binary Files**, or **SQL**:
+
+* Before applying the snake case transformation, MagicAppBuilder now performs an **uppercase-word normalization step**.
+* This prevents unwanted results when working with abbreviations or acronyms.
+
+For example:
+
+* `"GPIO"` is now correctly converted to `gpio` instead of `g_p_i_o`.
+* `"DeviceID"` becomes `device_id` as expected.
+
+This enhancement ensures cleaner, more predictable column names during schema generation — especially when dealing with technical or acronym-heavy datasets.
+

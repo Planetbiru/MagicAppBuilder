@@ -2701,6 +2701,98 @@ class EntityEditor {
     }
 
     /**
+     * Imports table data from the clipboard.
+     * Parses the clipboard text, generates columns from headers and data,
+     * and initializes a new entity with that data.
+     *
+     * @param {string} text - The clipboard text in tab-separated table format.
+     */
+    importFromClipboard(text) {
+        // Parse clipboard text into headers and structured data
+        let parsed = this.parseClipboardTable(text);
+
+        // Generate column definitions based on headers and data
+        const columns = this.generateCreateTable(parsed.headers, parsed.data);
+
+        // Import the structure into a new table with a generated name
+        this.importFromSheet(columns, this.getNewTableName());
+
+        // Store the imported data as the current entity's data
+        this.currentEntityData = parsed.data;
+    }
+
+    /**
+     * Parses tab-separated clipboard text into headers and data rows.
+     * Trims empty rows and columns, converts headers to Ucwords,
+     * and returns a structured object with headers and row objects.
+     *
+     * @param {string} text - Clipboard content copied from a spreadsheet or table.
+     * @returns {{headers: string[], data: object[]}} - Parsed column headers and row data.
+     */
+    parseClipboardTable(text) {
+        // Normalize line breaks and split into lines
+        let rows = text.trim().replace(/\r\n/g, '\n').split('\n');
+
+        // Split each row by tab and trim each cell
+        let table = rows.map(row => row.split('\t').map(col => col.trim()));
+
+        // Remove empty rows at the beginning
+        while (table.length && table[0].every(cell => cell === '')) table.shift();
+        // Remove empty rows at the end
+        while (table.length && table[table.length - 1].every(cell => cell === '')) table.pop();
+
+        /**
+         * Transposes a 2D array (matrix), turning rows into columns and vice versa.
+         * Used here to trim empty columns.
+         *
+         * @param {any[][]} matrix - The table to transpose.
+         * @returns {any[][]} - The transposed matrix.
+         */
+        function transpose(matrix) {
+            return matrix[0].map((_, i) => matrix.map(row => row[i]));
+        }
+
+        // Transpose to process columns as rows
+        let transposed = transpose(table);
+        // Remove empty columns at the beginning
+        while (transposed.length && transposed[0].every(cell => cell === '')) transposed.shift();
+        // Remove empty columns at the end
+        while (transposed.length && transposed[transposed.length - 1].every(cell => cell === '')) transposed.pop();
+        // Transpose back to original orientation
+        table = transpose(transposed);
+
+        // Return empty result if less than 2 rows (no data rows)
+        if (table.length < 2) return { headers: [], data: [] };
+
+        // Convert header row to Ucwords format
+        const headers = table[0].map(header => toUcwords(header));
+
+        // Convert each data row into an object using headers as keys
+        const data = table.slice(1).map(row => {
+            let obj = {};
+            headers.forEach((key, i) => {
+                obj[key] = row[i] ?? '';
+            });
+            return obj;
+        });
+
+        return { headers, data };
+
+        /**
+         * Converts each word in a string to Ucwords format.
+         * For example, "first name" becomes "First Name".
+         *
+         * @param {string} str - The input string.
+         * @returns {string} - The transformed string in Ucwords format.
+         */
+        function toUcwords(str) {
+            return str.replace(/\w\S*/g, word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            );
+        }
+    }
+
+    /**
      * Converts all keys in each row object to `snake_case`, but only includes keys that match column definitions.
      *
      * This function ensures that only columns defined in the `columns` array will be included in the result,
@@ -2827,12 +2919,15 @@ class EntityEditor {
     }
     
     /**
-     * Converts a string into snake_case format, trimming any leading or trailing underscores.
-     * This function handles spaces, non-alphanumeric characters, and conversions from camelCase or PascalCase.
-     * It also replaces multiple consecutive underscores with a single underscore.
+     * Converts a string to snake_case format by first transforming it to Ucwords,
+     * then applying snake_case rules. Trims leading/trailing underscores and 
+     * collapses multiple underscores.
+     *
+     * This function ensures that input like camelCase, PascalCase, or messy strings
+     * with special characters and inconsistent spacing are normalized first.
      *
      * @param {string} header - The input string to be converted.
-     * @returns {string} The string in snake_case format, with leading/trailing underscores removed and multiple underscores collapsed.
+     * @returns {string} The snake_case version of the input string.
      *
      * @example
      * snakeize("   This Is A Header   ");        // Returns "this_is_a_header"
@@ -2840,17 +2935,24 @@ class EntityEditor {
      * snakeize("_User ID_");                     // Returns "user_id"
      * snakeize("HeaderTitleExample");            // Returns "header_title_example"
      * snakeize("anotherTestString__");           // Returns "another_test_string"
-     * snakeize(" _with!Special@Chars#_   ");    // Returns "with_special_chars"
+     * snakeize(" _with!Special@Chars#_   ");     // Returns "with_special_chars"
      * snakeize("multiple___underscores");        // Returns "multiple_underscores"
      */
     snakeize(header) {
-        let name = header
-            .replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1_$2") // Handles camelCase/PascalCase conversion
-            .replace(/\s+/g, "_") // Replaces spaces with underscores
-            .replace(/[^\w]/g, "") // Removes non-alphanumeric characters (excluding underscores)
-            .toLowerCase() // Converts everything to lowercase
-            .replace(/^_+|_+$/g, "") // NOSONAR // Trims leading/trailing underscores
-            .replace(/__+/g, "_"); // Replaces multiple underscores with a single one
+        // Step 1: Convert to Ucwords to normalize word boundaries
+        let ucwords = header
+            .replace(/[_\-]+/g, ' ')         // NOSONAR // Replace underscores/dashes with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2') // Insert space before uppercase letters (camelCase)
+            .replace(/[^a-zA-Z0-9 ]+/g, '')  // Remove non-alphanumeric characters (except space)
+            .toLowerCase()
+            .replace(/\b\w/g, c => c.toUpperCase()); // Ucwords: capitalize first letter of each word
+
+        // Step 2: Convert to snake_case
+        let name = ucwords
+            .replace(/\s+/g, "_")           // Replace spaces with underscores
+            .toLowerCase()                  // Convert all to lowercase
+            .replace(/^_+|_+$/g, "")        // NOSONAR // Trim leading/trailing underscores
+            .replace(/__+/g, "_");          // Replace multiple underscores with one
 
         return name;
     }
