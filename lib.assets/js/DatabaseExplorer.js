@@ -462,19 +462,28 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     document.addEventListener('paste', function(event) {
-      const target = event.target;
-      if (target && target.closest('.entity-editor')) // NOSONAR
-      {
-        event.preventDefault();
-        let text = '';
-        if (event.clipboardData) {
-          text = event.clipboardData.getData('text/plain');
-        } else if (window.clipboardData) {
-          text = window.clipboardData.getData('Text');
+        const target = event.target;
+
+        // Do not intercept paste if the target is an editable element
+        const isEditableElement =
+            target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable;
+
+        // Only handle custom paste when not in an editable element and inside .entity-editor
+        if (!isEditableElement && target && target.closest('.entity-editor')) // NOSONAR
+        {
+            event.preventDefault(); // block default paste behavior
+            let text = '';
+            if (event.clipboardData) {
+            text = event.clipboardData.getData('text/plain');
+            } else if (window.clipboardData) {
+            text = window.clipboardData.getData('Text');
+            }
+            editor.importFromClipboard(text);
         }
-        editor.importFromClipboard(text);
-      }
     });
+
 
     document.querySelector('[type="submit"].execute').addEventListener('click', function(event) {
         event.preventDefault();
