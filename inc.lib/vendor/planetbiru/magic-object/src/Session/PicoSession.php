@@ -61,10 +61,17 @@ class PicoSession
             $this->setSessionMaxLifeTime($sessConf->getMaxLifeTime());
         }
         if ($sessConf && $sessConf->getSaveHandler() == "redis") {
-            $path = $sessConf->getSaveHandler();
-            $parsed = parse_url($path);
-            parse_str($parsed['query'], $parsedStr);
-            $this->saveToRedis($parsed['host'], $parsed['port'], $parsedStr['auth']);
+            $path = $sessConf->getSavePath();
+            $parsed = parse_url($path);            
+            $host = isset($parsed['host']) ? $parsed['host'] : '';
+            $port = isset($parsed['port']) ? $parsed['port'] : 0;
+            $auth = null;
+            if(isset($parsed['query']))
+            {
+                parse_str($parsed['query'], $parsedStr); 
+                $auth = isset($parsedStr['auth']) ? $parsedStr['auth'] : null;
+            }
+            $this->saveToRedis($host, $port, $auth);
         } elseif ($sessConf && $sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
             $this->saveToFiles($sessConf->getSavePath());
         }

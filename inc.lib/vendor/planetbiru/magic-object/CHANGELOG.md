@@ -1086,6 +1086,8 @@ Previously, in PHP 8, values like `'0'` or `'false'` could be incorrectly interp
 
 Now, default values are accurately converted to `TRUE` or `FALSE` based on their literal meaning.
 
+Berikut adalah versi yang sudah diperbarui untuk catatan rilis MagicObject v3.16.0:
+
 
 ## MagicObject Version 3.16.0
 
@@ -1096,4 +1098,13 @@ Now, default values are accurately converted to `TRUE` or `FALSE` based on their
 Added a new method `deleteRecordByPrimaryKey($primaryKeyValue)` to allow deleting a database record by its primary key, including support for composite keys.
 
 This method ensures the database connection is active and delegates deletion to the persistence layer.
+
+
+### Bug Fixes
+
+#### Fix: Session Handling with Redis
+
+Resolved a compatibility issue when using Redis as the PHP session handler. Previously, sessions could fail to initialize or persist correctly under certain configurations.
+
+Now, session storage works reliably with `session.save_handler = redis`, ensuring better support for scalable session storage backends.
 
