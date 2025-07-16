@@ -175,7 +175,9 @@ if($inputGet->getTrashEntity() != "")
 						<input type="datetime-local" class="form-control" name="time_from" value="<?php echo $inputGet->getTimeFrom(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>" autocomplete="off"/>
 					</span>
 
-                    <span>to</span>
+                    <span>
+						<?php echo $appLanguage->getTo();?>
+					</span>
                 
                     <span class="filter-control">
 						<input type="datetime-local" class="form-control" name="time_to" value="<?php echo $inputGet->getTimeTo(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>" autocomplete="off"/>
