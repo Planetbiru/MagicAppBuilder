@@ -1,138 +1,4 @@
-/**
- * Class to handle URL parsing and sorting parameters (orderby and ordertype).
- */
-class UrlSorter {
-    /**
-     * Initializes the URL parser with the current or specified URL.
-     * Parses the URL parameters and sets initial orderby and ordertype values.
-     *
-     * @param {string} [url=window.location.toString()] - The URL to parse. Defaults to the current window URL.
-     */
-    constructor(url = window.location.toString()) {
-        this.originalUrl = url;
-        this.originalQueryParams = {};
-        this.currentOrderBy = '';
-        this.currentOrderType = '';
 
-        this.newOrderBy = '';
-        this.newOrderType = '';
-
-        this._parseUrl();
-    }
-
-    /**
-     * Parses the URL and extracts base name and query parameters.
-     * Sets current and new orderby and ordertype values.
-     * @private
-     */
-    _parseUrl() {
-        let cleanUrl = this.originalUrl.split("#")[0];
-        let parts = cleanUrl.split("?");
-        this.baseURL = parts[0];
-        const queryString = parts[1] || "";
-
-        const pathSegments = this.baseURL.split('/');
-        this.baseName = pathSegments[pathSegments.length - 1] || '';
-
-        let argArray = queryString.split("&");
-        argArray.forEach(param => {
-            let pair = param.split("=");
-            if (pair[0] !== "") {
-                this.originalQueryParams[pair[0]] = pair[1];
-            }
-        });
-
-        this.currentOrderBy = this.originalQueryParams.orderby || '';
-        this.currentOrderType = this.originalQueryParams.ordertype || '';
-
-        this.newOrderBy = this.currentOrderBy;
-        this.newOrderType = this.currentOrderType;
-    }
-
-    /**
-     * Gets the current orderby value from the original URL.
-     * @returns {string}
-     */
-    getOrderBy() {
-        return this.currentOrderBy;
-    }
-
-    /**
-     * Gets the current ordertype value from the original URL.
-     * @returns {string}
-     */
-    getOrderType() {
-        return this.currentOrderType;
-    }
-
-    /**
-     * Sets a new orderby value.
-     * @param {string} orderBy
-     */
-    setOrderBy(orderBy) {
-        this.newOrderBy = orderBy;
-    }
-
-    /**
-     * Sets a new ordertype value.
-     * @param {string} orderType
-     */
-    setOrderType(orderType) {
-        this.newOrderType = orderType;
-    }
-
-    /**
-     * Returns original query parameters excluding orderby and ordertype.
-     * @returns {Object}
-     */
-    getOriginalQueryParams() {
-        const paramsWithoutOrder = { ...this.originalQueryParams };
-        delete paramsWithoutOrder.orderby;
-        delete paramsWithoutOrder.ordertype;
-        return paramsWithoutOrder;
-    }
-
-    /**
-     * Builds a relative URL using the base name and updated query parameters.
-     * @returns {string}
-     */
-    buildRelativeUrl() {
-        const finalQueryParams = { ...this.originalQueryParams };
-
-        if (this.newOrderBy) {
-            finalQueryParams.orderby = this.newOrderBy;
-        } else {
-            delete finalQueryParams.orderby;
-        }
-
-        if (this.newOrderType) {
-            finalQueryParams.ordertype = this.newOrderType;
-        } else {
-            delete finalQueryParams.ordertype;
-        }
-
-        let queryParts = [];
-        for (const key in finalQueryParams) {
-            if (
-                finalQueryParams.hasOwnProperty(key) &&
-                finalQueryParams[key] !== undefined &&
-                finalQueryParams[key] !== null &&
-                finalQueryParams[key] !== ''
-            ) {
-                queryParts.push(`${key}=${finalQueryParams[key]}`);
-            }
-        }
-
-        let queryString = queryParts.join("&");
-        let finalUrl = this.baseName;
-
-        if (queryString) {
-            finalUrl += "?" + queryString;
-        }
-
-        return finalUrl;
-    }
-}
 /**
  * Builds a URL with query parameters from a form and its FormData.
  *
@@ -140,8 +6,7 @@ class UrlSorter {
  * @param {FormData} formData - The FormData object containing key-value pairs to append to the URL.
  * @returns {string} A complete URL with query parameters.
  */
-function getFormUrl(form, formData)
-{
+function getFormUrl(form, formData) {
   const params = new URLSearchParams();
   for (const [key, value] of formData.entries()) {
     params.append(key, value);
@@ -163,35 +28,34 @@ function getFormUrl(form, formData)
  * @param {string} url - The URL to fetch content from.
  * @param {HTMLElement} section - The DOM element to be updated with the response HTML.
  */
-function fetchUrl(url, section)
-{
+function fetchUrl(url, section) {
   fetch(url, {
     method: 'GET',
     headers: {
       'X-Requested-With': 'XMLHttpRequest'
     }
   })
-  .then(response => response.text())
-  .then(html => {
-    section.innerHTML = html;
+    .then(response => response.text())
+    .then(html => {
+      section.innerHTML = html;
 
-    // Update browser URL without reload
-    history.pushState(null, '', url);
+      // Update browser URL without reload
+      history.pushState(null, '', url);
 
-    // Re-initialize sorting features if needed
-    const table = section.querySelector('table');
-    if (table) {
-      makeTableSortable(table);
-    }
+      // Re-initialize sorting features if needed
+      const table = section.querySelector('table');
+      if (table) {
+        makeTableSortable(table);
+      }
 
-    const tbody = section.querySelector('table tbody');
-    if (tbody) {
-      sortDataByDrag(tbody);
-    }
-  })
-  .catch(error => {
-    console.error('AJAX form error:', error);
-  });
+      const tbody = section.querySelector('table tbody');
+      if (tbody) {
+        sortDataByDrag(tbody);
+      }
+    })
+    .catch(error => {
+      console.error('AJAX form error:', error);
+    });
 }
 
 
@@ -202,15 +66,14 @@ function fetchUrl(url, section)
  */
 function initDateTimePicker() {
   let debugDatetimePicker = false;
-  
+
   // Change input type from date to text and add class for date-picker
-  $('input[type="date"], input[type="time"], input[type="datetime"], input[type="datetime-local"]').each(function (index, element) { 
+  $('input[type="date"], input[type="time"], input[type="datetime"], input[type="datetime-local"]').each(function (index, element) {
     let obj = $(this);
     let type = obj.attr('type');
-    let map = {'date':'date', 'time':'time', 'datetime':'date-time', 'datetime-local':'date-time'};
+    let map = { 'date': 'date', 'time': 'time', 'datetime': 'date-time', 'datetime-local': 'date-time' };
     let cls = map[type];
-    if(obj.attr("data-multiple-input") === undefined)
-    {
+    if (obj.attr("data-multiple-input") === undefined) {
       obj.attr('type', 'text');
       obj.addClass(`${cls}-picker`);
       let html = obj[0].outerHTML;
@@ -224,7 +87,7 @@ function initDateTimePicker() {
 
   // Initialize date-picker if there are inputs with the class 'date-picker'
   if ($('.date-picker').length) {
-    $('.date-picker').each(function() {
+    $('.date-picker').each(function () {
       let minDate = $(this).data('mindate') || false;
       let maxDate = $(this).data('maxdate') || false;
       $(this).datetimepicker({
@@ -250,7 +113,7 @@ function initDateTimePicker() {
 
   // Initialize date-time-picker if there are inputs with the class 'date-time-picker'
   if ($('.date-time-picker').length) {
-    $('.date-time-picker').each(function() {
+    $('.date-time-picker').each(function () {
       let minDate = $(this).data('mindate') || false;
       let maxDate = $(this).data('maxdate') || false;
       $(this).datetimepicker({
@@ -275,7 +138,7 @@ let lastUrl = null;
  */
 function initSortTable(selector = "table.table-sort-by-column") {
   const tables = document.querySelectorAll(selector);
-  
+
   tables.forEach(function (thisTable) {
     makeTableSortable(thisTable);
   });
@@ -290,36 +153,36 @@ function initSortTable(selector = "table.table-sort-by-column") {
  * @param {HTMLTableElement} thisTable - The table element to apply sorting functionality to.
  */
 function makeTableSortable(thisTable) {
-    const originalURL = document.location.toString();
+  const originalURL = document.location.toString();
 
-    const head = thisTable.querySelector('thead tr');
-    if (head) {
-        const cells = head.querySelectorAll("td.order-controll");
+  const head = thisTable.querySelector('thead tr');
+  if (head) {
+    const cells = head.querySelectorAll("td.order-controll");
 
-        cells.forEach(function (thisCel) {
-            let columnName = thisCel.getAttribute("data-col-name");
+    cells.forEach(function (thisCel) {
+      let columnName = thisCel.getAttribute("data-col-name");
 
-            if (columnName) {
-                let sorter = new UrlSorter(originalURL);
+      if (columnName) {
+        let sorter = new UrlSorter(originalURL);
 
-                if (columnName === sorter.getOrderBy()) {
-                    // Toggle order type between asc and desc if already sorted by this column
-                    let newOrderType = sorter.getOrderType() === 'desc' ? 'asc' : 'desc';
-                    sorter.setOrderType(newOrderType);
-                    thisCel.setAttribute("data-order-method", sorter.getOrderType());
-                } else {
-                    // Set sorting to ascending for a newly selected column
-                    sorter.setOrderBy(columnName);
-                    sorter.setOrderType('asc');
-                }
+        if (columnName === sorter.getOrderBy()) {
+          // Toggle order type between asc and desc if already sorted by this column
+          let newOrderType = sorter.getOrderType() === 'desc' ? 'asc' : 'desc';
+          sorter.setOrderType(newOrderType);
+          thisCel.setAttribute("data-order-method", sorter.getOrderType());
+        } else {
+          // Set sorting to ascending for a newly selected column
+          sorter.setOrderBy(columnName);
+          sorter.setOrderType('asc');
+        }
 
-                let link = thisCel.querySelector('a');
-                if (link) {
-                    link.href = sorter.buildRelativeUrl();
-                }
-            }
-        });
-    }
+        let link = thisCel.querySelector('a');
+        if (link) {
+          link.href = sorter.buildRelativeUrl();
+        }
+      }
+    });
+  }
 }
 
 
@@ -332,7 +195,7 @@ function makeTableSortable(thisTable) {
  * After sorting ends, the row numbers are updated via updateNumber().
  */
 function initSortData() {
-  document.querySelectorAll("tbody.data-table-manual-sort").forEach(function(dataToSort) {
+  document.querySelectorAll("tbody.data-table-manual-sort").forEach(function (dataToSort) {
     sortDataByDrag(dataToSort);
   });
 }
@@ -363,7 +226,7 @@ function sortDataByDrag(dataToSort) {
  * - Selects or deselects all checkboxes when the master checkbox is toggled.
  */
 function initCheckAll() {
-  document.addEventListener("change", function(e) {
+  document.addEventListener("change", function (e) {
     const masterCheckbox = e.target.closest(".check-master");
     if (!masterCheckbox) return;
 
@@ -371,7 +234,7 @@ function initCheckAll() {
     const selector = masterCheckbox.dataset.selector;
 
     // Temukan semua slave checkbox sesuai selector
-    document.querySelectorAll(".check-slave" + selector).forEach(function(slaveCheckbox) {
+    document.querySelectorAll(".check-slave" + selector).forEach(function (slaveCheckbox) {
       slaveCheckbox.checked = checked;
     });
   });
@@ -385,84 +248,84 @@ function initCheckAll() {
  * - Configures **date/time pickers** for input fields of type `date`, `time`, `datetime`, and `datetime-local`.
  */
 function initMultipleInput() {
-  
+
   let debugDatetimePicker = false;
 
   // Select all input elements that have the "data-multiple-input" attribute
   $('input[data-multi-input]').each(function (index, element) {
-      let obj = $(this);
-      /**
-       * Determines if the input field is a date/time-related input type.
-       * This is used to apply specific configurations.
-       * 
-       * @type {boolean}
-       */
-      let isDateType = obj.is('input[type="date"], input[type="time"], input[type="datetime"], input[type="datetime-local"]');
+    let obj = $(this);
+    /**
+     * Determines if the input field is a date/time-related input type.
+     * This is used to apply specific configurations.
+     * 
+     * @type {boolean}
+     */
+    let isDateType = obj.is('input[type="date"], input[type="time"], input[type="datetime"], input[type="datetime-local"]');
 
-      /**
-       * Configuration options for the PicoTagEditor instance.
-       * - `maxHeight`: Limits the maximum height of the tag editor container.
-       * - `trimInput`: Trims input values before adding them as tags (for date inputs).
-       * - `debug`: Enables or disables debug mode.
-       * - `minWidth`: Ensures a minimum width when used with date/time pickers.
-       */
-      let options = { maxHeight: 120, trimInput: isDateType, clearOnHide: true, debug: false };
-      if (isDateType) {
-          // Ensure the tag container is wider than the date-time picker.
-          options.minWidth = 260;
+    /**
+     * Configuration options for the PicoTagEditor instance.
+     * - `maxHeight`: Limits the maximum height of the tag editor container.
+     * - `trimInput`: Trims input values before adding them as tags (for date inputs).
+     * - `debug`: Enables or disables debug mode.
+     * - `minWidth`: Ensures a minimum width when used with date/time pickers.
+     */
+    let options = { maxHeight: 120, trimInput: isDateType, clearOnHide: true, debug: false };
+    if (isDateType) {
+      // Ensure the tag container is wider than the date-time picker.
+      options.minWidth = 260;
+    }
+
+    /**
+     * Initializes PicoTagEditor for the current input element.
+     *
+     * @param {HTMLElement} elem - The transformed input element.
+     * @param {HTMLElement} container - The tag editor container.
+     * @param {Object} editor - The PicoTagEditor instance.
+     */
+    let te = new PicoTagEditor(element, options, function (elem, container, editor) /*NOSONAR*/ {
+      if (!isDateType) {
+        return; // No need to initialize a date/time picker for non-date inputs.
       }
 
+      let inpuElement = $(elem);
+
       /**
-       * Initializes PicoTagEditor for the current input element.
-       *
-       * @param {HTMLElement} elem - The transformed input element.
-       * @param {HTMLElement} container - The tag editor container.
-       * @param {Object} editor - The PicoTagEditor instance.
+       * Maps input types to corresponding date/time picker classes.
        */
-      let te = new PicoTagEditor(element, options, function (elem, container, editor) /*NOSONAR*/ {
-          if (!isDateType) {
-              return; // No need to initialize a date/time picker for non-date inputs.
-          }
+      let typeMap = { 'date': 'date', 'time': 'time', 'datetime': 'date-time', 'datetime-local': 'date-time' };
+      let cls = typeMap[inpuElement.attr('type')] || '';
 
-          let inpuElement = $(elem);
+      // Change the input type to text (required for the date/time picker)
+      inpuElement.attr('type', 'text').addClass(`${cls}-picker-multiple pico-tag-edit`);
 
-          /**
-           * Maps input types to corresponding date/time picker classes.
-           */
-          let typeMap = { 'date': 'date', 'time': 'time', 'datetime': 'date-time', 'datetime-local': 'date-time' };
-          let cls = typeMap[inpuElement.attr('type')] || '';
-          
-          // Change the input type to text (required for the date/time picker)
-          inpuElement.attr('type', 'text').addClass(`${cls}-picker-multiple pico-tag-edit`);
+      // Wrap the input element inside a div for better styling
+      inpuElement.wrap(`<div class="input-datetime-wrapper ${cls}"></div>`);
 
-          // Wrap the input element inside a div for better styling
-          inpuElement.wrap(`<div class="input-datetime-wrapper ${cls}"></div>`);
+      // Find the new input element inside the container
+      inpuElement = $(container).find('.pico-tag-edit');
 
-          // Find the new input element inside the container
-          inpuElement = $(container).find('.pico-tag-edit');
+      // Store a reference to the input element in the editor
+      editor.inputElement = inpuElement[0];
 
-          // Store a reference to the input element in the editor
-          editor.inputElement = inpuElement[0];
+      // Retrieve the appropriate DateTimePicker options
+      let dpOptions = getDatePickerOptions(inpuElement, debugDatetimePicker);
+      if (dpOptions) {
+        // Initialize the DateTimePicker with the retrieved options
+        inpuElement.datetimepicker(dpOptions)
+          .on('dp.change', () => inpuElement.datetimepicker('hide')) // Hide on change
+          .on('dp.enter', () => { // Handle "Enter" key event
+            let val = inpuElement.val();
+            if (val.trim() !== '') {
+              editor.addTag(val); // Add entered value as a tag
+              inpuElement.val(''); // Clear input field
+              if (!editor.settings.debug) {
+                editor.waitingForHide(1500);
+              }
+            }
+          });
+      }
 
-          // Retrieve the appropriate DateTimePicker options
-          let dpOptions = getDatePickerOptions(inpuElement, debugDatetimePicker);
-          if (dpOptions) {
-              // Initialize the DateTimePicker with the retrieved options
-              inpuElement.datetimepicker(dpOptions)
-                  .on('dp.change', () => inpuElement.datetimepicker('hide')) // Hide on change
-                  .on('dp.enter', () => { // Handle "Enter" key event
-                      let val = inpuElement.val();
-                      if (val.trim() !== '') {
-                          editor.addTag(val); // Add entered value as a tag
-                          inpuElement.val(''); // Clear input field
-                          if (!editor.settings.debug) {
-                              editor.waitingForHide(1500);
-                          }
-                      }
-                  });
-          }
-
-      });
+    });
   });
 }
 
@@ -477,25 +340,25 @@ function getDatePickerOptions(inpuElement, debug) {
   let options = {};
 
   if (inpuElement.hasClass('date-picker-multiple')) {
-      // Options for date picker
-      options = {
-          minDate: inpuElement.data('mindate') || false,
-          maxDate: inpuElement.data('maxdate') || false,
-          format: 'YYYY-MM-DD',
-          debug
-      };
+    // Options for date picker
+    options = {
+      minDate: inpuElement.data('mindate') || false,
+      maxDate: inpuElement.data('maxdate') || false,
+      format: 'YYYY-MM-DD',
+      debug
+    };
   } else if (inpuElement.hasClass('time-picker-multiple')) {
-      // Options for time picker
-      options = { format: 'HH:mm:ss', debug };
+    // Options for time picker
+    options = { format: 'HH:mm:ss', debug };
   } else if (inpuElement.hasClass('date-time-picker-multiple')) {
-      // Options for date-time picker
-      options = {
-          minDate: inpuElement.data('mindate') || false,
-          maxDate: inpuElement.data('maxdate') || false,
-          format: 'YYYY-MM-DD HH:mm:ss',
-          useCurrent: 'day',
-          debug
-      };
+    // Options for date-time picker
+    options = {
+      minDate: inpuElement.data('mindate') || false,
+      maxDate: inpuElement.data('maxdate') || false,
+      format: 'YYYY-MM-DD HH:mm:ss',
+      useCurrent: 'day',
+      debug
+    };
   }
 
   // Return options if valid, otherwise return null
@@ -639,23 +502,21 @@ function initAjaxSupport() {
           },
           body: formData
         })
-        .then(response => response.text())
-        .then(html => {
-          section.innerHTML = html;
-          const table = section.querySelector('table');
-          if(table)
-          {
-            makeTableSortable(table);
-          }
-          const tbody = section.querySelector('table tbody');
-          if(tbody)
-          {
-          sortDataByDrag(tbody); // reinitialize drag-sort
-          }
-        })
-        .catch(error => {
-          console.error('AJAX form error:', error);
-        });
+          .then(response => response.text())
+          .then(html => {
+            section.innerHTML = html;
+            const table = section.querySelector('table');
+            if (table) {
+              makeTableSortable(table);
+            }
+            const tbody = section.querySelector('table tbody');
+            if (tbody) {
+              sortDataByDrag(tbody); // reinitialize drag-sort
+            }
+          })
+          .catch(error => {
+            console.error('AJAX form error:', error);
+          });
       } else {
         // Submit form using hidden button
         const hiddenSubmit = document.createElement('input');
@@ -689,16 +550,15 @@ function initAjaxSupport() {
   });
 
   // Handle AJAX pagination
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     const dataSection = e.target.closest('.data-section');
     if (!dataSection) return;
     let link = e.target.closest('.pagination-number .page-selector a');
-    if(!link)
-    {
+    if (!link) {
       link = e.target.closest('.order-controll a');
     }
     if (!link) return;
-    
+
     const section = link.closest('.data-section');
     if (!section || section.dataset.ajaxSupport !== "true") return;
 
@@ -706,41 +566,13 @@ function initAjaxSupport() {
 
     const url = link.getAttribute('href');
     lastUrl = url;
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => response.text())
-    .then(html => {
-      section.innerHTML = html;
-      // Push new URL into browser history
-      history.pushState(null, '', url);
-      
-      const table = section.querySelector('table');
-      if(table)
-      {
-        makeTableSortable(table);
-      }
-      const tbody = section.querySelector('table tbody');
-      if (tbody) {
-        sortDataByDrag(tbody);
-      }
-
-      
-      
-    })
-    .catch(error => {
-      console.error('Pagination AJAX error:', error);
-    });
+    fetchUrl(url, section);
   });
 
   // Intercept filter form submission
   const getForm = document.querySelector('.filter-section form');
-  if(getForm)
-  {
-    getForm.addEventListener('submit', function(e) {
+  if (getForm) {
+    getForm.addEventListener('submit', function (e) {
       const page = e.target.closest('.page.page-list');
       const section = page ? page.querySelector('.data-section[data-ajax-support="true"]') : null;
 
@@ -753,7 +585,7 @@ function initAjaxSupport() {
       const needsConfirmation = target.dataset.confirmation === 'true';
 
       const submitForm = () => {
-        
+
         if (isAjax) {
           const formData = new FormData(form);
 
@@ -777,7 +609,7 @@ function initAjaxSupport() {
             hiddenInput.name = target.name;
             hiddenInput.value = target.value;
             form.appendChild(hiddenInput);
-            
+
           }
 
           form.submit();
@@ -804,12 +636,10 @@ function initAjaxSupport() {
 
   const page = document.querySelector('.page.page-list');
   const section = page ? page.querySelector('.data-section[data-ajax-support="true"]') : null;
-  if(section)
-  {
+  if (section) {
     const btn1 = document.querySelector('#show_require_approval_data');
-    if(btn1)
-    {
-      btn1.addEventListener('click', function(e){
+    if (btn1) {
+      btn1.addEventListener('click', function (e) {
         e.preventDefault();
         const formData = new FormData(e.target.form);
         formData.append(e.target.name, e.target.value);
@@ -819,9 +649,8 @@ function initAjaxSupport() {
     }
 
     const btn2 = document.querySelector('#export_data');
-    if(btn2)
-    {
-      btn2.addEventListener('click', function(e){
+    if (btn2) {
+      btn2.addEventListener('click', function (e) {
         e.preventDefault();
         const formData = new FormData(e.target.form);
         formData.append(e.target.name, e.target.value);
@@ -837,28 +666,7 @@ function initAjaxSupport() {
 
     const url = window.location.href;
 
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => response.text())
-    .then(html => {
-      section.innerHTML = html;
-      const table = section.querySelector('table');
-      if(table)
-      {
-        makeTableSortable(table);
-      }
-      const tbody = section.querySelector('table tbody');
-      if (tbody) {
-        sortDataByDrag(tbody);
-      }
-    })
-    .catch(error => {
-      console.error('Failed to reload content on popstate:', error);
-    });
+    fetchUrl(url, section);
   });
 }
 
@@ -867,8 +675,7 @@ function initAjaxSupport() {
  * Initializes multiple select dropdowns using the MultiSelect library.
  * - Allows for selecting multiple options in a dropdown.
  */
-function initMultipleSelect()
-{
+function initMultipleSelect() {
   document.querySelectorAll('select[multiple]').forEach(select => new MultiSelect(select));
 }
 
@@ -877,34 +684,29 @@ function initMultipleSelect()
  * - Adds hidden inputs to the form to reflect the current sort order and column.
  * @param {string} queryString The query string from the current URL.
  */
-function initOrderUrl(queryString)
-{
+function initOrderUrl(queryString) {
   const urlParams = new URLSearchParams(queryString);
   const orderby = urlParams.get('orderby');
   const ordertype = urlParams.get('ordertype');
 
-  if(typeof orderby != 'undefined')
-  {
+  if (typeof orderby != 'undefined') {
     let orderbyInput = $('<input />');
     orderbyInput.attr('type', 'hidden');
     orderbyInput.attr('name', 'orderby');
     orderbyInput.attr('value', orderby);
 
-    if($('form.filter-form [name="orderby"]').length)
-    {
+    if ($('form.filter-form [name="orderby"]').length) {
       $('form.filter-form [name="orderby"]').remove();
     }
     $('form.filter-form').append(orderbyInput);
   }
 
-  if(typeof ordertype != 'undefined')
-  {
+  if (typeof ordertype != 'undefined') {
     let ordertypeInput = $('<input />');
     ordertypeInput.attr('type', 'hidden');
     ordertypeInput.attr('name', 'ordertype');
     ordertypeInput.attr('value', ordertype);
-    if($('form.filter-form [name="ordertype"]').length)
-    {
+    if ($('form.filter-form [name="ordertype"]').length) {
       $('form.filter-form [name="ordertype"]').remove();
     }
     $('form.filter-form').append(ordertypeInput);
@@ -986,8 +788,7 @@ function splitWithTail(str, delimiter, count) {
  */
 function initNotifications(selector, notifications, link, caption) {
   const notificationMenu = document.querySelector(selector);
-  if(typeof notifications.data != 'undefined')
-  {
+  if (typeof notifications.data != 'undefined') {
     notifications.data.forEach(notification => {
       const a = document.createElement('a');
       a.className = 'dropdown-item';
@@ -997,26 +798,22 @@ function initNotifications(selector, notifications, link, caption) {
       notificationMenu.appendChild(a);
     });
     let badge = '';
-    if(notifications.totalData > 99)
-    {
+    if (notifications.totalData > 99) {
       badge = '99+';
     }
-    else if(notifications.totalData > 0 && notifications.totalData <= 99)
-    {
+    else if (notifications.totalData > 0 && notifications.totalData <= 99) {
       badge = notifications.totalData;
     }
     notificationMenu.closest('li.nav-item').setAttribute('data-badge', badge);
 
-    if(notifications.data.length > 0)
-    {
+    if (notifications.data.length > 0) {
       let div = document.createElement('div');
       div.classList.add('menu-separator');
       notificationMenu.appendChild(div);
     }
-    
+
   }
-  else
-  {
+  else {
     notificationMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
 
@@ -1043,8 +840,7 @@ function initNotifications(selector, notifications, link, caption) {
  */
 function initMessages(selector, messages, link, caption) {
   const messageMenu = document.querySelector(selector);
-  if(typeof messages.data != 'undefined')
-  {
+  if (typeof messages.data != 'undefined') {
     messages.data.forEach(message => {
       let a = document.createElement('a');
       a.className = 'dropdown-item';
@@ -1054,29 +850,25 @@ function initMessages(selector, messages, link, caption) {
       messageMenu.appendChild(a);
     });
     let badge = '';
-    if(messages.totalData > 99)
-    {
+    if (messages.totalData > 99) {
       badge = '99+';
     }
-    else if(messages.totalData > 0 && messages.totalData <= 99)
-    {
+    else if (messages.totalData > 0 && messages.totalData <= 99) {
       badge = messages.totalData;
     }
     messageMenu.closest('li.nav-item').setAttribute('data-badge', badge);
 
-    if(messages.data.length > 0)
-    {
+    if (messages.data.length > 0) {
       let div = document.createElement('div');
       div.classList.add('menu-separator');
       messageMenu.appendChild(div);
     }
 
   }
-  else
-  {
+  else {
     messageMenu.closest('li.nav-item').setAttribute('data-badge', '');
   }
-  
+
   let a = document.createElement('a');
   a.className = 'dropdown-item';
   a.href = link;
@@ -1088,39 +880,36 @@ function initMessages(selector, messages, link, caption) {
  * Initializes the page by setting up event listeners for sidebar toggle, dark/light mode toggle, 
  * and initializing other functions like notifications, messages, and form actions.
  */
-function initPage()
-{
+function initPage() {
   // Toggle sidebar visibility
   // Select all elements with the class .toggle-sidebar
   document.querySelectorAll('.toggle-sidebar').forEach(toggleButton => {
     toggleButton.addEventListener('click', () => {
-        let width = document.body.clientWidth;
-        if (width >= 992) {
-            document.body.classList.toggle('sidebar-hidden'); // Hide or show the sidebar for large screens
-        } else {
-            document.body.classList.toggle('sidebar-show'); // Hide or show the sidebar for small screens
-        }
-        let hidden = document.body.classList.contains('sidebar-hidden');
-        window.localStorage.setItem('MagicAppBuilder.sidebarHidden', hidden ? 'true' : 'false');
+      let width = document.body.clientWidth;
+      if (width >= 992) {
+        document.body.classList.toggle('sidebar-hidden'); // Hide or show the sidebar for large screens
+      } else {
+        document.body.classList.toggle('sidebar-show'); // Hide or show the sidebar for small screens
+      }
+      let hidden = document.body.classList.contains('sidebar-hidden');
+      window.localStorage.setItem('MagicAppBuilder.sidebarHidden', hidden ? 'true' : 'false');
     });
   });
 
   // Toggle between light and dark modes
   document.querySelector('.toggle-mode').addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode'); // Switch to dark mode
-      document.body.classList.toggle('light-mode'); // Switch to light mode
-      let colorMode = '';
-      if(document.body.classList.contains('dark-mode'))
-      {
-        colorMode = 'dark-mode';
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', themeDark);
-      }
-      else
-      {
-        colorMode = 'light-mode';
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', themeLight);
-      }
-      window.localStorage.setItem('MagicAppBuilder.colorMode', colorMode);
+    document.body.classList.toggle('dark-mode'); // Switch to dark mode
+    document.body.classList.toggle('light-mode'); // Switch to light mode
+    let colorMode = '';
+    if (document.body.classList.contains('dark-mode')) {
+      colorMode = 'dark-mode';
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', themeDark);
+    }
+    else {
+      colorMode = 'light-mode';
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', themeLight);
+    }
+    window.localStorage.setItem('MagicAppBuilder.colorMode', colorMode);
   });
 }
 
@@ -1146,9 +935,9 @@ function camelToSnake(str) {
  * @param {string} formSelector - A CSS selector string used to identify the form element.
  */
 function restoreFormData(formData, errorField, formSelector) {
-    document.addEventListener('DOMContentLoaded', () => {
-      doRestoreFormData(formData, errorField, formSelector);
-    });
+  document.addEventListener('DOMContentLoaded', () => {
+    doRestoreFormData(formData, errorField, formSelector);
+  });
 }
 
 /**
@@ -1162,47 +951,47 @@ function restoreFormData(formData, errorField, formSelector) {
  * @param {string} formSelector - CSS selector pointing to the target form.
  */
 function doRestoreFormData(formData, errorField, formSelector) {
-    const form = document.querySelector(formSelector);
-    if (!form) {
-        console.warn("Form not found:", formSelector);
-        return;
-    }
+  const form = document.querySelector(formSelector);
+  if (!form) {
+    console.warn("Form not found:", formSelector);
+    return;
+  }
 
-    errorField = camelToSnake(errorField);
+  errorField = camelToSnake(errorField);
 
-    for (let [camelName, value] of Object.entries(formData)) {
-        const name = camelToSnake(camelName);
-        const elements = form.querySelectorAll(`[name="${name}"]`);
+  for (let [camelName, value] of Object.entries(formData)) {
+    const name = camelToSnake(camelName);
+    const elements = form.querySelectorAll(`[name="${name}"]`);
 
-        elements.forEach(element => {
-            const type = element.type;
+    elements.forEach(element => {
+      const type = element.type;
 
-            if (type === 'checkbox') {
-                element.checked = Array.isArray(value)
-                    ? value.includes(element.value)
-                    : Boolean(value);
-            } else if (type === 'radio') {
-                element.checked = element.value === value;
-            } else if (element.tagName === 'SELECT') {
-                Array.from(element.options).forEach(option => {
-                    option.selected = Array.isArray(value)
-                        ? value.includes(option.value)
-                        : option.value === value;
-                });
-            } else {
-                element.value = value;
-            }
-
-            // Highlight error field
-            if (name === errorField) {
-                element.classList.add('is-invalid');
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                element.focus();
-            } else {
-                element.classList.remove('is-invalid');
-            }
+      if (type === 'checkbox') {
+        element.checked = Array.isArray(value)
+          ? value.includes(element.value)
+          : Boolean(value);
+      } else if (type === 'radio') {
+        element.checked = element.value === value;
+      } else if (element.tagName === 'SELECT') {
+        Array.from(element.options).forEach(option => {
+          option.selected = Array.isArray(value)
+            ? value.includes(option.value)
+            : option.value === value;
         });
-    }
+      } else {
+        element.value = value;
+      }
+
+      // Highlight error field
+      if (name === errorField) {
+        element.classList.add('is-invalid');
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+      } else {
+        element.classList.remove('is-invalid');
+      }
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

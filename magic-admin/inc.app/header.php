@@ -22,6 +22,7 @@ use MagicObject\SecretObject;
     <script src="vendors/moment/min/moment.min.js"></script>
     <script src="vendors/datetime-picker/bootstrap-datetimepicker.min.js"></script>
     <script src="vendors/sortable/Sortable.min.js"></script>
+    <script src="js/UrlSorter.min.js"></script>
     <script src="js/custom.min.js"></script>
 
 </head>
