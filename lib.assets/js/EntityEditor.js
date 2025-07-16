@@ -2921,7 +2921,6 @@ class EntityEditor {
                 val = val.trim(); // NOSONAR
             }
 
-
             if (/^0\d+/.test(val)) {
                 isInt = false;
                 isFloat = false;
@@ -3027,6 +3026,15 @@ class EntityEditor {
         document.querySelector(this.selector + " .import-file-sql").click();
     }
 
+    /**
+     * Triggers the import action for spreadsheet data (Excel/CSV)
+     * by simulating a click on the file input element associated with sheet import.
+     * 
+     * This method sets `clearBeforeImport` to `true`, meaning existing data
+     * in the editor will be cleared before importing the new spreadsheet content.
+     * It uses the `selector` property to locate the appropriate DOM element
+     * and programmatically triggers a click.
+     */
     importSheet() {
         this.clearBeforeImport = true;
         document.querySelector(this.selector + " .import-file-sheet").click();
@@ -3326,7 +3334,6 @@ class EntityEditor {
         document.querySelector('[name="primary_key_length"]').value = _this.primaryKeyDataLength;
         document.querySelector('[name="column_type"]').value = _this.defaultDataType;
         document.querySelector('[name="column_length"]').value = _this.defaultDataLength;
-
     }
 
     /**
@@ -3431,7 +3438,6 @@ class EntityEditor {
         });
 
         thead.appendChild(headRow);
-        
 
         data.forEach((row, rowIndex) => {
             const tr = document.createElement('tr');
@@ -3459,8 +3465,6 @@ class EntityEditor {
                tbody.removeChild(tr);
             });
         });
-
-        
     }
     
     /**
@@ -3491,6 +3495,19 @@ class EntityEditor {
         return td;
     }
     
+    /**
+     * Creates a `<td>` element containing an editable `<input>` element
+     * for a specific entity data cell within the Entity Editor table.
+     * 
+     * The input is configured with metadata such as row index, column name,
+     * and data type for later reference and data extraction.
+     *
+     * @param {number} rowIndex - The zero-based row index in the data table.
+     * @param {number} colIndex - The zero-based column index in the data table.
+     * @param {Object} col - The column definition object (must contain `name` and `type`).
+     * @param {string} [value=""] - Optional initial value for the input field.
+     * @returns {HTMLTableCellElement} The generated `<td>` element containing the input.
+     */
     exportData() {
         let columns = [];
         let data = [];
@@ -3554,6 +3571,15 @@ class EntityEditor {
         console.log("Data exported as JSON:", content); // For debugging
     }
     
+    /**
+     * Collects the current entity data from the table and exports it as a downloadable JSON file.
+     *
+     * This function reads column headers from the `<thead>` and input values from the `<tbody>`,
+     * then constructs a structured JSON object containing both column names and row data.
+     * 
+     * The result is automatically downloaded as a `entity_data.json` file.
+     * Useful for backing up, sharing, or re-importing entity definitions.
+     */
     clearData()
     {
         this.showConfirmationDialog(
@@ -3626,7 +3652,6 @@ class EntityEditor {
 
         return row; // Return the created row for potential further manipulation
     }
-
     
     /**
      * Saves the current editable data from the entity data table
