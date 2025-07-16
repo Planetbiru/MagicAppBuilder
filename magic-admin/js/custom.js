@@ -133,6 +133,66 @@ class UrlSorter {
         return finalUrl;
     }
 }
+/**
+ * Builds a URL with query parameters from a form and its FormData.
+ *
+ * @param {HTMLFormElement} form - The form element containing the base URL (via `action` attribute).
+ * @param {FormData} formData - The FormData object containing key-value pairs to append to the URL.
+ * @returns {string} A complete URL with query parameters.
+ */
+function getFormUrl(form, formData)
+{
+  const params = new URLSearchParams();
+  for (const [key, value] of formData.entries()) {
+    params.append(key, value);
+  }
+
+  const baseUrl = form.getAttribute('action') || window.location.pathname;
+  return `${baseUrl}?${params.toString()}`;
+}
+
+/**
+ * Performs a GET request via AJAX to the specified URL and updates the content of a given section.
+ *
+ * This function:
+ * - Fetches HTML content from the URL.
+ * - Replaces the inner HTML of the target section.
+ * - Updates the browser's URL using `history.pushState`.
+ * - Initializes sortable table behavior if a table is found.
+ *
+ * @param {string} url - The URL to fetch content from.
+ * @param {HTMLElement} section - The DOM element to be updated with the response HTML.
+ */
+function fetchUrl(url, section)
+{
+  fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.text())
+  .then(html => {
+    section.innerHTML = html;
+
+    // Update browser URL without reload
+    history.pushState(null, '', url);
+
+    // Re-initialize sorting features if needed
+    const table = section.querySelector('table');
+    if (table) {
+      makeTableSortable(table);
+    }
+
+    const tbody = section.querySelector('table tbody');
+    if (tbody) {
+      sortDataByDrag(tbody);
+    }
+  })
+  .catch(error => {
+    console.error('AJAX form error:', error);
+  });
+}
 
 
 /**
@@ -256,7 +316,6 @@ function makeTableSortable(thisTable) {
                 let link = thisCel.querySelector('a');
                 if (link) {
                     link.href = sorter.buildRelativeUrl();
-                    console.log(link.href);
                 }
             }
         });
@@ -682,7 +741,9 @@ function initAjaxSupport() {
   if(getForm)
   {
     getForm.addEventListener('submit', function(e) {
-      const section = e.target.closest('.page.page-list').querySelector('.data-section[data-ajax-support="true"]');
+      const page = e.target.closest('.page.page-list');
+      const section = page ? page.querySelector('.data-section[data-ajax-support="true"]') : null;
+
       if (!section) return;
       const target = e.target;
       const form = target.closest('form');
@@ -692,6 +753,7 @@ function initAjaxSupport() {
       const needsConfirmation = target.dataset.confirmation === 'true';
 
       const submitForm = () => {
+        
         if (isAjax) {
           const formData = new FormData(form);
 
@@ -706,32 +768,7 @@ function initAjaxSupport() {
 
           const url = `${window.location.pathname}?${params.toString()}`;
 
-          fetch(url, {
-            method: 'GET',
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          })
-          .then(response => response.text())
-          .then(html => {
-            section.innerHTML = html;
-            // Update browser URL without reload
-            history.pushState(null, '', url);
-            const table = section.querySelector('table');
-            if(table)
-            {
-              makeTableSortable(table);
-            }
-            const tbody = section.querySelector('table tbody');
-            if(tbody)
-            {
-              sortDataByDrag(tbody);
-            }
-            
-          })
-          .catch(error => {
-            console.error('AJAX form error:', error);
-          });
+          fetchUrl(url, section);
 
         } else {
           if (target.name && !form.querySelector(`input[name="${target.name}"]`)) {
@@ -763,6 +800,34 @@ function initAjaxSupport() {
         submitForm();
       }
     });
+  }
+
+  const page = document.querySelector('.page.page-list');
+  const section = page ? page.querySelector('.data-section[data-ajax-support="true"]') : null;
+  if(section)
+  {
+    const btn1 = document.querySelector('#show_require_approval_data');
+    if(btn1)
+    {
+      btn1.addEventListener('click', function(e){
+        e.preventDefault();
+        const formData = new FormData(e.target.form);
+        formData.append(e.target.name, e.target.value);
+        let url = getFormUrl(e.target.form, formData);
+        fetchUrl(url, section);
+      });
+    }
+
+    const btn2 = document.querySelector('#export_data');
+    if(btn2)
+    {
+      btn2.addEventListener('click', function(e){
+        e.preventDefault();
+        const formData = new FormData(e.target.form);
+        formData.append(e.target.name, e.target.value);
+        window.location = getFormUrl(e.target.form, formData);
+      });
+    }
   }
 
   // Handle back/forward navigation with AJAX
