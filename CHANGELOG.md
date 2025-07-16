@@ -1659,9 +1659,9 @@ Furthermore, we've fixed an issue with **column type inference** during data imp
 Lastly, we've resolved a bug causing **NaN (Not a Number) width values** in the entity renderer, ensuring proper display and layout of entities.
 
 
-# MagicAppBuilder Version 1.12.1
+# MagicAppBuilder Version 1.13.0
 
-Version 1.12.1 brings an exciting productivity enhancement that makes defining new entities faster and more intuitive, especially when working with existing table data from other sources.
+Version 1.13.0 brings an exciting productivity enhancement that makes defining new entities faster and more intuitive — especially when working with existing table data from other sources.
 
 ## What's New
 
@@ -1681,5 +1681,21 @@ This feature drastically improves speed during prototyping and data modeling. It
 * Copying small datasets from spreadsheets or reports into your application.
 * Reusing structured data from external tools and websites.
 
-Combined with the **Entity Data Export/Import** feature from version 1.12.0, this gives you a complete, frictionless workflow for working with external tabular data.
+Combined with the **Entity Data Export/Import** feature introduced in version 1.12.0, this offers a complete, frictionless workflow for managing external tabular data.
+
+## Improvements
+
+### Improved Snake Case Conversion During Data Import
+
+We've improved how column names are converted to `snake_case` when importing data from **Excel**, **CSV**, **SQLite Binary Files**, or **SQL**:
+
+* Before applying the snake case transformation, MagicAppBuilder now performs an **uppercase-word normalization step**.
+* This prevents unwanted results when working with abbreviations or acronyms.
+
+For example:
+
+* `"GPIO"` is now correctly converted to `gpio` instead of `g_p_i_o`.
+* `"DeviceID"` becomes `device_id` as expected.
+
+This enhancement ensures cleaner, more predictable column names during schema generation — especially when dealing with technical or acronym-heavy datasets.
 

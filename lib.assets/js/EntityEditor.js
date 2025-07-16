@@ -2919,12 +2919,15 @@ class EntityEditor {
     }
     
     /**
-     * Converts a string into snake_case format, trimming any leading or trailing underscores.
-     * This function handles spaces, non-alphanumeric characters, and conversions from camelCase or PascalCase.
-     * It also replaces multiple consecutive underscores with a single underscore.
+     * Converts a string to snake_case format by first transforming it to Ucwords,
+     * then applying snake_case rules. Trims leading/trailing underscores and 
+     * collapses multiple underscores.
+     *
+     * This function ensures that input like camelCase, PascalCase, or messy strings
+     * with special characters and inconsistent spacing are normalized first.
      *
      * @param {string} header - The input string to be converted.
-     * @returns {string} The string in snake_case format, with leading/trailing underscores removed and multiple underscores collapsed.
+     * @returns {string} The snake_case version of the input string.
      *
      * @example
      * snakeize("   This Is A Header   ");        // Returns "this_is_a_header"
@@ -2932,17 +2935,24 @@ class EntityEditor {
      * snakeize("_User ID_");                     // Returns "user_id"
      * snakeize("HeaderTitleExample");            // Returns "header_title_example"
      * snakeize("anotherTestString__");           // Returns "another_test_string"
-     * snakeize(" _with!Special@Chars#_   ");    // Returns "with_special_chars"
+     * snakeize(" _with!Special@Chars#_   ");     // Returns "with_special_chars"
      * snakeize("multiple___underscores");        // Returns "multiple_underscores"
      */
     snakeize(header) {
-        let name = header
-            .replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1_$2") // Handles camelCase/PascalCase conversion
-            .replace(/\s+/g, "_") // Replaces spaces with underscores
-            .replace(/[^\w]/g, "") // Removes non-alphanumeric characters (excluding underscores)
-            .toLowerCase() // Converts everything to lowercase
-            .replace(/^_+|_+$/g, "") // NOSONAR // Trims leading/trailing underscores
-            .replace(/__+/g, "_"); // Replaces multiple underscores with a single one
+        // Step 1: Convert to Ucwords to normalize word boundaries
+        let ucwords = header
+            .replace(/[_\-]+/g, ' ')         // NOSONAR // Replace underscores/dashes with space
+            .replace(/([a-z])([A-Z])/g, '$1 $2') // Insert space before uppercase letters (camelCase)
+            .replace(/[^a-zA-Z0-9 ]+/g, '')  // Remove non-alphanumeric characters (except space)
+            .toLowerCase()
+            .replace(/\b\w/g, c => c.toUpperCase()); // Ucwords: capitalize first letter of each word
+
+        // Step 2: Convert to snake_case
+        let name = ucwords
+            .replace(/\s+/g, "_")           // Replace spaces with underscores
+            .toLowerCase()                  // Convert all to lowercase
+            .replace(/^_+|_+$/g, "")        // NOSONAR // Trim leading/trailing underscores
+            .replace(/__+/g, "_");          // Replace multiple underscores with one
 
         return name;
     }
