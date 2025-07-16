@@ -362,7 +362,7 @@ if($inputGet->getTrashEntity() != "")
 						<?php
 						}
 						?>
-						<?php if($userPermission->isAllowedRestore()){ ?>
+						<?php if($userPermission->isAllowedDelete()){ ?>
 						<button type="submit" class="btn btn-danger" name="user_action" id="delete_selected" value="delete" data-confirmation="true"  data-onclik-title="<?php echo htmlspecialchars($appLanguage->getTitleDeletePermanentConfirmation());?>" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeletePermanentConfirmation());?>"><?php echo $appLanguage->getButtonDeletePermanent();?></button>
 						<?php
 						}
