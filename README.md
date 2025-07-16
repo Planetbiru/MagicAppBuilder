@@ -475,6 +475,12 @@ composer dump-autoload --ignore-platform-reqs
 | SQLite                  | Development & Production |
 | SQL Server              | Production only          |
 
+## MagicServer
+
+MagicServer is a lightweight and portable server package that includes Apache, PHP, and MariaDB (MySQL-compatible), pre-configured to run MagicAppBuilder smoothly on Windows systems.
+
+To download MagicServer, follow link https://github.com/Planetbiru/MagicServer
+
 
 ## Conclusion
 
