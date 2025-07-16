@@ -60,7 +60,7 @@ function fixValue($original)
         'Button Login' => 'Login',
         'Button Restore' => 'Restore',
         'Label Option Select One Or Leave It Blank' => 'Select One or Leave It Blank',
-        'Label Option Select One' => 'Option Select One',
+        'Label Option Select One' => 'Select One',
         'Label Option Show All' => 'Show All',
         'Label Option Root Menu' => 'Root Menu',
         'Label Option Show Waiting Approval Only' => 'Show Waiting Approval Only',
