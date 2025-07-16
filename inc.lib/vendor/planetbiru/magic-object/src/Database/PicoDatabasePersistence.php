@@ -9,6 +9,7 @@ use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\Exceptions\EntityException;
 use MagicObject\Exceptions\InvalidAnnotationException;
 use MagicObject\Exceptions\InvalidFilterException;
+use MagicObject\Exceptions\InvalidParameterException;
 use MagicObject\Exceptions\NoInsertableColumnException;
 use MagicObject\Exceptions\NoColumnMatchException;
 use MagicObject\Exceptions\NoDatabaseConnectionException;
@@ -2916,6 +2917,65 @@ class PicoDatabasePersistence // NOSONAR
         {
             throw new DataRetrievalException($e->getMessage());
         }
+    }
+
+    /**
+     * Deletes a database record based on its primary key value(s).
+     *
+     * This method constructs and executes a DELETE SQL query to remove a record 
+     * that matches the given primary key value(s). It returns the number of affected rows.
+     * If an exception occurs during execution, the method returns 0.
+     *
+     * @param mixed $propertyValues The primary key value or an associative array of key-value pairs.
+     *                              - If the table has a single-column primary key, this can be a scalar.
+     *                              - If the table has a composite primary key, this must be an associative array.
+     * @return int The number of deleted records (0 or 1 typically).
+     */
+    public function deleteByPrimaryKey($propertyValues)
+    {
+        try
+        {
+            $sqlQuery = $this->deleteByPrimaryKeyQuery($propertyValues);
+            $stmt = $this->database->executeQuery($sqlQuery);
+            return $stmt->rowCount();
+        }
+        catch(Exception $e)
+        {
+            return 0;
+        }
+    }
+
+    /**
+     * Builds a DELETE SQL query to remove a record based on primary key value(s).
+     *
+     * This method uses the internal table metadata to determine the primary key columns
+     * and creates a `WHERE` clause that matches all key(s).
+     *
+     * @param mixed $propertyValues The primary key value or an associative array of key-value pairs.
+     *                              - For a single-column primary key: scalar value.
+     *                              - For composite key: associative array like ['id' => 5, 'lang' => 'en'].
+     * @return PicoDatabaseQueryBuilder The prepared query builder with the DELETE SQL query.
+     * @throws InvalidParameterException If the primary key values are invalid or missing.
+     */
+    public function deleteByPrimaryKeyQuery($propertyValues)
+    {
+        // Convert to array if necessary
+        $propertyValues = $this->toArray($propertyValues);
+        $info = $this->getTableInfo();
+        $primaryKeys = $info->getPrimaryKeys();
+
+        if ($this->isValidPrimaryKeyValues($primaryKeys, $propertyValues))
+        {
+            $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
+            $where = $this->createWhereByPrimaryKeys($queryBuilder, $primaryKeys, $propertyValues);
+            return $queryBuilder
+                ->newQuery()
+                ->delete()
+                ->from($info->getTableName())
+                ->where($where);
+        }
+
+        throw new InvalidParameterException("Invalid or missing primary key values.");
     }
     
     /**
