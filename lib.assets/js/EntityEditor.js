@@ -2701,6 +2701,33 @@ class EntityEditor {
     }
 
     /**
+     * Triggers the manual import of clipboard data.
+     * This method is intended to be called from UI elements (e.g., a button)
+     * and delegates the actual clipboard reading to `importFromClipboardManually`.
+     */
+    triggerImportFromClipboard() {
+        this.importFromClipboardManually();
+    }
+
+    /**
+     * Reads plain text from the user's clipboard using the Clipboard API,
+     * then passes the content to `importFromClipboard()` for processing.
+     * 
+     * This method must be called in response to a user interaction
+     * (e.g., button click) due to browser security restrictions.
+     * 
+     * If clipboard access is denied or fails, an error is logged.
+     */
+    async importFromClipboardManually() {
+        try {
+            const text = await navigator.clipboard.readText();
+            this.importFromClipboard(text);
+        } catch (err) {
+            console.error('Failed to read clipboard: ', err);
+        }
+    }
+
+    /**
      * Imports table data from the clipboard.
      * Parses the clipboard text, generates columns from headers and data,
      * and initializes a new entity with that data.
