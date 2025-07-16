@@ -1721,3 +1721,12 @@ This change maintains clarity while keeping the UI clean and space-efficient.
 
 Improved the **phrasing and word choice** across multiple confirmation dialogs and messages throughout the application to ensure greater clarity and consistency. These changes enhance the overall user experience, especially in multilingual environments.
 
+## Dependency Update
+
+### MagicObject Library
+
+MagicAppBuilder now includes MagicObject **version 3.16.0**, which brings several improvements and bug fixes:
+
+* **New:** `deleteRecordByPrimaryKey($primaryKeyValue)` method for deleting records using primary or composite keys.
+* **Fix:** Session handler compatibility with **Redis**, ensuring reliable session persistence when using `session.save_handler = redis`.
+
