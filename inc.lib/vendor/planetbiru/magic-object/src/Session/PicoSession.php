@@ -3,6 +3,7 @@
 namespace MagicObject\Session;
 
 use MagicObject\SecretObject;
+use stdClass;
 
 /**
  * Class PicoSession
@@ -61,20 +62,45 @@ class PicoSession
             $this->setSessionMaxLifeTime($sessConf->getMaxLifeTime());
         }
         if ($sessConf && $sessConf->getSaveHandler() == "redis") {
-            $path = $sessConf->getSavePath();
-            $parsed = parse_url($path);            
-            $host = isset($parsed['host']) ? $parsed['host'] : '';
-            $port = isset($parsed['port']) ? $parsed['port'] : 0;
-            $auth = null;
-            if(isset($parsed['query']))
-            {
-                parse_str($parsed['query'], $parsedStr); 
-                $auth = isset($parsedStr['auth']) ? $parsedStr['auth'] : null;
-            }
-            $this->saveToRedis($host, $port, $auth);
+            $redisParams = $this->getRedisParams($sessConf);
+            $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth);
         } elseif ($sessConf && $sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
             $this->saveToFiles($sessConf->getSavePath());
         }
+    }
+
+    /**
+     * Extracts Redis connection parameters from a session configuration object.
+     *
+     * Parses the Redis save path (in URL format) from the given SecretObject instance
+     * and returns an object containing the host, port, and optional authentication token.
+     *
+     * Example save path format: redis://localhost:6379?auth=yourpassword
+     *
+     * @param SecretObject $sessConf Session configuration object containing the Redis save path.
+     * @return stdClass An object with properties: `host` (string), `port` (int), and `auth` (string|null).
+     */
+    private function getRedisParams($sessConf)
+    {
+        $path = $sessConf->getSavePath();
+        $parsed = parse_url($path);            
+        $host = isset($parsed['host']) ? $parsed['host'] : '';
+        $port = isset($parsed['port']) ? $parsed['port'] : 0;
+        $auth = null;
+        if(isset($parsed['query']))
+        {
+            parse_str($parsed['query'], $parsedStr); 
+            $auth = isset($parsedStr['auth']) ? $parsedStr['auth'] : null;
+        }
+        if(!empty($host) && $port == 0)
+        {
+            $port = 6379; // Use default port
+        }
+        $params = new stdClass;
+        $params->host = $host;
+        $params->port = $port;
+        $params->auth = $auth;
+        return $params;
     }
 
     /**
@@ -319,18 +345,26 @@ class PicoSession
     }
 
     /**
-     * Saves the session to Redis.
+     * Configures PHP session storage to use Redis.
      *
-     * This method configures the session to be stored in Redis.
+     * This method sets the session handler and save path so that session data
+     * is stored in a Redis server. It supports optional authentication.
      *
-     * @param string $host Redis host.
-     * @param int $port Redis port.
-     * @param string $auth Redis authentication.
-     * @return self Returns the current instance for method chaining.
+     * @param string      $host Redis server hostname or IP address.
+     * @param int         $port Redis server port number.
+     * @param string|null $auth Optional authentication password for Redis.
+     * @return self Returns the current instance to allow method chaining.
      */
-    public function saveToRedis($host, $port, $auth)
+    public function saveToRedis($host, $port, $auth = null)
     {
-        $path = sprintf("tcp://%s:%d?auth=%s", $host, $port, $auth);
+        if(isset($auth))
+        {
+            $path = sprintf("tcp://%s:%d?auth=%s", $host, $port, $auth);
+        }
+        else
+        {
+            $path = sprintf("tcp://%s:%d", $host, $port);
+        }
         ini_set("session.save_handler", "redis");
         ini_set("session.save_path", $path);
         return $this;

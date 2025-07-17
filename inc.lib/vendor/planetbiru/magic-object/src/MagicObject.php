@@ -2056,15 +2056,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     private function countDataCustom($persist, $specification, $pageable, $sortable, $findOption, $result)
     {
-        if($this->_database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
-        {
-            $match = isset($result) && is_array($result) ? count($result) : 1;
-        }
-        else
-        {
-            $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
-        }
-        return $match;
+        return $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
     }
 
     /**
@@ -2081,27 +2073,7 @@ class MagicObject extends stdClass // NOSONAR
      */
     private function countDataCustomWithPagable($persist, $specification, $pageable, $sortable, $findOption, $result)
     {
-        if($this->_database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
-        {
-            if($findOption & self::FIND_OPTION_NO_FETCH_DATA)
-            {
-                $match = $pageable->getPage()->getOffset() + $pageable->getPage()->getPageSize() + 1;
-            }
-            else
-            {
-                $resultCount = count($result);
-                if($resultCount == $pageable->getPage()->getPageSize())
-                {
-                    $resultCount++;
-                }
-                $match = $pageable->getPage()->getOffset() + $resultCount;
-            }
-        }
-        else
-        {
-            $match = $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
-        }
-        return $match;
+        return $this->countData($persist, $specification, $pageable, $sortable, $findOption, $result);
     }
 
     /**

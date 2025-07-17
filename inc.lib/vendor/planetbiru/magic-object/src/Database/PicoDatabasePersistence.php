@@ -2773,108 +2773,93 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
-     * Count the total number of records without filters
+     * Count the total number of records based on a specification.
      *
-     * @param PicoSpecification|null $specification  Specification to filter results
-     * @param PicoPageable|null $pageable            Pageable information for pagination
-     * @param PicoSortable|null $sortable             Sort order for the results
-     * @return int                                   The count of records
-     * @throws DataRetrievalException If there is an error in data retrieval
+     * This function builds and executes a COUNT query. It's more reliable than
+     * using PDO's rowCount() which may not work consistently for SELECT statements.
+     *
+     * @param PicoSpecification|null $specification Specification to filter results.
+     * @return int The total count of records.
+     * @throws DataRetrievalException If there is an error during data retrieval.
      */
-    public function countAll($specification = null, $pageable = null, $sortable = null)
+    public function countAll($specification = null)
     {
-        $info = $this->getTableInfo();
-        $primaryKeys = array_values($info->getPrimaryKeys());
-        $agg = "*";
-        if(is_array($primaryKeys) && isset($primaryKeys[0][self::KEY_NAME]))
-        {
-            // it will be faster than asterisk
-            $agg = $primaryKeys[0][self::KEY_NAME];
-        }
-        $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
-        $sqlQuery = $queryBuilder
-            ->newQuery()
-            ->select($this->getAllColumns($info))
-            ->from($info->getTableName())
-        ;
-        if($specification != null && $specification instanceof PicoSpecification)
-        {
-            if($this->isRequireJoin($specification, $pageable, $sortable, $info))
-            {
-                $sqlQuery = $this->addJoinQuery($sqlQuery, $info);
-            }
-            $sqlQuery = $this->setSpecification($sqlQuery, $specification, $info);
-        }
-        else
-        {
+        try {
+            $info = $this->getTableInfo();
+
+            // Use the primary key for COUNT for better performance,
+            // otherwise, default to '*' as a fallback.
+            $primaryKeys = array_values($info->getPrimaryKeys());
+            $agg = isset($primaryKeys[0][self::KEY_NAME]) ? $primaryKeys[0][self::KEY_NAME] : '*';
+
+            $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
             $sqlQuery = $queryBuilder
                 ->newQuery()
-                ->select($agg)
-                ->from($info->getTableName())
-            ;
-        }
-        try
-        {
+                ->select("COUNT($agg) AS total")
+                ->from($info->getTableName());
+
+            // Add joins if the specification requires them.
+            // Pageable and sortable parameters are irrelevant for a count query.
+            if ($specification != null && $specification instanceof PicoSpecification) {
+                if ($this->isRequireJoin($specification, null, null, $info)) {
+                    $sqlQuery = $this->addJoinQuery($sqlQuery, $info);
+                }
+                $sqlQuery = $this->setSpecification($sqlQuery, $specification, $info);
+            }
+
+            // Execute the query and fetch the result.
             $stmt = $this->database->executeQuery($sqlQuery);
-            return $stmt->rowCount();
-        }
-        catch(Exception $e)
-        {
-            throw new DataRetrievalException($e->getMessage());
+            $result = $stmt->fetch();
+
+            // Return the count. 
+            // return 0 if the result is empty.
+            return (int) (isset($result['total']) ? $result['total'] : 0);
+
+        } catch (Exception $e) {
+            // Wrap the original exception with a more descriptive message.
+            throw new DataRetrievalException("Failed to count records: " . $e->getMessage(), 0, $e);
         }
     }
     
     /**
      * Count records based on specified criteria.
      *
-     * @param string $propertyName   The property name to filter by.
-     * @param mixed $propertyValue   The value of the property to filter by.
-     * @return int                   The count of matched records.
-     * @throws EntityException|InvalidFilterException|PDOException|DataRetrievalException If an error occurs.
+     * @param string $propertyName The property name to filter by.
+     * @param mixed $propertyValue The value of the property to filter by.
+     * @return int The count of matched records.
+     * @throws InvalidFilterException|DataRetrievalException If an error occurs.
      */
     public function countBy($propertyName, $propertyValue)
     {
-        $info = $this->getTableInfo();
-        $primaryKeys = array_values($info->getPrimaryKeys());
-        $agg = !empty($primaryKeys) ? $primaryKeys[0][self::KEY_NAME] : "*"; // Use primary key if available
-
-        $where = $this->createWhereFromArgs($info, $propertyName, $propertyValue);
-        
-        if (!$this->isValidFilter($where)) {
-            throw new InvalidFilterException(self::MESSAGE_INVALID_FILTER);
-        }
-
-        $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
-        $sqlQuery = $queryBuilder
-            ->newQuery()
-            ->select($this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE ? $agg : "COUNT(*) as total")
-            ->from($info->getTableName())
-            ->where($where);
-        $count = 0;
         try {
-            $stmt = $this->database->executeQuery($sqlQuery);
-            if ($stmt) {
-                if($this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
-                {
-                    $data = $stmt->fetchColumn();
-                    if($data === false)
-                    {
-                        // SQLite database
-                        $count = 0;
-                    }
-                    else
-                    {
-                        $count = 1;
-                    }
-                } 
-                else
-                {
-                    $count = $stmt->fetchColumn();
-                }
+            $info = $this->getTableInfo();
+            
+            $where = $this->createWhereFromArgs($info, $propertyName, $propertyValue);
+
+            if (!$this->isValidFilter($where)) {
+                throw new InvalidFilterException("Invalid filter expression provided.");
             }
-            return $count;
+
+            $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
+            
+            // Use a standard COUNT query that is compatible with all supported databases.
+            $sqlQuery = $queryBuilder
+                ->newQuery()
+                ->select("COUNT(*) AS total")
+                ->from($info->getTableName())
+                ->where($where);
+
+            // Execute the query and fetch the single result row.
+            $stmt = $this->database->executeQuery($sqlQuery);
+            $result = $stmt->fetch();
+
+            // Return the count. 
+            // return 0 if the result is empty.
+            return (int) (isset($result['total']) ? $result['total'] : 0);
+            
         } catch (Exception $e) {
-            throw new DataRetrievalException($e->getMessage());
+            // Wrap the original exception with a more descriptive message.
+            throw new DataRetrievalException("Failed to count records by property: " . $e->getMessage(), 0, $e);
         }
     }
     
