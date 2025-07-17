@@ -1089,22 +1089,30 @@ Now, default values are accurately converted to `TRUE` or `FALSE` based on their
 Berikut adalah versi yang sudah diperbarui untuk catatan rilis MagicObject v3.16.0:
 
 
-## MagicObject Version 3.16.0
+# MagicObject Version 3.16.0
 
-### Features
+## Features
 
-#### Add: `deleteRecordByPrimaryKey` Method
+### Add: `deleteRecordByPrimaryKey` Method
 
 Added a new method `deleteRecordByPrimaryKey($primaryKeyValue)` to allow deleting a database record by its primary key, including support for composite keys.
 
 This method ensures the database connection is active and delegates deletion to the persistence layer.
 
 
-### Bug Fixes
+## Bug Fixes
 
-#### Fix: Session Handling with Redis
+### Fix: Session Handling with Redis
 
 Resolved a compatibility issue when using Redis as the PHP session handler. Previously, sessions could fail to initialize or persist correctly under certain configurations.
 
 Now, session storage works reliably with `session.save_handler = redis`, ensuring better support for scalable session storage backends.
+
+
+# MagicObject Version 3.16.1
+
+## Bug Fixes
+
+* **`MagicObject::countAll()` and `MagicObject::countBy()`**: Fixed a bug where the counting methods did not function correctly with **SQLite** databases. These fixes ensure consistent counting functionality across all database types.
+
 
