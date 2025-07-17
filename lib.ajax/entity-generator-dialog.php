@@ -53,8 +53,9 @@ try {
                                             $selected = "";
                                             if ($table['table_name'] == $currentTableName) {
                                                 $selected = " selected";
+                                                $primaryKey = isset($table['primary_key'][0]) ? $table['primary_key'][0] : '';
                                             }
-                                            $primaryKey = isset($table['primary_key'][0]) ? $table['primary_key'][0] : '';
+                                            
                                             
                                             ?>
                                             <option value="<?php echo $table['table_name']; ?>"
