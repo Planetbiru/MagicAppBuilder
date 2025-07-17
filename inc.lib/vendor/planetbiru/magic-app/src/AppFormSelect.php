@@ -200,7 +200,7 @@ class AppFormSelect
         }
         if(isset($groupColumnValue))
         {
-            if(!isset($groupColumnValue) || empty($groupColumnValue))
+            if(!isset($groupColumnLabel) || empty($groupColumnLabel))
             {
                 $groupColumnLabel = $groupColumnValue;
             }
