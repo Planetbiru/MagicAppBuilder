@@ -378,7 +378,7 @@ body {
 
 .tabs-link-container {
   position: relative;
-  width: calc(100% - 50px);
+  width: calc(100% - 65px);
   border-bottom: 1px solid #EEEEEE;
   overflow: hidden;
 }
@@ -524,8 +524,17 @@ body {
   content: "➡️";
 }
 
+.icon-export::before {
+  content: "📤";
+}
+
 label {
   white-space: nowrap;
+}
+
+.diagram-export-selector {
+  max-height: 200px;
+  overflow: auto;
 }
 
 .data-preview-table td {

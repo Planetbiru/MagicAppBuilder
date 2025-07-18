@@ -754,6 +754,67 @@ document.addEventListener('DOMContentLoaded', () => {
         // Start reading the content of the selected file as text.
         reader.readAsText(file);
     });
+    
+    document.querySelector('.export-diagram').addEventListener('click', function(e){
+        e.preventDefault();
+        let div = document.createElement('div');
+        div.classList.add('diagram-export-selector');
+        let ul = document.createElement('ul');
+        
+        let diagrams = document.querySelectorAll('.diagram-tab');
+        if(diagrams)
+        {
+            
+            let checkboxAll = document.createElement('input');
+            let label = document.createElement('label');
+            let id = `cbd-all`;
+            let li = document.createElement('li');
+            label.setAttribute('for', id);
+            label.textContent = 'Select All';
+            checkboxAll.setAttribute('type', 'checkbox');
+            checkboxAll.id = id;
+            
+            checkboxAll.setAttribute('onchange', 'checkAllDiagram(event)');
+            
+            li.appendChild(checkboxAll);
+            li.appendChild(document.createTextNode(' '));
+            li.appendChild(label);
+            ul.appendChild(li);  
+            
+            diagrams.forEach((diagram, index) => {
+                let input = diagram.querySelector('input');
+                li = document.createElement('li');
+                let checkbox = document.createElement('input');
+                label = document.createElement('label');
+                id = `cbd-${index}`;
+                label.setAttribute('for', id);
+                label.textContent = input.value;
+                checkbox.setAttribute('type', 'checkbox');
+                checkbox.setAttribute('value', diagram.dataset.index);
+                checkbox.classList.add('diagram-to-export');
+                checkbox.id = id;
+                li.appendChild(checkbox);
+                li.appendChild(document.createTextNode(' '));
+                li.appendChild(label);
+                ul.appendChild(li);
+            });
+        }
+        div.appendChild(ul);
+        editor.showConfirmationDialog(div.outerHTML, 'Export Document', 'Export', 'Cancel', function(isOk){
+            if (isOk) {
+                let toBeExport = document.querySelectorAll('.diagram-to-export');
+                let diagramToExport = [];
+                toBeExport.forEach(cb => {
+                    if(cb.checked)
+                    {
+                        let idx = parseInt(cb.value);
+                        diagramToExport.push(editor.diagrams[idx]);
+                    }
+                });
+                editor.exportHTMLDocument(diagramToExport);
+            }
+        });
+    });
 
     init();
 
@@ -779,6 +840,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function checkAllDiagram(e1)
+{
+    e1.preventDefault();
+    let checked = e1.target.checked;
+    e1.target.closest('ul').querySelectorAll('input').forEach(cb =>{
+        cb.checked = checked; 
+    });
+}
 /**
  * Initiates the database export process if no other export is currently running.
  *

@@ -872,11 +872,12 @@ class EntityEditor {
         let selection = this.getCheckedEntities();
         let diagrams = [];
         let sortOrder = 0;
-        Object.entries(selection).forEach(([id, entities]) => {
+        Object.entries(selection).forEach(([id, entities], index) => {
             let name = document.querySelector(`.tabs-link-container [data-id="${id}"] input`).value;
             diagrams.push({id: id, name: name, sortOrder: sortOrder, entities: entities});
             sortOrder++;
         });
+        this.diagrams = diagrams;
         if(typeof this.callbackSaveDiagram == 'function')
         {
             this.callbackSaveDiagram(diagrams);
@@ -1553,7 +1554,8 @@ class EntityEditor {
         diagram.classList.add('diagram-entity');
         diagram.classList.add('tab-content');
         diagram.classList.add('active');
-        diagram.setAttribute('data-entities', entities.join(','));
+        diagram.dataset.entities = entities.join(',');
+        diagram.dataset.name = diagramName;
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute('width', 4);
         svg.setAttribute('height', 4);
@@ -3692,6 +3694,196 @@ class EntityEditor {
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
         modal.style.display = 'none';
     }
+    
+    /**
+     * Exports selected diagrams and related entities into a downloadable HTML file.
+     * The output includes SVG diagrams and their corresponding entity tables styled with CSS.
+     *
+     * @param {Array} diagramToExport - An array of diagram objects to export, each containing entity references.
+     */
+    exportHTMLDocument(diagramToExport) {
+        let _this = this;
+        let entityIds = [];
+        let svgs = [];
+
+        // Collect unique entity IDs and clone SVG elements
+        diagramToExport.forEach(diagram => {
+            if (diagram.entities) {
+                diagram.entities.forEach(entityId => {
+                    if (typeof entityId != 'undefined' && !entityIds.includes(entityId)) {
+                        entityIds.push(entityId);
+                    }
+                });
+            }
+            let svg = document.querySelector(`#${diagram.id}`);
+            if (svg) {
+                svg.dataset.name = diagram.name;
+                svgs.push(svg.cloneNode(true)); // Clone the SVG for export
+            }
+        });
+
+        // Create container and section to wrap tables and SVGs
+        let container = document.createElement('div');
+        container.classList.add('export-container');
+        let section = document.createElement('div');
+
+        
+
+        // Add SVGs to the section
+        svgs.forEach(svg => {
+            let svgWrapper = document.createElement('div');
+            svgWrapper.className = 'svgs-wrapper';
+            let h3 = document.createElement('h3');
+            h3.textContent = `Diagram: ${svg.dataset.name}`;
+            svgWrapper.appendChild(h3);
+            svgWrapper.appendChild(svg);
+            section.appendChild(svgWrapper);
+        });
+        
+        // Generate tables for each entity
+        entityIds.forEach(entityName => {
+            let entity = _this.getEntityByName(entityName); // Make sure this method exists
+            if (entity) {
+                let table = _this.createHtmlEntity(entity);
+                let tableWrapper = document.createElement('div');
+                tableWrapper.className = 'table-wrapper';
+                let h3 = document.createElement('h3');
+                h3.textContent = `Entity: ${entityName}`;
+                tableWrapper.appendChild(h3);
+                tableWrapper.appendChild(table);
+                section.appendChild(tableWrapper);
+            }
+        });
+
+        container.appendChild(section);
+
+        // Create the complete HTML document content
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <title>Exported Diagrams</title>
+            <style>
+                body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                }
+                .diagram-section {
+                margin-bottom: 40px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                }
+                .svg-wrapper {
+                text-align: center;
+                margin-bottom: 20px;
+                }
+                .svg-wrapper svg {
+                max-width: 100%;
+                height: auto;
+                }
+                table {
+                border-collapse: collapse;
+                width: 100%;
+                }
+                th, td {
+                border: 1px solid #999;
+                padding: 8px;
+                text-align: left;
+                }
+                th {
+                background-color: #eee;
+                }
+            </style>
+            </head>
+            <body>
+            ${container.innerHTML}
+            </body>
+            </html>
+        `;
+
+        // Download the HTML content as a file
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'diagrams.html';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    /**
+     * Creates an HTML table element for the given entity with column metadata.
+     *
+     * @param {Object} entity - The entity object containing columns metadata.
+     * @returns {HTMLElement} The table element representing the entity.
+     */
+    createHtmlEntity(entity) {
+        let _this = this;
+        let table = document.createElement('table');
+
+        // Create table header
+        let thead = document.createElement('thead');
+        let trHead = document.createElement('tr');
+
+        ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement'].forEach(property => {
+            let th = document.createElement('th');
+            th.textContent = _this.camelToTitle(property);
+            trHead.appendChild(th);
+        });
+
+        thead.appendChild(trHead);
+        table.appendChild(thead);
+
+        // Create table body
+        let tbody = document.createElement('tbody');
+
+        entity.columns.forEach(column => {
+            let tr = _this.createHtmlColumn(column);
+            tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        return table;
+    }
+
+    /**
+     * Creates an HTML table row element representing a column in the entity.
+     *
+     * @param {Object} column - The column metadata.
+     * @returns {HTMLElement} The table row element with column data.
+     */
+    createHtmlColumn(column) {
+        let tr = document.createElement('tr');
+
+        // Normalize primaryKey value (in case it's 1 instead of true)
+        column.primaryKey = column.primaryKey == 1 || column.primaryKey === true;
+
+        ['name', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement'].forEach(property => {
+            let td = document.createElement('td');
+            td.textContent = typeof column[property] === 'boolean' 
+                ? (column[property] === true ? 'true' : 'false') 
+                : column[property];
+            tr.appendChild(td);
+        });
+
+        return tr;
+    }
+
+    /**
+     * Converts a camelCase string to a title case string with spaces.
+     *
+     * @param {string} camelCaseStr - The camelCase string to convert.
+     * @returns {string} The converted title string.
+     */
+    camelToTitle(camelCaseStr) {
+        return camelCaseStr
+            .replace(/([A-Z])/g, ' $1')     // Add space before capital letters
+            .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+    }
+
+
 }
 
 

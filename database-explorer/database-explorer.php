@@ -153,6 +153,7 @@ if(!isset($databaseName))
                                     <ul class="tab-mover">
                                         <li><a class="move-left" href="javascript:"><span class="icon-move-left"></span></a></li>
                                         <li><a class="move-right" href="javascript:"><span class="icon-move-right"></span></a></li>
+                                        <li><a class="export-diagram" href="javascript:" ><span class="icon-export"></span></a></li>
                                     </ul>
                                     <div class="tabs-link-container">
                                         <ul class="diagram-list tabs">
