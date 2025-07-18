@@ -3498,37 +3498,33 @@ class EntityEditor {
     }
     
     /**
-     * Creates a `<td>` element containing an editable `<input>` element
-     * for a specific entity data cell within the Entity Editor table.
-     * 
-     * The input is configured with metadata such as row index, column name,
-     * and data type for later reference and data extraction.
+     * Exports data from the Entity Editor table into a downloadable CSV file.
      *
-     * @param {number} rowIndex - The zero-based row index in the data table.
-     * @param {number} colIndex - The zero-based column index in the data table.
-     * @param {Object} col - The column definition object (must contain `name` and `type`).
-     * @param {string} [value=""] - Optional initial value for the input field.
-     * @returns {HTMLTableCellElement} The generated `<td>` element containing the input.
+     * The CSV file includes headers derived from column names and values from input fields.
      */
     exportData() {
         let columns = [];
         let data = [];
 
         // Get column names from thead
-        document.querySelector('.data-preview-table').querySelector('thead').querySelectorAll('th.entity-column').forEach((th) => {
-            columns.push(th.dataset.name);
-        });
+        document.querySelector('.data-preview-table')
+            .querySelector('thead')
+            .querySelectorAll('th.entity-column')
+            .forEach((th) => {
+                columns.push(th.dataset.name);
+            });
 
         // Get data from tbody rows
-        let trs = document.querySelector('.data-preview-table').querySelector('tbody').querySelectorAll('tr');
+        let trs = document.querySelector('.data-preview-table')
+            .querySelector('tbody')
+            .querySelectorAll('tr');
+
         if (trs) {
             trs.forEach((tr) => {
                 let row = {};
                 tr.querySelectorAll('td.entity-column').forEach((td) => {
                     let input = td.querySelector('input');
-                    // Ensure input and its name property exist before accessing
-                    if (input && input.name) // NOSONAR
-                    {
+                    if (input && input.name) { // NOSONAR
                         row[input.dataset.col] = input.value;
                     }
                 });
@@ -3536,42 +3532,43 @@ class EntityEditor {
             });
         }
 
-        // Construct the data object to be exported
-        let content = {
-            columns: columns,
-            data: data
-        };
+        // Convert data to CSV
+        let csvRows = [];
 
-        // --- Add JSON download logic here ---
+        // Header row
+        csvRows.push(columns.join(','));
 
-        // Convert the content object to a JSON string
-        const jsonString = JSON.stringify(content, null, 2); // 'null, 2' for pretty-printing JSON
+        // Data rows
+        data.forEach((row) => {
+            let values = columns.map((col) => {
+                let val = row[col] || "";
+                // Escape double quotes by doubling them and wrap value in double quotes
+                return `"${val.replace(/"/g, '""')}"`;
+            });
+            csvRows.push(values.join(','));
+        });
 
-        // Create a Blob from the JSON string
-        const blob = new Blob([jsonString], { type: 'application/json' });
+        // Join all rows into a single CSV string
+        const csvString = csvRows.join('\n');
+
+        // Create a Blob from the CSV string
+        const blob = new Blob([csvString], { type: 'text/csv' });
 
         // Create a URL for the Blob
         const url = URL.createObjectURL(blob);
 
-        // Create a temporary anchor element
+        // Create and trigger a download link
         const a = document.createElement('a');
         a.href = url;
-        // Set the download attribute to specify the filename
-        a.download = 'entity_data.json'; // You can make this dynamic, e.g., 'entity_data_' + Date.now() + '.json'
-
-        // Append the anchor to the body (it doesn't need to be visible)
+        a.download = 'entity_data.csv';
         document.body.appendChild(a);
-
-        // Programmatically click the anchor to trigger the download
         a.click();
-
-        // Clean up: remove the anchor element and revoke the object URL
-        // Revoking the URL is crucial for performance and memory management
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
 
-        console.log("Data exported as JSON:", content); // For debugging
+        // Clean up
+        URL.revokeObjectURL(url);
     }
+
     
     /**
      * Collects the current entity data from the table and exports it as a downloadable JSON file.
@@ -3722,42 +3719,48 @@ class EntityEditor {
             }
         });
 
-        // Create container and section to wrap tables and SVGs
+        // Create container
         let container = document.createElement('div');
         container.classList.add('export-container');
-        let section = document.createElement('div');
 
-        
+        // For each diagram, add SVG and associated tables in one section
+        diagramToExport.forEach(diagram => {
+            let section = document.createElement('div');
+            section.className = 'diagram-section';
 
-        // Add SVGs to the section
-        svgs.forEach(svg => {
-            let svgWrapper = document.createElement('div');
-            svgWrapper.className = 'svgs-wrapper';
-            let h3 = document.createElement('h3');
-            h3.textContent = `Diagram: ${svg.dataset.name}`;
-            svgWrapper.appendChild(h3);
-            svgWrapper.appendChild(svg);
-            section.appendChild(svgWrapper);
-        });
-        
-        // Generate tables for each entity
-        entityIds.forEach(entityName => {
-            let entity = _this.getEntityByName(entityName); // Make sure this method exists
-            if (entity) {
-                let table = _this.createHtmlEntity(entity);
-                let tableWrapper = document.createElement('div');
-                tableWrapper.className = 'table-wrapper';
+            // Add SVG
+            let svg = svgs.find(s => s.dataset.name === diagram.name);
+            if (svg) {
+                let svgWrapper = document.createElement('div');
+                svgWrapper.className = 'svg-wrapper';
                 let h3 = document.createElement('h3');
-                h3.textContent = `Entity: ${entityName}`;
-                tableWrapper.appendChild(h3);
-                tableWrapper.appendChild(table);
-                section.appendChild(tableWrapper);
+                h3.textContent = `Diagram: ${svg.dataset.name}`;
+                svgWrapper.appendChild(h3);
+                svgWrapper.appendChild(svg);
+                section.appendChild(svgWrapper);
             }
+
+            // Add entity tables
+            if (diagram.entities) {
+                diagram.entities.forEach(entityName => {
+                    let entity = _this.getEntityByName(entityName);
+                    if (entity) {
+                        let table = _this.createHtmlEntity(entity);
+                        let tableWrapper = document.createElement('div');
+                        tableWrapper.className = 'table-wrapper';
+                        let h3 = document.createElement('h3');
+                        h3.textContent = `Entity: ${entityName}`;
+                        tableWrapper.appendChild(h3);
+                        tableWrapper.appendChild(table);
+                        section.appendChild(tableWrapper);
+                    }
+                });
+            }
+
+            container.appendChild(section);
         });
 
-        container.appendChild(section);
-
-        // Create the complete HTML document content
+        // HTML & CSS for export
         const htmlContent = `
             <!DOCTYPE html>
             <html>
@@ -3766,34 +3769,62 @@ class EntityEditor {
             <title>Exported Diagrams</title>
             <style>
                 body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    font-size: 12px;
+                }
+                .export-container {
+                    max-width: 100%;
                 }
                 .diagram-section {
-                margin-bottom: 40px;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 8px;
+                    margin-bottom: 30px;
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 8px;
+                    page-break-after: always;
                 }
                 .svg-wrapper {
-                text-align: center;
-                margin-bottom: 20px;
+                    text-align: center;
+                    margin-bottom: 10px;
                 }
                 .svg-wrapper svg {
-                max-width: 100%;
-                height: auto;
+                    max-width: 100%;
+                    height: auto;
+                }
+                .table-wrapper {
+                    overflow-x: auto;
+                    margin-top: 10px;
                 }
                 table {
-                border-collapse: collapse;
-                width: 100%;
+                    border-collapse: collapse;
+                    width: 100%;
+                    font-size: 11px;
                 }
                 th, td {
-                border: 1px solid #999;
-                padding: 8px;
-                text-align: left;
+                    border: 1px solid #999;
+                    padding: 6px;
+                    text-align: left;
                 }
                 th {
-                background-color: #eee;
+                    background-color: #eee;
+                }
+                @media print {
+                    body {
+                        margin: 10mm;
+                        font-size: 10px;
+                    }
+                    h3 {
+                        font-size: 14px;
+                        margin-bottom: 5px;
+                    }
+                    .svg-wrapper svg,
+                    .table-wrapper table {
+                        max-width: 100%;
+                        page-break-inside: avoid;
+                    }
+                    .diagram-section {
+                        page-break-after: always;
+                    }
                 }
             </style>
             </head>
@@ -3803,7 +3834,7 @@ class EntityEditor {
             </html>
         `;
 
-        // Download the HTML content as a file
+        // Trigger download
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -3812,6 +3843,7 @@ class EntityEditor {
         a.click();
         URL.revokeObjectURL(url);
     }
+
 
     /**
      * Creates an HTML table element for the given entity with column metadata.

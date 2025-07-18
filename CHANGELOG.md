@@ -1730,3 +1730,50 @@ MagicAppBuilder now includes MagicObject **version 3.16.0**, which brings severa
 * **New:** `deleteRecordByPrimaryKey($primaryKeyValue)` method for deleting records using primary or composite keys.
 * **Fix:** Session handler compatibility with **Redis**, ensuring reliable session persistence when using `session.save_handler = redis`.
 
+
+# MagicAppBuilder Version 1.14.0
+
+Version 1.14.0 introduces powerful enhancements to your data modeling workflow — with a focus on interoperability and documentation. This update builds upon the clipboard and import/export improvements from the previous release.
+
+## What's New
+
+### Export Entities as Interactive HTML Document
+
+You can now **export your entity definitions and ER diagrams** into a single, self-contained HTML file.
+
+This export includes:
+
+* A **visual diagram** showing the relationships between entities (ERD).
+* A **table-based overview** of each entity's fields, types, and attributes.
+* Clean, printable formatting — perfect for **documentation**, **reviews**, or **project handovers**.
+
+This feature makes it easier than ever to share and archive your data models with teams, stakeholders, or clients.
+
+## Changes
+
+### CSV Format for Entity Data Export
+
+Entity data is now exported in **CSV format** instead of JSON.
+
+This change improves **compatibility with spreadsheets**, databases, and other development tools. It also simplifies manual edits during early development or prototyping.
+
+CSV format ensures that your exported data can be:
+
+* Quickly reviewed or edited in **Excel**, **Google Sheets**, or other tools.
+* Easily imported into relational databases and code generators.
+
+### CSV Format for Entity Data Import
+
+In alignment with the new export format, **entity data import now also uses CSV**.
+
+This means:
+
+* You can **round-trip** data between export and import without conversion.
+* JSON format is no longer supported for import.
+
+Make sure your CSV files follow the same structure as exported files, with headers matching column names.
+
+## Summary
+
+MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareable data format. Combined with HTML documentation export and clipboard import from version 1.13.0, this release brings even more flexibility to your entity design and data integration workflows.
+

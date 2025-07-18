@@ -327,7 +327,7 @@ if(!isset($databaseName))
                 <button class="btn btn-primary save-data-entity">Save</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
-                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+                <input type="file" id="importDataFileInput" accept=".csv" style="display: none;">
             </div>
         </div>
     </div>

@@ -667,7 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.querySelector('.import-data-entity').addEventListener('click', function(){
-       document.querySelector('#jsonFileInput').click();
+       document.querySelector('#importDataFileInput').click();
     });
     
     document.querySelector('.add-data-entity').addEventListener('click', function(){
@@ -682,78 +682,61 @@ document.addEventListener('DOMContentLoaded', () => {
        editor.saveData(); 
     });
     
-    document.querySelector('#jsonFileInput').addEventListener('change', (event) => {
-        // Get the first file selected by the user.
+    document.querySelector('#importDataFileInput').addEventListener('change', (event) => {
         const file = event.target.files[0];
+        if (!file) return;
 
-        // If no file is selected, stop the process.
-        if (!file) {
-            return;
-        }
-
-        // Initialize a variable to store the parsed JSON data.
-        let loadedJsonData = null;
-
-        // Create a new FileReader instance to read the file content.
         const reader = new FileReader();
 
-        // Define the callback function to execute when the file has been successfully loaded.
         reader.onload = (e) => {
             try {
-                // Parse the JSON string from the file into a JavaScript object.
-                loadedJsonData = JSON.parse(e.target.result);
+                const csvText = e.target.result;
+                const lines = csvText.trim().split(/\r?\n/);
 
-                // Validate the format of the loaded JSON data.
-                // It must be an object containing 'columns' and 'data' properties, both of which must be arrays.
-                if (!loadedJsonData || !Array.isArray(loadedJsonData.columns) || !Array.isArray(loadedJsonData.data)) {
-                    console.error('Invalid JSON file format. Expected an object with "columns" and "data" arrays.');
-                    return; // Stop if the format is invalid.
+                if (lines.length < 2) {
+                    console.error('CSV file must contain at least one header row and one data row.');
+                    return;
                 }
 
-                // If the 'data' array exists and contains items.
-                if (loadedJsonData.data) {
-                    // Iterate over each row object in the loaded JSON data.
-                    loadedJsonData.data.forEach((rowData, index) => {
-                        // Call the 'addData' method of the 'editor' object to create a new empty table row (<tr>).
-                        // This method is assumed to return the newly created <tr> element.
-                        let tr = editor.addData();
+                // Parse header from the first line
+                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
 
-                        // If a new row was successfully created and returned.
-                        if (tr) {
-                            // Select all input elements within the newly created row that have the class 'entity-data-cell'.
-                            const inputCells = tr.querySelectorAll('input.entity-data-cell');
-
-                            // Iterate over each input cell found in the new row.
-                            inputCells.forEach(inputElement => {
-                                // Retrieve the column name for the current input from its 'data-col' attribute.
-                                const columnName = inputElement.dataset.col;
-
-                                // Set the value of the input element using the corresponding data from 'rowData'.
-                                // The nullish coalescing operator (?? '') ensures that if the data for a column is null or undefined,
-                                // the input's value defaults to an empty string.
-                                inputElement.value = rowData[columnName] ?? '';
-                            });
-                        }
+                // Parse data rows
+                const data = lines.slice(1).map(line => {
+                    const values = parseCSVLine(line);
+                    const row = {};
+                    headers.forEach((header, idx) => {
+                        row[header] = values[idx] ?? '';
                     });
-                }
+                    return row;
+                });
+
+                // Populate the editor with parsed data
+                data.forEach((rowData) => {
+                    let tr = editor.addData();
+                    if (tr) {
+                        const inputCells = tr.querySelectorAll('input.entity-data-cell');
+                        inputCells.forEach(inputElement => {
+                            const columnName = inputElement.dataset.col;
+                            inputElement.value = rowData[columnName] ?? '';
+                        });
+                    }
+                });
 
             } catch (error) {
-                // Catch and log any errors that occur during JSON parsing.
-                console.error('JSON parsing error:', error);
-                // An alert could be added here to notify the user directly.
+                console.error('CSV parsing error:', error);
             }
         };
 
-        // Define the callback function to execute if an error occurs during file reading.
-        reader.onerror = (e) => {
-            // Alert the user about the file reading error.
-            // Log the FileReader error to the console for debugging.
+        reader.onerror = () => {
             console.error('FileReader error:', reader.error);
         };
 
-        // Start reading the content of the selected file as text.
         reader.readAsText(file);
     });
+
+    
+
     
     document.querySelector('.export-diagram').addEventListener('click', function(e){
         e.preventDefault();
@@ -839,6 +822,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/**
+ * Parses a single CSV line into an array of values.
+ * Handles quoted values and escaped quotes (RFC 4180).
+ *
+ * @param {string} line - A line from the CSV file.
+ * @returns {string[]} An array of parsed string values.
+ */
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+
+        if (inQuotes) {
+            if (char === '"' && nextChar === '"') {
+                current += '"'; // Escaped quote
+                i++;
+            } else if (char === '"') {
+                inQuotes = false;
+            } else {
+                current += char;
+            }
+        } else {
+            if (char === '"') {
+                inQuotes = true;
+            } else if (char === ',') {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+    }
+
+    result.push(current);
+    return result;
+}
 
 function checkAllDiagram(e1)
 {
