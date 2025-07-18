@@ -3858,10 +3858,15 @@ class EntityEditor {
         // Create table header
         let thead = document.createElement('thead');
         let trHead = document.createElement('tr');
+        
+        let widths = ['30%', '15%', '10%', '10%', '15%', '10%', '10%'];
+        let headers = ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement'];
+        let labels  = ['Column Name', 'Type', 'Length', 'Nullable', 'Default', 'PK', 'Serial'];
 
-        ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement'].forEach(property => {
+        headers.forEach((property, index) => {
             let th = document.createElement('th');
-            th.textContent = _this.camelToTitle(property);
+            th.textContent = labels[index];
+            th.style.width = widths[index];
             trHead.appendChild(th);
         });
 
