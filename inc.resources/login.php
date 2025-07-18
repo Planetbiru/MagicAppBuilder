@@ -26,8 +26,8 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($hashPassword)))
             ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
             ->addAnd(PicoSpecification::getInstance()
-                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
                 ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
+                ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
             )
         ;
         $currentUser->findOne($appSpecsLogin);

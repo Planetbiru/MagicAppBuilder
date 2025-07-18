@@ -110,7 +110,8 @@ try
         $keys = array_keys($sessionsConfig->valueArray());
         foreach($keys as $key)
         {
-            if($sessionsConfig->get($key) != "")
+            $camelKey = PicoStringUtil::camelize($key);
+            if($sessionsConfig->get($key) != "" || $camelKey != "savePath" || $camelKey != "cookiePath")
             {
                 $existingSessions->set($key, $sessionsConfig->get($key));
             }
