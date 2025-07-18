@@ -1773,6 +1773,13 @@ This means:
 
 Make sure your CSV files follow the same structure as exported files, with headers matching column names.
 
+### Internal Dependency Update
+
+* **Upgraded MagicObject to version 3.16.2**, which includes:
+
+  * Fix for `session_start()` warnings during session handling.
+  * Improved compatibility with SQLite in `countAll()` and `countBy()` methods (from version 3.16.1).
+
 ## Summary
 
 MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareable data format. Combined with HTML documentation export and clipboard import from version 1.13.0, this release brings even more flexibility to your entity design and data integration workflows.
