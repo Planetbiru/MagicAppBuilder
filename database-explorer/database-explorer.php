@@ -153,6 +153,7 @@ if(!isset($databaseName))
                                     <ul class="tab-mover">
                                         <li><a class="move-left" href="javascript:"><span class="icon-move-left"></span></a></li>
                                         <li><a class="move-right" href="javascript:"><span class="icon-move-right"></span></a></li>
+                                        <li><a class="export-diagram" href="javascript:" ><span class="icon-export"></span></a></li>
                                     </ul>
                                     <div class="tabs-link-container">
                                         <ul class="diagram-list tabs">
@@ -326,7 +327,7 @@ if(!isset($databaseName))
                 <button class="btn btn-primary save-data-entity">Save</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
-                <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+                <input type="file" id="importDataFileInput" accept=".csv" style="display: none;">
             </div>
         </div>
     </div>
