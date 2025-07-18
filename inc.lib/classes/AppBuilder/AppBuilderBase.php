@@ -3474,7 +3474,7 @@ $subqueryMap = '.$referece.';
             else if($field->getDataFormat()->getFormatType() == 'numberFormat')
             {
                 // Number Format
-                $val = "->numberFormat".$upperFieldName."(".$this->fixFormat($field->getDataFormat()->getDecimal(), 'int').", ".$this->fixFormat($field->getDataFormat()->getDecimalSeparator(), 'string').", ".$this->fixFormat($field->getDataFormat()->getThousandsSeparator(), 'string').")";
+                $val = "->numberFormat".$upperFieldName."(".$this->fixFormat($field->getDataFormat()->getNumberFormat()->getDecimal(), 'int').", ".$this->fixFormat($field->getDataFormat()->getNumberFormat()->getDecimalSeparator(), 'string').", ".$this->fixFormat($field->getDataFormat()->getNumberFormat()->getThousandsSeparator(), 'string').")";
                 $result = self::VAR.$objectName.$val;
             }
             else if($field->getDataFormat()->getFormatType() == 'stringFormat')
@@ -3660,8 +3660,12 @@ $subqueryMap = '.$referece.';
     public function fixFormat($format, $type)
     {
         $format = trim($format);
-        if ($type == 'string' && strpos($format, '$') !== 0) {
+        if (strtolower($type) == 'string' && strpos($format, '$') !== 0) {
             $format = sprintf("'%s'", $format);
+        }
+        else if(strtolower($type) == 'int')
+        {
+            $format = (int) $format;
         }
         return $format;
     }
