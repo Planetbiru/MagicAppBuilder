@@ -138,7 +138,7 @@ class PicoSession
     public function startSession()
     {
         if ($this->_sessionState == self::SESSION_NOT_STARTED) {
-            $this->_sessionState = session_start();
+            $this->_sessionState = @session_start();
         }
         return $this->_sessionState;
     }

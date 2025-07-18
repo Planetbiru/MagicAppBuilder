@@ -1116,3 +1116,9 @@ Now, session storage works reliably with `session.save_handler = redis`, ensurin
 * **`MagicObject::countAll()` and `MagicObject::countBy()`**: Fixed a bug where the counting methods did not function correctly with **SQLite** databases. These fixes ensure consistent counting functionality across all database types.
 
 
+# MagicObject Version 3.16.2
+
+## Bug Fixes
+
+* **Session Handling**: Suppressed warnings when calling `session_start()` to prevent unnecessary error messages when a session is already active or headers have already been sent.
+
