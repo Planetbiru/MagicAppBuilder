@@ -145,7 +145,7 @@ class EntityRenderer {
         this.data.entities.forEach(entity => {
             entity.columns.forEach((col, index) => {
                 // Check if the column is a foreign key (ends with "_id")
-                if (col.name.endsWith("_id") && !col.primaryKey) {
+                if (col.name.endsWith("_id")) {
                     const refEntityName = col.name.replace("_id", "");
                     // Check if the referenced entity exists in the tables list
                     if (entity.name != refEntityName && this.tables[refEntityName]) {

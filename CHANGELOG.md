@@ -1773,6 +1773,13 @@ This means:
 
 Make sure your CSV files follow the same structure as exported files, with headers matching column names.
 
+### Improved Foreign Key Detection in ERD
+
+The logic in the `createRelationships()` method has been updated to improve foreign key detection.
+
+Previously, columns ending with `_id` were only considered foreign keys **if they were not primary keys**. Now, **all `_id` columns are treated as potential foreign keys**, even if they are also primary keys.
+This change ensures more accurate and complete relationship diagrams, especially in schemas where foreign keys double as primary keys.
+
 ### Internal Dependency Update
 
 * **Upgraded MagicObject to version 3.16.2**, which includes:
