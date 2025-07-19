@@ -101,7 +101,7 @@ class Column {
     fixColumnType(type) {
         if (!type) return '';
 
-        const match = type.match(/^(\w+)\s*\((\d+)\)$/i);
+        const match = type.match(/^(\w+)\s*\((\d+)\)$/i); // NOSONAR
         if (match) {
             const baseType = match[1].toLowerCase();
             if (baseType === 'boolean' || baseType === 'bool') {

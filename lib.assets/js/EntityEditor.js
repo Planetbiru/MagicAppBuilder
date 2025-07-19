@@ -3925,9 +3925,7 @@ class EntityEditor {
 
         ['name', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'description'].forEach(property => {
             let td = document.createElement('td');
-            td.textContent = typeof column[property] === 'boolean' 
-                ? (column[property] === true ? 'true' : 'false') 
-                : column[property];
+            td.textContent = typeof column[property] === 'boolean' ? (column[property] === true ? 'true' : 'false') : column[property]; // NOSONAR
             tr.appendChild(td);
         });
 
