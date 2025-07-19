@@ -3787,6 +3787,7 @@ class EntityEditor {
 
                         if (entity.description?.trim()) {
                             entity.description
+                                .trim()
                                 .split(/\r?\n/)
                                 .map(line => line.trim())
                                 .filter(line => line !== '')
