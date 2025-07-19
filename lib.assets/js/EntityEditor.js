@@ -3768,6 +3768,14 @@ class EntityEditor {
                         let h3 = document.createElement('h3');
                         h3.textContent = `Entity: ${entityName}`;
                         tableWrapper.appendChild(h3);
+                        
+                        if(entity.description && entity.description.trim() != '')
+                        {
+                            let p = document.createElement('p');
+                            p.textContent = entity.description;
+                            tableWrapper.appendChild(p);
+                        }
+
                         tableWrapper.appendChild(table);
                         section.appendChild(tableWrapper);
                     }
@@ -3877,7 +3885,7 @@ class EntityEditor {
         let trHead = document.createElement('tr');
         
         let widths = ['20%', '14%', '9%', '9%', '9%', '8%', '8%', '23%'];
-        let headers = ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'comment'];
+        let headers = ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'description'];
         let labels  = ['Column Name', 'Type', 'Length', 'Nullable', 'Default', 'PK', 'Serial', 'Description'];
 
         headers.forEach((property, index) => {
@@ -3915,7 +3923,7 @@ class EntityEditor {
         // Normalize primaryKey value (in case it's 1 instead of true)
         column.primaryKey = column.primaryKey == 1 || column.primaryKey === true;
 
-        ['name', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'comment'].forEach(property => {
+        ['name', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'description'].forEach(property => {
             let td = document.createElement('td');
             td.textContent = typeof column[property] === 'boolean' 
                 ? (column[property] === true ? 'true' : 'false') 
