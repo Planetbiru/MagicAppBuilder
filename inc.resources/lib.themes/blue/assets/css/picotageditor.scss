@@ -24,6 +24,8 @@ $dark-text: #ddd;
 
     .tags-container{
         width: 100%;
+        line-height: 2rem;
+        white-space: wrap;
     }
 
     &[data-focus="true"] .tags-container {

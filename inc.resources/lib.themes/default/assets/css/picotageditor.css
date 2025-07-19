@@ -7,6 +7,8 @@
 }
 .pico-tag-editor .tags-container {
   width: 100%;
+  line-height: 2rem;
+  white-space: wrap;
 }
 .pico-tag-editor[data-focus=true] .tags-container {
   position: absolute;
