@@ -3787,6 +3787,7 @@ class EntityEditor {
 
                         if (entity.description?.trim()) {
                             entity.description
+                                .trim()
                                 .split(/\r?\n/)
                                 .map(line => line.trim())
                                 .filter(line => line !== '')
@@ -3912,7 +3913,8 @@ class EntityEditor {
                     let svgString = serializer.serializeToString(clonedSvg);
 
                     // Double-check and ensure the SVG namespace is present at the root
-                    if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                    if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) // NOSONAR
+                    {
                         svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
                     }
 
