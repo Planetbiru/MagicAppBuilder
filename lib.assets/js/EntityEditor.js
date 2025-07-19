@@ -3786,9 +3786,15 @@ class EntityEditor {
                         tableWrapper.appendChild(h3);
 
                         if (entity.description?.trim()) {
-                            const p = document.createElement('p');
-                            p.textContent = entity.description;
-                            tableWrapper.appendChild(p);
+                            entity.description
+                                .split(/\r?\n/)
+                                .map(line => line.trim())
+                                .filter(line => line !== '')
+                                .forEach(line => {
+                                    const p = document.createElement('p');
+                                    p.textContent = line;
+                                    tableWrapper.appendChild(p);
+                                });
                         }
 
                         const table = this.createHtmlEntity(entity);
