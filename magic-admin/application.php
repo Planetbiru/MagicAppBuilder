@@ -409,7 +409,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getUrl();?></td>
-						<td><?php echo $application->getUrl();?></td>
+						<td><a href="<?php echo $application->getUrl();?>" target="_blank"><?php echo $application->getUrl();?></a></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
@@ -503,6 +503,7 @@ $sortOrderMap = array(
 	"workspaceId" => "workspaceId",
 	"author" => "author",
 	"baseApplicationDirectory" => "baseApplicationDirectory",
+	"url" => "url",
 	"sortOrder" => "sortOrder",
 	"timeCreate" => "timeCreate",
 	"active" => "active"
@@ -709,6 +710,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="workspace_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWorkspace();?></a></td>
 								<td data-col-name="author" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAuthor();?></a></td>
 								<td data-col-name="base_application_directory" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></a></td>
+								<td data-col-name="url" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUrl();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="time_create" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTimeCreate();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
@@ -749,6 +751,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="workspace_id"><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
 								<td data-col-name="author"><?php echo $application->getAuthor();?></td>
 								<td data-col-name="base_application_directory"><?php echo $application->getBaseApplicationDirectory();?></td>
+								<td data-col-name="url"><a href="<?php echo $application->getUrl();?>" target="_blank"><?php echo $application->getUrl();?></a></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $application->getSortOrder();?></td>
 								<td data-col-name="time_create"><?php echo $application->getTimeCreate();?></td>
 								<td data-col-name="active"><?php echo $application->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
