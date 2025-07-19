@@ -244,6 +244,7 @@ if(!isset($databaseName))
                                                 <th class="column-nl">NL</th>
                                                 <th class="column-pk">PK</th>
                                                 <th class="column-ai">AI</th>
+                                                <th class="column-ds">Description</th>
                                             </tr>
                                         </thead>
                                         <tbody class="entity-columns-table-body">
@@ -268,6 +269,7 @@ if(!isset($databaseName))
                                                 <th>Value</th>
                                                 <th>Default</th>
                                                 <th class="column-nl">NL</th>
+                                                <th class="column-ds">Description</th>
                                             </tr>
                                         </thead>
                                         <tbody class="template-columns-table-body">

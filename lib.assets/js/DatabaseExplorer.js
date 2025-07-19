@@ -799,6 +799,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    document.querySelector('#table-entity-editor').addEventListener('keydown', function (event) {
+        if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'text') return;
+
+        const key = event.key;
+        if (key !== 'ArrowUp' && key !== 'ArrowDown') return;
+
+        const currentInput = event.target;
+        const currentCell = currentInput.closest('td');
+        const currentRow = currentCell?.parentElement;
+        if (!currentRow) return;
+
+        // Get the index of the current cell in the row
+        const cellIndex = [...currentRow.children].indexOf(currentCell);
+
+        // Get previous or next row
+        const targetRow = key === 'ArrowUp' 
+            ? currentRow.previousElementSibling 
+            : currentRow.nextElementSibling;
+
+        if (!targetRow) return;
+
+        const targetCell = targetRow.children[cellIndex];
+        if (!targetCell) return;
+
+        const targetInput = targetCell.querySelector('input[type="text"]');
+        if (targetInput) {
+            event.preventDefault(); // Prevent caret movement
+            targetInput.focus();
+            targetInput.select(); // Optional: select text for editing
+        }
+    });
+
+
     init();
 
     if($('input[data-type="datetime"]').length)

@@ -62,18 +62,19 @@ const DIALECT_TYPE_MAP = {
  */
 class Column {
     /**
-     * Creates an instance of the Column class.
-     * 
+     * Constructs a new Column instance representing a database table column.
+     *
      * @param {string} name - The name of the column.
-     * @param {string} [type="VARCHAR"] - The data type of the column (e.g., "VARCHAR", "INT", "ENUM", etc.).
-     * @param {string} [length=""] - The length of the column for types like VARCHAR (optional).
-     * @param {boolean} [nullable=false] - Whether the column can be NULL (default is false).
-     * @param {string} [defaultValue=""] - The default value for the column (optional).
-     * @param {boolean} [primaryKey=false] - Whether the column is a primary key (default is false).
-     * @param {boolean} [autoIncrement=false] - Whether the column auto-increments (default is false).
-     * @param {string} [values=""] - The valid values for ENUM or SET types, or the range of values for types like DECIMAL, NUMERIC, FLOAT, and DOUBLE (optional, comma-separated).
+     * @param {string} [type="VARCHAR"] - The SQL data type of the column (e.g., "VARCHAR", "INT", "ENUM").
+     * @param {string|null} [length=""] - The length or precision of the column (e.g., "255" for VARCHAR, or "10,2" for DECIMAL). Optional.
+     * @param {boolean} [nullable=false] - Indicates whether the column allows NULL values.
+     * @param {string|null} [defaultValue=""] - The default value assigned to the column. Optional.
+     * @param {boolean} [primaryKey=false] - Specifies whether the column is a primary key.
+     * @param {boolean} [autoIncrement=false] - Indicates if the column value auto-increments (typically used for numeric primary keys).
+     * @param {string|null} [values=""] - Valid values for ENUM/SET types, or value range for numeric types (comma-separated). Optional.
+     * @param {string|null} [description=""] - A comment or description for the column. Optional.
      */
-    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "") //NOSONAR
+    constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "", description = "") //NOSONAR
     {
         this.name = name;
         this.type = type;
@@ -83,6 +84,7 @@ class Column {
         this.primaryKey = primaryKey;
         this.autoIncrement = autoIncrement;
         this.values = values;
+        this.description = description;
     }
     
     /**

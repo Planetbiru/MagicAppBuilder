@@ -1745,9 +1745,19 @@ This export includes:
 
 * A **visual diagram** showing the relationships between entities (ERD).
 * A **table-based overview** of each entity's fields, types, and attributes.
+* **Descriptions** for both entities and columns — clearly displayed for documentation purposes.
 * Clean, printable formatting — perfect for **documentation**, **reviews**, or **project handovers**.
 
 This feature makes it easier than ever to share and archive your data models with teams, stakeholders, or clients.
+
+### Entity Description Field
+
+You can now add a **description** to each entity.
+
+* This field serves as a brief explanation of the entity's purpose or usage.
+* The description is included in the **HTML export**, displayed alongside the entity name.
+
+Use this field to improve the clarity and maintainability of your data model — especially when collaborating with others.
 
 ## Changes
 
