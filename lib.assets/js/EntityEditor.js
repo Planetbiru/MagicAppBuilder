@@ -1150,7 +1150,7 @@ class EntityEditor {
                 columnData.values !== "null" ? columnData.values : "",
                 null,
                 null,
-                columnData.comment
+                columnData.description
             );
             columns.push(column);
         });
@@ -3519,6 +3519,7 @@ class EntityEditor {
      * The CSV file includes headers derived from column names and values from input fields.
      */
     exportData() {
+        const entity = this.entities[this.currentEntityIndex];
         let columns = [];
         let data = [];
 
@@ -3576,7 +3577,7 @@ class EntityEditor {
         // Create and trigger a download link
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'entity_data.csv';
+        a.download = `${entity.name}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

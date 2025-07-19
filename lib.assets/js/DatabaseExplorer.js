@@ -799,37 +799,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelector('#table-entity-editor').addEventListener('keydown', function (event) {
-        if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'text') return;
-
-        const key = event.key;
-        if (key !== 'ArrowUp' && key !== 'ArrowDown') return;
-
-        const currentInput = event.target;
-        const currentCell = currentInput.closest('td');
-        const currentRow = currentCell?.parentElement;
-        if (!currentRow) return;
-
-        // Get the index of the current cell in the row
-        const cellIndex = [...currentRow.children].indexOf(currentCell);
-
-        // Get previous or next row
-        const targetRow = key === 'ArrowUp' 
-            ? currentRow.previousElementSibling 
-            : currentRow.nextElementSibling;
-
-        if (!targetRow) return;
-
-        const targetCell = targetRow.children[cellIndex];
-        if (!targetCell) return;
-
-        const targetInput = targetCell.querySelector('input[type="text"]');
-        if (targetInput) {
-            event.preventDefault(); // Prevent caret movement
-            targetInput.focus();
-            targetInput.select(); // Optional: select text for editing
-        }
-    });
+    // Apply to both tables
+    enableArrowKeyNavigation('#table-entity-editor');
+    enableArrowKeyNavigation('#table-template-editor');
 
 
     init();
@@ -855,6 +827,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/**
+ * Enables vertical keyboard navigation using ArrowUp and ArrowDown keys
+ * for text inputs inside a table. It ensures navigation stays in the same
+ * column and skips over hidden or invisible inputs.
+ *
+ * @param {string} tableSelector - A CSS selector for the table element.
+ */
+function enableArrowKeyNavigation(tableSelector) {
+    document.querySelector(tableSelector)?.addEventListener('keydown', function (event) {
+        // Only process text input fields
+        if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'text') return;
+
+        const key = event.key;
+        if (key !== 'ArrowUp' && key !== 'ArrowDown') return;
+
+        const currentInput = event.target;
+        const currentCell = currentInput.closest('td');
+        const currentRow = currentCell?.parentElement;
+        if (!currentRow) return;
+
+        // Get the index of the current cell within its row
+        const cellIndex = [...currentRow.children].indexOf(currentCell);
+
+        // Determine the next row based on the arrow key pressed
+        let targetRow = key === 'ArrowUp'
+            ? currentRow.previousElementSibling
+            : currentRow.nextElementSibling;
+
+        // Helper function to check if an element is visible
+        function isVisible(el) {
+            return el && el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden';
+        }
+
+        // Loop upward or downward until a visible input is found in the same column
+        while (targetRow) {
+            const targetCell = targetRow.children[cellIndex];
+            if (targetCell) {
+                const input = targetCell.querySelector('input[type="text"]');
+                if (isVisible(input)) {
+                    event.preventDefault(); // Prevent default caret movement
+                    input.focus();          // Move focus to the target input
+                    input.select();         // Optionally select the text inside
+                    break;
+                }
+            }
+
+            // Move to the next row in the same direction
+            targetRow = key === 'ArrowUp'
+                ? targetRow.previousElementSibling
+                : targetRow.nextElementSibling;
+        }
+    });
+}
+
+
 
 /**
  * Parses a single CSV line into an array of values.
