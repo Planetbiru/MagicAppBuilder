@@ -1743,10 +1743,14 @@ You can now **export your entity definitions and ER diagrams** into a single, se
 
 This export includes:
 
-* A **visual diagram** showing the relationships between entities (ERD).
-* A **table-based overview** of each entity's fields, types, and attributes.
-* **Descriptions** for both entities and columns — clearly displayed for documentation purposes.
-* Clean, printable formatting — perfect for **documentation**, **reviews**, or **project handovers**.
+-   A **visual diagram** showing the relationships between entities (ERD).
+    
+-   A **table-based overview** of each entity's fields, types, and attributes.
+    
+-   **Descriptions** for both entities and columns — clearly displayed for documentation purposes.
+    
+-   Clean, printable formatting — perfect for **documentation**, **reviews**, or **project handovers**.
+    
 
 This feature makes it easier than ever to share and archive your data models with teams, stakeholders, or clients.
 
@@ -1754,8 +1758,10 @@ This feature makes it easier than ever to share and archive your data models wit
 
 You can now add a **description** to each entity.
 
-* This field serves as a brief explanation of the entity's purpose or usage.
-* The description is included in the **HTML export**, displayed alongside the entity name.
+-   This field serves as a brief explanation of the entity's purpose or usage.
+    
+-   The description is included in the **HTML export**, displayed alongside the entity name.
+    
 
 Use this field to improve the clarity and maintainability of your data model — especially when collaborating with others.
 
@@ -1769,8 +1775,10 @@ This change improves **compatibility with spreadsheets**, databases, and other d
 
 CSV format ensures that your exported data can be:
 
-* Quickly reviewed or edited in **Excel**, **Google Sheets**, or other tools.
-* Easily imported into relational databases and code generators.
+-   Quickly reviewed or edited in **Excel**, **Google Sheets**, or other tools.
+    
+-   Easily imported into relational databases and code generators.
+    
 
 ### CSV Format for Entity Data Import
 
@@ -1778,10 +1786,21 @@ In alignment with the new export format, **entity data import now also uses CSV*
 
 This means:
 
-* You can **round-trip** data between export and import without conversion.
-* JSON format is no longer supported for import.
+-   You can **round-trip** data between export and import without conversion.
+    
+-   JSON format is no longer supported for import.
+    
 
 Make sure your CSV files follow the same structure as exported files, with headers matching column names.
+
+### Import Behavior for SQL and Spreadsheet Data
+
+The import behavior for SQL and spreadsheet (Excel/CSV) data has been updated.
+
+-   The `clearBeforeImport` flag for `importSQL()` and `importSheet()` methods is now set to `false`.
+    
+-   This means that when importing SQL or spreadsheet data, **existing entities will no longer be automatically cleared** from the editor. New data will be added alongside existing content, allowing for incremental imports or merging of data.
+    
 
 ### Improved Foreign Key Detection in ERD
 
@@ -1793,22 +1812,26 @@ This change ensures more accurate and complete relationship diagrams, especially
 
 ### Internal Dependency Update
 
-* **Upgraded MagicObject to version 3.16.2**, which includes:
-
-  * Fix for `session_start()` warnings during session handling.
-  * Improved compatibility with SQLite in `countAll()` and `countBy()` methods (from version 3.16.1).
+-   **Upgraded MagicObject to version 3.16.2**, which includes:
+    
+    -   Fix for `session_start()` warnings during session handling.
+        
+    -   Improved compatibility with SQLite in `countAll()` and `countBy()` methods (from version 3.16.1).
+        
 
 ## Bug Fixes
 
-* **Fixed incorrect string formatting in user-defined data format templates**:
-
-  * The `fixFormat()` method now correctly distinguishes between literal dollar signs (e.g. `$ %s`) and variable references (e.g. `$currency %s`).
-  * Formats starting with invalid variable characters after `$` are no longer treated as variables.
-  * Ensures consistent behavior when formatting string and numeric outputs.
-
-* **Resolved minor inconsistencies in CSV column typing during export/import**, especially for boolean and date types.
+-   **Fixed incorrect string formatting in user-defined data format templates**:
+    
+    -   The `fixFormat()` method now correctly distinguishes between literal dollar signs (e.g. `$ %s`) and variable references (e.g. `$currency %s`).
+        
+    -   Formats starting with invalid variable characters after `$` are no longer treated as variables.
+        
+    -   Ensures consistent behavior when formatting string and numeric outputs.
+        
+-   **Resolved minor inconsistencies in CSV column typing during export/import**, especially for boolean and date types.
+    
 
 ## Summary
 
 MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareable data format. Combined with HTML documentation export and clipboard import from version 1.13.0, this release brings even more flexibility to your entity design and data integration workflows.
-

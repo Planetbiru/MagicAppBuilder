@@ -3020,10 +3020,10 @@ class EntityEditor {
     /**
      * Triggers the import action for JSON entities by simulating a click
      * on the file input element associated with JSON import.
-     * 
+     *
      * This method sets `clearBeforeImport` to `true`, which indicates that
-     * any existing data should be cleared before importing new data. It then 
-     * locates the DOM element using the `selector` property combined with 
+     * any existing data should be cleared before importing new data. It then
+     * locates the DOM element using the `selector` property combined with
      * the `.import-file-json` class, and simulates a click to prompt file selection.
      */
     uploadEntities() {
@@ -3034,27 +3034,27 @@ class EntityEditor {
     /**
      * Triggers the import action for SQL data by simulating a click
      * on the file input element associated with SQL import.
-     * 
-     * This method sets `clearBeforeImport` to `true`, meaning existing data
-     * will be cleared before new data is imported. It locates the file input
+     *
+     * This method sets `clearBeforeImport` to `false`, meaning existing data
+     * will NOT be cleared before new data is imported. It locates the file input
      * element using the `selector` property and triggers a click event.
      */
     importSQL() {
-        this.clearBeforeImport = true;
+        this.clearBeforeImport = false;
         document.querySelector(this.selector + " .import-file-sql").click();
     }
 
     /**
      * Triggers the import action for spreadsheet data (Excel/CSV)
      * by simulating a click on the file input element associated with sheet import.
-     * 
-     * This method sets `clearBeforeImport` to `true`, meaning existing data
-     * in the editor will be cleared before importing the new spreadsheet content.
+     *
+     * This method sets `clearBeforeImport` to `false`, meaning existing data
+     * in the editor will NOT be cleared before importing the new spreadsheet content.
      * It uses the `selector` property to locate the appropriate DOM element
      * and programmatically triggers a click.
      */
     importSheet() {
-        this.clearBeforeImport = true;
+        this.clearBeforeImport = false;
         document.querySelector(this.selector + " .import-file-sheet").click();
     }
 
