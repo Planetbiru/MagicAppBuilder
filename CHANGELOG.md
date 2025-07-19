@@ -1818,7 +1818,7 @@ This change ensures more accurate and complete relationship diagrams, especially
 
 * **Fixed incorrect string formatting in user-defined data format templates**:
 
-  * The `fixFormat()` method now correctly distinguishes between literal dollar signs (e.g. `$ %s`) and variable references (e.g. `$currency %s`).
+  * The `fixFormat()` method now correctly distinguishes between literal dollar signs (e.g. `$ %s`) and variable references (e.g. `$appLanguage->getCurrencyFormat()`).
   * Formats starting with invalid variable characters after `$` are no longer treated as variables.
   * Ensures consistent behavior when formatting string and numeric outputs.
 
