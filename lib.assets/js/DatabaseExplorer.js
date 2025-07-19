@@ -734,20 +734,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         reader.readAsText(file);
     });
-
-    
-
     
     document.querySelector('.export-diagram').addEventListener('click', function(e){
         e.preventDefault();
         let div = document.createElement('div');
         div.classList.add('diagram-export-selector');
         let ul = document.createElement('ul');
-        
+
         let diagrams = document.querySelectorAll('.diagram-tab');
-        if(diagrams)
-        {
-            
+        if (diagrams) {
+            // Checkbox "Select All"
             let checkboxAll = document.createElement('input');
             let label = document.createElement('label');
             let id = `cbd-all`;
@@ -756,14 +752,17 @@ document.addEventListener('DOMContentLoaded', () => {
             label.textContent = 'Select All';
             checkboxAll.setAttribute('type', 'checkbox');
             checkboxAll.id = id;
-            
             checkboxAll.setAttribute('onchange', 'checkAllDiagram(event)');
-            
             li.appendChild(checkboxAll);
             li.appendChild(document.createTextNode(' '));
             li.appendChild(label);
             ul.appendChild(li);  
-            
+            let li2 = document.createElement('li');
+            let ul2 = document.createElement('ul');
+            ul.appendChild(li2);
+            li2.appendChild(ul2);
+
+            // Per diagram
             diagrams.forEach((diagram, index) => {
                 let input = diagram.querySelector('input');
                 li = document.createElement('li');
@@ -779,25 +778,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.appendChild(checkbox);
                 li.appendChild(document.createTextNode(' '));
                 li.appendChild(label);
-                ul.appendChild(li);
+                ul2.appendChild(li);
             });
+
+            // Checkbox Export as PNG
+            li = document.createElement('li');
+            let pngCheckbox = document.createElement('input');
+            label = document.createElement('label');
+            id = 'export-use-png';
+            label.setAttribute('for', id);
+            label.textContent = 'Export Image as PNG instead of SVG';
+            pngCheckbox.setAttribute('type', 'checkbox');
+            pngCheckbox.id = id;
+            pngCheckbox.classList.add('export-as-png');
+            li.appendChild(pngCheckbox);
+            li.appendChild(document.createTextNode(' '));
+            li.appendChild(label);
+            ul.appendChild(li);
         }
+
         div.appendChild(ul);
+
         editor.showConfirmationDialog(div.outerHTML, 'Export Document', 'Export', 'Cancel', function(isOk){
             if (isOk) {
                 let toBeExport = document.querySelectorAll('.diagram-to-export');
                 let diagramToExport = [];
                 toBeExport.forEach(cb => {
-                    if(cb.checked)
-                    {
+                    if (cb.checked) {
                         let idx = parseInt(cb.value);
                         diagramToExport.push(editor.diagrams[idx]);
                     }
                 });
-                editor.exportHTMLDocument(diagramToExport);
+
+                // Get usePng value from checkbox
+                const usePng = document.getElementById('export-use-png').checked;
+                editor.exportHTMLDocument(diagramToExport, usePng);
             }
         });
     });
+
 
     // Apply to both tables
     enableArrowKeyNavigation('#table-entity-editor');
@@ -929,7 +948,7 @@ function checkAllDiagram(e1)
 {
     e1.preventDefault();
     let checked = e1.target.checked;
-    e1.target.closest('ul').querySelectorAll('input').forEach(cb =>{
+    e1.target.closest('ul').querySelectorAll('input.diagram-to-export').forEach(cb =>{
         cb.checked = checked; 
     });
 }
