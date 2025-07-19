@@ -3653,6 +3653,12 @@ $subqueryMap = '.$referece.';
     /**
      * Fixes the format of a string based on the given type.
      *
+     * This function is used to normalize formatting templates.
+     * - If the type is 'string' and the format does not represent a variable (e.g., does not start with $varName),
+     *   it will be wrapped in single quotes for consistency.
+     * - If the format starts with '$' but is followed by a space or an invalid character for a variable name,
+     *   it is treated as a regular string, not a variable.
+     *
      * @param string $format The format to be fixed.
      * @param string $type The expected data type ('string', 'int', etc.).
      * @return string The corrected format.
@@ -3660,11 +3666,26 @@ $subqueryMap = '.$referece.';
     public function fixFormat($format, $type)
     {
         $format = trim($format);
-        if (strtolower($type) == 'string' && strpos($format, '$') !== 0) {
-            $format = sprintf("'%s'", $format);
+        $type = strtolower($type);
+
+        if ($type === 'string') {
+            $isVariable = false;
+
+            if (strpos($format, '$') === 0) {
+                // Get the character following the '$'
+                $nextChar = substr($format, 1, 1);
+
+                // Check if it's valid as the start of a variable name (a letter or underscore)
+                if (preg_match('/[a-zA-Z_]/', $nextChar)) {
+                    $isVariable = true;
+                }
+            }
+
+            if (!$isVariable) {
+                $format = sprintf("'%s'", $format);
+            }
         }
-        else if(strtolower($type) == 'int')
-        {
+        elseif ($type === 'int') {
             $format = (int) $format;
         }
         return $format;

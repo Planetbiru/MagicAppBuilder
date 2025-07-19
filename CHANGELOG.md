@@ -1788,6 +1788,7 @@ Make sure your CSV files follow the same structure as exported files, with heade
 The logic in the `createRelationships()` method has been updated to improve foreign key detection.
 
 Previously, columns ending with `_id` were only considered foreign keys **if they were not primary keys**. Now, **all `_id` columns are treated as potential foreign keys**, even if they are also primary keys.
+
 This change ensures more accurate and complete relationship diagrams, especially in schemas where foreign keys double as primary keys.
 
 ### Internal Dependency Update
@@ -1796,6 +1797,16 @@ This change ensures more accurate and complete relationship diagrams, especially
 
   * Fix for `session_start()` warnings during session handling.
   * Improved compatibility with SQLite in `countAll()` and `countBy()` methods (from version 3.16.1).
+
+## Bug Fixes
+
+* **Fixed incorrect string formatting in user-defined data format templates**:
+
+  * The `fixFormat()` method now correctly distinguishes between literal dollar signs (e.g. `$ %s`) and variable references (e.g. `$currency %s`).
+  * Formats starting with invalid variable characters after `$` are no longer treated as variables.
+  * Ensures consistent behavior when formatting string and numeric outputs.
+
+* **Resolved minor inconsistencies in CSV column typing during export/import**, especially for boolean and date types.
 
 ## Summary
 
