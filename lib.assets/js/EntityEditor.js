@@ -461,6 +461,7 @@ class EntityEditor {
         const tableBody = document.querySelector(this.selector+" .entity-columns-table-body");
         const row = document.createElement("tr");
         let columnLength = column.length == null ? '' : column.length.toString().replace(/\D/g,'');
+        let columnValue = column.values == null ? '' : column.values;
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
         let nullable = '';
@@ -489,7 +490,7 @@ class EntityEditor {
                 </select>
             </td>
             <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline-block' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+            <td><input type="text" class="column-enum" value="${columnValue}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
