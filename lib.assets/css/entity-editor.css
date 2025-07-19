@@ -536,6 +536,9 @@ label {
   max-height: 200px;
   overflow: auto;
 }
+.diagram-export-selector li {
+  line-height: 1.5;
+}
 
 .data-preview-table td {
   padding: 0 !important;

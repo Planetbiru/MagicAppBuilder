@@ -473,6 +473,7 @@ class EntityEditor {
             nullable = 'checked';
         }
         let originalName = column.name;
+        let columnDescription = column.description ? column.description : '';
         
         row.innerHTML = `
             <td class="drag-handle"></td>
@@ -493,6 +494,7 @@ class EntityEditor {
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
             <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${column.autoIncrement ? '' : 'disabled'}></td>
+            <td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
         `;
         tableBody.appendChild(row);
         this.initDraggableRow(row);
@@ -739,6 +741,7 @@ class EntityEditor {
         const columnAutoIncrements = document.querySelectorAll(this.selector+" #table-entity-editor .column-autoIncrement");
         const columnLengths = document.querySelectorAll(this.selector+" #table-entity-editor .column-length");
         const columnEnums = document.querySelectorAll(this.selector+" #table-entity-editor .column-enum");
+        const columnDescriptions = document.querySelectorAll(this.selector+" #table-entity-editor .column-description");
 
         let modifiedColumnNames = [];
 
@@ -752,6 +755,7 @@ class EntityEditor {
                 columnPrimaryKeys[i].checked,
                 columnAutoIncrements[i].checked,
                 columnEnums[i].value || null,
+                columnDescriptions[i].value || null,
             );
 
             if(columnNames[i].dataset.originalName && columnNames[i].dataset.originalName != columnNames[i].value)
@@ -774,6 +778,7 @@ class EntityEditor {
                     columnPrimaryKeys[i].checked,
                     columnAutoIncrements[i].checked,
                     columnEnums[i].value || null,
+                    columnDescriptions[i].value || null,
                 )
             );
         }
@@ -928,6 +933,7 @@ class EntityEditor {
         let columnLength = column.length == null ? '' : column.length.replace(/\D/g, '');
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
+        let columnDescription = column.description ? column.description : '';
         row.innerHTML = `
             <td class="drag-handle"></td>
             <td class="column-action">
@@ -945,6 +951,7 @@ class EntityEditor {
             <td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
+            <td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
         `;
         tableBody.appendChild(row);
         this.initDraggableRow(row);
@@ -964,6 +971,7 @@ class EntityEditor {
         const columnDefaults = document.querySelectorAll(this.selector + " .table-template-editor .column-default");
         const columnLengths = document.querySelectorAll(this.selector + " .table-template-editor .column-length");
         const columnEnums = document.querySelectorAll(this.selector + " .table-template-editor .column-enum");
+        const columnDescriptions = document.querySelectorAll(this.selector + " .table-template-editor .column-description");
 
         for (let i = 0; i < columnNames.length; i++) {
             let column = new Column(
@@ -973,6 +981,9 @@ class EntityEditor {
                 columnNullables[i].checked,
                 columnDefaults[i].value || null,
                 columnEnums[i].value || null,
+                null,
+                null,
+                columnDescriptions[i].value || null,
             );
             columns.push(column);
         }
@@ -1097,6 +1108,7 @@ class EntityEditor {
                     columnData.primaryKey,
                     columnData.autoIncrement,
                     columnData.values !== "null" ? columnData.values : "",
+                    columnData.description
                 );
                 
                 // Add the column to the entity
@@ -1136,6 +1148,9 @@ class EntityEditor {
                 columnData.nullable,
                 columnData.default,
                 columnData.values !== "null" ? columnData.values : "",
+                null,
+                null,
+                columnData.comment
             );
             columns.push(column);
         });
@@ -1173,6 +1188,7 @@ class EntityEditor {
                     columnData.Key,
                     columnData.AutoIncrement,
                     (columnData.EnumValues != null && typeof columnData.EnumValues == 'object') ? columnData.EnumValues.join(', ') : null,
+                    null
                 );
                 
                 // Add the column to the entity
@@ -2957,7 +2973,7 @@ class EntityEditor {
             const cleanName = _this.snakeize(header)
             const values = rows.map(row => row[header]);
             const type = _this.guessType(values);
-            return new Column(cleanName, type, null, true, null, false, false, null);
+            return new Column(cleanName, type, null, true, null, false, false, null, null);
         });
         return cols;
     }
@@ -3858,10 +3874,15 @@ class EntityEditor {
         // Create table header
         let thead = document.createElement('thead');
         let trHead = document.createElement('tr');
+        
+        let widths = ['20%', '14%', '9%', '9%', '9%', '8%', '8%', '23%'];
+        let headers = ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'comment'];
+        let labels  = ['Column Name', 'Type', 'Length', 'Nullable', 'Default', 'PK', 'Serial', 'Description'];
 
-        ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement'].forEach(property => {
+        headers.forEach((property, index) => {
             let th = document.createElement('th');
-            th.textContent = _this.camelToTitle(property);
+            th.textContent = labels[index];
+            th.style.width = widths[index];
             trHead.appendChild(th);
         });
 
@@ -3880,6 +3901,7 @@ class EntityEditor {
         return table;
     }
 
+
     /**
      * Creates an HTML table row element representing a column in the entity.
      *
@@ -3892,7 +3914,7 @@ class EntityEditor {
         // Normalize primaryKey value (in case it's 1 instead of true)
         column.primaryKey = column.primaryKey == 1 || column.primaryKey === true;
 
-        ['name', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement'].forEach(property => {
+        ['name', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'comment'].forEach(property => {
             let td = document.createElement('td');
             td.textContent = typeof column[property] === 'boolean' 
                 ? (column[property] === true ? 'true' : 'false') 
