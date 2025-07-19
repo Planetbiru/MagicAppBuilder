@@ -2126,8 +2126,8 @@ $subqueryMap = '.$referece.';
             $activate->setAttribute('data-event', 'false');
             $activate->setAttribute('data-onclik-title', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getTitleActivateConfirmation());'.self::PHP_CLOSE_TAG);
             $activate->setAttribute('data-onclik-message', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getWarningActivateConfirmation());'.self::PHP_CLOSE_TAG);
-            $activate->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG);
-            $activate->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG);
+            $activate->setAttribute('data-ok-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonOk());'.self::PHP_CLOSE_TAG); // NOSONAR
+            $activate->setAttribute('data-cancel-button-label', self::PHP_OPEN_TAG.'echo htmlspecialchars($appLanguage->getButtonCancel());'.self::PHP_CLOSE_TAG); // NOSONAR
             $activate->appendChild($dom->createTextNode(self::PHP_OPEN_TAG.'echo $appLanguage->getButtonActivate();'.self::PHP_CLOSE_TAG));
 
             $deactivate = $dom->createElement('button');
