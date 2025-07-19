@@ -3708,74 +3708,90 @@ class EntityEditor {
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
         modal.style.display = 'none';
     }
-    
-    /**
-     * Exports selected diagrams and related entities into a downloadable HTML file.
-     * The output includes SVG diagrams and their corresponding entity tables styled with CSS.
-     *
-     * @param {Array} diagramToExport - An array of diagram objects to export, each containing entity references.
-     */
-    exportHTMLDocument(diagramToExport) {
-        let _this = this;
-        let entityIds = [];
-        let svgs = [];
 
-        // Collect unique entity IDs and clone SVG elements
+    /**
+     * Exports selected diagrams and their related entities into a downloadable HTML file.
+     * The output can include either embedded SVGs or PNG images converted from those SVGs.
+     * It also includes corresponding entity tables styled with CSS for printing or documentation.
+     *
+     * @param {Array} diagramToExport - An array of diagram objects to export. Each should contain an ID and list of entities.
+     * @param {boolean} usePng - If true, SVGs will be converted to PNG images before embedding in the HTML.
+     */
+    async exportHTMLDocument(diagramToExport, usePng = false) {
+        const entityIds = [];
+        const svgs = [];
+
         diagramToExport.forEach(diagram => {
             if (diagram.entities) {
                 diagram.entities.forEach(entityId => {
-                    if (typeof entityId != 'undefined' && !entityIds.includes(entityId)) {
+                    if (entityId && !entityIds.includes(entityId)) {
                         entityIds.push(entityId);
                     }
                 });
             }
-            let svg = document.querySelector(`#${diagram.id}`);
-            if (svg) {
-                svg.dataset.name = diagram.name;
-                svgs.push(svg.cloneNode(true)); // Clone the SVG for export
+
+            const svgEl = document.querySelector(`#${diagram.id}`);
+            if (svgEl) {
+                svgEl.dataset.name = diagram.name;
+                const cloned = svgEl.cloneNode(true);
+
+                cloned.querySelectorAll("foreignObject").forEach(el => el.remove());
+
+                svgs.push(cloned);
             }
         });
 
-        // Create container
-        let container = document.createElement('div');
+        const container = document.createElement('div');
         container.classList.add('export-container');
 
-        // For each diagram, add SVG and associated tables in one section
-        diagramToExport.forEach(diagram => {
-            let section = document.createElement('div');
+        for (const diagram of diagramToExport) {
+            const section = document.createElement('div');
             section.className = 'diagram-section';
 
-            // Add SVG
-            let svg = svgs.find(s => s.dataset.name === diagram.name);
-            if (svg) {
-                let svgWrapper = document.createElement('div');
+            const svgCcontainer = svgs.find(s => s.dataset.name === diagram.name);
+            if (svgCcontainer) {
+                const svgWrapper = document.createElement('div');
                 svgWrapper.className = 'svg-wrapper';
-                let h3 = document.createElement('h3');
-                h3.textContent = `Diagram: ${svg.dataset.name}`;
+
+                const h3 = document.createElement('h3');
+                h3.textContent = `Diagram: ${svgCcontainer.dataset.name}`;
                 svgWrapper.appendChild(h3);
-                svgWrapper.appendChild(svg);
+
+                if (usePng) {
+                    try {
+                        let svg = svgCcontainer.querySelector('svg');
+                        const dataUrl = await this.convertSvgToPng(svg);  
+                        const img = document.createElement('img');
+                        img.src = dataUrl;
+                        svgWrapper.appendChild(img);
+                    } catch (err) {
+                        console.error("❌ Failed to convert SVG to PNG", err);
+                        svgWrapper.appendChild(svgCcontainer); 
+                    }
+                } else {
+                    svgWrapper.appendChild(svgCcontainer);
+                }
+
                 section.appendChild(svgWrapper);
             }
-
-            // Add entity tables
             if (diagram.entities) {
                 diagram.entities.forEach(entityName => {
-                    let entity = _this.getEntityByName(entityName);
+                    const entity = this.getEntityByName(entityName);
                     if (entity) {
-                        let table = _this.createHtmlEntity(entity);
-                        let tableWrapper = document.createElement('div');
+                        const tableWrapper = document.createElement('div');
                         tableWrapper.className = 'table-wrapper';
-                        let h3 = document.createElement('h3');
+
+                        const h3 = document.createElement('h3');
                         h3.textContent = `Entity: ${entityName}`;
                         tableWrapper.appendChild(h3);
-                        
-                        if(entity.description && entity.description.trim() != '')
-                        {
-                            let p = document.createElement('p');
+
+                        if (entity.description?.trim()) {
+                            const p = document.createElement('p');
                             p.textContent = entity.description;
                             tableWrapper.appendChild(p);
                         }
 
+                        const table = this.createHtmlEntity(entity);
                         tableWrapper.appendChild(table);
                         section.appendChild(tableWrapper);
                     }
@@ -3783,83 +3799,25 @@ class EntityEditor {
             }
 
             container.appendChild(section);
-        });
+        }
 
-        // HTML & CSS for export
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-            <meta charset="UTF-8">
-            <title>Exported Diagrams</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
-                    font-size: 12px;
-                }
-                .export-container {
-                    max-width: 100%;
-                }
-                .diagram-section {
-                    margin-bottom: 30px;
-                    padding: 10px;
-                    border: 1px solid #ccc;
-                    border-radius: 8px;
-                    page-break-after: always;
-                }
-                .svg-wrapper {
-                    text-align: center;
-                    margin-bottom: 10px;
-                }
-                .svg-wrapper svg {
-                    max-width: 100%;
-                    height: auto;
-                }
-                .table-wrapper {
-                    overflow-x: auto;
-                    margin-top: 10px;
-                }
-                table {
-                    border-collapse: collapse;
-                    width: 100%;
-                    font-size: 11px;
-                }
-                th, td {
-                    border: 1px solid #999;
-                    padding: 6px;
-                    text-align: left;
-                }
-                th {
-                    background-color: #eee;
-                }
-                @media print {
-                    body {
-                        margin: 10mm;
-                        font-size: 10px;
-                    }
-                    h3 {
-                        font-size: 14px;
-                        margin-bottom: 5px;
-                    }
-                    .svg-wrapper svg,
-                    .table-wrapper table {
-                        max-width: 100%;
-                        page-break-inside: avoid;
-                    }
-                    .diagram-section {
-                        page-break-after: always;
-                    }
-                }
-            </style>
-            </head>
-            <body>
-            ${container.innerHTML}
-            </body>
-            </html>
-        `;
+        const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Exported Diagrams</title>
+        <style>
+            body { font-family: Arial; font-size: 12px; margin: 20px; }
+            .diagram-section { margin-bottom: 30px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; page-break-after: always; }
+            .svg-wrapper { text-align: center; margin-bottom: 10px; }
+            .svg-wrapper svg { max-width: 100%; height: auto; }
+            .table-wrapper { overflow-x: auto; }
+            table { border-collapse: collapse; width: 100%; font-size: 11px; }
+            th, td { border: 1px solid #999; padding: 6px; text-align: left; }
+            th { background-color: #eee; }
+            @media print {
+                body { font-size: 10px; margin: 10mm; }
+                h3 { font-size: 14px; margin-bottom: 5px; }
+                .svg-wrapper svg, .table-wrapper table { page-break-inside: avoid; }
+            }
+        </style></head><body>${container.innerHTML}</body></html>`;
 
-        // Trigger download
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -3867,6 +3825,137 @@ class EntityEditor {
         a.download = 'diagrams.html';
         a.click();
         URL.revokeObjectURL(url);
+    }
+
+    /**
+     * Converts an SVG element to a PNG data URL using canvas.
+     *
+     * @param {SVGElement} svgElement - The SVG element to convert.
+     * @returns {Promise<string>} A promise resolving to a PNG data URL.
+     */
+    async convertSvgToPng(svgElement) {
+        return new Promise((resolve) => {
+            // Clone the SVG element to avoid modifying the original
+            const clonedSvg = svgElement.cloneNode(true);
+
+            // Ensure the SVG namespace is explicitly set
+            clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+            // Create a style element and embed the desired font styles
+            const styleElement = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            // Use a general selector like 'svg' or '*' to apply styles broadly
+            // or target specific elements if known. Here, 'svg' targets the root.
+            styleElement.textContent = `
+                svg, text {
+                    font-family: Arial, sans-serif;
+                    font-size: 11px;
+                }
+            `;
+
+            // Find or create a <defs> element to append the style.
+            // <defs> is a standard place for definitions like styles, gradients, etc.
+            let defs = clonedSvg.querySelector('defs');
+            if (!defs) {
+                defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                // Prepend defs to ensure it's at the beginning of the SVG content
+                clonedSvg.prepend(defs);
+            }
+            defs.appendChild(styleElement);
+
+            // No longer appending to document.body to avoid disturbing the DOM layout.
+            // The SVG will be processed as a detached DOM node.
+
+            // Use requestAnimationFrame to ensure any internal browser rendering queues are processed
+            // before serialization, though its impact might be less significant for detached nodes.
+            requestAnimationFrame(() => {
+                try {
+                    // Determine the target element for bounding box calculation.
+                    // Prioritize specific graphic elements, then fall back to the SVG itself.
+                    let bboxTarget = clonedSvg.querySelector('g, path, rect, circle, ellipse, line, polygon, polyline, text') || clonedSvg;
+
+                    // If SVG width/height are not set and getBBox is available, calculate them.
+                    // Note: getBBox() might not be reliable on detached elements in all browsers.
+                    // If dimensions are crucial and getBBox() fails, ensure the original SVG
+                    // has explicit width/height or provide appropriate fallbacks.
+                    if (
+                        (!clonedSvg.hasAttribute('width') || !clonedSvg.hasAttribute('height')) &&
+                        typeof bboxTarget.getBBox === 'function'
+                    ) {
+                        try {
+                            const bbox = bboxTarget.getBBox();
+                            // Ensure width and height are positive, provide fallbacks
+                            const width = Math.ceil(bbox.width || 800);
+                            const height = Math.ceil(bbox.height || 600);
+                            clonedSvg.setAttribute('width', width);
+                            clonedSvg.setAttribute('height', height);
+                        } catch (e) {
+                            console.warn('⚠️ getBBox() failed on detached SVG element, using fallback dimensions.', e);
+                            // Fallback to default dimensions if getBBox fails
+                            clonedSvg.setAttribute('width', '800');
+                            clonedSvg.setAttribute('height', '600');
+                        }
+                    } else if (!clonedSvg.hasAttribute('width') || !clonedSvg.hasAttribute('height')) {
+                        // If getBBox is not a function or not available, use default fallbacks
+                        clonedSvg.setAttribute('width', clonedSvg.getAttribute('width') || '800');
+                        clonedSvg.setAttribute('height', clonedSvg.getAttribute('height') || '600');
+                    }
+
+
+                    // Serialize the SVG DOM into an XML string
+                    const serializer = new XMLSerializer();
+                    let svgString = serializer.serializeToString(clonedSvg);
+
+                    // Double-check and ensure the SVG namespace is present at the root
+                    if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                        svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+
+                    // Create a Blob from the SVG string
+                    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+                    // Create an object URL for the Blob
+                    const url = URL.createObjectURL(svgBlob);
+
+                    // Create a new Image object
+                    const img = new Image();
+
+                    // Set up the onload handler for the image
+                    img.onload = () => {
+                        // Create a canvas element
+                        const canvas = document.createElement('canvas');
+                        // Set canvas dimensions to match the image
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        // Get the 2D rendering context
+                        const ctx = canvas.getContext('2d');
+                        // Draw the SVG image onto the canvas
+                        ctx.drawImage(img, 0, 0);
+
+                        // Clean up: revoke the object URL
+                        URL.revokeObjectURL(url);
+
+                        // Resolve the promise with the PNG data URL
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+
+                    // Set up the onerror handler for the image
+                    img.onerror = (err) => {
+                        console.error('❌ Failed to load SVG image for PNG conversion', err);
+                        console.debug('🔍 SVG string that failed:', svgString);
+                        // Clean up even on error
+                        URL.revokeObjectURL(url);
+                        // Resolve with an empty string or reject the promise
+                        resolve('');
+                    };
+
+                    // Set the image source to the object URL, triggering the load process
+                    img.src = url;
+                } catch (err) {
+                    console.error('❌ Error during SVG → PNG conversion:', err);
+                    // Resolve with an empty string or reject the promise
+                    resolve('');
+                }
+            });
+        });
     }
 
 

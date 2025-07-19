@@ -652,11 +652,17 @@ label {
 }
 
 .diagram-export-selector{
-    max-height: 200px;
-    overflow: auto;
     li{
         line-height: 1.5;
+        ul{
+            max-height: 200px;
+            overflow: auto;
+            padding-left: 20px;
+        }
     }
+
+    
+    
 }
 .data-preview-table{
     td

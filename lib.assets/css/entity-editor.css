@@ -532,12 +532,13 @@ label {
   white-space: nowrap;
 }
 
-.diagram-export-selector {
-  max-height: 200px;
-  overflow: auto;
-}
 .diagram-export-selector li {
   line-height: 1.5;
+}
+.diagram-export-selector li ul {
+  max-height: 200px;
+  overflow: auto;
+  padding-left: 20px;
 }
 
 .data-preview-table td {
