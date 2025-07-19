@@ -2735,6 +2735,7 @@ class EntityEditor {
      * (e.g., button click) due to browser security restrictions.
      * 
      * If clipboard access is denied or fails, an error is logged.
+     * @async
      */
     async importFromClipboardManually() {
         try {
@@ -3141,6 +3142,7 @@ class EntityEditor {
      * @param {Function} callback - The callback function to be called when the OK button is clicked.
      * 
      * @returns {void} - This function does not return a value.
+     * @async
      */
     showAlertDialog(message, title, captionOk, callback)
     {
@@ -3716,6 +3718,7 @@ class EntityEditor {
      *
      * @param {Array} diagramToExport - An array of diagram objects to export. Each should contain an ID and list of entities.
      * @param {boolean} usePng - If true, SVGs will be converted to PNG images before embedding in the HTML.
+     * @async
      */
     async exportHTMLDocument(diagramToExport, usePng = false) {
         const entityIds = [];
@@ -3839,6 +3842,7 @@ class EntityEditor {
      *
      * @param {SVGElement} svgElement - The SVG element to convert.
      * @returns {Promise<string>} A promise resolving to a PNG data URL.
+     * @async
      */
     async convertSvgToPng(svgElement) {
         return new Promise((resolve) => {
