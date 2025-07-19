@@ -525,7 +525,7 @@ body {
 }
 
 .icon-export::before {
-  content: "📤";
+  content: "🗃️";
 }
 
 label {
