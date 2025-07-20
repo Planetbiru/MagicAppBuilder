@@ -3812,22 +3812,55 @@ class EntityEditor {
             container.appendChild(section);
         }
 
+        const now = new Date();
+        const generatedAt = now.toLocaleString(); // or .toISOString() 
+
         const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Exported Diagrams</title>
-        <style>
-            body { font-family: Arial; font-size: 12px; margin: 20px; }
-            .diagram-section { margin-bottom: 30px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; page-break-after: always; }
-            .svg-wrapper { text-align: center; margin-bottom: 10px; }
-            .svg-wrapper svg { max-width: 100%; height: auto; }
-            .table-wrapper { overflow-x: auto; }
-            table { border-collapse: collapse; width: 100%; font-size: 11px; }
-            th, td { border: 1px solid #999; padding: 6px; text-align: left; }
-            th { background-color: #eee; }
-            @media print {
-                body { font-size: 10px; margin: 10mm; }
-                h3 { font-size: 14px; margin-bottom: 5px; }
-                .svg-wrapper svg, .table-wrapper table { page-break-inside: avoid; }
-            }
-        </style></head><body>${container.innerHTML}</body></html>`;
+            <style>
+                body { font-family: Arial; font-size: 12px; margin: 20px; }
+                .document-center { text-align: center; }
+                .generated-info { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; }
+
+                .diagram-section {
+                    margin-bottom: 30px;
+                    border-radius: 8px;
+                    padding: 10px;
+                    page-break-after: always;
+                }
+
+                @media screen {
+                    .diagram-section {
+                        border: 1px solid #ccc;
+                        border-radius: 8px;
+                    }
+                }
+
+                @media print {
+                    .diagram-section {
+                        border: none !important;
+                        border-radius: 0 !important;
+                    }
+                }
+
+                .svg-wrapper { text-align: center; margin-bottom: 10px; }
+                .svg-wrapper svg { max-width: 100%; height: auto; }
+                .table-wrapper { overflow-x: auto; }
+                table { border-collapse: collapse; width: 100%; font-size: 11px; }
+                th, td { border: 1px solid #999; padding: 6px; text-align: left; }
+                th { background-color: #eee; }
+
+                @media print {
+                    body { font-size: 10px; margin: 10mm; }
+                    h3 { font-size: 14px; margin-bottom: 5px; }
+                    .svg-wrapper svg, .table-wrapper table { page-break-inside: avoid; }
+                }
+            </style></head>
+            <body>
+                <h1 class="document-center">Entity Relationship Diagram</h1>
+                <div class="generated-info">Generated at: ${generatedAt}</div>
+                ${container.innerHTML}
+            </body></html>`;
+
 
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
