@@ -734,17 +734,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         reader.readAsText(file);
     });
-    
-    document.querySelector('.export-diagram').addEventListener('click', function(e){
-        e.preventDefault();
-        editor.showExportHTMLDialog();
-    });
-
 
     // Apply to both tables
     enableArrowKeyNavigation('#table-entity-editor');
     enableArrowKeyNavigation('#table-template-editor');
-
 
     init();
 
