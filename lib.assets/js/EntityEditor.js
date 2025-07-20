@@ -3685,7 +3685,6 @@ class EntityEditor {
 
         const rowDataMap = {};
 
-        // Kelompokkan input berdasarkan baris
         inputs.forEach(input => {
             const row = input.dataset.row;
             const col = input.dataset.col;
@@ -3697,18 +3696,17 @@ class EntityEditor {
             rowDataMap[row][col] = input.value;
         });
 
-        // Konversi ke array
         const newData = Object.keys(rowDataMap)
             .sort((a, b) => parseInt(a) - parseInt(b))
             .map(rowKey => rowDataMap[rowKey]);
 
-        // Update entity data
         entity.data = newData;
         let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
         let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
         let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
         let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
+        this.exportToSQL();
         modal.style.display = 'none';
     }
 
