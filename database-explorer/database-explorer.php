@@ -203,13 +203,13 @@ if(!isset($databaseName))
                             <button class="btn" onclick="editor.uploadEntities()">Import Entity</button>
                             <button class="btn" onclick="editor.downloadEntities()">Export Entity</button>
                             <button class="btn" onclick="editor.importSQL()">Import SQL</button>
-                            <button class="btn" onclick="editor.appendFromSQL()">Append Entity</button>
                             <button class="btn" onclick="editor.importSheet()">Import Spreadsheet</button>
                             <button class="btn" onclick="editor.triggerImportFromClipboard()">Import Clipboard</button>
-                            <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
                             <button class="btn" onclick="downloadSVG()">Export SVG</button>
                             <button class="btn" onclick="downloadPNG()">Export PNG</button>
                             <button class="btn" onclick="downloadMD()">Export MD</button>
+                            <button class="btn" onclick="downloadHTML()">Export HTML</button>
+                            <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
                             <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>    
                             <button class="btn" onclick="editor.sortAndGroupEntities()">Sort Entity by Type</button>              
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
