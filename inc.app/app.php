@@ -37,7 +37,16 @@ database:
     databaseSchema: public
     timeZone: Asia/Jakarta
     databaseFilePath: ''
-
+sessions:
+    name: MAGICAPP
+    maxLifeTime: 86400
+    saveHandler: files
+    savePath: ''
+    cookiePath: /
+    cookieDomain: ''
+    cookieSecure: false
+    cookieHttpOnly: false
+    cookieSameSite: Strict
 role:
     bypassRole: true
 

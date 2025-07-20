@@ -415,7 +415,7 @@ $nameInIndonesian = array(
                             <tr>
                                 <td>Cookie Same Site</td>
                                 <td>
-                                    <select class="form-control" name="sessions_cookie_samesite" id="sessions_cookie_samesite">
+                                    <select class="form-control" name="sessions_cookie_same_site" id="sessions_cookie_same_site">
                                         <option value="None" <?php echo $cfgSession->getCookieSameSite() == 'None' ? $constSelected : ''; ?>>None</option>
                                         <option value="Lax" <?php echo $cfgSession->getCookieSameSite() == 'Lax' ? $constSelected : ''; ?>>Lax</option>
                                         <option value="Strict" <?php echo $cfgSession->getCookieSameSite() == 'Strict' ? $constSelected : ''; ?>>Strict</option>
