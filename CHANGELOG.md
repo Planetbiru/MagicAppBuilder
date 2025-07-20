@@ -1824,6 +1824,34 @@ This change ensures more accurate and complete relationship diagrams, especially
 
 * **Resolved minor inconsistencies in CSV column typing during export/import**, especially for boolean and date types.
 
+* **Fixed incorrect SameSite attribute behavior in generated apps:**
+
+  * The session configuration key `cookieSamesite` has been corrected to `cookieSameSite`, matching the proper casing.
+  * The `SameSite` cookie attribute is now correctly set, improving security and cross-browser compatibility.
+
+## New Configuration Options
+
+### Custom Session and Cookie Settings
+
+MagicAppBuilder now support **customizable session and cookie settings** through a structured `sessions` configuration.
+
+You can define:
+
+* `name`: Custom session name.
+* `maxLifeTime`: Session maximum lifetime (in seconds).
+* `saveHandler`: Session storage method (e.g., `files`, `redis`).
+* `savePath`: Path or location for storing session data.
+* `cookiePath`: The path scope for the session cookie.
+* `cookieDomain`: The domain for which the cookie is valid.
+* `cookieSecure`: Whether the cookie should only be sent over HTTPS.
+* `cookieHttpOnly`: Whether the cookie is inaccessible to JavaScript.
+* `cookieSameSite`: Cross-origin policy for the cookie (`Strict`, `Lax`, or `None`).
+
+This addition gives developers full control over session behavior in MagicAppBuilder — improving security, compatibility, and flexibility across deployment environments.
+
+To modify these settings, open the `core.yml` file located in the `inc.cfg` directory under the document root of your MagicAppBuilder installation.
+
+
 ## Summary
 
 MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareable data format. Combined with HTML documentation export and clipboard import from version 1.13.0, this release brings even more flexibility to your entity design and data integration workflows.

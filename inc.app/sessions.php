@@ -7,6 +7,32 @@ if($builderConfig != null && $builderConfig->getSessions() != null)
 {
     $sessionConfig = $builderConfig->getSessions();
     $sessions = new PicoSession($sessionConfig);
+
+    $appCookieMaxLifetime = $sessionConfig->getMaxLifetime();
+    $appCookiePath = $sessionConfig->getCookiePath();
+    $appCookieDomain = $sessionConfig->getCookieDomain();
+    $appCookieSecure = $sessionConfig->isCookieSecure();
+    $appCookieHttpOnly = $sessionConfig->isCookieHttpOnly();
+    $appCookieSameSite = $sessionConfig->getCookieSameSite();
+
+    if(!isset($appCookiePath))
+    {
+        $appCookiePath = "/";
+    }
+    if(!isset($appCookieMaxLifetime))
+    {
+        $appCookieMaxLifetime = "/";
+    }
+
+    $sessions->setSessionCookieParams(
+        $appCookieMaxLifetime,
+        $appCookiePath,
+        $appCookieDomain,
+        $appCookieSecure,
+        $appCookieHttpOnly,
+        $appCookieSameSite
+    );
+
 }
 else
 {
