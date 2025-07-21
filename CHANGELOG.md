@@ -1859,7 +1859,8 @@ MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareab
 
 # MagicAppBuilder Version 1.15.0
 
-Version 1.15.0 introduces additional flexibility in how application icons are managed, making it easier to work with scalable vector formats. This update also brings a significant enhancement to the clipboard import functionality, making it more robust when handling different types of data. Overall, this release focuses on **enhancing visual customization and compatibility** in your generated applications.
+Version 1.15.0 introduces additional flexibility in how application icons are managed, making it easier to work with scalable vector formats. This update also brings a significant enhancement to the clipboard import functionality and a new feature for managing your projects. Overall, this release focuses on **enhancing visual customization and compatibility** in your generated applications.
+
 
 ## What's New
 
@@ -1876,10 +1877,18 @@ This change gives developers and designers more freedom in customizing the appea
 
 The **Entity Editor** now includes a smarter import feature. When a user pastes content that is not a standard HTML table (e.g., data copied directly from a spreadsheet or document), the editor will attempt to convert the clipboard content to HTML and automatically parse the first table it finds. This enhancement makes the import process more resilient and user-friendly, especially when importing from applications like **Microsoft Word**, **Google Docs**, or tables on **web pages**.
 
+### Application and Workspace Favorites
+
+You can now mark your most-used applications and workspaces as **favorites**. This is a powerful feature for developers who manage a large number of projects, as it provides quick access to your most important items.
+* **Starring** an application or workspace will place it at the very top of the list.
+* Favorited items are prioritized regardless of their active status, ensuring your key projects are always easy to find.
+
+
 ## Compatibility Note
 
 * The SVG-to-PNG fallback mechanism is retained for legacy environments or where rasterized previews are required.
 * Previously uploaded PNG icons remain compatible and functional.
+
 
 ## Bug Fixes
 
