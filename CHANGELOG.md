@@ -1856,3 +1856,30 @@ To modify these settings, open the `core.yml` file located in the `inc.cfg` dire
 
 MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareable data format. Combined with HTML documentation export and clipboard import from version 1.13.0, this release brings even more flexibility to your entity design and data integration workflows.
 
+
+# MagicAppBuilder Version 1.15.0
+
+Version 1.15.0 introduces additional flexibility to how application icons are managed — making it easier to work with scalable vector formats. This update focuses on **enhancing visual customization and compatibility** in your generated apps.
+
+## What's New
+
+### Support for SVG Icons
+
+You can now upload **SVG files** as application icons in addition to PNG files.
+
+- SVGs offer **resolution-independent quality**, making them ideal for responsive UIs and high-DPI displays.
+- The icon uploader now accepts both `.svg` and `.png` file formats.
+- Internally, SVG files are sanitized and rendered consistently across all supported browsers.
+
+This change gives developers and designers more freedom in customizing the appearance of apps built with MagicAppBuilder.
+
+## Compatibility Note
+
+- The SVG-to-PNG fallback mechanism is retained for legacy environments or where rasterized previews are required.
+- Previously uploaded PNG icons remain compatible and functional.
+
+## Bug Fixes
+
+- Fixed an issue where uploading invalid or corrupt image files could cause silent failures in the icon selection interface.
+- Improved error handling and feedback when uploading unsupported formats.
+
