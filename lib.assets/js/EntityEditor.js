@@ -3723,9 +3723,6 @@ class EntityEditor {
             if (svgEl) {
                 svgEl.dataset.name = diagram.name;
                 const cloned = svgEl.cloneNode(true);
-
-                cloned.querySelectorAll("foreignObject").forEach(el => el.remove());
-
                 svgs.push(cloned);
             }
         });
