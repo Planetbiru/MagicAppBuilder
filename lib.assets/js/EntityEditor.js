@@ -2659,12 +2659,12 @@ class EntityEditor {
             if (ext === 'csv') {
                 const parsed = Papa.parse(contents, { header: true });
                 const headers = parsed.meta.fields;
-                const rows = parsed.data;
+                const json = parsed.data;
 
                 const entityName = _this.toValidTableName(file.name);
-                const columns = _this.generateCreateTable(headers, rows);
+                const columns = _this.generateCreateTable(headers, json);
                 _this.importFromSheet(columns, entityName);
-                _this.currentEntityData = rows;
+                _this.currentEntityData = json;
             } else if (ext === 'xlsx' || ext === 'xls') {
                 const uint8Array = new Uint8Array(contents);
                 const workbook = XLSX.read(uint8Array, { type: "array" });
