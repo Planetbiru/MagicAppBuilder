@@ -1859,27 +1859,29 @@ MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareab
 
 # MagicAppBuilder Version 1.15.0
 
-Version 1.15.0 introduces additional flexibility to how application icons are managed — making it easier to work with scalable vector formats. This update focuses on **enhancing visual customization and compatibility** in your generated apps.
+Version 1.15.0 introduces additional flexibility in how application icons are managed, making it easier to work with scalable vector formats. This update also brings a significant enhancement to the clipboard import functionality, making it more robust when handling different types of data. Overall, this release focuses on **enhancing visual customization and compatibility** in your generated applications.
 
 ## What's New
 
 ### Support for SVG Icons
 
 You can now upload **SVG files** as application icons in addition to PNG files.
-
-- SVGs offer **resolution-independent quality**, making them ideal for responsive UIs and high-DPI displays.
-- The icon uploader now accepts both `.svg` and `.png` file formats.
-- Internally, SVG files are sanitized and rendered consistently across all supported browsers.
+* SVGs offer **resolution-independent quality**, making them ideal for responsive UIs and high-DPI displays.
+* The icon uploader now accepts both `.svg` and `.png` file formats.
+* Internally, SVG files are sanitized and rendered consistently across all supported browsers.
 
 This change gives developers and designers more freedom in customizing the appearance of apps built with MagicAppBuilder.
 
+### Enhanced Clipboard Import
+
+The **Entity Editor** now includes a smarter import feature. When a user pastes content that is not a standard HTML table (e.g., data copied directly from a spreadsheet or document), the editor will attempt to convert the clipboard content to HTML and automatically parse the first table it finds. This enhancement makes the import process more resilient and user-friendly, especially when importing from applications like **Microsoft Word**, **Google Docs**, or tables on **web pages**.
+
 ## Compatibility Note
 
-- The SVG-to-PNG fallback mechanism is retained for legacy environments or where rasterized previews are required.
-- Previously uploaded PNG icons remain compatible and functional.
+* The SVG-to-PNG fallback mechanism is retained for legacy environments or where rasterized previews are required.
+* Previously uploaded PNG icons remain compatible and functional.
 
 ## Bug Fixes
 
-- Fixed an issue where uploading invalid or corrupt image files could cause silent failures in the icon selection interface.
-- Improved error handling and feedback when uploading unsupported formats.
-
+* Fixed an issue where uploading invalid or corrupt image files could cause silent failures in the icon selection interface.
+* Improved error handling and feedback when uploading unsupported formats.

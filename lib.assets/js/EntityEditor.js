@@ -2729,19 +2729,42 @@ class EntityEditor {
     }
 
     /**
-     * Reads plain text from the user's clipboard using the Clipboard API,
-     * then passes the content to `importFromClipboard()` for processing.
-     * 
-     * This method must be called in response to a user interaction
-     * (e.g., button click) due to browser security restrictions.
-     * 
-     * If clipboard access is denied or fails, an error is logged.
+     * Reads content from the user's clipboard, prioritizing HTML table data,
+     * then falling back to plain text if no HTML content is found.
+     * * This method must be called in response to a user interaction
+     * (e.g., a button click) due to browser security restrictions.
+     * * If clipboard access is denied or a read operation fails, an error is logged.
      * @async
      */
     async importFromClipboardManually() {
         try {
+            const clipboardItems = await navigator.clipboard.read();
+            let parsed;
+
+            // First, check for HTML content (e.g., from Excel or a web page).
+            for (const item of clipboardItems) {
+                if (item.types.includes('text/html')) {
+                    const htmlBlob = await item.getType('text/html');
+                    const htmlText = await htmlBlob.text();
+
+                    // Create a temporary div to parse the HTML and find a table.
+                    const div = document.createElement('div');
+                    div.innerHTML = htmlText;
+                    let tables = div.querySelectorAll('table');
+
+                    if (tables && tables.length > 0) {
+                        parsed = this.parseHtmlToJSON(tables[0]);
+                        this.importFromClipboard(parsed);
+                        return; // Exit after successfully parsing and importing the table.
+                    }
+                }
+            }
+
+            // If no HTML table was found in the clipboard, fall back to reading plain text.
             const text = await navigator.clipboard.readText();
-            this.importFromClipboard(text);
+            parsed = this.parseTextToJSON(text);
+            this.importFromClipboard(parsed);
+
         } catch (err) {
             console.error('Failed to read clipboard: ', err);
         }
@@ -2758,11 +2781,9 @@ class EntityEditor {
      *
      * Otherwise, the import will be skipped.
      *
-     * @param {string} text - The clipboard text in tab-separated table format.
+     * @param {Object} parsed - The clipboard text in tab-separated table format.
      */
-    importFromClipboard(text) {
-        // Parse clipboard text into headers and structured data
-        let parsed = this.parseClipboardTable(text);
+    importFromClipboard(parsed) {
 
         // Validate minimum header/data requirements
         const hasEnoughColumns = parsed.headers.length >= 2 && parsed.data.length >= 1;
@@ -2785,52 +2806,55 @@ class EntityEditor {
 
 
     /**
-     * Parses tab-separated clipboard text into headers and data rows.
-     * Trims empty rows and columns, converts headers to Ucwords,
-     * and returns a structured object with headers and row objects.
+     * Parses tab-separated text from a clipboard into a structured object.
+     * It's designed to handle content copied from spreadsheets (like Excel or Google Sheets).
+     * The function automatically trims empty rows and columns, converts headers to a
+     * standard format (Ucwords), and returns a clean object with headers and data rows.
      *
-     * @param {string} text - Clipboard content copied from a spreadsheet or table.
-     * @returns {{headers: string[], data: object[]}} - Parsed column headers and row data.
+     * @param {string} text - The clipboard content, typically tab-separated values.
+     * @returns {{headers: string[], data: object[]}} - An object containing an array of headers and an array of data objects.
      */
-    parseClipboardTable(text) {
-        // Normalize line breaks and split into lines
+    parseTextToJSON(text) {
+        // Normalize line breaks and split the text into an array of rows.
         let rows = text.trim().replace(/\r\n/g, '\n').split('\n');
 
-        // Split each row by tab and trim each cell
+        // Split each row by tabs to create a 2D array (table).
         let table = rows.map(row => row.split('\t').map(col => col.trim()));
 
-        // Remove empty rows at the beginning
+        // Trim any completely empty rows from the top and bottom of the table.
         while (table.length && table[0].every(cell => cell === '')) table.shift();
-        // Remove empty rows at the end
         while (table.length && table[table.length - 1].every(cell => cell === '')) table.pop();
 
         /**
-         * Transposes a 2D array (matrix), turning rows into columns and vice versa.
-         * Used here to trim empty columns.
+         * Transposes a 2D array, converting rows into columns and vice versa.
+         * This is a helper function used to easily trim empty columns.
          *
-         * @param {any[][]} matrix - The table to transpose.
-         * @returns {any[][]} - The transposed matrix.
+         * @param {any[][]} matrix - The array to transpose.
+         * @returns {any[][]} - The transposed array.
          */
         function transpose(matrix) {
+            // Handle empty matrix case
+            if (matrix.length === 0 || matrix[0].length === 0) return [];
             return matrix[0].map((_, i) => matrix.map(row => row[i]));
         }
 
-        // Transpose to process columns as rows
+        // Transpose the table to process columns as rows.
         let transposed = transpose(table);
-        // Remove empty columns at the beginning
+
+        // Trim any completely empty columns from the beginning and end.
         while (transposed.length && transposed[0].every(cell => cell === '')) transposed.shift();
-        // Remove empty columns at the end
         while (transposed.length && transposed[transposed.length - 1].every(cell => cell === '')) transposed.pop();
-        // Transpose back to original orientation
+
+        // Transpose back to the original row/column orientation.
         table = transpose(transposed);
 
-        // Return empty result if less than 2 rows (no data rows)
+        // If the table has fewer than 2 rows (header + at least one data row), return an empty result.
         if (table.length < 2) return { headers: [], data: [] };
 
-        // Convert header row to Ucwords format
+        // The first row is the header. Convert each header string to Ucwords format.
         const headers = table[0].map(header => toUcwords(header));
 
-        // Convert each data row into an object using headers as keys
+        // Convert each remaining data row into an object using the headers as keys.
         const data = table.slice(1).map(row => {
             let obj = {};
             headers.forEach((key, i) => {
@@ -2842,17 +2866,90 @@ class EntityEditor {
         return { headers, data };
 
         /**
+         * Converts the first letter of each word in a string to uppercase.
+         * Example: "first name" becomes "First Name".
+         *
+         * @param {string} str - The input string.
+         * @returns {string} - The string in Ucwords format.
+         */
+        function toUcwords(str) {
+            if (!str) return '';
+            return str.replace(/\w\S*/g, word =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            );
+        }
+    }
+    
+    /**
+     * Parses an HTML table element and converts its content into a structured JSON object.
+     * * This function is designed to handle three scenarios:
+     * 1. A table with a <thead> and <tbody>: It uses the <thead> for column headers.
+     * 2. A table with only a <tbody>: It treats the first row in <tbody> as headers.
+     * 3. A table with no <thead> or <tbody>: It treats the first row as headers.
+     * * Headers are automatically converted to Ucwords format.
+     * * @param {HTMLTableElement} table - The HTML table element to parse.
+     * @returns {{headers: string[], data: object[]}} An object containing an array of headers and an array of row objects.
+     */
+    parseHtmlToJSON(table) {
+        const data = [];
+        let headers = [];
+        let dataRows = [];
+
+        /**
          * Converts each word in a string to Ucwords format.
-         * For example, "first name" becomes "First Name".
+         * Example: "first name" becomes "First Name".
          *
          * @param {string} str - The input string.
          * @returns {string} - The transformed string in Ucwords format.
          */
         function toUcwords(str) {
-            return str.replace(/\w\S*/g, word => 
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            );
+            if (!str) return '';
+            return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
         }
+
+        // Scenario 1: Table has a <thead>
+        if (table.tHead) {
+            const headerRow = table.tHead.querySelector('tr');
+            headers = Array.from(headerRow.children).map(cell => toUcwords(cell.textContent.trim()));
+            dataRows = Array.from(table.tBodies?.[0]?.rows || []);
+        } 
+        // Scenarios 2 & 3: Table does not have a <thead>
+        else {
+            const allRows = Array.from(table.rows);
+            if (allRows.length > 0) {
+                const headerRow = allRows[0];
+                headers = Array.from(headerRow.children).map(cell => toUcwords(cell.textContent.trim()));
+                // The data rows start from the second row
+                dataRows = allRows.slice(1);
+            }
+        }
+
+        // If no headers were found, return an empty object to avoid errors.
+        if (headers.length === 0) {
+            return { headers: [], data: [] };
+        }
+
+        // Iterate over each data row and convert it to an object.
+        for (const row of dataRows) {
+            const rowData = {};
+            const cells = Array.from(row.cells);
+            
+            // Iterate through each cell and map its content to the corresponding header.
+            for (let i = 0; i < headers.length; i++) {
+                const header = headers[i];
+                const cell = cells[i];
+                
+                if (cell) {
+                    rowData[header] = cell.textContent.trim();
+                } else {
+                    // Add null if a cell is missing to maintain consistent data structure.
+                    rowData[header] = null;
+                }
+            }
+            data.push(rowData);
+        }
+
+        return { headers, data };
     }
 
     /**

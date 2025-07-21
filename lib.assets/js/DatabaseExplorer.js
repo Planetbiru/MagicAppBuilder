@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
-    document.addEventListener('paste', function(event) {
+    document.addEventListener('paste', async function(event) {
         const target = event.target;
 
         // Do not intercept paste if the target is an editable element
@@ -471,16 +471,40 @@ document.addEventListener('DOMContentLoaded', () => {
             target.isContentEditable;
 
         // Only handle custom paste when not in an editable element and inside .entity-editor
-        if (!isEditableElement && target && target.closest('.entity-editor')) // NOSONAR
-        {
+        if (!isEditableElement && target && target.closest('.entity-editor')) {
             event.preventDefault(); // block default paste behavior
-            let text = '';
-            if (event.clipboardData) {
-            text = event.clipboardData.getData('text/plain');
-            } else if (window.clipboardData) {
-            text = window.clipboardData.getData('Text');
+
+            let parsed;
+            try {
+                // Use await to wait for the promise from clipboard.read() to resolve
+                const clipboardItems = await navigator.clipboard.read();
+                
+                for (const item of clipboardItems) {
+                    if (item.types.includes('text/html')) {
+                        const htmlBlob = await item.getType('text/html'); // 'await' is also needed here
+                        const htmlText = await htmlBlob.text(); // And here
+                        
+                        const div = document.createElement('div');
+                        div.innerHTML = htmlText;
+                        let tables = div.querySelectorAll('table');
+                        
+                        if(tables && tables.length > 0) {
+                            parsed = editor.parseHtmlToJSON(tables[0]);
+                            editor.importFromClipboard(parsed);
+                            return; // Return after finding an HTML table
+                        }
+                    }
+                }
+
+                // If there is no HTML data, try reading as plain text
+                const text = await navigator.clipboard.readText();
+                parsed = editor.parseTextToJSON(text);
+                editor.importFromClipboard(parsed);
+                
+            } catch (error) {
+                console.error('Failed to read from clipboard:', error);
+                // Add a fallback or an error message to the user if needed
             }
-            editor.importFromClipboard(text);
         }
     });
 
