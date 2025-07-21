@@ -1,6 +1,15 @@
-
-
+/**
+ * Represents a diagram containing a subset of entities.
+ */
 class Diagram {
+
+    /**
+     * Creates a new Diagram instance.
+     * 
+     * @param {string} name - The name of the diagram.
+     * @param {number} sortOrder - The sort order index of the diagram.
+     * @param {Entity[]} originalEntities - The full list of entities available for selection.
+     */
     constructor(name, sortOrder, originalEntities) {
         /**
          * Array of entity names included in this diagram.
@@ -35,7 +44,6 @@ class Diagram {
         this.createERD = function (updatedWidth, drawRelationship) {
             this.entityRenderer.createERD(this.getData(), updatedWidth, drawRelationship);
         };
-        
     }
 
     /**

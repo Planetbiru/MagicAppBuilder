@@ -162,7 +162,6 @@ class Entity {
         return formatted;
     }
 
-
     /**
      * Converts a boolean-like value into dialect-specific representation.
      *

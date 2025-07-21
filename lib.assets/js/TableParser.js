@@ -69,7 +69,6 @@ class TableParser {
             return obj;
         });
 
-
         // Return the parsed query structure.
         return { tableName, columns, rows };
     }
