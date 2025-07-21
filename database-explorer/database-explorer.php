@@ -41,6 +41,7 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
+    <script src="../lib.assets/js/SVGtoPNG.min.js"></script>
     <script src="../lib.assets/js/sql-wasm.min.js"></script>
     <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
     <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
