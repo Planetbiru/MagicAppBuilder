@@ -1,5 +1,3 @@
-
-
 let selectedItem = null; // To store the selected file or directory
 let contentModified = true;
 let currentMode = null;
@@ -147,12 +145,12 @@ function initFileManager()
           event.stopPropagation();
         }
     });
+
     document.querySelector('.root-directory').addEventListener("contextmenu", function (event) {
       showRootContextMenu(event, contextMenu);
       event.stopPropagation();
       event.preventDefault();
-    });
-      
+    });     
 
     // Hide context menu on click outside
     document.addEventListener("click", function () {
@@ -239,6 +237,18 @@ function initFileManager()
     fileManagerEditor.refresh();
 }
 
+/**
+ * Displays the custom context menu for the root directory at the cursor's position.
+ *
+ * This function prevents the default browser context menu from appearing,
+ * resets the selected item, and dynamically generates a context menu with options
+ * related to file and directory operations such as creating, uploading, resetting,
+ * and downloading content. It also ensures the menu is positioned within the visible
+ * window bounds.
+ *
+ * @param {MouseEvent} event - The right-click event triggering the context menu.
+ * @param {HTMLElement} contextMenu - The HTML element representing the context menu.
+ */
 function showRootContextMenu(event, contextMenu) {
   event.preventDefault(); // Prevent the default context menu from appearing
   selectedItem = null; // Reset selected item
@@ -378,8 +388,8 @@ function createNewFile(dir)
  * structure or resetting the file manager content.
  * 
  * @param {string} dir - The directory where the new directory should be created. 
- *                        If an empty string is passed, the new directory will be 
- *                        created at the root level. 
+ *                       If an empty string is passed, the new directory will be 
+ *                       created at the root level. 
  */
 function createNewDirectory(dir)
 {

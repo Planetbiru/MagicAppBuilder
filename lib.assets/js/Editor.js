@@ -10,13 +10,11 @@ let transEd3 = null;
 let transEd4 = null;
 let transEd5 = null;
 let transEd6 = null;
-
 let currentTab = "";
 let lastLine1 = -1;
 let lastLine2 = -1;
 let focused = {};
 let modeInput = null;
-
 let fileManagerEditor = null;
 
 /**

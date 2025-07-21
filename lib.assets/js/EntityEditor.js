@@ -1,5 +1,3 @@
-
-
 /**
  * Class to manage the creation, editing, and deletion of database entities (tables),
  * as well as generating SQL statements for the entities.

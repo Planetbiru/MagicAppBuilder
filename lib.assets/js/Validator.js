@@ -1,10 +1,26 @@
+/**
+ * EnumEditor handles the creation and management of a list of enumerated values.
+ * 
+ * This component provides a simple UI for users to input multiple enum values
+ * which are rendered as input fields and outputted as a string in the format: {"A", "B", "C"}.
+ */
 class EnumEditor {
+    /**
+     * Constructs the EnumEditor instance.
+     * 
+     * @param {HTMLElement} parentElement - The parent element where the enum editor will be rendered.
+     */
     constructor(parentElement) {
         this.parent = parentElement;
+
+        // Container for dynamically added enum inputs
         this.itemsContainer = document.createElement('div');
+
+        // Output container to store the final enum string value
         this.outputContainer = this.parent.closest('.modal').querySelector('[data-prop="allowedValues"]');
         this.outputContainer.value = '';
 
+        // Button to add new enum item
         const addButton = document.createElement('button');
         addButton.className = 'btn btn-primary mt-2';
         addButton.innerHTML = '<i class="fa fa-plus"></i> Add Item';
@@ -13,20 +29,34 @@ class EnumEditor {
 
         this.parent.appendChild(this.itemsContainer);
         this.parent.appendChild(addButton);
-        this.addItem();
+        this.addItem(); // Start with one input field
     }
 
+    /**
+     * Sanitizes a string by removing double and single quotes.
+     * 
+     * @param {string} value - The input string to sanitize.
+     * @returns {string} - The sanitized string.
+     */
     sanitize(value) {
         return value.replace(/["']/g, ''); // remove double and single quotes
     }
 
+    /**
+     * Adds a new input field for an enum item.
+     * 
+     * @param {string} [value=''] - Optional initial value for the new item.
+     */
     addItem(value = '') {
         const div = document.createElement('div');
         div.className = 'enum-item input-group';
+
         let table = document.createElement('table');
         table.className = 'table table-borderless table-enum';
+
         let tbody = document.createElement('tbody');
         let tr = document.createElement('tr');
+
         let td1 = document.createElement('td');
         let td2 = document.createElement('td');
         td2.setAttribute('width', '30');
@@ -48,21 +78,23 @@ class EnumEditor {
 
         td1.appendChild(input);
         td2.appendChild(btn);
-
         tr.appendChild(td1);
         tr.appendChild(td2);
-
         tbody.appendChild(tr);
-
         table.appendChild(tbody);
-
         div.appendChild(table);
 
         this.itemsContainer.appendChild(div);
 
-        this.updateOutput();
+        this.updateOutput(); // Update output string
     }
 
+
+    /**
+     * Updates the output string based on current input values.
+     * 
+     * The output is formatted like: {"Value1", "Value2"} or empty string if no valid items.
+     */
     updateOutput() {
         const inputs = this.itemsContainer.querySelectorAll('input');
         const values = [];
