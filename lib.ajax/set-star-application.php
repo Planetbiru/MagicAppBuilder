@@ -15,9 +15,6 @@ $star = $inputPost->getStar(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, fal
 
 if(isset($adminId) && !empty($adminId) && $applicationId)
 {
-    $databaseBuilder->setCallbackDebugQuery(function($sql){
-       error_log($sql); 
-    });
     $starApplication = new StarApplication(null, $databaseBuilder);
     try
     {
