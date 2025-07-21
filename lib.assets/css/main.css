@@ -480,10 +480,14 @@ li.file-syntax-error a {
   min-height: 40px;
 }
 
-.workspace-item[data-selected=true],
-.application-item[data-selected=true] {
+.workspace-item[data-selected=true], .application-item[data-selected=true] {
   border-color: rgba(0, 0, 0, 0.15);
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.workspace-item .card-body .card-title, .application-item .card-body .card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .table td,

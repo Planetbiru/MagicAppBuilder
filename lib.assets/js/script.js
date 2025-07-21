@@ -3261,93 +3261,127 @@ let initAll = function () {
 
   $(document).on("click", '.upload-application-icons', function () {
     let applicationId = $(this).closest('form').find('input[name="application_id"]').val();
-    
+
     let el = document.querySelector('#iconFileInput');
     if (el) {
         el.parentNode.removeChild(el);
     }
 
-    // Create dynamic input file element
     const inputFile = document.createElement('input');
     inputFile.type = 'file';
-    inputFile.accept = 'image/png';
+    inputFile.accept = 'image/png, image/svg+xml';
     inputFile.id = 'iconFileInput';
     inputFile.style.position = 'absolute';
     inputFile.style.left = '-1000000px';
     inputFile.style.top = '-1000000px';
 
-    inputFile.addEventListener('change', function () {
+    inputFile.addEventListener('change', async function () {
         const selectedFile = inputFile.files[0];
         if (!selectedFile) {
-            asyncAlert('Please select a PNG file first.', 'Notification', [
+            asyncAlert('Please select an image file first.', 'Notification', [
                 { caption: 'Close', fn: () => {}, class: 'btn-primary' }
             ]);
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            const image = new Image();
-            image.onload = function () // NOSONAR
-            {
-                // Validate image dimensions (minimum 512x512)
-                if (image.width < 512 || image.height < 512) {
-                    asyncAlert('The image must be at least 512x512 pixels.', 'Notification', [
-                        { caption: 'Close', fn: () => {}, class: 'btn-primary' }
-                    ]);
-                    return;
-                }
+        const fileType = selectedFile.type;
 
-                // === PREVIEW the uploaded image ===
-                const previewImg = document.querySelector('.application-icon-preview');
-                if (previewImg) {
-                    previewImg.src = event.target.result;
-                    previewImg.width = 256;
-                    previewImg.height = 256;
-                }
+        let image = new Image();
+        let imageDataUrl = null;
 
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const iconSizes = [
-                    { size: 16, name: "favicon-16x16.png" },
-                    { size: 32, name: "favicon-32x32.png" },
-                    { size: 48, name: "favicon-48x48.png" },
-                    { size: 57, name: "apple-icon-57x57.png" },
-                    { size: 60, name: "apple-icon-60x60.png" },
-                    { size: 72, name: "apple-icon-72x72.png" },
-                    { size: 76, name: "apple-icon-76x76.png" },
-                    { size: 114, name: "apple-icon-114x114.png" },
-                    { size: 120, name: "apple-icon-120x120.png" },
-                    { size: 144, name: "apple-icon-144x144.png" },
-                    { size: 152, name: "apple-icon-152x152.png" },
-                    { size: 180, name: "apple-icon-180x180.png" },
-                    { size: 192, name: "android-icon-192x192.png" },
-                    { size: 256, name: "favicon.png" },
-                    { size: 512, name: "android-icon-512x512.png" }
-                ];
+        if (fileType === 'image/svg+xml') {
+            // Read SVG as text
+            const svgText = await selectedFile.text();
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            const svgElement = svgDoc.querySelector('svg');
 
-                iconSizes.forEach(icon => {
-                    canvas.width = icon.size;
-                    canvas.height = icon.size;
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
-                    const dataUrl = canvas.toDataURL('image/png');
-                    sendIconPngToServer(applicationId, dataUrl, icon.name);
-                });
+            if (!svgElement) {
+                asyncAlert('Invalid SVG content.', 'Notification', [
+                    { caption: 'Close', fn: () => {}, class: 'btn-primary' }
+                ]);
+                return;
+            }
 
-                generateFaviconICO(applicationId, image);
-                resetFileManager();
-            };
+            try {
+                // Convert SVG to PNG via helper function
+                imageDataUrl = await convertSvgToPng(svgElement);
+            } catch (err) {
+                console.error('SVG conversion error:', err);
+                asyncAlert('Failed to convert SVG to PNG.', 'Notification', [
+                    { caption: 'Close', fn: () => {}, class: 'btn-primary' }
+                ]);
+                return;
+            }
+        } else if (fileType === 'image/png') {
+            imageDataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(selectedFile);
+            });
+        } else {
+            asyncAlert('Unsupported file type. Please select PNG or SVG.', 'Notification', [
+                { caption: 'Close', fn: () => {}, class: 'btn-primary' }
+            ]);
+            return;
+        }
 
-            image.src = event.target.result;
+        // Load image for dimension validation and icon generation
+        image.onload = function () {
+            if (image.width < 512 || image.height < 512) {
+                asyncAlert('The image must be at least 512x512 pixels.', 'Notification', [
+                    { caption: 'Close', fn: () => {}, class: 'btn-primary' }
+                ]);
+                return;
+            }
+
+            const previewImg = document.querySelector('.application-icon-preview');
+            if (previewImg) {
+                previewImg.src = imageDataUrl;
+                previewImg.width = 256;
+                previewImg.height = 256;
+            }
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const iconSizes = [
+                { size: 16, name: "favicon-16x16.png" },
+                { size: 32, name: "favicon-32x32.png" },
+                { size: 48, name: "favicon-48x48.png" },
+                { size: 57, name: "apple-icon-57x57.png" },
+                { size: 60, name: "apple-icon-60x60.png" },
+                { size: 72, name: "apple-icon-72x72.png" },
+                { size: 76, name: "apple-icon-76x76.png" },
+                { size: 114, name: "apple-icon-114x114.png" },
+                { size: 120, name: "apple-icon-120x120.png" },
+                { size: 144, name: "apple-icon-144x144.png" },
+                { size: 152, name: "apple-icon-152x152.png" },
+                { size: 180, name: "apple-icon-180x180.png" },
+                { size: 192, name: "android-icon-192x192.png" },
+                { size: 256, name: "favicon.png" },
+                { size: 512, name: "android-icon-512x512.png" }
+            ];
+
+            iconSizes.forEach(icon => {
+                canvas.width = icon.size;
+                canvas.height = icon.size;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, icon.size, icon.size);
+                const dataUrl = canvas.toDataURL('image/png');
+                sendIconPngToServer(applicationId, dataUrl, icon.name);
+            });
+
+            generateFaviconICO(applicationId, image);
+            resetFileManager();
         };
 
-        reader.readAsDataURL(selectedFile);
+        image.src = imageDataUrl;
     });
 
-    // Trigger file dialog
     inputFile.click();
-  });
+});
+
 
   
   $(document).on('click', '.button-open-file', function(e1){
