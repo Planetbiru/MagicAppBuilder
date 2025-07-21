@@ -12,7 +12,7 @@ jQuery(function($) {
         // If the icon is "solid" (fa-solid fa-star), it's currently stared and will be changed to unstared (false).
         const isStared = clickedElement.find('i').hasClass('fa-solid');
         const newStarStatus = !isStared;
-
+        increaseAjaxPending();
         $.ajax({
             url: 'lib.ajax/set-star-application.php',
             type: 'POST',
@@ -21,9 +21,11 @@ jQuery(function($) {
                 star: newStarStatus ? 1 : 0 // Sending 1 or 0 is more common and consistent
             },
             success: function(response) {
+                decreaseAjaxPending();
                 loadApplicationList();
             },
             error: function(jqXHR, textStatus, errorThrown) {
+                decreaseAjaxPending();
                 // Show an error message if the request fails
                 console.error("Failed to change star status:", textStatus, errorThrown);
             }
@@ -44,7 +46,7 @@ jQuery(function($) {
         // If the icon is "solid" (fa-solid fa-star), it's currently stared and will be changed to unstared (false).
         const isStared = clickedElement.find('i').hasClass('fa-solid');
         const newStarStatus = !isStared;
-
+        increaseAjaxPending();
         $.ajax({
             url: 'lib.ajax/set-star-workspace.php',
             type: 'POST',
@@ -53,11 +55,12 @@ jQuery(function($) {
                 star: newStarStatus ? 1 : 0 // Sending 1 or 0 is more common and consistent
             },
             success: function(response) {
-                // Panggil fungsi untuk memuat ulang daftar workspace
+                decreaseAjaxPending();
                 loadWorkspaceList();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 // Show an error message if the request fails
+                decreaseAjaxPending();
                 console.error("Failed to change star status:", textStatus, errorThrown);
             }
         });
