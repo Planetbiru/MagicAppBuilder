@@ -1859,7 +1859,7 @@ MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareab
 
 # MagicAppBuilder Version 1.15.0
 
-Version 1.15.0 introduces additional flexibility in how application icons are managed, making it easier to work with scalable vector formats. This update also brings a significant enhancement to the clipboard import functionality and a new feature for managing your projects. Overall, this release focuses on **enhancing visual customization and compatibility** in your generated applications.
+Version 1.15.0 introduces additional flexibility in how application icons are managed, making it easier to work with scalable vector formats. This update also brings a significant enhancement to the clipboard import functionality, improved data validation in the Entity Editor, and a new feature for managing your projects. Overall, this release focuses on **enhancing visual customization, compatibility**, and **data consistency** in your generated applications.
 
 
 ## What's New
@@ -1867,21 +1867,34 @@ Version 1.15.0 introduces additional flexibility in how application icons are ma
 ### Support for SVG Icons
 
 You can now upload **SVG files** as application icons in addition to PNG files.
+
 * SVGs offer **resolution-independent quality**, making them ideal for responsive UIs and high-DPI displays.
 * The icon uploader now accepts both `.svg` and `.png` file formats.
 * Internally, SVG files are sanitized and rendered consistently across all supported browsers.
 
 This change gives developers and designers more freedom in customizing the appearance of apps built with MagicAppBuilder.
 
+
 ### Enhanced Clipboard Import
 
 The **Entity Editor** now includes a smarter import feature. When a user pastes content that is not a standard HTML table (e.g., data copied directly from a spreadsheet or document), the editor will attempt to convert the clipboard content to HTML and automatically parse the first table it finds. This enhancement makes the import process more resilient and user-friendly, especially when importing from applications like **Microsoft Word**, **Google Docs**, or tables on **web pages**.
 
+
 ### Application and Workspace Favorites
 
 You can now mark your most-used applications and workspaces as **favorites**. This is a powerful feature for developers who manage a large number of projects, as it provides quick access to your most important items.
+
 * **Starring** an application or workspace will place it at the very top of the list.
 * Favorited items are prioritized regardless of their active status, ensuring your key projects are always easy to find.
+
+
+### Duplicate Column Name Detection
+
+To ensure **data model integrity**, the **Entity Editor** now includes built-in validation for **duplicate column names**:
+
+* During entity creation or editing, the system automatically checks for repeated column names.
+* If duplicates are detected, a warning will be shown, highlighting the problematic field.
+* This helps prevent accidental overwrites and errors during code generation or database export.
 
 
 ## Compatibility Note
@@ -1894,3 +1907,4 @@ You can now mark your most-used applications and workspaces as **favorites**. Th
 
 * Fixed an issue where uploading invalid or corrupt image files could cause silent failures in the icon selection interface.
 * Improved error handling and feedback when uploading unsupported formats.
+* Fixed rendering glitch in the entity preview panel on certain browsers.

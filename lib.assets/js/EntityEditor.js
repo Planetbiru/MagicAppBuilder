@@ -677,14 +677,25 @@ class EntityEditor {
     /**
      * Saves the currently edited entity by either creating a new one or updating an existing one.
      *
-     * This method serves as the primary handler for entity persistence:
-     * 1. It first checks for duplicate entity names and prompts the user to rename the entity if a duplicate is found.
-     * 2. If the name is unique or the conflict is resolved, it calls `doSaveEntity()` to persist the data.
-     * 3. After saving, it checks for an active diagram tab (`.tabs-link-container li.diagram-tab.active`).
-     * 4. If an active diagram tab is present, it calls `selectDiagram()` to re-render the associated diagram
-     *    and reflect any updates to the entity data.
+     * This method serves as the primary handler for entity persistence. It performs the following steps:
      *
-     * This function ensures that both the underlying entity data and its visual representation in the diagram remain synchronized.
+     * 1. **Primary Key Validation**: Ensures that the entity has at least one primary key defined.
+     *    If not, an alert is shown and the save process is halted.
+     *
+     * 2. **Duplicate Column Check**: Detects any duplicate column names within the entity.
+     *    If found, an alert is shown specifying the duplicated column name, and focus is set to the problematic input field.
+     *
+     * 3. **Entity Name Duplication Check** (on create only): If the entity name already exists in the system,
+     *    a confirmation dialog prompts the user to rename the entity.
+     *
+     * 4. **Entity Persistence**: If all validations pass, it calls `doSaveEntity()` to persist the entity data.
+     *
+     * 5. **Diagram Synchronization**: After saving, it checks for an active diagram tab
+     *    (`.tabs-link-container li.diagram-tab.active`) and, if found, re-renders the diagram via `selectDiagram()`
+     *    to reflect the latest changes.
+     *
+     * This function ensures that the entity is valid and uniquely named before saving,
+     * and also keeps its visual representation up-to-date.
      */
     saveEntity() {
         const selector = this.selector + " .entity-container .entity-name";
@@ -693,6 +704,15 @@ class EntityEditor {
         
         if (!this.hasPrimaryKey()) {
             this.showAlertDialog("A primary key is required before saving the entity.", "Primary Key Required", "OK");
+            return;
+        }
+
+        let result = this.checkDuplicatedColumn();
+        if(result)
+        {
+            this.showAlertDialog(`Duplicate column name: '${result.name}'`, "Duplicated Column Name", "OK", function(){
+                result.element.select();
+            });
             return;
         }
         
@@ -724,6 +744,43 @@ class EntityEditor {
             this.selectDiagram(activeDiagram);
         }
     }
+
+    /**
+     * Checks for duplicated column names in the entity editor table.
+     *
+     * Iterates over all input fields with the class `.column-name` inside
+     * the `#table-entity-editor` element scoped by `this.selector`.
+     * If a duplicate column name is found, it returns an object containing:
+     * - `index`: The index of the duplicate field.
+     * - `name`: The duplicated column name.
+     * - `element`: The DOM element of the duplicate field.
+     * 
+     * If no duplicate is found, returns `null`.
+     *
+     * @returns {{ index: number, name: string, element: HTMLElement } | null}
+     */
+    checkDuplicatedColumn() {
+        let columns = [];
+        const columnNames = document.querySelectorAll(this.selector + " #table-entity-editor .column-name");
+
+        for (let i = 0; i < columnNames.length; i++) {
+            let columnName = columnNames[i].value;
+
+            if (columns.includes(columnName)) {
+                return {
+                    index: i,
+                    name: columnName,
+                    element: columnNames[i]
+                };
+            }
+
+            columns.push(columnName);
+        }
+
+        return null;
+    }
+
+
 
     /**
      * Saves the current entity, either updating an existing one or creating a new one.
