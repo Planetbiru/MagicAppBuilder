@@ -1,4 +1,5 @@
 <?php
+
 // Runner script for starting the WebSocket server
 
 use AppBuilder\WebSocket\WebSocketServer;
