@@ -780,8 +780,6 @@ class EntityEditor {
         return null;
     }
 
-
-
     /**
      * Saves the current entity, either updating an existing one or creating a new one.
      */
