@@ -7,7 +7,6 @@ use MagicApp\Field;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
-use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";

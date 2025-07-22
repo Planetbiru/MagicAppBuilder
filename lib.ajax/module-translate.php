@@ -60,7 +60,7 @@ function fixValue($original)
         'Button Login' => 'Login',
         'Button Restore' => 'Restore',
         'Label Option Select One Or Leave It Blank' => 'Select One or Leave It Blank',
-        'Label Option Select One' => 'Select One',
+        'Label Option Select One' => 'Select One', // NOSONAR
         'Label Option Show All' => 'Show All',
         'Label Option Root Menu' => 'Root Menu',
         'Label Option Show Waiting Approval Only' => 'Show Waiting Approval Only',
@@ -68,7 +68,7 @@ function fixValue($original)
         'Label Select All Items' => 'Select All Items',
         'Label Select Items' => 'Select Items',
         'Label Select None' => 'Select None',
-        'Label Select One' => 'Select One',
+        'Label Select One' => 'Select One', // NOSONAR
         'Label Selected' => 'Selected',
         'Message Data Not Found' => 'Data not found',
         'Message No Data Require Approval' => 'No data require approval',
@@ -88,7 +88,7 @@ function fixValue($original)
         'Numero' => 'No',
         'Option Select All' => 'Select All',
         'Option Select None' => 'Select None',
-        'Option Select One' => 'Select One',
+        'Option Select One' => 'Select One', // NOSONAR
         'Placeholder Search' => 'Search',
         'Placeholder Search By' => 'Search By',
         'Placeholder Search By Code' => 'Search By Code',

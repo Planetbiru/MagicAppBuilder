@@ -1,4 +1,5 @@
 <?php
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $filename = 'template.html';
     $content = $_POST['content'];

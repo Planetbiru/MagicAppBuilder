@@ -120,6 +120,12 @@ try
 
     $existingSessions->setCookieSecure($existingSessions->isCookieSecure());
     $existingSessions->setCookieHttpOnly($existingSessions->isCookieHttpOnly());
+    
+    $sessionPath = trim($existingSessions->getSavePath());
+    if(strlen($sessionPath) > 1 && !file_exists($sessionPath))
+    {
+        mkdir($sessionPath, 0755, true);
+    }
 	
 	$appConfig->setDatabase($existingDatabase);
 	$appConfig->setSessions($existingSessions);
