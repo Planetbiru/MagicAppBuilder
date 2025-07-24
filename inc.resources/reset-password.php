@@ -1,6 +1,7 @@
 <?php
 
 use MagicApp\Field;
+use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
@@ -66,8 +67,9 @@ if($inputGet->getToken() != null)
             && $inputPost->getPasswordRepeat() != null && $inputPost->getPasswordRepeat() != "" 
             && $inputPost->getPassword() == $inputPost->getPasswordRepeat())
             {
-                $hashPassword = sha1($inputPost->getPassword());
-                $admin->setPassword(sha1($hashPassword));
+                $hashPassword = AppAccountSecurity::generateHash($appConfig, $plainPassword, 1);
+                $hashPassword2 = AppAccountSecurity::generateHash($appConfig, $hashPassword, 1);
+                $admin->setPassword($hashPassword2);
                 $admin->setResetToken(null);
                 $admin->setValidationCode(null);
                 $admin->update();

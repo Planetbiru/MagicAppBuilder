@@ -346,6 +346,11 @@ resetPassword:
 '    
 );
 
+$newApp->setAccountSecurity([
+    'algorithm' => 'sha1',
+    'salt' => ''
+]);
+
 $newApp->setResetPassword($resetPasswordContainer->getResetPassword());
 
 $ipForwarding = new SecretObject();

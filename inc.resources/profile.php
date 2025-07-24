@@ -13,6 +13,7 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
+use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\AppValidatorMessage;
@@ -116,7 +117,8 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
         $plainPassword = trim($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true), " \t\r\n ");
         if(!empty($plainPassword))
         {
-            $hashPassword = sha1(sha1($plainPassword));
+            $hashPassword = AppAccountSecurity::generateHash($appConfig, $plainPassword, 1);
+			$hashPassword2 = AppAccountSecurity::generateHash($appConfig, $hashPassword, 1);
 
 			if(passwordExists($database, $adminId, $hashPassword))
 			{
@@ -125,8 +127,8 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 			else
 			{
 				$updater = $admin->where($specification);
-				$updater->setPassword($hashPassword)->update();
-				$sessions->userPassword = sha1($plainPassword);
+				$updater->setPassword($hashPassword2)->update();
+				$sessions->userPassword = $hashPassword;
 				createPasswordHistory($database, $adminId, $hashPassword);
 			}
         }

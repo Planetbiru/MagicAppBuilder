@@ -18,6 +18,7 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
+use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\AppValidatorMessage;
@@ -49,7 +50,8 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$admin = new AppAdminImpl(null, $database);
 	$admin->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$hashPassword = sha1(sha1($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true)));
+	$appUserPassword = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
+	$hashPassword = AppAccountSecurity::generateHash($appConfig, $appUserPassword, 2);
 	$admin->setPassword($hashPassword);
 	$admin->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -122,10 +124,10 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		$plainPassword = trim($inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true), " \t\r\n ");
         if(!empty($plainPassword))
         {
-            $hashPassword = sha1(sha1($plainPassword));
-            $updater = $admin->where($specification);
-            $updater->setPassword($hashPassword)
-                ->update();
+			$hashPassword = AppAccountSecurity::generateHash($appConfig, $plainPassword, 2);
+			$updater = $admin->where($specification);
+			$updater->setPassword($hashPassword)
+				->update();
         }
 
         $username = trim($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true), " \t\r\n ");

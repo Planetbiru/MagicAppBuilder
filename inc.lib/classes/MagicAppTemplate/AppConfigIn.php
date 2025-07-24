@@ -37,4 +37,15 @@ class AppConfigIn extends SecretObject
      * @var string
      */
     protected $sessions;
+
+    /**
+     * Account security configuration (encrypted input)
+     *
+     * This property holds security-related settings used for account protection.
+     * The value is encrypted and will be decrypted automatically when accessed.
+     *
+     * @DecryptIn
+     * @var string
+     */
+    protected $accountSecurity;
 }

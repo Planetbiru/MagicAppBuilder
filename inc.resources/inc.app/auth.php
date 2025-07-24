@@ -15,6 +15,7 @@ use MagicObject\SetterGetter;
 use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
+use MagicAppTemplate\AppAccountSecurity;
 
 require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/session.php";
@@ -30,7 +31,8 @@ if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true
     $currentUser = new AppAdminImpl(null, $database);
     $currentUser->setAdminId("superuser");
     $currentUser->setUsername("superuser");
-    $currentUser->setPassword(sha1(sha1("superuser")));
+    $hashPassword2 = AppAccountSecurity::generateHash($appConfig, "superuser", 2);
+    $currentUser->setPassword($hashPassword2);
     $currentUser->setName("Super User");
     $languageId = $sessions->languageId;        
     if(!isset($languageId) || empty($languageId))
@@ -53,9 +55,10 @@ else
         }
         else
         {
+            $hashPassword = AppAccountSecurity::generateHash($appConfig, $appSessionPassword, 1);   
             $appSpecsLogin = PicoSpecification::getInstance()
                 ->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower(Field::of()->username), strtolower($appSessionUsername)))
-                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, sha1($appSessionPassword)))
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, $hashPassword))
                 ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
                 ->addAnd(PicoSpecification::getInstance()
                     ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))

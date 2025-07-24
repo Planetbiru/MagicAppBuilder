@@ -2,6 +2,7 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\Field;
+use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\AppMultiLevelMenuTool;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
@@ -233,7 +234,7 @@ if($applicationId != null)
         $ip = $_SERVER['REMOTE_ADDR'];
         $userId = "superuser";
         $userName = "superuser";
-        $userPassword = sha1(sha1("superuser"));
+        $userPassword = AppAccountSecurity::generateHash($appConfig, "superuser", 2);
         $userFullName = "Super User";
         $userLanguageId = "en";
         $userActive = true;
@@ -380,7 +381,7 @@ if($applicationId != null)
                             // Reset password
                             $username = $admin->trimUsername();
                             // Reset password
-                            $userPassword = sha1(sha1($username));
+                            $userPassword = AppAccountSecurity::generateHash($appConfig, $username, 2);
                             $admin->setPassword($userPassword);
                             $admin->update();
                             generateRole($adminLevelId, $database, $menuAppConfig, $currentAction);

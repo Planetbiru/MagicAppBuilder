@@ -1909,105 +1909,141 @@ To ensure **data model integrity**, the **Entity Editor** now includes built-in 
 * Improved error handling and feedback when uploading unsupported formats.
 * Fixed rendering glitch in the entity preview panel on certain browsers.
 
-
 # MagicAppBuilder Version 1.15.1
+
+MagicAppBuilder 1.15.1 introduces a critical improvement to data type handling and enhanced account security configuration support. These updates ensure more reliable cross-database compatibility and provide developers with fine-grained control over password hashing behavior.
+
 
 ## Type Mapping Change: `DECIMAL` → `DOUBLE` (MySQL & SQLite)
 
-To prevent **unintended rounding** during cross-DBMS conversions (e.g., values like `0.99` turning into `1` when a `DECIMAL(p, s)` was incorrectly inferred as an integer scale), MagicAppBuilder now **maps `DECIMAL` from other DBMSs to `DOUBLE`** when targeting **MySQL** and **SQLite**.
+To prevent **unintended rounding** issues during cross-DBMS conversions (e.g., values like `0.99` turning into `1` when `DECIMAL(p, s)` was misinterpreted as `DECIMAL(p, 0)`), MagicAppBuilder now **maps `DECIMAL` to `DOUBLE` or `REAL`** when generating SQL for **MySQL** and **SQLite**.
 
-### What changed?
+### 🔧 What Changed?
 
-**Before (≤ 1.15.0)**
+**Before (≤ 1.15.0):**
+
+```js
+decimal: 'DECIMAL'
+```
+
+**Now (≥ 1.15.1):**
+
+```js
+decimal: 'DOUBLE' // for MySQL
+decimal: 'REAL'   // for SQLite
+```
+
+#### MySQL Mapping Example:
 
 ```js
 const DIALECT_TYPE_MAP = {
   mysql: {
     ...
-    decimal: 'DECIMAL',
+    decimal: 'DOUBLE', // ← updated
     ...
-  },
-  // ...
+  }
 };
 ```
 
-**Now (≥ 1.15.1)**
+#### SQLite Mapping Example:
 
 ```js
 const DIALECT_TYPE_MAP = {
-  mysql: {
-    int: 'INT',
-    bigint: 'BIGINT',
-    varchar: 'VARCHAR',
-    boolean: 'TINYINT(1)',
-    text: 'TEXT',
-    datetime: 'DATETIME',
-    timestamp: 'TIMESTAMP',
-    float: 'FLOAT',
-    double: 'DOUBLE',
-    decimal: 'DOUBLE', // ← changed
-    enum: 'ENUM',
-    set: 'SET',
-  },
   sqlite: {
-    int: 'INTEGER',
-    bigint: 'INTEGER',
-    varchar: 'TEXT',
-    boolean: 'INTEGER',
-    text: 'TEXT',
-    datetime: 'TEXT',
-    timestamp: 'TEXT',
-    float: 'REAL',
-    double: 'REAL',
-    decimal: 'REAL', // or 'DOUBLE' if you prefer to keep the label consistent
-    enum: 'TEXT',
-    set: 'TEXT',
-  },
-  // postgresql & sqlserver unchanged
+    ...
+    decimal: 'REAL', // ← updated
+    ...
+  }
 };
 ```
+
+> PostgreSQL and SQL Server mappings remain unchanged.
 
 ### Why?
 
-During migrations from other databases, schemas that **didn’t explicitly carry precision/scale** (e.g., `DECIMAL(10,2)`) often defaulted to `DECIMAL(p,0)` in MySQL, producing **silent rounding**. Mapping to floating types (`DOUBLE`/`REAL`) avoids those hard cut-offs.
+In real-world migrations, missing precision/scale often led to `DECIMAL` being interpreted as an integer (`DECIMAL(p, 0)`), which silently **rounded decimal values** — a serious issue in financial or measurement contexts.
 
-### Trade-off
+Mapping `DECIMAL` to floating-point types avoids this silent rounding behavior.
 
--   `DOUBLE/REAL` avoid forced rounding due to missing `(p, s)`, **but** they are **floating-point** and can introduce **binary precision artifacts** (e.g., `0.1 + 0.2 = 0.30000000000000004`).
-    
--   If you need **exact precision** (money, accounting), **stick with `DECIMAL(p, s)`** and **explicitly define** the precision & scale yourself.
-    
+### Trade-offs
 
-### How to keep using `DECIMAL`
+| Type              | Pros                                          | Cons                                                      |
+| ----------------- | --------------------------------------------- | --------------------------------------------------------- |
+| `DOUBLE` / `REAL` | No silent rounding, better for unknown scales | Can introduce binary precision issues (`0.1 + 0.2 ≠ 0.3`) |
+| `DECIMAL(p, s)`   | Exact representation, ideal for money         | Must define `p` and `s` explicitly or risk rounding       |
 
-If you **want to keep `DECIMAL`** in MySQL (and you accept the responsibility of defining it properly), override the mapping in your own config:
+### How to Revert to `DECIMAL`
+
+If you need exact decimal behavior (e.g., for accounting):
+
+* **Override the mapping manually**:
 
 ```js
 const CUSTOM_DIALECT_TYPE_MAP = {
   ...DIALECT_TYPE_MAP,
   mysql: {
     ...DIALECT_TYPE_MAP.mysql,
-    decimal: 'DECIMAL', // revert
-  },
-  sqlite: {
-    ...DIALECT_TYPE_MAP.sqlite,
-    decimal: 'NUMERIC', // or leave as REAL/DOUBLE if you prefer FP
+    decimal: 'DECIMAL', // ← revert
   }
 };
 ```
 
-Or, on a per-column basis in your model/entity definition, specify the full type:
+* **Define per-column types**:
 
 ```js
 column.type = 'DECIMAL(10,2)';
 ```
 
-### Migration / Upgrade Notes
+### Migration Notes
 
--   Existing schemas are **not altered automatically**. The new mapping only affects **newly generated DDL**.
-    
--   If you want to migrate existing `DECIMAL` columns to `DOUBLE`, run the appropriate `ALTER TABLE ... MODIFY COLUMN ...` statements manually.
-    
--   Re-run your schema diff / migration generator to see if anything changes for your models.
+* Existing schemas **are not modified** automatically.
+* The new behavior only applies to **newly generated DDLs**.
+* Use `ALTER TABLE` if you want to manually change existing `DECIMAL` columns to `DOUBLE`.
 
-If you want me to fold this directly into your full 1.15.1 changelog (or generate SQL migration snippets), just drop your current `DIALECT_TYPE_MAP` and I’ll produce the final doc + diffs.
+
+## New Application Config: Account Security
+
+MagicAppBuilder 1.15.1 introduces new **account security configuration** for password hashing.
+
+### Default Configuration
+
+Generated applications will now include:
+
+```yaml
+accountSecurity:
+    algorithm: sha1
+    salt: ''
+```
+
+### Description
+
+* **`algorithm`**: The hash algorithm used when hashing passwords (e.g., `sha1`, `sha256`, `md5`).
+* **`salt`**: An optional string appended to the password before hashing to increase entropy.
+
+### Benefits
+
+* Developers now have **explicit control** over how passwords are hashed.
+* Supporting `salt` improves resistance against rainbow table attacks.
+* You can change the algorithm or salt **without modifying application logic**, just by editing config.
+
+### Password Column Size Increased
+
+To accommodate longer hash outputs (e.g., SHA-512, SHAKE256), the default password column length has been increased:
+
+```diff
+- password VARCHAR(100)
++ password VARCHAR(512)
+```
+
+This ensures compatibility with a wide range of algorithms and encoding formats (e.g., hexadecimal, base64).
+
+
+## Summary
+
+| Feature                             | Description                                            |
+| ----------------------------------- | ------------------------------------------------------ |
+| `DECIMAL` → `DOUBLE` (MySQL/SQLite) | Prevents unintended rounding during migrations         |
+| `accountSecurity` config            | Improves flexibility and security of password handling |
+| Password column length              | Supports long hashes by increasing size to 512 chars   |
+
+

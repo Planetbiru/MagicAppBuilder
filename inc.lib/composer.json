@@ -1,8 +1,9 @@
 {
     "autoload": {
         "psr-0": {
-            "DatabaseExplorer\\": "classes/",
             "AppBuilder\\": "classes/",
+            "AppTemplate\\": "classes/",
+            "DatabaseExplorer\\": "classes/",
             "MagicAdmin\\": "classes/",
             "MagicAppTemplate\\": "classes/"
         }
