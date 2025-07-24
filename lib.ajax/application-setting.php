@@ -90,6 +90,7 @@ if($appConfig->getSessions() == null)
 }
 $cfgDatabase = new SecretObject($appConfig->getDatabase());
 $cfgSession = new SecretObject($appConfig->getSessions());
+$cfgAccountSecurity = new SecretObject($appConfig->getAccountSecurity());
 $app = new SecretObject($appConfig->getApplication());
 
 $databases = new MagicObject();
@@ -360,16 +361,57 @@ $nameInIndonesian = array(
                 </div>
             </div>
         </div>
+
         <div class="card">
             <div class="card-header" id="heading2">
                 <h5 class="mb-0">
                     <button type="button" class="btn" data-toggle="collapse" data-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
-                    Session and Cookie
+                    Account Security
                     </button>
                 </h5>
             </div>
 
             <div id="collapse2" class="collapse collapsed" aria-labelledby="heading2" data-parent="#accordion-setting">
+                <div class="card-body">
+
+                    <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td>Hash Algorithm</td>
+                                <td>
+                                    <select class="form-control" name="account_security_algorithm" id="account_security_algorithm">
+                                        <?php
+                                        $algorithms = ['sha1', 'sha256', 'sha384', 'sha512', 'md5'];
+                                        foreach ($algorithms as $algorithm) {
+                                            $selected = $cfgAccountSecurity->getAlgorithm() === $algorithm ? $constSelected : '';
+                                            echo "<option value=\"{$algorithm}\" {$selected}>{$algorithm}</option>\r\n";
+                                        }
+                                        ?>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Hash Salt</td>
+                                <td><input class="form-control" type="text" name="account_security_salt" id="account_security_salt" value="<?php echo $cfgAccountSecurity->getSalt();?>"></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header" id="heading3">
+                <h5 class="mb-0">
+                    <button type="button" class="btn" data-toggle="collapse" data-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
+                    Session and Cookie
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapse3" class="collapse collapsed" aria-labelledby="heading3" data-parent="#accordion-setting">
                 <div class="card-body">
 
                     <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -428,15 +470,15 @@ $nameInIndonesian = array(
             </div>
         </div>
         <div class="card">
-            <div class="card-header" id="heading3">
+            <div class="card-header" id="heading4">
                 <h5 class="mb-0">
-                    <button type="button" class="btn" data-toggle="collapse" data-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
+                    <button type="button" class="btn" data-toggle="collapse" data-target="#collapse4" aria-expanded="true" aria-controls="collapse4">
                     Reserved Columns
                     </button>
                 </h5>
             </div>
 
-            <div id="collapse3" class="collapse collapsed" aria-labelledby="heading3" data-parent="#accordion-setting">
+            <div id="collapse4" class="collapse collapsed" aria-labelledby="heading4" data-parent="#accordion-setting">
                 <div class="card-body">
                     <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tbody>

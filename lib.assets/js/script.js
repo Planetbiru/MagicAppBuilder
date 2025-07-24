@@ -1376,6 +1376,7 @@ let initAll = function () {
       active_theme: form.find('[name="active_theme"]').val(),
       database: {},
       sessions: {},
+      account_security: {},
       entity_info: {},
       module_location: []
     };
@@ -1394,6 +1395,9 @@ let initAll = function () {
       }
       if (name.indexOf("sessions_") !== -1) {
         dataToPost.sessions[name.substring(9)] = inputs[i].value;
+      }
+      if (name.indexOf("account_security_") !== -1) {
+        dataToPost.account_security[name.substring(17)] = inputs[i].value;
       }
       if (name.indexOf("entity_info_") !== -1) {
         dataToPost.entity_info[name.substring(12)] = inputs[i].value;

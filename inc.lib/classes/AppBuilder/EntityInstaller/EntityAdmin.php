@@ -54,7 +54,7 @@ class EntityAdmin extends MagicObject
 	/**
 	 * Password
 	 * 
-	 * @Column(name="password", type="varchar(100)", length=100, nullable=true)
+	 * @Column(name="password", type="varchar(512)", length=512, nullable=true)
 	 * @Label(content="Password")
 	 * @var string
 	 */
