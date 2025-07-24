@@ -73,14 +73,18 @@ select[multiple].form-control {
         .multi-select-header-option {
             display: inline-block;
             font-size: 15px;
-            padding: 3px 8px;
             margin-right: 4px;
+        }
+
+        .multi-select-header-placeholder{
+            padding: 6px 8px;
         }
 
         .multi-select-header-option {
             background-color: $color-background-light;
             border-radius: 3px;
             max-width: 120px;
+            padding: 3px 8px;
         }
 
         .multi-select-header-max {
