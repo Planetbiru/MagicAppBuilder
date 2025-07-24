@@ -391,7 +391,7 @@ $nameInIndonesian = array(
                                 </td>
                             </tr>
                             <tr>
-                                <td>Salt</td>
+                                <td>Hash Salt</td>
                                 <td><input class="form-control" type="text" name="account_security_salt" id="account_security_salt" value="<?php echo $cfgAccountSecurity->getSalt();?>"></td>
                             </tr>
 
