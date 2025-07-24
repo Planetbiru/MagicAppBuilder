@@ -1910,7 +1910,7 @@ To ensure **data model integrity**, the **Entity Editor** now includes built-in 
 * Fixed rendering glitch in the entity preview panel on certain browsers.
 
 
-# MagicAppBuilder v1.15.1
+# MagicAppBuilder Version 1.15.1
 
 ## Type Mapping Change: `DECIMAL` → `DOUBLE` (MySQL & SQLite)
 
