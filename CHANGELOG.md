@@ -1908,3 +1908,106 @@ To ensure **data model integrity**, the **Entity Editor** now includes built-in 
 * Fixed an issue where uploading invalid or corrupt image files could cause silent failures in the icon selection interface.
 * Improved error handling and feedback when uploading unsupported formats.
 * Fixed rendering glitch in the entity preview panel on certain browsers.
+
+
+# MagicAppBuilder v1.15.1
+
+## Type Mapping Change: `DECIMAL` → `DOUBLE` (MySQL & SQLite)
+
+To prevent **unintended rounding** during cross-DBMS conversions (e.g., values like `0.99` turning into `1` when a `DECIMAL(p, s)` was incorrectly inferred as an integer scale), MagicAppBuilder now **maps `DECIMAL` from other DBMSs to `DOUBLE`** when targeting **MySQL** and **SQLite**.
+
+### What changed?
+
+**Before (≤ 1.15.0)**
+
+```js
+const DIALECT_TYPE_MAP = {
+  mysql: {
+    ...
+    decimal: 'DECIMAL',
+    ...
+  },
+  // ...
+};
+```
+
+**Now (≥ 1.15.1)**
+
+```js
+const DIALECT_TYPE_MAP = {
+  mysql: {
+    int: 'INT',
+    bigint: 'BIGINT',
+    varchar: 'VARCHAR',
+    boolean: 'TINYINT(1)',
+    text: 'TEXT',
+    datetime: 'DATETIME',
+    timestamp: 'TIMESTAMP',
+    float: 'FLOAT',
+    double: 'DOUBLE',
+    decimal: 'DOUBLE', // ← changed
+    enum: 'ENUM',
+    set: 'SET',
+  },
+  sqlite: {
+    int: 'INTEGER',
+    bigint: 'INTEGER',
+    varchar: 'TEXT',
+    boolean: 'INTEGER',
+    text: 'TEXT',
+    datetime: 'TEXT',
+    timestamp: 'TEXT',
+    float: 'REAL',
+    double: 'REAL',
+    decimal: 'REAL', // or 'DOUBLE' if you prefer to keep the label consistent
+    enum: 'TEXT',
+    set: 'TEXT',
+  },
+  // postgresql & sqlserver unchanged
+};
+```
+
+### Why?
+
+During migrations from other databases, schemas that **didn’t explicitly carry precision/scale** (e.g., `DECIMAL(10,2)`) often defaulted to `DECIMAL(p,0)` in MySQL, producing **silent rounding**. Mapping to floating types (`DOUBLE`/`REAL`) avoids those hard cut-offs.
+
+### Trade-off
+
+-   `DOUBLE/REAL` avoid forced rounding due to missing `(p, s)`, **but** they are **floating-point** and can introduce **binary precision artifacts** (e.g., `0.1 + 0.2 = 0.30000000000000004`).
+    
+-   If you need **exact precision** (money, accounting), **stick with `DECIMAL(p, s)`** and **explicitly define** the precision & scale yourself.
+    
+
+### How to keep using `DECIMAL`
+
+If you **want to keep `DECIMAL`** in MySQL (and you accept the responsibility of defining it properly), override the mapping in your own config:
+
+```js
+const CUSTOM_DIALECT_TYPE_MAP = {
+  ...DIALECT_TYPE_MAP,
+  mysql: {
+    ...DIALECT_TYPE_MAP.mysql,
+    decimal: 'DECIMAL', // revert
+  },
+  sqlite: {
+    ...DIALECT_TYPE_MAP.sqlite,
+    decimal: 'NUMERIC', // or leave as REAL/DOUBLE if you prefer FP
+  }
+};
+```
+
+Or, on a per-column basis in your model/entity definition, specify the full type:
+
+```js
+column.type = 'DECIMAL(10,2)';
+```
+
+### Migration / Upgrade Notes
+
+-   Existing schemas are **not altered automatically**. The new mapping only affects **newly generated DDL**.
+    
+-   If you want to migrate existing `DECIMAL` columns to `DOUBLE`, run the appropriate `ALTER TABLE ... MODIFY COLUMN ...` statements manually.
+    
+-   Re-run your schema diff / migration generator to see if anything changes for your models.
+
+If you want me to fold this directly into your full 1.15.1 changelog (or generate SQL migration snippets), just drop your current `DIALECT_TYPE_MAP` and I’ll produce the final doc + diffs.
