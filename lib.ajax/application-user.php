@@ -4,7 +4,7 @@ use AppBuilder\EntityInstaller\EntityApplication;
 use MagicApp\Field;
 use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\ApplicationMenu;
-use MagicAppTemplate\AppMultiLevelMenuTool;
+use MagicAppTemplate\AppMultiLevelMenu;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
@@ -174,7 +174,7 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
             // Create parent module
             if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
             {
-                $appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
+                $appMultiLevelMenuTool = new AppMultiLevelMenu($database);
                 $appMultiLevelMenuTool->createParentModule($currentAction);
                 $appMultiLevelMenuTool->updateRolesByAdminLevelId($adminLevelId, $currentAction);
             }
