@@ -7,35 +7,41 @@ const DIALECT_TYPE_MAP = {
         text: 'TEXT',
         datetime: 'DATETIME',
         timestamp: 'TIMESTAMP',
-        decimal: 'DECIMAL',
+        float: 'FLOAT',
+        double: 'DOUBLE',
+        decimal: 'DOUBLE',
         enum: 'ENUM',
         set: 'SET',
     },
     postgresql: {
         int: 'INTEGER',
         bigint: 'BIGINT',
-        varchar: 'CHARACTER VARYING',
+        varchar: 'VARCHAR',
         boolean: 'BOOLEAN',
         tinyint1: 'BOOLEAN',
         text: 'TEXT',
-        datetime: 'TIMESTAMP',
+        datetime: 'TIMESTAMP', // PostgreSQL uses TIMESTAMP for both DATETIME and TIMESTAMP
         timestamp: 'TIMESTAMP',
+        float: 'REAL',
+        double: 'DOUBLE PRECISION',
         decimal: 'NUMERIC',
-        enum: 'TEXT', // PostgreSQL doesn't support native ENUM in simple SQL
-        set: 'TEXT', // no native SET type
+        enum: 'TEXT', // native ENUM requires CREATE TYPE, so TEXT is safer
+        set: 'TEXT', // no SET type in PostgreSQL
     },
     sqlite: {
         int: 'INTEGER',
         bigint: 'INTEGER',
-        varchar: 'NVARCHAR',
-        boolean: 'BOOLEAN',
-        tinyint1: 'BOOLEAN',
+        varchar: 'TEXT', // SQLite does not enforce VARCHAR limits, all treated as TEXT
+        boolean: 'INTEGER', // SQLite stores BOOLEAN as 0/1 integer
+        tinyint1: 'INTEGER',
         text: 'TEXT',
-        datetime: 'DATETIME',
-        timestamp: 'TIMESTAMP',
-        decimal: 'REAL',
-        enum: 'TEXT', // SQLite does not have native ENUM type, using TEXT instead
-        set: 'TEXT', // SQLite does not have native SET type, using TEXT instead
+        datetime: 'TEXT', // stored in ISO 8601 string format
+        timestamp: 'TEXT',
+        float: 'REAL',
+        double: 'REAL',
+        decimal: 'NUMERIC', // REAL has floating point, NUMERIC is for exact math
+        enum: 'TEXT',
+        set: 'TEXT',
     },
     sqlserver: {
         int: 'INT',
@@ -43,14 +49,17 @@ const DIALECT_TYPE_MAP = {
         varchar: 'NVARCHAR',
         boolean: 'BIT',
         tinyint1: 'BIT',
-        text: 'TEXT',
+        text: 'NVARCHAR(MAX)', // prefer NVARCHAR for Unicode safety
         datetime: 'DATETIME',
+        timestamp: 'DATETIME2', // more precise than DATETIME
+        float: 'FLOAT',
+        double: 'FLOAT', // SQL Server doesn't have DOUBLE, FLOAT is used
         decimal: 'DECIMAL',
-        enum: 'NVARCHAR', // SQL Server does not have native ENUM type, using NVARCHAR instead
-        set: 'NVARCHAR', // SQL Server does not have native SET type, using NVARCHAR instead
-        timestamp: 'DATETIME2', // SQL Server uses DATETIME2 for better precision
+        enum: 'NVARCHAR', // no native ENUM
+        set: 'NVARCHAR', // no native SET
     },
 };
+
 /**
  * Represents a column in a database table.
  * 
