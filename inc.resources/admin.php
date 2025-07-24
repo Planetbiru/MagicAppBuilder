@@ -53,6 +53,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$appUserPassword = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
 	$hashPassword = AppAccountSecurity::generateHash($appConfig, $appUserPassword, 2);
 	$admin->setPassword($hashPassword);
+	$admin->setPasswordVersion(sha1(time().mt_rand(1000000, 9999999)));
 	$admin->setAdminLevelId($inputPost->getAdminLevelId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setGender($inputPost->getGender(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$admin->setBirthDay($inputPost->getBirthDay(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -126,7 +127,9 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
         {
 			$hashPassword = AppAccountSecurity::generateHash($appConfig, $plainPassword, 2);
 			$updater = $admin->where($specification);
-			$updater->setPassword($hashPassword)
+			$updater
+				->setPassword($hashPassword)
+				->setPasswordVersion(sha1(time().mt_rand(1000000, 9999999)))
 				->update();
         }
 
