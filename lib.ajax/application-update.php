@@ -25,6 +25,7 @@ try
 	
 	$databaseConfig = new SecretObject($inputPost->getDatabase());
 	$sessionsConfig = new SecretObject($inputPost->getSessions());
+    $accountSecurity = new SecretObject($inputPost->getAccountSecurity());
 	
     // fix data type
 	$databaseConfig->setPort(intval($databaseConfig->getPort()));
@@ -118,6 +119,24 @@ try
         }
     }
 
+    $existingAccountSecurity = $appConfig->getAccountSecurity();
+    if($existingAccountSecurity == null)
+    {
+        $existingAccountSecurity = $accountSecurity;
+    }
+    else
+    {
+        $keys = array_keys($accountSecurity->valueArray());
+        foreach($keys as $key)
+        {
+            $camelKey = PicoStringUtil::camelize($key);
+            if($accountSecurity->get($key) != "" || $camelKey != "salt")
+            {
+                $existingAccountSecurity->set($key, $accountSecurity->get($key));
+            }
+        }
+    }
+
     $existingSessions->setCookieSecure($existingSessions->isCookieSecure());
     $existingSessions->setCookieHttpOnly($existingSessions->isCookieHttpOnly());
     
@@ -129,6 +148,7 @@ try
 	
 	$appConfig->setDatabase($existingDatabase);
 	$appConfig->setSessions($existingSessions);
+    $appConfig->setAccountSecurity($existingAccountSecurity);
 	$appConfig->setEntityInfo($inputPost->getEntityInfo());
     $appConfig->getApplication()->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
     $appConfig->getApplication()->setActiveTheme($inputPost->getActiveTheme());
@@ -150,6 +170,7 @@ try
     $appConfig2->loadYamlFile($yml2, true, true, true);
     $appConfig2->setDatabase($existingDatabase);
 	$appConfig2->setSessions($existingSessions);
+    $appConfig2->setAccountSecurity($appConfig->getAccountSecurity());
     $appConfig2->setEntityInfo($appConfig->getEntityInfo());
 
     if($appConfig2->getApplication() == null)

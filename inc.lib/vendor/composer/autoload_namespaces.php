@@ -9,5 +9,6 @@ return array(
     'MagicAppTemplate\\' => array($baseDir . '/classes'),
     'MagicAdmin\\' => array($baseDir . '/classes'),
     'DatabaseExplorer\\' => array($baseDir . '/classes'),
+    'AppTemplate\\' => array($baseDir . '/classes'),
     'AppBuilder\\' => array($baseDir . '/classes'),
 );

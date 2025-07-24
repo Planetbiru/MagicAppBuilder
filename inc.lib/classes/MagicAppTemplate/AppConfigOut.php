@@ -39,4 +39,16 @@ class AppConfigOut extends SecretObject
      * @var string
      */
     protected $sessions;
+
+    /**
+     * Account security configuration (to be encrypted on output)
+     *
+     * Holds password-related security settings such as the hashing algorithm
+     * and optional salt. This data should be encrypted before being stored or transmitted.
+     * The encryption is handled automatically using the @EncryptOut annotation.
+     *
+     * @EncryptOut
+     * @var string
+     */
+    protected $accountSecurity;
 }

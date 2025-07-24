@@ -62,6 +62,10 @@ class ComposerStaticInitec57b79da9c49fe88b5ef2780de2f2b6
         ),
         'A' => 
         array (
+            'AppTemplate\\' => 
+            array (
+                0 => __DIR__ . '/../..' . '/classes',
+            ),
             'AppBuilder\\' => 
             array (
                 0 => __DIR__ . '/../..' . '/classes',

@@ -48,9 +48,9 @@ class AppUserPasswordHistoryImpl extends MagicObject
     /**
 	 * Password
 	 * 
-	 * @Column(name="password", type="varchar(100)", length=100, nullable=true)
+	 * @Column(name="password", type="varchar(512)", length=512, nullable=true)
 	 * @Label(content="Password")
-	 * @MaxLength(value=200)
+	 * @MaxLength(value=512)
 	 * @var string
 	 */
 	protected $password;
