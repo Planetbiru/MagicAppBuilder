@@ -76,7 +76,7 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
         $entityMainName = $entityMain->getEntityName();
         $approvalRequired = $appFeatures->isApprovalRequired();
         $trashRequired = $appFeatures->isTrashRequired();
-        $validatorRequired = $appFeatures->isValidator();
+        $validatorRequired = $appFeatures->isValidationRequired();
         $sortOrder = $appFeatures->isSortOrder();    
         $activationKey = $entityInfo->getActive();
         $appConf = $appConfig->getApplication();
@@ -188,7 +188,7 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
 
         // Generate validator
         $validationInfo = new AppValidatorInfo();
-        if($appFeatures->isValidator())
+        if($appFeatures->isValidationRequired())
         {
             $entityGenerator = new PicoEntityGenerator(null, null, null, null);
             $validator = $request->getValidator();
@@ -214,7 +214,7 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
         if($approvalRequired) {
             $appBuilder = new AppBuilderApproval($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
-            if($appFeatures->isValidator())
+            if($appFeatures->isValidationRequired())
             {
                 $appBuilder->setValidatiorInfo($validationInfo);
             }
@@ -248,7 +248,7 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
         {
             $appBuilder = new AppBuilder($builderConfig, $appConfig, $appFeatures, $entityInfo, $entityApvInfo, $allField, $ajaxSupport);
             $appBuilder->setTarget($request->getTarget());
-            if($appFeatures->isValidator())
+            if($appFeatures->isValidationRequired())
             {
                 $appBuilder->setValidatiorInfo($validationInfo);
             }
