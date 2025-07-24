@@ -4,6 +4,7 @@ const DIALECT_TYPE_MAP = {
         bigint: 'BIGINT',
         varchar: 'VARCHAR',
         boolean: 'TINYINT(1)',
+        tinyint1: 'TINYINT(1)',
         text: 'TEXT',
         datetime: 'DATETIME',
         timestamp: 'TIMESTAMP',
@@ -16,32 +17,32 @@ const DIALECT_TYPE_MAP = {
     postgresql: {
         int: 'INTEGER',
         bigint: 'BIGINT',
-        varchar: 'VARCHAR',
+        varchar: 'CHARACTER VARYING',
         boolean: 'BOOLEAN',
         tinyint1: 'BOOLEAN',
         text: 'TEXT',
-        datetime: 'TIMESTAMP', // PostgreSQL uses TIMESTAMP for both DATETIME and TIMESTAMP
+        datetime: 'TIMESTAMP',
         timestamp: 'TIMESTAMP',
         float: 'REAL',
         double: 'DOUBLE PRECISION',
         decimal: 'NUMERIC',
-        enum: 'TEXT', // native ENUM requires CREATE TYPE, so TEXT is safer
-        set: 'TEXT', // no SET type in PostgreSQL
+        enum: 'TEXT', // PostgreSQL doesn't support native ENUM in simple SQL
+        set: 'TEXT', // no native SET type
     },
     sqlite: {
         int: 'INTEGER',
         bigint: 'INTEGER',
-        varchar: 'TEXT', // SQLite does not enforce VARCHAR limits, all treated as TEXT
-        boolean: 'INTEGER', // SQLite stores BOOLEAN as 0/1 integer
-        tinyint1: 'INTEGER',
+        varchar: 'NVARCHAR',
+        boolean: 'BOOLEAN',
+        tinyint1: 'BOOLEAN',
         text: 'TEXT',
-        datetime: 'TEXT', // stored in ISO 8601 string format
-        timestamp: 'TEXT',
+        datetime: 'DATETIME',
+        timestamp: 'TIMESTAMP',
         float: 'REAL',
         double: 'REAL',
-        decimal: 'NUMERIC', // REAL has floating point, NUMERIC is for exact math
-        enum: 'TEXT',
-        set: 'TEXT',
+        decimal: 'REAL',
+        enum: 'TEXT', // SQLite does not have native ENUM type, using TEXT instead
+        set: 'TEXT', // SQLite does not have native SET type, using TEXT instead
     },
     sqlserver: {
         int: 'INT',
@@ -55,8 +56,8 @@ const DIALECT_TYPE_MAP = {
         float: 'FLOAT',
         double: 'FLOAT', // SQL Server doesn't have DOUBLE, FLOAT is used
         decimal: 'DECIMAL',
-        enum: 'NVARCHAR', // no native ENUM
-        set: 'NVARCHAR', // no native SET
+        enum: 'NVARCHAR', // SQL Server does not have native ENUM type, using NVARCHAR instead
+        set: 'NVARCHAR', // SQL Server does not have native SET type, using NVARCHAR instead
     },
 };
 
