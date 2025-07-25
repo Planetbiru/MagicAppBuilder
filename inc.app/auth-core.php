@@ -15,7 +15,6 @@ $activeWorkspace = new EntityWorkspace();
 $activeApplication = new EntityApplication();
 
 $userLoggedIn = false;
-
 $appBaseConfigPath = "";
 $configTemplatePath = "";
 $entityAdmin = new EntityAdmin(null, $databaseBuilder);

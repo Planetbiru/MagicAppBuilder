@@ -177,18 +177,16 @@ class AppAdminLoginImpl extends MagicObject
      */
     public function unserialize($data)
     {
-        $values = unserialize($data);
-
-        $this->adminId         = isset($values['v1']) ? $values['v1'] : null;
-        $this->name            = isset($values['v2']) ? $values['v2'] : null;
-        $this->username        = isset($values['v3']) ? $values['v3'] : null;
-        $this->email           = isset($values['v4']) ? $values['v4'] : null;
-        $this->phone           = isset($values['v5']) ? $values['v5'] : null;
-        $this->languageId      = isset($values['v6']) ? $values['v6'] : null;
-        $this->adminLevelId    = isset($values['v7']) ? $values['v7'] : null;
-        $this->blocked         = isset($values['v8']) ? $values['v8'] : false;
-        $this->active          = isset($values['v9']) ? $values['v9'] : true;
-        $this->passwordVersion = isset($values['v10']) ? $values['v10'] : null;
+        $this->adminId         = isset($data['v1']) ? $data['v1'] : null;
+        $this->name            = isset($data['v2']) ? $data['v2'] : null;
+        $this->username        = isset($data['v3']) ? $data['v3'] : null;
+        $this->email           = isset($data['v4']) ? $data['v4'] : null;
+        $this->phone           = isset($data['v5']) ? $data['v5'] : null;
+        $this->languageId      = isset($data['v6']) ? $data['v6'] : null;
+        $this->adminLevelId    = isset($data['v7']) ? $data['v7'] : null;
+        $this->blocked         = isset($data['v8']) ? $data['v8'] : false;
+        $this->active          = isset($data['v9']) ? $data['v9'] : true;
+        $this->passwordVersion = isset($data['v10']) ? $data['v10'] : null;
     }
 
     /**
@@ -262,8 +260,9 @@ class AppAdminLoginImpl extends MagicObject
     public function validPasswordVersion()
     {
         $sessionId = sha1($this->getAdminId());
-        $passwordVersion = $this->getPasswordVersionFromSession($sessionId);
-        return $passwordVersion == $this->getPasswordVersion();
+        $version1 = trim($this->getPasswordVersionFromSession($sessionId));
+        $version2 = trim($this->getPasswordVersion());
+         return $version1 == $version2;
     }
 
 }
