@@ -462,6 +462,10 @@ class EntityEditor {
         let columnValue = column.values == null ? '' : column.values;
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
+        if(typeSimple.toUpperCase() == 'BIGINT' && columnLength == '')
+        {
+            columnLength = '20';
+        }
         let nullable = '';
         if(column.primaryKey)
         {

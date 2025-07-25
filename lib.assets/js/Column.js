@@ -86,6 +86,10 @@ class Column {
      */
     constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "", description = "") //NOSONAR
     {
+        if(type.toUpperCase().indexOf('BIGINT') && length == '')
+        {
+            length = '20';
+        }
         this.name = name;
         this.type = type;
         this.length = length;
@@ -148,6 +152,11 @@ class Column {
         let mappedType = typeMap[typeKey] || this.type;
         
         mappedType = this.fixColumnType(mappedType);
+
+        if(mappedType == 'BIGINT' && dialect == 'mysql')
+        {
+            this.length = '20';
+        }
 
         const isEnumOrSet = ['enum', 'set'].includes(typeKey);
         const isRangeType = ['numeric', 'decimal', 'double', 'float'].includes(typeKey);
