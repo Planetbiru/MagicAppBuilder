@@ -5,5 +5,5 @@ inc.cfg/entities/*
 tmp/*
 .cache/*
 inc.cfg/*
-inc.database/database.sqlite
+inc.database/*
 magic-admin/update/*
