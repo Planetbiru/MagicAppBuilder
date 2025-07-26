@@ -86,6 +86,14 @@ function setSuperuserRole($adminLevelId, $database)
             $adminRole->setAllowedDetail(true);
             $adminRole->setAllowedSortOrder(true);
             $adminRole->setAllowedApprove(true);
+
+            $now = date('Y-m-d H:i:s');
+            $ip = $_SERVER["REMOTE_ADDR"];
+            $adminRole->setTimeCreate($now);
+            $adminRole->setTimeEdit($now);
+            $adminRole->setIpCreate($ip);
+            $adminRole->setIpEdit($ip);
+
             $adminRole->update();
             
         }
@@ -119,7 +127,11 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 	$adminRole = new AppAdminRoleImpl(null, $database);
 	$moduleFinder = new AppModuleImpl(null, $database);
 	$specification1 = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true));
-	if($adminLevelId != "")
+
+    $now = date('Y-m-d H:i:s');
+    $ip = $_SERVER["REMOTE_ADDR"];
+
+    if($adminLevelId != "")
 	{
 		try
 		{
@@ -138,16 +150,20 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 					// Check if the admin role already exists
 					$adminRole->findOne($specification2);
                     $adminRole
-					->setAllowedList(true)
-					->setAllowedDetail(true)
-					->setAllowedCreate(true)
-					->setAllowedUpdate(true)
-					->setAllowedDelete(true)
-					->setAllowedApprove(true)
-					->setAllowedSortOrder(true)
-					->setAllowedExport(true)
-					->setActive(true)
-					->update();
+                        ->setAllowedList(true)
+                        ->setAllowedDetail(true)
+                        ->setAllowedCreate(true)
+                        ->setAllowedUpdate(true)
+                        ->setAllowedDelete(true)
+                        ->setAllowedApprove(true)
+                        ->setAllowedSortOrder(true)
+                        ->setAllowedExport(true)
+                        ->setTimeCreate($now)
+                        ->setTimeEdit($now)
+                        ->setIpCreate($ip)
+                        ->setIpEdit($ip)
+                        ->setActive(true)
+                        ->update();
 				}
 				catch(Exception $e)
 				{
@@ -156,18 +172,22 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 					// and set the database connection
 					$adminRole = new AppAdminRoleImpl(null, $database);
 					$adminRole->setModuleId($moduleId)
-					->setAdminLevelId($adminLevelId)
-					->setModuleCode($moduleCode)
-					->setAllowedList(true)
-					->setAllowedDetail(true)
-					->setAllowedCreate(true)
-					->setAllowedUpdate(true)
-					->setAllowedDelete(true)
-					->setAllowedApprove(true)
-					->setAllowedSortOrder(true)
-					->setAllowedExport(true)
-					->setActive(true)
-					->insert();
+                        ->setAdminLevelId($adminLevelId)
+                        ->setModuleCode($moduleCode)
+                        ->setAllowedList(true)
+                        ->setAllowedDetail(true)
+                        ->setAllowedCreate(true)
+                        ->setAllowedUpdate(true)
+                        ->setAllowedDelete(true)
+                        ->setAllowedApprove(true)
+                        ->setAllowedSortOrder(true)
+                        ->setAllowedExport(true)
+                        ->setTimeCreate($now)
+                        ->setTimeEdit($now)
+                        ->setIpCreate($ip)
+                        ->setIpEdit($ip)
+                        ->setActive(true)
+                        ->insert();
 				}
 			}
                 
@@ -194,7 +214,7 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 $inputPost = new InputPost();
 $inputGet = new InputGet();
 $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-$now = date("Y-m-d H:i:s");
+$now = date('Y-m-d H:i:s');
 
 if($applicationId != null)
 {
@@ -230,7 +250,7 @@ if($applicationId != null)
         $adminLevelId = "superuser";
         $adminLevelName = "Super User";
         
-        $now = date("Y-m-d H:i:s");
+        $now = date('Y-m-d H:i:s');
         $ip = $_SERVER['REMOTE_ADDR'];
         $userId = "superuser";
         $userName = "superuser";
