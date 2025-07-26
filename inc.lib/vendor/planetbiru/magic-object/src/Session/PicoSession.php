@@ -3,6 +3,7 @@
 namespace MagicObject\Session;
 
 use MagicObject\SecretObject;
+use MagicObject\Util\PicoStringUtil;
 use stdClass;
 
 /**
@@ -72,36 +73,72 @@ class PicoSession
     /**
      * Extracts Redis connection parameters from a session configuration object.
      *
-     * Parses the Redis save path (in URL format) from the given SecretObject instance
-     * and returns an object containing the host, port, and optional authentication token.
+     * Parses the Redis `save_path` (in URL format) from the given SecretObject instance
+     * and returns a stdClass object containing the Redis host, port, and optional authentication.
      *
-     * Example save path format: redis://localhost:6379?auth=yourpassword
+     * Example save path formats:
+     * - tcp://127.0.0.1:6379
+     * - tcp://[::1]:6379
+     * - tcp://localhost:6379?auth=yourpassword
      *
      * @param SecretObject $sessConf Session configuration object containing the Redis save path.
-     * @return stdClass An object with properties: `host` (string), `port` (int), and `auth` (string|null).
+     * @return stdClass An object with the properties: `host` (string), `port` (int), and `auth` (string|null).
      */
     private function getRedisParams($sessConf)
     {
         $path = $sessConf->getSavePath();
-        $parsed = parse_url($path);            
+
+        // Ensure the URI has a scheme so parse_url works properly
+        if (strpos($path, '://') === false) {
+            $path = 'tcp://' . $path;
+        }
+
+        // Special handling for "::1" without brackets and port (common IPv6 localhost)
+        if (strpos($path, '://::1:') !== false && substr_count($path, ':') == 4) {
+            $path = str_replace('://::1:', '://[::1]:', $path);
+        }
+
+        // Wrap unbracketed IPv6 addresses with []
+        // This regex captures tcp:// followed by IPv6 without brackets
+        $path = preg_replace_callback(
+            '#tcp://([a-fA-F0-9:]+)(:[0-9]+)?#', // NOSONAR
+            function ($matches) {
+                $host = $matches[1];
+                $port = isset($matches[2]) ? $matches[2] : '';
+                // Add brackets if host contains ':' and is not already bracketed
+                if (strpos($host, ':') !== false && strpos($host, '[') === false) {
+                    return 'tcp://[' . $host . ']' . $port;
+                }
+                return $matches[0];
+            },
+            $path
+        );
+
+        $parsed = parse_url($path);
+
         $host = isset($parsed['host']) ? $parsed['host'] : '';
         $port = isset($parsed['port']) ? $parsed['port'] : 0;
         $auth = null;
-        if(isset($parsed['query']))
-        {
-            parse_str($parsed['query'], $parsedStr); 
+
+        // Parse query string to extract authentication token if available
+        if (isset($parsed['query'])) {
+            parse_str($parsed['query'], $parsedStr);
             $auth = isset($parsedStr['auth']) ? $parsedStr['auth'] : null;
         }
-        if(!empty($host) && $port == 0)
-        {
-            $port = 6379; // Use default port
+
+        // Set default Redis port if not explicitly defined
+        if (!empty($host) && $port == 0) {
+            $port = 6379;
         }
+
         $params = new stdClass;
         $params->host = $host;
         $params->port = $port;
         $params->auth = $auth;
+
         return $params;
     }
+
 
     /**
      * Returns the instance of PicoSession.
