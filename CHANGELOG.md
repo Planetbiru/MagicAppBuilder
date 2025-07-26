@@ -2047,3 +2047,55 @@ This ensures compatibility with a wide range of algorithms and encoding formats 
 | Password column length              | Supports long hashes by increasing size to 512 chars   |
 
 
+# MagicAppBuilder Version 1.15.2
+
+MagicAppBuilder 1.15.2 introduces a developer-focused feature that improves user account management during the application development phase. This addition gives developers better control over test data and ensures a clean working environment before deployment.
+
+## New Feature: Delete User Accounts from *Application Option*
+
+You can now delete user accounts directly from the **Application Option** menu within the developer interface.
+
+### What Can You Do?
+
+* Manually delete user accounts during the development process.
+* Remove dummy or test accounts without accessing the database directly.
+* Avoid confusion caused by outdated or unused user entries.
+
+### Why This Matters
+
+During development, user accounts are often created for:
+
+* Testing login/logout flows
+* Verifying role-based access
+* Simulating real-world scenarios
+
+However, these accounts often become obsolete and clutter the environment. This feature helps developers clean up such accounts efficiently before production or between development iterations.
+
+### Security Notes
+
+This feature is **available only in development mode** to prevent misuse in production. Access is:
+
+* **Hidden in production mode**
+* Restricted to **developer-admin users** only
+
+### Where to Find It
+
+Menu Path:
+`Application Option → Developer Tools → Manage Users → Delete Account`
+
+### How to Use
+
+1. Run your application in development mode.
+2. Open the **Application Option** menu.
+3. Go to the **Developer Tools** tab.
+4. Select **Manage Users**.
+5. Choose a user account to delete and confirm the action.
+
+## Summary
+
+| Feature               | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| Delete user accounts  | Allows manual removal of test/dummy users during development |
+| Development mode only | Feature is disabled and hidden in production mode            |
+| Improves data hygiene | Keeps the development environment clean and reduces clutter  |
+

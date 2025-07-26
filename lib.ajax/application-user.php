@@ -70,6 +70,8 @@ function cleanUpRole($database)
  */
 function setSuperuserRole($adminLevelId, $database)
 {
+    $now = date('Y-m-d H:i:s'); // NOSONAR
+    $ip = $_SERVER["REMOTE_ADDR"];
     $adminRole = new AppAdminRoleImpl(null, $database);
     try
     {
@@ -86,9 +88,6 @@ function setSuperuserRole($adminLevelId, $database)
             $adminRole->setAllowedDetail(true);
             $adminRole->setAllowedSortOrder(true);
             $adminRole->setAllowedApprove(true);
-
-            $now = date('Y-m-d H:i:s');
-            $ip = $_SERVER["REMOTE_ADDR"];
             $adminRole->setTimeCreate($now);
             $adminRole->setTimeEdit($now);
             $adminRole->setIpCreate($ip);
@@ -128,7 +127,7 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 	$moduleFinder = new AppModuleImpl(null, $database);
 	$specification1 = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true));
 
-    $now = date('Y-m-d H:i:s');
+    $now = date('Y-m-d H:i:s'); // NOSONAR
     $ip = $_SERVER["REMOTE_ADDR"];
 
     if($adminLevelId != "")
@@ -214,7 +213,8 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 $inputPost = new InputPost();
 $inputGet = new InputGet();
 $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-$now = date('Y-m-d H:i:s');
+$now = date('Y-m-d H:i:s'); // NOSONAR
+$ip = $_SERVER['REMOTE_ADDR'];
 
 if($applicationId != null)
 {
@@ -249,9 +249,6 @@ if($applicationId != null)
         
         $adminLevelId = "superuser";
         $adminLevelName = "Super User";
-        
-        $now = date('Y-m-d H:i:s');
-        $ip = $_SERVER['REMOTE_ADDR'];
         $userId = "superuser";
         $userName = "superuser";
         $userPassword = AppAccountSecurity::generateHash($appConfig, "superuser", 2);

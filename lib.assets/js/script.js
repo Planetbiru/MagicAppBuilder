@@ -2890,6 +2890,31 @@ let initAll = function () {
       }
     });
   });
+
+  $(document).on('click', '#delete-user', function (e) {
+    e.preventDefault();
+    let modal = $(this).closest('.modal');
+    let frm = $(this).closest('form');
+    let applicationId = $(this).closest('.modal').attr('data-application-id');
+    let adminIds = [];
+    frm.find('.admin_id:checked').each(function (e) {
+      let adminId = $(this).val();
+      adminIds.push(adminId);
+    });
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-user.php',
+      data: { userAction: 'delete', applicationId: applicationId, adminId: adminIds },
+      success: function (data) {
+        decreaseAjaxPending();
+        modal.find('.user-container').empty().append(data);
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+  });
   
   
   $(document).on('click', '.button-application-database', function (e) {
@@ -3320,7 +3345,7 @@ let initAll = function () {
         } else if (fileType === 'image/png') {
             imageDataUrl = await new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
+                reader.onload = (e) => resolve(e.target.result); // NOSONAR
                 reader.onerror = reject;
                 reader.readAsDataURL(selectedFile);
             });
