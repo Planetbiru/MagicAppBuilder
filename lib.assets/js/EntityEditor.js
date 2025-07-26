@@ -253,7 +253,22 @@ class EntityEditor {
         document.querySelector(this.selector+" .import-file-sheet").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
             if (file) {
-                editor.importSheetFile(file); 
+                editor.importSheetFile(file, function(fileExtension, fileName, sheetName, headers, data){
+                    if(fileExtension == 'csv')
+                    {
+                        const entityName = _this.toValidTableName(fileName);
+                        const columns = _this.generateCreateTable(headers, data);
+                        _this.currentEntityData = data;
+                        _this.importFromSheet(columns, entityName);
+                    }
+                    else if(fileExtension == 'xls' || fileExtension == 'xlsx')
+                    {
+                        const entityName = _this.toValidTableName(sheetName);
+                        const columns = _this.generateCreateTable(headers, data);
+                        _this.currentEntityData = data;
+                        _this.importFromSheet(columns, entityName);
+                    }
+                }); 
             } else {
                 console.log("Please select a JSON file first.");
             }
@@ -462,6 +477,10 @@ class EntityEditor {
         let columnValue = column.values == null ? '' : column.values;
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
+        if(typeSimple.toUpperCase() == 'BIGINT' && columnLength == '')
+        {
+            columnLength = '20';
+        }
         let nullable = '';
         if(column.primaryKey)
         {
@@ -2701,36 +2720,29 @@ class EntityEditor {
      *
      * @param {File} file - The uploaded file to be imported.
      */
-    importSheetFile(file) {
+    importSheetFile(file, callbackFunction) {
         const _this = this;
-        const ext = file.name.split('.').pop().toLowerCase();
+        const fileExtension = file.name.split('.').pop().toLowerCase();
         const reader = new FileReader();
 
         reader.onload = function (e) {
             const contents = e.target.result;
 
-            if (ext === 'csv') {
+            if (fileExtension === 'csv') {
                 const parsed = Papa.parse(contents, { header: true });
                 const headers = parsed.meta.fields;
-                const json = parsed.data;
-
-                const entityName = _this.toValidTableName(file.name);
-                const columns = _this.generateCreateTable(headers, json);
-                _this.importFromSheet(columns, entityName);
-                _this.currentEntityData = json;
-            } else if (ext === 'xlsx' || ext === 'xls') {
+                const data = parsed.data;
+                callbackFunction(fileExtension, file.name, null, headers, data);
+            } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
                 const uint8Array = new Uint8Array(contents);
                 const workbook = XLSX.read(uint8Array, { type: "array" });
 
                 const selectSheetAndImport = (sheetIndex) => {
                     const sheetName = workbook.SheetNames[sheetIndex];
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
-                    _this.currentEntityData = json;
-                    if (json.length > 0) {
-                        const headers = Object.keys(json[0]);
-                        const entityName = _this.toValidTableName(sheetName);
-                        const columns = _this.generateCreateTable(headers, json);
-                        _this.importFromSheet(columns, entityName);
+                    const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
+                    if (data.length > 0) {
+                        const headers = Object.keys(data[0]);
+                        callbackFunction(fileExtension, file.name, sheetName, headers, data);
                     }
                 };
 
@@ -2761,11 +2773,11 @@ class EntityEditor {
                     selectSheetAndImport(0);
                 }
             } else {
-                _this.showAlertDialog(`Unsupported file format: ${ext}`, "Alert", "OK");
+                _this.showAlertDialog(`Unsupported file format: ${fileExtension}`, "Alert", "OK");
             }
         };
 
-        if (ext === 'csv') {
+        if (fileExtension === 'csv') {
             reader.readAsText(file); // for CSV
         } else {
             reader.readAsArrayBuffer(file); // for Excel

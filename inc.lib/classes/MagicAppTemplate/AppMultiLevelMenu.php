@@ -15,7 +15,7 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\SetterGetter;
 
 /**
- * AppMultiLevelMenuTool
+ * AppMultiLevelMenu
  *
  * This class is a utility designed to manage and maintain the hierarchical structure
  * of modules and their associated roles within an application, specifically focusing
@@ -38,7 +38,7 @@ use MagicObject\SetterGetter;
  * 
  * @package MagicAppTemplate
  */
-class AppMultiLevelMenuTool
+class AppMultiLevelMenu
 {
     /**
      * Database instance used for all module and role operations.
@@ -49,7 +49,7 @@ class AppMultiLevelMenuTool
     private $database;
 
     /**
-     * Constructor to initialize the AppMultiLevelMenuTool with a database instance.
+     * Constructor to initialize the AppMultiLevelMenu with a database instance.
      *
      * @param PicoDatabase $database The database instance to be used for all operations
      * within this tool.

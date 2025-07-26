@@ -106,9 +106,10 @@ try
                <div class="user-container">
                   <?php include_once __DIR__ . "/application-user.php"; ?>
                </div>
-               <button type="button" class="btn btn-primary" id="create-user">Create User</button>
+               <button type="button" class="btn btn-primary" id="create-user">Create</button>
                <button type="button" class="btn btn-primary" id="reset-user-password">Reset Password</button>
                <button type="button" class="btn btn-primary" id="set-user-role">Set Superuser Role</button>
+               <button type="button" class="btn btn-danger" id="delete-user">Delete</button>
             </div>
          </div>
       </div>

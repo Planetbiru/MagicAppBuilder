@@ -471,7 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
             target.isContentEditable;
 
         // Only handle custom paste when not in an editable element and inside .entity-editor
-        if (!isEditableElement && target && target.closest('.entity-editor')) {
+        if (!isEditableElement && target && target.closest('.entity-editor')) // NOSONAR
+        {
             event.preventDefault(); // block default paste behavior
 
             let parsed;
@@ -706,57 +707,23 @@ document.addEventListener('DOMContentLoaded', () => {
        editor.saveData(); 
     });
     
-    document.querySelector('#importDataFileInput').addEventListener('change', (event) => {
+    document.querySelector('#importDataFileInput').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (!file) return;
 
-        const reader = new FileReader();
-
-        reader.onload = (e) => {
-            try {
-                const csvText = e.target.result;
-                const lines = csvText.trim().split(/\r?\n/);
-
-                if (lines.length < 2) {
-                    console.error('CSV file must contain at least one header row and one data row.');
-                    return;
-                }
-
-                // Parse header from the first line
-                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-
-                // Parse data rows
-                const data = lines.slice(1).map(line => {
-                    const values = parseCSVLine(line);
-                    const row = {};
-                    headers.forEach((header, idx) => {
-                        row[header] = values[idx] ?? '';
+        editor.importSheetFile(file, function(fileExtension, fileName, sheetName, headers, data){
+            // Populate the editor with parsed data
+            data.forEach((rowData) => {
+                let tr = editor.addData();
+                if (tr) {
+                    const inputCells = tr.querySelectorAll('input.entity-data-cell');
+                    inputCells.forEach(inputElement => {
+                        const columnName = inputElement.dataset.col;
+                        inputElement.value = rowData[columnName] ?? '';
                     });
-                    return row;
-                });
-
-                // Populate the editor with parsed data
-                data.forEach((rowData) => {
-                    let tr = editor.addData();
-                    if (tr) {
-                        const inputCells = tr.querySelectorAll('input.entity-data-cell');
-                        inputCells.forEach(inputElement => {
-                            const columnName = inputElement.dataset.col;
-                            inputElement.value = rowData[columnName] ?? '';
-                        });
-                    }
-                });
-
-            } catch (error) {
-                console.error('CSV parsing error:', error);
-            }
-        };
-
-        reader.onerror = () => {
-            console.error('FileReader error:', reader.error);
-        };
-
-        reader.readAsText(file);
+                }
+            });
+        })
     });
 
     // Apply to both tables

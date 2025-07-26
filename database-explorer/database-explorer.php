@@ -38,7 +38,7 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/EntityEditor.min.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
     <script src="../lib.assets/js/SVGtoPNG.min.js"></script>
@@ -329,7 +329,7 @@ if(!isset($databaseName))
                 <button class="btn btn-primary save-data-entity">Save</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
-                <input type="file" id="importDataFileInput" accept=".csv" style="display: none;">
+                <input type="file" id="importDataFileInput" accept=".xlsx,.xls,.csv" style="display: none;">
             </div>
         </div>
     </div>

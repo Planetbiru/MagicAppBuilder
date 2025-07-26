@@ -2047,3 +2047,87 @@ This ensures compatibility with a wide range of algorithms and encoding formats 
 | Password column length              | Supports long hashes by increasing size to 512 chars   |
 
 
+# MagicAppBuilder Version 1.15.2
+
+MagicAppBuilder 1.15.2 introduces two developer-focused features that improve both **user account management** and **data import flexibility** during the application development phase. These updates give developers better control over test data and streamline the development process.
+
+
+## New Feature: Delete User Accounts from *Application Option*
+
+You can now delete user accounts directly from the **Application Option** menu within the developer interface.
+
+### What Can You Do?
+
+* Manually delete user accounts during the development process.
+* Remove dummy or test accounts without accessing the database directly.
+* Avoid confusion caused by outdated or unused user entries.
+
+### Why This Matters
+
+During development, user accounts are often created for:
+
+* Testing login/logout flows
+* Verifying role-based access
+* Simulating real-world scenarios
+
+However, these accounts often become obsolete and clutter the environment. This feature helps developers clean up such accounts efficiently before production or between development iterations.
+
+### Security Notes
+
+This feature is **available only in development mode** to prevent misuse in production. Access is:
+
+* **Hidden in production mode**
+* Restricted to **developer-admin users** only
+
+
+### How to Use
+
+1. Run your application in development mode.
+2. Open the **Application Option** menu.
+3. Go to the **Application User** tab.
+4. Select the user you want to delete.
+5. Click the **Delete** button.
+
+
+## New Feature: Excel File Support for Entity Editor Import
+
+The **Entity Editor** now supports **importing data from Excel files (`.xlsx`)**, in addition to the previously supported CSV format.
+
+### What Changed?
+
+**Before (≤ 1.15.1):**
+
+* Only CSV files could be imported into the Entity Editor.
+
+**Now (≥ 1.15.2):**
+
+* You can import both CSV and Excel (`.xlsx`) files.
+
+### Benefits
+
+* Simplifies data migration from spreadsheets.
+* Reduces the need to convert Excel files to CSV manually.
+* Supports better formatting and column alignment from Excel data.
+
+
+### How to Use
+
+1. Open the **Entity Editor** for a specific entity.
+2. Click the **Edit Entity** icon.
+3. Click the **Data** button.
+4. Choose an `.xlsx` or `.csv` file to import.
+5. If the file contains multiple sheets, the Entity Editor will prompt you to select the sheet to import.
+6. Preview the data and confirm the import.
+7. Click the **Save** button to save the data.
+
+
+## Summary
+
+| Feature                     | Description                                                              |
+| --------------------------- | ------------------------------------------------------------------------ |
+| Delete user accounts        | Allows manual removal of test/dummy users during development             |
+| Development mode only       | Feature is disabled and hidden in production mode                        |
+| Excel file import           | Entity Editor now supports importing `.xlsx` files in addition to `.csv` |
+| Improves data hygiene       | Keeps development environment clean and reduces clutter                  |
+| Enhances import flexibility | Makes data import more convenient and compatible with Excel workflows    |
+
