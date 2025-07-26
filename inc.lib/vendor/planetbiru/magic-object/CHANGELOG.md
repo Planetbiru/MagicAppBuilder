@@ -1122,3 +1122,12 @@ Now, session storage works reliably with `session.save_handler = redis`, ensurin
 
 * **Session Handling**: Suppressed warnings when calling `session_start()` to prevent unnecessary error messages when a session is already active or headers have already been sent.
 
+
+# MagicObject Version 3.16.3
+
+## Bug Fixes
+
+* **Redis Session Save Path Parsing**
+  Fixed an issue where `session.save_path` values containing IPv6 addresses (e.g., `tcp://::1`) were parsed incorrectly.
+  The parser now properly handles IPv6 addresses—with or without square brackets—to ensure correct host and port extraction when connecting to Redis.
+
