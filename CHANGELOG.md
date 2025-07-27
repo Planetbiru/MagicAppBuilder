@@ -2135,7 +2135,8 @@ The **Entity Editor** now supports **importing data from Excel files (`.xlsx`)**
 
 # MagicAppBuilder Version 1.15.3
 
-MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers.
+MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers, along with an important update to module access control.
+
 
 ## New Feature: Preview Release Notes from the Admin Panel
 
@@ -2158,4 +2159,19 @@ You can now **preview release notes directly from the Application Option** menu.
 * Makes release tracking easier during development and testing.
 * Helps teams stay aligned on changes in each version.
 * Reduces the need to open external changelog files.
+
+
+## Access Control Update: Data Restoration Module
+
+In this release, the **Data Restoration module is no longer treated as a "special access" module**.
+
+### Why This Matters
+
+* Previously, the module required special access privileges, limiting its availability even to users who had been explicitly granted permission to restore data from the recycle bin.
+* Starting in **version 1.15.3**, it behaves like a standard module: access is controlled solely through role-based permissions.
+
+### Clarification
+
+* **Data Restoration is not considered a core or critical module**, and its exclusion from the special access group does **not pose any risk to application integrity**.
+* On the contrary, this change **ensures that users who are intentionally granted permission to restore deleted data** can now do so without being blocked by special access restrictions.
 

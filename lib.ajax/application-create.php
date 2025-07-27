@@ -453,36 +453,43 @@ menu:
         href: admin.php
         icon: fa fa-user
         specialAccess: true
+        active: true
       - 
         title: Admin Level
         href: admin-level.php
         icon: fa fa-user
         specialAccess: true
+        active: true
       - 
         title: Admin Role
         href: admin-role.php
         icon: fa fa-user
         specialAccess: true
+        active: true
       - 
         title: Module
         href: module.php
         icon: fa fa-cog
         specialAccess: true
+        active: true
       - 
         title: Module Group
         href: module-group.php
         icon: fa fa-cog
         specialAccess: true
+        active: true
       - 
         title: Message Folder
         href: message-folder.php
         icon: fa fa-folder
         specialAccess: false
+        active: true
       - 
         title: Data Restoration
         href: data-restoration.php
         icon: fa fa-trash-restore
-        specialAccess: true
+        specialAccess: false
+        active: true
     active: false
 
 ");
