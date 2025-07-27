@@ -2131,3 +2131,31 @@ The **Entity Editor** now supports **importing data from Excel files (`.xlsx`)**
 | Improves data hygiene       | Keeps development environment clean and reduces clutter                  |
 | Enhances import flexibility | Makes data import more convenient and compatible with Excel workflows    |
 
+
+
+# MagicAppBuilder Version 1.15.3
+
+MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers.
+
+## New Feature: Preview Release Notes from the Admin Panel
+
+You can now **preview release notes directly from the Application Option** menu. This helps developers and testers quickly verify what changes are included in each release version, without leaving the development interface.
+
+### What Can You Do?
+
+* View formatted release notes in a modal popup.
+* See changelogs associated with specific version tags.
+* Use it as a quick reference for recent updates or regression checks.
+
+### Where It Appears
+
+* Go to the **Application Option** menu.
+* Select the **Release Note** tab.
+* Click on a version from the list to preview its release content.
+
+### Benefits
+
+* Makes release tracking easier during development and testing.
+* Helps teams stay aligned on changes in each version.
+* Reduces the need to open external changelog files.
+
