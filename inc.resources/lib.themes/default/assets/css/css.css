@@ -766,9 +766,6 @@ select[multiple].form-control {
   font-size: 15px;
   margin-right: 4px;
 }
-.multi-select .multi-select-header .multi-select-header-option {
-  padding: 3px 8px;
-}
 .multi-select .multi-select-header .multi-select-header-placeholder {
   padding: 6px 8px;
 }
@@ -776,6 +773,7 @@ select[multiple].form-control {
   background-color: #f1f2f5;
   border-radius: 3px;
   max-width: 120px;
+  padding: 3px 8px;
 }
 .multi-select .multi-select-header .multi-select-header-max {
   font-size: 14px;
