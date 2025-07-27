@@ -93,6 +93,13 @@ $jsLang = [
   #release-body-content h6 {
     font-size: 1rem;
   }
+  #release-select{
+    display: inline-block;
+    width: auto;
+    padding-right: 32px;
+    max-width: 100%;
+    vertical-align: bottom;
+  }
 </style>
 <div class="page page-jambi">
 	<table class="responsive responsive-two-cols">
@@ -107,7 +114,7 @@ $jsLang = [
             </tr>
             <tr>
                 <td><?php echo $appLanguage->getUpdateToVersion();?></td>
-                <td><select id="release-select" class="form-control" style="display: inline-block;width: auto;padding-right: 32px;max-width: 100%;" disabled>
+                <td><select id="release-select" class="form-control" disabled>
                     <option><?php echo $appLanguage->getPleaseLoadReleasesFirst();?></option>
                 </select> 
                 <button type="button" class="btn btn-primary" onclick="loadReleases()"><i class="fa fa-refresh"></i></button>

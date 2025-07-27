@@ -44,10 +44,7 @@ if ($inputPost->getDatabaseName() !== null) {
             $data['diagrams'] = json_decode($diagrams);
             file_put_contents($path, json_encode($data));
         }
-        if (strlen($entities) > 10) {
-
-            
-
+        if (strlen($entities) > 0) {
             $data['entities'] = json_decode($entities, true);
 
             // Update entity->creator and entity->modifier
