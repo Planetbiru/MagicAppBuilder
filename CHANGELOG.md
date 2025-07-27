@@ -2135,7 +2135,7 @@ The **Entity Editor** now supports **importing data from Excel files (`.xlsx`)**
 
 # MagicAppBuilder Version 1.15.3
 
-MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers, along with an important update to module access control.
+MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers, along with an important update to module access control and a bug fix in the Entity Editor.
 
 
 ## New Feature: Preview Release Notes from the Admin Panel
@@ -2165,13 +2165,15 @@ You can now **preview release notes directly from the Application Option** menu.
 
 In this release, the **Data Restoration module is no longer treated as a "special access" module**.
 
-### Why This Matters
+Previously, the module required special access privileges, which prevented some users from restoring data even when their role had been explicitly granted permission.
+Starting in **version 1.15.3**, the module behaves like a regular feature: access is determined solely by role-based permissions.
 
-* Previously, the module required special access privileges, limiting its availability even to users who had been explicitly granted permission to restore data from the recycle bin.
-* Starting in **version 1.15.3**, it behaves like a standard module: access is controlled solely through role-based permissions.
+This change ensures that users who are granted permission to restore deleted data from the recycle bin can do so without unnecessary restrictions.
 
-### Clarification
 
-* **Data Restoration is not considered a core or critical module**, and its exclusion from the special access group does **not pose any risk to application integrity**.
-* On the contrary, this change **ensures that users who are intentionally granted permission to restore deleted data** can now do so without being blocked by special access restrictions.
+## Bug Fixes
+
+* **Entity Deletion in Entity Editor**
+  Fixed an issue where the Entity Editor would leave one undeletable entity even after multiple deletions.
+  Users can now successfully delete **all entities** from the Entity Editor without any leftover entries.
 
