@@ -141,7 +141,8 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
 			{
 				$moduleId = $module->getModuleId();
 				$moduleCode = $module->getModuleCode();
-				$specification2 = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $moduleId))
+				$specification2 = PicoSpecification::getInstance()
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleId, $moduleId))
 				->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminLevelId, $adminLevelId));
 				$adminRole = new AppAdminRoleImpl(null, $database);
 				try
