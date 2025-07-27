@@ -295,7 +295,7 @@ if($inputGet->getTrashEntity() != "")
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
-								<?php if($userPermission->isAllowedRestore()){ ?>
+								<?php if($userPermission->isAllowedDelete() || $userPermission->isAllowedRestore()){ ?>
 								<td class="data-controll data-selector" data-key="trash_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-trash-id"/>
 								</td>
@@ -328,7 +328,7 @@ if($inputGet->getTrashEntity() != "")
 							?>
 		
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
-								<?php if($userPermission->isAllowedRestore()){ ?>
+								<?php if($userPermission->isAllowedDelete() || $userPermission->isAllowedRestore()){ ?>
 								<td class="data-selector" data-key="trash_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-trash-id" name="checked_row_id[]" value="<?php echo $trashData->get($camelPrimaryKey);?>"/>
 								</td>

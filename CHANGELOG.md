@@ -2137,7 +2137,6 @@ The **Entity Editor** now supports **importing data from Excel files (`.xlsx`)**
 
 MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers, along with an important update to module access control and a bug fix in the Entity Editor.
 
-
 ## New Feature: Preview Release Notes from the Admin Panel
 
 You can now **preview release notes directly from the Application Option** menu. This helps developers and testers quickly verify what changes are included in each release version, without leaving the development interface.
@@ -2160,7 +2159,6 @@ You can now **preview release notes directly from the Application Option** menu.
 * Helps teams stay aligned on changes in each version.
 * Reduces the need to open external changelog files.
 
-
 ## Access Control Update: Data Restoration Module
 
 In this release, the **Data Restoration module is no longer treated as a "special access" module**.
@@ -2170,10 +2168,14 @@ Starting in **version 1.15.3**, the module behaves like a regular feature: acces
 
 This change ensures that users who are granted permission to restore deleted data from the recycle bin can do so without unnecessary restrictions.
 
-
 ## Bug Fixes
 
 * **Entity Deletion in Entity Editor**
   Fixed an issue where the Entity Editor would leave one undeletable entity even after multiple deletions.
   Users can now successfully delete **all entities** from the Entity Editor without any leftover entries.
+
+* **Checkbox Visibility in Data Restoration Module**
+  Fixed a bug where the **checkbox for selecting records** in the Data Restoration module did not appear
+  when the user had permission to permanently delete data but **did not have permission to restore**.
+  The checkbox now appears correctly as long as the user has **any applicable permission** for the selected operation.
 
