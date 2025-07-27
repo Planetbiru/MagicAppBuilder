@@ -26,7 +26,7 @@ use MagicAppTemplate\Entity\App\AppModuleMultiLevelImpl;
 use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
-use MagicAppTemplate\AppMultiLevelMenuTool;
+use MagicAppTemplate\AppMultiLevelMenu;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
