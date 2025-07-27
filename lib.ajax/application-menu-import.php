@@ -3,7 +3,7 @@
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\EntityInstaller\EntityWorkspace;
 use MagicAppTemplate\ApplicationMenu;
-use MagicAppTemplate\AppMultiLevelMenuTool;
+use MagicAppTemplate\AppMultiLevelMenu;
 use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
 use MagicAppTemplate\Entity\App\AppModuleMinImpl;
 use MagicObject\Database\PicoDatabase;
@@ -169,7 +169,7 @@ if($applicationId != null)
                 // Create parent module
                 if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
                 {
-                    $appMultiLevelMenuTool = new AppMultiLevelMenuTool($database);
+                    $appMultiLevelMenuTool = new AppMultiLevelMenu($database);
                     $appMultiLevelMenuTool->createParentModule($currentAction);
                     $appMultiLevelMenuTool->updateRolesByAdminLevelId($adminLevelId, $currentAction);
                     
