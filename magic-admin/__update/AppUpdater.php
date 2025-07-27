@@ -1,5 +1,9 @@
 <?php
 
+use MagicObject\Util\Parsedown;
+
+require_once dirname(dirname(__DIR__)) . "/inc.lib/vendor/planetbiru/magic-object/src/Util/Parsedown.php"; 
+
 /**
  * Exception class for update-related errors.
  */
@@ -81,6 +85,8 @@ class AppUpdater
             throw new \UpdateException("Invalid response format from GitHub.");
         }
 
+        $parsedown = new Parsedown();
+
         $result = array();
         foreach ($releases as $release) {
             $tag = isset($release['tag_name']) ? $release['tag_name'] : '';
@@ -94,7 +100,8 @@ class AppUpdater
                 'tag_name'    => $tag,
                 'name'        => isset($release['name']) ? $release['name'] : '',
                 'published_at'=> isset($release['published_at']) ? $release['published_at'] : '',
-                'zipball_url' => isset($release['zipball_url']) ? $release['zipball_url'] : ''
+                'zipball_url' => isset($release['zipball_url']) ? $release['zipball_url'] : '',
+                'body_html' => $parsedown->text($release['body'])
             );
         }
 

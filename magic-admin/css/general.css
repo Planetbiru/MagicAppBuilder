@@ -642,6 +642,10 @@ tr[data-active=false] td {
   background-color: #312e2e;
 }
 
+.modal-header {
+  padding: 0.5rem 1rem;
+}
+
 .dark-mode .modal-content {
   background-color: #2c2f33;
   color: #f1f1f1;

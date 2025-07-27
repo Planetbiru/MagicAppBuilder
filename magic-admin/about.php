@@ -71,6 +71,29 @@ $jsLang = [
     'updateDatabaseSuccessfully' => $appLanguage->getUpdateDatabaseSuccessfully()
 ];
 ?>
+<style>
+  #release-body-content h1 {
+    font-size: 1.35rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.4rem;
+  }
+
+  #release-body-content h2 {
+    font-size: 1.25rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.4rem;
+  }
+
+  #release-body-content h3 {
+    font-size: 1.15rem;
+  }
+
+  #release-body-content h4,
+  #release-body-content h5,
+  #release-body-content h6 {
+    font-size: 1rem;
+  }
+</style>
 <div class="page page-jambi">
 	<table class="responsive responsive-two-cols">
         <tbody>
@@ -86,7 +109,10 @@ $jsLang = [
                 <td><?php echo $appLanguage->getUpdateToVersion();?></td>
                 <td><select id="release-select" class="form-control" style="display: inline-block;width: auto;padding-right: 32px;max-width: 100%;" disabled>
                     <option><?php echo $appLanguage->getPleaseLoadReleasesFirst();?></option>
-                </select> <button type="button" class="btn btn-primary" onclick="loadReleases()"><i class="fa fa-refresh"></i></button></td>
+                </select> 
+                <button type="button" class="btn btn-primary" onclick="loadReleases()"><i class="fa fa-refresh"></i></button>
+                <button type="button" class="btn btn-secondary" onclick="showReleaseBody()" id="btn-show-release-body" disabled><?php echo $appLanguage->getViewReleaseNote(); ?></button>
+              </td>
             </tr>
             <tr>
                 <td></td>
@@ -102,9 +128,35 @@ $jsLang = [
         </tbody>
     </table>
 </div>
+<!-- Release Note Modal -->
+<div class="modal fade" id="releaseBodyModal" tabindex="-1" role="dialog" aria-labelledby="releaseBodyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="releaseBodyModalLabel"><?php echo $appLanguage->getReleaseNote(); ?></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="<?php echo $appLanguage->getClose(); ?>">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="release-body-content">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   const lang = <?php echo json_encode($jsLang, JSON_UNESCAPED_UNICODE); ?>;
+  let release_body = {};
+
+  function showReleaseBody() {
+    const select = document.getElementById('release-select');
+    const tag = select.value;
+    const content = release_body[tag] || '<em>No release notes found</em>';
+    const container = document.getElementById('release-body-content');
+    container.innerHTML = content;
+    $('#releaseBodyModal').modal('show');
+  }
 
   function loadReleases() {
     const statusEl = document.getElementById('status');
@@ -127,6 +179,9 @@ $jsLang = [
           opt.value = release.tag_name;
           opt.textContent = (release.name || release.tag_name) + ' ('+release.published_at+')';
           select.appendChild(opt);
+          release_body[release.tag_name] = release.body_html;
+          updateBtn.disabled = false;
+          document.getElementById('btn-show-release-body').disabled = false;
         });
         select.disabled = false;
         updateBtn.disabled = false;
