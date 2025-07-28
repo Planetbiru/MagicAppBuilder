@@ -2183,7 +2183,7 @@ This change ensures that users who are granted permission to restore deleted dat
 
 # MagicAppBuilder Version 1.15.4
 
-MagicAppBuilder 1.15.4 delivers a subtle but valuable usability improvement to the **Entity Editor**, helping developers create better SQL insert statements by leveraging database defaults.
+MagicAppBuilder 1.15.4 delivers two important enhancements to the **Entity Editor**: one improves how default values are handled during insert generation, and the other adds long-awaited support for composite primary keys.
 
 ## Enhancement: Use Default Values in Insert Statements
 
@@ -2204,4 +2204,23 @@ This behavior helps avoid explicitly inserting values like `null` or `''` for co
 * Prevents accidental overrides of default values with empty data.
 * Ensures behavior is consistent with the actual database schema.
 * Reduces manual editing when generating sample data or migrating entities.
+
+
+## Bug Fix: Support for Composite Primary Keys
+
+Previously, the **Entity Editor** did not support entities with **composite primary keys**—tables with two or more columns as the primary key. This prevented users from editing or inserting data into such tables.
+
+Starting in version 1.15.4, this limitation has been addressed.
+
+### What’s Fixed?
+
+* The Entity Editor now recognizes and supports **multiple-column primary keys**.
+* You can edit, insert, and delete records from tables that use composite keys.
+* Generated `WHERE` clauses for updates and deletions now include **all key columns**.
+
+### Benefits
+
+* Unlocks full support for more complex table structures.
+* Ensures better compatibility with legacy databases and normalized schemas.
+* Reduces manual intervention when working with composite keys.
 
