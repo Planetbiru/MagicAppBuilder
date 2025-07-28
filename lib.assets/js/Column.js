@@ -128,20 +128,24 @@ class Column {
 
 
     /**
-     * Converts the column definition into a valid SQL column definition string.
+     * Converts the column definition into a valid SQL column definition string
+     * for the specified SQL dialect.
      * 
-     * This method generates the SQL column definition based on the column's properties such as:
-     * - data type (e.g., VARCHAR, INT, ENUM, etc.)
-     * - nullable status
-     * - primary key status
-     * - auto-increment behavior
-     * - default value
-     * - valid values for ENUM/SET types or range values for DECIMAL, NUMERIC, FLOAT, and DOUBLE.
+     * This method builds a complete column declaration based on the column's properties:
      * 
-     * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", "sql server".
-     * @returns {string} The SQL column definition.
+     * - Data type (e.g., VARCHAR, INT, ENUM, etc.), mapped to the appropriate SQL dialect.
+     * - Length or precision/scale for applicable types (e.g., VARCHAR(255), DECIMAL(10,2)).
+     * - Nullable (`NULL` or `NOT NULL`) depending on `nullable` and `primaryKey` status.
+     * - Primary key (`PRIMARY KEY`) inline or separately, depending on `separatePrimaryKey`.
+     * - Auto-increment/identity column behavior (`AUTO_INCREMENT`, `SERIAL`, `IDENTITY`, etc.).
+     * - Default value handling (for boolean, numeric, or string types).
+     * - ENUM or SET values for MySQL-specific declarations.
+     * 
+     * @param {string} dialect - Target SQL dialect. Supported values: "mysql", "postgresql", "sqlite", "sqlserver".
+     * @param {boolean} [separatePrimaryKey=false] - If true, skips `PRIMARY KEY` inline in favor of separate definition.
+     * @returns {string} The full SQL column definition string based on the column's metadata.
      */
-    toSQL(dialect = 'mysql') // NOSONAR
+    toSQL(dialect = 'mysql', separatePrimaryKey = false) // NOSONAR
     {
         let typeKey = this.type.toLowerCase();
         if(typeKey == 'tinyint' && this.length == 1)
@@ -184,14 +188,19 @@ class Column {
         // NOT NULL / NULL
         if (!this.primaryKey) {
             columnDef += this.nullable ? ' NULL' : ' NOT NULL';
-        } else {
+        } else if(separatePrimaryKey)
+        {
+            columnDef += ' NOT NULL';
+        }
+        else
+        {
             columnDef += ' NOT NULL PRIMARY KEY';
         }
 
         // AUTO_INCREMENT
         if (this.autoIncrement) {
             if (dialect === 'mysql') columnDef += ' AUTO_INCREMENT';
-            else if (dialect === 'postgresql') columnDef = `${this.name} SERIAL PRIMARY KEY`;
+            else if (dialect === 'postgresql') columnDef = `${this.name} SERIAL`;
             else if (dialect === 'sqlite') columnDef += ' AUTOINCREMENT';
             else if (dialect === 'sqlserver') columnDef += ' IDENTITY(1,1)';
         }

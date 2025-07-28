@@ -2179,3 +2179,29 @@ This change ensures that users who are granted permission to restore deleted dat
   when the user had permission to permanently delete data but **did not have permission to restore**.
   The checkbox now appears correctly as long as the user has **any applicable permission** for the selected operation.
 
+
+
+# MagicAppBuilder Version 1.15.4
+
+MagicAppBuilder 1.15.4 delivers a subtle but valuable usability improvement to the **Entity Editor**, helping developers create better SQL insert statements by leveraging database defaults.
+
+## Enhancement: Use Default Values in Insert Statements
+
+Starting from this version, the **Entity Editor now automatically skips columns with default values** when generating SQL `INSERT` statements, if those fields are left empty.
+
+This behavior helps avoid explicitly inserting values like `null` or `''` for columns that already have a `DEFAULT` clause defined in the database schema.
+
+### How It Works
+
+* When generating an `INSERT` statement:
+
+  * Columns with empty values and a defined `DEFAULT` in the database will be **excluded** from the statement.
+  * This allows the database engine to apply the default value automatically.
+
+### Benefits
+
+* Makes insert statements cleaner and more maintainable.
+* Prevents accidental overrides of default values with empty data.
+* Ensures behavior is consistent with the actual database schema.
+* Reduces manual editing when generating sample data or migrating entities.
+
