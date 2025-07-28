@@ -2183,7 +2183,8 @@ This change ensures that users who are granted permission to restore deleted dat
 
 # MagicAppBuilder Version 1.15.4
 
-MagicAppBuilder 1.15.4 delivers two important enhancements to the **Entity Editor**: one improves how default values are handled during insert generation, and the other adds long-awaited support for composite primary keys. This version also includes fixes related to the generation of default values during entity creation and SQL schema generation.
+MagicAppBuilder 1.15.4 delivers several important improvements to the **Entity Editor**, making entity management more intelligent and schema generation more reliable. This version introduces enhanced handling of default values, full support for composite primary keys, and a new system for determining entity creation order based on dependencies.
+
 
 ## Enhancement: Use Default Values in Insert Statements
 
@@ -2244,3 +2245,41 @@ This version also fixes several issues related to default value handling during 
 * Reduces the need for manual fixes after exporting or syncing schema.
 * Improves the reliability of database migrations and updates.
 
+
+## New Feature: Automatic Entity Ordering Based on Dependency Depth
+
+To simplify the process of creating application modules, the Entity Editor now **automatically assigns a dependency depth to each entity**, allowing developers to **generate or scaffold modules in the correct order**.
+
+### How It Works
+
+* Each entity is assigned a **depth value** based on its dependencies (e.g., foreign key relationships).
+* Entities with **no dependencies** receive the **lowest depth** and should be created first.
+* Entities that **depend on others** receive **higher depth values**, ensuring proper creation order.
+
+### Benefits
+
+* Prevents foreign key violations during schema creation.
+* Ensures a **topologically sorted** order for module generation.
+* Simplifies automation, especially in large schemas with complex relationships.
+
+### Example
+
+| Entity Name | Dependency Depth |
+| ----------- | ---------------- |
+| Artist      | 1                |
+| Album       | 2                |
+| Track       | 3                |
+
+> In this example, the system will generate `Artist` before `Album`, and `Album` before `Track`.
+
+Berikut adalah versi revisi dari bagian akhir untuk konsistensi gaya dan penulisan, sekaligus penyesuaian agar sejalan dengan dokumentasi sebelumnya:
+
+
+### UI Enhancement: Sort Tables by Dependency Depth
+
+To help developers quickly determine the correct order for module creation, the **Select Table** section now includes a **“Sort by Dependency Depth”** button. This feature reorders the list of available tables in the dropdown based on their dependency depth.
+
+* **Custom Tables** are sorted from the lowest to highest dependency level, so tables with no dependencies appear at the top.
+* **System Tables** are not sorted by dependency and are listed separately below the custom tables.
+
+This enhancement simplifies the process of selecting source tables when generating modules, eliminating the need to manually refer to the generated entity documentation.

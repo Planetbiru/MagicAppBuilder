@@ -445,4 +445,117 @@ class AppDatabase
         }
         return $validTrashTables;
     }
+
+    /**
+     * Calculates the dependency depth of each entity using DFS.
+     *
+     * @param array $entities Array of entities with 'table_name' and 'columns' (with 'name')
+     * @param bool $reverse Whether to reverse the depth (entities with no dependencies become deepest)
+     * @return array Modified array of entities with 'depth'
+     */
+    public static function calculateEntityDepth($entities, $reverse = false)
+    {
+        $nameToEntity = array();
+        foreach ($entities as $entity) {
+            $nameToEntity[$entity['table_name']] = $entity;
+        }
+
+        $graph = array();
+        foreach ($entities as $entity) {
+            $references = array();
+            if(!isset($entity['columns']))
+            {
+                $entity['columns'] = array();
+            }
+            foreach ($entity['columns'] as $col) {
+                if (substr($col['column_name'], -3) === '_id') {
+                    $ref = substr($col['column_name'], 0, -3);
+                    if ($ref !== $entity['table_name'] && isset($nameToEntity[$ref])) {
+                        $references[] = $ref;
+                    }
+                }
+            }
+            $graph[$entity['table_name']] = $references;
+        }
+
+        $visited = array();
+
+        $dfs = function ($name, &$seen = array()) use (&$graph, &$visited, &$dfs) {
+            if (isset($visited[$name])) return $visited[$name];
+            if (isset($seen[$name])) return 0;
+
+            $seen[$name] = true;
+
+            $parents = isset($graph[$name]) ? $graph[$name] : array();
+
+            $maxDepth = 0;
+            foreach ($parents as $p) {
+                $maxDepth = max($maxDepth, $dfs($p, $seen));
+            }
+
+            $depth = $maxDepth + 1;
+            $visited[$name] = $depth;
+            unset($seen[$name]);
+
+            return $depth;
+        };
+
+        foreach ($entities as &$entity) {
+            $seen = array();
+            $entity['depth'] = $dfs($entity['table_name'], $seen);
+            unset($entity['columns']);
+        }
+        unset($entity);
+
+        if ($reverse) {
+            $maxDepth = 0;
+            foreach ($entities as $e) {
+                if ($e['depth'] > $maxDepth) {
+                    $maxDepth = $e['depth'];
+                }
+            }
+            foreach ($entities as &$entity) {
+                $entity['depth'] = $maxDepth - $entity['depth'];
+            }
+            unset($entity);
+        }
+
+        return $entities;
+    }
+
+    /**
+     * Sorts entities by 'depth' property ascending. If reverse=true, sorts descending.
+     * If depth is equal, it sorts by 'table_name' alphabetically.
+     *
+     * @param array $entities
+     * @param bool $reverse
+     * @return array
+     */
+    public static function sortEntitiesByDepth($entities, $reverse = false)
+    {
+        $sorted = $entities;
+
+        if ($reverse) {
+            $maxDepth = 0;
+            foreach ($sorted as $e) {
+                if ($e['depth'] > $maxDepth) {
+                    $maxDepth = $e['depth'];
+                }
+            }
+            foreach ($sorted as &$e) {
+                $e['depth'] = $maxDepth - $e['depth'];
+            }
+            unset($e);
+        }
+
+        // Sort by depth first, then by table_name alphabetically
+        usort($sorted, function ($a, $b) {
+            if ($a['depth'] === $b['depth']) {
+                return strcmp($a['table_name'], $b['table_name']);
+            }
+            return $a['depth'] - $b['depth'];
+        });
+
+        return $sorted;
+    }
 }
