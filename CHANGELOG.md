@@ -2183,7 +2183,7 @@ This change ensures that users who are granted permission to restore deleted dat
 
 # MagicAppBuilder Version 1.15.4
 
-MagicAppBuilder 1.15.4 delivers two important enhancements to the **Entity Editor**: one improves how default values are handled during insert generation, and the other adds long-awaited support for composite primary keys.
+MagicAppBuilder 1.15.4 delivers two important enhancements to the **Entity Editor**: one improves how default values are handled during insert generation, and the other adds long-awaited support for composite primary keys. This version also includes fixes related to the generation of default values during entity creation and SQL schema generation.
 
 ## Enhancement: Use Default Values in Insert Statements
 
@@ -2223,4 +2223,24 @@ Starting in version 1.15.4, this limitation has been addressed.
 * Unlocks full support for more complex table structures.
 * Ensures better compatibility with legacy databases and normalized schemas.
 * Reduces manual intervention when working with composite keys.
+
+
+## Bug Fixes: Default Value Generation in Entity and Schema
+
+This version also fixes several issues related to default value handling during entity definition and SQL generation.
+
+### What’s Fixed?
+
+* Default values defined in the **Entity Editor** are now correctly reflected in:
+
+  * Generated `CREATE TABLE` statements.
+  * Generated `ALTER TABLE` statements.
+* Default values are no longer omitted or malformed in generated SQL.
+* Support for various dialects (MySQL, PostgreSQL, SQLite, SQL Server) has been refined to properly handle dialect-specific default expressions.
+
+### Benefits
+
+* Ensures consistency between entity definitions and generated SQL schemas.
+* Reduces the need for manual fixes after exporting or syncing schema.
+* Improves the reliability of database migrations and updates.
 

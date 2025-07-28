@@ -5280,7 +5280,7 @@ $subqueryMap = '.$referece.';
                 'Type'=>DataType::INT_11,     
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); // sort_order
         }
@@ -5301,21 +5301,21 @@ $subqueryMap = '.$referece.';
                 'Type'=>DataType::VARCHAR_40, 
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); //admin_ask_edit",
             $cols["ipAskEdit"] = array(
                 'Type'=>DataType::VARCHAR_50, 
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); //ip_ask_edit",
             $cols["timeAskEdit"] = array(
                 'Type'=>DataType::TIMESTAMP,  
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); //time_ask_edit",
             $cols["draft"] = array(
@@ -5335,7 +5335,7 @@ $subqueryMap = '.$referece.';
                 'Type'=>DataType::VARCHAR_40, 
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); //approval_id",
 
@@ -5368,7 +5368,7 @@ $subqueryMap = '.$referece.';
                 'Type'=>DataType::VARCHAR_40, 
                 'Null'=>'NO', 
                 'Key'=>'PRI', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
                 )
         );
@@ -5392,7 +5392,7 @@ $subqueryMap = '.$referece.';
                 'Type'=>DataType::INT_11,     
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); // sort_order
         }
@@ -5412,21 +5412,21 @@ $subqueryMap = '.$referece.';
                 'Type'=>DataType::VARCHAR_40, 
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); //admin_ask_edit",
             $cols["ipAskEdit"] = array(
                 'Type'=>DataType::VARCHAR_50, 
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); //ip_ask_edit",
             $cols["timeAskEdit"] = array(
                 'Type'=>DataType::TIMESTAMP,  
                 'Null'=>'YES', 
                 'Key'=>'', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
             ); //time_ask_edit",
             $cols["approvalStatus"] = array(
@@ -5463,7 +5463,7 @@ $subqueryMap = '.$referece.';
                 'Type'=>DataType::VARCHAR_40, 
                 'Null'=>'NO', 
                 'Key'=>'PRI', 
-                'Default'=>null, 
+                'Default'=>'NULL', 
                 'Extra'=>''
                 )
         );
