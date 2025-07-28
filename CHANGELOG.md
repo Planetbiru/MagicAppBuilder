@@ -2272,4 +2272,15 @@ To simplify the process of creating application modules, the Entity Editor now *
 
 > In this example, the system will generate `Artist` before `Album`, and `Album` before `Track`.
 
+Berikut adalah versi revisi dari bagian akhir untuk konsistensi gaya dan penulisan, sekaligus penyesuaian agar sejalan dengan dokumentasi sebelumnya:
+
+
+### UI Enhancement: Sort Tables by Dependency Depth
+
+To help developers quickly determine the correct order for module creation, the **Entity Editor** now includes a **“Sort by Dependency Depth”** button. This feature reorders the available tables in the dropdown based on their dependency levels.
+
+* **Custom tables** are sorted from the lowest to highest dependency depth, ensuring that tables with no dependencies appear at the top.
+* **System tables** remain unsorted and are listed separately below custom tables.
+
+This makes it easier to identify which tables should be used first when generating modules—without needing to inspect the generated HTML documentation manually.
 

@@ -3963,7 +3963,7 @@ class EntityEditor {
         h3.textContent = 'Table: Entities Ordered by Dependency Depth';
         div.appendChild(h3);
         
-        let sortedEntities = this.sortEntitiesByDepth(this.calculateModuleDepth(this.entities));
+        let sortedEntities = this.sortEntitiesByDepth(this.calculateEntityDepth(this.entities));
         let table2 = document.createElement('table');
         let thead2 = document.createElement('thead');
         let tbody2 = document.createElement('tbody');
@@ -4247,7 +4247,7 @@ class EntityEditor {
      * @returns {Array<Object>} - The original list of entities, with an added `depth`
      * property (number) for each entity, indicating its calculated dependency depth.
      */
-    calculateModuleDepth(entities, reverse = false) {
+    calculateEntityDepth(entities, reverse = false) {
         // Create a quick lookup map from entity name to the entity object for efficient access.
         const nameToEntity = Object.fromEntries(entities.map(e => [e.name, e]));
 
@@ -4321,83 +4321,6 @@ class EntityEditor {
         }
 
         return entities;
-    }
-    
-    /**
-     * Calculates the dependency depth for each entity.
-     *
-     * This function traverses the entities to build a dependency graph based on columns
-     * ending with '_id'. It then uses a Depth-First Search (DFS) algorithm to determine
-     * the "depth" of each entity. Entities with no dependencies will have a depth of 1,
-     * and the depth increases with more dependencies. The calculated depth is added
-     * directly as a `depth` property to each entity object.
-     *
-     * @param {Array<Object>} entities - A list of entity objects. Each entity object
-     * is expected to have a `name` property (string) and a `columns` property (array of objects).
-     * Each column object should have a `name` property (string).
-     * @returns {void} - This function modifies the input `entities` array by adding
-     * a `depth` property (number) to each entity object.
-     */
-    calculateEntityDepth(entities) {
-        // Create a quick lookup map from entity name to the entity object for efficient access.
-        const nameToEntity = Object.fromEntries(entities.map(e => [e.name, e]));
-
-        // Build the dependency graph: entity -> [referenced entities].
-        // A 'referenced entity' is one that the current entity depends on (via an `_id` field).
-        const graph = {};
-        for (const entity of entities) {
-            // Identify references by filtering columns ending with '_id' and removing the suffix.
-            // Ensure the reference is not to itself and exists in the provided entities.
-            const references = entity.columns
-            .filter(col => col.name.endsWith('_id'))
-            .map(col => col.name.replace(/_id$/, ''))
-            .filter(ref => ref !== entity.name && nameToEntity[ref]);
-            graph[entity.name] = references;
-        }
-
-        // A map to store the calculated depth for each entity to avoid redundant calculations
-        // and enable memoization within the DFS.
-        const visited = new Map();
-
-        /**
-         * Performs a Depth-First Search (DFS) to calculate the depth of a given entity.
-         * The depth is determined by the maximum depth of its direct dependencies plus one.
-         *
-         * @param {string} entityName - The name of the entity for which to calculate the depth.
-         * @param {Set<string>} [seen=new Set()] - A set to keep track of entities visited
-         * in the current DFS path. This helps to detect and prevent infinite loops in
-         * cases of cyclic dependencies by returning a base depth (0) if a cycle is found.
-         * @returns {number} The calculated depth of the entity.
-         */
-        function dfs(entityName, seen = new Set()) {
-            // If the depth for this entity has already been calculated, return the stored value.
-            if (visited.has(entityName)) return visited.get(entityName);
-            // If the entity is already in the current `seen` set, it means a cycle has been detected.
-            // Return 0 to break the cycle and prevent infinite recursion.
-            if (seen.has(entityName)) return 0;
-            // Add the current entity to the `seen` set to mark it as visited in this path.
-            seen.add(entityName);
-
-            // Get the direct parent dependencies for the current entity.
-            const parents = graph[entityName] || [];
-
-            // Calculate the maximum depth among all parent dependencies.
-            // If there are no parents, the `maxDepth` is 0.
-            const maxDepth = parents.length > 0
-            ? Math.max(...parents.map(p => dfs(p, new Set(seen))))
-            : 0;
-
-            // The depth of the current entity is one more than the maximum depth of its parents.
-            const depth = maxDepth + 1;
-            // Store the calculated depth in the `visited` map for future lookups.
-            visited.set(entityName, depth);
-            return depth;
-        }
-
-        // Calculate the depth for all entities by initiating DFS for each.
-        for (const entity of entities) {
-            entity.depth = dfs(entity.name);
-        }
     }
 
     /**

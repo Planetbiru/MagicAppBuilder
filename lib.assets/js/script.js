@@ -1312,6 +1312,11 @@ let initAll = function () {
     e.preventDefault();
     loadTable();
   });
+  
+  $(document).on("click", "#sort_by_dependency_depth", function (e) {
+    e.preventDefault();
+    sortByDependencyDepth();
+  });
 
   $(document).on("click", "#load_column", function (e) {
     e.preventDefault();
@@ -6901,6 +6906,96 @@ function updateCurrentApplivation(dataToPost) {
     }
   });
 }
+
+/**
+ * Sorts and updates the <select name="source_table"> options based on 
+ * dependency depth retrieved from the server.
+ * 
+ * This function sends an AJAX GET request to fetch the list of tables
+ * sorted by dependency depth, then updates the <select> element by:
+ * - Clearing previous options.
+ * - Adding a placeholder option.
+ * - Grouping options into "Custom Tables" and "System Tables".
+ * - Preserving the previously selected value if available.
+ * 
+ * Each <option> may contain a `data-primary-key` attribute for additional context.
+ * 
+ * The request is sent to: lib.ajax/database-sort-by-dependency-depth.php
+ */
+function sortByDependencyDepth()
+{
+  increaseAjaxPending();
+  
+  $.ajax({
+    type: "GET",
+    url: "lib.ajax/database-sort-by-dependency-depth.php",
+    dataType: "json",
+    success: function (data) {
+      decreaseAjaxPending();
+
+      const $select = $('select[name="source_table"]');
+      $select.empty();
+
+      // Placeholder option
+      $('<option>', {
+        text: '- Select Table -',
+        value: ''
+      }).appendTo($select);
+
+      // Prepare grouping by table_group
+      const grouped = {
+        custom: [],
+        system: []
+      };
+
+      $.each(data, function (key, table) {
+        const group = table.table_group === 'system' ? 'system' : 'custom';
+
+        const $option = $('<option>', {
+          text: table.table_name,
+          value: table.table_name
+        });
+
+        if (Array.isArray(table.primary_key) && table.primary_key.length > 0) {
+          $option.attr("data-primary-key", table.primary_key[0]);
+        }
+
+        grouped[group].push($option);
+      });
+
+      // Label mapping
+      const groupLabels = {
+        custom: 'Custom Tables',
+        system: 'System Tables'
+      };
+
+      // Render <optgroup> in desired order: custom first
+      ['custom', 'system'].forEach(groupKey => {
+        if (grouped[groupKey].length > 0) {
+          const $optgroup = $('<optgroup>', {
+            label: groupLabels[groupKey]
+          });
+
+          grouped[groupKey].forEach(option => {
+            $optgroup.append(option);
+          });
+
+          $select.append($optgroup);
+        }
+      });
+
+      // Restore selected value if present
+      const selectedVal = $select.attr("data-value");
+      if (selectedVal) {
+        $select.val(selectedVal);
+      }
+    },
+    error: function () {
+      decreaseAjaxPending();
+    }
+  });
+}
+
 
 /**
  * Loads the list of tables from the database into a select element.
