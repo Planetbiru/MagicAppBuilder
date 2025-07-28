@@ -3956,9 +3956,12 @@ class EntityEditor {
             container.appendChild(section);
         }
         
+        let div = document.createElement('div');
+        div.classList.add('table-wrapper');
+        
         let h3 = document.createElement('h3');
         h3.textContent = 'Table: Entities Ordered by Dependency Depth';
-        container.appendChild(h3);
+        div.appendChild(h3);
         
         let sortedEntities = this.sortEntitiesByDepth(this.calculateModuleDepth(this.entities));
         let table2 = document.createElement('table');
@@ -3997,7 +4000,9 @@ class EntityEditor {
             tbody2.appendChild(tr22);
         });
         
-        container.appendChild(table2);
+        div.appendChild(table2);
+        
+        container.appendChild(div);
 
         const now = new Date();
         const generatedAt = now.toLocaleString(); // or .toISOString() 
