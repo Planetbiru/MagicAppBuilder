@@ -5276,21 +5276,68 @@ $subqueryMap = '.$referece.';
         
         if($this->appFeatures->isSortOrder())
         {
-            $cols["sortOrder"]       = array('Type'=>DataType::INT_11,     'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //sort_order",
+            $cols["sortOrder"] = array(
+                'Type'=>DataType::INT_11,     
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); // sort_order
         }
         if($this->appFeatures->isActivateDeactivate())
         {
-            $cols["active"]          = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''); //active",
+            $cols["active"] = array(
+                'Type'=>DataType::TINYINT_1,  
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'1',    
+                'Extra'=>''
+            ); // active
         }
         
         if($this->appFeatures->isApprovalRequired())
         {
-            $cols["adminAskEdit"]    = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_ask_edit",
-            $cols["ipAskEdit"]       = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_ask_edit",
-            $cols["timeAskEdit"]     = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_ask_edit",
-            $cols["draft"]           = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''); //draft",
-            $cols["waitingFor"]      = array('Type'=>DataType::INT_4,      'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''); //waiting_for",
-            $cols["approvalId"]      = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //approval_id",
+            $cols["adminAskEdit"] = array(
+                'Type'=>DataType::VARCHAR_40, 
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); //admin_ask_edit",
+            $cols["ipAskEdit"] = array(
+                'Type'=>DataType::VARCHAR_50, 
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); //ip_ask_edit",
+            $cols["timeAskEdit"] = array(
+                'Type'=>DataType::TIMESTAMP,  
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); //time_ask_edit",
+            $cols["draft"] = array(
+                'Type'=>DataType::TINYINT_1,  
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'0',    
+                'Extra'=>''
+            ); //draft",
+            $cols["waitingFor"] = array(
+                'Type'=>DataType::INT_4,      
+                'Null'=>'YES', 'Key'=>'', 
+                'Default'=>'0',    
+                'Extra'=>''
+            ); //waiting_for",
+            $cols["approvalId"] = array(
+                'Type'=>DataType::VARCHAR_40, 
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); //approval_id",
 
         }
         $result = array();
@@ -5316,7 +5363,14 @@ $subqueryMap = '.$referece.';
     {
         return array(
 
-            array('Field'=>$entityApproval->getPrimaryKey(), 'Type'=>DataType::VARCHAR_40, 'Null'=>'NO', 'Key'=>'PRI', 'Default'=>null, 'Extra'=>'')
+            array(
+                'Field'=>$entityApproval->getPrimaryKey(), 
+                'Type'=>DataType::VARCHAR_40, 
+                'Null'=>'NO', 
+                'Key'=>'PRI', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+                )
         );
     }
     
@@ -5334,18 +5388,54 @@ $subqueryMap = '.$referece.';
         
         if($this->appFeatures->isSortOrder())
         {
-            $cols["sortOrder"]       = array('Type'=>DataType::INT_11,     'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //sort_order",
+            $cols["sortOrder"] = array(
+                'Type'=>DataType::INT_11,     
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); // sort_order
         }
         if($this->appFeatures->isActivateDeactivate())
         {
-            $cols["active"]          = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''); //active",
+            $cols["active"] = array(
+                'Type'=>DataType::TINYINT_1,  
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'1',    
+                'Extra'=>''
+            ); // active
         }
         if($this->appFeatures->isApprovalRequired())
         {
-            $cols["adminAskEdit"]    = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_ask_edit",
-            $cols["ipAskEdit"]       = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_ask_edit",
-            $cols["timeAskEdit"]     = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_ask_edit",
-            $cols["approvalStatus"]  = array('Type'=>DataType::INT_4,      'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''); //waiting_for",
+            $cols["adminAskEdit"] = array(
+                'Type'=>DataType::VARCHAR_40, 
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); //admin_ask_edit",
+            $cols["ipAskEdit"] = array(
+                'Type'=>DataType::VARCHAR_50, 
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); //ip_ask_edit",
+            $cols["timeAskEdit"] = array(
+                'Type'=>DataType::TIMESTAMP,  
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+            ); //time_ask_edit",
+            $cols["approvalStatus"] = array(
+                'Type'=>DataType::INT_4,      
+                'Null'=>'YES', 
+                'Key'=>'', 
+                'Default'=>'0',    
+                'Extra'=>''
+            ); //waiting_for",
         }
         $result = array();
         foreach($cols as $key=>$value)
@@ -5368,7 +5458,14 @@ $subqueryMap = '.$referece.';
     {
         return array(
 
-            array('Field'=>$entityTrash->getPrimaryKey(), 'Type'=>DataType::VARCHAR_40, 'Null'=>'NO', 'Key'=>'PRI', 'Default'=>null, 'Extra'=>'')
+            array(
+                'Field'=>$entityTrash->getPrimaryKey(), 
+                'Type'=>DataType::VARCHAR_40, 
+                'Null'=>'NO', 
+                'Key'=>'PRI', 
+                'Default'=>'NULL', 
+                'Extra'=>''
+                )
         );
     }
     
@@ -5382,41 +5479,120 @@ $subqueryMap = '.$referece.';
      */
     public function getSucessorTrashColumns()
     {
-        $cols = array();
-        
-        if($this->appFeatures->isSortOrder())
-        {
-            $cols["sortOrder"]       = array('Type'=>DataType::INT_11,     'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //sort_order",
-        }
-        if($this->appFeatures->isActivateDeactivate())
-        {
-            $cols["active"]          = array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'1',    'Extra'=>''); //active",
-        }
-        if($this->appFeatures->isApprovalRequired())
-        {
-            $cols["adminAskEdit"]    = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_ask_edit",
-            $cols["ipAskEdit"]       = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_ask_edit",
-            $cols["timeAskEdit"]     = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_ask_edit",
+        $cols = [];
+
+        if ($this->appFeatures->isSortOrder()) {
+            $cols['sortOrder'] = [
+                'Type'    => DataType::INT_11,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ]; // sort_order
         }
 
-        $cols["adminDelete"]         = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_delete",
-        $cols["ipDelete"]            = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_delete",
-        $cols["timeDelete"]          = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_delete",
+        if ($this->appFeatures->isActivateDeactivate()) {
+            $cols['active'] = [
+                'Type'    => DataType::TINYINT_1,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => '1',
+                'Extra'   => ''
+            ]; // active
+        }
 
-        $cols["restored"]            = array('Type'=>DataType::TINYINT_1, 'Null'=>'YES', 'Key'=>'', 'Default'=>'0', 'Extra'=>'');     //restored",
-        $cols["adminRestore"]        = array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //admin_restore",
-        $cols["ipRestore"]           = array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //ip_restore",
-        $cols["timeRestore"]         = array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''); //time_restore",
+        if ($this->appFeatures->isApprovalRequired()) {
+            $cols['adminAskEdit'] = [
+                'Type'    => DataType::VARCHAR_40,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ]; // admin_ask_edit
 
-        $result = array();
+            $cols['ipAskEdit'] = [
+                'Type'    => DataType::VARCHAR_50,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ]; // ip_ask_edit
 
-        foreach($cols as $key=>$value)
-        {
-            $value['Field'] = $this->entityInfo->get($key) != null ? $this->entityInfo->get($key) : PicoStringUtil::snakeize($key);
+            $cols['timeAskEdit'] = [
+                'Type'    => DataType::TIMESTAMP,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ]; // time_ask_edit
+        }
+
+        $cols['adminDelete'] = [
+            'Type'    => DataType::VARCHAR_40,
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => null,
+            'Extra'   => ''
+        ]; // admin_delete
+
+        $cols['ipDelete'] = [
+            'Type'    => DataType::VARCHAR_50,
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => null,
+            'Extra'   => ''
+        ]; // ip_delete
+
+        $cols['timeDelete'] = [
+            'Type'    => DataType::TIMESTAMP,
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => null,
+            'Extra'   => ''
+        ]; // time_delete
+
+        $cols['restored'] = [
+            'Type'    => DataType::TINYINT_1,
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => '0',
+            'Extra'   => ''
+        ]; // restored
+
+        $cols['adminRestore'] = [
+            'Type'    => DataType::VARCHAR_40,
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => null,
+            'Extra'   => ''
+        ]; // admin_restore
+
+        $cols['ipRestore'] = [
+            'Type'    => DataType::VARCHAR_50,
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => null,
+            'Extra'   => ''
+        ]; // ip_restore
+
+        $cols['timeRestore'] = [
+            'Type'    => DataType::TIMESTAMP,
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => null,
+            'Extra'   => ''
+        ]; // time_restore
+
+        $result = [];
+
+        foreach ($cols as $key => $value) {
+            $value['Field'] = $this->entityInfo->get($key) ?? PicoStringUtil::snakeize($key);
             $result[] = $value;
         }
+
         return $result;
     }
+
 
     /**
      * Retrieve column information for the entity
@@ -5427,23 +5603,121 @@ $subqueryMap = '.$referece.';
      */
     public function getColumnInfo()
     {
-        return array(
-            "adminCreate"  => array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //admin_create",
-            "adminEdit"    => array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //admin_edit",
-            "adminAskEdit" => array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //admin_ask_edit",
-            "ipCreate"     => array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //ip_create",
-            "ipEdit"       => array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //ip_edit",
-            "ipAskEdit"    => array('Type'=>DataType::VARCHAR_50, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //ip_ask_edit",
-            "timeCreate"   => array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //time_create",
-            "timeEdit"     => array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //time_edit",
-            "timeAskEdit"  => array('Type'=>DataType::TIMESTAMP,  'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //time_ask_edit",
-            "sortOrder"    => array('Type'=>DataType::INT_11,     'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>''), //sort_order",
-            "active"       => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'1',    'Extra'=>''), //active",
-            "draft"        => array('Type'=>DataType::TINYINT_1,  'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //draft",
-            "waitingFor"   => array('Type'=>DataType::INT_4,      'Null'=>'YES', 'Key'=>'', 'Default'=>'0',    'Extra'=>''), //waiting_for",
-            "approvalId"   => array('Type'=>DataType::VARCHAR_40, 'Null'=>'YES', 'Key'=>'', 'Default'=>'NULL', 'Extra'=>'')  //approval_id",
-        );
+        return [
+            'adminCreate'  => [
+                'Type'    => DataType::VARCHAR_40,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // admin_create
+
+            'adminEdit'    => [
+                'Type'    => DataType::VARCHAR_40,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // admin_edit
+
+            'adminAskEdit' => [
+                'Type'    => DataType::VARCHAR_40,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // admin_ask_edit
+
+            'ipCreate'     => [
+                'Type'    => DataType::VARCHAR_50,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // ip_create
+
+            'ipEdit'       => [
+                'Type'    => DataType::VARCHAR_50,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // ip_edit
+
+            'ipAskEdit'    => [
+                'Type'    => DataType::VARCHAR_50,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // ip_ask_edit
+
+            'timeCreate'   => [
+                'Type'    => DataType::TIMESTAMP,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // time_create
+
+            'timeEdit'     => [
+                'Type'    => DataType::TIMESTAMP,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // time_edit
+
+            'timeAskEdit'  => [
+                'Type'    => DataType::TIMESTAMP,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // time_ask_edit
+
+            'sortOrder'    => [
+                'Type'    => DataType::INT_11,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ], // sort_order
+
+            'active'       => [
+                'Type'    => DataType::TINYINT_1,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => '1',
+                'Extra'   => ''
+            ], // active
+
+            'draft'        => [
+                'Type'    => DataType::TINYINT_1,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => '0',
+                'Extra'   => ''
+            ], // draft
+
+            'waitingFor'   => [
+                'Type'    => DataType::INT_4,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => '0',
+                'Extra'   => ''
+            ], // waiting_for
+
+            'approvalId'   => [
+                'Type'    => DataType::VARCHAR_40,
+                'Null'    => 'YES',
+                'Key'     => '',
+                'Default' => null,
+                'Extra'   => ''
+            ] // approval_id
+        ];
     }
+
 
     /**
      * Check if the provided value is considered true

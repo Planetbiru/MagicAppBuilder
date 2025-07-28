@@ -145,7 +145,7 @@ class PicoEntityGenerator
             $attrs[] = "length=$length";
         }
 
-        if (!empty($columnDefault)) {
+        if ($columnDefault != '' && strtoupper($columnDefault) != 'NULL') {
             $attrs[] = "defaultValue=\"" . $columnDefault . "\"";
         }
         if (!empty($columnNull)) {

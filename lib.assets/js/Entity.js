@@ -50,19 +50,71 @@ class Entity {
     setData(data) {
         this.data = data || [];
     }
+    
+    /**
+     * Counts the number of columns marked as primary keys.
+     *
+     * @returns {number} The number of primary key columns.
+     */
+    countPrimaryKey() {
+        return this.columns.filter(col => col.primaryKey).length;
+    }
+    
+    /**
+     * Returns an array of column names that are marked as primary keys.
+     *
+     * @returns {string[]} Array of primary key column names.
+     */
+    getPrimaryKeyColumns() {
+        return this.columns
+            .filter(col => col.primaryKey)
+            .map(col => col.name);
+    }
+    
+    /**
+     * Returns a comma-separated string of primary key column names,
+     * formatted according to the SQL dialect.
+     * 
+     * - For MySQL: backticks are added (e.g., `id`, `user_id`)
+     * - For other dialects: plain comma-separated list (e.g., id, user_id)
+     * 
+     * @param {string} dialect - SQL dialect (e.g., "mysql", "postgresql", etc.)
+     * @returns {string} The formatted primary key columns as a string.
+     */
+    getPrimaryKeyColumnsAsString(dialect = "mysql") {
+        const keys = this.getPrimaryKeyColumns();
+        return dialect === "mysql"
+            ? keys.map(k => `\`${k}\``).join(', ')
+            : keys.join(', ');
+    }
+
 
     /**
-     * Converts the entity (with its columns) into a valid SQL `CREATE TABLE` statement.
+     * Converts the entity (table definition with its columns) into a valid SQL `CREATE TABLE` statement.
      *
-     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", "sql server".
-     * @returns {string} The SQL statement for creating the entity (table).
+     * This method generates a complete `CREATE TABLE` statement based on:
+     * - SQL dialect (e.g., MySQL, PostgreSQL, SQLite, SQL Server)
+     * - Column definitions and types
+     * - Primary key placement (inline or separate based on number of keys)
+     * - Handling of auto-increment fields, default values, nullability, etc.
+     *
+     * If the table has a composite primary key (more than one column),
+     * the primary key constraint is placed separately at the end of the column list.
+     *
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", or "sqlserver".
+     * @returns {string} The generated SQL `CREATE TABLE` statement.
      */
     toSQL(dialect = "mysql") {
+        let separatePrimaryKey = this.countPrimaryKey() > 1;
         let cols = [];
         let sql = `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
         this.columns.forEach(col => {
-            cols.push(`\t${col.toSQL(dialect)}`);
+            cols.push(`\t${col.toSQL(dialect, separatePrimaryKey)}`);
         });
+        if(separatePrimaryKey)
+        {
+            cols.push(`\tPRIMARY KEY(${this.getPrimaryKeyColumnsAsString(dialect)})`);
+        }
         sql += cols.join(",\r\n"); // Remove trailing comma and newline
         sql += "\r\n);\r\n\r\n";
         return sql;
@@ -112,10 +164,16 @@ class Entity {
     /**
      * Formats a value for SQL insertion based on column type and SQL dialect.
      *
+     * If the value is null-like (null, undefined, empty string, or "null" literal for non-text types):
+     * - If `nullable` is true → returns `'null'`
+     * - If `nullable` is false:
+     *   - Returns column.default if available
+     *   - Otherwise, returns type-specific default (0 for number, '' for text, etc.)
+     *
      * @param {*} value - The value to format.
      * @param {Column} column - The Column object associated with the value.
-     * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", "sql server".
-     * @param {boolean} [nullable=true] - If false, null-like values will be replaced with defaults (0 for numeric, '0'/'false' for boolean, '' for text).
+     * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", or "sqlserver".
+     * @param {boolean} [nullable=true] - If false, null-like values will be replaced with defaults.
      * @returns {string} SQL-safe representation of the value.
      */
     formatValue(value, column, dialect = 'mysql', nullable = true) {
@@ -126,91 +184,101 @@ class Entity {
         const isInteger = column.isTypeInteger(type);
         const isFloat = column.isTypeFloat(type);
         const isBoolean = column.isTypeBoolean(type, length);
+        
+
 
         const isNullLike = (
             value === null ||
             value === undefined ||
             (typeof value === 'string' && value.trim() === '') ||
-            (!isText && String(value).toLowerCase() === 'null') // allow 'null' literal only if not text
+            (!isText && String(value).toLowerCase() === 'null')
         );
 
         if (isNullLike) {
             if (nullable) {
-                return 'null'; // Returns 'null' if null is allowed
+                return 'null';
+            }
+
+            // Use defaultValue if defined
+            if (column.default !== undefined && column.default !== null) {
+                return this.formatValue(column.default, column, dialect, true);
+            }
+
+            // Type-specific fallback
+            if (isBoolean) {
+                return this.formatBoolean(value, dialect, false, column.default); // default false
+            } else if (isInteger || isFloat) {
+                return '0';
             } else {
-                // Replaces null-like values with defaults based on type if not nullable
-                if (isInteger || isFloat) /*NOSONAR*/ {
-                    return '0';
-                } else if (isBoolean) {
-                    // Call formatBoolean with nullable false
-                    return this.formatBoolean(value, dialect, false);
-                } else { // Assumed text type
-                    return "''"; // Empty string
-                }
+                return "''";
             }
         }
-        let formatted = '';
-        if (isBoolean) {
-            // Call formatBoolean with the same nullable parameter
-            formatted = this.formatBoolean(value, dialect, nullable);
-        } else if (isInteger || isFloat) {
-            formatted = value.toString();
-        } else {
-            formatted = this.quoteString(value); // all text types including 'null'
-        }
 
-        return formatted;
+        // Format non-null value
+        if (isBoolean) {
+            return this.formatBoolean(value, dialect, nullable, column.default);
+        } else if (isInteger || isFloat) {
+            return value.toString();
+        } else {
+            return this.quoteString(value);
+        }
     }
+
 
     /**
      * Converts a boolean-like value into dialect-specific representation.
      *
      * @param {*} value - Input value, possibly boolean, number, or string.
      * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", "sql server".
-     * @param {boolean} [nullable=true] - If false, null-like values will be replaced with defaults ('0'/'false').
+     * @param {boolean} [nullable=true] - If false, null-like values will be replaced with default false.
+     * @param {boolean|string|number|null} [defaultValue=null] - Optional default value to use when value is null-like.
      * @returns {string} The formatted boolean value: '1', '0', 'true', 'false', or 'null'.
      */
-    formatBoolean(value, dialect = 'mysql', nullable = true) {
-        const isNullLike = (
+    formatBoolean(value, dialect = 'mysql', nullable = true, defaultValue = null) {
+        const isNullLike =
             value === null ||
             value === undefined ||
-            (typeof value === 'string' && value.trim().toLowerCase() === 'null')
-        );
+            (typeof value === 'string' && value.trim() === '') ||
+            (typeof value === 'string' && value.trim().toLowerCase() === 'null');
 
+        // Handle null-like input
         if (isNullLike) {
             if (nullable) {
                 return 'null';
-            } else {
-                // Returns default boolean if not nullable
-                switch (dialect.toLowerCase()) {
-                    case 'sqlite':
-                    case 'sqlserver':
-                        return '0'; // Default 0 for non-nullable boolean
-                    case 'postgresql':
-                        return 'false'; // Default 'false' for non-nullable boolean
-                    case 'mysql':
-                    default:
-                        return '0'; // Default 0 for non-nullable boolean
-                }
+            }
+
+            // Use defaultValue if provided
+            if (defaultValue !== null && defaultValue !== undefined) {
+                return this.formatBoolean(defaultValue, dialect, false);
+            }
+
+            // Fallback default false
+            switch (dialect.toLowerCase()) {
+                case 'postgresql':
+                    return 'false';
+                case 'sqlite':
+                case 'sqlserver':
+                case 'mysql':
+                default:
+                    return '0';
             }
         }
 
+        // Determine truthiness
         const val = String(value).toLowerCase().trim();
-        const isTrue = val === 'true' || val === '1' || val === 'yes';
+        const isTrue = val === 'true' || val === '1' || val === 'yes' || val === 'on';
 
         switch (dialect.toLowerCase()) {
-            case 'sqlite':
-            case 'sqlserver':
-                return isTrue ? '1' : '0';
-
             case 'postgresql':
                 return isTrue ? 'true' : 'false';
-
+            case 'sqlite':
+            case 'sqlserver':
             case 'mysql':
             default:
                 return isTrue ? '1' : '0';
         }
     }
+
 
     /**
      * Escapes and quotes a string value for SQL.

@@ -2179,3 +2179,68 @@ This change ensures that users who are granted permission to restore deleted dat
   when the user had permission to permanently delete data but **did not have permission to restore**.
   The checkbox now appears correctly as long as the user has **any applicable permission** for the selected operation.
 
+
+
+# MagicAppBuilder Version 1.15.4
+
+MagicAppBuilder 1.15.4 delivers two important enhancements to the **Entity Editor**: one improves how default values are handled during insert generation, and the other adds long-awaited support for composite primary keys. This version also includes fixes related to the generation of default values during entity creation and SQL schema generation.
+
+## Enhancement: Use Default Values in Insert Statements
+
+Starting from this version, the **Entity Editor now automatically skips columns with default values** when generating SQL `INSERT` statements, if those fields are left empty.
+
+This behavior helps avoid explicitly inserting values like `null` or `''` for columns that already have a `DEFAULT` clause defined in the database schema.
+
+### How It Works
+
+* When generating an `INSERT` statement:
+
+  * Columns with empty values and a defined `DEFAULT` in the database will be **excluded** from the statement.
+  * This allows the database engine to apply the default value automatically.
+
+### Benefits
+
+* Makes insert statements cleaner and more maintainable.
+* Prevents accidental overrides of default values with empty data.
+* Ensures behavior is consistent with the actual database schema.
+* Reduces manual editing when generating sample data or migrating entities.
+
+
+## Bug Fix: Support for Composite Primary Keys
+
+Previously, the **Entity Editor** did not support entities with **composite primary keys**—tables with two or more columns as the primary key. This prevented users from editing or inserting data into such tables.
+
+Starting in version 1.15.4, this limitation has been addressed.
+
+### What’s Fixed?
+
+* The Entity Editor now recognizes and supports **multiple-column primary keys**.
+* You can edit, insert, and delete records from tables that use composite keys.
+* Generated `WHERE` clauses for updates and deletions now include **all key columns**.
+
+### Benefits
+
+* Unlocks full support for more complex table structures.
+* Ensures better compatibility with legacy databases and normalized schemas.
+* Reduces manual intervention when working with composite keys.
+
+
+## Bug Fixes: Default Value Generation in Entity and Schema
+
+This version also fixes several issues related to default value handling during entity definition and SQL generation.
+
+### What’s Fixed?
+
+* Default values defined in the **Entity Editor** are now correctly reflected in:
+
+  * Generated `CREATE TABLE` statements.
+  * Generated `ALTER TABLE` statements.
+* Default values are no longer omitted or malformed in generated SQL.
+* Support for various dialects (MySQL, PostgreSQL, SQLite, SQL Server) has been refined to properly handle dialect-specific default expressions.
+
+### Benefits
+
+* Ensures consistency between entity definitions and generated SQL schemas.
+* Reduces the need for manual fixes after exporting or syncing schema.
+* Improves the reliability of database migrations and updates.
+
