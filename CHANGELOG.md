@@ -2277,10 +2277,9 @@ Berikut adalah versi revisi dari bagian akhir untuk konsistensi gaya dan penulis
 
 ### UI Enhancement: Sort Tables by Dependency Depth
 
-To help developers quickly determine the correct order for module creation, the **Entity Editor** now includes a **“Sort by Dependency Depth”** button. This feature reorders the available tables in the dropdown based on their dependency levels.
+To help developers quickly determine the correct order for module creation, the **Select Table** section now includes a **“Sort by Dependency Depth”** button. This feature reorders the list of available tables in the dropdown based on their dependency depth.
 
-* **Custom tables** are sorted from the lowest to highest dependency depth, ensuring that tables with no dependencies appear at the top.
-* **System tables** remain unsorted and are listed separately below custom tables.
+* **Custom Tables** are sorted from the lowest to highest dependency level, so tables with no dependencies appear at the top.
+* **System Tables** are not sorted by dependency and are listed separately below the custom tables.
 
-This makes it easier to identify which tables should be used first when generating modules—without needing to inspect the generated HTML documentation manually.
-
+This enhancement simplifies the process of selecting source tables when generating modules, eliminating the need to manually refer to the generated entity documentation.
