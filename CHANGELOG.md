@@ -2275,8 +2275,6 @@ To simplify the process of creating application modules, the Entity Editor now *
 > In this example, the system will generate `Artist` before `Album`, and `Album` before `Track`.
 
 
-# MagicAppBuilder Version 1.16.0
-
 ## Enhancement: Autocomplete for Filter and Order Setup
 
 To improve usability and reduce input errors, the **main module creation form** now includes **autocomplete support** when users define filters and sort orders.
@@ -2294,6 +2292,7 @@ To improve usability and reduce input errors, the **main module creation form** 
 * Minimizes errors from manual typing of column names.
 * Improves the overall experience when building and customizing modules.
 
+# MagicAppBuilder Version 1.16.0
 
 ## Upgrade: MagicObject Updated to Version 3.16.4
 
