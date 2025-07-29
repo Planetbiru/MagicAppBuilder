@@ -3,6 +3,7 @@
 use MagicApp\Field;
 use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
+use MagicAppTemplate\Entity\App\AppAdminLoginImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
@@ -59,7 +60,7 @@ if($inputGet->getToken() != null)
         $specs = PicoSpecification::getInstance()
         ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->validationCode, hash('sha256', $token)))
         ;
-        $admin = new AppAdminImpl(null, $database);
+        $admin = new AppAdminLoginImpl(null, $database);
         $admin->findOne($specs);
         if($admin->getAdminId() != null)
         {
@@ -70,12 +71,13 @@ if($inputGet->getToken() != null)
                 $hashPassword = AppAccountSecurity::generateHash($appConfig, $plainPassword, 1);
                 $hashPassword2 = AppAccountSecurity::generateHash($appConfig, $hashPassword, 1);
                 $admin->setPassword($hashPassword2);
+                $admin->setPasswordVersion(sha1(time().mt_rand(1000000, 9999999)));
                 $admin->setResetToken(null);
                 $admin->setValidationCode(null);
                 $admin->update();
                 
-                $sessions->userPassword = $inputPost->getPassword();
-                $sessions->username  = $admin->getUsername();
+                $sessions->loggedId = true;
+                $sessions->userData = $admin->serialize();
                 
                 header("Location: ./index.php");
                 exit();

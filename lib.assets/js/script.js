@@ -3514,17 +3514,25 @@ let initAll = function () {
       if(isSupportMultiple($(this).val()))
       {
         tr.find('.input-multiple-filter')[0].disabled = false;
+        
+        tr.find('.input-exact-filter')[0].disabled = false;
       }
       else
       {
         tr.find('.input-multiple-filter')[0].disabled = true;
         tr.find('.input-multiple-filter')[0].checked = false;
+        
+        tr.find('.input-exact-filter')[0].disabled = true;
+        tr.find('.input-exact-filter')[0].checked = false;
       }
     }
     else
     {
       tr.find('.input-multiple-filter')[0].disabled = true;
       tr.find('.input-multiple-filter')[0].checked = false;
+      
+      tr.find('.input-exact-filter')[0].disabled = true;
+      tr.find('.input-exact-filter')[0].checked = false;
     }
   });
 
@@ -6476,6 +6484,7 @@ function generateScript(selector) // NOSONAR
       
       let multipleData = $(this).find("input.input-multiple-data")[0].checked;
       let multipleFilter = $(this).find("input.input-multiple-filter")[0].checked;
+      let exactFilter = $(this).find("input.input-exact-filter")[0].checked;
 
       let field = {
         fieldName: fieldName,
@@ -6496,7 +6505,8 @@ function generateScript(selector) // NOSONAR
         referenceData: referenceData,
         referenceFilter: referenceFilter,
         multipleData: multipleData,
-        multipleFilter: multipleFilter
+        multipleFilter: multipleFilter,
+        exactFilter: exactFilter
       };
       fields.push(field);
     });
@@ -7135,6 +7145,11 @@ function isSupportMultiple(value)
   return value == 'text' || value == 'select';
 }
 
+function isExactFilter(value)
+{
+  return value === true || value == 'true';
+}
+
 /**
  * Restores the form data from a given object.
  *
@@ -7212,9 +7227,15 @@ function restoreForm(data)  //NOSONAR
             tr.find('.reference-filter').val(JSON.stringify(data.fields[i].referenceFilter));
             tr.find('.reference_button_filter').css('display', 'inline');
             tr.find('.input-field-filter[value="select"]')[0].checked = true;
+            
+            tr.find('.input-multiple-filter')[0].disabled = false;
+            tr.find('.input-exact-filter')[0].disabled = false;
           }
           if (data.fields[i].filterElementType == 'text') {
             tr.find('.input-field-filter[value="text"]')[0].checked = true;
+            
+            tr.find('.input-multiple-filter')[0].disabled = false;
+            tr.find('.input-exact-filter')[0].disabled = false;
           }
           
           if(isSupportMultiple(data.fields[i].elementType))
@@ -7222,7 +7243,7 @@ function restoreForm(data)  //NOSONAR
             tr.find('.input-multiple-data')[0].disabled = false;
             if(isTrue(data.fields[i].multipleData))
             {
-              tr.find('.input-multiple-data')[0].checked = 1;
+              tr.find('.input-multiple-data')[0].checked = true;
             }
           }
           else
@@ -7235,13 +7256,20 @@ function restoreForm(data)  //NOSONAR
             tr.find('.input-multiple-filter')[0].disabled = false;
             if(isTrue(data.fields[i].multipleFilter))
             {
-              tr.find('.input-multiple-filter')[0].checked = 1;
+              tr.find('.input-multiple-filter')[0].checked = true;
             }
           }
-          else
+
+          
+          if(isExactFilter(data.fields[i].exactFilter))
           {
-            tr.find('.input-multiple-filter')[0].disabled = true;
+            tr.find('.input-exact-filter')[0].disabled = false;
+            if(isTrue(data.fields[i].exactFilter))
+            {
+              tr.find('.input-exact-filter')[0].checked = true;
+            }
           }
+
           
           tr.find('.input-field-data-type').val(data.fields[i].dataType);
           tr.find('.input-data-filter').val(data.fields[i].inputFilter);
@@ -7909,6 +7937,9 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
       </td>
       <td align="center">
         <input type="checkbox" class="input-multiple-filter" name="multiple_filter_${field}" value="1" disabled="disabled">
+      </td>
+      <td align="center">
+        <input type="checkbox" class="input-exact-filter" name="exact_filter_${field}" value="1" disabled="disabled">
       </td>
       <td>
         ${generateSelectType(field, args)}

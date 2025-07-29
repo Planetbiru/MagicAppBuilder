@@ -313,6 +313,7 @@ if($applicationId != null)
             $userFinder = new AppAdminImpl(null, $database);
             $userFinder->setUsername($userName);
             $userFinder->setPassword($userPassword);
+            $userFinder->setPasswordVersion(sha1(time().mt_rand(1000000, 9999999)));
             $userFinder->setSpecialAccess(true);
             $userFinder->setName($userFullName);
             $userFinder->setLanguageId($userLanguageId);
@@ -401,6 +402,7 @@ if($applicationId != null)
                             // Reset password
                             $userPassword = AppAccountSecurity::generateHash($appConfig, $username, 2);
                             $admin->setPassword($userPassword);
+                            $admin->setPasswordVersion(sha1(time().mt_rand(1000000, 9999999)));
                             $admin->update();
                             generateRole($adminLevelId, $database, $menuAppConfig, $currentAction);
                         }

@@ -2018,10 +2018,19 @@ $subqueryMap = '.$referece.';
     }
 
     /**
-     * Get the filter type for a specific field.
+     * Determine the appropriate filter type for a given field.
      *
-     * @param AppField $field The field object to determine the filter type.
-     * @return string The determined filter type.
+     * This method analyzes the field's reference filter type and input filter configuration
+     * to return a standardized filter type string that can be used in UI or query building.
+     *
+     * Possible return values include:
+     * - `boolean`   → for filters like yes/no or true/false
+     * - `number`    → for numeric input filters or onezero types
+     * - `textequals` → for exact-match text filters
+     * - `fulltext`  → for partial-match (LIKE) text filters
+     *
+     * @param AppField $field The field object to analyze.
+     * @return string The resolved filter type.
      */
     private function getFilterType($field)
     {
@@ -2040,6 +2049,10 @@ $subqueryMap = '.$referece.';
             if(stripos($field->getInputFilter(), 'number') !== false)
             {
                 $dataType = 'number';
+            }
+            else if($field->getExactFilter())
+            {
+                $dataType = 'textequals';
             }
             else
             {

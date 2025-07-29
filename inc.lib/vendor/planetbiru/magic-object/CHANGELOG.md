@@ -1131,3 +1131,49 @@ Now, session storage works reliably with `session.save_handler = redis`, ensurin
   Fixed an issue where `session.save_path` values containing IPv6 addresses (e.g., `tcp://::1`) were parsed incorrectly.
   The parser now properly handles IPv6 addresses—with or without square brackets—to ensure correct host and port extraction when connecting to Redis.
 
+
+# MagicObject Version 3.16.4
+
+## Enhancement: Support for Exact Text Matching (`textequals`)
+
+MagicObject now supports a new filter type called **`textequals`**, allowing developers to create filters that perform **exact string comparisons** (`=`) instead of case-insensitive partial matches using `LIKE`.
+
+### What Changed?
+
+A new condition was added to the `fromUserInput()` method:
+
+```php
+elseif ($filter->isTextEquals()) {
+    $specification->addAnd(PicoPredicate::getInstance()->equals($filter->getColumnName(), $filterValue));
+}
+```
+
+This enables behavior like:
+
+```php
+$specMap = array(
+    "artistId" => PicoSpecification::filter("artistId", "number"),
+    "genreId" => PicoSpecification::filter("genreId", "textequals")
+);
+
+$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
+```
+
+With this map, any request like `?genreId=Jazz` will produce:
+
+```sql
+WHERE genre_id = 'Jazz'
+```
+
+Instead of:
+
+```sql
+WHERE LOWER(genre_id) LIKE '%jazz%'
+```
+
+### Why It Matters?
+
+* **Improved Performance:** Exact matches are faster and use indexes more effectively.
+* **Tighter Filtering:** You now have finer control over which fields use partial or exact text search.
+* **More Predictable Behavior:** Prevents accidental partial matches, especially useful for enums or codes.
+

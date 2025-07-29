@@ -55,6 +55,16 @@ class AppUserPasswordHistoryImpl extends MagicObject
 	 */
 	protected $password;
 
+	/**
+	 * Password Version
+	 * 
+	 * @Column(name="password_version", type="varchar(512)", length=512, nullable=true)
+	 * @Label(content="Password Version")
+	 * @MaxLength(value=512)
+	 * @var string
+	 */
+	protected $passwordVersion;
+
     /**
 	 * Time Create
 	 * 

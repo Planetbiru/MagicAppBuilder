@@ -65,6 +65,16 @@ class AppAdminImpl extends MagicObject
 	protected $password;
 
 	/**
+	 * Password Version
+	 * 
+	 * @Column(name="password_version", type="varchar(512)", length=512, nullable=true)
+	 * @Label(content="Password Version")
+	 * @MaxLength(value=512)
+	 * @var string
+	 */
+	protected $passwordVersion;
+
+	/**
 	 * Admin Level ID
 	 * 
 	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=true)

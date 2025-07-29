@@ -21,6 +21,7 @@ class PicoSpecificationFilter
     const DATA_TYPE_ARRAY_STRING = "string[]";
     const DATA_TYPE_ARRAY_BOOLEAN = "boolean[]";
     const DATA_TYPE_FULLTEXT = "fulltext";
+    const DATA_TYPE_TEXT_EQUALS = "textequals";
 
     /**
      * The name of the column this filter applies to.
@@ -237,6 +238,18 @@ class PicoSpecificationFilter
     public function isFulltext()
     {
         return $this->dataType === self::DATA_TYPE_FULLTEXT;
+    }
+    
+    /**
+     * Checks if the data type is a text equality match (exact match).
+     *
+     * This is typically used for exact string comparisons in filtering.
+     *
+     * @return bool true if the data type is text equals, false otherwise.
+     */
+    public function isTextEquals()
+    {
+        return strpos($this->dataType, self::DATA_TYPE_TEXT_EQUALS) !== false;
     }
 
     /**
