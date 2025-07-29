@@ -28,6 +28,7 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
     }
     catch(Exception $e)
     {
+        require_once __DIR__ . "/magic-admin/update/update-database.php";
         $userLoggedIn = false;
     }
     if(!$userLoggedIn)

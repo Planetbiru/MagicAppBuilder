@@ -39,6 +39,7 @@ if(isset($databaseBuilder) && isset($sessions->magicUsername) && isset($sessions
     catch(Exception $e)
     {
         $userLoggedIn = false;
+        require_once dirname(__DIR__) . "/magic-admin/update/update-database.php";
         error_log($e->getMessage());
     }
 }
