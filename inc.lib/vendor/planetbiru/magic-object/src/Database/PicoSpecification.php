@@ -518,20 +518,29 @@ class PicoSpecification // NOSONAR
      * @param PicoSpecificationFilter[]|null $map The filter map defining expected filters.
      * @return PicoSpecification The constructed specification based on user input.
      */
-    public static function fromUserInput($request, $map = null)
+    public static function fromUserInput($request, $map = null) // NOSONAR
     {
         $specification = new self;
         if (self::isArray($map)) {
             foreach ($map as $key => $filter) {
                 $filterValue = $request->get($key);
                 $filterValue = self::fixInput($filterValue, $filter);
-                if ($filterValue !== null && !self::isValueEmpty($filterValue) && $filter instanceof PicoSpecificationFilter) {
+                if (self::isValidFilter($filterValue, $filter)) {
                     if ($filter->isNumber() || $filter->isBoolean() || $filter->isArrayNumber() || $filter->isArrayBoolean() || $filter->isArrayString()) {
                         $specification->addAnd(PicoPredicate::getInstance()->equals($filter->getColumnName(), $filter->valueOf($filterValue)));
                     } elseif ($filter->isFulltext()) {
                         $specification->addAnd(self::fullTextSearch($filter->getColumnName(), $filterValue));
                     } else if(is_array($filterValue)) {
                         $specification->addAnd(self::fullTextSearchArray($filter->getColumnName(), $filterValue));
+                    } elseif ($filter->isTextEquals()) {
+                        if($filter->isArray())
+                        {
+                            $specification->addAnd(PicoPredicate::getInstance()->in($filter->getColumnName(), $filterValue));
+                        }
+                        else
+                        {
+                            $specification->addAnd(PicoPredicate::getInstance()->equals($filter->getColumnName(), $filterValue));
+                        }
                     } else {
                         $specification->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower($filter->getColumnName()), PicoPredicate::generateLikeContains(strtolower($filterValue))));
                     }
@@ -539,6 +548,21 @@ class PicoSpecification // NOSONAR
             }
         }
         return $specification;
+    }
+    
+    /**
+     * Validates whether a given filter value and filter object are usable.
+     *
+     * This method checks if the filter value is not null or empty,
+     * and that the filter is a valid instance of PicoSpecificationFilter.
+     *
+     * @param mixed $filterValue The value to be validated.
+     * @param PicoSpecificationFilter $filter The filter instance to validate against.
+     * @return bool Returns true if the filter value is valid and the filter is an instance of PicoSpecificationFilter, false otherwise.
+     */
+    private static function isValidFilter($filterValue, $filter)
+    {
+        return $filterValue !== null && !self::isValueEmpty($filterValue) && $filter instanceof PicoSpecificationFilter;
     }
 
     /**
