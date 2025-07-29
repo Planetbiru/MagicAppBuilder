@@ -2333,7 +2333,6 @@ WHERE LOWER(genre_id) LIKE '%jazz%'
 * **Better performance** due to index usage on exact matches.
 * **Greater control** over search behavior in generated modules.
 
----
 
 ## Additional Notes
 
