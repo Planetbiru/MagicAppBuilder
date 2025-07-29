@@ -2335,7 +2335,12 @@ WHERE LOWER(genre_id) LIKE '%jazz%'
 
 ## Additional Notes
 
-* This version maintains full compatibility with previous entity and module configurations.
-* Existing modules will continue to use `text` filters unless explicitly updated to `textequals`.
-* Developers can now offer **"Exact Match" options** in custom filter UIs with minimal code changes.
+* Backward compatible with all existing entities and modules.
+* Existing modules will continue using `text` filters unless explicitly changed to `textequals`.
+* When creating a module, developers can **check the `EX` (Exact Match)** checkbox in the **Filter Element** section.
 
+  * If checked, the generated filter will perform an **exact match** in the database using `=`.
+  * Input must **exactly match** the stored value (including case sensitivity).
+  * Partial matches (e.g., using only a part of a name or word) will no longer work.
+  * This is ideal for filtering by codes, IDs, or values where precision is critical.
+  * **Index optimization** leads to better performance on large datasets.
