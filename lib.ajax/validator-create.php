@@ -75,6 +75,7 @@ if($inputPost->getUserAction() == 'create')
         $dataTypes = array();
         $valProps = array();
         
+        $number = 1;
         foreach($fields as $field)
         {
             $fieldName = $field['column_name'];
@@ -83,7 +84,7 @@ if($inputPost->getUserAction() == 'create')
             $dataTypes[$fieldName] = $dataType;
 
             // Only generate properties for fields with validation definitions
-            $number = 1;
+            
             if(isset($data[$fieldName]))
             {
                 $vals = array();
