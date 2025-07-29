@@ -3700,7 +3700,7 @@ function validateReference() {
   valueColumnContainer.attr('data-loading', 'true');
   referenceObjectNameContainer.attr('data-loading', 'true');
   referencePropertyNameContainer.attr('data-loading', 'true');
-
+  $('#data-list-reference').empty();
   // Make an AJAX request to validate the reference information
   $.ajax({
     method: 'POST',
@@ -3742,6 +3742,13 @@ function validateReference() {
       {
         let li2 = $(`<li><a href="javascript:;" data-column="${data.columns[i]}">${data.columns[i]}</a></li>`);
         ul2.append(li2);
+        let camelField = camelize(data.columns[i]);
+        $('#data-list-reference').append(
+          $('<option>', {
+            value: camelField,
+            text: camelField
+          })
+        );
       }
       $('.column-list').append(ul2);
       
@@ -7064,11 +7071,11 @@ function loadColumn(tableName, selector) {
       let field, args;
       let domHtml;
       let skippedOnInsertEdit = answer.skipped_insert_edit;
-      $('#list-column').empty();
+      $('#data-list-column').empty();
       for (i in data) {
         field = data[i].column_name;
         let camelField = camelize(field);
-        $('#list-column').append(
+        $('#data-list-column').append(
           $('<option>', {
             value: camelField,
             text: camelField
