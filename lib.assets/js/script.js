@@ -5228,6 +5228,28 @@ function upperCamelize(input) {
 }
 
 /**
+ * Converts a string from snake_case to lowerCamelCase.
+ *
+ * This function splits the input by underscores, capitalizes each word
+ * except the first, and joins them without spaces. The first word remains
+ * in lowercase to follow camelCase convention.
+ *
+ * @param {string} input - The input string in snake_case format.
+ * @returns {string} The transformed string in lowerCamelCase format.
+ */
+function camelize(input) {
+  return input
+    .toLowerCase()
+    .split('_')
+    .map((word, index) => {
+      if (index === 0) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join('');
+}
+
+
+/**
  * Checks if a given key exists in an array of objects.
  *
  * This function iterates through an array of objects, each expected to
@@ -7042,8 +7064,16 @@ function loadColumn(tableName, selector) {
       let field, args;
       let domHtml;
       let skippedOnInsertEdit = answer.skipped_insert_edit;
+      $('#list-column').empty();
       for (i in data) {
         field = data[i].column_name;
+        let camelField = camelize(field);
+        $('#list-column').append(
+          $('<option>', {
+            value: camelField,
+            text: camelField
+          })
+        );
         args = { data_type: data[i].data_type, column_type: data[i].column_type };
         domHtml = generateRow(field, args, skippedOnInsertEdit);
         let tr = $(domHtml);
@@ -7949,13 +7979,19 @@ function deserializeForm(data) {
 }
 
 /**
- * Adds a new row to the end of the specified table by duplicating the last row in the tbody.
+ * Clones the last row of the <tbody> in the specified table and appends the cloned row to the end.
  *
- * @param {jQuery} table - The jQuery object representing the table to which a row should be added.
+ * This function duplicates the structure and content of the last <tr> in the table's <tbody>,
+ * appends the cloned row to the same <tbody>, and returns the cloned jQuery object. It does not
+ * clear input values or rebind event handlers.
+ *
+ * @param {jQuery} table - The jQuery object representing the target table.
+ * @returns {jQuery} The newly appended cloned row as a jQuery object.
  */
 function addRow(table) {
   let lastRow = table.find("tbody").find("tr:last-child").prop("outerHTML");
   table.find("tbody").append(lastRow);
+  return table.find("tbody").find("tr:last-child");
 }
 
 /**

@@ -295,6 +295,9 @@
 </button> &nbsp;
 </div>
 
+<datalist id="list-column">
+</datalist>
+
 <!-- Reference Begin -->
 <div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
 <div class="modal-dialog modal-lg">
@@ -416,7 +419,7 @@
 </thead>
 <tbody>
 <tr>
-<td><input type="text" class="form-control data-filter-column-name" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control data-filter-column-name" value="" autocomplete="off" list="list-column"></td>
 <td>
 <select class="form-control data-filter-column-comparison">
 <option value="equals">=</option>
@@ -472,7 +475,7 @@
 </thead>
 <tbody>
 <tr>
-<td><input type="text" class="form-control data-order-column-name" value="" autocomplete="off"></td>
+<td><input type="text" class="form-control data-order-column-name" value="" autocomplete="off" list="list-column"></td>
 <td><select class="form-control data-order-order-type">
 <option value="PicoSort::ORDER_TYPE_ASC">ASC</option>
 <option value="PicoSort::ORDER_TYPE_DESC">DESC</option>

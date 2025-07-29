@@ -2183,7 +2183,7 @@ This change ensures that users who are granted permission to restore deleted dat
 
 # MagicAppBuilder Version 1.15.4
 
-MagicAppBuilder 1.15.4 delivers several important improvements to the **Entity Editor**, making entity management more intelligent and schema generation more reliable. This version introduces enhanced handling of default values, full support for composite primary keys, and a new system for determining entity creation order based on dependencies.
+MagicAppBuilder 1.15.4 delivers several important improvements to the **Entity Editor**, making entity management more intelligent and schema generation more reliable. This version introduces enhanced handling of default values, full support for composite primary keys, a new system for determining entity creation order based on dependencies, and user-friendly autocomplete features in the module generator.
 
 
 ## Enhancement: Use Default Values in Insert Statements
@@ -2272,3 +2272,20 @@ To simplify the process of creating application modules, the Entity Editor now *
 
 > In this example, the system will generate `Artist` before `Album`, and `Album` before `Track`.
 
+
+## Enhancement: Autocomplete for Filter and Order Setup
+
+To improve usability and reduce input errors, the **main module creation form** now includes **autocomplete support** when users define filters and sort orders.
+
+### How It Works
+
+* When configuring filter and order fields:
+
+  * The input boxes for column names now provide **autocomplete suggestions** based on the table’s columns.
+  * Suggestions are automatically populated, helping users avoid typos and invalid column names.
+
+### Benefits
+
+* Speeds up the configuration of data list views.
+* Minimizes errors from manual typing of column names.
+* Improves the overall experience when building and customizing modules.
