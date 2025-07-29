@@ -118,14 +118,14 @@ $jsLang = [
                     <option><?php echo $appLanguage->getPleaseLoadReleasesFirst();?></option>
                 </select> 
                 <button type="button" class="btn btn-primary" onclick="loadReleases()"><i class="fa fa-refresh"></i></button>
-                <button type="button" class="btn btn-secondary" onclick="showReleaseBody()" id="btn-show-release-body" disabled><?php echo $appLanguage->getViewReleaseNote(); ?></button>
+                <button type="button" class="btn btn-secondary" onclick="showReleaseBody()" id="btn-show-release-body" disabled><?php echo $appLanguage->getButtonViewReleaseNote(); ?></button>
               </td>
             </tr>
             <tr>
                 <td></td>
                 <td>           
-                    <button type="button" class="btn btn-success" onclick="startUpdate()" id="update-btn" disabled><?php echo $appLanguage->getUpdateNow();?></button>
-                    <button type="button" class="btn btn-success" onclick="updateDatabase()"><?php echo $appLanguage->getUpdateDatabase();?></button>
+                    <button type="button" class="btn btn-success" onclick="startUpdate()" id="update-btn" disabled><?php echo $appLanguage->getButtonUpdateNow();?></button>
+                    <button type="button" class="btn btn-success" onclick="updateDatabase()"><?php echo $appLanguage->getButtonUpdateDatabase();?></button>
                 </td>
             </tr>
             <tr>
