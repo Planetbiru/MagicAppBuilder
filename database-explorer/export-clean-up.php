@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-$baseDirectory = realpath(dirname(__DIR__) . '/tmp/'); 
+$baseDirectory = realpath(dirname(__DIR__) . '/.tmp'); 
 
 $exportFileMaxAge = $builderConfig->getExportFileMaxAge();
 

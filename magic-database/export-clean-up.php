@@ -7,7 +7,7 @@ if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
     exit(); // Bye non superuser
 }
 
-$baseDirectory = realpath(dirname(__DIR__) . '/tmp/'); 
+$baseDirectory = realpath(dirname(__DIR__) . '/.tmp'); 
 
 $exportFileMaxAge = $builderConfig->getExportFileMaxAge();
 
