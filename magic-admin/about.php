@@ -223,6 +223,9 @@ $jsLang = [
         statusEl.classList.add('success');
         document.querySelector('#application-version').textContent = json.new_version;
         document.querySelector('#last-update').textContent = json.last_update;
+
+        // Call updateDatabase after extraction
+        updateDatabase();
       })
       .catch(err => {
         statusEl.textContent = '❌ ' + err.message;
