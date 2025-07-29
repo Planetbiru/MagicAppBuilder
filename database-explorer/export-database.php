@@ -10,7 +10,7 @@ $inputPost = new InputPost();
 
 $batchSize = 100;
 $maxQuerySize = 524288;
-$tmpDir = dirname(__DIR__) . '/tmp';
+$tmpDir = dirname(__DIR__) . '/.tmp';
 if(!file_exists($tmpDir))
 {
     mkdir($tmpDir, 0755, true);

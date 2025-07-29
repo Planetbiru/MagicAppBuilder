@@ -11,7 +11,7 @@ function startsWith($haystack, $needle) {
     return substr($haystack, 0, strlen($needle)) === $needle;
 }
 
-$baseDirectory = realpath(dirname(__DIR__) . '/tmp/'); // Ensure real path
+$baseDirectory = realpath(dirname(__DIR__) . '/.tmp'); // Ensure real path
 if ($baseDirectory === false) {
     http_response_code(500);
     exit;

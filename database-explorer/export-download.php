@@ -5,7 +5,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 function startsWith($haystack, $needle) {
     return substr($haystack, 0, strlen($needle)) === $needle;
 }
-$tmpDir = dirname(__DIR__) . '/tmp';
+$tmpDir = dirname(__DIR__) . '/.tmp';
 if(!file_exists($tmpDir))
 {
     mkdir($tmpDir, 0755, true);

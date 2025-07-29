@@ -16,7 +16,7 @@ $inputPost = new InputPost();
 $batchSize = 100;
 $maxQuerySize = 524288;
 
-$tmpDir = dirname(__DIR__) . '/tmp';
+$tmpDir = dirname(__DIR__) . '/.tmp';
 if(!file_exists($tmpDir))
 {
     mkdir($tmpDir, 0755, true);
@@ -26,7 +26,7 @@ else
     chmod($tmpDir, 0755);
 }
 
-$baseDirectory = realpath(dirname(__DIR__) . '/tmp'); // Ensure absolute path to base directory
+$baseDirectory = realpath(dirname(__DIR__) . '/.tmp'); // Ensure absolute path to base directory
 if ($baseDirectory === false) {
     http_response_code(500);
     exit(json_encode(["success" => false, "error" => "Base directory not found."]));
@@ -50,11 +50,6 @@ $applicationId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZ
 $databaseName = $inputPost->getDatabaseName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $schemaName = $inputPost->getSchema(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $targetDatabaseType = $inputPost->getTargetDatabaseType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
-
-// Ensure tmp folder exists
-if (!file_exists($baseDirectory)) {
-    mkdir($baseDirectory, 0755, true);
-}
 
 // Fetch and sanitize input data
 $fileName = $inputPost->getFileName();
