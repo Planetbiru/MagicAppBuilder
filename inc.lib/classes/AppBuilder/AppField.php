@@ -149,6 +149,16 @@ class AppField // NOSONAR
      * @var bool
      */
     private $multipleFilter = false;
+    
+    /**
+     * Indicates whether exact match filtering is enabled for this field.
+     *
+     * When set to true, this field will use exact comparison (e.g., `=`) instead of partial matching
+     * (e.g., `LIKE`) when used as a filter in queries.
+     *
+     * @var bool
+     */
+    private $exactFilter;
 
     /**
      * Data format
@@ -182,6 +192,7 @@ class AppField // NOSONAR
         $this->additionalOutput = $value->getAdditionalOutput();
         $this->multipleData = $this->isTrue($value->getMultipleData());
         $this->multipleFilter = $this->isTrue($value->getMultipleFilter());
+        $this->exactFilter = $this->isTrue($value->getExactFilter());
         $this->dataFormat = PicoObjectParser::parseJsonRecursive($value->getDataFormat());
     }
 
@@ -447,6 +458,34 @@ class AppField // NOSONAR
         $this->multipleFilter = $multipleFilter;
 
         return $this;
+    }
+    
+    /**
+     * Set whether to use exact matching for filtering.
+     *
+     * This method sets the exact filter flag, which determines whether
+     * the system should perform exact comparisons instead of using LIKE or other fuzzy methods.
+     *
+     * @param bool $exactFilter True to enable exact filtering, false to disable.
+     * @return self Returns the instance for method chaining.
+     */
+    public function setExactFilter($exactFilter)
+    {
+        $this->exactFilter = $exactFilter;
+        return $this;
+    }
+    
+    /**
+     * Get the exact filter setting.
+     *
+     * This method retrieves the current value of the exact filter flag,
+     * which indicates whether the field uses exact comparison during filtering.
+     *
+     * @return bool True if exact filtering is enabled, false otherwise.
+     */
+    public function getExactFilter()
+    {
+        return $this->exactFilter;
     }
 
     /**

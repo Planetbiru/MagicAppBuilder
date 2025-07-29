@@ -2135,7 +2135,8 @@ The **Entity Editor** now supports **importing data from Excel files (`.xlsx`)**
 
 # MagicAppBuilder Version 1.15.3
 
-MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers, along with an important update to module access control and a bug fix in the Entity Editor.
+MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers, along with an important update to module access control.
+
 
 ## New Feature: Preview Release Notes from the Admin Panel
 
@@ -2159,16 +2160,17 @@ You can now **preview release notes directly from the Application Option** menu.
 * Helps teams stay aligned on changes in each version.
 * Reduces the need to open external changelog files.
 
+
 ## Access Control Update: Data Restoration Module
 
 In this release, the **Data Restoration module is no longer treated as a "special access" module**.
 
-Previously, the module required special access privileges, which prevented some users from restoring data even when their role had been explicitly granted permission.
-Starting in **version 1.15.3**, the module behaves like a regular feature: access is determined solely by role-based permissions.
+### Why This Matters
 
-This change ensures that users who are granted permission to restore deleted data from the recycle bin can do so without unnecessary restrictions.
+* Previously, the module required special access privileges, limiting its availability even to users who had been explicitly granted permission to restore data from the recycle bin.
+* Starting in **version 1.15.3**, it behaves like a standard module: access is controlled solely through role-based permissions.
 
-## Bug Fixes
+### Clarification
 
 * **Entity Deletion in Entity Editor**
   Fixed an issue where the Entity Editor would leave one undeletable entity even after multiple deletions.
@@ -2273,6 +2275,8 @@ To simplify the process of creating application modules, the Entity Editor now *
 > In this example, the system will generate `Artist` before `Album`, and `Album` before `Track`.
 
 
+# MagicAppBuilder Version 1.16.0
+
 ## Enhancement: Autocomplete for Filter and Order Setup
 
 To improve usability and reduce input errors, the **main module creation form** now includes **autocomplete support** when users define filters and sort orders.
@@ -2289,3 +2293,51 @@ To improve usability and reduce input errors, the **main module creation form** 
 * Speeds up the configuration of data list views.
 * Minimizes errors from manual typing of column names.
 * Improves the overall experience when building and customizing modules.
+
+
+## Upgrade: MagicObject Updated to Version 3.16.4
+
+This release includes an upgrade to **MagicObject 3.16.4**, bringing with it support for the new `textequals` filter type—allowing developers to define **exact string match** conditions instead of the usual `LIKE`-based search.
+
+### What’s New in MagicObject 3.16.4?
+
+* Introduced support for `textequals` in `PicoSpecification`.
+* Exact match filters generate SQL using `=` instead of `LIKE`.
+* Indexes can now be leveraged more effectively for string filters.
+
+### Example Usage
+
+```php
+$specMap = array(
+    "artistId" => PicoSpecification::filter("artistId", "number"),
+    "genreId" => PicoSpecification::filter("genreId", "textequals")
+);
+$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
+```
+
+Generates this SQL:
+
+```sql
+WHERE genre_id = 'Jazz'
+```
+
+Instead of:
+
+```sql
+WHERE LOWER(genre_id) LIKE '%jazz%'
+```
+
+### Benefits
+
+* **More precise** filtering for string fields.
+* **Better performance** due to index usage on exact matches.
+* **Greater control** over search behavior in generated modules.
+
+---
+
+## Additional Notes
+
+* This version maintains full compatibility with previous entity and module configurations.
+* Existing modules will continue to use `text` filters unless explicitly updated to `textequals`.
+* Developers can now offer **"Exact Match" options** in custom filter UIs with minimal code changes.
+
