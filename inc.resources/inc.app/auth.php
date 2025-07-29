@@ -1,30 +1,34 @@
 <?php
 
 use MagicApp\AppUserActivityLogger;
+use MagicApp\Field;
 use MagicAppTemplate\AppLanguageImpl;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicAppTemplate\Entity\App\AppUserActivityImpl;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\SecretObject;
 use MagicObject\SetterGetter;
 use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 use MagicAppTemplate\AppAccountSecurity;
-use MagicAppTemplate\Entity\App\AppAdminLoginImpl;
 
 require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/session.php";
 
 $appModule = new AppModuleImpl(null, $database);
 $appUserRole = new AppAdminRoleImpl(null, $database);
-$currentUser = new AppAdminLoginImpl(null, $database);
+$currentUser = new AppAdminImpl(null, $database);
 
 $languageId = 'en';
 
 if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true")
 {
+    $currentUser = new AppAdminImpl(null, $database);
     $currentUser->setAdminId("superuser");
     $currentUser->setUsername("superuser");
     $hashPassword2 = AppAccountSecurity::generateHash($appConfig, "superuser", 2);
@@ -42,21 +46,26 @@ else
 {
     try
     {
-        $logedIn = $sessions->logedIn;
-        
-        if(!$logedIn)
+        $appSessionUsername = $sessions->username;
+        $appSessionPassword = $sessions->userPassword;
+        if(empty($appSessionUsername) || empty($appSessionPassword))
         {
             require_once __DIR__ . "/login-form.php";
             exit();
         }
         else
         {
-            $currentUser->unserialize($sessions->userData); 
-            if(!$currentUser->validPasswordVersion())
-            {
-                require_once __DIR__ . "/login-form.php";
-                exit();
-            }
+            $hashPassword = AppAccountSecurity::generateHash($appConfig, $appSessionPassword, 1);   
+            $appSpecsLogin = PicoSpecification::getInstance()
+                ->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower(Field::of()->username), strtolower($appSessionUsername)))
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, $hashPassword))
+                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
+                ->addAnd(PicoSpecification::getInstance()
+                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
+                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
+                )
+            ;
+            $currentUser->findOne($appSpecsLogin); 
         }  
     }
     catch(Exception $e)

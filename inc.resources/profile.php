@@ -120,7 +120,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
             $hashPassword = AppAccountSecurity::generateHash($appConfig, $plainPassword, 1);
 			$hashPassword2 = AppAccountSecurity::generateHash($appConfig, $hashPassword, 1);
 
-			if(passwordExists($database, $adminId, $hashPassword2))
+			if(passwordExists($database, $adminId, $hashPassword))
 			{
 				$passwordUsed = true;
 			}
@@ -131,7 +131,8 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 					->setPassword($hashPassword2)
 					->setPasswordVersion(sha1(time().mt_rand(1000000, 9999999)))
 					->update();
-				createPasswordHistory($database, $adminId, $hashPassword2);
+				$sessions->userPassword = $hashPassword;
+				createPasswordHistory($database, $adminId, $hashPassword);
 			}
         }
 

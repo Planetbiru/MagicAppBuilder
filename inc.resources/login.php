@@ -1,19 +1,19 @@
 <?php
 
 use MagicApp\Field;
+use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 use MagicAppTemplate\AppAccountSecurity;
-use MagicAppTemplate\Entity\App\AppAdminLoginImpl;
 
 require_once __DIR__ . "/inc.app/app.php";
 require_once __DIR__ . "/inc.app/session.php";
 
 $inputPost = new InputPost();
 
-$currentUser = new AppAdminLoginImpl(null, $database);
+$currentUser = new AppAdminImpl(null, $database);
 
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
@@ -35,11 +35,8 @@ if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
         ;
         $currentUser->findOne($appSpecsLogin);
         $userLoggedIn = true;
-        $sessions->logedIn = true;
-        $sessions->userData = $currentUser->serialize();
-
-        // Update password version
-        $currentUser->updatePasswordVersion($currentUser->getPasswordVersion());
+        $sessions->username = $inputPost->getUsername();
+        $sessions->userPassword = $hashPassword;
     }
     catch(Exception $e)
     {
