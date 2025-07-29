@@ -16,6 +16,16 @@ $inputPost = new InputPost();
 $batchSize = 100;
 $maxQuerySize = 524288;
 
+$tmpDir = dirname(__DIR__) . '/tmp';
+if(!file_exists($tmpDir))
+{
+    mkdir($tmpDir, 0755, true);
+}
+else
+{
+    chmod($tmpDir, 0755);
+}
+
 $baseDirectory = realpath(dirname(__DIR__) . '/tmp'); // Ensure absolute path to base directory
 if ($baseDirectory === false) {
     http_response_code(500);
