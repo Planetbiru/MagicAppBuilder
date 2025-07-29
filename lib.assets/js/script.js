@@ -7227,9 +7227,15 @@ function restoreForm(data)  //NOSONAR
             tr.find('.reference-filter').val(JSON.stringify(data.fields[i].referenceFilter));
             tr.find('.reference_button_filter').css('display', 'inline');
             tr.find('.input-field-filter[value="select"]')[0].checked = true;
+            
+            tr.find('.input-multiple-filter')[0].disabled = false;
+            tr.find('.input-exact-filter')[0].disabled = false;
           }
           if (data.fields[i].filterElementType == 'text') {
             tr.find('.input-field-filter[value="text"]')[0].checked = true;
+            
+            tr.find('.input-multiple-filter')[0].disabled = false;
+            tr.find('.input-exact-filter')[0].disabled = false;
           }
           
           if(isSupportMultiple(data.fields[i].elementType))
@@ -7237,7 +7243,7 @@ function restoreForm(data)  //NOSONAR
             tr.find('.input-multiple-data')[0].disabled = false;
             if(isTrue(data.fields[i].multipleData))
             {
-              tr.find('.input-multiple-data')[0].checked = 1;
+              tr.find('.input-multiple-data')[0].checked = true;
             }
           }
           else
@@ -7250,26 +7256,20 @@ function restoreForm(data)  //NOSONAR
             tr.find('.input-multiple-filter')[0].disabled = false;
             if(isTrue(data.fields[i].multipleFilter))
             {
-              tr.find('.input-multiple-filter')[0].checked = 1;
+              tr.find('.input-multiple-filter')[0].checked = true;
             }
           }
-          else
-          {
-            tr.find('.input-multiple-filter')[0].disabled = true;
-          }
+
           
           if(isExactFilter(data.fields[i].exactFilter))
           {
             tr.find('.input-exact-filter')[0].disabled = false;
             if(isTrue(data.fields[i].exactFilter))
             {
-              tr.find('.input-exact-filter')[0].checked = 1;
+              tr.find('.input-exact-filter')[0].checked = true;
             }
           }
-          else
-          {
-            tr.find('.input-exact-filter')[0].disabled = true;
-          }
+
           
           tr.find('.input-field-data-type').val(data.fields[i].dataType);
           tr.find('.input-data-filter').val(data.fields[i].inputFilter);
