@@ -296,10 +296,9 @@
 </button> &nbsp;
 </div>
 
-<datalist id="data-list-column">
-</datalist>
-<datalist id="data-list-reference">
-</datalist>
+<datalist id="data-list-column"></datalist>
+<datalist id="data-list-reference"></datalist>
+<datalist id="data-list-date-format"></datalist>
 
 <!-- Reference Begin -->
 <div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
@@ -350,7 +349,7 @@
 </ul>
 <div id="data-format-tab" class="tab-content">
 <div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-<input type="text" id="input-control-string-format" class="form-control">
+<input type="text" id="input-control-string-format" class="form-control" autocomplete="off">
 <div class="button-area">
 <button type="button" class="btn btn-primary button-load-string-format"><i class="fas fa-refresh"></i> Load</button>
 <button type="button" class="btn btn-primary button-save-string-format"><i class="fas fa-save"></i> Save</button>
@@ -361,7 +360,7 @@
 </div>
 </div>
 <div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-<input type="text" id="input-control-date-format" class="form-control">
+<input type="text" id="input-control-date-format" class="form-control" list="data-list-date-format" autocomplete="off">
 <div class="button-area">
 <button type="button" class="btn btn-primary button-load-date-format"><i class="fas fa-refresh"></i> Load</button>
 <button type="button" class="btn btn-primary button-save-date-format"><i class="fas fa-save"></i> Save</button>
@@ -373,11 +372,11 @@
 </div>
 <div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
 <div class="input-label">Decimal</div>                 
-<input type="text" id="input-control-decimal" class="form-control">
+<input type="text" id="input-control-decimal" class="form-control" autocomplete="off">
 <div class="input-label">Decimal Separator</div>                
-<input type="text" id="input-control-decimal-separator" class="form-control">
+<input type="text" id="input-control-decimal-separator" class="form-control" autocomplete="off">
 <div class="input-label">Thousands Separator</div>                
-<input type="text" id="input-control-thousands-separator" class="form-control">
+<input type="text" id="input-control-thousands-separator" class="form-control" autocomplete="off">
 <div class="button-area">
 <button type="button" class="btn btn-primary button-load-number-format"><i class="fas fa-refresh"></i> Load</button>
 <button type="button" class="btn btn-primary button-save-number-format"><i class="fas fa-save"></i> Save</button>
