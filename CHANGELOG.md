@@ -2360,3 +2360,16 @@ This version focuses on internal housekeeping to improve maintainability and red
 
 > There are no functional changes in this release. All existing modules and features remain unaffected.
 
+
+## Enhancement: Autocomplete for Date Format Input
+
+To help developers define consistent and correct date/time formats when creating a module, the **Date Format** input field now supports **autocomplete** via a `<datalist>`. This feature:
+
+* Provides a list of commonly used date and datetime formats.
+* Displays preview values (e.g., `d/m/Y H:i (30/07/2025 15:30)`) while storing only the raw format (e.g., `d/m/Y H:i`).
+* Reduces errors and speeds up module creation by offering ready-to-use formats.
+* Supports ISO, Indonesian, and international styles.
+
+This enhancement is available in the **Generate Module** under the **Date Format** input.
+
+
