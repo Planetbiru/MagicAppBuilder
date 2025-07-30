@@ -282,9 +282,8 @@ table.responsive-three-cols {
     display: inline-block;
     width: auto;
     min-width: 100px;
+    max-width: 240px;
   }
-
-
 
   [type="datetime-local"],
   [type="datetime"] {
