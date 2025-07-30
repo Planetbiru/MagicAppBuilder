@@ -229,6 +229,7 @@ table.responsive-three-cols > tbody > tr > td:nth-child(1) {
   display: inline-block;
   width: auto;
   min-width: 100px;
+  max-width: 240px;
 }
 .filter-section [type=datetime-local],
 .filter-section [type=datetime] {
