@@ -708,4 +708,8 @@ tr[data-active=false] td {
 
 .dark-mode tr[data-active=false] td {
   background-color: #312e2e;
+}
+
+.list-group-item {
+  padding: 0.4rem 0.75rem;
 }/*# sourceMappingURL=general.css.map */

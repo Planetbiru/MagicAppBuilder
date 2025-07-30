@@ -710,6 +710,10 @@ tr[data-active=false] td {
   background-color: #312e2e;
 }
 
+.list-group-item {
+  padding: 0.4rem 0.75rem;
+}
+
 select[multiple].form-control {
   height: 38px;
 }

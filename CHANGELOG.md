@@ -2372,4 +2372,19 @@ To help developers define consistent and correct date/time formats when creating
 
 This enhancement is available in the **Generate Module** under the **Date Format** input.
 
+Berikut adalah tambahan catatan rilis yang menjelaskan fitur pencarian menu di aplikasi yang dihasilkan:
+
+## Enhancement: Sidebar Menu Search
+
+Generated applications now include a **search tool for the sidebar menu**, making navigation faster and more efficient, especially in apps with many modules.
+
+Key highlights:
+
+* Users can **type any part of a menu label** to filter and find matching links.
+* Only menu items with valid links (i.e., not starting with `#`) are included in the search results.
+* Matching items are displayed in a separate panel without modifying the existing sidebar.
+* The original sidebar menu is **automatically hidden** while searching and shown again when the input is cleared.
+* Results are displayed in a **flat list** for quick access.
+
+This search tool is especially helpful for administrators or developers managing large applications with many configuration or data modules.
 
