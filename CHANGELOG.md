@@ -2344,3 +2344,19 @@ WHERE LOWER(genre_id) LIKE '%jazz%'
   * Partial matches (e.g., using only a part of a name or word) will no longer work.
   * This is ideal for filtering by codes, IDs, or values where precision is critical.
   * **Index optimization** leads to better performance on large datasets.
+
+
+# MagicAppBuilder Version 1.16.1
+
+## Cleanup: Removal of Unused Files
+
+This version focuses on internal housekeeping to improve maintainability and reduce project bloat.
+
+### What's Changed
+
+* Removed legacy and unused files from the codebase.
+* Cleaned up redundant assets and outdated components.
+* Streamlined the project structure for improved efficiency.
+
+> There are no functional changes in this release. All existing modules and features remain unaffected.
+
