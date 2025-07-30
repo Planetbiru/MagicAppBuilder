@@ -174,7 +174,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
 $appEntityLanguage = new AppEntityLanguageImpl(new GitProfile(), $appConfig, $currentUser->getLanguageId());
-require_once __DIR__ ."/inc.app/simple-header.php";
+require_once __DIR__ ."/inc.app/simple-header.php"; // NOSONAR
 ?>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
@@ -239,7 +239,7 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 	</div>
 </div>
 <?php 
-require_once __DIR__ ."/inc.app/simple-footer.php";
+require_once __DIR__ ."/inc.app/simple-footer.php"; // NOSONAR
 }
 else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
