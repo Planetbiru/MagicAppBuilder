@@ -7119,8 +7119,21 @@ function loadColumn(tableName, selector) {
         $(".define-wrapper").css("display", "block");
         $("#define-column-tab").click();
       }
+      loadDateTimeFormat();
     },
   });
+}
+
+/**
+ * Loads a list of commonly used date-time format options into the datalist element.
+ *
+ * This function fetches pre-rendered <option> elements from a PHP file and injects them
+ * into the <datalist id="data-list-date-format"> element. Each option contains a format string
+ * as its value and a human-readable preview as its label.
+ */
+function loadDateTimeFormat()
+{
+  $('#data-list-date-format').load('lib.ajax/date-time-format.php');
 }
 
 /**
