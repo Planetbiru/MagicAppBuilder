@@ -994,6 +994,71 @@ function doRestoreFormData(formData, errorField, formSelector) {
   }
 }
 
+/**
+ * Initializes the search functionality for the sidebar menu.
+ * This function sets up an event listener on the search input field.
+ * As the user types, it filters the menu items and displays matching results.
+ * If the search query is empty, the original menu is shown.
+ *
+ * @returns {void}
+ */
+function initSearchMenu() {
+  // Select the sidebar menu element
+  const $menu = $('#sidebarMenu');
+  // Select the element where search results will be displayed
+  const $results = $('#menuSearchResults');
+  // Select the search input field
+  const $input = $('#menuSearch');
+
+  // Attach an 'input' event listener to the search input field
+  $input.on('input', function () {
+    // Get the current value of the input field and convert it to lowercase for case-insensitive search
+    const query = $(this).val().toLowerCase();
+    // Clear any previous search results
+    $results.empty();
+
+    // If the query has content, hide the original menu
+    if (query.length > 0) {
+      $menu.hide();
+    } else {
+      // If the query is empty, show the original menu and exit the function
+      $menu.show();
+      return;
+    }
+
+    // Initialize an array to store the search results
+    const results = [];
+
+    // Iterate over each 'a' (anchor) tag within the sidebar menu
+    $menu.find('a').each(function () {
+      // Get the current anchor tag as a jQuery object
+      const $link = $(this);
+      // Get the 'href' attribute of the link
+      const href = $link.attr('href');
+      // Get the text content of the link and trim whitespace
+      const text = $link.text().trim();
+
+      // Skip this link if its href attribute is falsy or starts with '#' (e.g., internal page anchors)
+      if (!href || href.startsWith('#')) return;
+
+      // If the lowercase text of the link includes the lowercase query, add it to the results
+      if (text.toLowerCase().includes(query)) {
+        results.push({ text, href });
+      }
+    });
+
+    // If no results were found, display a "No matches found" message
+    if (results.length === 0) {
+      $results.append('<li class="list-group-item text-muted">No matches found</li>');
+    } else {
+      // Otherwise, append each found result as a list item with a link
+      results.forEach(item => {
+        $results.append(`<li class="list-group-item"><a href="${item.href}">${item.text}</a></li>`);
+      });
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize general page setup (e.g., tabs, tooltips, etc.)
   initPage();
@@ -1021,4 +1086,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Apply sorting state (highlighting, arrows, etc.) based on URL query params
   initOrderUrl(window.location.search);
+
+  // Initializes the search functionality for the sidebar menu.
+  initSearchMenu()
 });
