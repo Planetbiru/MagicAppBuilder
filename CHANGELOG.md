@@ -2372,13 +2372,12 @@ To help developers define consistent and correct date/time formats when creating
 
 This enhancement is available in the **Generate Module** under the **Date Format** input.
 
-Berikut adalah tambahan catatan rilis yang menjelaskan fitur pencarian menu di aplikasi yang dihasilkan:
 
 ## Enhancement: Sidebar Menu Search
 
 Generated applications now include a **search tool for the sidebar menu**, making navigation faster and more efficient, especially in apps with many modules.
 
-Key highlights:
+### Key Highlights
 
 * Users can **type any part of a menu label** to filter and find matching links.
 * Only menu items with valid links (i.e., not starting with `#`) are included in the search results.
@@ -2388,3 +2387,13 @@ Key highlights:
 
 This search tool is especially helpful for administrators or developers managing large applications with many configuration or data modules.
 
+
+## Bug Fix: Export Database to Excel
+
+Fixed an issue where **columns with empty values or mixed data types** could result in incorrect cell formats or misaligned data in the exported Excel file. The export engine now:
+
+* Properly detects and formats columns even when initial rows contain null or blank values.
+* Applies consistent column typing (e.g., string, number, date) based on full data inspection.
+* Improves compatibility with spreadsheet applications such as Microsoft Excel and LibreOffice Calc.
+
+This fix ensures more reliable data exports across all supported database dialects (MySQL, PostgreSQL, SQLite, SQL Server).
