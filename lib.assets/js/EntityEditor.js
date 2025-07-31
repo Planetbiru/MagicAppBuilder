@@ -2343,7 +2343,27 @@ class EntityEditor {
             // Error handling (not implemented)
         });
     }
-    
+
+    /**
+     * Handles the "Edit Entity" action from the context menu.
+     * Hides the context menu and triggers the entity editor for the selected entity.
+     */
+    editEntityContextMenu()
+    {
+        hideContextMenu();
+        this.editEntity(parseInt(selectedElement.dataset.index));
+    }
+
+    /**
+     * Handles the "View Data" action from the context menu.
+     * Hides the context menu and opens the data viewer for the selected entity.
+     */
+    dataEntityContextMenu()
+    {
+        hideContextMenu();
+        this.viewData(parseInt(selectedElement.dataset.index));
+    }
+
     /**
      * Downloads the currently active diagram as an SVG file.
      * Uses either the global entityRenderer or a specific diagramRenderer depending on the diagram ID.

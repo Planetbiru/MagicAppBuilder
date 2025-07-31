@@ -49,10 +49,6 @@ function initDiagramContextMenu(svg) {
                 if (!input || input.id !== 'id1') {
                     li.remove();
                 }
-                else
-                {
-                    input.checked = false;
-                }
             });
 
             // Add submenu items dynamically based on entity's relations
@@ -64,7 +60,7 @@ function initDiagramContextMenu(svg) {
             // Automatically position submenu to the left or right based on screen space
             const viewportWidth = window.innerWidth;
             const shouldOpenLeft = e.pageX > (viewportWidth / 2);
-            submenu.style.left = shouldOpenLeft ? '-97%' : '97%';
+            submenu.style.left = shouldOpenLeft ? '-240px' : '97%';
             submenu.style.right = shouldOpenLeft ? '97%' : 'auto';
 
         } else {
