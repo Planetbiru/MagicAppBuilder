@@ -1,6 +1,10 @@
+// Global variable to track which entity was right-clicked
 let selectedElement = null;
+
 document.addEventListener('DOMContentLoaded', function () {
-    // Hide context menu when clicking elsewhere
+    /**
+     * Hide context menu when clicking anywhere outside it.
+     */
     document.addEventListener("click", function (e) {
         const contextMenu = document.querySelector('#context-menu');
         if (!e.target.closest("#context-menu")) {
@@ -10,33 +14,104 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
- * Initialize the context menu for the entity diagram SVG.
- * @param {SVGElement} svg - The SVG element containing the entity diagram.
+ * Programmatically hides the context menu.
  */
-function initDiagramContextMenu(svg)
-{
+function hideContextMenu() {
     const contextMenu = document.querySelector('#context-menu');
+    contextMenu.style.display = "none";
+}
+
+/**
+ * Initialize context menu behavior for an SVG element containing entity diagrams.
+ * @param {SVGElement} svg - The SVG container to bind the right-click context menu to.
+ */
+function initDiagramContextMenu(svg) {
+    const contextMenu = document.querySelector('#context-menu');
+
     svg.addEventListener("contextmenu", function (e) {
         const entity = e.target.closest('g.svg-entity');
         selectedElement = entity;
+
         if (entity) {
-            e.preventDefault();
-            let count = renderContextMenu(entity);
-            if(count > 0)
-            {
-                contextMenu.style.top = `${e.pageY}px`;
-                contextMenu.style.left = `${e.pageX}px`;
-                contextMenu.style.display = "block";
-            }
-            else
-            {
-                contextMenu.style.display = "none";
-            }
+            e.preventDefault(); // Prevent the default browser context menu
+
+            // Position context menu near the mouse click
+            contextMenu.style.top = `${e.pageY}px`;
+            contextMenu.style.left = `${e.pageX}px`;
+            contextMenu.style.display = "block";
+
+            const referenceMenu = document.querySelector('#menu-make-reference');
+            const submenu = document.querySelector('#reference-submenu');
+
+            // Remove all submenu items except the first one (usually "Check all")
+            submenu.querySelectorAll('li').forEach((li) => {
+                const input = li.querySelector('input');
+                if (!input || input.id !== 'id1') {
+                    li.remove();
+                }
+            });
+
+            // Add submenu items dynamically based on entity's relations
+            const count = renderReferenceSubmenu(entity, submenu);
+
+            // Show or hide the "Add Reference" menu based on available relationships
+            referenceMenu.style.display = count > 0 ? 'block' : 'none';
+
+            // Automatically position submenu to the left or right based on screen space
+            const viewportWidth = window.innerWidth;
+            const shouldOpenLeft = e.pageX > (viewportWidth / 2);
+            submenu.style.left = shouldOpenLeft ? '-97%' : '97%';
+            submenu.style.right = shouldOpenLeft ? '97%' : 'auto';
+
         } else {
             contextMenu.style.display = "none";
         }
     });
 }
+
+
+/**
+ * Populate the reference submenu with available foreign key relations.
+ * @param {Element} entity - The SVG group element representing the entity.
+ * @param {HTMLElement} submenu - The submenu DOM element to populate.
+ * @returns {number} Number of submenu items rendered.
+ */
+function renderReferenceSubmenu(entity, submenu) {
+    const tableName = entity.dataset.entity;
+    const columns = entity.querySelectorAll('.diagram-column-name');
+    let count = 0;
+
+    columns.forEach((col, index) => {
+        const columnName = col.textContent.trim();
+        const refTable = columnName.substring(0, columnName.length - 3);
+
+        if (refTable !== tableName && columnName.endsWith('_id')) {
+            const testInput = document.querySelector(`.table-list input[data-name="${refTable}"]`);
+            if (testInput) {
+                const li = document.createElement('li');
+
+                const input = document.createElement('input');
+                const inputId = `reference-checkbox-${index}`;
+                input.type = 'checkbox';
+                input.checked = isSelectedTable(refTable);
+                input.dataset.name = refTable;
+                input.id = inputId;
+                input.addEventListener('change', selectTable);
+
+                const label = document.createElement('label');
+                label.setAttribute('for', inputId);
+                label.textContent = ` ${columnName}`; // Spasi sebelum teks agar rapi
+
+                li.appendChild(input);
+                li.appendChild(label);
+                submenu.appendChild(li);
+                count++;
+            }
+        }
+    });
+    return count;
+}
+
 
 /**
  * Render the context menu for a given entity.
@@ -46,7 +121,6 @@ function initDiagramContextMenu(svg)
 function renderContextMenu(entity) {
     const contextMenu = document.querySelector('#context-menu');
     const ul = contextMenu.querySelector('ul');
-    ul.innerHTML = ''; // Clear previous menu
 
     const tableName = entity.dataset.entity;
     const columns = entity.querySelectorAll('.diagram-column-name');

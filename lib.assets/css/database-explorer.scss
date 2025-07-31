@@ -3,6 +3,8 @@
 @import 'context-menu.scss';
 @import 'wave-animation.scss';
 
+
+
 * {
     margin: 0;
     padding: 0;
@@ -44,7 +46,8 @@ a {
                 display: block;
                 border-radius: 3px;
 
-                &:hover, &.active {
+                &:hover,
+                &.active {
                     background-color: #495057;
                 }
             }
@@ -434,7 +437,7 @@ textarea {
     z-index: 1;
 }
 
-.modal-content p{
+.modal-content p {
     line-height: 1.45;
     margin-bottom: 4px;
 }
@@ -448,15 +451,15 @@ textarea {
 
 .modal-md .modal-content {
     display: block;
-    width: 500px; 
+    width: 500px;
     max-width: calc(100vw - 40px);
     margin: 80px auto 0 auto;
 }
 
 .modal-lg .modal-content {
     display: block;
-    width: 800px; 
-    max-width: calc(100vw - 40px); 
+    width: 800px;
+    max-width: calc(100vw - 40px);
     margin: 80px auto 0 auto;
 }
 
@@ -464,42 +467,46 @@ textarea {
     .modal-content {
         margin: 20px auto 0 auto;
     }
-    .modal-body{
+
+    .modal-body {
         max-height: calc(100vh - 135px);
         overflow: auto;
 
-        
+
     }
 }
 
-.sql-table-export
-{
-    td[align="right"]{
+.sql-table-export {
+    td[align="right"] {
         text-align: right;
     }
+
     thead {
-        td, th{
+
+        td,
+        th {
             background-color: #e6e6e6;
             padding-top: 4px;
         }
     }
-    tbody
-    {
-        tr td.table-name
-        {
+
+    tbody {
+        tr td.table-name {
             position: relative;
         }
-        tr td.table-name::after
-        {
+
+        tr td.table-name::after {
             width: 10px;
             height: 10px;
             position: absolute;
             right: 6px;
             top: 2px;
         }
+
         /* Show dots for tables currently being exported */
         tr[data-status="in-progress"] td.table-name::after {
-            content: '...'; /* Indicates export is in progress */
+            content: '...';
+            /* Indicates export is in progress */
             color: orange;
             margin-left: 4px;
             font-weight: bold;
@@ -507,7 +514,8 @@ textarea {
 
         /* Show nothing (or replace with checkmark if desired) for finished tables */
         tr[data-status="finish"] td.table-name::after {
-            content: '✓'; /* Optional: shows checkmark for finished */
+            content: '✓';
+            /* Optional: shows checkmark for finished */
             color: green;
             margin-left: 4px;
             font-weight: bold;
@@ -515,7 +523,8 @@ textarea {
 
         /* Show cross mark for tables that failed to export */
         tr[data-status="error"] td.table-name::after {
-            content: '✗'; /* Indicates export failed */
+            content: '✗';
+            /* Indicates export failed */
             color: red;
             margin-left: 4px;
             font-weight: bold;
@@ -558,11 +567,13 @@ textarea {
 
     table.two-side-table {
         border: none;
+
         td {
             border: none;
             padding: 8px 0;
 
-            input[type="text"], select{
+            input[type="text"],
+            select {
                 padding: 4px 8px;
                 border: 1px solid #DDDDDD;
                 background-color: #FFFFFF;
@@ -689,14 +700,14 @@ td.cell-delete {
     padding: 1px 4px;
     width: 28px;
     text-align: center;
-    a{
+
+    a {
         display: block;
         font-size: 11px;
     }
 }
 
-textarea.description-textarea
-{
+textarea.description-textarea {
     height: 200px;
 }
 
@@ -704,40 +715,20 @@ textarea.description-textarea
     height: calc(100vh - 100px);
 }
 
-a.all-table{
+a.all-table {
     color: #fafafa;
 }
 
 .context-menu-relation {
-  width: 250px;
-  max-height: 300px;
-  overflow-y: auto;
-
-  ul {
-    padding-top: 2px;
-    padding-bottom: 2px;
-    li[data-type="relation"] {
-      padding: 3px 5px;
-
-      &:hover {
-        background-color: #ffffff;
-      }
-
-      &::before {
-        display: none;
-      }
-
-      * {
-        vertical-align: text-top;
-      }
-    }
-  }
+    width: 250px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
-.input-label
-{
+.input-label {
     padding: 0.375rem 0;
 }
+
 .form-control {
     height: calc(1.5em + .6rem + 1px);
     padding: .15rem .6rem;
@@ -749,13 +740,16 @@ a.all-table{
     border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
-th.header-drag-handle{
+
+th.header-drag-handle {
     width: 17px;
 }
+
 .drag-handle {
     cursor: move;
 }
-.drag-handle::before{
+
+.drag-handle::before {
     content: '⠿';
     font-size: 15px !important;
     width: 17px;
@@ -763,14 +757,57 @@ th.header-drag-handle{
     display: inherit;
     color: #555555;
 }
+
 tr.dragging {
     opacity: 0.5;
 }
+
 tr.over {
     outline: 2px dashed #747474;
 }
-tr.group-header{
-    td{
+
+tr.group-header {
+    td {
         background-color: #f1f8ff;
     }
 }
+
+.has-submenu>.submenu {
+    display: none;
+    position: absolute;
+    top: -1px;
+    left: 100%;
+    background: #fff;
+    border: 1px solid #ccc;
+    z-index: 1001;
+    min-width: 200px;
+}
+
+.has-submenu:hover>.submenu {
+    display: block;
+    
+}
+
+.copy-feedback {
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #4CAF50;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: shrinkFade 0.4s ease-out forwards;
+  z-index: 9999;
+}
+
+@keyframes shrinkFade {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+
+
