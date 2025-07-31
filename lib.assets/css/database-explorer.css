@@ -933,4 +933,21 @@ tr.group-header td {
     transform: scale(0.2);
     opacity: 0;
   }
+}
+.download-feedback {
+  position: fixed;
+  pointer-events: none;
+  animation: dropFade 0.6s ease-out forwards;
+  z-index: 9999;
+}
+
+@keyframes dropFade {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300px); /* move down ~300px */
+    opacity: 0;
+  }
 }/*# sourceMappingURL=database-explorer.css.map */

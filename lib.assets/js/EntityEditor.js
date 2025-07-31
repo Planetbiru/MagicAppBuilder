@@ -2323,6 +2323,88 @@ class EntityEditor {
             // Error handling (not implemented)
         });
     }
+    
+    /**
+     * Downloads the currently active diagram as an SVG file.
+     * Uses either the global entityRenderer or a specific diagramRenderer depending on the diagram ID.
+     */
+    downloadSVG() {
+        let diagramContainer = document.querySelector('.diagram-container');
+        let diagram = diagramContainer.querySelector('.diagram.active');
+        if (diagram) {
+            let id = diagram.getAttribute('id');
+            if (id == 'all-entities') {
+                entityRenderer.downloadSVG();
+            } else {
+                diagramRenderer[id].downloadSVG();
+            }
+        }
+    }
+
+    /**
+     * Triggers SVG download of the current diagram and displays a visual download effect.
+     * @param {MouseEvent} e - Mouse event used to extract cursor position for animation.
+     */
+    downloadEntitySVG(e) {
+        this.downloadSVG();
+        this.showDownloadEffect(e.clientX, e.clientY);
+        hideContextMenu();
+    }
+
+    /**
+     * Downloads the currently active diagram as a PNG file.
+     * Uses either the global entityRenderer or a specific diagramRenderer depending on the diagram ID.
+     */
+    downloadPNG() {
+        let diagramContainer = document.querySelector('.diagram-container');
+        let diagram = diagramContainer.querySelector('.diagram.active');
+        if (diagram) {
+            let id = diagram.getAttribute('id');
+            if (id == 'all-entities') {
+                entityRenderer.downloadPNG();
+            } else {
+                diagramRenderer[id].downloadPNG();
+            }
+        }
+    }
+
+    /**
+     * Triggers PNG download of the current diagram and displays a visual download effect.
+     * @param {MouseEvent} e - Mouse event used to extract cursor position for animation.
+     */
+    downloadEntityPNG(e) {
+        this.downloadPNG();
+        this.showDownloadEffect(e.clientX, e.clientY);
+        hideContextMenu();
+    }
+
+    /**
+     * Downloads the currently active diagram as a Markdown (MD) file.
+     * Uses either the global entityRenderer or a specific diagramRenderer depending on the diagram ID.
+     */
+    downloadMD() {
+        let diagramContainer = document.querySelector('.diagram-container');
+        let diagram = diagramContainer.querySelector('.diagram.active');
+        if (diagram) {
+            let id = diagram.getAttribute('id');
+            if (id == 'all-entities') {
+                entityRenderer.downloadMD();
+            } else {
+                diagramRenderer[id].downloadMD();
+            }
+        }
+    }
+
+    /**
+     * Triggers Markdown (MD) download of the current diagram and displays a visual download effect.
+     * @param {MouseEvent} e - Mouse event used to extract cursor position for animation.
+     */
+    downloadDiagramMD(e) {
+        this.downloadMD();
+        this.showDownloadEffect(e.clientX, e.clientY);
+        hideContextMenu();
+    }
+
 
     /**
      * Display a visual circular animation effect at the cursor position.
@@ -2342,6 +2424,32 @@ class EntityEditor {
             circle.remove();
         }, 400);
     }
+    
+    /**
+     * Display a visual downward SVG arrow animation at the cursor position.
+     * Indicates successful download or action trigger.
+     * @param {number} x - X coordinate of the mouse cursor.
+     * @param {number} y - Y coordinate of the mouse cursor.
+     */
+    showDownloadEffect(x, y) {
+        const arrow = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        arrow.setAttribute("class", "download-feedback");
+        arrow.setAttribute("width", "24");
+        arrow.setAttribute("height", "24");
+        arrow.setAttribute("viewBox", "0 0 24 24");
+        arrow.innerHTML = `
+        <path fill="#4CAF50" d="M12 2v14.17l5.59-5.58L19 12l-7 7-7-7 1.41-1.41L12 16.17V2z"/>
+        `;
+
+        arrow.style.left = `${x - 12}px`; // Center horizontally
+        arrow.style.top = `${y - 162}px`;  // Slight offset upward
+        document.body.appendChild(arrow);
+
+        setTimeout(() => {
+            arrow.remove();
+        }, 600); // Match animation duration
+    }
+
     
     /**
      * Generates a base filename based on the provided data object.

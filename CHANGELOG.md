@@ -2410,6 +2410,7 @@ The **Entity Editor** now includes a powerful and interactive **context menu**, 
 
 * **Export diagram to SVG** — Save the current diagram as an SVG image.
 * **Export diagram to PNG** — Download a raster image version of the diagram.
+* **Export diagram to Markdown** — Download a Markdown document representing the entity diagram and structure.
 * **Copy table structure to clipboard** — Copies the SQL structure of the selected table.
 * **Copy table data to clipboard** — Copies the data (rows) of the selected table.
 * **Copy table structure and data to clipboard** — Copies both structure and contents in SQL format.
@@ -2425,4 +2426,22 @@ The **Entity Editor** now includes a powerful and interactive **context menu**, 
 This feature significantly improves workflow for database designers working within the visual editor.
 
 
+## UI Enhancement: Visual Effects on Export and Clipboard Actions
+
+To improve user experience, MagicAppBuilder now includes subtle **visual feedback** when performing context menu actions in the Entity Editor.
+
+### Visual Effects Added
+
+* ✅ Flash highlight + toast message when:
+
+  * Exporting diagram to **SVG**
+  * Exporting diagram to **PNG**
+  * Exporting diagram to **Markdown**
+* ✅ Animated tooltip with checkmark when:
+
+  * Copying **table structure** to clipboard
+  * Copying **table data** to clipboard
+  * Copying **structure and data** to clipboard
+
+These enhancements make it easier for users to confirm actions, especially when working with large diagrams or complex entity structures.
 
