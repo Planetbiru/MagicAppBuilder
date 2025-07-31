@@ -89,7 +89,7 @@ class DatabaseXLSXExporter
             $columns
         );
 
-        $stmt = $this->pdo->query("SELECT * FROM $tableName");
+        $stmt = $this->pdo->query("SELECT * FROM \"$tableName\"");
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $this->writer->writeSheetRow(
                 $this->sheetPrefix . $tableName,

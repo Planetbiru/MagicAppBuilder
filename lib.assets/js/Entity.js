@@ -123,7 +123,7 @@ class Entity {
     /**
      * Generates a single SQL INSERT statement with multiple rows.
      *
-     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", "sql server".
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", "sqlserver".
      * @returns {string} SQL INSERT statement.
      */
     toSQLInsert(dialect = "mysql") {
@@ -220,7 +220,7 @@ class Entity {
         } else if (isInteger || isFloat) {
             return value.toString();
         } else {
-            return this.quoteString(value);
+            return this.quoteString(value, dialect);
         }
     }
 
@@ -229,7 +229,7 @@ class Entity {
      * Converts a boolean-like value into dialect-specific representation.
      *
      * @param {*} value - Input value, possibly boolean, number, or string.
-     * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", "sql server".
+     * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", "sqlserver".
      * @param {boolean} [nullable=true] - If false, null-like values will be replaced with default false.
      * @param {boolean|string|number|null} [defaultValue=null] - Optional default value to use when value is null-like.
      * @returns {string} The formatted boolean value: '1', '0', 'true', 'false', or 'null'.
@@ -284,10 +284,41 @@ class Entity {
      * Escapes and quotes a string value for SQL.
      *
      * @param {string} value - The string value to escape and quote.
+     * @param {string} dialect - SQL dialect: "mysql", "postgresql", "sqlite", "sqlserver".
      * @returns {string} - Escaped and quoted string.
      */
-    quoteString(value) {
-        const escaped = String(value).replace(/'/g, "''");
-        return `'${escaped}'`;
+    quoteString(value, dialect = 'mysql') {
+        let str = String(value);
+
+        // Escape single quotes
+        str = str.replace(/'/g, "''");
+
+        switch (dialect.toLowerCase()) {
+            case 'mysql':
+                // Escape backslashes for MySQL
+                str = str.replace(/\\/g, '\\\\');
+                break;
+
+            case 'postgresql':
+                // Escape backslashes and use E'' syntax for PostgreSQL
+                str = str.replace(/\\/g, '\\\\');
+                return `E'${str}'`;
+
+            case 'sqlite':
+                // Backslashes are literal in SQLite, no need to escape
+                break;
+
+            case 'sqlserver':
+                // Backslashes are literal in SQL Server, no need to escape
+                break;
+
+            default:
+                // Default to MySQL-style escaping
+                str = str.replace(/\\/g, '\\\\');
+                break;
+        }
+
+        return `'${str}'`;
     }
+
 }
