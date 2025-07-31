@@ -288,7 +288,7 @@ class Entity {
      * @returns {string} - Escaped and quoted string.
      */
     quoteString(value, dialect = 'mysql') {
-        let str = String(value);
+        let str = String(value);        
 
         // Escape single quotes
         str = str.replace(/'/g, "''");
