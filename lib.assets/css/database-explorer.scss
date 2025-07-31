@@ -720,7 +720,7 @@ a.all-table {
 }
 
 .context-menu-relation {
-    width: 250px;
+    width: 160px;
     max-height: 300px;
     overflow-y: auto;
 }
@@ -790,8 +790,8 @@ tr.group-header {
 
 .copy-feedback {
   position: fixed;
-  width: 50px;
-  height: 50px;
+  width: 64px;
+  height: 64px;
   border: 2px solid #4CAF50;
   border-radius: 50%;
   pointer-events: none;
@@ -810,4 +810,20 @@ tr.group-header {
   }
 }
 
+.download-feedback {
+  position: fixed;
+  pointer-events: none;
+  animation: dropFade 0.4s ease-out forwards;
+  z-index: 9999;
+}
 
+@keyframes dropFade {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300px); /* move down ~300px */
+    opacity: 0;
+  }
+}
