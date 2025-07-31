@@ -2252,6 +2252,26 @@ class EntityEditor {
         });
         return sql;
     }
+    
+    /**
+     * Handles the "Edit Entity" action from the context menu.
+     * Hides the context menu and triggers the entity editor for the selected entity.
+     */
+    editEntityContextMenu()
+    {
+        hideContextMenu();
+        this.editEntity(parseInt(selectedElement.dataset.index));
+    }
+
+    /**
+     * Handles the "View Data" action from the context menu.
+     * Hides the context menu and opens the data viewer for the selected entity.
+     */
+    dataEntityContextMenu()
+    {
+        hideContextMenu();
+        this.viewData(parseInt(selectedElement.dataset.index));
+    }
 
     /**
      * Copy the SQL CREATE TABLE statement of the selected entity to clipboard.
@@ -2415,8 +2435,8 @@ class EntityEditor {
     showCopyEffect(x, y) {
         const circle = document.createElement('div');
         circle.className = 'copy-feedback';
-        circle.style.left = `${x - 25}px`;  // Adjust for centering
-        circle.style.top = `${y - 25}px`;
+        circle.style.left = `${x - 32}px`;  // Adjust for centering
+        circle.style.top = `${y - 32}px`;
         document.body.appendChild(circle);
 
         // Automatically remove the effect after 400ms
@@ -2434,20 +2454,20 @@ class EntityEditor {
     showDownloadEffect(x, y) {
         const arrow = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         arrow.setAttribute("class", "download-feedback");
-        arrow.setAttribute("width", "24");
-        arrow.setAttribute("height", "24");
-        arrow.setAttribute("viewBox", "0 0 24 24");
+        arrow.setAttribute("width", "64");
+        arrow.setAttribute("height", "64");
+        arrow.setAttribute("viewBox", "0 0 64 64");
         arrow.innerHTML = `
-        <path fill="#4CAF50" d="M12 2v14.17l5.59-5.58L19 12l-7 7-7-7 1.41-1.41L12 16.17V2z"/>
+        <svg height="64px" width="64px" version="1.1" id="DownloadArrow" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 166.356 166.356" xml:space="preserve" fill="#4CAF50"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path style="fill:#4CAF50;" d="M83.172,164.348L0,81.188h48.606V2.008h69.144v79.18h48.606L83.172,164.348z M14.404,87.155 l68.768,68.756l68.774-68.756h-40.163V7.975h-57.21v79.18H14.404z"></path> </g> </g> </g></svg>
         `;
 
-        arrow.style.left = `${x - 12}px`; // Center horizontally
-        arrow.style.top = `${y - 162}px`;  // Slight offset upward
+        arrow.style.left = `${x - 32}px`; // Center horizontally
+        arrow.style.top = `${y - 182}px`;  // Slight offset upward
         document.body.appendChild(arrow);
 
         setTimeout(() => {
             arrow.remove();
-        }, 600); // Match animation duration
+        }, 400); // Match animation duration
     }
 
     
