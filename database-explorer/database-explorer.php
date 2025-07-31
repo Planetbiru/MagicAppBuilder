@@ -403,14 +403,19 @@ if(!isset($databaseName))
             </div>
         </div>
     </div>
-    
-    
-
-
 
     <div id="context-menu" class="context-menu context-menu-relation" style="display: none; position: absolute; z-index: 1000;">
         <ul>
-            <li data-type="relation"><label for="id1"><input id="id1" type="checkbox"> Check all</label></li>
+            <li class="has-submenu" id="menu-make-reference">
+            <a href="javascript:;">Add Reference</a>
+            <ul class="submenu" id="reference-submenu">
+                <li data-type="relation"><label for="id1"><input id="id1" type="checkbox"> Check all</label></li>
+            </ul>
+            <li id="menu-export-svg"><a href="javascript:;" onclick="downloadSVG();">Export SVG</a></li>
+            <li id="menu-export-png"><a href="javascript:;" onclick="downloadPNG();">Export PNG</a></li>
+            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy Structure</a></li>
+            <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy Data</a></li>
+            <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy All</a></li>
         </ul>
     </div>
 </body>

@@ -1,3 +1,9 @@
+/* Basic styling for the menu list */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
 
 /* Context Menu Styles */
 .context-menu {
@@ -6,39 +12,49 @@
     border: 1px solid #ccc;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 9999;
-    padding: 5px;
     width: 180px;
 	display: flex;
     align-items: center;
     cursor: pointer;
     transition: background-color 0.3s ease; /* Add transition for hover effect */
+    overflow: visible !important;
 }
 
 .context-menu ul {
 	list-style: none;
-	padding: 0;
 	margin: 0;
+    padding: 5px;
 }
 
 .context-menu ul li {
-	padding: 5px 10px 5px 10px;
+	padding: 0;
 	cursor: pointer;
 	transition: background-color 0.2s;
+}
+.context-menu ul li a{
+    display: block;
+    color: #555555;
+    padding: 5px 10px 5px 10px;
+}
+.context-menu ul li ul{
+  padding: 5px;
+
+
+    li{
+        padding: 5px 10px;
+    }
 }
 
 .context-menu ul li:hover {
 	background-color: #f0f0f0;
 }
 
-/* Basic styling for the menu list */
-ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+
+
+.container-file-manager{
+.context-menu ul li {
+	padding: 5px 10px 5px 10px;
 }
-
-
-
 /* Styling for icons using pseudo-elements */
 .context-menu li::before {
     content: ''; /* Default content */
@@ -100,4 +116,5 @@ ul {
 .context-menu [data-operation="reset"]::before, .context-menu [data-operation="refresh-dir"]::before {
     content: '\f021'; /* Font Awesome icon for refresh (reset) */
     color: #2196F3; /* Blue for reset */
+}
 }

@@ -662,6 +662,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         editor.updateDiagram();
     });
+
+    document.addEventListener('change', (event) => {
+        const target = event.target;
+
+        // Ensure the event originates from 'id1' and is user-initiated (not from a script)
+        if (target.id === 'id1' && event.isTrusted) {
+            const parentList = target.closest('ul');
+            let lastCheckbox = null;
+            if (parentList) {
+                const checkboxes = parentList.querySelectorAll('input[type="checkbox"]');
+                const isChecked = target.checked;
+                
+                // Get the last element in the checkbox list
+                
+                
+                checkboxes.forEach((checkbox) => {
+                    // Only change the state if necessary
+                    if (checkbox.checked !== isChecked) {
+                        checkbox.checked = isChecked;
+                    }
+                    let selector = `.selected-entity[data-name="${checkbox.dataset.name}"]`;
+                    let cb = document.querySelector(selector);
+                    if(cb)
+                    {
+                        cb.checked = checkbox.checked;
+                        lastCheckbox = cb;
+                    }
+                });
+                
+                // After all checkboxes have been changed, only trigger the 'change' event on the last element
+                if (lastCheckbox) {
+                    // Create a custom event and flag it as a "simulated" event
+                    const customEvent = new Event('change', { bubbles: true });
+                    customEvent.isSimulated = true;
+                    lastCheckbox.dispatchEvent(customEvent);
+                }
+            }
+        }
+    });
     
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
