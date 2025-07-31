@@ -756,7 +756,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let tr = editor.addData();
                 if (tr) {
                     const inputCells = tr.querySelectorAll('input.entity-data-cell');
-                    inputCells.forEach(inputElement => {
+                    inputCells.forEach(inputElement => /*NOSONAR*/{
                         const columnName = inputElement.dataset.col;
                         inputElement.value = rowData[columnName] ?? '';
                     });

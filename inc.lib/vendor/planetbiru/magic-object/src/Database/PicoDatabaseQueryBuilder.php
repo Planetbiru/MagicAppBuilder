@@ -691,37 +691,64 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	}
 	
 	/**
-	 * Escape special characters in a SQL string.
+	 * Escapes a raw SQL query string to be safely used in an SQL statement,
+	 * including handling of single quotes, backslashes, and line breaks,
+	 * based on the active database type.
 	 *
-	 * This method escapes special characters in a SQL query string to prevent SQL 
-	 * injection and ensure proper execution across different database systems. 
-	 * It handles various database types (SQLite, MySQL/MariaDB, PostgreSQL, and SQL Server) 
-	 * by applying database-specific escaping techniques:
-	 * - For MySQL/MariaDB, it uses `addslashes` for special characters and escapes 
-	 *   newline characters.
-	 * - For PostgreSQL and SQLite, it uses a custom quote replacement function and escapes 
-	 *   newline characters.
-	 * - For SQL Server, it doubles the single quote characters (`'`) to escape them.
+	 * This function does **not** quote the entire string with `'` — it is intended
+	 * for use in building safe query fragments or inline strings.
 	 *
-	 * @param string $query The SQL query string to escape. This should be a valid 
-	 *                      SQL statement that may contain special characters 
-	 *                      requiring escaping.
-	 * @return string The escaped SQL query string. This result can be safely used 
-	 *                in database queries to avoid syntax errors and SQL injection 
-	 *                vulnerabilities.
+	 * Behavior per database:
+	 * - MySQL/MariaDB: Escapes `'` as `\'` and `\` as `\\`
+	 * - PostgreSQL   : Escapes `'` as `''` and `\` as `\\` (assumes use with E'' literals)
+	 * - SQLite       : Escapes `'` as `''`; backslash is literal
+	 * - SQL Server   : Escapes `'` as `''`; backslash is literal
+	 *
+	 * All RDBMS: Converts `\r` and `\n` into `\\r` and `\\n`
+	 *
+	 * @param string $query The raw SQL string to be escaped.
+	 * @return string The escaped SQL string, safe for inclusion in SQL statements.
 	 */
-	public function escapeSQL($query)
+	public function escapeSQL($query) // NOSONAR
 	{
+		// Escape carriage return and newline for all
+		$query = str_replace(["\r", "\n"], ["\\r", "\\n"], $query);
+
 		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) !== false 
 			|| stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) !== false) {
-			return str_replace(array("\r", "\n"), array("\\r", "\\n"), addslashes($query));
+			// MySQL/MariaDB: escape both backslash and single quote
+			return str_replace(
+				["\\", "'"],
+				["\\\\", "\\'"],
+				$query
+			);
 		}
-		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_PGSQL) !== false 
-			|| stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false
-			|| stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLSERVER) !== false) {
-			return str_replace(array("\r", "\n"), array("\\r", "\\n"), $this->replaceQuote($query));
+
+		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_PGSQL) !== false) {
+			// PostgreSQL: double single quotes and backslashes (E'' required at usage site)
+			return str_replace(
+				["\\", "'"],
+				["\\\\", "''"],
+				$query
+			);
 		}
-		return $query;
+
+		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) !== false) {
+			// SQLite: only escape single quote
+			return str_replace("'", "''", $query);
+		}
+
+		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLSERVER) !== false) {
+			// SQL Server: only escape single quote
+			return str_replace("'", "''", $query);
+		}
+
+		// Default fallback: treat like MySQL
+		return str_replace(
+			["\\", "'"],
+			["\\\\", "\\'"],
+			$query
+		);
 	}
 
 	
