@@ -411,16 +411,12 @@ if(!isset($databaseName))
             <ul class="submenu" id="reference-submenu">
                 <li data-type="relation"><label for="id1"><input id="id1" type="checkbox"> Check all</label></li>
             </ul>
-            <li id="menu-export-svg"><a href="javascript:;" onclick="editor.downloadEntitySVG(event);">Export SVG</a></li>
-            <li id="menu-export-png"><a href="javascript:;" onclick="editor.downloadEntityPNG(event);">Export PNG</a></li>
-            <li id="menu-export-md"><a href="javascript:;" onclick="editor.downloadDiagramMD(event);">Export MD</a></li>
-            <li class="dropdown-divider"></li>
+            <li id="menu-export-svg"><a href="javascript:;" onclick="downloadSVG();">Export SVG</a></li>
+            <li id="menu-export-png"><a href="javascript:;" onclick="downloadPNG();">Export PNG</a></li>
+            <li id="menu-export-md"><a href="javascript:;" onclick="downloadMD();">Export MD</a></li>
             <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy Structure</a></li>
             <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy Data</a></li>
             <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy All</a></li>
-            <li class="dropdown-divider"></li>
-            <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
-            <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
         </ul>
     </div>
 </body>

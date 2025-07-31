@@ -2252,6 +2252,96 @@ class EntityEditor {
         });
         return sql;
     }
+
+    /**
+     * Copy the SQL CREATE TABLE statement of the selected entity to clipboard.
+     * @param {MouseEvent} e - The mouse event that triggered the copy action.
+     */
+    copyTableStructure(e) {
+        let _this = this;
+        // Get the SQL dialect from the <meta> tag
+        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let sql = [];
+
+        // Get the entity from the selected SVG element
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        sql.push(entity.toSQL(dialect));
+
+        // Write SQL to clipboard
+        navigator.clipboard.writeText(sql.join(''))
+        .then(() => {
+            // Show visual feedback and hide context menu
+            _this.showCopyEffect(e.clientX, e.clientY);
+            hideContextMenu();
+        })
+        .catch(err => {
+            // Error handling (not implemented)
+        });
+    }
+
+    /**
+     * Copy the SQL INSERT statement of the selected entity to clipboard.
+     * @param {MouseEvent} e - The mouse event that triggered the copy action.
+     */
+    copyTableData(e) {
+        let _this = this;
+        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let sql = [];
+
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        sql.push(entity.toSQLInsert(dialect));
+
+        navigator.clipboard.writeText(sql.join(''))
+        .then(() => {
+            _this.showCopyEffect(e.clientX, e.clientY);
+            hideContextMenu();
+        })
+        .catch(err => {
+            // Error handling (not implemented)
+        });
+    }
+
+    /**
+     * Copy both the SQL CREATE TABLE and INSERT statements of the selected entity.
+     * @param {MouseEvent} e - The mouse event that triggered the copy action.
+     */
+    copyTableStructureAndData(e) {
+        let _this = this;
+        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let sql = [];
+
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        sql.push(entity.toSQL(dialect));
+        sql.push(entity.toSQLInsert(dialect));
+
+        navigator.clipboard.writeText(sql.join(''))
+        .then(() => {
+            _this.showCopyEffect(e.clientX, e.clientY);
+            hideContextMenu();
+        })
+        .catch(err => {
+            // Error handling (not implemented)
+        });
+    }
+
+    /**
+     * Display a visual circular animation effect at the cursor position.
+     * Indicates successful copy-to-clipboard operation.
+     * @param {number} x - X coordinate of the mouse cursor.
+     * @param {number} y - Y coordinate of the mouse cursor.
+     */
+    showCopyEffect(x, y) {
+        const circle = document.createElement('div');
+        circle.className = 'copy-feedback';
+        circle.style.left = `${x - 25}px`;  // Adjust for centering
+        circle.style.top = `${y - 25}px`;
+        document.body.appendChild(circle);
+
+        // Automatically remove the effect after 400ms
+        setTimeout(() => {
+            circle.remove();
+        }, 400);
+    }
     
     /**
      * Handles the "Edit Entity" action from the context menu.
