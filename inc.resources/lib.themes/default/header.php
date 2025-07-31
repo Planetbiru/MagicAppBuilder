@@ -37,7 +37,7 @@ $appDocumentTitle = trim($currentModule->getModuleTitle() . " | " . $appConfig->
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <h4 class="text-white text-center"><a href="index.php"><?php echo $appLanguage->getDashboard();?></a></h4>
         <div class="menu-search-box p-2">
-            <input type="text" id="menuSearch" class="form-control" placeholder="Search menu...">
+            <input type="text" id="menuSearch" class="form-control" placeholder="<?php echo $appLanguage->getPlaceholderSearchMenu();?>">
             <ul id="menuSearchResults" class="list-group mt-2"></ul>
         </div>
         <?php echo $appMenu;?>
