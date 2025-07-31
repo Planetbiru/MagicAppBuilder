@@ -2426,4 +2426,22 @@ The **Entity Editor** now includes a powerful and interactive **context menu**, 
 This feature significantly improves workflow for database designers working within the visual editor.
 
 
+## UI Enhancement: Visual Effects on Export and Clipboard Actions
+
+To improve user experience, MagicAppBuilder now includes subtle **visual feedback** when performing context menu actions in the Entity Editor.
+
+### Visual Effects Added
+
+* ✅ Flash highlight + toast message when:
+
+  * Exporting diagram to **SVG**
+  * Exporting diagram to **PNG**
+  * Exporting diagram to **Markdown**
+* ✅ Animated tooltip with checkmark when:
+
+  * Copying **table structure** to clipboard
+  * Copying **table data** to clipboard
+  * Copying **structure and data** to clipboard
+
+These enhancements make it easier for users to confirm actions, especially when working with large diagrams or complex entity structures.
 
