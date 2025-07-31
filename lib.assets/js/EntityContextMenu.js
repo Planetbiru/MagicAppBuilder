@@ -49,6 +49,10 @@ function initDiagramContextMenu(svg) {
                 if (!input || input.id !== 'id1') {
                     li.remove();
                 }
+                else
+                {
+                    input.checked = false;
+                }
             });
 
             // Add submenu items dynamically based on entity's relations
