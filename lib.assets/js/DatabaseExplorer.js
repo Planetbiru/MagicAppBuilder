@@ -1176,61 +1176,22 @@ function updateMarginLeft(step) {
 /**
  * Downloads the currently active diagram as an SVG file.
  */
-function downloadSVG()
-{
-    let diagramContainer = document.querySelector('.diagram-container');
-    let diagram = diagramContainer.querySelector('.diagram.active');
-    if(diagram)
-    {
-        let id = diagram.getAttribute('id');
-        if(id == 'all-entities')
-        {
-            entityRenderer.downloadSVG();
-        }
-        else
-        {
-            diagramRenderer[id].downloadSVG();
-        }
-    }
+function downloadSVG() {
+    editor.downloadSVG();
 }
 
 /**
  * Downloads the currently active diagram as a PNG file.
  */
-function downloadPNG()
-{
-    let diagramContainer = document.querySelector('.diagram-container');
-    let diagram = diagramContainer.querySelector('.diagram.active');
-    if(diagram)
-    {
-        let id = diagram.getAttribute('id');
-        if(id == 'all-entities')
-        {
-            entityRenderer.downloadPNG();
-        }
-        else
-        {
-            diagramRenderer[id].downloadPNG();
-        }
-    }
+function downloadPNG() {
+    editor.downloadPNG();
 }
 
-function downloadMD()
-{
-    let diagramContainer = document.querySelector('.diagram-container');
-    let diagram = diagramContainer.querySelector('.diagram.active');
-    if(diagram)
-    {
-        let id = diagram.getAttribute('id');
-        if(id == 'all-entities')
-        {
-            entityRenderer.downloadMD();
-        }
-        else
-        {
-            diagramRenderer[id].downloadMD();
-        }
-    }
+/**
+ * Downloads the currently active diagram as a Markdown (MD) file.
+ */
+function downloadMD() {
+    editor.downloadMD();
 }
 
 /**
