@@ -2445,7 +2445,6 @@ To improve user experience, MagicAppBuilder now includes subtle **visual feedbac
 
 These enhancements make it easier for users to confirm actions, especially when working with large diagrams or complex entity structures.
 
-<<<<<<< Updated upstream
 ## Enhancement: Split SQL INSERT into Multiple Statements
 
 The `toSQLInsert(dialect, maxRow)` function now supports an additional `maxRow` parameter that controls the **maximum number of rows per generated INSERT statement**.
@@ -2476,8 +2475,6 @@ A new utility function has been added to the **Entity Data Editor** that helps n
 * Works directly on the **data preview table**, allowing instant inline updates.
 
 This enhancement is especially helpful when working with imported datasets from varied sources that use different date or time formats.
-=======
->>>>>>> Stashed changes
 
 ## Enhancement: Import Spreadsheet from DBF Files
 
@@ -2509,4 +2506,5 @@ When a `.dbf` file is uploaded via the import menu:
 3. The extracted metadata is passed to the editor for column generation and preview.
 
 This enhancement allows users to bring in legacy datasets or export tables from older desktop database software into **MagicAppBuilder** for modernization and low-code application development.
+
 
