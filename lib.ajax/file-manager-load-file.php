@@ -32,5 +32,6 @@ try {
 } catch (Exception $e) {
     // Log any errors that occur
     error_log($e->getMessage());
+    echo "{}";
     // do nothing
 }
