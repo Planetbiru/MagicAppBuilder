@@ -2541,3 +2541,36 @@ This issue has been fixed in **version 1.17.0**.
   * Update legacy entity definitions without restriction.
 * Ensures consistent behavior with common database schema design patterns.
 
+
+## Bug Fix: Cookie Lifetime Configuration
+
+Previously, the **cookie lifetime** setting for user sessions did not behave as expected, causing cookies to **expire too early** or **fail to persist**.
+
+### Problem
+
+* The `cookie_lifetime` configuration defined in the global settings was **not consistently applied** to session cookies.
+* In some cases:
+
+  * Cookies were treated as session-only (deleted when the browser closed), even when `cookie_lifetime` was explicitly set.
+  * Changes to the cookie lifetime had **no effect** on session persistence.
+
+### Resolution
+
+* The session management system now correctly applies the `cookie_lifetime` configuration when:
+
+  * Initializing sessions (`session_set_cookie_params`)
+  * Setting or refreshing session cookies (`setcookie`)
+* Support has been improved for both:
+
+  * Duration-based lifetimes (in seconds), and
+  * Absolute expiration times (timestamps)
+
+### Impact
+
+* Session cookies now **persist correctly** according to the configured `cookie_lifetime` value.
+* This is especially beneficial for:
+
+  * "Remember Me" login features
+  * Multi-tab or multi-device access
+* Improves reliability of session handling for end users.
+
