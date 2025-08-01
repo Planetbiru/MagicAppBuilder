@@ -216,7 +216,7 @@ if(!isset($databaseName))
                             <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
                             <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                             <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
-                            <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.csv,.dbf" style="display: none;" />
+                            <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
                         </div>
 
                         <!-- Entity Editor Form -->
@@ -330,7 +330,7 @@ if(!isset($databaseName))
                 <button class="btn btn-primary save-data-entity">Save</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
-                <input type="file" id="importDataFileInput" accept=".xlsx,.xls,.csv,.dbf" style="display: none;">
+                <input type="file" id="importDataFileInput" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;">
             </div>
         </div>
     </div>
