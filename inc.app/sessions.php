@@ -21,7 +21,7 @@ if($builderConfig != null && $builderConfig->getSessions() != null)
     }
     if(!isset($appCookieMaxLifetime))
     {
-        $appCookieMaxLifetime = "/";
+        $appCookieMaxLifetime = 1440;
     }
 
     $sessions->setSessionCookieParams(
