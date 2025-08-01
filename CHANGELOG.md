@@ -2458,3 +2458,21 @@ The `toSQLInsert(dialect, maxRow)` function now supports an additional `maxRow` 
 * Default value for `maxRow` is 100.
 
 This enhancement improves flexibility and control when exporting or generating bulk SQL inserts.
+
+## Enhancement: Fix Date/Time Format in Entity Data Editor
+
+A new utility function has been added to the **Entity Data Editor** that helps normalize various date/time formats imported from different sources such as Excel, Access, Word, and web forms.
+
+### Key Details
+
+* Allows you to **convert inconsistent or non-standard date/time strings** into proper MySQL-compatible formats.
+* Supports formatting as:
+
+  * `YYYY-MM-DD` (date only)
+  * `HH:mm:ss` (time only)
+  * `YYYY-MM-DD HH:mm:ss` (full datetime)
+* Useful for cleaning data before exporting or saving to the database.
+* Works directly on the **data preview table**, allowing instant inline updates.
+
+This enhancement is especially helpful when working with imported datasets from varied sources that use different date or time formats.
+
