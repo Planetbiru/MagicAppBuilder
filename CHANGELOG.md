@@ -2432,12 +2432,12 @@ To improve user experience, MagicAppBuilder now includes subtle **visual feedbac
 
 ### Visual Effects Added
 
-* ✅ Flash highlight + toast message when:
+* Flash highlight + toast message when:
 
   * Exporting diagram to **SVG**
   * Exporting diagram to **PNG**
   * Exporting diagram to **Markdown**
-* ✅ Animated tooltip with checkmark when:
+* Animated tooltip with checkmark when:
 
   * Copying **table structure** to clipboard
   * Copying **table data** to clipboard
@@ -2458,3 +2458,81 @@ The `toSQLInsert(dialect, maxRow)` function now supports an additional `maxRow` 
 * Default value for `maxRow` is 100.
 
 This enhancement improves flexibility and control when exporting or generating bulk SQL inserts.
+
+## Enhancement: Fix Date/Time Format in Entity Data Editor
+
+A new utility function has been added to the **Entity Data Editor** that helps normalize various date/time formats imported from different sources such as Excel, Access, Word, and web forms.
+
+### Key Details
+
+* Allows you to **convert inconsistent or non-standard date/time strings** into proper MySQL-compatible formats.
+* Supports formatting as:
+
+  * `YYYY-MM-DD` (date only)
+  * `HH:mm:ss` (time only)
+  * `YYYY-MM-DD HH:mm:ss` (full datetime)
+* Useful for cleaning data before exporting or saving to the database.
+* Works directly on the **data preview table**, allowing instant inline updates.
+
+This enhancement is especially helpful when working with imported datasets from varied sources that use different date or time formats.
+
+## Enhancement: Import Spreadsheet from DBF Files
+
+The **Entity Editor** now supports importing entity definitions and data directly from `.dbf` (DBase) files in addition to existing spreadsheet formats.
+
+### Supported File Formats for Import
+
+* `.xls` — Microsoft Excel 97-2003
+* `.xlsx` — Microsoft Excel (modern format)
+* `.csv` — Comma-separated values
+* `.dbf` — DBase database files (e.g., dBase III/IV, FoxPro, Visual FoxPro)
+
+### Key Features
+
+* Automatic parsing of `.dbf` files using a built-in `DBFParser` class.
+* Field headers and records are extracted and transformed into editable entity definitions.
+* No third-party library is required for DBF parsing.
+* Seamless integration into the existing `importSheetFile` mechanism in the Entity Editor.
+
+### How It Works
+
+When a `.dbf` file is uploaded via the import menu:
+
+1. The system reads the file as an `ArrayBuffer`.
+2. The custom `DBFParser` decodes the file, extracting:
+
+   * Field definitions (headers)
+   * Record values (rows)
+3. The extracted metadata is passed to the editor for column generation and preview.
+
+This enhancement allows users to bring in legacy datasets or export tables from older desktop database software into **MagicAppBuilder** for modernization and low-code application development.
+
+## Bug Fix: Auto Increment Checkbox on Integer Primary Keys
+
+Previously, when editing an existing entity, the **auto increment** checkbox was incorrectly disabled for primary key columns of type `INTEGER`.
+
+### Problem
+
+* When loading an existing entity definition:
+
+  * If a column was marked as **primary key** and had data type `INTEGER`, the **Auto Increment** checkbox was disabled.
+  * This prevented users from enabling or reviewing auto-increment behavior on numeric IDs.
+
+### Resolution
+
+This issue has been fixed in **version 1.17.0**.
+
+* The **Auto Increment** checkbox is now properly **enabled** for columns that:
+
+  * Are marked as **primary key**, and
+  * Have the data type **`INTEGER`**, **`INT`**, or equivalent numeric types (e.g., `BIGINT` in supported dialects).
+* The checkbox state is correctly preserved when loading entity metadata.
+
+### Impact
+
+* Users can now:
+
+  * Enable or disable auto increment behavior on numeric primary key columns.
+  * Update legacy entity definitions without restriction.
+* Ensures consistent behavior with common database schema design patterns.
+

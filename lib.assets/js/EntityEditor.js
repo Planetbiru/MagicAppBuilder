@@ -254,7 +254,7 @@ class EntityEditor {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importSheetFile(file, function(fileExtension, fileName, sheetName, headers, data){
-                    if(fileExtension == 'csv')
+                    if(fileExtension == 'csv' || fileExtension == 'dbf')
                     {
                         const entityName = _this.toValidTableName(fileName);
                         const columns = _this.generateCreateTable(headers, data);
@@ -477,6 +477,7 @@ class EntityEditor {
         let columnValue = column.values == null ? '' : column.values;
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
+        let aiDisabled = 'disabled';
         if(typeSimple.toUpperCase() == 'BIGINT' && columnLength == '')
         {
             columnLength = '20';
@@ -489,6 +490,10 @@ class EntityEditor {
         else if(column.nullable)
         {
             nullable = 'checked';
+        }
+        if((column.primaryKey && typeSimple.toLowerCase().indexOf('int') != -1) || column.autoIncrement)
+        {
+            aiDisabled = '';
         }
         let originalName = column.name;
         let columnDescription = column.description ? column.description : '';
@@ -511,7 +516,7 @@ class EntityEditor {
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
-            <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${column.autoIncrement ? '' : 'disabled'}></td>
+            <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${aiDisabled}></td>
             <td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
         `;
         tableBody.appendChild(row);
@@ -2947,9 +2952,16 @@ class EntityEditor {
             const contents = e.target.result;
 
             if (fileExtension === 'csv') {
-                const parsed = Papa.parse(contents, { header: true });
-                const headers = parsed.meta.fields;
-                const data = parsed.data;
+                // Parse CSV with PapaParse
+                const parser = Papa.parse(contents, { header: true });
+                const headers = parser.meta.fields;
+                const data = parser.data;
+                callbackFunction(fileExtension, file.name, null, headers, data);
+            } else if (fileExtension === 'dbf') {
+                // Parse DBF with custom DBFParser
+                const parser = new DBFParser(contents);
+                const data = parser.parse();
+                const headers = parser.fields.map(f => f.name);
                 callbackFunction(fileExtension, file.name, null, headers, data);
             } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
                 const uint8Array = new Uint8Array(contents);
@@ -2996,9 +3008,11 @@ class EntityEditor {
         };
 
         if (fileExtension === 'csv') {
-            reader.readAsText(file); // for CSV
+            reader.readAsText(file);          // CSV → text
+        } else if (fileExtension === 'dbf') {
+            reader.readAsArrayBuffer(file);   // DBF → binary buffer
         } else {
-            reader.readAsArrayBuffer(file); // for Excel
+            reader.readAsArrayBuffer(file);   // Excel → binary buffer
         }
     }
 
@@ -3813,6 +3827,29 @@ class EntityEditor {
         table.appendChild(tbody);
         wrapper.appendChild(table);
         modalBody.appendChild(wrapper);
+        
+        
+        let fixDateTimeWrapper = document.createElement('div');
+        
+        fixDateTimeWrapper.innerHTML = `
+        Fix Date Time 
+        <select id="selector-fix-date-time" class="form-control">
+        </select>
+        Mode
+        <select id="date-time-mode" class="form-control">
+            <option value="datetime">datetime</option>
+            <option value="date">date</option>
+            <option value="time">time</option>
+        </select>
+        <button ="button-fix-date-time" class="btn btn-primary" onclick="editor.fixDateTime(this.closest('div').querySelector('#selector-fix-date-time').value, this.closest('div').querySelector('#date-time-mode').value)">Fix Data</button>
+        `;
+        let selectOne = document.createElement('option');
+        selectOne.value = '';
+        selectOne.textContent = 'Select Column';
+        fixDateTimeWrapper.classList.add('button-area');
+        modalBody.appendChild(fixDateTimeWrapper);
+        
+        fixDateTimeWrapper.querySelector('select').appendChild(selectOne);
 
         // Show modal
         modal.style.display = 'block';
@@ -3823,6 +3860,11 @@ class EntityEditor {
             th.textContent = col.name;
             th.dataset.name = col.name;
             headRow.appendChild(th);
+            
+            let select = document.createElement('option');
+            select.value = col.name;
+            select.textContent = col.name;
+            fixDateTimeWrapper.querySelector('select').appendChild(select);
         });
 
         thead.appendChild(headRow);
@@ -4573,6 +4615,171 @@ class EntityEditor {
         // Return a new sorted array. Using `[...entities]` creates a shallow copy
         // to avoid modifying the original array, and then sorts it based on the `depth` property.
         return [...entities].sort((a, b) => a.depth - b.depth);
+    }
+    
+    /**
+     * Attempts to parse a datetime value from Excel, Word, or Access formats.
+     * @param {string|number|Date} input - The input datetime value (string, number, or Date).
+     * @returns {Date|null} Parsed Date object or null if invalid.
+     */
+    parseDateTime(input) {
+        // Return input if it's already a valid Date object.
+        if (input instanceof Date && !isNaN(input.getTime())) {
+            return input;
+        }
+
+        // Handle Excel serial date number
+        if (typeof input === 'number') {
+            // Excel's "1900" date system treats 1900 as a leap year (leap bug).
+            // Day 1 = Jan 1, 1900.
+            const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Dec 30, 1899
+            // Adjust for the leap year bug by adding a day for dates after Feb 28, 1900.
+            const excelDate = input > 60 ? input - 1 : input;
+            const date = new Date(excelEpoch.getTime() + excelDate * 86400000);
+            return isNaN(date.getTime()) ? null : date;
+        }
+
+        if (typeof input !== 'string') {
+            return null;
+        }
+
+        const trimmed = input.trim();
+
+        // 1. Try native Date() parsing for standard formats (like ISO 8601).
+        const isoDate = new Date(trimmed);
+        if (!isNaN(isoDate.getTime())) {
+            return isoDate;
+        }
+
+        // 2. Handle common regional formats manually to avoid ambiguity.
+        // Using a separate regex for each format reduces ambiguity.
+        
+        // YYYY-MM-DD HH:mm:ss (ISO-like)
+        const ymdMatch = trimmed.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+        if (ymdMatch) {
+            const [, year, month, day, hour = 0, minute = 0, second = 0] = ymdMatch.map(Number);
+            const date = new Date(year, month - 1, day, hour, minute, second || 0);
+            return isNaN(date.getTime()) ? null : date;
+        }
+
+        // DD/MM/YYYY HH:mm:ss (European/Indonesian style)
+        const dmyMatch = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+        if (dmyMatch) {
+            const [, day, month, year, hour = 0, minute = 0, second = 0] = dmyMatch.map(Number);
+            const date = new Date(year, month - 1, day, hour, minute, second || 0);
+            // Add validation to ensure day and month are valid
+            if (date.getMonth() === month - 1 && date.getDate() === day) {
+            return isNaN(date.getTime()) ? null : date;
+            }
+        }
+
+        // MM/DD/YYYY HH:mm:ss (US style)
+        const mdyMatch = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+        if (mdyMatch) {
+            const [, month, day, year, hour = 0, minute = 0, second = 0] = mdyMatch.map(Number);
+            const date = new Date(year, month - 1, day, hour, minute, second || 0);
+            if (date.getMonth() === month - 1 && date.getDate() === day) {
+            return isNaN(date.getTime()) ? null : date;
+            }
+        }
+
+        // 3. Handle formats with month names (e.g., "01 Jan 2025" or "Jan 01, 2025").
+        const monthNames = {
+            jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+            jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+            january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+            july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+        };
+
+        const namePattern = trimmed.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$|^(\w+)\s+(\d{1,2}),?\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/i); // NOSONAR
+        if (namePattern) {
+            const [
+            , // full match
+            day1, monthName1, year1, hour1 = 0, minute1 = 0, second1 = 0, // DD MMM YYYY
+            monthName2, day2, year2, hour2 = 0, minute2 = 0, second2 = 0, // MMM DD, YYYY
+            ] = namePattern;
+
+            let day, month, year, hour, minute, second;
+
+            if (day1) { // Matched DD MMM YYYY
+            day = parseInt(day1, 10);
+            month = monthNames[monthName1.toLowerCase()];
+            year = parseInt(year1, 10);
+            [hour, minute, second] = [parseInt(hour1, 10), parseInt(minute1, 10), parseInt(second1, 10)];
+            } else { // Matched MMM DD, YYYY
+            day = parseInt(day2, 10);
+            month = monthNames[monthName2.toLowerCase()];
+            year = parseInt(year2, 10);
+            [hour, minute, second] = [parseInt(hour2, 10), parseInt(minute2, 10), parseInt(second2, 10)];
+            }
+
+            if (month !== undefined && !isNaN(day) && !isNaN(year)) {
+            const date = new Date(year, month, day, hour, minute, second || 0);
+            // Validate again to avoid incorrect date creations (e.g., 31 Feb)
+            if (date.getMonth() === month && date.getDate() === day) {
+                return isNaN(date.getTime()) ? null : date;
+            }
+            }
+        }
+
+        // If all attempts fail, return null.
+        return null;
+    }
+    
+    /**
+     * Formats a JavaScript Date object to a MySQL-compatible string.
+     *
+     * @param {Date} date - The Date object to format.
+     * @param {'date'|'time'|'datetime'} [mode='datetime'] - The format mode.
+     * @returns {string} Formatted MySQL-compatible string.
+     */
+    formatDateTimeForMySQL(date, mode = 'datetime') {
+        if (!(date instanceof Date) || isNaN(date)) return '';
+
+        const pad = n => n.toString().padStart(2, '0');
+
+        const year = date.getFullYear();
+        const month = pad(date.getMonth() + 1);
+        const day = pad(date.getDate());
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        const seconds = pad(date.getSeconds());
+
+        switch (mode) {
+            case 'date':
+            return `${year}-${month}-${day}`;
+            case 'time':
+            return `${hours}:${minutes}:${seconds}`;
+            case 'datetime':
+            default:
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+    }
+
+    /**
+     * Fixes and formats all values in a given column of the data preview table as MySQL-compatible datetime strings.
+     *
+     * This method parses raw cell values into JavaScript Date objects using `parseDateTime()`
+     * and then formats them into the appropriate MySQL format using `formatDateTimeForMySQL()`.
+     *
+     * @param {string} column - The column name (data-col attribute) to target.
+     * @param {'date'|'time'|'datetime'} [mode='datetime'] - The output format mode.
+     *     - 'date' → formats as YYYY-MM-DD
+     *     - 'time' → formats as HH:mm:ss
+     *     - 'datetime' → formats as YYYY-MM-DD HH:mm:ss
+     */
+    fixDateTime(column, mode = 'datetime') {
+        let _this = this;
+        let tbody = document.querySelector('.data-preview-table tbody');
+        let cells = tbody.querySelectorAll(`[data-col="${column}"]`);
+        if (cells && cells.length > 0) {
+            cells.forEach(cell => {
+                let dt = _this.parseDateTime(cell.value);
+                if (dt != null) {
+                    cell.value = _this.formatDateTimeForMySQL(dt, mode);
+                }
+            });
+        }
     }
 
 }

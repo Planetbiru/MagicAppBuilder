@@ -957,4 +957,7 @@ tr.group-header td {
     transform: translateY(300px); /* move down ~300px */
     opacity: 0;
   }
+}
+.button-area {
+  padding-top: 10px;
 }/*# sourceMappingURL=database-explorer.css.map */
