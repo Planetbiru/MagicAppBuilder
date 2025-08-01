@@ -2476,3 +2476,34 @@ A new utility function has been added to the **Entity Data Editor** that helps n
 
 This enhancement is especially helpful when working with imported datasets from varied sources that use different date or time formats.
 
+## Enhancement: Import Spreadsheet from DBF Files
+
+The **Entity Editor** now supports importing entity definitions and data directly from `.dbf` (DBase) files in addition to existing spreadsheet formats.
+
+### Supported File Formats for Import
+
+* `.xls` — Microsoft Excel 97-2003
+* `.xlsx` — Microsoft Excel (modern format)
+* `.csv` — Comma-separated values
+* `.dbf` — DBase database files (e.g., dBase III/IV, FoxPro, Visual FoxPro)
+
+### Key Features
+
+* ✅ Automatic parsing of `.dbf` files using a built-in `DBFParser` class.
+* ✅ Field headers and records are extracted and transformed into editable entity definitions.
+* ✅ No third-party library is required for DBF parsing.
+* ✅ Seamless integration into the existing `importSheetFile` mechanism in the Entity Editor.
+
+### How It Works
+
+When a `.dbf` file is uploaded via the import menu:
+
+1. The system reads the file as an `ArrayBuffer`.
+2. The custom `DBFParser` decodes the file, extracting:
+
+   * Field definitions (headers)
+   * Record values (rows)
+3. The extracted metadata is passed to the editor for column generation and preview.
+
+This enhancement allows users to bring in legacy datasets or export tables from older desktop database software into **MagicAppBuilder** for modernization and low-code application development.
+

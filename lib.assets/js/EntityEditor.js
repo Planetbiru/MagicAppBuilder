@@ -254,7 +254,7 @@ class EntityEditor {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importSheetFile(file, function(fileExtension, fileName, sheetName, headers, data){
-                    if(fileExtension == 'csv')
+                    if(fileExtension == 'csv' || fileExtension == 'dbf')
                     {
                         const entityName = _this.toValidTableName(fileName);
                         const columns = _this.generateCreateTable(headers, data);
@@ -2947,9 +2947,16 @@ class EntityEditor {
             const contents = e.target.result;
 
             if (fileExtension === 'csv') {
-                const parsed = Papa.parse(contents, { header: true });
-                const headers = parsed.meta.fields;
-                const data = parsed.data;
+                // Parse CSV with PapaParse
+                const parser = Papa.parse(contents, { header: true });
+                const headers = parser.meta.fields;
+                const data = parser.data;
+                callbackFunction(fileExtension, file.name, null, headers, data);
+            } else if (fileExtension === 'dbf') {
+                // Parse DBF with custom DBFParser
+                const parser = new DBFParser(contents);
+                const data = parser.parse();
+                const headers = parser.fields.map(f => f.name);
                 callbackFunction(fileExtension, file.name, null, headers, data);
             } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
                 const uint8Array = new Uint8Array(contents);
@@ -2996,9 +3003,11 @@ class EntityEditor {
         };
 
         if (fileExtension === 'csv') {
-            reader.readAsText(file); // for CSV
+            reader.readAsText(file);          // CSV → text
+        } else if (fileExtension === 'dbf') {
+            reader.readAsArrayBuffer(file);   // DBF → binary buffer
         } else {
-            reader.readAsArrayBuffer(file); // for Excel
+            reader.readAsArrayBuffer(file);   // Excel → binary buffer
         }
     }
 
@@ -4677,7 +4686,7 @@ class EntityEditor {
             july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
         };
 
-        const namePattern = trimmed.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$|^(\w+)\s+(\d{1,2}),?\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/i);
+        const namePattern = trimmed.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$|^(\w+)\s+(\d{1,2}),?\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/i); // NOSONAR
         if (namePattern) {
             const [
             , // full match

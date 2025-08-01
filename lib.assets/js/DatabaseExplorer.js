@@ -755,10 +755,15 @@ document.addEventListener('DOMContentLoaded', () => {
             data.forEach((rowData) => {
                 let tr = editor.addData();
                 if (tr) {
+                    let snakeRow = {};
+                    for (const key of Object.keys(rowData)) {
+                        const snakeKey = editor.snakeize(key);
+                        snakeRow[snakeKey] = rowData[key];
+                    }
                     const inputCells = tr.querySelectorAll('input.entity-data-cell');
                     inputCells.forEach(inputElement => /*NOSONAR*/{
                         const columnName = inputElement.dataset.col;
-                        inputElement.value = rowData[columnName] ?? '';
+                        inputElement.value = snakeRow[columnName] ?? '';
                     });
                 }
             });
