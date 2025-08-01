@@ -477,6 +477,7 @@ class EntityEditor {
         let columnValue = column.values == null ? '' : column.values;
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
+        let aiDisabled = 'disabled';
         if(typeSimple.toUpperCase() == 'BIGINT' && columnLength == '')
         {
             columnLength = '20';
@@ -489,6 +490,10 @@ class EntityEditor {
         else if(column.nullable)
         {
             nullable = 'checked';
+        }
+        if((column.primaryKey && typeSimple.toLowerCase().indexOf('int') != -1) || column.autoIncrement)
+        {
+            aiDisabled = '';
         }
         let originalName = column.name;
         let columnDescription = column.description ? column.description : '';
@@ -511,7 +516,7 @@ class EntityEditor {
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
-            <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${column.autoIncrement ? '' : 'disabled'}></td>
+            <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${aiDisabled}></td>
             <td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
         `;
         tableBody.appendChild(row);

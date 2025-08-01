@@ -2432,12 +2432,12 @@ To improve user experience, MagicAppBuilder now includes subtle **visual feedbac
 
 ### Visual Effects Added
 
-* ✅ Flash highlight + toast message when:
+* Flash highlight + toast message when:
 
   * Exporting diagram to **SVG**
   * Exporting diagram to **PNG**
   * Exporting diagram to **Markdown**
-* ✅ Animated tooltip with checkmark when:
+* Animated tooltip with checkmark when:
 
   * Copying **table structure** to clipboard
   * Copying **table data** to clipboard
@@ -2489,10 +2489,10 @@ The **Entity Editor** now supports importing entity definitions and data directl
 
 ### Key Features
 
-* ✅ Automatic parsing of `.dbf` files using a built-in `DBFParser` class.
-* ✅ Field headers and records are extracted and transformed into editable entity definitions.
-* ✅ No third-party library is required for DBF parsing.
-* ✅ Seamless integration into the existing `importSheetFile` mechanism in the Entity Editor.
+* Automatic parsing of `.dbf` files using a built-in `DBFParser` class.
+* Field headers and records are extracted and transformed into editable entity definitions.
+* No third-party library is required for DBF parsing.
+* Seamless integration into the existing `importSheetFile` mechanism in the Entity Editor.
 
 ### How It Works
 
@@ -2507,4 +2507,32 @@ When a `.dbf` file is uploaded via the import menu:
 
 This enhancement allows users to bring in legacy datasets or export tables from older desktop database software into **MagicAppBuilder** for modernization and low-code application development.
 
+## Bug Fix: Auto Increment Checkbox on Integer Primary Keys
+
+Previously, when editing an existing entity, the **auto increment** checkbox was incorrectly disabled for primary key columns of type `INTEGER`.
+
+### Problem
+
+* When loading an existing entity definition:
+
+  * If a column was marked as **primary key** and had data type `INTEGER`, the **Auto Increment** checkbox was disabled.
+  * This prevented users from enabling or reviewing auto-increment behavior on numeric IDs.
+
+### Resolution
+
+This issue has been fixed in **version 1.17.0**.
+
+* The **Auto Increment** checkbox is now properly **enabled** for columns that:
+
+  * Are marked as **primary key**, and
+  * Have the data type **`INTEGER`**, **`INT`**, or equivalent numeric types (e.g., `BIGINT` in supported dialects).
+* The checkbox state is correctly preserved when loading entity metadata.
+
+### Impact
+
+* Users can now:
+
+  * Enable or disable auto increment behavior on numeric primary key columns.
+  * Update legacy entity definitions without restriction.
+* Ensures consistent behavior with common database schema design patterns.
 
