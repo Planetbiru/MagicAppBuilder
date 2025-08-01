@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
   new Chart(ctxLine, {
     type: 'line',
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: ['Blue', 'Red', 'Orange', 'Yellow', 'Teal', 'Purple'],
       datasets: [{
         label: 'Value',
         data: [12, 19, 3, 5, 2, 3],
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
   new Chart(ctxPie, {
     type: 'doughnut',
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: ['Blue', 'Red', 'Orange', 'Yellow', 'Teal', 'Purple'],
       datasets: [{
         label: 'Value',
         data: [12, 19, 3, 5, 2, 3],
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
   new Chart(ctxBar, {
     type: 'bar',
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: ['Blue', 'Red', 'Orange', 'Yellow', 'Teal', 'Purple'],
       datasets: [{
         label: 'Value',
         data: [12, 19, 3, 5, 2, 3],
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
   new Chart(ctxArea, {
     type: 'polarArea',
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: ['Blue', 'Red', 'Orange', 'Yellow', 'Teal', 'Purple'],
       datasets: [{
         label: 'Value',
         data: [12, 19, 3, 5, 2, 3],
