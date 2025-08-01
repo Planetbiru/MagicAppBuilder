@@ -2445,3 +2445,16 @@ To improve user experience, MagicAppBuilder now includes subtle **visual feedbac
 
 These enhancements make it easier for users to confirm actions, especially when working with large diagrams or complex entity structures.
 
+## Enhancement: Split SQL INSERT into Multiple Statements
+
+The `toSQLInsert(dialect, maxRow)` function now supports an additional `maxRow` parameter that controls the **maximum number of rows per generated INSERT statement**.
+
+### Key Details
+
+* If the input data contains many rows, the function automatically splits it into multiple `INSERT` statements, each containing up to `maxRow` rows.
+* This is useful for:
+  * Improving compatibility with database engines that limit the number of rows per statement.
+  * Enhancing readability or debugging of generated SQL scripts.
+* Default value for `maxRow` is 100.
+
+This enhancement improves flexibility and control when exporting or generating bulk SQL inserts.
