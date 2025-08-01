@@ -2393,9 +2393,9 @@ class EntityEditor {
      * @param {MouseEvent} e - Mouse event used to extract cursor position for animation.
      */
     downloadEntityPNG(e) {
+        hideContextMenu();
         this.downloadPNG();
         this.showDownloadEffect(e.clientX, e.clientY);
-        hideContextMenu();
     }
 
     /**
@@ -2420,9 +2420,9 @@ class EntityEditor {
      * @param {MouseEvent} e - Mouse event used to extract cursor position for animation.
      */
     downloadDiagramMD(e) {
+        hideContextMenu();
         this.downloadMD();
         this.showDownloadEffect(e.clientX, e.clientY);
-        hideContextMenu();
     }
 
 

@@ -121,26 +121,39 @@ class Entity {
     }
 
     /**
-     * Generates a single SQL INSERT statement with multiple rows.
+     * Generates one or more SQL INSERT statements, each containing up to `maxRow` rows.
      *
-     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", "sqlserver".
-     * @returns {string} SQL INSERT statement.
+     * This method splits the data into chunks of up to `maxRow` rows and generates
+     * separate INSERT statements for each chunk. It also handles proper value formatting
+     * based on the target SQL dialect and column definitions.
+     *
+     * @param {string} dialect - Target SQL dialect. Supported values: "mysql", "postgresql", "sqlite", "sqlserver".
+     * @param {number} maxRow - Maximum number of rows per INSERT statement (default is 100).
+     * @returns {string} The generated SQL INSERT statements as a single string.
      */
-    toSQLInsert(dialect = "mysql") {
+    toSQLInsert(dialect = "mysql", maxRow = 100) {
         if (!this.data || this.data.length === 0) return '';
 
         const columnNames = this.columns.map(col => col.name);
-        const valuesList = this.data.map(row => {
-            return '(' + columnNames.map(name => {
-                const column = this.columns.find(col => col.name === name);
-                // Get nullable value from column.nullable
-                const nullable = column ? column.nullable : false; // Default false if column not found
-                return this.formatValue(row[name], column, dialect, nullable);
-            }).join(', ') + ')';
-        });
+        const chunks = [];
 
-        return `INSERT INTO ${this.name} (${columnNames.join(', ')}) VALUES\n${valuesList.join(',\n')};\r\n`;
+        for (let i = 0; i < this.data.length; i += maxRow) {
+            const slice = this.data.slice(i, i + maxRow);
+            const valuesList = slice.map(row => {
+                return '(' + columnNames.map(name => {
+                    const column = this.columns.find(col => col.name === name);
+                    const nullable = column ? column.nullable : false;
+                    return this.formatValue(row[name], column, dialect, nullable);
+                }).join(', ') + ')';
+            });
+
+            const insertStatement = `INSERT INTO ${this.name} (${columnNames.join(', ')}) VALUES\n${valuesList.join(',\n')};\r\n`;
+            chunks.push(insertStatement);
+        }
+
+        return chunks.join('\n');
     }
+
 
     /**
      * Generates a single SQL INSERT statement for the given row.
