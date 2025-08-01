@@ -261,7 +261,7 @@ class EntityEditor {
                         _this.currentEntityData = data;
                         _this.importFromSheet(columns, entityName);
                     }
-                    else if(fileExtension == 'xls' || fileExtension == 'xlsx')
+                    else if(fileExtension == 'xls' || fileExtension == 'xlsx' || fileExtension == 'ods')
                     {
                         const entityName = _this.toValidTableName(sheetName);
                         const columns = _this.generateCreateTable(headers, data);
@@ -2963,7 +2963,7 @@ class EntityEditor {
                 const data = parser.parse();
                 const headers = parser.fields.map(f => f.name);
                 callbackFunction(fileExtension, file.name, null, headers, data);
-            } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+            } else if (fileExtension === 'xlsx' || fileExtension === 'xls' || fileExtension === 'ods') {
                 const uint8Array = new Uint8Array(contents);
                 const workbook = XLSX.read(uint8Array, { type: "array" });
 
@@ -3325,31 +3325,41 @@ class EntityEditor {
     guessType(values) // NOSONAR
     {
         let isInt = true, isFloat = true, isBool = true;
+        let hasDecimal = false;
+
         for (let val of values.slice(0, 24)) {
-            // Safely normalize to string
-            if (val === undefined || val === null) {
-                return 'TEXT';
-            } else if (typeof val !== "string") {
+            // Normalize to string
+            if (val === undefined || val === null) return 'TEXT';
+
+            if (typeof val !== "string") {
                 val = String(val).trim(); // NOSONAR
             } else {
                 val = val.trim(); // NOSONAR
             }
 
+            // Early detection: if value has leading zero and is numeric, treat as TEXT
             if (/^0\d+/.test(val)) {
                 isInt = false;
                 isFloat = false;
             }
-            
+
+            // Detect float
+            if (/^[-+]?\d+\.\d+$/.test(val)) {
+                hasDecimal = true;
+            }
+
+            // Update flags
             if (!/^[-+]?\d+$/.test(val)) isInt = false;
             if (!/^[-+]?\d+(\.\d+)?$/.test(val)) isFloat = false;
             if (!/^(true|false|yes|no|1|0)$/i.test(val)) isBool = false;
         }
 
-        if (isFloat) return "FLOAT";
+        if (isFloat && hasDecimal) return "FLOAT";
         if (isInt) return "BIGINT";
         if (isBool) return "BOOLEAN";
         return "TEXT";
     }
+
 
     /**
      * Generates an array of column definitions based on headers and data rows.
@@ -3835,13 +3845,19 @@ class EntityEditor {
         Fix Date Time 
         <select id="selector-fix-date-time" class="form-control">
         </select>
+        Format
+        <select id="format-preference" class="form-control">
+            <option value="mdy">mdy</option>
+            <option value="dmy">dmy</option>
+            <option value="ymd">ymd</option>
+        </select>
         Mode
         <select id="date-time-mode" class="form-control">
             <option value="datetime">datetime</option>
             <option value="date">date</option>
             <option value="time">time</option>
         </select>
-        <button ="button-fix-date-time" class="btn btn-primary" onclick="editor.fixDateTime(this.closest('div').querySelector('#selector-fix-date-time').value, this.closest('div').querySelector('#date-time-mode').value)">Fix Data</button>
+        <button ="button-fix-date-time" class="btn btn-primary" onclick="editor.fixDateTime(this.closest('div').querySelector('#selector-fix-date-time').value, this.closest('div').querySelector('#format-preference').value, this.closest('div').querySelector('#date-time-mode').value)">Fix Data</button>
         `;
         let selectOne = document.createElement('option');
         selectOne.value = '';
@@ -4616,113 +4632,105 @@ class EntityEditor {
         // to avoid modifying the original array, and then sorts it based on the `depth` property.
         return [...entities].sort((a, b) => a.depth - b.depth);
     }
-    
+
     /**
-     * Attempts to parse a datetime value from Excel, Word, or Access formats.
+     * Attempts to parse a datetime value from Excel, Word, or Access formats,
+     * with support for various regional date formats and Excel serial numbers.
+     *
      * @param {string|number|Date} input - The input datetime value (string, number, or Date).
+     * @param {string} [formatPreference='ymd'] - Preferred date order: 'ymd', 'dmy', or 'mdy'.
      * @returns {Date|null} Parsed Date object or null if invalid.
      */
-    parseDateTime(input) {
-        // Return input if it's already a valid Date object.
+    parseDateTime(input, formatPreference = 'ymd') // NOSONAR
+    {
         if (input instanceof Date && !isNaN(input.getTime())) {
             return input;
         }
 
-        // Handle Excel serial date number
         if (typeof input === 'number') {
-            // Excel's "1900" date system treats 1900 as a leap year (leap bug).
-            // Day 1 = Jan 1, 1900.
-            const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Dec 30, 1899
-            // Adjust for the leap year bug by adding a day for dates after Feb 28, 1900.
-            const excelDate = input > 60 ? input - 1 : input;
+            const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+            const excelDate = input > 60 ? input - 1 : input; // Excel leap year bug
             const date = new Date(excelEpoch.getTime() + excelDate * 86400000);
             return isNaN(date.getTime()) ? null : date;
         }
 
-        if (typeof input !== 'string') {
-            return null;
-        }
+        if (typeof input !== 'string') return null;
 
         const trimmed = input.trim();
 
-        // 1. Try native Date() parsing for standard formats (like ISO 8601).
-        const isoDate = new Date(trimmed);
-        if (!isNaN(isoDate.getTime())) {
-            return isoDate;
-        }
+        // Try ISO format
+        const iso = new Date(trimmed);
+        if (!isNaN(iso.getTime())) return iso;
 
-        // 2. Handle common regional formats manually to avoid ambiguity.
-        // Using a separate regex for each format reduces ambiguity.
-        
-        // YYYY-MM-DD HH:mm:ss (ISO-like)
-        const ymdMatch = trimmed.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
-        if (ymdMatch) {
-            const [, year, month, day, hour = 0, minute = 0, second = 0] = ymdMatch.map(Number);
-            const date = new Date(year, month - 1, day, hour, minute, second || 0);
-            return isNaN(date.getTime()) ? null : date;
-        }
-
-        // DD/MM/YYYY HH:mm:ss (European/Indonesian style)
-        const dmyMatch = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
-        if (dmyMatch) {
-            const [, day, month, year, hour = 0, minute = 0, second = 0] = dmyMatch.map(Number);
-            const date = new Date(year, month - 1, day, hour, minute, second || 0);
-            // Add validation to ensure day and month are valid
-            if (date.getMonth() === month - 1 && date.getDate() === day) {
-            return isNaN(date.getTime()) ? null : date;
-            }
-        }
-
-        // MM/DD/YYYY HH:mm:ss (US style)
-        const mdyMatch = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
-        if (mdyMatch) {
-            const [, month, day, year, hour = 0, minute = 0, second = 0] = mdyMatch.map(Number);
-            const date = new Date(year, month - 1, day, hour, minute, second || 0);
-            if (date.getMonth() === month - 1 && date.getDate() === day) {
-            return isNaN(date.getTime()) ? null : date;
-            }
-        }
-
-        // 3. Handle formats with month names (e.g., "01 Jan 2025" or "Jan 01, 2025").
-        const monthNames = {
+        const months = {
             jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
             jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
-            january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
-            july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+            january: 0, february: 1, march: 2, april: 3, june: 5,
+            july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
         };
 
-        const namePattern = trimmed.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$|^(\w+)\s+(\d{1,2}),?\s+(\d{4})(?:,\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/i); // NOSONAR
-        if (namePattern) {
-            const [
-            , // full match
-            day1, monthName1, year1, hour1 = 0, minute1 = 0, second1 = 0, // DD MMM YYYY
-            monthName2, day2, year2, hour2 = 0, minute2 = 0, second2 = 0, // MMM DD, YYYY
-            ] = namePattern;
+        // Named month
+        const named = trimmed.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})(?:[,\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$|^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})(?:[,\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/); // NOSONAR
+        if (named) {
+            let d, m, y, h, i, s;
 
-            let day, month, year, hour, minute, second;
-
-            if (day1) { // Matched DD MMM YYYY
-            day = parseInt(day1, 10);
-            month = monthNames[monthName1.toLowerCase()];
-            year = parseInt(year1, 10);
-            [hour, minute, second] = [parseInt(hour1, 10), parseInt(minute1, 10), parseInt(second1, 10)];
-            } else { // Matched MMM DD, YYYY
-            day = parseInt(day2, 10);
-            month = monthNames[monthName2.toLowerCase()];
-            year = parseInt(year2, 10);
-            [hour, minute, second] = [parseInt(hour2, 10), parseInt(minute2, 10), parseInt(second2, 10)];
+            if (named[1]) {
+                d = parseInt(named[1], 10);
+                m = months[named[2].toLowerCase()];
+                y = parseInt(named[3], 10);
+                h = parseInt(named[4] || '0', 10);
+                i = parseInt(named[5] || '0', 10);
+                s = parseInt(named[6] || '0', 10);
+            } else {
+                d = parseInt(named[8], 10);
+                m = months[named[7].toLowerCase()];
+                y = parseInt(named[9], 10);
+                h = parseInt(named[10] || '0', 10);
+                i = parseInt(named[11] || '0', 10);
+                s = parseInt(named[12] || '0', 10);
             }
 
-            if (month !== undefined && !isNaN(day) && !isNaN(year)) {
-            const date = new Date(year, month, day, hour, minute, second || 0);
-            // Validate again to avoid incorrect date creations (e.g., 31 Feb)
-            if (date.getMonth() === month && date.getDate() === day) {
-                return isNaN(date.getTime()) ? null : date;
-            }
+            if (m !== undefined && !isNaN(d) && !isNaN(y)) {
+                const date = new Date(y, m, d, h, i, s || 0);
+                if (date.getDate() === d && date.getMonth() === m) return date;
             }
         }
 
-        // If all attempts fail, return null.
+        // Numeric formats like dd-mm-yyyy or yyyy-mm-dd
+        const parts = trimmed.match(/^(\d{1,4})[\/\-](\d{1,2})[\/\-](\d{1,4})(?:[\sT](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/); // NOSONAR
+        if (parts) {
+            let y, m, d;
+            const p1 = parseInt(parts[1], 10);
+            const p2 = parseInt(parts[2], 10);
+            const p3 = parseInt(parts[3], 10);
+            const h = parseInt(parts[4] || '0', 10);
+            const i = parseInt(parts[5] || '0', 10);
+            const s = parseInt(parts[6] || '0', 10);
+
+            switch (formatPreference) {
+                case 'dmy':
+                    d = p1; m = p2; y = p3;
+                    break;
+                case 'mdy':
+                    m = p1; d = p2; y = p3;
+                    break;
+                case 'ymd':
+                default:
+                    y = p1; m = p2; d = p3;
+                    break;
+            }
+
+            const date = new Date(y, m - 1, d, h, i, s);
+            if (
+                !isNaN(date.getTime()) &&
+                date.getFullYear() === y &&
+                date.getMonth() === m - 1 &&
+                date.getDate() === d
+            ) {
+                return date;
+            }
+        }
+
         return null;
     }
     
@@ -4763,18 +4771,19 @@ class EntityEditor {
      * and then formats them into the appropriate MySQL format using `formatDateTimeForMySQL()`.
      *
      * @param {string} column - The column name (data-col attribute) to target.
+     * @param {string} [formatPreference='ymd'] - Preferred date order: 'ymd', 'dmy', or 'mdy'.
      * @param {'date'|'time'|'datetime'} [mode='datetime'] - The output format mode.
      *     - 'date' → formats as YYYY-MM-DD
      *     - 'time' → formats as HH:mm:ss
      *     - 'datetime' → formats as YYYY-MM-DD HH:mm:ss
      */
-    fixDateTime(column, mode = 'datetime') {
+    fixDateTime(column, formatPreference = 'ymd', mode = 'datetime') {
         let _this = this;
         let tbody = document.querySelector('.data-preview-table tbody');
         let cells = tbody.querySelectorAll(`[data-col="${column}"]`);
         if (cells && cells.length > 0) {
             cells.forEach(cell => {
-                let dt = _this.parseDateTime(cell.value);
+                let dt = _this.parseDateTime(cell.value, formatPreference);
                 if (dt != null) {
                     cell.value = _this.formatDateTimeForMySQL(dt, mode);
                 }

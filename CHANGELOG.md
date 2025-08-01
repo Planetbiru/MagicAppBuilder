@@ -2476,9 +2476,9 @@ A new utility function has been added to the **Entity Data Editor** that helps n
 
 This enhancement is especially helpful when working with imported datasets from varied sources that use different date or time formats.
 
-## Enhancement: Import Spreadsheet from DBF Files
+## Enhancement: Import Spreadsheet from DBF and ODS Files
 
-The **Entity Editor** now supports importing entity definitions and data directly from `.dbf` (DBase) files in addition to existing spreadsheet formats.
+The **Entity Editor** now supports importing entity definitions and data directly from **`.dbf`** (DBase) and **`.ods`** (OpenDocument Spreadsheet) files in addition to existing spreadsheet formats.
 
 ### Supported File Formats for Import
 
@@ -2486,26 +2486,31 @@ The **Entity Editor** now supports importing entity definitions and data directl
 * `.xlsx` — Microsoft Excel (modern format)
 * `.csv` — Comma-separated values
 * `.dbf` — DBase database files (e.g., dBase III/IV, FoxPro, Visual FoxPro)
+* `.ods` — OpenDocument Spreadsheet (used by LibreOffice, OpenOffice)
 
 ### Key Features
 
-* Automatic parsing of `.dbf` files using a built-in `DBFParser` class.
+* Automatic parsing of `.dbf` and `.ods` files using built-in parsers.
 * Field headers and records are extracted and transformed into editable entity definitions.
-* No third-party library is required for DBF parsing.
+* No third-party dependencies are required for `.dbf`, while `.ods` support uses a lightweight built-in parser or conversion via `SheetJS` fallback (if available).
 * Seamless integration into the existing `importSheetFile` mechanism in the Entity Editor.
 
 ### How It Works
 
-When a `.dbf` file is uploaded via the import menu:
+When a `.dbf` or `.ods` file is uploaded via the import menu:
 
-1. The system reads the file as an `ArrayBuffer`.
-2. The custom `DBFParser` decodes the file, extracting:
+1. The system reads the file as an `ArrayBuffer` or text content.
+2. Based on the file extension:
 
-   * Field definitions (headers)
-   * Record values (rows)
-3. The extracted metadata is passed to the editor for column generation and preview.
+   * `.dbf` → Uses `DBFParser` class to extract headers and records.
+   * `.ods` → Uses an internal parser that reads XML content (`content.xml`) inside the ODS zip archive, or falls back to `SheetJS` if enabled.
+3. The parsed table structure and data are displayed for preview and editing.
 
-This enhancement allows users to bring in legacy datasets or export tables from older desktop database software into **MagicAppBuilder** for modernization and low-code application development.
+### Benefits
+
+* Allows importing data from **LibreOffice / OpenOffice** `.ods` files.
+* Enables smooth migration from **open standard** formats and **legacy desktop systems** into MagicAppBuilder.
+* Expands compatibility with a wide range of spreadsheet tools.
 
 ## Bug Fix: Auto Increment Checkbox on Integer Primary Keys
 
