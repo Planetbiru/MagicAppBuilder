@@ -44,6 +44,7 @@ function initDiagramContextMenu(svg) {
             const submenu = document.querySelector('#reference-submenu');
 
             // Remove all submenu items except the first one (usually "Check all")
+            let checkAll = null;
             submenu.querySelectorAll('li').forEach((li) => {
                 const input = li.querySelector('input');
                 if (!input || input.id !== 'id1') {
@@ -51,12 +52,18 @@ function initDiagramContextMenu(svg) {
                 }
                 else
                 {
-                    input.checked = false;
+                    checkAll = input;
                 }
             });
 
             // Add submenu items dynamically based on entity's relations
-            const count = renderReferenceSubmenu(entity, submenu);
+            const result = renderReferenceSubmenu(entity, submenu);
+            const count = result.count;
+
+            if(checkAll != null)
+            {
+                checkAll.checked = result.count == result.checked;
+            }
 
             // Show or hide the "Add Reference" menu based on available relationships
             referenceMenu.style.display = count > 0 ? 'block' : 'none';
@@ -78,12 +85,13 @@ function initDiagramContextMenu(svg) {
  * Populate the reference submenu with available foreign key relations.
  * @param {Element} entity - The SVG group element representing the entity.
  * @param {HTMLElement} submenu - The submenu DOM element to populate.
- * @returns {number} Number of submenu items rendered.
+ * @returns {{count: number, checked: number}} Number of submenu items rendered and number of items initially checked.
  */
 function renderReferenceSubmenu(entity, submenu) {
     const tableName = entity.dataset.entity;
     const columns = entity.querySelectorAll('.diagram-column-name');
     let count = 0;
+    let checked = 0;
 
     columns.forEach((col, index) => {
         const columnName = col.textContent.trim();
@@ -97,9 +105,13 @@ function renderReferenceSubmenu(entity, submenu) {
                 const input = document.createElement('input');
                 const inputId = `reference-checkbox-${index}`;
                 input.type = 'checkbox';
-                input.checked = isSelectedTable(refTable);
                 input.dataset.name = refTable;
                 input.id = inputId;
+
+                const isChecked = isSelectedTable(refTable);
+                input.checked = isChecked;
+                if (isChecked) checked++;
+
                 input.addEventListener('change', selectTable);
 
                 const label = document.createElement('label');
@@ -113,8 +125,10 @@ function renderReferenceSubmenu(entity, submenu) {
             }
         }
     });
-    return count;
+
+    return { count, checked };
 }
+
 
 
 /**
