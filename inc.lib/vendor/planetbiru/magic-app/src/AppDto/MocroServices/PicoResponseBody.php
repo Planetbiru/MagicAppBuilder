@@ -4,6 +4,7 @@ namespace MagicApp\AppDto\MocroServices;
 
 use MagicApp\AppUserPermission;
 use MagicApp\PicoModule;
+use MagicObject\Database\PicoPageable;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 
@@ -40,11 +41,18 @@ class PicoResponseBody extends PicoObjectToString
      * @var ModuleInfo
      */
     protected $module;
+
+    /**
+     * PicoListPage
+     *
+     * @var PicoListPage
+     */
+    protected $pageable;
     
     /**
      * The data returned in the response, which can be of any type.
      *
-     * @var EntityData
+     * @var EntityData|null
      */
     protected $data;
 
@@ -324,6 +332,21 @@ class PicoResponseBody extends PicoObjectToString
             $this->module = $module;
         }
 
+        return $this;
+    }
+
+    /**
+     * Sets the pageable configuration for the current instance.
+     *
+     * Wraps the provided {@see PicoPageable} into a {@see PicoListPage}
+     * and stores it for internal pagination handling.
+     *
+     * @param PicoPageable $pageable The pageable object containing pagination settings.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setPageable($pageable)
+    {
+        $this->pageable = new PicoListPage($pageable);
         return $this;
     }
 

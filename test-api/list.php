@@ -8,13 +8,20 @@ use MagicApp\AppDto\MocroServices\PicoEntityInfo;
 use MagicApp\AppDto\MocroServices\PicoModuleInfo;
 use MagicApp\AppDto\MocroServices\PicoResponseBody;
 use MagicApp\AppDto\MocroServices\PicoUserFormOutputList;
+use MagicObject\Database\PicoPage;
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoSortable;
+use MagicObject\Language\PicoEntityLanguage;
 use MagicObject\SecretObject;
 
 require_once __DIR__ . "/database.php";
 
 $entity = new EntityApplication(null, $database);
+$entityLanguage = new PicoEntityLanguage($entity);
 
-$pageData = $entity->findAll();
+$pageable = new PicoPageable(new PicoPage(1, 3), new PicoSortable('name', 'asc'));
+
+$pageData = $entity->findAll(null, $pageable);
 
 $picoEntityInfo = new PicoEntityInfo(["active"=>"active"]);
 $picoModule = new PicoModuleInfo("application", "Application", "list");
@@ -27,28 +34,31 @@ $picoModule
 
 $data = new PicoUserFormOutputList();
 
-$data->addHeader(new PicoDataHeader("applicationId", $entity->label("applicationId")));
-$data->addHeader(new PicoDataHeader("name", $entity->label("name")));
-$data->addHeader(new PicoDataHeader("description", $entity->label("description")));
-$data->addHeader(new PicoDataHeader("workspace", $entity->label("workspace")));
-$data->addHeader(new PicoDataHeader("architecture", $entity->label("architecture")));
-$data->addHeader(new PicoDataHeader("projectDirectory", $entity->label("projectDirectory")));
-$data->addHeader(new PicoDataHeader("baseApplicationDirectory", $entity->label("baseApplicationDirectory")));
-$data->addHeader(new PicoDataHeader("author", $entity->label("author")));
+// Set column header
+$fields = [
+  "applicationId", "name", "description", "workspace",
+  "architecture", "projectDirectory", "baseApplicationDirectory", "author"
+];
+foreach ($fields as $field) {
+    $data->addHeader(new PicoDataHeader($field, $entityLanguage->get($field)));
+}
+
 $data->setSortHeader("applicationId", "asc");
+
 foreach($pageData->getResult() as $row)
 {
+	// What data will be shown
 	$data->addDataItem(
 		new PicoOutputDataItem(
 			[
-				"applicationId"=>$row->get("applicationId"), 
-				"name"=>$row->get("name"),
-				"description"=>$row->get("description"),
-				"workspace"=>$row->hasValue("workspace") ? $row->get("workspace")->get("name") : null,
-				"architecture"=>$row->get("architecture"),
-				"projectDirectory"=>$row->get("projectDirectory"),
-				"baseApplicationDirectory"=>$row->get("baseApplicationDirectory"),
-				"author"=>$row->get("author")
+				"applicationId"=>$row->retrieve("applicationId"), 
+				"name"=>$row->retrieve("name"),
+				"description"=>$row->retrieve("description"),
+				"workspace"=>$row->retrieve("workspace", "name"),
+				"architecture"=>$row->retrieve("architecture"),
+				"projectDirectory"=>$row->retrieve("projectDirectory"),
+				"baseApplicationDirectory"=>$row->retrieve("baseApplicationDirectory"),
+				"author"=>$row->retrieve("author")
 			],
 			$row,
 			$primaryKeys,
@@ -62,6 +72,7 @@ $setting->setPrettify(true);
 
 echo PicoResponseBody::getInstance()
 	->setModule($picoModule)
+	->setPageable($pageable)
     ->setData($data)
     ->setEntity($entity)
 	->setting($setting)
