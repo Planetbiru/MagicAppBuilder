@@ -9,9 +9,9 @@ use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
-use MagicAppTemplate\ApplicationMenu;
-use MagicAppTemplate\AppMultiLevelMenuTool;
+use MagicAppTemplate\AppMultiLevelMenu;
 use MagicAppTemplate\AppUserPermissionImpl;
+use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
@@ -154,7 +154,7 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 	try {
 		// Mulai transaksi untuk memastikan data konsisten
 		
-		$multiLevelMenuTool = new AppMultiLevelMenuTool($database);
+		$multiLevelMenuTool = new AppMultiLevelMenu($database);
 		$multiLevelMenuTool->createParentModule($currentAction);
 
 		foreach ($_POST['admin_role_id'] as $index => $adminRoleId) {

@@ -194,9 +194,9 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
             // Create parent module
             if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
             {
-                $appMultiLevelMenuTool = new AppMultiLevelMenu($database);
-                $appMultiLevelMenuTool->createParentModule($currentAction);
-                $appMultiLevelMenuTool->updateRolesByAdminLevelId($adminLevelId, $currentAction);
+                $AppMultiLevelMenu = new AppMultiLevelMenu($database);
+                $AppMultiLevelMenu->createParentModule($currentAction);
+                $AppMultiLevelMenu->updateRolesByAdminLevelId($adminLevelId, $currentAction);
             }
             
             // Update the application menu cache

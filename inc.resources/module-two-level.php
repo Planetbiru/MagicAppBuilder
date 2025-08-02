@@ -3,29 +3,29 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
+use MagicApp\AppFormBuilder;
+use MagicApp\AppUserPermission;
+use MagicApp\Field;
+use MagicApp\PicoModule;
+use MagicApp\UserAction;
+use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppValidatorMessage;
+use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
-use MagicObject\Request\PicoFilterConstant;
-use MagicObject\Request\InputGet;
-use MagicObject\Request\InputPost;
-use MagicApp\AppFormBuilder;
-use MagicApp\Field;
-use MagicApp\PicoModule;
-use MagicApp\UserAction;
-use MagicApp\AppUserPermission;
-use MagicAppTemplate\AppEntityLanguageImpl;
-use MagicAppTemplate\AppIncludeImpl;
-use MagicAppTemplate\ApplicationMenu;
-use MagicAppTemplate\AppValidatorMessage;
-use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
-use MagicAppTemplate\Entity\App\AppModuleGroupMinImpl;
-use MagicAppTemplate\Entity\App\AppModuleImpl;
 use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\MagicObject;
+use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SetterGetter;
 
 require_once __DIR__ . "/inc.app/auth.php";

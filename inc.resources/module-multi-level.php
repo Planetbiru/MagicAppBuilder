@@ -3,30 +3,30 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
+use MagicApp\AppUserPermission;
+use MagicApp\Field;
+use MagicApp\PicoModule;
+use MagicApp\UserAction;
+use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppMultiLevelMenu;
+use MagicAppTemplate\AppValidatorMessage;
+use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
+use MagicAppTemplate\Entity\App\AppModuleImpl;
+use MagicAppTemplate\Entity\App\AppModuleMultiLevelImpl;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
-use MagicObject\Request\PicoFilterConstant;
-use MagicObject\Request\InputGet;
-use MagicObject\Request\InputPost;
-use MagicApp\Field;
-use MagicApp\PicoModule;
-use MagicApp\UserAction;
-use MagicApp\AppUserPermission;
-use MagicAppTemplate\AppEntityLanguageImpl;
-use MagicAppTemplate\AppIncludeImpl;
-use MagicAppTemplate\ApplicationMenu;
-use MagicAppTemplate\AppValidatorMessage;
-use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
-use MagicAppTemplate\Entity\App\AppModuleImpl;
-use MagicAppTemplate\Entity\App\AppModuleMultiLevelImpl;
 use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\MagicObject;
+use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\SetterGetter;
-use MagicAppTemplate\AppMultiLevelMenu;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -286,7 +286,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 }
 else if($inputGet->getUserAction() == 'generate-parent-module')
 {
-	$multiLevelMenuTool = new AppMultiLevelMenuTool($database);
+	$multiLevelMenuTool = new AppMultiLevelMenu($database);
 	$multiLevelMenuTool->createParentModule($currentAction);
 	$currentModule->redirectTo();
 }

@@ -3,28 +3,28 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
-use MagicObject\MagicObject;
-use MagicObject\Database\PicoPage;
-use MagicObject\Database\PicoPageable;
-use MagicObject\Database\PicoPredicate;
-use MagicObject\Database\PicoSort;
-use MagicObject\Database\PicoSortable;
-use MagicObject\Database\PicoSpecification;
-use MagicObject\Request\PicoFilterConstant;
-use MagicObject\Request\InputGet;
-use MagicObject\Request\InputPost;
 use MagicApp\AppFormBuilder;
+use MagicApp\AppUserPermission;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
-use MagicApp\AppUserPermission;
 use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
+use MagicObject\Database\PicoPage;
+use MagicObject\Database\PicoPageable;
+use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSort;
+use MagicObject\Database\PicoSortable;
+use MagicObject\Database\PicoSpecification;
 use MagicObject\Exceptions\InvalidValueException;
+use MagicObject\MagicObject;
+use MagicObject\Request\InputGet;
+use MagicObject\Request\InputPost;
+use MagicObject\Request\PicoFilterConstant;
 
 require_once __DIR__ . "/inc.app/auth.php";
 

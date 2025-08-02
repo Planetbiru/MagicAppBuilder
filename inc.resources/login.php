@@ -1,12 +1,12 @@
 <?php
 
 use MagicApp\Field;
+use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
-use MagicAppTemplate\AppAccountSecurity;
 
 require_once __DIR__ . "/inc.app/app.php";
 require_once __DIR__ . "/inc.app/session.php";
