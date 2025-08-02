@@ -4423,6 +4423,17 @@ class EntityEditor {
             .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
     }
 
+    /**
+     * Displays a dialog for exporting diagrams to an HTML document.
+     * 
+     * The dialog allows the user to:
+     * - Select individual diagrams to export
+     * - Select all diagrams at once
+     * - Choose whether to export diagram images as PNG instead of SVG
+     * 
+     * Once the user confirms, it calls `editor.exportHTMLDocument` with
+     * the selected diagrams and the image format preference.
+     */
     showExportHTMLDialog()
     {
         let div = document.createElement('div');
