@@ -6,6 +6,7 @@ use MagicObject\Exceptions\InvalidValueException;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
 
+
 require_once __DIR__ . "/inc.app/auth.php";
 
 $inputGet = new InputGet();

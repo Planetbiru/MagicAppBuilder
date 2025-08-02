@@ -169,9 +169,9 @@ if($applicationId != null)
                 // Create parent module
                 if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
                 {
-                    $appMultiLevelMenuTool = new AppMultiLevelMenu($database);
-                    $appMultiLevelMenuTool->createParentModule($currentAction);
-                    $appMultiLevelMenuTool->updateRolesByAdminLevelId($adminLevelId, $currentAction);
+                    $AppMultiLevelMenu = new AppMultiLevelMenu($database);
+                    $AppMultiLevelMenu->createParentModule($currentAction);
+                    $AppMultiLevelMenu->updateRolesByAdminLevelId($adminLevelId, $currentAction);
                     
                     // Update the application menu cache
                     $applicationMenu = new ApplicationMenu($database, null, null, null, null, null);
