@@ -16,7 +16,7 @@ class PicoOutputFieldApproval extends PicoOutputFieldDetail
     /**
      * Draft value made by another user, awaiting approval or rejection.
      *
-     * @var InputFieldValue|null
+     * @var PicoInputFieldValue|null
      */
     protected $proposedValue;
     
@@ -26,10 +26,10 @@ class PicoOutputFieldApproval extends PicoOutputFieldDetail
      * Initializes the properties of the field, label, data type, current value, and proposed value.
      * This constructor ensures that the proposed value (if provided) is assigned to the appropriate property.
      * 
-     * @param InputField $inputField The input field object containing the field's value and label.
+     * @param PicoInputField $inputField The input field object containing the field's value and label.
      * @param string $dataType The data type of the field (e.g., string, integer, date).
-     * @param InputFieldValue|null $currentValue The current value of the field, typically used for editing or updating.
-     * @param InputFieldValue|null $proposedValue The proposed value of the field, typically used for approval (optional).
+     * @param PicoInputFieldValue|null $currentValue The current value of the field, typically used for editing or updating.
+     * @param PicoInputFieldValue|null $proposedValue The proposed value of the field, typically used for approval (optional).
      */
     public function __construct($inputField, $dataType = "string", $currentValue = null, $proposedValue = null)
     {

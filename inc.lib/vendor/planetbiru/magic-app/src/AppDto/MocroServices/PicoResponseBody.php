@@ -2,7 +2,6 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
-use MagicApp\AppUserPermission;
 use MagicApp\PicoModule;
 use MagicObject\Database\PicoPageable;
 use MagicObject\MagicObject;
@@ -19,7 +18,7 @@ use MagicObject\SecretObject;
  * 
  * @package MagicApp\AppDto\MocroServices
  */
-class PicoResponseBody extends PicoObjectToString
+class PicoResponseBody extends PicoObjectToString // NOSONAR
 {
     /**
      * The response code from the service or API.
@@ -386,15 +385,36 @@ class PicoResponseBody extends PicoObjectToString
 
         return $this;
     }
-    
+
     /**
-     * Undocumented function
+     * Sets the response code and response text from a PicoResponseStatus object.
      *
-     * @param AppUserPermission $appUserPermission
+     * @param PicoResponseStatus $responseStatus The response status object containing code and text.
      * @return self Returns the current instance for method chaining.
      */
-    public function setPermission($appUserPermission)
+    public function setResponseStatus($responseStatus)
     {
+        $this->responseCode = $responseStatus->getResponseCode();
+        $this->responseText = $responseStatus->getResponseText();
+        return $this;
+    }
+
+    /**
+     * Sets the response status based on a boolean success value.
+     *
+     * If true, sets the response to success (code 000).
+     * If false, sets the response to failure (code 999).
+     *
+     * @param bool $success Indicates whether the operation was successful.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setSuccess($success)
+    {
+        if ($success) {
+            $this->setResponseStatus(new PicoResponseStatus(PicoStatusCode::SUCCESS));
+        } else {
+            $this->setResponseStatus(new PicoResponseStatus(PicoStatusCode::FAILURE));
+        }
         return $this;
     }
 

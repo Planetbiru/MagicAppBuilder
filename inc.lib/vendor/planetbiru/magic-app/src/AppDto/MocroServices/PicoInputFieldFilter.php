@@ -25,7 +25,7 @@ class PicoInputFieldFilter extends PicoInputFieldInsert
     /**
      * Static function to create instance
      *
-     * @param InputField $inputField Input field
+     * @param PicoInputField $inputField Input field
      * @param string $inputType The type of the input field.
      * @param string $dataType The data type of the input field.
      * @param string|null $optionSource Optional source for options (e.g., for a select dropdown).
@@ -51,7 +51,7 @@ class PicoInputFieldFilter extends PicoInputFieldInsert
      * Constructor for PicoInputFieldFilter.
      * Initializes the input field properties with provided values.
      *
-     * @param InputField $inputField Input field
+     * @param PicoInputField $inputField Input field
      * @param string $inputType The type of the input field.
      * @param string $dataType The data type of the input field.
      * @param string|null $optionSource Optional source for options (e.g., for a select dropdown).

@@ -52,7 +52,7 @@ class PicoFilterDetail extends PicoObjectToString
      *
      * @return self Returns the current instance for method chaining.
      */
-    public function setField(PicoInputField $field)
+    public function setField($field)
     {
         $this->field = $field;
 
