@@ -2574,3 +2574,56 @@ Previously, the **cookie lifetime** setting for user sessions did not behave as 
   * Multi-tab or multi-device access
 * Improves reliability of session handling for end users.
 
+
+## Enhancement: Auto-Detect Length for `CHAR` and `VARCHAR` Fields
+
+When importing data from spreadsheets or tables, the Entity Editor now **automatically estimates and sets the length** for `CHAR` and `VARCHAR` fields.
+
+### Key Highlights
+
+* Reduces manual setup when defining field sizes.
+* Makes schema generation more accurate and efficient.
+
+## Bug Fix: Auto Increment on SQLite Integer Primary Keys
+
+### Issue
+
+* In previous versions, SQLite incorrectly generated auto increment for non-`INTEGER` types or ignored `AUTOINCREMENT` due to type mismatch.
+
+### Resolution
+
+* The system now ensures that `AUTOINCREMENT` is only applied to `INTEGER PRIMARY KEY` columns in SQLite, as required by the SQLite spec.
+
+### Result
+
+* Prevents invalid syntax errors and improves compatibility with SQLite.
+
+
+
+## Bug Fix: Auto Increment Column Generation for SQLite
+
+### Problem
+
+* When generating a `CREATE TABLE` query for **SQLite**, the system used MySQL-style syntax (e.g., `INTEGER(20) NOT NULL PRIMARY KEY AUTOINCREMENT`), which caused errors.
+* SQLite **only allows** `AUTOINCREMENT` on columns declared as `INTEGER PRIMARY KEY` **without length or modifiers**.
+
+### Resolution
+
+* When exporting or generating SQL for SQLite, the system now **automatically removes the length modifier** and ensures the correct form:
+  `INTEGER PRIMARY KEY AUTOINCREMENT`
+* This applies only to numeric primary keys with auto increment enabled, ensuring SQLite compatibility while retaining MySQL behavior in other dialects.
+
+### Example
+
+**Before (Invalid in SQLite):**
+
+```sql
+payment_id INTEGER(20) NOT NULL PRIMARY KEY AUTOINCREMENT
+```
+
+**After (Valid in SQLite):**
+
+```sql
+payment_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+```
+

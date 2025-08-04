@@ -161,6 +161,8 @@ class Column {
         {
             this.length = '20';
         }
+        
+        
 
         const isEnumOrSet = ['enum', 'set'].includes(typeKey);
         const isRangeType = ['numeric', 'decimal', 'double', 'float'].includes(typeKey);
@@ -182,7 +184,14 @@ class Column {
         }
         // Length types
         else if (isLengthType && this.length) {
-            columnDef += `(${this.length})`;
+            if(dialect == 'sqlite' && this.primaryKey && this.autoIncrement && this.type.toLowerCase().indexOf('int') !== -1)
+            {
+                columnDef += '';
+            }
+            else
+            {
+                columnDef += `(${this.length})`;
+            }
         }
 
         // NOT NULL / NULL
