@@ -38,7 +38,7 @@ class PicoOutputFieldDetail extends PicoObjectToString
     /**
      * The current value of the field, typically used when editing or updating a record.
      *
-     * @var InputFieldValue|null
+     * @var PicoInputFieldValue|null
      */
     protected $currentValue;
     
@@ -48,13 +48,13 @@ class PicoOutputFieldDetail extends PicoObjectToString
      * Initializes the properties of the field, label, data type, and current value.
      * If no current value is provided, it defaults to `null`.
      *
-     * @param InputField $inputField The input field object that contains the field's value and label.
+     * @param PicoInputField $inputField The input field object that contains the field's value and label.
      * @param string $dataType The data type of the field (e.g., string, integer, date).
-     * @param InputFieldValue|null $currentValue The current value of the field, used for editing/updating (optional).
+     * @param PicoInputFieldValue|null $currentValue The current value of the field, used for editing/updating (optional).
      */
     public function __construct($inputField, $dataType = "string", $currentValue = null)
     {
-        if (isset($inputField)) {
+        if (isset($inputField) && $inputField instanceof PicoInputField) {
             $this->field = $inputField->getValue();
             $this->label = $inputField->getLabel();
         }
@@ -71,7 +71,7 @@ class PicoOutputFieldDetail extends PicoObjectToString
      *
      * Returns the value of the field, which can be used when displaying or editing the field.
      *
-     * @return InputFieldValue|null The current value of the input field or null if not set.
+     * @return PicoInputFieldValue|null The current value of the input field or null if not set.
      */
     public function getCurrentValue()
     {
@@ -83,7 +83,7 @@ class PicoOutputFieldDetail extends PicoObjectToString
      *
      * Allows updating the current value of the field, which is useful for editing or saving data.
      *
-     * @param InputFieldValue $currentValue The new current value to set for the input field.
+     * @param PicoInputFieldValue $currentValue The new current value to set for the input field.
      * 
      * @return self Returns the current instance for method chaining.
      */

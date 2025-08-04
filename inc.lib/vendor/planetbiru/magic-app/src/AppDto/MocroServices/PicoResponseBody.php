@@ -2,8 +2,8 @@
 
 namespace MagicApp\AppDto\MocroServices;
 
-use MagicApp\AppUserPermission;
 use MagicApp\PicoModule;
+use MagicObject\Database\PicoPageable;
 use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 
@@ -18,7 +18,7 @@ use MagicObject\SecretObject;
  * 
  * @package MagicApp\AppDto\MocroServices
  */
-class PicoResponseBody extends PicoObjectToString
+class PicoResponseBody extends PicoObjectToString // NOSONAR
 {
     /**
      * The response code from the service or API.
@@ -40,11 +40,18 @@ class PicoResponseBody extends PicoObjectToString
      * @var ModuleInfo
      */
     protected $module;
+
+    /**
+     * PicoListPage
+     *
+     * @var PicoListPage
+     */
+    protected $pageable;
     
     /**
      * The data returned in the response, which can be of any type.
      *
-     * @var EntityData
+     * @var EntityData|null
      */
     protected $data;
 
@@ -328,6 +335,21 @@ class PicoResponseBody extends PicoObjectToString
     }
 
     /**
+     * Sets the pageable configuration for the current instance.
+     *
+     * Wraps the provided {@see PicoPageable} into a {@see PicoListPage}
+     * and stores it for internal pagination handling.
+     *
+     * @param PicoPageable $pageable The pageable object containing pagination settings.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setPageable($pageable)
+    {
+        $this->pageable = new PicoListPage($pageable);
+        return $this;
+    }
+
+    /**
      * Configures the current instance with the provided settings.
      *
      * This method applies configuration options from a `SecretObject` instance, including:
@@ -363,15 +385,36 @@ class PicoResponseBody extends PicoObjectToString
 
         return $this;
     }
-    
+
     /**
-     * Undocumented function
+     * Sets the response code and response text from a PicoResponseStatus object.
      *
-     * @param AppUserPermission $appUserPermission
+     * @param PicoResponseStatus $responseStatus The response status object containing code and text.
      * @return self Returns the current instance for method chaining.
      */
-    public function setPermission($appUserPermission)
+    public function setResponseStatus($responseStatus)
     {
+        $this->responseCode = $responseStatus->getResponseCode();
+        $this->responseText = $responseStatus->getResponseText();
+        return $this;
+    }
+
+    /**
+     * Sets the response status based on a boolean success value.
+     *
+     * If true, sets the response to success (code 000).
+     * If false, sets the response to failure (code 999).
+     *
+     * @param bool $success Indicates whether the operation was successful.
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setSuccess($success)
+    {
+        if ($success) {
+            $this->setResponseStatus(new PicoResponseStatus(PicoStatusCode::SUCCESS));
+        } else {
+            $this->setResponseStatus(new PicoResponseStatus(PicoStatusCode::FAILURE));
+        }
         return $this;
     }
 

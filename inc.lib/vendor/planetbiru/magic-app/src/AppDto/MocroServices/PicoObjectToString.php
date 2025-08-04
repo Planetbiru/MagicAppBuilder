@@ -386,7 +386,7 @@ class PicoObjectToString
      * @param array $array The array to be checked.
      * @return bool Returns true if the array is sequential, otherwise false.
      */
-    private function isSequentialArray(array $array)
+    private function isSequentialArray($array)
     {
         return array_keys($array) === range(0, count($array) - 1);
     }

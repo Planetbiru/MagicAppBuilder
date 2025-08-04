@@ -147,6 +147,7 @@ class EntityEditor {
         ];
         this.db = null; // SQL.js database instance
         this.parsedTableData = {};
+        this.maxLength = {};
     }
 
     /**
@@ -478,9 +479,15 @@ class EntityEditor {
         let columnDefault = column.default == null ? '' : column.default;
         let typeSimple = column.type.split('(')[0].trim();
         let aiDisabled = 'disabled';
+        let originalName = column.name;
+        let maxLength = this.maxLength[originalName] ?? '0';
         if(typeSimple.toUpperCase() == 'BIGINT' && columnLength == '')
         {
             columnLength = '20';
+        }
+        else if(maxLength != '0')
+        {
+            columnLength = maxLength;
         }
         let nullable = '';
         if(column.primaryKey)
@@ -495,7 +502,7 @@ class EntityEditor {
         {
             aiDisabled = '';
         }
-        let originalName = column.name;
+        
         let columnDescription = column.description ? column.description : '';
         
         row.innerHTML = `
@@ -511,7 +518,7 @@ class EntityEditor {
                     ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
                 </select>
             </td>
-            <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline-block' : 'none'};"></td>
+            <td><input type="text" class="column-length" value="${columnLength}" max="${maxLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline-block' : 'none'};"></td>
             <td><input type="text" class="column-enum" value="${columnValue}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
             <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
@@ -3367,6 +3374,7 @@ class EntityEditor {
      * This function:
      * - Cleans and normalizes column names (spaces and special characters removed).
      * - Uses sample data from each column to infer the appropriate SQL data type.
+     * - Calculates the maximum string length for each column and stores it in `this.maxLength`.
      * - Creates a `Column` instance for each header with inferred properties.
      *
      * @param {string[]} headers - The list of column headers (field names) from the data source.
@@ -3375,12 +3383,26 @@ class EntityEditor {
      */
     generateCreateTable(headers, rows) {
         let _this = this;
+        this.maxLength = {};
+
         const cols = headers.map(header => {
-            const cleanName = _this.snakeize(header)
+            const cleanName = _this.snakeize(header);
             const values = rows.map(row => row[header]);
+
+            // Hitung panjang maksimum string
+            let maxLen = 0;
+            values.forEach(val => {
+                if (typeof val === 'string' || typeof val === 'number') {
+                    const len = String(val).length;
+                    if (len > maxLen) maxLen = len;
+                }
+            });
+            _this.maxLength[cleanName] = Math.ceil(maxLen/10) * 10;
+
             const type = _this.guessType(values);
             return new Column(cleanName, type, null, true, null, false, false, null, null);
         });
+
         return cols;
     }
     
