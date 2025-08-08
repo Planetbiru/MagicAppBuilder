@@ -758,12 +758,30 @@ class EntityRenderer {
         URL.revokeObjectURL(url);
     }
 
-
+    
+    /**
+     * Formats a given timestamp into a localized date-time string.
+     *
+     * Converts the provided timestamp into a `Date` object and formats it
+     * in `MM/DD/YYYY HH:MM:SS` format using the `en-US` locale. The comma
+     * from the default locale output is removed for a cleaner display.
+     *
+     * @param {number|string|Date} timestamp - The timestamp or date value to format.
+     * @returns {string} The formatted date-time string.
+     */
     formatDate(timestamp) {
         const date = new Date(timestamp);
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        const options = { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        };
         return date.toLocaleDateString('en-US', options).replace(',', '');
     }
+
 
     /**
      * Returns the SVG element currently used for rendering.

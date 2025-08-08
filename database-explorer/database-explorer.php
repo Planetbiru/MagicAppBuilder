@@ -197,26 +197,43 @@ if(!isset($databaseName))
                             <textarea class="query-generated" spellcheck="false" autocomplete="off" readonly></textarea>
                         </div>
                     </div>
-                    
                     <div class="editor-container">
                         <div class="button-container">
-                            <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
-                            <button class="btn" onclick="editor.uploadEntities()">Import Entity</button>
-                            <button class="btn" onclick="editor.downloadEntities()">Export Entity</button>
-                            <button class="btn" onclick="editor.importSQL()">Import SQL</button>
-                            <button class="btn" onclick="editor.importSheet()">Import Spreadsheet</button>
-                            <button class="btn" onclick="editor.triggerImportFromClipboard()">Import Clipboard</button>
-                            <button class="btn" onclick="downloadSVG()">Export SVG</button>
-                            <button class="btn" onclick="downloadPNG()">Export PNG</button>
-                            <button class="btn" onclick="downloadMD()">Export MD</button>
-                            <button class="btn" onclick="downloadHTML()">Export HTML</button>
-                            <button class="btn" onclick="editor.downloadSQL()">Export SQL</button>
-                            <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>    
-                            <button class="btn" onclick="editor.sortAndGroupEntities()">Sort Entity by Type</button>              
-                            <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
-                            <input class="import-file-json" type="file" accept=".json" style="display: none;" />
-                            <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
-                            <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
+                            
+
+                            <span class="btn-group">
+                                <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
+                            </span>
+
+                            <!-- Import group -->
+                            <span class="btn-group btn-group-with-label">
+                                <span class="group-label">Import</span>
+                                <button class="btn" onclick="editor.uploadEntities()">Entity</button>
+                                <button class="btn" onclick="editor.importSQL()">SQL</button>
+                                <button class="btn" onclick="editor.importSheet()">Spreadsheet</button>
+                                <button class="btn" onclick="editor.triggerImportFromClipboard()">Clipboard</button>
+                            </span>
+
+                            <!-- Export group -->
+                            <span class="btn-group btn-group-with-label">
+                                <span class="group-label">Export</span>
+                                <button class="btn" onclick="editor.downloadEntities()">Entity</button>
+                                <button class="btn" onclick="downloadSVG()">SVG</button>
+                                <button class="btn" onclick="downloadPNG()">PNG</button>
+                                <button class="btn" onclick="downloadMD()">MD</button>
+                                <button class="btn" onclick="downloadHTML()">HTML</button>
+                                <button class="btn" onclick="editor.exportToGraphQL()">GraphQL</button>
+                                <button class="btn" onclick="editor.downloadSQL()">SQL</button>
+                            </span>
+                            
+                            <span class="btn-group">
+                                <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>    
+                                <button class="btn" onclick="editor.sortAndGroupEntities()">Sort Entity by Type</button>              
+                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
+                                <input class="import-file-json" type="file" accept=".json" style="display: none;" />
+                                <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
+                                <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
+                            </span>
                         </div>
 
                         <!-- Entity Editor Form -->
