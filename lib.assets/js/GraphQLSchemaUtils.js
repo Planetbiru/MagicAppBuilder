@@ -145,6 +145,7 @@ class GraphQLSchemaUtils {
             const typeName = match[2];
             const fieldsBlock = match[3];
 
+            // Skip the Query type as it is not a data model
             if (typeName === 'Query') {
                 continue;
             }
@@ -153,6 +154,7 @@ class GraphQLSchemaUtils {
             const fieldRegex = /(\w+):\s*([\w!]+)/g;
             let fieldMatch;
 
+            // Extract fields and their types
             while ((fieldMatch = fieldRegex.exec(fieldsBlock)) !== null) {
                 const fieldName = fieldMatch[1];
                 let fieldType = fieldMatch[2];
@@ -168,8 +170,10 @@ class GraphQLSchemaUtils {
             }
 
             if (typeOrInput === 'type') {
+                // Store as a type definition
                 parsedSchema.types[typeName] = fields;
-            } else {
+            } else if (typeOrInput === 'input') {
+                // Store as an input definition
                 parsedSchema.inputs[typeName] = fields;
             }
         }

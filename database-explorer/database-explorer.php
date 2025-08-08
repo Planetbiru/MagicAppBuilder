@@ -38,7 +38,7 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/EntityEditor.min.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
     <script src="../lib.assets/js/SVGtoPNG.min.js"></script>
@@ -213,6 +213,7 @@ if(!isset($databaseName))
                                 <button class="btn" onclick="editor.importSQL()">SQL</button>
                                 <button class="btn" onclick="editor.importSheet()">Spreadsheet</button>
                                 <button class="btn" onclick="editor.triggerImportFromClipboard()">Clipboard</button>
+                                <button class="btn" onclick="editor.importGraphQLSchema()">GraphQL</button>
                             </span>
 
                             <!-- Export group -->
@@ -234,6 +235,7 @@ if(!isset($databaseName))
                                 <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                                 <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
                                 <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
+                                <input class="import-file-graphql" type="file" accept=".graphql" style="display: none;" />
                             </span>
                         </div>
 
