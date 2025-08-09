@@ -1177,3 +1177,17 @@ WHERE LOWER(genre_id) LIKE '%jazz%'
 * **Tighter Filtering:** You now have finer control over which fields use partial or exact text search.
 * **More Predictable Behavior:** Prevents accidental partial matches, especially useful for enums or codes.
 
+
+# MagicObject Version 3.16.8
+
+## Bug Fix: Data Conversion on Export to SQL Server
+
+Fixed an issue with **BIT** value conversion when exporting data to SQL Server.
+Previously, `TRUE` and `FALSE` values were exported as literal text strings.
+After this fix, they are correctly exported as numeric values:
+
+* `TRUE` → `1`
+* `FALSE` → `0`
+
+This ensures proper compatibility with SQL Server’s `BIT` data type and avoids errors when importing exported data.
+

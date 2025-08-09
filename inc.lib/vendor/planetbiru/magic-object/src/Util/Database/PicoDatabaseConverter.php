@@ -503,8 +503,8 @@ class PicoDatabaseConverter // NOSONAR
                     if (!isset($value)) {
                         return null;
                     }
-                    // For SQLite, return as integer 0/1
-                    if (stripos($dialect, 'sqlite') !== false) {
+                    // For SQLite and SQL Server, return as integer 0/1
+                    if (stripos($dialect, 'sqlite') !== false || stripos($dialect, 'sqlserver') !== false) {
                         return $value === true ? 1 : 0;
                     }
                     return $value ? "TRUE" : "FALSE";
