@@ -2690,8 +2690,13 @@ The Entity Editor now includes a **GraphQL Schema Parser**, allowing users to cr
 
 **Details**
 
-* **Functionality**: Users can import a GraphQL schema file, and the system will automatically parse the `type` and `input` definitions.
+* **Functionality**: Users can import a GraphQL schema file, and the system will automatically parse the `type` and `input` definitions, except those named `Query`.
+  Between `type` and `input`, both may point to the same table in the database. Users should verify the validity of each and choose one to keep while discarding the unnecessary one.
 * **Entity Generation**: Each `type` definition in the schema is converted into a new entity within the editor. The fields within each type become the columns of the new entity.
 * **Relationship Handling**: The parser intelligently identifies relationships and data types, ensuring that the generated entities are accurate representations of the original schema.
 * **Workflow**: This enables a seamless workflow where developers can define their schema first and then use the Entity Editor to automatically scaffold the corresponding database entities.
+
+**When to Use**
+
+Importing from a GraphQL Schema is recommended only when the developer does not have access to the database structure, or when the database is damaged, lost, or otherwise unavailable. This is considered a last-resort option. Entities imported from a GraphQL Schema cannot be used directly without adjustments, because primary key columns are almost always assumed to be `VARCHAR(255)`, whereas the actual database might use different data types. Users will need to update the data type of each column to ensure the system functions as intended. This limitation exists because a GraphQL Schema describes the shape of the data for client access purposes, not the precise underlying database types.
 
