@@ -10,7 +10,6 @@ use MagicObject\Database\PicoTableInfo;
 use MagicObject\Database\PicoTableInfoExtended;
 use MagicObject\MagicObject;
 use MagicObject\Util\Database\DatabaseTypeConverter;
-use MagicObject\Util\Database\PicoDatabaseUtil;
 use MagicObject\Util\Database\PicoDatabaseUtilMySql;
 use MagicObject\Util\Database\PicoDatabaseUtilPostgreSql;
 use MagicObject\Util\Database\PicoDatabaseUtilSqlite;
@@ -24,7 +23,7 @@ use MagicObject\Util\Database\PicoDatabaseUtilSqlServer;
  * @package MagicObject\Generator
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoDatabaseDump
+class PicoDatabaseDump // NOSONAR
 {
     /**
      * Table information
@@ -168,22 +167,67 @@ class PicoDatabaseDump
     }
 
     /**
-     * Update the query to set a default value for a column.
+     * Updates an ALTER TABLE query to set a default value for a specific column.
      *
-     * @param string $query Query string
-     * @param array $entityColumn Entity column information
-     * @return string Updated query string
+     * This method appends a DEFAULT clause to the given query string based on the
+     * provided entity column configuration. If the default value is 'NULL' (case-sensitive)
+     * or 'null', it will explicitly set the default to NULL. Otherwise, it will pass
+     * the value through {@see fixDefaultValue()} to ensure proper formatting based
+     * on the column type and database type.
+     *
+     * @param string $query         The base ALTER TABLE query string to be updated.
+     * @param array  $entityColumn  The entity column definition array, which should
+     *                              contain the {@see MagicObject::KEY_DEFAULT_VALUE} key
+     *                              if a default value is defined.
+     * @param string|null $columnType   The column's data type (e.g., 'VARCHAR', 'INT', etc.).
+     * @param string|null $databaseType The target database type (e.g., MySQL, PostgreSQL, SQLite, SQL Server).
+     *
+     * @return string The updated query string including the DEFAULT clause (if applicable).
      */
-    public function updateQueryAlterTableDefaultValue($query, $entityColumn)
+    public function updateQueryAlterTableDefaultValue($query, $entityColumn, $columnType = null, $databaseType = null)
     {
         if (isset($entityColumn[MagicObject::KEY_DEFAULT_VALUE])) {
             if ($entityColumn[MagicObject::KEY_DEFAULT_VALUE] == 'NULL' || $entityColumn[MagicObject::KEY_DEFAULT_VALUE] == 'null') {
                 $query .= " DEFAULT NULL";
             } else {
-                $query .= " DEFAULT " . PicoDatabaseUtil::escapeValue($entityColumn[MagicObject::KEY_DEFAULT_VALUE], true);
+                $query .= " DEFAULT " . $this->fixDefaultValue($entityColumn[MagicObject::KEY_DEFAULT_VALUE], $columnType, $databaseType);
             }
         }
         return $query;
+    }
+
+    /**
+     * Formats and escapes a default value for use in a database schema query.
+     *
+     * This method ensures the default value is correctly formatted depending on
+     * the column's data type and the target database type, using the appropriate
+     * database utility class.
+     *
+     * @param mixed       $defaultValue The raw default value to be fixed.
+     * @param string      $type         The column's data type.
+     * @param string|null $databaseType The target database type (e.g., MySQL, PostgreSQL, SQLite, SQL Server).
+     *
+     * @return string The properly formatted default value for inclusion in a query.
+     */
+    public function fixDefaultValue($defaultValue, $type, $databaseType = null)
+    {
+        if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL)
+        {
+            $util = new PicoDatabaseUtilPostgreSql();
+        }
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE)
+        {
+            $util = new PicoDatabaseUtilSqlite();
+        }
+        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLSERVER)
+        {
+            $util = new PicoDatabaseUtilSqlServer();
+        }
+        else
+        {
+            $util = new PicoDatabaseUtilMySql();
+        }
+        return $util->fixDefaultValue($defaultValue, $type);
     }
 
     /**
@@ -343,7 +387,7 @@ class PicoDatabaseDump
                         $columnType = $dataTypeConverter->convertType($entityColumn['type'], $database->getDatabaseType());
                         $query = $this->createQueryAlterTable($tableName, $entityColumn['name'], $columnType);
                         $query = $this->updateQueryAlterTableNullable($query, $entityColumn);
-                        $query = $this->updateQueryAlterTableDefaultValue($query, $entityColumn);
+                        $query = $this->updateQueryAlterTableDefaultValue($query, $entityColumn, $columnType, $database->getDatabaseType());
                         $query = $this->updateQueryAlterTableAddColumn($query, $lastColumn, $database->getDatabaseType());
                         $queryAlter[] = $query . ";";
                     }

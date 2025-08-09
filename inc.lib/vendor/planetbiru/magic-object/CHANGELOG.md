@@ -1191,3 +1191,36 @@ After this fix, they are correctly exported as numeric values:
 
 This ensures proper compatibility with SQL Server’s `BIT` data type and avoids errors when importing exported data.
 
+## Bug Fix: Default Value Handling in ALTER TABLE
+
+Fixed an issue where **DEFAULT VALUE** clauses were not correctly generated when altering a table after entity changes.
+The fix covers **both NULL and non-null default values**:
+
+* Correctly applies `DEFAULT NULL` when specified.
+* Properly formats non-null default values (e.g., `DEFAULT 0`, `DEFAULT 'ACTIVE'`, etc.) according to the column type and target database.
+* Ensures compatibility with all supported database types (MySQL, PostgreSQL, SQLite, SQL Server).
+
+### Example
+
+**Before:**
+
+```sql
+ALTER TABLE users MODIFY status VARCHAR(20);
+```
+
+*(Default value lost after column change)*
+
+**After:**
+
+```sql
+ALTER TABLE users MODIFY status VARCHAR(20) DEFAULT 'ACTIVE';
+```
+
+or
+
+```sql
+ALTER TABLE users MODIFY last_login TIMESTAMP DEFAULT NULL;
+```
+
+This prevents migration errors and ensures schema changes retain and apply consistent default values across databases.
+
