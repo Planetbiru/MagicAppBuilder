@@ -2700,3 +2700,7 @@ The Entity Editor now includes a **GraphQL Schema Parser**, allowing users to cr
 
 Importing from a GraphQL Schema is recommended only when the developer does not have access to the database structure, or when the database is damaged, lost, or otherwise unavailable. This is considered a last-resort option. Entities imported from a GraphQL Schema cannot be used directly without adjustments, because primary key columns are almost always assumed to be `VARCHAR(255)`, whereas the actual database might use different data types. Users will need to update the data type of each column to ensure the system functions as intended. This limitation exists because a GraphQL Schema describes the shape of the data for client access purposes, not the precise underlying database types.
 
+
+## Bug Fix: Database Export in Magic Database Page
+
+Fixed an issue where exporting the database from the **Magic Database** page would fail or produce incomplete files under certain conditions. The export process now runs reliably and generates complete, accurate database dumps.
