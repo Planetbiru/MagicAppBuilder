@@ -847,7 +847,7 @@ textarea.description-textarea {
 }
 
 [data-no-table=true] textarea[name=query] {
-  height: calc(100vh - 102px);
+  height: calc(100vh - 105px);
 }
 
 a.all-table {
