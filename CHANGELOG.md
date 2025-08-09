@@ -2629,7 +2629,7 @@ payment_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
 
 
 
-# MagicAppBuilder Version 1.17.1
+# MagicAppBuilder Version 1.18.0
 
 ## Enhancement: Confirmation Dialog for Viewing Large Entity Data
 
