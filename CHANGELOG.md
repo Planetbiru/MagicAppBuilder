@@ -2703,4 +2703,13 @@ Importing from a GraphQL Schema is recommended only when the developer does not 
 
 ## Bug Fix: Database Export in Magic Database Page
 
-Fixed an issue where exporting the database from the **Magic Database** page would fail or produce incomplete files under certain conditions. The export process now runs reliably and generates complete, accurate database dumps.
+Fixed an issue where the **Magic Database** page failed to display the list of tables available for export due to a configuration error. This issue prevented users from selecting which tables to export. The configuration has been corrected, and the page now reliably shows all exportable tables.
+
+
+## Upgrade: MagicObject to Version 3.16.8
+
+Upgraded the MagicObject library to **version 3.16.8**, which includes a bug fix for SQL Server exports:
+
+* `BIT` values are now correctly exported as `1` (for TRUE) and `0` (for FALSE) instead of literal strings `TRUE` and `FALSE`.
+  This ensures better compatibility and prevents type mismatch issues when importing into SQL Server.
+
