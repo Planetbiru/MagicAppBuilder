@@ -633,8 +633,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.closest('.table-list input[type="checkbox"]')) {
             
             let diagram = document.querySelector('.diagram-container .diagram.active');
-            let currentSelection = diagram.getAttribute('data-entities').split(',');
-
+            let source = diagram.getAttribute('data-entities') || '';
+            let currentSelection = source.split(',');
             let selectedEntities = new Set(); // Use a Set to store selected entities
             
             // Iterate through checkboxes and add checked ones to the set
@@ -657,9 +657,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Update the data-entities attribute with the new order
             diagram.setAttribute('data-entities', updatedEntities.join(','));
-
             editor.saveDiagram();
         }
+    
         editor.updateDiagram();
     });
 

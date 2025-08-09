@@ -2627,3 +2627,76 @@ payment_id INTEGER(20) NOT NULL PRIMARY KEY AUTOINCREMENT
 payment_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
 ```
 
+
+
+# MagicAppBuilder Version 1.17.1
+
+## Enhancement: Confirmation Dialog for Viewing Large Entity Data
+
+Before opening the Entity Data Viewer, the system will now display a confirmation dialog if the number of data rows exceeds 1,000.
+
+**Purpose**
+
+* To prevent lag or crashes caused by rendering large tables.
+* To give users full control to cancel or continue the process.
+
+**Details**
+
+* **Default limit**: 1,000 rows (can be configured).
+* If the number of rows is ≤ the limit, data is displayed directly without confirmation.
+* If the number of rows > the limit, a dialog appears showing the number of rows and offering "Continue" or "Cancel" options.
+
+
+
+## Enhancement: Export Entity to GraphQL
+
+The Entity Editor now supports exporting entities to a GraphQL format to simplify integration with GraphQL APIs.
+
+**Key Features**
+
+* Exports schema and type definitions based on the entity structure.
+* Supports scalar types, relationships, and nullable/non-nullable fields.
+* The output is presented as a ready-to-use `.graphql` file.
+
+**Benefits**
+
+* Accelerates the development of GraphQL-based APIs.
+* Reduces manual work in creating type definitions.
+
+
+
+## UI Enhancement: Button Layout Optimization in Entity Editor
+
+The button layout in the Entity Editor has been updated to improve readability and reduce text duplication.
+
+**Changes**
+
+* Eliminated the repetition of "Import" and "Export" in button labels.
+* Grouped buttons by function:
+  * **Import Group** — all file/spreadsheet import buttons.
+  * **Export Group** — all export options (SQL, GraphQL, images, etc.).
+* Button icons have been clarified to remain easily recognizable without repeated text.
+
+**Impact**
+
+* The interface is cleaner and more concise.
+* Users can still differentiate between export and import buttons through visual grouping.
+
+
+
+## New Feature: GraphQL Schema Parser
+
+The Entity Editor now includes a **GraphQL Schema Parser**, allowing users to create entities directly from an existing GraphQL schema. This feature streamlines the process of generating entities from a single `.graphql` file.
+
+**Details**
+
+* **Functionality**: Users can import a GraphQL schema file, and the system will automatically parse the `type` and `input` definitions, except those named `Query`.
+  Between `type` and `input`, both may point to the same table in the database. Users should verify the validity of each and choose one to keep while discarding the unnecessary one.
+* **Entity Generation**: Each `type` definition in the schema is converted into a new entity within the editor. The fields within each type become the columns of the new entity.
+* **Relationship Handling**: The parser intelligently identifies relationships and data types, ensuring that the generated entities are accurate representations of the original schema.
+* **Workflow**: This enables a seamless workflow where developers can define their schema first and then use the Entity Editor to automatically scaffold the corresponding database entities.
+
+**When to Use**
+
+Importing from a GraphQL Schema is recommended only when the developer does not have access to the database structure, or when the database is damaged, lost, or otherwise unavailable. This is considered a last-resort option. Entities imported from a GraphQL Schema cannot be used directly without adjustments, because primary key columns are almost always assumed to be `VARCHAR(255)`, whereas the actual database might use different data types. Users will need to update the data type of each column to ensure the system functions as intended. This limitation exists because a GraphQL Schema describes the shape of the data for client access purposes, not the precise underlying database types.
+

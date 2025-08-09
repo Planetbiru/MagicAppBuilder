@@ -166,6 +166,86 @@ class EntityEditor {
     }
 
     /**
+     * Generates an array of `Column` objects by mapping an array of GraphQL properties.
+     * This function handles the conversion of GraphQL types and naming conventions to
+     * their SQL counterparts, including detecting primary keys and assigning appropriate
+     * data types and lengths.
+     *
+     * @param {string} entityName - The name of the GraphQL entity (e.g., "Album").
+     * @param {Array<Object>} properties - An array of property objects from the GraphQL schema.
+     * @returns {Array<Column>} An array of `Column` objects, ready for SQL table generation.
+     */
+    generateColumnFromSchemaProperties(entityName, properties) {
+        let _this = this;
+        const cols = properties.map(property => {
+            const cleanName = _this.snakeize(property.name);
+            const pk = _this.isLikePk(entityName, cleanName);
+            const types = _this.graphQLtoSQLType(property.type, pk);
+            let type = types.columnType;
+            let length = types.length;
+            return new Column(cleanName, type, length, property.nullable, null, pk, false, null, null);
+        });
+
+        return cols;
+    }
+
+    /**
+     * Maps a given GraphQL type to a corresponding SQL column type and a default length.
+     * The mapping is based on a predefined set of type conversions.
+     *
+     * @param {string} grapqlType - The GraphQL type name (e.g., 'String', 'Int', 'ID').
+     * @param {boolean} pk - A flag indicating whether the column is a primary key.
+     * @returns {{columnType: string, length: string}} An object containing the mapped SQL column type and its length.
+     */
+    graphQLtoSQLType(grapqlType, pk)
+    {
+        let columnType = 'TEXT';
+        let length = '';
+        const map = {
+            'String' : 'TEXT',
+            'Int' : 'BIGINT',
+            'Float' : 'DOUBLE',
+            'Boolean' : 'TINYINT',
+            'ID' : 'VARCHAR'
+        };
+        if(typeof map[grapqlType] != 'undefined')
+        {
+            columnType = map[grapqlType];
+        }
+        
+        if(columnType == 'TEXT' && pk)
+        {
+            columnType = 'VARCHAR';
+        }
+        if(columnType == 'VARCHAR')
+        {
+            length = '255';
+        }
+        else if(columnType == 'BIGINT')
+        {
+            length = '20';
+        }
+        else if(grapqlType == 'Boolean')
+        {
+            length = '1';
+        }
+        return {columnType: columnType, length: length};
+    }
+
+    /**
+     * Checks if a column name follows the primary key naming convention for a given entity.
+     * The convention is assumed to be `<entityName>_id`.
+     *
+     * @param {string} entityName - The name of the entity.
+     * @param {string} cleanName - The snake_cased name of the column to check.
+     * @returns {boolean} True if the column name matches the primary key convention, otherwise false.
+     */
+    isLikePk(entityName, cleanName)
+    {
+        return `${entityName}_id` == cleanName;
+    }
+
+    /**
      * Adds event listeners to checkboxes for selecting and deselecting entities.
      */
     addDomListeners() {
@@ -272,6 +352,22 @@ class EntityEditor {
                 }); 
             } else {
                 console.log("Please select a JSON file first.");
+            }
+        });
+
+        document.querySelector(this.selector+" .import-file-graphql").addEventListener("change", function () {
+            const file = this.files[0]; // Get the selected file
+            if (file) {
+                editor.processGraphQLSchema(file, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+        
+                }); 
+            } else {
+                console.log("Please select a GraphQL Schema file first.");
             }
         });
         
@@ -471,7 +567,8 @@ class EntityEditor {
      * @param {boolean} [focus=false] - Whether to focus on the new column's name input.
      * @param {boolean} [newColumn=false] - Whether this is a new column being added.
      */
-    addColumnToTable(column, focus = false, newColumn = false) {
+    addColumnToTable(column, focus = false, newColumn = false) // NOSONAR
+    {
         const tableBody = document.querySelector(this.selector+" .entity-columns-table-body");
         const row = document.createElement("tr");
         let columnLength = column.length == null ? '' : column.length.toString().replace(/\D/g,'');
@@ -492,11 +589,11 @@ class EntityEditor {
         let nullable = '';
         if(column.primaryKey)
         {
-            nullable = 'disabled';
+            nullable += ' disabled';
         }
         else if(column.nullable)
         {
-            nullable = 'checked';
+            nullable += ' checked';
         }
         if((column.primaryKey && typeSimple.toLowerCase().indexOf('int') != -1) || column.autoIncrement)
         {
@@ -521,7 +618,7 @@ class EntityEditor {
             <td><input type="text" class="column-length" value="${columnLength}" max="${maxLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline-block' : 'none'};"></td>
             <td><input type="text" class="column-enum" value="${columnValue}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
             <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
-            <td class="column-nl"><input type="checkbox" class="column-nullable" ${nullable}></td>
+            <td class="column-nl"><input type="checkbox" class="column-nullable"${nullable}></td>
             <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
             <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${aiDisabled}></td>
             <td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
@@ -1979,16 +2076,30 @@ class EntityEditor {
      */
     viewData(index = -1)
     {
-        if(index < 0)
-        {
+        let _this = this;
+        if (index < 0) {
             index = this.currentEntityIndex;
-        }
-        else
-        {
+        } else {
             this.currentEntityIndex = index;
         }
+
         let entity = this.entities[index];
-        this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+        let dataLength = entity.data.length;
+
+        if (dataLength > 1000) {
+            let message = `<p>This entity contains ${dataLength} records.<br />Opening such a large dataset may cause your browser to become unresponsive or even crash due to running out of memory.<br />Do you still want to proceed?</p>`;
+            let title = 'Warning: Large Dataset Detected';
+            let captionOk = 'Open Anyway';
+            let captionCancel = 'Cancel';
+
+            _this.showConfirmationDialog(message, title, captionOk, captionCancel, function(isOk) {
+                if (isOk) {
+                    _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+                }
+            });
+        } else {
+            _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+        }
     }
 
     /**
@@ -2213,6 +2324,24 @@ class EntityEditor {
                 tr.querySelector('.column-autoIncrement').checked = false;
             }
         }
+    }
+
+    /**
+     * Exports the current entities into a GraphQL schema definition file (.graphql)
+     * with automatic relationship detection.
+     *
+     * @param {string} [filename="schema.graphql"] - The output filename.
+     * @param {boolean} [removeIdFields=true] - If true, removes scalar fields ending in `_id` and only keeps the relationship fields.
+     */
+    exportToGraphQL(filename = "schema.graphql") {
+        const schema = GraphQLSchemaUtils.buildGraphQLSchema(this.entities);
+        const blob = new Blob([schema], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
     /**
@@ -3021,6 +3150,202 @@ class EntityEditor {
         } else {
             reader.readAsArrayBuffer(file);   // Excel → binary buffer
         }
+    }
+
+    /**
+     * Triggers the file selection dialog for importing a GraphQL schema file.
+     * This function simulates a click on a hidden file input element, allowing the user
+     * to select a `.graphql` file from their local machine. It also sets a flag to
+     * control the import behavior.
+     *
+     * @param {boolean} clearBeforeImport - A flag indicating whether to clear the existing
+     *                                         schema before the new one is imported.
+     */
+    importGraphQLSchema()
+    {
+        this.clearBeforeImport = false;
+        document.querySelector(this.selector + " .import-file-graphql").click();
+    }
+
+    /**
+     * Imports a GraphQL schema from a file, parses it, and invokes a callback with the structured data.
+     * The function validates the file to ensure it has a `.graphql` extension before processing.
+     * If the file is not a valid GraphQL schema file, an alert dialog is shown.
+     *
+     * @param {File} file - The file object representing the GraphQL schema file to be imported.
+     * @param {function(string, string, object, object): void} callbackFunction - The callback function to be executed
+     *     after the schema has been successfully parsed. It receives the following arguments:
+     *     - fileExtension (string): The extension of the imported file.
+     *     - fileName (string): The name of the imported file.
+     *     - types (object): The parsed and normalized GraphQL type definitions.
+     *     - inputs (object): The parsed and normalized GraphQL input type definitions.
+     */
+    processGraphQLSchema(file, callbackFunction)
+    {        
+        const _this = this;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const contents = e.target.result;
+
+            if (fileExtension === 'graphql') {          
+                const schemaObject = GraphQLSchemaUtils.parseGraphQLSchema(contents);
+                const types = GraphQLSchemaUtils.normalizeEntity(schemaObject.types, "snake");
+                const inputs = GraphQLSchemaUtils.normalizeEntity(schemaObject.inputs, "snake");
+
+
+                // Get the names of all tables in the database
+                let importedEntities = [];
+
+                let index = 0;
+
+                if (!_this.clearBeforeImport) {
+                    index = _this.entities.length;
+                }
+
+                // Process types to create entities
+                // Types are often used for GraphQL queries, so we treat them as entities too
+                // This allows us to visualize them in the editor
+                // and understand the structure of the data being queried.
+                // Types are not used for mutations, so we can skip them if needed.
+                // However, they can be useful for understanding the data structure.
+                // We can also use them to create entities for queries.
+                // This allows us to visualize the data structure of the queries.
+                for (let [entityName, properties] of Object.entries(types)) {
+                    let cleanEntityName = _this.toValidTableName(entityName);
+                    let columns = _this.generateColumnFromSchemaProperties(cleanEntityName, properties);
+                    let entity = new Entity(_this.snakeize(cleanEntityName), index);
+                    columns.forEach(column => {
+                        entity.addColumn(column);
+                    });
+                    importedEntities.push(entity);
+                    index++;
+                }
+
+                // Process inputs to create entities
+                // Inputs are often used for GraphQL mutations, so we treat them as entities too
+                // This allows us to visualize them in the editor
+                // and understand the structure of the data being passed in mutations.
+                // Inputs are not used for queries, so we can skip them if needed.
+                // However, they can be useful for understanding the data structure.
+                // We can also use them to create entities for mutations.
+                // This allows us to visualize the data structure of the mutations.
+                for (let [entityName, properties] of Object.entries(inputs)) {
+                    let cleanEntityName = _this.toValidTableName(entityName);
+                    let columns = _this.generateColumnFromSchemaProperties(cleanEntityName, properties);
+                    let entity = new Entity(_this.snakeize(cleanEntityName), index);
+                    columns.forEach(column => {
+                        entity.addColumn(column);
+                    });
+                    importedEntities.push(entity);
+                    index++;
+                }
+
+                if (_this.clearBeforeImport) {
+                    _this.entities = importedEntities;
+                    _this.clearEntities(); // Clear the existing entities
+                    _this.clearDiagrams(); // Clear the existing diagrams
+                    _this.renderEntities(); // Update the view with the fetched entities
+                } else {
+                    let existing = [];
+                    _this.entities.forEach((entity) => {
+                        existing.push(entity.name);
+                    });
+                    importedEntities.forEach((entity) => {
+                        if (!existing.includes(entity.name)) {
+                            entity.index = _this.entities.length;
+                            _this.entities.push(entity);
+                        }
+                    });
+                    _this.renderEntities(); // Update the view with the fetched entities
+                }
+
+                if (typeof callbackFunction === 'function') {
+                    callbackFunction(_this.entities); // Execute callback with the updated entities
+                }
+
+                _this.restoreCheckedEntitiesFromCurrentDiagram(); // Restore checked entities from the current diagram
+            } else {
+                _this.showAlertDialog(`Unsupported file format: ${fileExtension}`, "Alert", "OK");
+            }
+        };
+
+        reader.readAsText(file);
+    }
+
+    /**
+     * Fixes primary key column types and lengths for imported entities by checking other entities for the most common matching type and length.
+     * 
+     * If a primary key column is a VARCHAR(255), it is assumed to be an ID type from a GraphQL schema import.
+     * This method then looks at other entities to determine the most frequent type and length for the same column name
+     * and updates the primary key column accordingly.
+     *
+     * @param {Array<Object>} importedEntities - The list of entities with their columns.
+     * @returns {Array<Object>} - The modified list of entities with corrected primary key types and lengths.
+     */
+    fixPrimaryKeys(importedEntities) {
+        let _this = this;
+        // Iterate through each imported entity to fix primary keys
+        importedEntities.forEach(entity => {
+            // Check if the entity has a primary key defined
+            const primaryKeyColumns = entity.columns.filter(col => col.primaryKey);
+            if (primaryKeyColumns.length > 0) {
+                primaryKeyColumns.forEach(col => {
+                    // If the column is a VARCHAR with length 255,
+                    if(col.type == 'VARCHAR' && col.length == '255')
+                    {
+                        // If the column is a VARCHAR with length 255, 
+                        // indicate that column type is ID from GraphQL schema.
+                        // Confirm real type from other entities.
+                        let realTypeAndLength = _this.getRealTypeFromOtherEntities(importedEntities, entity.name, col.name);
+                        col.type = realTypeAndLength.type;
+                        col.length = realTypeAndLength.length;
+                    } 
+                });
+            } 
+        });
+        return importedEntities; // Return the modified entities with fixed primary keys
+    }
+
+    /**
+     * Determines the most frequent type and length for a given column name across all entities except the one being processed.
+     * 
+     * Counts how often each type and length appears for the column in other entities, then returns the most frequent values.
+     * Defaults to VARCHAR(255) if no matches are found.
+     *
+     * @param {Array<Object>} importedEntities - The list of entities with their columns.
+     * @param {string} entityName - The name of the current entity (excluded from search).
+     * @param {string} columnName - The name of the column to find matching types and lengths for.
+     * @returns {{type: string, length: string}} - The most frequent type and length for the column across other entities.
+     */
+    getRealTypeFromOtherEntities(importedEntities, entityName, columnName) {
+        const typeCount = {};
+        const lengthCount = {};
+
+        // Collect type and length occurrences from other entities
+        importedEntities.forEach(entity => {
+            if (entity.name !== entityName) {
+                entity.columns.forEach(col => {
+                    if (col.name === columnName) {
+                        typeCount[col.type] = (typeCount[col.type] || 0) + 1;
+                        lengthCount[col.length] = (lengthCount[col.length] || 0) + 1;
+                    }
+                });
+            }
+        });
+
+        // Helper to get the most frequent value
+        const getMostFrequent = (countObj, defaultValue) => {
+            const entries = Object.entries(countObj);
+            if (entries.length === 0) return defaultValue;
+            return entries.sort((a, b) => b[1] - a[1])[0][0];
+        };
+
+        return {
+            type: getMostFrequent(typeCount, 'VARCHAR'),
+            length: getMostFrequent(lengthCount, '255')
+        };
     }
 
     /**
