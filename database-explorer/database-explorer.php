@@ -235,7 +235,7 @@ if(!isset($databaseName))
                                 <input class="import-file-json" type="file" accept=".json" style="display: none;" />
                                 <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
                                 <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
-                                <input class="import-file-graphql" type="file" accept=".graphql" style="display: none;" />
+                                <input class="import-file-graphql" type="file" accept=".graphqls" style="display: none;" />
                             </span>
                         </div>
 

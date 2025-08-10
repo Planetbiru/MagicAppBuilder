@@ -2656,7 +2656,7 @@ The Entity Editor now supports exporting entities to a GraphQL format to simplif
 
 * Exports schema and type definitions based on the entity structure.
 * Supports scalar types, relationships, and nullable/non-nullable fields.
-* The output is presented as a ready-to-use `.graphql` file.
+* The output is presented as a ready-to-use `.graphqls` file.
 
 **Benefits**
 
@@ -2686,7 +2686,7 @@ The button layout in the Entity Editor has been updated to improve readability a
 
 ## New Feature: GraphQL Schema Parser
 
-The Entity Editor now includes a **GraphQL Schema Parser**, allowing users to create entities directly from an existing GraphQL schema. This feature streamlines the process of generating entities from a single `.graphql` file.
+The Entity Editor now includes a **GraphQL Schema Parser**, allowing users to create entities directly from an existing GraphQL schema. This feature streamlines the process of generating entities from a single `.graphqls` file.
 
 **Details**
 
