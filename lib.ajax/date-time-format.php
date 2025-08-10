@@ -16,7 +16,7 @@ $formats = [
     'd F Y'           => date('d F Y'),            // 30 July 2025
     'j F Y'           => date('j F Y'),            // 30 July 2025
     'j F Y H:i'       => date('j F Y H:i'),        // 30 July 2025 03:30
-    'j F Y H:i:'       => date('j F Y H:i'),        // 30 July 2025 03:30
+    'j F Y H:i:s'     => date('j F Y H:i:s'),        // 30 July 2025 03:30:30
     'l, j F Y'        => date('l, j F Y'),         // Wednesday, 30 July 2025
     'H:i d-m-Y'       => date('H:i d-m-Y'),
 

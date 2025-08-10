@@ -8,7 +8,7 @@ if($builderConfig != null && $builderConfig->getSessions() != null)
     $sessionConfig = $builderConfig->getSessions();
     $sessions = new PicoSession($sessionConfig);
 
-    $appCookieMaxLifetime = $sessionConfig->getMaxLifetime();
+    $appCookieMaxLifeTime = $sessionConfig->getMaxLifeTime();
     $appCookiePath = $sessionConfig->getCookiePath();
     $appCookieDomain = $sessionConfig->getCookieDomain();
     $appCookieSecure = $sessionConfig->isCookieSecure();
@@ -19,20 +19,19 @@ if($builderConfig != null && $builderConfig->getSessions() != null)
     {
         $appCookiePath = "/";
     }
-    if(!isset($appCookieMaxLifetime))
+    if(!isset($appCookieMaxLifeTime))
     {
-        $appCookieMaxLifetime = 1440;
+        $appCookieMaxLifeTime = 1440;
     }
 
     $sessions->setSessionCookieParams(
-        $appCookieMaxLifetime,
+        $appCookieMaxLifeTime,
         $appCookiePath,
         $appCookieDomain,
         $appCookieSecure,
         $appCookieHttpOnly,
         $appCookieSameSite
     );
-
 }
 else
 {
