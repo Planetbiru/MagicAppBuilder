@@ -7,7 +7,10 @@ use MagicObject\Request\InputPost;
 
 require_once dirname(__DIR__) . "/inc.app/platform-check.php";
 require_once dirname(__DIR__) . "/inc.app/auth-core.php";
-
+if(!$userLoggedIn)
+{
+    exit();
+}
 if(!isset($entityAdmin) || $entityAdmin->getAdminLevelId() != "superuser")
 {
     exit(); // Bye non superuser

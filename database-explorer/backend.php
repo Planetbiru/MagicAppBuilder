@@ -8,8 +8,11 @@ use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/platform-check.php";
-require_once dirname(__DIR__) . "/inc.app/auth.php";
-
+require_once dirname(__DIR__) . "/inc.app/auth-core.php";
+if(!$userLoggedIn)
+{
+    exit();
+}
 if(basename($_SERVER['PHP_SELF']) == basename(__FILE__))
 {
     // Prevent user to access this path

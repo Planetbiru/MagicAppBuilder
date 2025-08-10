@@ -5,7 +5,10 @@ use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
-
+if(!$userLoggedIn)
+{
+    exit();
+}
 $inputPost = new InputPost();
 
 $batchSize = 100;
