@@ -2327,13 +2327,13 @@ class EntityEditor {
     }
 
     /**
-     * Exports the current entities into a GraphQL schema definition file (.graphql)
+     * Exports the current entities into a GraphQL schema definition file (.graphqls)
      * with automatic relationship detection.
      *
-     * @param {string} [filename="schema.graphql"] - The output filename.
+     * @param {string} [filename="schema.graphqls"] - The output filename.
      * @param {boolean} [removeIdFields=true] - If true, removes scalar fields ending in `_id` and only keeps the relationship fields.
      */
-    exportToGraphQL(filename = "schema.graphql") {
+    exportToGraphQL(filename = "schema.graphqls") {
         const schema = GraphQLSchemaUtils.buildGraphQLSchema(this.entities);
         const blob = new Blob([schema], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
@@ -3155,7 +3155,7 @@ class EntityEditor {
     /**
      * Triggers the file selection dialog for importing a GraphQL schema file.
      * This function simulates a click on a hidden file input element, allowing the user
-     * to select a `.graphql` file from their local machine. It also sets a flag to
+     * to select a `.graphqls` file from their local machine. It also sets a flag to
      * control the import behavior.
      *
      * @param {boolean} clearBeforeImport - A flag indicating whether to clear the existing
@@ -3169,7 +3169,7 @@ class EntityEditor {
 
     /**
      * Imports a GraphQL schema from a file, parses it, and invokes a callback with the structured data.
-     * The function validates the file to ensure it has a `.graphql` extension before processing.
+     * The function validates the file to ensure it has a `.graphqls` extension before processing.
      * If the file is not a valid GraphQL schema file, an alert dialog is shown.
      *
      * @param {File} file - The file object representing the GraphQL schema file to be imported.
