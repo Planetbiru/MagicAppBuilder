@@ -1,7 +1,10 @@
 <?php
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
-
+if(!$userLoggedIn)
+{
+    exit();
+}
 $baseDirectory = realpath(dirname(__DIR__) . '/.tmp'); 
 
 $exportFileMaxAge = $builderConfig->getExportFileMaxAge();

@@ -3,7 +3,11 @@
 use AppBuilder\AppDatabase;
 use MagicObject\Request\InputGet;
 
-require_once dirname(__DIR__) . "/inc.app/auth.php";
+require_once dirname(__DIR__) . "/inc.app/auth-code.php";
+if(!$userLoggedIn)
+{
+    exit();
+}
 require_once __DIR__ . "/inc.db/config.php";
 
 $inputGet = new InputGet();
