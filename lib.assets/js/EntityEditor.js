@@ -7,7 +7,6 @@
  * statements for creating the tables in MySQL.
  */
 class EntityEditor {
-
     /**
      * Creates an instance of the EntityEditor class.
      * 
@@ -166,15 +165,15 @@ class EntityEditor {
     }
 
     /**
-     * Generates an array of `Column` objects by mapping an array of GraphQL properties.
-     * This function handles the conversion of GraphQL types and naming conventions to
-     * their SQL counterparts, including detecting primary keys and assigning appropriate
-     * data types and lengths.
-     *
-     * @param {string} entityName - The name of the GraphQL entity (e.g., "Album").
-     * @param {Array<Object>} properties - An array of property objects from the GraphQL schema.
-     * @returns {Array<Column>} An array of `Column` objects, ready for SQL table generation.
-     */
+     * Generates an array of `Column` objects by mapping an array of GraphQL properties.
+     * This function handles the conversion of GraphQL types and naming conventions to
+     * their SQL counterparts, including detecting primary keys and assigning appropriate
+     * data types and lengths.
+     *
+     * @param {string} entityName - The name of the GraphQL entity (e.g., "Album").
+     * @param {Array<Object>} properties - An array of property objects from the GraphQL schema.
+     * @returns {Array<Column>} An array of `Column` objects, ready for SQL table generation.
+     */
     generateColumnFromSchemaProperties(entityName, properties) {
         let _this = this;
         const cols = properties.map(property => {
@@ -190,13 +189,13 @@ class EntityEditor {
     }
 
     /**
-     * Maps a given GraphQL type to a corresponding SQL column type and a default length.
-     * The mapping is based on a predefined set of type conversions.
-     *
-     * @param {string} grapqlType - The GraphQL type name (e.g., 'String', 'Int', 'ID').
-     * @param {boolean} pk - A flag indicating whether the column is a primary key.
-     * @returns {{columnType: string, length: string}} An object containing the mapped SQL column type and its length.
-     */
+     * Maps a given GraphQL type to a corresponding SQL column type and a default length.
+     * The mapping is based on a predefined set of type conversions.
+     *
+     * @param {string} grapqlType - The GraphQL type name (e.g., 'String', 'Int', 'ID').
+     * @param {boolean} pk - A flag indicating whether the column is a primary key.
+     * @returns {{columnType: string, length: string}} An object containing the mapped SQL column type and its length.
+     */
     graphQLtoSQLType(grapqlType, pk)
     {
         let columnType = 'TEXT';
@@ -233,13 +232,13 @@ class EntityEditor {
     }
 
     /**
-     * Checks if a column name follows the primary key naming convention for a given entity.
-     * The convention is assumed to be `<entityName>_id`.
-     *
-     * @param {string} entityName - The name of the entity.
-     * @param {string} cleanName - The snake_cased name of the column to check.
-     * @returns {boolean} True if the column name matches the primary key convention, otherwise false.
-     */
+     * Checks if a column name follows the primary key naming convention for a given entity.
+     * The convention is assumed to be `<entityName>_id`.
+     *
+     * @param {string} entityName - The name of the entity.
+     * @param {string} cleanName - The snake_cased name of the column to check.
+     * @returns {boolean} True if the column name matches the primary key convention, otherwise false.
+     */
     isLikePk(entityName, cleanName)
     {
         return `${entityName}_id` == cleanName;
@@ -262,7 +261,6 @@ class EntityEditor {
             }       
             _this.exportToSQL();
         });
-        
         
         document.addEventListener('change', function (event) {
             
@@ -2784,7 +2782,8 @@ class EntityEditor {
         const _this = this;
         const reader = new FileReader();
 
-        // Baca 512 byte pertama
+        // Read only the first 512 bytes of the file to check if it looks like a SQLite database
+        // This is a performance optimization to avoid loading large files unnecessarily.
         const blob = file.slice(0, 512);
         reader.onload = function (e) {
             const buffer = new Uint8Array(e.target.result);
@@ -3159,7 +3158,7 @@ class EntityEditor {
      * control the import behavior.
      *
      * @param {boolean} clearBeforeImport - A flag indicating whether to clear the existing
-     *                                         schema before the new one is imported.
+     *                                         schema before the new one is imported.
      */
     importGraphQLSchema()
     {
@@ -3168,18 +3167,18 @@ class EntityEditor {
     }
 
     /**
-     * Imports a GraphQL schema from a file, parses it, and invokes a callback with the structured data.
-     * The function validates the file to ensure it has a `.graphqls` extension before processing.
-     * If the file is not a valid GraphQL schema file, an alert dialog is shown.
-     *
-     * @param {File} file - The file object representing the GraphQL schema file to be imported.
-     * @param {function(string, string, object, object): void} callbackFunction - The callback function to be executed
-     *     after the schema has been successfully parsed. It receives the following arguments:
-     *     - fileExtension (string): The extension of the imported file.
-     *     - fileName (string): The name of the imported file.
-     *     - types (object): The parsed and normalized GraphQL type definitions.
-     *     - inputs (object): The parsed and normalized GraphQL input type definitions.
-     */
+     * Imports a GraphQL schema from a file, parses it, and invokes a callback with the structured data.
+     * The function validates the file to ensure it has a `.graphqls` extension before processing.
+     * If the file is not a valid GraphQL schema file, an alert dialog is shown.
+     *
+     * @param {File} file - The file object representing the GraphQL schema file to be imported.
+     * @param {function(string, string, object, object): void} callbackFunction - The callback function to be executed
+     *     after the schema has been successfully parsed. It receives the following arguments:
+     *     - fileExtension (string): The extension of the imported file.
+     *     - fileName (string): The name of the imported file.
+     *     - types (object): The parsed and normalized GraphQL type definitions.
+     *     - inputs (object): The parsed and normalized GraphQL input type definitions.
+     */
     processGraphQLSchema(file, callbackFunction)
     {        
         const _this = this;
@@ -3714,7 +3713,10 @@ class EntityEditor {
             const cleanName = _this.snakeize(header);
             const values = rows.map(row => row[header]);
 
-            // Hitung panjang maksimum string
+            // Calculate maximum length of values in the column
+            // This is used to set the length of VARCHAR columns
+            // and to determine the maximum size for TEXT columns.
+            // It ensures that the column can accommodate the longest value.
             let maxLen = 0;
             values.forEach(val => {
                 if (typeof val === 'string' || typeof val === 'number') {
