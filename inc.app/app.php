@@ -73,6 +73,14 @@ phpIni:
     maxExecutionTime: 600
     memoryLimit: 256M
 exportFileMaxAge: 21600
+
+notification:
+    enabled: true
+    auth_token: default_token
+    ws_port: 8081
+    ws_url: ws://localhost:8081/notify
+    http_port: 8080
+    http_url: http://localhost:8080/notify
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();
