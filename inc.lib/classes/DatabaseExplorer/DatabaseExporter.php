@@ -402,53 +402,85 @@ class DatabaseExporter // NOSONAR
 
     /**
      * Ensures that the given CREATE TABLE query includes "IF NOT EXISTS" after "CREATE TABLE" and removes unnecessary whitespaces.
-     * If the query does not contain "IF NOT EXISTS", it will add it after "CREATE TABLE". 
+     * If the query does not contain "IF NOT EXISTS", it will add it after "CREATE TABLE".
      * It also retains the rest of the query (e.g., table columns and constraints) unchanged.
      *
      * @param string $createTableQuery The SQL query that creates a table (can be unformatted or missing "IF NOT EXISTS").
+     * @param string $targetDatabaseType The target DB type to handle dialect differences ('sqlserver' disables IF NOT EXISTS).
      * @return string The processed SQL query with "IF NOT EXISTS" correctly inserted and proper formatting.
      */
     private function ensureCreateTableIfNotExists($createTableQuery, $targetDatabaseType) {
-        // Remove unnecessary whitespace (tabs, newlines, multiple spaces) from the input query.
-        // This ensures the query has only single spaces between tokens.
-        $cleanQuery = preg_replace('/\s+/', ' ', $createTableQuery); // Normalize whitespaces.
+        // Normalize whitespaces to single spaces for easier parsing
+        $cleanQuery = preg_replace('/\s+/', ' ', trim($createTableQuery));
 
-        // Define the search strings for "CREATE TABLE IF NOT EXISTS" and "CREATE TABLE".
-        $search1 = "CREATE TABLE IF NOT EXISTS ";
-        $search2 = "CREATE TABLE ";
+        $searchCreateIfNotExists = 'CREATE TABLE IF NOT EXISTS ';
+        $searchCreate = 'CREATE TABLE ';
 
-        // Check if "CREATE TABLE IF NOT EXISTS" is already present in the query.
-        $pos1 = stripos($cleanQuery, $search1, 0);
-        if ($pos1 === false) {
-            // If "CREATE TABLE IF NOT EXISTS" is not found, locate "CREATE TABLE" and adjust the position.
-            $pos1 = stripos($cleanQuery, $search2, 0) + strlen($search2);
+        // Find positions in case-insensitive way
+        $posCreateIfNotExists = stripos($cleanQuery, $searchCreateIfNotExists);
+        $posCreate = stripos($cleanQuery, $searchCreate);
+
+        // If "CREATE TABLE" not found, return query as is
+        if ($posCreate === false) {
+            return $createTableQuery;
+        }
+
+        // Determine position after CREATE TABLE / CREATE TABLE IF NOT EXISTS
+        if ($posCreateIfNotExists === false) {
+            // Only "CREATE TABLE" found, position right after it
+            $posAfterCreate = $posCreate + strlen($searchCreate);
         } else {
-            // If found, update pos1 to point right after "IF NOT EXISTS".
-            $pos1 += strlen($search1);
+            // "CREATE TABLE IF NOT EXISTS" found, position right after it
+            $posAfterCreate = $posCreateIfNotExists + strlen($searchCreateIfNotExists);
         }
 
-        // Locate the position of the first space after the table name, which indicates the end of the table name.
-        $pos2 = strpos($cleanQuery, " ", $pos1);
+        // Find the end of the table name - could be space or '(' after posAfterCreate
+        $posSpace = strpos($cleanQuery, ' ', $posAfterCreate);
+        $posParen = strpos($cleanQuery, '(', $posAfterCreate);
 
-        // Extract the table name from the query using the positions found.
-        $tableName = substr($cleanQuery, $pos1, $pos2 - $pos1);
-
-        // Find the position of the table name in the original query to extract the part after the table name.
-        $tableStartPos = strpos($createTableQuery, $tableName);
-
-        // Extract everything after the table name to preserve the column definitions and other parts of the query.
-        
-        $afterTableName = substr($createTableQuery, $tableStartPos + strlen($tableName));
-        // Reconstruct the SQL query by adding "CREATE TABLE IF NOT EXISTS" and the table name, 
-        // followed by the rest of the query (columns, constraints, etc.).
-        if($targetDatabaseType == 'sqlserver')
-        {
-            return "CREATE TABLE $tableName " . ltrim($afterTableName);
+        if ($posSpace === false && $posParen === false) {
+            // No space or '(' found, take till end
+            $posTableNameEnd = strlen($cleanQuery);
+        } elseif ($posSpace === false) {
+            $posTableNameEnd = $posParen;
+        } elseif ($posParen === false) {
+            $posTableNameEnd = $posSpace;
+        } else {
+            $posTableNameEnd = min($posSpace, $posParen);
         }
-        else
-        {
-            return "CREATE TABLE IF NOT EXISTS $tableName " . ltrim($afterTableName);
+
+        // Extract table name from clean query
+        $tableName = substr($cleanQuery, $posAfterCreate, $posTableNameEnd - $posAfterCreate);
+        $tableName = trim($tableName);
+
+        // Find the position of the table name in the original query (starting search from CREATE TABLE position)
+        $posTableNameInOriginal = stripos($createTableQuery, $tableName, $posCreate);
+        if ($posTableNameInOriginal === false) {
+            // fallback: just after CREATE TABLE position
+            $posTableNameInOriginal = $posCreate + strlen($searchCreate);
         }
+
+        // Extract everything after the table name in original query, preserve formatting here
+        $afterTableName = substr($createTableQuery, $posTableNameInOriginal + strlen($tableName));
+
+        // Compose new query based on target DB type
+        if (strtolower($targetDatabaseType) === 'sqlserver') {
+            // SQL Server does not support IF NOT EXISTS in CREATE TABLE
+            // Caller should handle existence check externally, so just return normal CREATE TABLE
+            $result = "CREATE TABLE $tableName" . ltrim($afterTableName);
+        } else {
+            // For others, ensure "IF NOT EXISTS" is present after "CREATE TABLE"
+            if ($posCreateIfNotExists === false) {
+                // Insert IF NOT EXISTS after CREATE TABLE
+                $result = "CREATE TABLE IF NOT EXISTS $tableName" . ltrim($afterTableName);
+            } else {
+                // Already has IF NOT EXISTS, return original query but trimmed and normalized whitespace
+                // Or rebuild normalized version:
+                $result = "CREATE TABLE IF NOT EXISTS $tableName" . ltrim($afterTableName);
+            }
+        }
+
+        return $result;
     }
 
     /**
