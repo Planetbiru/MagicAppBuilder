@@ -2713,3 +2713,23 @@ Upgraded the MagicObject library to **version 3.16.8**, which includes a bug fix
 * `BIT` values are now correctly exported as `1` (for TRUE) and `0` (for FALSE) instead of literal strings `TRUE` and `FALSE`.
   This ensures better compatibility and prevents type mismatch issues when importing into SQL Server.
 
+
+# MagicAppBuilder Version 1.18.1
+
+## Bug Fix: Drag-and-Drop Column Ordering in Entity Editor
+
+Fixed a JavaScript error that occurred when reordering table columns or template columns in the **Entity Editor**:
+
+```
+Uncaught DOMException: Node.insertBefore: Child to insert before is not a child of this node
+```
+
+**Context**
+This issue appeared when users tried to reorder columns in the data table or in the column template list within the Entity Editor. The problem happened because the target row’s parent `<tbody>` did not match the cached reference, especially when the DOM structure changed during the drag-and-drop process.
+
+**Resolution**
+The fix ensures the correct `<tbody>` is always determined at the time of the drop action, preventing mismatched parent nodes and eliminating the DOMException error.
+
+**Impact**
+Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
+

@@ -695,18 +695,20 @@ class EntityEditor {
         row.addEventListener("drop", function (e) {
             e.preventDefault();
 
+            // Ensure the drag source row is defined
+            const currentTbody = this.closest('tbody');
+
             if (_this.dragSrcRow !== this) {
-                const rows = Array.from(_this.tbody.children);
+                const rows = Array.from(currentTbody.children);
                 const draggedIndex = rows.indexOf(_this.dragSrcRow);
                 const targetIndex = rows.indexOf(this);
 
                 if (draggedIndex < targetIndex) {
-                    _this.tbody.insertBefore(_this.dragSrcRow, this.nextSibling);
+                    currentTbody.insertBefore(_this.dragSrcRow, this.nextSibling);
                 } else {
-                    _this.tbody.insertBefore(_this.dragSrcRow, this);
+                    currentTbody.insertBefore(_this.dragSrcRow, this);
                 }
 
-                // (Optional) call updateRowNumbers if it exists
                 if (typeof _this.updateRowNumbers === 'function') {
                     _this.updateRowNumbers();
                 }
