@@ -28,8 +28,9 @@ try
     $accountSecurity = new SecretObject($inputPost->getAccountSecurity());
 	
     // fix data type
-	$databaseConfig->setPort(intval($databaseConfig->getPort()));
-	$sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
+    $databaseConfig->setPort(intval($databaseConfig->getPort()));
+    $databaseConfig->setConnectionTimeout(intval($databaseConfig->getConnectionTimeout()));
+    $sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
 
     $appConfig = new SecretObject(null);
 

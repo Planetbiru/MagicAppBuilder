@@ -695,18 +695,20 @@ class EntityEditor {
         row.addEventListener("drop", function (e) {
             e.preventDefault();
 
+            // Ensure the drag source row is defined
+            const currentTbody = this.closest('tbody');
+
             if (_this.dragSrcRow !== this) {
-                const rows = Array.from(_this.tbody.children);
+                const rows = Array.from(currentTbody.children);
                 const draggedIndex = rows.indexOf(_this.dragSrcRow);
                 const targetIndex = rows.indexOf(this);
 
                 if (draggedIndex < targetIndex) {
-                    _this.tbody.insertBefore(_this.dragSrcRow, this.nextSibling);
+                    currentTbody.insertBefore(_this.dragSrcRow, this.nextSibling);
                 } else {
-                    _this.tbody.insertBefore(_this.dragSrcRow, this);
+                    currentTbody.insertBefore(_this.dragSrcRow, this);
                 }
 
-                // (Optional) call updateRowNumbers if it exists
                 if (typeof _this.updateRowNumbers === 'function') {
                     _this.updateRowNumbers();
                 }
@@ -2945,21 +2947,37 @@ class EntityEditor {
                     }
                     // --- End: Add data import capability ---
 
-                    let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info
+                    let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info           
+
                     if (tableInfo.length > 0) {
+                        let hasAutoIncrement = false;
+                        const hasCompositePrimaryKey = tableInfo[0].values.filter(columnInfo => /*NOSONAR*/ columnInfo[5]).length > 1;
+
                         tableInfo[0].values.forEach(columnInfo => /*NOSONAR*/{
+                            
+                            let isAutoIncrement = columnInfo[2].toUpperCase() == 'INTEGER' && columnInfo[5];
+                            if(hasAutoIncrement || hasCompositePrimaryKey)
+                            {
+                                isAutoIncrement = false;
+                            }
+
                             const column = new Column(
-                                _this.snakeize(columnInfo[1]),
-                                _this.toMySqlType(columnInfo[2]),
-                                _this.getColumnSize(columnInfo[2]),
-                                columnInfo[3] === 1,
-                                columnInfo[4],
-                                columnInfo[5],
-                                false,
-                                null,
+                                _this.snakeize(columnInfo[1]), // The name of the column.
+                                _this.toMySqlType(columnInfo[2]), // The SQL data type of the column (e.g., "VARCHAR", "INT", "ENUM").
+                                _this.getColumnSize(columnInfo[2]), // The length or precision of the column (e.g., "255" for VARCHAR, or "10,2" for DECIMAL). Optional.
+                                columnInfo[3] === 1, // Indicates whether the column allows NULL values.
+                                columnInfo[4], // The default value assigned to the column. Optional.
+                                columnInfo[5], // Specifies whether the column is a primary key.
+                                isAutoIncrement, // Indicates if the column value auto-increments (typically used for numeric primary keys).
+                                null, // Valid values for ENUM/SET types, or value range for numeric types (comma-separated). Optional.
                             );
                             // Add the column to the entity
                             entity.addColumn(column);
+
+                            if(hasAutoIncrement)
+                            {
+                                hasAutoIncrement = false;
+                            }
                         });
                         importedEntities.push(entity); // Add the entity to the imported entities
                     }
@@ -4609,6 +4627,12 @@ class EntityEditor {
         tr21.appendChild(th2);
         
         sortedEntities.forEach((entity, index)=>{
+            let depth = entity.depth - 1;
+            if(depth < 0)
+            {
+                depth = 0;
+            }
+
             let tr22 = document.createElement('tr');
             
             let td0 = document.createElement('td');
@@ -4620,7 +4644,7 @@ class EntityEditor {
             td1.textContent = entity.name;
             tr22.appendChild(td1);
             let td2 = document.createElement('td');
-            td2.textContent = entity.depth;
+            td2.textContent = depth;
             tr22.appendChild(td2);
             tbody2.appendChild(tr22);
         });

@@ -1224,3 +1224,33 @@ ALTER TABLE users MODIFY last_login TIMESTAMP DEFAULT NULL;
 
 This prevents migration errors and ensures schema changes retain and apply consistent default values across databases.
 
+
+# MagicObject Version 3.17.0
+
+## Enhancement: Configurable Database Connection Timeout
+
+Added support for **connection timeout** configuration, retrieved directly from the database connection settings.
+
+**Details**
+
+* The timeout value is defined in the database configuration (e.g., `core.yml` or application-specific config).
+* Applied when establishing a PDO connection to all supported RDBMS drivers (MySQL, PostgreSQL, SQLite, SQL Server).
+* The timeout ensures that connection attempts fail gracefully if the database server does not respond within the specified time.
+
+**Example (`core.yml`):**
+
+```yaml
+database:
+    driver: mysql
+    host: localhost
+    port: 3306
+    username: app_user
+    password: secret
+    database_name: appdb
+    connection_timeout: 10
+```
+
+**Impact**
+This feature gives developers better control over database connectivity, especially in environments with slow or unreliable networks, by preventing applications from hanging indefinitely during connection attempts.
+
+

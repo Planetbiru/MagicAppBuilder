@@ -350,6 +350,10 @@ $nameInIndonesian = array(
                                 <td><input class="form-control" type="text" name="database_time_zone_system" id="database_time_zone_system" value="<?php echo $cfgDatabase->getTimeZoneSystem(); ?>"></td>
                             </tr>
                             <tr>
+                                <td>Connection Timeout</td>
+                                <td><input class="form-control" type="text" name="database_connection_timeout" id="database_connection_timeout" value="<?php echo $cfgDatabase->getConnectionTimeout(); ?>"></td>
+                            </tr>
+                            <tr>
                                 <td></td>
                                 <td>
                                     <button class="btn btn-primary" type="button" id="test-database-connection"><i class="fa-solid fa-right-left"></i> Test Connection</button>

@@ -2713,3 +2713,95 @@ Upgraded the MagicObject library to **version 3.16.8**, which includes a bug fix
 * `BIT` values are now correctly exported as `1` (for TRUE) and `0` (for FALSE) instead of literal strings `TRUE` and `FALSE`.
   This ensures better compatibility and prevents type mismatch issues when importing into SQL Server.
 
+
+# MagicAppBuilder Version 1.18.1
+
+## Bug Fix: Drag-and-Drop Column Ordering in Entity Editor
+
+Fixed a JavaScript error that occurred when reordering table columns or template columns in the **Entity Editor**:
+
+```
+Uncaught DOMException: Node.insertBefore: Child to insert before is not a child of this node
+```
+
+**Context**
+This issue appeared when users tried to reorder columns in the data table or in the column template list within the Entity Editor. The problem happened because the target row’s parent `<tbody>` did not match the cached reference, especially when the DOM structure changed during the drag-and-drop process.
+
+**Resolution**
+The fix ensures the correct `<tbody>` is always determined at the time of the drop action, preventing mismatched parent nodes and eliminating the DOMException error.
+
+**Impact**
+Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
+
+
+# MagicAppBuilder Version 1.18.1
+
+## Bug Fix: Drag-and-Drop Column Ordering in Entity Editor
+
+Fixed a JavaScript error that occurred when reordering table columns or template columns in the **Entity Editor**:
+
+```
+Uncaught DOMException: Node.insertBefore: Child to insert before is not a child of this node
+```
+
+**Context**
+This issue appeared when users tried to reorder columns in the data table or in the column template list within the Entity Editor. The problem happened because the target row’s parent `<tbody>` did not match the cached reference, especially when the DOM structure changed during the drag-and-drop process.
+
+**Resolution**
+The fix ensures the correct `<tbody>` is always determined at the time of the drop action, preventing mismatched parent nodes and eliminating the DOMException error.
+
+**Impact**
+Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
+
+## Enhancement: Configurable Database Connection Timeout
+
+Introduced a new configuration option `connection_timeout` in **core.yml**, allowing users to control the database connection timeout (in seconds).
+
+**Example (`core.yml`):**
+
+```yaml
+database:
+    driver: sqlite
+    host: ""
+    port: 3306
+    username: ""
+    password: ""
+    database_name: ""
+    database_schema: public
+    time_zone: Asia/Jakarta
+    database_file_path: D:/MagicServer/www/MagicAppBuilder/inc.database/database2.sqlite
+    connection_timeout: 10
+```
+
+**Scope**
+
+* This timeout setting is applied to **both**:
+
+  * The internal database connection used by **MagicAppBuilder** itself.
+  * The application database connection in the **generated application**.
+
+**Impact**
+Developers can now fine-tune the maximum wait time for establishing database connections across both the builder and generated applications, improving flexibility for environments with varying network or server response times.
+
+
+## Enhancement: Auto Increment on Entity Import from SQLite
+
+When importing entities from a SQLite database file, the system will now automatically assign **Auto Increment** to the primary key column if the following conditions are met:
+
+1. The primary key column is of type **`INTEGER`**.
+2. The entity does **not** have a composite primary key.
+
+**Impact**
+This ensures that imported entities more closely reflect the original SQLite schema behavior, simplifying entity management and preventing the need for manual adjustments after import.
+
+
+## Change: Dependency Depth in Entity Editor
+
+The **dependency depth** calculation in the **Entity Editor** has been adjusted:
+
+* Previously, the base dependency depth started at **1**.
+* Now, it starts at **0**.
+
+**Impact**
+Entities without dependencies on other entities will have a dependency depth of **0** instead of **1**, providing a clearer and more accurate representation of entity relationships.
+

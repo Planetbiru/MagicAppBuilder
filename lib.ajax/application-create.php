@@ -269,6 +269,7 @@ $databaseConfig = array(
     'database_schema' => '',
     'time_zone' => $currentTimeZone,
     'time_zone_system' => $currentTimeZone,
+    'connection_timeout' => 10
 );
 
 $newApp->setEntityInfo($entityInfo);
