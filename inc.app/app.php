@@ -37,6 +37,7 @@ database:
     databaseSchema: public
     timeZone: Asia/Jakarta
     databaseFilePath: ''
+    connectionTimeout: 10
 sessions:
     name: MAGICAPP
     maxLifeTime: 86400

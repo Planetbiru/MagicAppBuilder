@@ -2733,3 +2733,53 @@ The fix ensures the correct `<tbody>` is always determined at the time of the dr
 **Impact**
 Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
 
+
+# MagicAppBuilder Version 1.18.1
+
+## Bug Fix: Drag-and-Drop Column Ordering in Entity Editor
+
+Fixed a JavaScript error that occurred when reordering table columns or template columns in the **Entity Editor**:
+
+```
+Uncaught DOMException: Node.insertBefore: Child to insert before is not a child of this node
+```
+
+**Context**
+This issue appeared when users tried to reorder columns in the data table or in the column template list within the Entity Editor. The problem happened because the target row’s parent `<tbody>` did not match the cached reference, especially when the DOM structure changed during the drag-and-drop process.
+
+**Resolution**
+The fix ensures the correct `<tbody>` is always determined at the time of the drop action, preventing mismatched parent nodes and eliminating the DOMException error.
+
+**Impact**
+Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
+
+## Enhancement: Configurable Database Connection Timeout
+
+Introduced a new configuration option `connection_timeout` in **core.yml**, allowing users to control the database connection timeout (in seconds).
+
+**Example (`core.yml`):**
+
+```yaml
+database:
+    driver: sqlite
+    host: ""
+    port: 3306
+    username: ""
+    password: ""
+    database_name: ""
+    database_schema: public
+    time_zone: Asia/Jakarta
+    database_file_path: D:/MagicServer/www/MagicAppBuilder/inc.database/database2.sqlite
+    connection_timeout: 10
+```
+
+**Scope**
+
+* This timeout setting is applied to **both**:
+
+  * The internal database connection used by **MagicAppBuilder** itself.
+  * The application database connection in the **generated application**.
+
+**Impact**
+Developers can now fine-tune the maximum wait time for establishing database connections across both the builder and generated applications, improving flexibility for environments with varying network or server response times.
+

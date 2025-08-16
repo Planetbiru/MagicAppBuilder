@@ -321,11 +321,13 @@ class PicoDatabase // NOSONAR
      * Establishes a connection to the specified database type. Optionally selects a database if the 
      * connection is to an RDMS and the flag is set.
      *
+     * @param int $timeout Connection timeout in seconds.
      * @param bool $withDatabase Flag to select the database when connected (default is true).
      * @return bool true if the connection is successful, false if it fails.
      */
     public function connect($withDatabase = true)
     {
+        $timeout = $this->databaseCredentials->issetConnectionTimeout() ? $this->databaseCredentials->getConnectionTimeout() : 0;
         $databaseTimeZone = $this->databaseCredentials->getTimeZone();      
         if ($databaseTimeZone !== null && !empty($databaseTimeZone)) {
             date_default_timezone_set($this->databaseCredentials->getTimeZone());
@@ -337,7 +339,7 @@ class PicoDatabase // NOSONAR
         }
         else
         {
-            return $this->connectRDMS($withDatabase);
+            return $this->connectRDMS($withDatabase, $timeout);
         }
     }
     
@@ -384,11 +386,12 @@ class PicoDatabase // NOSONAR
      *
      * @param bool $withDatabase Flag to specify whether to select a database upon connection (default is true).
      *                            If true, the database is selected; otherwise, only the connection is made.
+     * @param int $timeout Connection timeout in seconds.
      * @return bool true if the connection is successfully established, false otherwise.
      * @throws InvalidDatabaseConfiguration If the database username is missing from the configuration.
      * @throws PDOException If an error occurs during the connection process.
      */
-    private function connectRDMS($withDatabase = true)
+    private function connectRDMS($withDatabase = true, $timeout = 0)
     {
         $connected = false;
         $timeZoneOffset = date("P");
@@ -405,15 +408,15 @@ class PicoDatabase // NOSONAR
 
             // Handle PostgreSQL-specific connection settings
             if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
-                $this->connectPostgreSql($connectionString, $timeZoneOffset, $charset);
+                $this->connectPostgreSql($connectionString, $timeZoneOffset, $charset, $timeout);
             }
             // Handle MySQL-specific connection settings
             else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MARIADB || $this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
-                $this->connectMySql($connectionString, $timeZoneOffset, $charset);
+                $this->connectMySql($connectionString, $timeZoneOffset, $charset, $timeout);
             }
             // Handle SQL Server-specific connection settings
             else if ($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLSERVER) {
-                $this->connectSqlServer($connectionString);
+                $this->connectSqlServer($connectionString, $timeout);
             }
             // If the database type is neither MySQL nor PostgreSQL, throw an exception
             else {
@@ -441,12 +444,13 @@ class PicoDatabase // NOSONAR
      * @param string $connectionString The connection string used to connect to the database.
      * @param string $timeZoneOffset The time zone offset to be used in the database session.
      * @param string $charset The character set (charset) to be used for the database connection.
+     * @param int $timeout Connection timeout in seconds.
      *
      * @return void
      *
      * @throws PDOException If there is an error while establishing the connection or executing the initial queries.
      */
-    private function connectMySql($connectionString, $timeZoneOffset, $charset)
+    private function connectMySql($connectionString, $timeZoneOffset, $charset, $timeout = 0)
     {
         $initialQueries = array();
         // Set time zone for MySQL
@@ -457,15 +461,20 @@ class PicoDatabase // NOSONAR
             $initialQueries[] = "SET NAMES '$charset';";  // Set charset for MySQL
         }
 
+        $options = array(
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_FOUND_ROWS => true
+        );
+        if($timeout > 0)
+        {
+            $options[PDO::ATTR_TIMEOUT] = $timeout;
+        }
         // MySQL connection setup
         $this->databaseConnection = new PDO(
             $connectionString,
             $this->databaseCredentials->getUsername(),
             $this->databaseCredentials->getPassword(),
-            array(
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_FOUND_ROWS => true
-            )
+            $options
         );
 
         if (!empty($initialQueries)) {
@@ -487,12 +496,13 @@ class PicoDatabase // NOSONAR
      * @param string $connectionString The connection string used to connect to the PostgreSQL database.
      * @param string $timeZoneOffset The time zone offset to be used in the database session.
      * @param string $charset The character set (charset) to be used for the PostgreSQL connection.
+     * @param int $timeout Connection timeout in seconds.
      *
      * @return void
      *
      * @throws PDOException If there is an error while establishing the connection or executing the initial queries.
      */
-    private function connectPostgreSql($connectionString, $timeZoneOffset, $charset)
+    private function connectPostgreSql($connectionString, $timeZoneOffset, $charset, $timeout = 0)
     {
         $initialQueries = array();
         // Set time zone for PostgreSQL
@@ -507,15 +517,20 @@ class PicoDatabase // NOSONAR
         if ($this->databaseCredentials->getDatabaseSchema() != null && $this->databaseCredentials->getDatabaseSchema() != "") {
             $initialQueries[] = "SET search_path TO " . $this->databaseCredentials->getDatabaseSchema() . ";";
         }
+        $options = array(
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        );
+        if($timeout > 0)
+        {
+            $options[PDO::ATTR_TIMEOUT] = $timeout;
+        }
 
         // PostgreSQL connection setup
         $this->databaseConnection = new PDO(
             $connectionString,
             $this->databaseCredentials->getUsername(),
             $this->databaseCredentials->getPassword(),
-            array(
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            )
+            $options 
         );
 
         // Execute the initial queries (timezone, charset, schema) in PostgreSQL
@@ -533,23 +548,30 @@ class PicoDatabase // NOSONAR
      * This method sets up a connection to a SQL Server database and then establishes a PDO connection to the database.
      *
      * @param string $connectionString The connection string used to connect to the SQL Server database.
+     * @param int $timeout Connection timeout in seconds.
      *
      * @return void
      *
      * @throws PDOException If there is an error while establishing the connection or executing the initial queries.
      */
-    private function connectSqlServer($connectionString)
+    private function connectSqlServer($connectionString, $timeout = 0)
     {
         $initialQueries = array();
+
+        $options = array(
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        );
+        if($timeout > 0)
+        {
+            $options[PDO::ATTR_TIMEOUT] = $timeout;
+        }
 
         // SQL Server connection setup
         $this->databaseConnection = new PDO(
             $connectionString,
             $this->databaseCredentials->getUsername(),
             $this->databaseCredentials->getPassword(),
-            array(
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            )
+            $options
         );
 
         // Execute the initial queries (timezone, charset) in SQL Server
