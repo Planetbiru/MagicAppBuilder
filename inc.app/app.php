@@ -6,6 +6,11 @@ use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
 
+if(!isset($_SERVER['REMOTE_ADDR']))
+{
+    $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+}
+
 $builderConfig = new AppSecretObject(null);
 if($builderConfig->getApplication() == null)
 {
@@ -82,6 +87,7 @@ notification:
     ws_url: ws://localhost:8081/notify
     http_port: 8080
     http_url: http://localhost:8080/notify
+    http_request_timeout: 10
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();
