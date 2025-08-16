@@ -71,8 +71,8 @@ function initDiagramContextMenu(svg) {
             // Automatically position submenu to the left or right based on screen space
             const viewportWidth = window.innerWidth;
             const shouldOpenLeft = e.pageX > (viewportWidth / 2);
-            submenu.style.left = shouldOpenLeft ? '-240px' : '97%';
-            submenu.style.right = shouldOpenLeft ? '97%' : 'auto';
+            submenu.style.left = shouldOpenLeft ? '-240px' : '96%';
+            submenu.style.right = shouldOpenLeft ? '96%' : 'auto';
 
         } else {
             contextMenu.style.display = "none";
