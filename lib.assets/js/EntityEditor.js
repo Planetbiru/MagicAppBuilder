@@ -4627,6 +4627,12 @@ class EntityEditor {
         tr21.appendChild(th2);
         
         sortedEntities.forEach((entity, index)=>{
+            let depth = entity.depth - 1;
+            if(depth < 0)
+            {
+                depth = 0;
+            }
+
             let tr22 = document.createElement('tr');
             
             let td0 = document.createElement('td');
@@ -4638,7 +4644,7 @@ class EntityEditor {
             td1.textContent = entity.name;
             tr22.appendChild(td1);
             let td2 = document.createElement('td');
-            td2.textContent = entity.depth;
+            td2.textContent = depth;
             tr22.appendChild(td2);
             tbody2.appendChild(tr22);
         });

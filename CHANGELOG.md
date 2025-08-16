@@ -2794,3 +2794,14 @@ When importing entities from a SQLite database file, the system will now automat
 **Impact**
 This ensures that imported entities more closely reflect the original SQLite schema behavior, simplifying entity management and preventing the need for manual adjustments after import.
 
+
+## Change: Dependency Depth in Entity Editor
+
+The **dependency depth** calculation in the **Entity Editor** has been adjusted:
+
+* Previously, the base dependency depth started at **1**.
+* Now, it starts at **0**.
+
+**Impact**
+Entities without dependencies on other entities will have a dependency depth of **0** instead of **1**, providing a clearer and more accurate representation of entity relationships.
+
