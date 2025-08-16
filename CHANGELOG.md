@@ -2783,3 +2783,14 @@ database:
 **Impact**
 Developers can now fine-tune the maximum wait time for establishing database connections across both the builder and generated applications, improving flexibility for environments with varying network or server response times.
 
+
+## Enhancement: Auto Increment on Entity Import from SQLite
+
+When importing entities from a SQLite database file, the system will now automatically assign **Auto Increment** to the primary key column if the following conditions are met:
+
+1. The primary key column is of type **`INTEGER`**.
+2. The entity does **not** have a composite primary key.
+
+**Impact**
+This ensures that imported entities more closely reflect the original SQLite schema behavior, simplifying entity management and preventing the need for manual adjustments after import.
+
