@@ -2947,21 +2947,37 @@ class EntityEditor {
                     }
                     // --- End: Add data import capability ---
 
-                    let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info
+                    let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info           
+
                     if (tableInfo.length > 0) {
+                        let hasAutoIncrement = false;
+                        const hasCompositePrimaryKey = tableInfo[0].values.filter(columnInfo => /*NOSONAR*/ columnInfo[5]).length > 1;
+
                         tableInfo[0].values.forEach(columnInfo => /*NOSONAR*/{
+                            
+                            let isAutoIncrement = columnInfo[2].toUpperCase() == 'INTEGER' && columnInfo[5];
+                            if(hasAutoIncrement || hasCompositePrimaryKey)
+                            {
+                                isAutoIncrement = false;
+                            }
+
                             const column = new Column(
-                                _this.snakeize(columnInfo[1]),
-                                _this.toMySqlType(columnInfo[2]),
-                                _this.getColumnSize(columnInfo[2]),
-                                columnInfo[3] === 1,
-                                columnInfo[4],
-                                columnInfo[5],
-                                false,
-                                null,
+                                _this.snakeize(columnInfo[1]), // The name of the column.
+                                _this.toMySqlType(columnInfo[2]), // The SQL data type of the column (e.g., "VARCHAR", "INT", "ENUM").
+                                _this.getColumnSize(columnInfo[2]), // The length or precision of the column (e.g., "255" for VARCHAR, or "10,2" for DECIMAL). Optional.
+                                columnInfo[3] === 1, // Indicates whether the column allows NULL values.
+                                columnInfo[4], // The default value assigned to the column. Optional.
+                                columnInfo[5], // Specifies whether the column is a primary key.
+                                isAutoIncrement, // Indicates if the column value auto-increments (typically used for numeric primary keys).
+                                null, // Valid values for ENUM/SET types, or value range for numeric types (comma-separated). Optional.
                             );
                             // Add the column to the entity
                             entity.addColumn(column);
+
+                            if(hasAutoIncrement)
+                            {
+                                hasAutoIncrement = false;
+                            }
                         });
                         importedEntities.push(entity); // Add the entity to the imported entities
                     }
