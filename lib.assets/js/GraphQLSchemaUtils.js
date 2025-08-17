@@ -252,7 +252,7 @@ class GraphQLSchemaUtils {
         // Generate TYPE definitions
         entities.forEach(entity => {
             let typeName = toUpperCamelCase(entity.name);
-            schema += `type ${typeName} {\n`;
+            schema += `\ntype ${typeName} {\n`;
 
             const primaryKeys = entity.columns.filter(col => col.primaryKey);
             const isCompositeKey = primaryKeys.length > 1;
@@ -313,13 +313,13 @@ class GraphQLSchemaUtils {
                 }
             });
 
-            schema += `}\n\n`;
+            schema += `}\n`;
         });
 
         // Generate INPUT definitions
         entities.forEach(entity => {
             let inputName = toUpperCamelCase(entity.name) + "Input";
-            schema += `input ${inputName} {\n`;
+            schema += `\ninput ${inputName} {\n`;
 
             const primaryKeys = entity.columns.filter(col => col.primaryKey);
             const isCompositeKey = primaryKeys.length > 1;
@@ -351,11 +351,21 @@ class GraphQLSchemaUtils {
                 schema += `    ${toCamelCase(col.name)}: ${gqlType}\n`;
             });
 
-            schema += `}\n\n`;
+            schema += `}\n`;
         });
+        
+        schema += `\ninput DataFilter{
+    fieldName: String,
+    fieldValue: String
+}\n`;
+
+        schema += `\ninput DataOrder{
+    fieldName: String,
+    orderType: String
+}\n`;     
 
         // Add Query block
-        schema += `type Query {\n`;
+        schema += `\ntype Query {\n`;
         entities.forEach(entity => {
             const typeName = toUpperCamelCase(entity.name);
             const camelCaseName = toCamelCase(entity.name);
@@ -368,7 +378,7 @@ class GraphQLSchemaUtils {
                 // Combine all primary keys into a single argument string
                 const primaryKeyArgs = primaryKeyCols.map(col => {
                     const primaryKeyName = toCamelCase(col.name);
-                    return `${primaryKeyName}: ID!`;
+                    return `${primaryKeyName}: ID`;
                 }).join(', ');
                 
                 const singleQueryName = `get${typeName}`;
@@ -377,9 +387,33 @@ class GraphQLSchemaUtils {
 
             // Add a query for all entities
             const pluralName = `${camelCaseName}s`;
-            const allQueryName = `getAll${toUpperCamelCase(pluralName)}`;
+            const allQueryName = `get${toUpperCamelCase(pluralName)}`;
 
-            schema += `    ${allQueryName}: [${typeName}]\n`;
+            schema += `    ${allQueryName}(pageNumber: Int, pageSize: Int, dataFilter: [DataFilter], dataOrder: [DataOrder]): [${typeName}]\n`;
+        });
+        schema += `}\n`;
+        
+
+        // Add Mutation block
+        schema += `\ntype Mutation {\n`;
+        entities.forEach(entity => {
+            const typeName = toUpperCamelCase(entity.name);
+            const inputName = `${typeName}Input`;
+
+            // Find all primary key columns
+            const primaryKeyCols = entity.columns.filter(c => c.primaryKey);
+
+            // Create mutation
+            schema += `    create${typeName}(input: ${inputName}!): ${typeName}\n`;
+            schema += `    update${typeName}(input: ${inputName}!): ${typeName}\n`;
+
+            // Delete mutation — pakai semua PK sebagai parameter
+            if (primaryKeyCols.length > 0) {
+                const pkArgs = primaryKeyCols
+                    .map(pk => `${toCamelCase(pk.name)}: ID!`)
+                    .join(', ');
+                schema += `    delete${typeName}(${pkArgs}): Boolean\n`;
+            }
         });
         schema += `}\n`;
 
