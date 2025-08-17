@@ -2960,14 +2960,25 @@ class EntityEditor {
                             {
                                 isAutoIncrement = false;
                             }
+                            let columnName = _this.snakeize(columnInfo[1]);
+                            let columnType = _this.toMySqlType(columnInfo[2]);
+                            let columnSize = _this.getColumnSize(columnInfo[2]);
+                            let isNull = columnInfo[3] === 1;
+                            let defaultValue = columnInfo[4];
+                            let isPrimaryKey = columnInfo[5];
+
+                            if((columnSize == null || columnSize == 0) && columnType == 'BIGINT')
+                            {
+                                columnSize = '20';
+                            }
 
                             const column = new Column(
-                                _this.snakeize(columnInfo[1]), // The name of the column.
-                                _this.toMySqlType(columnInfo[2]), // The SQL data type of the column (e.g., "VARCHAR", "INT", "ENUM").
-                                _this.getColumnSize(columnInfo[2]), // The length or precision of the column (e.g., "255" for VARCHAR, or "10,2" for DECIMAL). Optional.
-                                columnInfo[3] === 1, // Indicates whether the column allows NULL values.
-                                columnInfo[4], // The default value assigned to the column. Optional.
-                                columnInfo[5], // Specifies whether the column is a primary key.
+                                columnName, // The name of the column.
+                                columnType, // The SQL data type of the column (e.g., "VARCHAR", "INT", "ENUM").
+                                columnSize, // The length or precision of the column (e.g., "255" for VARCHAR, or "10,2" for DECIMAL). Optional.
+                                isNull, // Indicates whether the column allows NULL values.
+                                defaultValue, // The default value assigned to the column. Optional.
+                                isPrimaryKey, // Specifies whether the column is a primary key.
                                 isAutoIncrement, // Indicates if the column value auto-increments (typically used for numeric primary keys).
                                 null, // Valid values for ENUM/SET types, or value range for numeric types (comma-separated). Optional.
                             );

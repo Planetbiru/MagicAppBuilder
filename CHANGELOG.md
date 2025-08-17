@@ -2753,6 +2753,16 @@ The fix ensures the correct `<tbody>` is always determined at the time of the dr
 **Impact**
 Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
 
+
+## Bug Fix: Column Size on Entity Import from SQLite
+
+Fixed an issue where column size information was not properly imported from a **SQLite database file**.
+Now, when entities are imported, the **column length/size attributes** are correctly detected and applied.
+
+**Impact**
+Developers no longer need to manually adjust column sizes after import, ensuring imported entities more accurately match the original SQLite schema.
+
+
 ## Enhancement: Configurable Database Connection Timeout
 
 Introduced a new configuration option `connection_timeout` in **core.yml**, allowing users to control the database connection timeout (in seconds).
