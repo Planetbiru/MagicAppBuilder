@@ -194,9 +194,9 @@ function generateRole($adminLevelId, $database, $appConfig, $currentAction)
             // Create parent module
             if($appConfig->issetApplication() && $appConfig->getApplication()->getMultiLevelMenu())
             {
-                $AppMultiLevelMenu = new AppMultiLevelMenu($database);
-                $AppMultiLevelMenu->createParentModule($currentAction);
-                $AppMultiLevelMenu->updateRolesByAdminLevelId($adminLevelId, $currentAction);
+                $pppMultiLevelMenu = new AppMultiLevelMenu($database);
+                $pppMultiLevelMenu->createParentModule($currentAction);
+                $pppMultiLevelMenu->updateRolesByAdminLevelId($adminLevelId, $currentAction);
             }
             
             // Update the application menu cache
@@ -291,7 +291,6 @@ if($applicationId != null)
                 // Update user with superuser level
                 if($admin->getAdminLevelId() == null || $admin->getAdminLevelId() == "")
                 {
-                    
                     $adminLevelId = "superuser";
                 }
                 else
