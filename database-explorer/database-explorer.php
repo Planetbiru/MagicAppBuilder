@@ -227,7 +227,6 @@ if(!isset($databaseName))
                                 <button class="btn" onclick="downloadPNG()">PNG</button>
                                 <button class="btn" onclick="downloadMD()">MD</button>
                                 <button class="btn" onclick="downloadHTML()">HTML</button>
-                                <button class="btn" onclick="editor.exportToGraphQL()">GraphQL</button>
                                 <button class="btn" onclick="editor.downloadSQL()">SQL</button>
                             </span>
                             
