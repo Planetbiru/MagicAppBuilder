@@ -296,7 +296,7 @@ class TableParser {
         const f = line.toUpperCase().replace(/\s+/g, ' ').trim();
         let ai = false;
         // Check for MySQL/MariaDB's AUTO_INCREMENT
-        ai = f.includes('AUTO_INCREMENT');
+        ai = f.includes('AUTO_INCREMENT') || f.includes('AUTOINCREMENT');
         
         // Check for PostgreSQL's SERIAL, BIGSERIAL, or nextval() function
         if(!ai)
@@ -455,7 +455,8 @@ class TableParser {
             }
             if (rg_pk_composite.test(line)) {
                 let m = rg_pk_composite.exec(line);
-                if (m && m[1]) {
+                if (m && m[1]) // NOSONAR
+                {
                     let pkeys = m[1].split(',').map(pk => pk.trim());
                     primaryKeyList.push(...pkeys);
                     for (let i in fieldList) {
@@ -714,7 +715,7 @@ class TableParser {
                 let info = this.parseTable(sub);
                 inf.push(info);
             }
-            catch(e)
+            catch(e) // NOSONAR
             {
                 // If parsing fails, log the error and continue.
             }   
@@ -736,9 +737,9 @@ class TableParser {
         for (let i in parsedResult) {
             let data = this.parseInsertQuery(parsedResult[i].query);
             if (
-                data != null &&
-                data.tableName != null &&
-                data.tableName !== '' &&
+                data != null && // NOSONAR
+                data.tableName != null && // NOSONAR
+                data.tableName !== '' && // NOSONAR
                 typeof data.rows !== 'undefined' &&
                 Array.isArray(data.rows) &&
                 data.rows.length > 0
