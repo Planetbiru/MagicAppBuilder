@@ -230,16 +230,20 @@ class DatabaseExplorer // NOSONAR
             }
         }
 
-        // Grupkan tabel menjadi system dan custom
-        $grouped = ['custom' => [], 'system' => []];
+        $grouped = ['custom' => [], 'system' => [], 'sqlite_internal' => []];
         foreach ($tables as $tbl) {
-            $group = in_array($tbl, DatabaseUtil::SYSTEM_TABLES) ? 'system' : 'custom';
-            $grouped[$group][] = $tbl;
+            if ($dbType === 'sqlite' && $tbl === 'sqlite_sequence') {
+                $grouped['sqlite_internal'][] = $tbl;
+            } else {
+                $group = in_array($tbl, DatabaseUtil::SYSTEM_TABLES) ? 'system' : 'custom';
+                $grouped[$group][] = $tbl;
+            }
         }
 
-        foreach (['custom', 'system'] as $group) {
+        foreach (['custom', 'system', 'sqlite_internal'] as $group) {
             if (count($grouped[$group]) > 0) {
-                $groupLi = $dom->createElement('li', ucfirst($group) . ' Tables');
+                $groupLabel = $group === 'sqlite_internal' ? 'SQLite Internal Tables' : ucfirst($group) . ' Tables';
+                $groupLi = $dom->createElement('li', $groupLabel);
                 $groupLi->setAttribute('class', 'table-group');
                 $ul->appendChild($groupLi);
 
@@ -261,6 +265,7 @@ class DatabaseExplorer // NOSONAR
         $dom->appendChild($ul);
         return $dom->saveHTML();
     }
+
 
     /**
      * Displays a sidebar with tables in the selected database.
@@ -321,23 +326,35 @@ class DatabaseExplorer // NOSONAR
             }
         } elseif ($dbType == 'sqlite') {
             // Query for SQLite to retrieve table list
-            $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'");
-            
+            $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC");
+
+            $systemUl = $dom->createElement('ul');
+            $systemUl->setAttribute('class', 'system-table-list');
+
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $tableName = $row['name'];
 
-                // Create list item and link
                 $li = $dom->createElement('li');
                 $a = $dom->createElement('a', $tableName);
                 $a->setAttribute('href', "?applicationId=$applicationId&database=$databaseName&schema=$schemaName&table=$tableName");
 
-                // Highlight the selected table
                 if ($table == $tableName) {
                     $a->setAttribute('class', 'active'); //NOSONAR
                 }
 
                 $li->appendChild($a);
-                $ul->appendChild($li);
+
+                if ($tableName === 'sqlite_sequence') {
+                    $systemUl->appendChild($li);
+                } else {
+                    $ul->appendChild($li);
+                }
+            }
+
+            if ($systemUl->hasChildNodes()) {
+                $systemHeading = $dom->createElement('h4', 'System Tables');
+                $dom->appendChild($systemHeading);
+                $dom->appendChild($systemUl);
             }
         } else {
             // Unsupported database type
