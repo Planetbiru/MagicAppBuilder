@@ -53,6 +53,8 @@ class SQLConverter {
         this.dbToMySQL = {
             // SQLite types to MySQL mapping
             "bigint": "BIGINT",
+            "serial": "BIGINT",
+            "bigserial": "BIGINT",
             "mediumint": "MEDIUMINT",
             "smallint": "SMALLINT",
             "integer": "INT",
