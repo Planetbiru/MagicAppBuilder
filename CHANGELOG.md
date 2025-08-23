@@ -2815,3 +2815,58 @@ The **dependency depth** calculation in the **Entity Editor** has been adjusted:
 **Impact**
 Entities without dependencies on other entities will have a dependency depth of **0** instead of **1**, providing a clearer and more accurate representation of entity relationships.
 
+
+# MagicAppBuilder Version 1.18.2
+
+## Enhancement: Management of `sqlite_internal` Tables
+
+Added explicit handling for **`sqlite_internal` tables** during entity import from SQLite databases.
+These internal system tables are now correctly separated from user-defined entities, preventing accidental imports and ensuring that only relevant application entities are managed within MagicAppBuilder.
+
+**Impact**
+Developers will no longer see unwanted internal SQLite structures in the entity list, resulting in a cleaner and more accurate entity import process.
+
+
+## Bug Fix: Auto Increment Parsing in MySQL and SQLite
+
+Fixed an issue where **Auto Increment** columns were not always correctly detected during entity import from **MySQL** and **SQLite** databases.
+The parsing logic has been improved to reliably identify auto-incremented primary keys across both dialects.
+
+**Impact**
+Imported entities now correctly preserve auto-increment behavior, reducing the need for manual schema adjustments.
+
+
+## Bug Fix: Composite Primary Key Parsing
+
+Improved parsing for **composite primary keys** across multiple database engines, including **MySQL, MariaDB, PostgreSQL, and SQL Server**.
+The system now accurately recognizes and maps multi-column primary keys, ensuring imported entities reflect the original schema definitions.
+
+**Impact**
+Applications with complex database schemas can now be imported without losing critical primary key definitions, improving data integrity and query reliability.
+
+
+## Bug Fix: Data Type Mapping for PostgreSQL Entity Import
+
+Corrected an issue where certain PostgreSQL data types were not properly mapped during entity import.
+The improved type mapping ensures that PostgreSQL-specific column types (such as `uuid`, `jsonb`, `timestamptz`, etc.) are now correctly translated into the MagicAppBuilder entity model.
+
+**Impact**
+Developers working with PostgreSQL can now expect more faithful imports with fewer manual type corrections required.
+
+
+## Change: Table Name Quoting in SQLite and PostgreSQL Export
+
+MagicAppBuilder no longer applies quotes (`"table_name"`) around table names when exporting entities to **SQLite** and **PostgreSQL**.
+This adjustment improves compatibility with standard database conventions and reduces unnecessary quoting in generated SQL.
+
+**Impact**
+Exported SQL is now cleaner and more consistent, minimizing potential conflicts with external tools or database clients.
+
+
+## Upgrade: MagicObject 3.17.1
+
+Upgraded **MagicObject** dependency to **version 3.17.1**, bringing the latest stability improvements, performance optimizations, and expanded compatibility for entity operations.
+
+**Impact**
+Generated applications benefit from the latest improvements in MagicObject, ensuring smoother runtime behavior and broader database support.
+
