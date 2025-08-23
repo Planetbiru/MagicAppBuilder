@@ -1254,3 +1254,33 @@ database:
 This feature gives developers better control over database connectivity, especially in environments with slow or unreliable networks, by preventing applications from hanging indefinitely during connection attempts.
 
 
+# MagicObject v3.17.1 — Release Notes
+
+## What’s Changed
+
+* **PostgreSQL & SQLite Export:** Removed unnecessary double quotes (`"`) around **table names** when exporting database schema.
+
+## Details
+
+Previously, exported DDL wrapped table names in quotes:
+
+```sql
+CREATE TABLE "useraccount" (...);
+```
+
+Starting from v3.17.1, table names are written without quotes:
+
+```sql
+CREATE TABLE useraccount (...);
+```
+
+## Why This Change?
+
+* **Cleaner SQL Output:** Makes exported schema easier to read.
+* **Improved Compatibility:** Some tools and workflows expect unquoted identifiers in both PostgreSQL and SQLite.
+
+## Notes
+
+* **No naming strategy changes** were introduced. Table names remain exactly the same; only the surrounding quotes are removed.
+* If your schema relies on **case-sensitive identifiers** or **reserved keywords**, you may still need to add quotes manually.
+

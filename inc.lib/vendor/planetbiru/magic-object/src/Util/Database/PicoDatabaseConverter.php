@@ -776,9 +776,6 @@ class PicoDatabaseConverter // NOSONAR
         switch ($dialect) {
             case 'mysql':
                 return "`" . $identifier . "`";
-            case 'postgresql':
-            case 'sqlite':
-                return "\"" . $identifier . "\"";
             default:
                 return $identifier;
         }
