@@ -1756,6 +1756,11 @@ class PicoDatabaseConverter // NOSONAR
                     $columnDefinition .= ' AUTO_INCREMENT';
                 }
 
+                if(stripos($columnDefinition, ' AUTOINCREMENT') != false)
+                {
+                    $columnDefinition = str_ireplace(' AUTOINCREMENT', ' AUTO_INCREMENT', $columnDefinition);
+                }
+
                 $definition = trim("$columnName $translatedType $columnDefinition");
                 // Remove duplicate NOT NULL
                 $definition = preg_replace('/\bNOT NULL\b\s*(?=.*\bNOT NULL\b)/i', '', $definition);
