@@ -3398,13 +3398,11 @@ class EntityEditor {
             const clipboardItems = await navigator.clipboard.read();
             let parsed;
 
-            // First, check for HTML content (e.g., from Excel or a web page).
             for (const item of clipboardItems) {
                 if (item.types.includes('text/html')) {
                     const htmlBlob = await item.getType('text/html');
                     const htmlText = await htmlBlob.text();
 
-                    // Create a temporary div to parse the HTML and find a table.
                     const div = document.createElement('div');
                     div.innerHTML = htmlText;
                     let tables = div.querySelectorAll('table');
@@ -3412,20 +3410,82 @@ class EntityEditor {
                     if (tables && tables.length > 0) {
                         parsed = this.parseHtmlToJSON(tables[0]);
                         this.importFromClipboard(parsed);
-                        return; // Exit after successfully parsing and importing the table.
+                        return;
                     }
                 }
             }
 
-            // If no HTML table was found in the clipboard, fall back to reading plain text.
             const text = await navigator.clipboard.readText();
-            parsed = this.parseTextToJSON(text);
-            this.importFromClipboard(parsed);
+            
+
+            if (/^create\s+table/i.test(text.trim())) {
+                this.parseCreateTable(text);
+                
+            } else {
+                parsed = this.parseTextToJSON(text);
+                this.importFromClipboard(parsed);
+            }
 
         } catch (err) {
             console.error('Failed to read clipboard: ', err);
         }
     }
+    
+    parseCreateTable(contents)
+    {
+        console.log(contents);
+        const translator = new SQLConverter(); // Create an instance to handle SQL dialect conversion
+        const translatedContents = translator.translate(contents, 'mysql').replace(/`/g, ''); // Translate and clean backticks
+
+        const tableParser = new TableParser(translatedContents); // Parse translated SQL structure (CREATE TABLE)
+        tableParser.parseData(contents); // Parse original SQL content (INSERT INTO) to extract row data
+        
+        console.log(tableParser.tableInfo);
+
+        const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
+
+        if (_this.clearBeforeImport) {
+            // Replace current entities with imported ones
+            _this.entities = importedEntities;
+
+            importedEntities.forEach((entity) => {
+                const tableName = entity.name;
+                if (tableParser.data?.[tableName]) {
+                    entity.setData(tableParser.data[tableName]); // Assign row data if available
+                }
+            });
+
+            _this.clearEntities();  // Remove all existing entities from editor
+            _this.clearDiagrams();  // Remove all diagrams
+            _this.renderEntities(); // Render the imported entities in the interface
+        } else {
+            // Merge imported entities with existing ones
+            const existing = _this.entities.map(e => e.name);
+
+            importedEntities.forEach((entity) => {
+                if (!existing.includes(entity.name)) {
+                    entity.index = _this.entities.length;
+
+                    if (tableParser.data?.[entity.name]) {
+                        entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                    }
+
+                    _this.entities.push(entity);
+                }
+            });
+
+            _this.renderEntities(); // Refresh UI to reflect changes
+        }
+
+        /*
+        if (typeof callback === 'function') {
+            callback(_this.entities); // Invoke callback with updated entity list
+        }
+        */
+
+        _this.restoreCheckedEntitiesFromCurrentDiagram(); // Reapply previous diagram selections
+    }
+
 
     /**
      * Imports table data from the clipboard.
