@@ -3,23 +3,26 @@ let selectedElement = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     /**
-     * Hide context menu when clicking anywhere outside it.
+     * Hide all context menus when clicking anywhere outside them.
      */
     document.addEventListener("click", function (e) {
-        const contextMenu = document.querySelector('#context-menu');
-        if (!e.target.closest("#context-menu")) {
-            contextMenu.style.display = "none";
-        }
+        document.querySelectorAll('.context-menu').forEach(menu => {
+            if (!e.target.closest(".context-menu")) {
+                menu.style.display = "none";
+            }
+        });
     });
 });
 
 /**
- * Programmatically hides the context menu.
+ * Programmatically hides all context menus.
  */
 function hideContextMenu() {
-    const contextMenu = document.querySelector('#context-menu');
-    contextMenu.style.display = "none";
+    document.querySelectorAll('.context-menu').forEach(menu => {
+        menu.style.display = "none";
+    });
 }
+
 
 /**
  * Initialize context menu behavior for an SVG element containing entity diagrams.
@@ -74,6 +77,27 @@ function initDiagramContextMenu(svg) {
             submenu.style.left = shouldOpenLeft ? '-240px' : '96%';
             submenu.style.right = shouldOpenLeft ? '96%' : 'auto';
 
+        } else {
+            contextMenu.style.display = "none";
+        }
+    });
+}
+
+
+function initAllEntitiesContextMenu(svg) {
+    const contextMenu = document.querySelector('#context-menu-all-entities');
+
+    svg.addEventListener("contextmenu", function (e) {
+        const entity = e.target.closest('g.svg-entity');
+        selectedElement = entity;
+
+        if (entity) {
+            e.preventDefault(); // Prevent the default browser context menu
+
+            // Position context menu near the mouse click
+            contextMenu.style.top = `${e.pageY}px`;
+            contextMenu.style.left = `${e.pageX}px`;
+            contextMenu.style.display = "block";
         } else {
             contextMenu.style.display = "none";
         }

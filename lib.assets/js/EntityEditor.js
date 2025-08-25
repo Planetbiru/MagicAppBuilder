@@ -2466,6 +2466,39 @@ class EntityEditor {
     }
 
     /**
+     * Duplicate the selected entity along with its data.
+     *
+     * This function:
+     * 1. Retrieves the entity by name from the selected element.
+     * 2. Deep clones the entity's data so that changes do not affect the original entity.
+     * 3. Generates a new table/entity name with a `_copy` suffix and ensures it is valid.
+     * 4. Prepares the cloned entity and its data for editing in the entity editor as a draft.
+     * 5. Imports the cloned columns into the editor context (not persisted yet).
+     * 6. Hides the context menu.
+     *
+     * Note: The duplicated entity and its data will only be persisted when the user clicks "Save Entity".
+     *
+     * @function duplicateEntity
+     * @returns {void}
+     */
+    duplicateEntity() {
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+
+        // Deep clone data to prevent changes from affecting the original entity
+        this.currentEntityData = JSON.parse(JSON.stringify(entity.data));
+
+        let tableName = `${entity.name}_copy`;
+        const entityName = this.toValidTableName(tableName);
+        const columns = entity.columns;
+
+        // Load cloned columns and entity into editor as a draft
+        this.importFromSheet(columns, entityName);
+
+        // Hide context menu
+        hideContextMenu();
+    }
+
+    /**
      * Handles the "Edit Entity" action from the context menu.
      * Hides the context menu and triggers the entity editor for the selected entity.
      */

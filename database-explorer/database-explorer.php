@@ -38,10 +38,10 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/Column.min.js"></script>
     <script src="../lib.assets/js/Entity.min.js"></script>
     <script src="../lib.assets/js/Diagram.min.js"></script>
-    <script src="../lib.assets/js/EntityEditor.js"></script>
+    <script src="../lib.assets/js/EntityEditor.min.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
     <script src="../lib.assets/js/SVGtoPNG.min.js"></script>
@@ -444,6 +444,25 @@ if(!isset($databaseName))
             <li class="dropdown-divider"></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
+            <li class="dropdown-divider"></li>
+            <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
+        </ul>
+    </div>
+
+    <div id="context-menu-all-entities" class="context-menu context-menu-relation" style="display: none; position: absolute; z-index: 1000;">
+        <ul>
+            <li id="menu-export-svg"><a href="javascript:;" onclick="editor.downloadEntitySVG(event);">Export SVG</a></li>
+            <li id="menu-export-png"><a href="javascript:;" onclick="editor.downloadEntityPNG(event);">Export PNG</a></li>
+            <li id="menu-export-md"><a href="javascript:;" onclick="editor.downloadDiagramMD(event);">Export MD</a></li>
+            <li class="dropdown-divider"></li>
+            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy Structure</a></li>
+            <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy Data</a></li>
+            <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy All</a></li>
+            <li class="dropdown-divider"></li>
+            <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
+            <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
+            <li class="dropdown-divider"></li>
+            <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
         </ul>
     </div>
 </body>

@@ -2858,3 +2858,32 @@ Version 1.19.0 introduces a significant usability improvement by allowing users 
 
 This change reduces friction for the user, making the process of prototyping and managing database entities much more efficient. It is a key enhancement that aligns with the overall goal of making MagicAppBuilder a more streamlined and developer-friendly tool.
 
+## New Feature: Context Menu Enhancements
+
+This version also adds **enhanced context menu options** on the **All Entities** tab and for individual diagrams, making entity management faster and more convenient:
+
+### Context Menu on **All Entities** Tab
+
+* Export options:
+
+  * **Export SVG**
+  * **Export PNG**
+  * **Export MD** (Markdown)
+* Copy options:
+
+  * **Copy Structure**
+  * **Copy Data**
+  * **Copy All** (Structure + Data)
+* Edit options:
+
+  * **Edit Entity**
+  * **Edit Data**
+* **Duplicate Entity** – Quickly clone an existing entity along with its data as a draft for editing.
+
+### Context Menu on Individual Diagrams
+
+* Added **Duplicate Entity** entry to allow cloning an entity directly from its diagram context menu.
+* The duplicated entity and its data appear in the editor as a draft and will only be persisted when the user clicks **Save Entity**.
+
+These additions streamline workflow for developers by reducing the number of steps required to export, copy, edit, or duplicate entities, aligning with the goal of a more intuitive and efficient design experience.
+

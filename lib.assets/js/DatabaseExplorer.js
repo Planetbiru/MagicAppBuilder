@@ -803,6 +803,8 @@ document.addEventListener('DOMContentLoaded', () => {
             format: 'H:i:s'
         });
     }
+
+    initAllEntitiesContextMenu(document.querySelector('#all-entities .erd-svg'));
 });
 
 function downloadHTML()
