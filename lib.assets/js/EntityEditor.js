@@ -3416,10 +3416,7 @@ class EntityEditor {
                 }
             }
 
-            const text = await navigator.clipboard.readText();
-            
-            console.log('text', text);
-            
+            const text = await navigator.clipboard.readText();            
 
             if (/create\s+table/i.test(text.trim())) {
                 this.parseCreateTable(text, function(entities){
