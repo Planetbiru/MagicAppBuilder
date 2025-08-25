@@ -2885,5 +2885,9 @@ This version also adds **enhanced context menu options** on the **All Entities**
 * Added **Duplicate Entity** entry to allow cloning an entity directly from its diagram context menu.
 * The duplicated entity and its data appear in the editor as a draft and will only be persisted when the user clicks **Save Entity**.
 
+## Bug Fixes
+
+* **viewData() index handling** – Fixed an issue where calling `viewData()` with `index = -1` did not correctly use the current entity index. Now, if no index is provided, the method falls back to the currently selected entity and displays the appropriate data or alert if the entity has not been saved yet.
+
 These additions streamline workflow for developers by reducing the number of steps required to export, copy, edit, or duplicate entities, aligning with the goal of a more intuitive and efficient design experience.
 

@@ -2067,38 +2067,58 @@ class EntityEditor {
     }
     
     /**
-     * Sets the currently selected entity index and opens a dialog to view its data.
+     * Opens a dialog to view the data of a selected entity.
      *
-     * @param {number} index - The index of the entity in the `entities` array to view.
+     * If the `index` parameter is provided (>= 0), the method sets `currentEntityIndex` to that value
+     * and retrieves the corresponding entity from the `entities` array. If the entity's data contains
+     * more than 1000 records, a confirmation dialog is shown to warn the user about potential browser
+     * performance issues. The data is only displayed if the user confirms.
      *
-     * This method updates `currentEntityIndex`, retrieves the entity at the specified index,
-     * and opens a data dialog using `showEntityDataDialog`.
+     * If no `index` is provided, the method uses the current value of `currentEntityIndex`. If the
+     * index is invalid (e.g., no entity selected or entity not saved yet), an informational alert
+     * is displayed.
+     *
+     * The method does not persist any changes; it only opens the data in a dialog for viewing.
+     *
+     * @param {number} [index=-1] - The index of the entity in the `entities` array to view. If omitted, 
+     *                               the current entity index is used.
+     * @returns {void}
      */
     viewData(index = -1)
     {
         let _this = this;
+        let entity;
         if (index < 0) {
             index = this.currentEntityIndex;
-        } else {
-            this.currentEntityIndex = index;
         }
+        if(index >= 0)
+        {
+            entity = this.entities[index];
 
-        let entity = this.entities[index];
-        let dataLength = entity.data.length;
+            let dataLength = entity.data.length;
 
-        if (dataLength > 1000) {
-            let message = `<p>This entity contains ${dataLength} records.<br />Opening such a large dataset may cause your browser to become unresponsive or even crash due to running out of memory.<br />Do you still want to proceed?</p>`;
-            let title = 'Warning: Large Dataset Detected';
-            let captionOk = 'Open Anyway';
-            let captionCancel = 'Cancel';
+            if (dataLength > 1000) {
+                let message = `<p>This entity contains ${dataLength} records.<br />Opening such a large dataset may cause your browser to become unresponsive or even crash due to running out of memory.<br />Do you still want to proceed?</p>`;
+                let title = 'Warning: Large Dataset Detected';
+                let captionOk = 'Open Anyway';
+                let captionCancel = 'Cancel';
 
-            _this.showConfirmationDialog(message, title, captionOk, captionCancel, function(isOk) {
-                if (isOk) {
-                    _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
-                }
-            });
-        } else {
-            _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+                _this.showConfirmationDialog(message, title, captionOk, captionCancel, function(isOk) {
+                    if (isOk) {
+                        _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+                    }
+                });
+            } else {
+                _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+            }
+        }
+        else
+        {
+            _this.showAlertDialog(
+                "Entity data is only available after you save this entity.", 
+                "Information", 
+                "OK"
+            );
         }
     }
 
