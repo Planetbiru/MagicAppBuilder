@@ -86,7 +86,7 @@ class Column {
      */
     constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "", description = "") //NOSONAR
     {
-        if(type.toUpperCase().indexOf('BIGINT') && length == '')
+        if(type.toUpperCase().indexOf('BIGINT') !== -1 && (length == null || length == 0 || length == ''))
         {
             length = '20';
         }
@@ -99,6 +99,7 @@ class Column {
         this.autoIncrement = autoIncrement;
         this.values = values;
         this.description = description;
+        console.log(this);
     }
     
     /**
