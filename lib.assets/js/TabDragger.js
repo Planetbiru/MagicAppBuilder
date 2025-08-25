@@ -130,20 +130,33 @@ class TabDragger {
   }
 
   /**
-   * Initializes all `<li>` elements within the list that have the class "diagram-tab"
-   * by making them draggable and attaching drag/drop listeners.
-   * Also sets up a listener on the main list to execute the `onEnd` callback when a drop occurs.
+   * Initializes all draggable diagram tabs and sets up drag-and-drop behavior.
+   *
+   * This method does the following:
+   * 1. Selects all `<li>` elements within `this.list` that have the class "diagram-tab".
+   * 2. Makes each tab draggable by calling `makeDraggable(tab)`.
+   * 3. Attaches a 'drop' event listener to the main list container (`this.list`):
+   *    - When a drag-and-drop operation completes, the provided `onEnd` callback is executed.
+   *    - The callback is triggered after a short delay (60ms) to ensure DOM updates from the drop are complete.
+   *
+   * @returns {void}
    */
   initAll() {
-    // Select all potential tab elements within the list
-    const tabs = this.list.querySelectorAll(".diagram-tab");
-    // Apply draggable behavior to each found tab
-    tabs.forEach(tab => this.makeDraggable(tab));
+      let _this = this;
 
-    // Listen for the 'drop' event on the entire list to trigger the onEnd callback
-    this.list.addEventListener("drop", () => {
-      this.onEnd(); // Execute the provided callback function
-    });
+      // Select all tab elements within the list that should be draggable
+      const tabs = this.list.querySelectorAll(".diagram-tab");
+
+      // Make each tab draggable and attach necessary drag/drop listeners
+      tabs.forEach(tab => this.makeDraggable(tab));
+
+      // Listen for 'drop' event on the entire list to call the onEnd callback
+      this.list.addEventListener("drop", () => {
+          setTimeout(function() {
+              _this.onEnd(); // Execute the callback after a small delay to allow DOM updates
+          }, 60);
+      });
   }
+
 }
 
