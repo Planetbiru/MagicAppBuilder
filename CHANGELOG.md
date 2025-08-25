@@ -2734,26 +2734,6 @@ The fix ensures the correct `<tbody>` is always determined at the time of the dr
 Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
 
 
-# MagicAppBuilder Version 1.18.1
-
-## Bug Fix: Drag-and-Drop Column Ordering in Entity Editor
-
-Fixed a JavaScript error that occurred when reordering table columns or template columns in the **Entity Editor**:
-
-```
-Uncaught DOMException: Node.insertBefore: Child to insert before is not a child of this node
-```
-
-**Context**
-This issue appeared when users tried to reorder columns in the data table or in the column template list within the Entity Editor. The problem happened because the target row’s parent `<tbody>` did not match the cached reference, especially when the DOM structure changed during the drag-and-drop process.
-
-**Resolution**
-The fix ensures the correct `<tbody>` is always determined at the time of the drop action, preventing mismatched parent nodes and eliminating the DOMException error.
-
-**Impact**
-Users can now smoothly reorder both table columns and template columns in the Entity Editor without encountering errors.
-
-
 ## Bug Fix: Column Size on Entity Import from SQLite
 
 Fixed an issue where column size information was not properly imported from a **SQLite database file**.
