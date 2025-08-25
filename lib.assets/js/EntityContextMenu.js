@@ -25,8 +25,28 @@ function hideContextMenu() {
 
 
 /**
- * Initialize context menu behavior for an SVG element containing entity diagrams.
- * @param {SVGElement} svg - The SVG container to bind the right-click context menu to.
+ * Initializes the context menu for entities within a diagram SVG.
+ *
+ * This function sets up a right-click (`contextmenu`) event listener on the provided `svg` element.
+ * When a user right-clicks on an entity (`<g>` element with class `svg-entity`):
+ *   - Updates the global `selectedElement` to the clicked entity.
+ *   - Displays the custom context menu (`#context-menu`) near the mouse cursor.
+ *   - Dynamically updates the "Reference" submenu (`#reference-submenu`) based on the entity's relationships.
+ *   - Removes all existing submenu items except the first ("Check all") and adds new items via `renderReferenceSubmenu`.
+ *   - Checks/unchecks the "Check all" item depending on the current selection.
+ *   - Shows or hides the "Add Reference" menu (`#menu-make-reference`) depending on available relationships.
+ *   - Positions the submenu automatically to the left or right based on available screen space.
+ *
+ * If the right-click does not occur on an entity, the context menu is hidden.
+ *
+ * @param {SVGSVGElement} svg - The SVG element containing diagram entities.
+ *
+ * @returns {void}
+ *
+ * @example
+ * // Initialize diagram context menu for an SVG with id 'diagram-svg'
+ * const svg = document.getElementById('diagram-svg');
+ * initDiagramContextMenu(svg);
  */
 function initDiagramContextMenu(svg) {
     const contextMenu = document.querySelector('#context-menu');
@@ -83,7 +103,25 @@ function initDiagramContextMenu(svg) {
     });
 }
 
-
+/**
+ * Initializes the context menu for all entities within a given SVG element.
+ *
+ * This function sets up a right-click (`contextmenu`) event listener on the provided `svg` element.
+ * When a user right-clicks on an entity (`<g>` element with class `svg-entity`):
+ *   - The `selectedElement` is updated to the clicked entity.
+ *   - The custom context menu (`#context-menu-all-entities`) is displayed near the mouse cursor.
+ *
+ * If the right-click does not occur on an entity, the context menu is hidden.
+ *
+ * @param {SVGSVGElement} svg - The SVG element containing all entity groups.
+ *
+ * @returns {void}
+ *
+ * @example
+ * // Initialize context menu for an SVG with id 'diagram-svg'
+ * const svg = document.getElementById('diagram-svg');
+ * initAllEntitiesContextMenu(svg);
+ */
 function initAllEntitiesContextMenu(svg) {
     const contextMenu = document.querySelector('#context-menu-all-entities');
 
@@ -103,7 +141,6 @@ function initAllEntitiesContextMenu(svg) {
         }
     });
 }
-
 
 /**
  * Populate the reference submenu with available foreign key relations.
@@ -152,8 +189,6 @@ function renderReferenceSubmenu(entity, submenu) {
 
     return { count, checked };
 }
-
-
 
 /**
  * Render the context menu for a given entity.
