@@ -2850,3 +2850,44 @@ Upgraded **MagicObject** dependency to **version 3.17.1**, bringing the latest s
 **Impact**
 Generated applications benefit from the latest improvements in MagicObject, ensuring smoother runtime behavior and broader database support.
 
+# MagicAppBuilder Version 1.19.0
+
+## New Feature: Paste SQL Query
+
+Version 1.19.0 introduces a significant usability improvement by allowing users to **paste SQL queries directly into the editor**. This new feature bypasses the need to save a query to a `.sql` file and then import it, greatly simplifying the workflow for developers who need to quickly import new entities.
+
+This change reduces friction for the user, making the process of prototyping and managing database entities much more efficient. It is a key enhancement that aligns with the overall goal of making MagicAppBuilder a more streamlined and developer-friendly tool.
+
+## New Feature: Context Menu Enhancements
+
+This version also adds **enhanced context menu options** on the **All Entities** tab and for individual diagrams, making entity management faster and more convenient:
+
+### Context Menu on **All Entities** Tab
+
+* Export options:
+
+  * **Export SVG**
+  * **Export PNG**
+  * **Export MD** (Markdown)
+* Copy options:
+
+  * **Copy Structure**
+  * **Copy Data**
+  * **Copy All** (Structure + Data)
+* Edit options:
+
+  * **Edit Entity**
+  * **Edit Data**
+* **Duplicate Entity** – Quickly clone an existing entity along with its data as a draft for editing.
+
+### Context Menu on Individual Diagrams
+
+* Added **Duplicate Entity** entry to allow cloning an entity directly from its diagram context menu.
+* The duplicated entity and its data appear in the editor as a draft and will only be persisted when the user clicks **Save Entity**.
+
+## Bug Fixes
+
+* **viewData() index handling** – Fixed an issue where calling `viewData()` with `index = -1` did not correctly use the current entity index. Now, if no index is provided, the method falls back to the currently selected entity and displays the appropriate data or alert if the entity has not been saved yet.
+
+These additions streamline workflow for developers by reducing the number of steps required to export, copy, edit, or duplicate entities, aligning with the goal of a more intuitive and efficient design experience.
+

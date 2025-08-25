@@ -471,8 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
             target.isContentEditable;
 
         // Only handle custom paste when not in an editable element and inside .entity-editor
-        if (!isEditableElement && target && target.closest('.entity-editor')) // NOSONAR
-        {
+        if (!isEditableElement && target && target.closest('.entity-editor')) { // NOSONAR
             event.preventDefault(); // block default paste behavior
 
             let parsed;
@@ -482,14 +481,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 for (const item of clipboardItems) {
                     if (item.types.includes('text/html')) {
-                        const htmlBlob = await item.getType('text/html'); // 'await' is also needed here
-                        const htmlText = await htmlBlob.text(); // And here
+                        const htmlBlob = await item.getType('text/html');
+                        const htmlText = await htmlBlob.text();
                         
                         const div = document.createElement('div');
                         div.innerHTML = htmlText;
                         let tables = div.querySelectorAll('table');
                         
-                        if(tables && tables.length > 0) {
+                        if (tables && tables.length > 0) {
                             parsed = editor.parseHtmlToJSON(tables[0]);
                             editor.importFromClipboard(parsed);
                             return; // Return after finding an HTML table
@@ -499,16 +498,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // If there is no HTML data, try reading as plain text
                 const text = await navigator.clipboard.readText();
-                parsed = editor.parseTextToJSON(text);
-                editor.importFromClipboard(parsed);
-                
+
+                if (/create\s+table/i.test(text.trim())) {
+                    editor.parseCreateTable(text, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                });
+                } else {
+                    parsed = editor.parseTextToJSON(text);
+                    editor.importFromClipboard(parsed);
+                }
             } catch (error) {
                 console.error('Failed to read from clipboard:', error);
-                // Add a fallback or an error message to the user if needed
             }
         }
     });
-
 
     document.querySelector('[type="submit"].execute').addEventListener('click', function(event) {
         event.preventDefault();
@@ -796,6 +803,8 @@ document.addEventListener('DOMContentLoaded', () => {
             format: 'H:i:s'
         });
     }
+
+    initAllEntitiesContextMenu(document.querySelector('#all-entities .erd-svg'));
 });
 
 function downloadHTML()

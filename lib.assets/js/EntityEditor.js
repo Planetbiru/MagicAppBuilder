@@ -2067,38 +2067,58 @@ class EntityEditor {
     }
     
     /**
-     * Sets the currently selected entity index and opens a dialog to view its data.
+     * Opens a dialog to view the data of a selected entity.
      *
-     * @param {number} index - The index of the entity in the `entities` array to view.
+     * If the `index` parameter is provided (>= 0), the method sets `currentEntityIndex` to that value
+     * and retrieves the corresponding entity from the `entities` array. If the entity's data contains
+     * more than 1000 records, a confirmation dialog is shown to warn the user about potential browser
+     * performance issues. The data is only displayed if the user confirms.
      *
-     * This method updates `currentEntityIndex`, retrieves the entity at the specified index,
-     * and opens a data dialog using `showEntityDataDialog`.
+     * If no `index` is provided, the method uses the current value of `currentEntityIndex`. If the
+     * index is invalid (e.g., no entity selected or entity not saved yet), an informational alert
+     * is displayed.
+     *
+     * The method does not persist any changes; it only opens the data in a dialog for viewing.
+     *
+     * @param {number} [index=-1] - The index of the entity in the `entities` array to view. If omitted, 
+     *                               the current entity index is used.
+     * @returns {void}
      */
     viewData(index = -1)
     {
         let _this = this;
+        let entity;
         if (index < 0) {
             index = this.currentEntityIndex;
-        } else {
-            this.currentEntityIndex = index;
         }
+        if(index >= 0)
+        {
+            entity = this.entities[index];
 
-        let entity = this.entities[index];
-        let dataLength = entity.data.length;
+            let dataLength = entity.data.length;
 
-        if (dataLength > 1000) {
-            let message = `<p>This entity contains ${dataLength} records.<br />Opening such a large dataset may cause your browser to become unresponsive or even crash due to running out of memory.<br />Do you still want to proceed?</p>`;
-            let title = 'Warning: Large Dataset Detected';
-            let captionOk = 'Open Anyway';
-            let captionCancel = 'Cancel';
+            if (dataLength > 1000) {
+                let message = `<p>This entity contains ${dataLength} records.<br />Opening such a large dataset may cause your browser to become unresponsive or even crash due to running out of memory.<br />Do you still want to proceed?</p>`;
+                let title = 'Warning: Large Dataset Detected';
+                let captionOk = 'Open Anyway';
+                let captionCancel = 'Cancel';
 
-            _this.showConfirmationDialog(message, title, captionOk, captionCancel, function(isOk) {
-                if (isOk) {
-                    _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
-                }
-            });
-        } else {
-            _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+                _this.showConfirmationDialog(message, title, captionOk, captionCancel, function(isOk) {
+                    if (isOk) {
+                        _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+                    }
+                });
+            } else {
+                _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+            }
+        }
+        else
+        {
+            _this.showAlertDialog(
+                "Entity data is only available after you save this entity.", 
+                "Information", 
+                "OK"
+            );
         }
     }
 
@@ -2463,6 +2483,39 @@ class EntityEditor {
         .catch(err => {
             // Error handling (not implemented)
         });
+    }
+
+    /**
+     * Duplicate the selected entity along with its data.
+     *
+     * This function:
+     * 1. Retrieves the entity by name from the selected element.
+     * 2. Deep clones the entity's data so that changes do not affect the original entity.
+     * 3. Generates a new table/entity name with a `_copy` suffix and ensures it is valid.
+     * 4. Prepares the cloned entity and its data for editing in the entity editor as a draft.
+     * 5. Imports the cloned columns into the editor context (not persisted yet).
+     * 6. Hides the context menu.
+     *
+     * Note: The duplicated entity and its data will only be persisted when the user clicks "Save Entity".
+     *
+     * @function duplicateEntity
+     * @returns {void}
+     */
+    duplicateEntity() {
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+
+        // Deep clone data to prevent changes from affecting the original entity
+        this.currentEntityData = JSON.parse(JSON.stringify(entity.data));
+
+        let tableName = `${entity.name}_copy`;
+        const entityName = this.toValidTableName(tableName);
+        const columns = entity.columns;
+
+        // Load cloned columns and entity into editor as a draft
+        this.importFromSheet(columns, entityName);
+
+        // Hide context menu
+        hideContextMenu();
     }
 
     /**
@@ -3394,17 +3447,16 @@ class EntityEditor {
      * @async
      */
     async importFromClipboardManually() {
+        this.clearBeforeImport = false;
         try {
             const clipboardItems = await navigator.clipboard.read();
             let parsed;
 
-            // First, check for HTML content (e.g., from Excel or a web page).
             for (const item of clipboardItems) {
                 if (item.types.includes('text/html')) {
                     const htmlBlob = await item.getType('text/html');
                     const htmlText = await htmlBlob.text();
 
-                    // Create a temporary div to parse the HTML and find a table.
                     const div = document.createElement('div');
                     div.innerHTML = htmlText;
                     let tables = div.querySelectorAll('table');
@@ -3412,19 +3464,92 @@ class EntityEditor {
                     if (tables && tables.length > 0) {
                         parsed = this.parseHtmlToJSON(tables[0]);
                         this.importFromClipboard(parsed);
-                        return; // Exit after successfully parsing and importing the table.
+                        return;
                     }
                 }
             }
 
-            // If no HTML table was found in the clipboard, fall back to reading plain text.
-            const text = await navigator.clipboard.readText();
-            parsed = this.parseTextToJSON(text);
-            this.importFromClipboard(parsed);
+            const text = await navigator.clipboard.readText();            
+
+            if (/create\s+table/i.test(text.trim())) {
+                this.parseCreateTable(text, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                });
+                
+            } else {
+                parsed = this.parseTextToJSON(text);
+                this.importFromClipboard(parsed);
+            }
 
         } catch (err) {
             console.error('Failed to read clipboard: ', err);
         }
+    }
+    
+    /**
+     * Parses SQL code from a CREATE TABLE statement, extracts table and column definitions,
+     * and converts them into entities for the editor. It handles both replacing existing
+     * entities and merging new ones. It also attempts to parse INSERT statements to
+     * include row data.
+     *
+     * @param {string} contents The raw SQL content, typically from a clipboard or file.
+     * @param {function(Array<Object>):void} [callback] An optional callback function to be
+     * executed after the entities have been imported and rendered. The callback
+     * receives the array of all current entities as its argument.
+     */
+    parseCreateTable(contents, callback)
+    {
+        let _this = this;
+        const translator = new SQLConverter(); // Create an instance to handle SQL dialect conversion
+        const translatedContents = translator.translate(contents, 'mysql').replace(/`/g, ''); // Translate and clean backticks
+
+        const tableParser = new TableParser(translatedContents); // Parse translated SQL structure (CREATE TABLE)
+        tableParser.parseData(contents); // Parse original SQL content (INSERT INTO) to extract row data
+        
+        const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
+
+        if (_this.clearBeforeImport) {
+            // Replace current entities with imported ones
+            _this.entities = importedEntities;
+
+            importedEntities.forEach((entity) => {
+                const tableName = entity.name;
+                if (tableParser.data?.[tableName]) {
+                    entity.setData(tableParser.data[tableName]); // Assign row data if available
+                }
+            });
+
+            _this.clearEntities();  // Remove all existing entities from editor
+            _this.clearDiagrams();  // Remove all diagrams
+            _this.renderEntities(); // Render the imported entities in the interface
+        } else {
+            // Merge imported entities with existing ones
+            const existing = _this.entities.map(e => e.name);
+
+            importedEntities.forEach((entity) => {
+                if (!existing.includes(entity.name)) {
+                    entity.index = _this.entities.length;
+
+                    if (tableParser.data?.[entity.name]) {
+                        entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                    }
+
+                    _this.entities.push(entity);
+                }
+            });
+
+            _this.renderEntities(); // Refresh UI to reflect changes
+        }
+        
+        if (typeof callback === 'function') {
+            callback(_this.entities); // Invoke callback with updated entity list
+        }
+        
+        _this.restoreCheckedEntitiesFromCurrentDiagram(); // Reapply previous diagram selections
     }
 
     /**
