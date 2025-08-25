@@ -499,24 +499,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 // If there is no HTML data, try reading as plain text
                 const text = await navigator.clipboard.readText();
 
-                // 🔎 cek apakah SQL CREATE TABLE
-                if (/^create\s+table/i.test(text.trim())) {
-                    editor.parseCreateTable(text);
+                if (/create\s+table/i.test(text.trim())) {
+                    editor.parseCreateTable(text, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                });
                 } else {
                     parsed = editor.parseTextToJSON(text);
                     editor.importFromClipboard(parsed);
                 }
-
-                
-                
             } catch (error) {
                 console.error('Failed to read from clipboard:', error);
-                // Add a fallback or an error message to the user if needed
             }
         }
     });
-
-
 
     document.querySelector('[type="submit"].execute').addEventListener('click', function(event) {
         event.preventDefault();

@@ -99,7 +99,6 @@ class Column {
         this.autoIncrement = autoIncrement;
         this.values = values;
         this.description = description;
-        console.log(this);
     }
     
     /**

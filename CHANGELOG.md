@@ -2850,3 +2850,11 @@ Upgraded **MagicObject** dependency to **version 3.17.1**, bringing the latest s
 **Impact**
 Generated applications benefit from the latest improvements in MagicObject, ensuring smoother runtime behavior and broader database support.
 
+# MagicAppBuilder Version 1.19.0
+
+## New Feature: Paste SQL Query
+
+Version 1.19.0 introduces a significant usability improvement by allowing users to **paste SQL queries directly into the editor**. This new feature bypasses the need to save a query to a `.sql` file and then import it, greatly simplifying the workflow for developers who need to quickly import new entities.
+
+This change reduces friction for the user, making the process of prototyping and managing database entities much more efficient. It is a key enhancement that aligns with the overall goal of making MagicAppBuilder a more streamlined and developer-friendly tool.
+

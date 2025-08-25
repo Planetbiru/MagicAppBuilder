@@ -3394,6 +3394,7 @@ class EntityEditor {
      * @async
      */
     async importFromClipboardManually() {
+        this.clearBeforeImport = false;
         try {
             const clipboardItems = await navigator.clipboard.read();
             let parsed;
@@ -3417,9 +3418,17 @@ class EntityEditor {
 
             const text = await navigator.clipboard.readText();
             
+            console.log('text', text);
+            
 
-            if (/^create\s+table/i.test(text.trim())) {
-                this.parseCreateTable(text);
+            if (/create\s+table/i.test(text.trim())) {
+                this.parseCreateTable(text, function(entities){
+                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
+                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
+                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                });
                 
             } else {
                 parsed = this.parseTextToJSON(text);
@@ -3431,17 +3440,26 @@ class EntityEditor {
         }
     }
     
-    parseCreateTable(contents)
+    /**
+     * Parses SQL code from a CREATE TABLE statement, extracts table and column definitions,
+     * and converts them into entities for the editor. It handles both replacing existing
+     * entities and merging new ones. It also attempts to parse INSERT statements to
+     * include row data.
+     *
+     * @param {string} contents The raw SQL content, typically from a clipboard or file.
+     * @param {function(Array<Object>):void} [callback] An optional callback function to be
+     * executed after the entities have been imported and rendered. The callback
+     * receives the array of all current entities as its argument.
+     */
+    parseCreateTable(contents, callback)
     {
-        console.log(contents);
+        let _this = this;
         const translator = new SQLConverter(); // Create an instance to handle SQL dialect conversion
         const translatedContents = translator.translate(contents, 'mysql').replace(/`/g, ''); // Translate and clean backticks
 
         const tableParser = new TableParser(translatedContents); // Parse translated SQL structure (CREATE TABLE)
         tableParser.parseData(contents); // Parse original SQL content (INSERT INTO) to extract row data
         
-        console.log(tableParser.tableInfo);
-
         const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
 
         if (_this.clearBeforeImport) {
@@ -3476,16 +3494,13 @@ class EntityEditor {
 
             _this.renderEntities(); // Refresh UI to reflect changes
         }
-
-        /*
+        
         if (typeof callback === 'function') {
             callback(_this.entities); // Invoke callback with updated entity list
         }
-        */
-
+        
         _this.restoreCheckedEntitiesFromCurrentDiagram(); // Reapply previous diagram selections
     }
-
 
     /**
      * Imports table data from the clipboard.
