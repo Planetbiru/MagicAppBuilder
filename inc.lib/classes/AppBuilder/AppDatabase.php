@@ -81,7 +81,7 @@ class AppDatabase
             $queryBuilder->newQuery()
                 ->select("name")
                 ->from("sqlite_master")
-                ->where("type = 'table'"); // Removed direct filtering
+                ->where("type = 'table' and name != 'sqlite_sequence'"); // Removed direct filtering
             $rs = $database->executeQuery($queryBuilder);
         }
 
