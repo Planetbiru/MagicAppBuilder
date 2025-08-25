@@ -453,7 +453,7 @@ class AppDatabase
      * @param bool $reverse Whether to reverse the depth (entities with no dependencies become deepest)
      * @return array Modified array of entities with 'depth'
      */
-    public static function calculateEntityDepth($entities, $reverse = false)
+    public static function calculateEntityDepth($entities, $reverse = false) // NOSONAR
     {
         $nameToEntity = array();
         foreach ($entities as $entity) {
@@ -481,8 +481,14 @@ class AppDatabase
         $visited = array();
 
         $dfs = function ($name, &$seen = array()) use (&$graph, &$visited, &$dfs) {
-            if (isset($visited[$name])) return $visited[$name];
-            if (isset($seen[$name])) return 0;
+            if (isset($visited[$name])) 
+            {
+                return $visited[$name];
+            }
+            if (isset($seen[$name])) 
+            {
+                return 0;
+            }
 
             $seen[$name] = true;
 
