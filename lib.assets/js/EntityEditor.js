@@ -299,10 +299,7 @@ class EntityEditor {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importJSON(file, function(entities){
-                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
         
                 }); // Import the file if it's selected
@@ -317,10 +314,7 @@ class EntityEditor {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importSQLFile(file, function(entities){
-                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
         
                 }); // Import the file if it's selected
@@ -357,10 +351,7 @@ class EntityEditor {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.processGraphQLSchema(file, function(entities){
-                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
         
                 }); 
@@ -2740,10 +2731,7 @@ class EntityEditor {
      * @returns {void} - This function does not return a value.
      */
     downloadSQL() {
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
         
         const data = {
             applicationId: applicationId,
@@ -3464,7 +3452,7 @@ class EntityEditor {
 
                     if (tables && tables.length > 0) {
                         parsed = this.parseHtmlToJSON(tables[0]);
-                        this.importFromClipboard(parsed);
+                        this.importFromData(parsed);
                         return;
                     }
                 }
@@ -3474,16 +3462,13 @@ class EntityEditor {
 
             if (/create\s+table/i.test(text.trim())) {
                 this.parseCreateTable(text, function(entities){
-                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
                 });
                 
             } else {
                 parsed = this.parseTextToJSON(text);
-                this.importFromClipboard(parsed);
+                this.importFromData(parsed);
             }
 
         } catch (err) {
@@ -3554,19 +3539,18 @@ class EntityEditor {
     }
 
     /**
-     * Imports table data from the clipboard.
-     * Parses the clipboard text, generates columns from headers and data,
-     * and initializes a new entity with that data.
-     *
-     * The import will only proceed if:
-     * 1. Headers contain at least 2 columns and data has at least 1 row, OR
-     * 2. Headers contain at least 1 column and data has at least 2 rows.
-     *
-     * Otherwise, the import will be skipped.
-     *
-     * @param {Object} parsed - The clipboard text in tab-separated table format.
+     * Imports data from a parsed source, such as a CSV or spreadsheet.
+     * 
+     * This function first validates the data to ensure it meets minimum requirements
+     * for columns and rows. It then generates column definitions based on the
+     * parsed headers and data, creates a new table with a unique name, and
+     * stores the imported data.
+     * @param {object} parsed The parsed data object containing 'headers' and 'data'.
+     * @param {string[]} parsed.headers An array of strings representing the column headers.
+     * @param {Array<string[]>} parsed.data A two-dimensional array of strings, where each inner array represents a row of data.
+     * @returns {void}
      */
-    importFromClipboard(parsed) {
+    importFromData(parsed) {
 
         // Validate minimum header/data requirements
         const hasEnoughColumns = parsed.headers.length >= 2 && parsed.data.length >= 1;
@@ -3586,7 +3570,6 @@ class EntityEditor {
         // Store the imported data as the current entity's data
         this.currentEntityData = parsed.data;
     }
-
 
     /**
      * Parses tab-separated text from a clipboard into a structured object.
@@ -3986,10 +3969,7 @@ class EntityEditor {
      * @returns {Promise<void>} - This function does not return a value but performs a download side-effect.
      */
     async downloadEntities() {
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
 
         let url = buildUrl('entity', applicationId, databaseType, databaseName, databaseSchema, []);
 
@@ -4630,10 +4610,7 @@ class EntityEditor {
             .map(rowKey => rowDataMap[rowKey]);
 
         entity.data = newData;
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-        let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-        let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
         this.exportToSQL();
         modal.style.display = 'none';
