@@ -38,6 +38,41 @@ function debounce(func, delay) {
 }
 
 /**
+ * Retrieves metadata values defined in the HTML <meta> tags.
+ *
+ * This function searches for specific <meta> elements in the current document
+ * and extracts their `content` attribute. The values represent application
+ * configuration parameters such as the application identifier, the target
+ * database name, schema, and type.
+ *
+ * Example of expected <meta> tags in HTML:
+ *   <meta name="application-id" content="my-app">
+ *   <meta name="database-name" content="mydb">
+ *   <meta name="database-schema" content="public">
+ *   <meta name="database-type" content="postgresql">
+ *
+ * @function getMetaValues
+ * @returns {Object} An object containing:
+ *   @property {string} applicationId - The application identifier.
+ *   @property {string} databaseName  - The database name.
+ *   @property {string} databaseSchema - The schema name in the database.
+ *   @property {string} databaseType  - The database type (e.g., mysql, postgresql, sqlite).
+ *
+ * @example
+ * const { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+ * console.log(applicationId, databaseName, databaseSchema, databaseType);
+ */
+function getMetaValues() {
+  return {
+    applicationId: document.querySelector('meta[name="application-id"]').getAttribute('content'),
+    databaseName: document.querySelector('meta[name="database-name"]').getAttribute('content'),
+    databaseSchema: document.querySelector('meta[name="database-schema"]').getAttribute('content'),
+    databaseType: document.querySelector('meta[name="database-type"]').getAttribute('content')
+  };
+}
+
+
+/**
  * Saves the vertical scroll position of the `.table-list` element to localStorage.
  */
 function saveScrollPosition() {
@@ -392,6 +427,34 @@ function openSQLiteStructure(file) {
     reader.readAsArrayBuffer(file); // Important: reads binary content
 }
 
+/**
+ * Determines whether a given DOM element is editable.
+ *
+ * This function checks if the provided element is an editable field,
+ * such as an <input>, <textarea>, or any element with the
+ * `contenteditable` attribute set to true.
+ *
+ * @function isEditableElement
+ * @param {HTMLElement} element - The DOM element to check.
+ * @returns {boolean} True if the element is editable, false otherwise.
+ *
+ * @example
+ * const input = document.querySelector('input');
+ * console.log(isEditableElement(input)); // true
+ *
+ * const div = document.querySelector('div[contenteditable="true"]');
+ * console.log(isEditableElement(div)); // true
+ *
+ * const span = document.querySelector('span');
+ * console.log(isEditableElement(span)); // false
+ */
+function isEditableElement(element)
+{
+    return element.tagName === 'INPUT' ||
+        element.tagName === 'TEXTAREA' ||
+        element.isContentEditable;
+}
+
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -416,46 +479,28 @@ document.addEventListener('DOMContentLoaded', () => {
             primaryKeyDataLength: 20,
             
             callbackLoadEntity: function(){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 fetchEntityFromServer(applicationId, databaseType, databaseName, databaseSchema);
                 fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema);         
             }, 
             callbackSaveEntity: function (entities){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
             },
             callbackSaveDiagram: function (diagrams){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams); 
             },
             callbackLoadTemplate: function(){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 fetchTemplateFromServer(applicationId, databaseType, databaseName, databaseSchema);         
             }, 
             callbackSaveTemplate: function (template){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 sendTemplateToServer(applicationId, databaseType, databaseName, databaseSchema, template); 
             },
             callbackSaveConfig: function (template){
-                let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 sendConfigToServer(applicationId, databaseType, databaseName, databaseSchema, template); 
             }
         }
@@ -467,13 +512,10 @@ document.addEventListener('DOMContentLoaded', () => {
         editor.clearBeforeImport = false;
 
         // Do not intercept paste if the target is an editable element
-        const isEditableElement =
-            target.tagName === 'INPUT' ||
-            target.tagName === 'TEXTAREA' ||
-            target.isContentEditable;
+        const isEditable = isEditableElement(target);
 
         // Only handle custom paste when not in an editable element and inside .entity-editor
-        if (!isEditableElement && target && target.closest('.entity-editor')) { // NOSONAR
+        if (!isEditable && target && target.closest('.entity-editor')) { // NOSONAR
             event.preventDefault(); // block default paste behavior
 
             let parsed;
@@ -492,7 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         if (tables && tables.length > 0) {
                             parsed = editor.parseHtmlToJSON(tables[0]);
-                            editor.importFromClipboard(parsed);
+                            editor.importFromData(parsed);
                             return; // Return after finding an HTML table
                         }
                     }
@@ -503,15 +545,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (/create\s+table/i.test(text.trim())) {
                     editor.parseCreateTable(text, function(entities){
-                    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-                    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-                    let databaseSchema = document.querySelector('meta[name="database-schema"]').getAttribute('content');
-                    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
+                    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
                 });
                 } else {
                     parsed = editor.parseTextToJSON(text);
-                    editor.importFromClipboard(parsed);
+                    editor.importFromData(parsed);
                 }
             } catch (error) {
                 console.error('Failed to read from clipboard:', error);
@@ -943,10 +982,7 @@ function startExportDatabase(selector, onFinishCallback)
  */
 function exportDatabase(selector, onFinish) {
     // Read metadata from <meta> tags
-    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-    let schemaName = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
 
     exportTableList = [];
 
@@ -1082,10 +1118,7 @@ function exportTable(selector, onFinish) {
  * @param {string} tableName - Optional table name to preselect or focus on.
  */
 function listTableToExport(selector, tableName) {
-    let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');
-    let databaseType = document.querySelector('meta[name="database-type"]').getAttribute('content');
-    let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');
-    let schemaName = document.querySelector('meta[name="database-schema"]').getAttribute('content');
+    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
     $(selector).find('.modal-body').empty().append('<div style="text-align: center;"><span class="animation-wave"><span></span></span></div>');
     $.ajax({
         type: 'GET',
@@ -1094,7 +1127,7 @@ function listTableToExport(selector, tableName) {
             applicationId: applicationId,
             databaseType: databaseType,
             databaseName: databaseName,
-            schemaName: schemaName,
+            schemaName: databaseSchema,
             tableName: tableName
         },
         success: function(data) {

@@ -2874,7 +2874,7 @@ This version also adds **enhanced context menu options** on the **All Entities**
   * **Copy Structure**
   * **Copy Data**
   * **Copy All** (Structure + Data)
-  * **Paste Entity**
+  * **Import from Clipboard**
 * Edit options:
 
   * **Edit Entity**
@@ -2884,12 +2884,16 @@ This version also adds **enhanced context menu options** on the **All Entities**
 ### Context Menu on Individual Diagrams
 
 * Added **Duplicate Entity** entry to allow cloning an entity directly from its diagram context menu.
-* Added **Paste Entity** entry to allow importing an entity from the clipboard.
+* Added **Import from Clipboard** entry to allow importing an entity from the clipboard.
 * The duplicated entity and its data appear in the editor as a draft and will only be persisted when the user clicks **Save Entity**.
+
+## New Feature: Export Workspace
+
+This release introduces the ability to **export the entire workspace** in a single step. Instead of exporting applications one by one, users can now export **all active applications** within a workspace into a single ZIP file.
+
+Inside this ZIP, each application’s own export is packaged as an individual ZIP file. This makes it much easier to back up or transfer large workspaces that contain multiple applications, ensuring a more efficient workflow when working on complex projects.
 
 ## Bug Fixes
 
 * **viewData() index handling** – Fixed an issue where calling `viewData()` with `index = -1` did not correctly use the current entity index. Now, if no index is provided, the method falls back to the currently selected entity and displays the appropriate data or alert if the entity has not been saved yet.
-
-These additions streamline workflow for developers by reducing the number of steps required to export, copy, edit, or duplicate entities, aligning with the goal of a more intuitive and efficient design experience.
 

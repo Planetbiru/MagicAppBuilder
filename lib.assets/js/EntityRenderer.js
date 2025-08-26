@@ -552,8 +552,7 @@ class EntityRenderer {
     {
         let ul = document.querySelector('.diagram-list.tabs');
         let input = ul.querySelector('.diagram-tab.active input[type="text"]');
-        let applicationId = document.querySelector('meta[name="application-id"]').getAttribute('content');;
-        let databaseName = document.querySelector('meta[name="database-name"]').getAttribute('content');;
+        let { applicationId, databaseName } = getMetaValues();
         let fileName = '';
         let name = '';
         if(databaseName != '')
