@@ -441,6 +441,7 @@ if(!isset($databaseName))
             <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy Structure</a></li>
             <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy Data</a></li>
             <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy All</a></li>
+            <li id="menu-paste-clipboard"><a href="javascript:;" onclick="editor.triggerImportFromClipboard();">Paste Entity</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
@@ -458,6 +459,7 @@ if(!isset($databaseName))
             <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy Structure</a></li>
             <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy Data</a></li>
             <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy All</a></li>
+            <li id="menu-paste-clipboard"><a href="javascript:;" onclick="editor.triggerImportFromClipboard();">Paste Entity</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>

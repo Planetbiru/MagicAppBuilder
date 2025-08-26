@@ -2874,6 +2874,7 @@ This version also adds **enhanced context menu options** on the **All Entities**
   * **Copy Structure**
   * **Copy Data**
   * **Copy All** (Structure + Data)
+  * **Paste Entity**
 * Edit options:
 
   * **Edit Entity**
@@ -2883,6 +2884,7 @@ This version also adds **enhanced context menu options** on the **All Entities**
 ### Context Menu on Individual Diagrams
 
 * Added **Duplicate Entity** entry to allow cloning an entity directly from its diagram context menu.
+* Added **Paste Entity** entry to allow importing an entity from the clipboard.
 * The duplicated entity and its data appear in the editor as a draft and will only be persisted when the user clicks **Save Entity**.
 
 ## Bug Fixes

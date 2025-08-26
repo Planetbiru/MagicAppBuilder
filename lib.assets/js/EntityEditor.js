@@ -3436,6 +3436,7 @@ class EntityEditor {
      */
     triggerImportFromClipboard() {
         this.importFromClipboardManually();
+        hideContextMenu();
     }
 
     /**
