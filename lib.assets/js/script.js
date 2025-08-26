@@ -3117,6 +3117,34 @@ let initAll = function () {
     }, 1000);
   });
 
+  $(document).on('click', '.button-workspace-export', function (e) {
+    e.preventDefault();
+    
+    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id') || '';
+
+    // Create a temporary form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'lib.ajax/workspace-export.php';
+    form.style.display = 'none';
+
+    // Add input for workspaceId
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'workspaceId';
+    input.value = workspaceId;
+    form.appendChild(input);
+
+    // Append form to body and submit
+    document.body.appendChild(form);
+    form.submit();
+
+    // Remove form after submission (optional)
+    setTimeout(() => {
+        document.body.removeChild(form);
+    }, 1000);
+  });
+
 
 
   $(document).on('click', '.button-application-open', function (e) {
