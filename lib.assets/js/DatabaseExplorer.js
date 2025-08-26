@@ -463,6 +463,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('paste', async function(event) {
         const target = event.target;
+        
+        editor.clearBeforeImport = false;
 
         // Do not intercept paste if the target is an editable element
         const isEditableElement =
