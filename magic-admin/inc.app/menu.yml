@@ -69,3 +69,7 @@ menu:
     icon: "fas fa-question-circle"
     href: "about.php"
     submenu: []
+  - title: "Application Config"
+    icon: "fas fa-cogs"
+    href: "application-config.php"
+    submenu: []
