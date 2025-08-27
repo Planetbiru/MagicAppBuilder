@@ -2893,6 +2893,11 @@ This release introduces the ability to **export the entire workspace** in a sing
 
 Inside this ZIP, each application’s own export is packaged as an individual ZIP file. This makes it much easier to back up or transfer large workspaces that contain multiple applications, ensuring a more efficient workflow when working on complex projects.
 
+## New Feature: Magic Admin – Environment Variables & Configuration Encryption
+
+Magic Admin now supports **creating environment variables and encrypting application configurations** directly for production environments.
+This feature provides a more secure and streamlined way to manage sensitive application settings, ensuring that production deployments follow best practices for configuration management and data protection.
+
 ## Bug Fixes
 
 * **viewData() index handling** – Fixed an issue where calling `viewData()` with `index = -1` did not correctly use the current entity index. Now, if no index is provided, the method falls back to the currently selected entity and displays the appropriate data or alert if the entity has not been saved yet.
