@@ -70,6 +70,6 @@ menu:
     href: "about.php"
     submenu: []
   - title: "Application Config"
-    icon: "fas fa-cogs"
+    icon: "fas fa-cog"
     href: "application-config.php"
     submenu: []
