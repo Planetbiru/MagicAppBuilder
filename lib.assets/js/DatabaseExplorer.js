@@ -1023,7 +1023,7 @@ function exportDatabase(selector, onFinish) {
         applicationId: applicationId,
         databaseType: databaseType,
         databaseName: databaseName,
-        schemaName: schemaName
+        schemaName: databaseSchema
     };
 
     // Begin exporting tables
