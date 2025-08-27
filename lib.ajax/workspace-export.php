@@ -96,7 +96,10 @@ try {
     header('Expires: 0');
 
     readfile($zipFilename);
-    unlink($zipFilename);
+    foreach($temps as $path)
+    {
+        @unlink($path);
+    }
     exit;
 }
 catch(Exception $e) {
