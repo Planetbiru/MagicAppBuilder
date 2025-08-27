@@ -598,10 +598,10 @@ class DatabaseExporter // NOSONAR
                 break;
             case PicoDatabaseType::DATABASE_TYPE_MYSQL:
             case PicoDatabaseType::DATABASE_TYPE_MARIADB:
-                $this->exportMySQLTableData($tables, $targetDatabaseType, $targetDatabaseType, $batchSize, $maxQuerySize);
+                $this->exportMySQLTableData($tables, $targetDatabaseType, $batchSize, $maxQuerySize);
                 break;
             case PicoDatabaseType::DATABASE_TYPE_PGSQL:
-                $this->exportPostgreSQLTableData($tables, $targetDatabaseType, $targetDatabaseType, $schema, $batchSize, $maxQuerySize);
+                $this->exportPostgreSQLTableData($tables, $targetDatabaseType, $schema, $batchSize, $maxQuerySize);
                 break;
             default:
                 break;
