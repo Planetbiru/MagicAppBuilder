@@ -25,9 +25,8 @@ if(!isset($appCookiePath))
 }
 if(!isset($appCookieMaxLifetime))
 {
-    $appCookieMaxLifetime = "/";
+    $appCookieMaxLifetime = 1440;
 }
-
 
 $sessions->setSessionCookieParams(
     $appCookieMaxLifetime,
