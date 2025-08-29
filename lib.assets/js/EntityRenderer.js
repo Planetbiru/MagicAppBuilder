@@ -356,7 +356,7 @@ class EntityRenderer {
 
         const div = document.createElement("div");
         div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        div.style.cssText = `font-size: 12px; font-family: sans-serif; color: #1d3c86; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: ${height}px;`;
+        div.style.cssText = `font-size: 12px; font-family: sans-serif; color: #1d3c86; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: ${height}px; text-align:left;`;
         div.textContent = text;
         foreign.appendChild(div);
 
