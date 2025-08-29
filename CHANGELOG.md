@@ -2902,4 +2902,5 @@ This feature provides a more secure and streamlined way to manage sensitive appl
 
 * **viewData() index handling** – Fixed an issue where calling `viewData()` with `index = -1` did not correctly use the current entity index. Now, if no index is provided, the method falls back to the currently selected entity and displays the appropriate data or alert if the entity has not been saved yet.
 * **Database Exporter (MySQL & PostgreSQL)** – Fixed an issue where incorrect parameter passing caused the batch size not to be set properly. This resulted in row-by-row exports even for small datasets, leading to unnecessarily large dump files and excessive queries during database restore.
+* **Update Primary Key values** – Fixed a bug in the update form where changing a primary key value caused the field to become empty. After the fix, primary key updates work correctly and persist the intended value. 
 

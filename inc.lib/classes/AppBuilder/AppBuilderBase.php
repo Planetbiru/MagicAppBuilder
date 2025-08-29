@@ -3894,11 +3894,11 @@ $subqueryMap = '.$referece.';
 
             if($multipleData)
             {
-                $input->setAttribute('name', $field->getFieldName().'[]');
+                $input->setAttribute('name', $fieldName.'[]');
             }
             else
             {
-                $input->setAttribute('name', $field->getFieldName());
+                $input->setAttribute('name', $fieldName);
             }
 
             $input = $this->addAttributeId($input, $id);  
@@ -3971,7 +3971,7 @@ $subqueryMap = '.$referece.';
 
             if($multipleData)
             {
-                $input->setAttribute('name', $field->getFieldName().'[]');
+                $input->setAttribute('name', $fieldName.'[]');
                 $input->setAttribute('data-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getSelectItems();'.self::PHP_CLOSE_TAG);
                 $input->setAttribute('data-search-placeholder', self::PHP_OPEN_TAG.'echo $appLanguage->getPlaceholderSearch();'.self::PHP_CLOSE_TAG);
                 $input->setAttribute('data-label-selected', self::PHP_OPEN_TAG.'echo $appLanguage->getLabelSelected();'.self::PHP_CLOSE_TAG);
@@ -3981,7 +3981,7 @@ $subqueryMap = '.$referece.';
             }
             else
             {
-                $input->setAttribute('name', $field->getFieldName());
+                $input->setAttribute('name', $fieldName);
             }
 
             $input = $this->addAttributeId($input, $id);
