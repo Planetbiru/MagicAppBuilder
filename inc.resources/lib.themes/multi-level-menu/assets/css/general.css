@@ -708,4 +708,19 @@ tr[data-active=false] td {
 
 .dark-mode tr[data-active=false] td {
   background-color: #312e2e;
+}
+
+#menuSearchResults .list-group-item {
+  padding: 0.4rem 0.75rem;
+  background-color: #464646;
+  border-color: #212529;
+  color: #e4e6e8;
+}
+#menuSearchResults .list-group-item a {
+  display: block;
+  color: #e4e6e8;
+}
+#menuSearchResults .list-group-item a:hover {
+  text-decoration: none;
+  color: #f9fcff;
 }/*# sourceMappingURL=general.css.map */

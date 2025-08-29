@@ -854,6 +854,20 @@ tr[data-active="false"] td{
 
 }
 
-.list-group-item {
-  padding: .4rem 0.75rem;
+#menuSearchResults
+{
+  .list-group-item {
+    padding: .4rem 0.75rem;
+    background-color: #464646;
+    border-color: #212529;
+    color: #e4e6e8;
+    a {
+      display: block;
+      color: #e4e6e8;
+      &:hover {
+        text-decoration: none;
+        color: #f9fcff;
+      }
+    }
+  }
 }
