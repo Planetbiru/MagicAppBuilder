@@ -152,6 +152,8 @@ class Column {
         {
             typeKey = 'tinyint1';
         }
+
+        // Ensure typeMap is a valid object, default to mysql if the dialect isn't found
         let typeMap = DIALECT_TYPE_MAP[dialect] || DIALECT_TYPE_MAP.mysql;
         let mappedType = typeMap[typeKey] || this.type;
         
@@ -162,8 +164,6 @@ class Column {
             this.length = '20';
         }
         
-        
-
         const isEnumOrSet = ['enum', 'set'].includes(typeKey);
         const isRangeType = ['numeric', 'decimal', 'double', 'float'].includes(typeKey);
         const isLengthType = ['varchar', 'char', 'binary', 'varbinary', 'bit', 'tinyint', 'smallint', 'mediumint', 'int', 'bigint'].includes(typeKey);
@@ -218,7 +218,8 @@ class Column {
         if (this.hasDefault()) {
             if (this.isTypeBoolean(this.type, this.length)) {
                 columnDef += ` DEFAULT ${this.toBoolean(this.default, dialect)}`;
-            } else if (this.isTypeNumeric(this.type, Object.values(DIALECT_TYPE_MAP[dialect])) && !isNaN(this.default)) {
+            } 
+            else if (typeMap && this.isTypeNumeric(this.type, Object.values(typeMap)) && !isNaN(this.default)) {
                 columnDef += ` DEFAULT ${this.default}`;
             } 
             else if(isNaN(this.default))
