@@ -298,13 +298,11 @@ class EntityEditor {
         document.querySelector(this.selector+" .import-file-json").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
             if (file) {
-                editor.importJSON(file, function(entities){
+                editor.importJSON(file, function(entities, diagrams){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-        
+                    sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);  
                 }); // Import the file if it's selected
-    
-                
             } else {
                 console.log("Please select a JSON file first.");
             }
@@ -316,7 +314,6 @@ class EntityEditor {
                 editor.importSQLFile(file, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-        
                 }); // Import the file if it's selected
             } else {
                 console.log("Please select a JSON file first.");
@@ -2800,7 +2797,7 @@ class EntityEditor {
                 _this.updateDiagram(); // Update the diagram with the imported entities
                 _this.renderEntities(); // Update the view with the fetched entities
                 if (typeof callback === 'function') {
-                    callback(_this.entities); // Execute callback with the updated entities
+                    callback(_this.entities, _this.diagrams); // Execute callback with the updated entities
                 }
             } catch (err) {
                 console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
