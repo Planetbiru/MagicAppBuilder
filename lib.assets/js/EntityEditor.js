@@ -2879,37 +2879,56 @@ class EntityEditor {
 
                 const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
 
-                if (_this.clearBeforeImport) {
-                    // Replace current entities with imported ones
-                    _this.entities = importedEntities;
+                if(importedEntities && importedEntities.length)
+                {
+                    if (_this.clearBeforeImport) {
+                        // Replace current entities with imported ones
+                        _this.entities = importedEntities;
 
-                    importedEntities.forEach((entity) => {
-                        const tableName = entity.name;
-                        if (tableParser.data?.[tableName]) {
-                            entity.setData(tableParser.data[tableName]); // Assign row data if available
-                        }
-                    });
-
-                    _this.clearEntities();  // Remove all existing entities from editor
-                    _this.clearDiagrams();  // Remove all diagrams
-                    _this.renderEntities(); // Render the imported entities in the interface
-                } else {
-                    // Merge imported entities with existing ones
-                    const existing = _this.entities.map(e => e.name);
-
-                    importedEntities.forEach((entity) => {
-                        if (!existing.includes(entity.name)) {
-                            entity.index = _this.entities.length;
-
-                            if (tableParser.data?.[entity.name]) {
-                                entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                        importedEntities.forEach((entity) => {
+                            const tableName = entity.name;
+                            if (tableParser.data?.[tableName]) {
+                                entity.setData(tableParser.data[tableName]); // Assign row data if available
                             }
+                        });
 
-                            _this.entities.push(entity);
+                        _this.clearEntities();  // Remove all existing entities from editor
+                        _this.clearDiagrams();  // Remove all diagrams
+                        _this.renderEntities(); // Render the imported entities in the interface
+                    } else {
+                        // Merge imported entities with existing ones
+                        const existing = _this.entities.map(e => e.name);
+
+                        importedEntities.forEach((entity) => {
+                            if (!existing.includes(entity.name)) {
+                                entity.index = _this.entities.length;
+
+                                if (tableParser.data?.[entity.name]) {
+                                    entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                                }
+
+                                _this.entities.push(entity);
+                            }
+                            else if (tableParser.data?.[entity.name]) {
+                                _this.getEntityByName(entity.name).appendData(tableParser.data[entity.name]); // Assign row data if available
+                            }
+                        });
+
+                        _this.renderEntities(); // Refresh UI to reflect changes
+                    }
+                }
+                else if(tableParser.data)
+                {
+                    for (const tableName in tableParser.data) {
+                        if (tableParser.data.hasOwnProperty(tableName)) {
+                            // Find the existing entity by name
+                            const existingEntity = _this.getEntityByName(tableName);
+                            if (existingEntity) {
+                                // Append the new data, which is handled by the appendData function
+                                existingEntity.appendData(tableParser.data[tableName]);                             
+                            }
                         }
-                    });
-
-                    _this.renderEntities(); // Refresh UI to reflect changes
+                    }
                 }
 
                 if (typeof callback === 'function') {
@@ -3046,6 +3065,9 @@ class EntityEditor {
                         if (!existing.includes(entity.name)) {
                             entity.index = _this.entities.length;
                             _this.entities.push(entity);
+                        }
+                        else if (tableParser.data?.[entity.name]) {
+                            _this.getEntityByName(entity.name).appendData(entity.getData()); // Assign row data if available
                         }
                     });
                     _this.renderEntities(); // Update the view with the fetched entities
@@ -3457,7 +3479,8 @@ class EntityEditor {
 
             const text = await navigator.clipboard.readText();            
 
-            if (/create\s+table/i.test(text.trim())) {
+            if (/create\s+table/i.test(text.trim()) || /insert\s+into/i.test(text.trim())) {
+                console.log('parse');
                 this.parseCreateTable(text, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
@@ -3495,37 +3518,57 @@ class EntityEditor {
         
         const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
 
-        if (_this.clearBeforeImport) {
-            // Replace current entities with imported ones
-            _this.entities = importedEntities;
+        if(importedEntities && importedEntities.length)
+        {
+            if (_this.clearBeforeImport) {
+                // Replace current entities with imported ones
+                _this.entities = importedEntities;
 
-            importedEntities.forEach((entity) => {
-                const tableName = entity.name;
-                if (tableParser.data?.[tableName]) {
-                    entity.setData(tableParser.data[tableName]); // Assign row data if available
-                }
-            });
-
-            _this.clearEntities();  // Remove all existing entities from editor
-            _this.clearDiagrams();  // Remove all diagrams
-            _this.renderEntities(); // Render the imported entities in the interface
-        } else {
-            // Merge imported entities with existing ones
-            const existing = _this.entities.map(e => e.name);
-
-            importedEntities.forEach((entity) => {
-                if (!existing.includes(entity.name)) {
-                    entity.index = _this.entities.length;
-
-                    if (tableParser.data?.[entity.name]) {
-                        entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                importedEntities.forEach((entity) => {
+                    const tableName = entity.name;
+                    if (tableParser.data?.[tableName]) {
+                        entity.setData(tableParser.data[tableName]); // Assign row data if available
                     }
+                });
 
-                    _this.entities.push(entity);
+                _this.clearEntities();  // Remove all existing entities from editor
+                _this.clearDiagrams();  // Remove all diagrams
+                _this.renderEntities(); // Render the imported entities in the interface
+            } else {
+                // Merge imported entities with existing ones
+                const existing = _this.entities.map(e => e.name);
+
+                importedEntities.forEach((entity) => {
+                    if (!existing.includes(entity.name)) {
+                        entity.index = _this.entities.length;
+
+                        if (tableParser.data?.[entity.name]) {
+                            entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                        }
+
+                        _this.entities.push(entity);
+                    }
+                    else if (tableParser.data?.[entity.name]) {
+                        console.log('append data');
+                        _this.getEntityByName(entity.name).appendData(tableParser.data[entity.name]); // Assign row data if available
+                    }
+                });
+
+                _this.renderEntities(); // Refresh UI to reflect changes
+            }
+        }
+        else if(tableParser.data)
+        {
+            for (const tableName in tableParser.data) {
+                if (tableParser.data.hasOwnProperty(tableName)) {
+                    // Find the existing entity by name
+                    const existingEntity = _this.getEntityByName(tableName);
+                    if (existingEntity) {
+                        // Append the new data, which is handled by the appendData function
+                        existingEntity.appendData(tableParser.data[tableName]);  
+                    }
                 }
-            });
-
-            _this.renderEntities(); // Refresh UI to reflect changes
+            }
         }
         
         if (typeof callback === 'function') {

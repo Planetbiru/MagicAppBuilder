@@ -2898,6 +2898,18 @@ Inside this ZIP, each application’s own export is packaged as an individual ZI
 Magic Admin now supports **creating environment variables and encrypting application configurations** directly for production environments.
 This feature provides a more secure and streamlined way to manage sensitive application settings, ensuring that production deployments follow best practices for configuration management and data protection.
 
+## New Feature: Append Entity Data from SQL `INSERT`
+
+Version 1.19.0 expands its SQL import capabilities with support for **appending entity data** from `INSERT INTO` queries. Previously, MagicAppBuilder focused solely on creating table structures (`CREATE TABLE`). Now, when you paste or import a file containing an `INSERT INTO` query, the data within that query will be automatically added to the corresponding existing entity in the editor.
+
+This feature is incredibly useful for:
+
+* **Seeding initial data** into newly created entities.
+* **Updating or adding to existing entities** with new data from SQL scripts without manual entry.
+* **Integrating prototype data** from external SQL scripts directly into your project.
+
+This is a significant boost to efficiency, especially for workflows involving data transfer between environments or populating datasets for testing and development.
+
 ## Bug Fixes
 
 * **viewData() index handling** – Fixed an issue where calling `viewData()` with `index = -1` did not correctly use the current entity index. Now, if no index is provided, the method falls back to the currently selected entity and displays the appropriate data or alert if the entity has not been saved yet.

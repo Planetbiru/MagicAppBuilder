@@ -50,6 +50,57 @@ class Entity {
     setData(data) {
         this.data = data || [];
     }
+
+    /**
+     * Appends new data (rows) to the entity, preventing primary key collisions.
+     * * This method adds new data to the entity's existing `this.data` array.
+     * It first checks for primary key conflicts to ensure that no duplicate
+     * primary keys are inserted. If a row's primary key(s) already exist
+     * in the current data, that row is ignored and not added.
+     * * @param {Array<Object>} newData - An array of data objects to be appended.
+     * @returns {number} The number of rows successfully appended.
+     */
+    appendData(newData) {
+        if (!newData || newData.length === 0) {
+            return 0;
+        }
+
+        const primaryKeyColumns = this.getPrimaryKeyColumns();
+        
+        // If there are no primary keys, all data is appended.
+        if (primaryKeyColumns.length === 0) {
+            this.data.push(...newData);
+            return newData.length;
+        }
+
+        const existingKeys = new Set();
+        this.data.forEach(row => {
+            const key = primaryKeyColumns.map(pk => row[pk]).join('__');
+            existingKeys.add(key);
+        });
+
+        let appendedCount = 0;
+        newData.forEach(newRow => {
+            const newKey = primaryKeyColumns.map(pk => newRow[pk]).join('__');
+            
+            if (!existingKeys.has(newKey)) {
+                this.data.push(newRow);
+                existingKeys.add(newKey);
+                appendedCount++;
+            }
+        });
+
+        return appendedCount;
+    }
+
+    /**
+     * Get entity data
+     * @returns {Array<Object>} newData - An array of data objects
+     */
+    getData()
+    {
+        return this.data;
+    }
     
     /**
      * Counts the number of columns marked as primary keys.
