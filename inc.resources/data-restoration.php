@@ -1,10 +1,10 @@
 <?php
 
-use MagicApp\AppUserPermission;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppUserPermissionImpl;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
@@ -23,7 +23,7 @@ $inputGet = new InputGet();
 $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "data-restoration", $appLanguage->getDataRestoration());
-$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
+$userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 

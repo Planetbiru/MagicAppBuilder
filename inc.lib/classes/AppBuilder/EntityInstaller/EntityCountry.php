@@ -5,9 +5,9 @@ namespace AppBuilder\EntityInstaller;
 use MagicObject\MagicObject;
 
 /**
- * The EntityMessageFolder class represents an entity in the "message_folder" table.
+ * The EntityCountry class represents an entity in the "country" table.
  *
- * This entity maps to the "message_folder" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "country" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
@@ -17,26 +17,29 @@ use MagicObject\MagicObject;
  * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
- * @Table(name="message_folder")
+ * @Table(name="country")
  */
-class EntityMessageFolder extends MagicObject
+class EntityCountry extends MagicObject
 {
 	/**
-	 * Message Folder ID
+	 * Country ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
-	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Message Folder ID")
+	 * @NotNull
+	 * @Column(name="country_id", type="varchar(5)", length=5, nullable=false)
+	 * @Label(content="Country ID")
+	 * @MaxLength(value=5)
 	 * @var string
 	 */
-	protected $messageFolderId;
+	protected $countryId;
 
 	/**
 	 * Name
 	 * 
 	 * @Column(name="name", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Name")
+	 * @MaxLength(value=100)
 	 * @var string
 	 */
 	protected $name;
@@ -44,12 +47,31 @@ class EntityMessageFolder extends MagicObject
 	/**
 	 * Sort Order
 	 * 
-	 * @NotNull
-	 * @Column(name="sort_order", type="int", nullable=true)
+	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
 	 * @Label(content="Sort Order")
 	 * @var int
 	 */
 	protected $sortOrder;
+
+	/**
+	 * Admin Create
+	 * 
+	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
+	 * @Label(content="Admin Create")
+	 * @MaxLength(value=40)
+	 * @var string
+	 */
+	protected $adminCreate;
+
+	/**
+	 * Admin Edit
+	 * 
+	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Edit")
+	 * @MaxLength(value=40)
+	 * @var string
+	 */
+	protected $adminEdit;
 
 	/**
 	 * Time Create
@@ -70,28 +92,11 @@ class EntityMessageFolder extends MagicObject
 	protected $timeEdit;
 
 	/**
-	 * Admin Create
-	 * 
-	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
-	 * @Label(content="Admin Create")
-	 * @var string
-	 */
-	protected $adminCreate;
-
-	/**
-	 * Admin Edit
-	 * 
-	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Edit")
-	 * @var string
-	 */
-	protected $adminEdit;
-
-	/**
 	 * IP Create
 	 * 
 	 * @Column(name="ip_create", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Create")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipCreate;
@@ -101,6 +106,7 @@ class EntityMessageFolder extends MagicObject
 	 * 
 	 * @Column(name="ip_edit", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Edit")
+	 * @MaxLength(value=50)
 	 * @var string
 	 */
 	protected $ipEdit;
@@ -109,8 +115,8 @@ class EntityMessageFolder extends MagicObject
 	 * Active
 	 * 
 	 * @NotNull
-	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="TRUE", nullable=true)
-	 * @DefaultColumn(value="TRUE")
+	 * @Column(name="active", type="tinyint(1)", length=1, defaultValue="1", nullable=false)
+	 * @DefaultColumn(value="1")
 	 * @Label(content="Active")
 	 * @var bool
 	 */

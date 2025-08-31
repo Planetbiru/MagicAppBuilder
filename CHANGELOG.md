@@ -2918,3 +2918,18 @@ This is a significant boost to efficiency, especially for workflows involving da
 * **Diagram persistence after JSON import** – Fixed an issue where diagrams were not saved after importing entities from a JSON file. Previously, only the entities were stored on the server while the diagrams were lost. Now, both entities and their diagrams are saved properly, ensuring that complex relationship diagrams remain intact after import.
 * **Save Entity Data from Entity Editor** – Fixed an issue where saving data after adding or updating records via the **Entity Editor** did not persist correctly. Now, both new entries and modifications are reliably stored without data loss.
 
+
+# MagicAppBuilder Version 1.20.0
+
+## New Feature: Starter Package Entities
+
+Version 1.20.0 introduces the **Starter Package Entities** feature, a new way to quickly jumpstart your application development. This package provides a pre-built foundation, so you don't have to start from scratch.
+
+A **Starter Package** includes a variety of ready-to-use assets:
+
+* **Table Designs:** Pre-defined table schemas customized for specific application types, such as libraries, hotels, restaurants, or schools.
+* **Source Code and Binaries:** Relevant source code and binary files for the application, including front-end pages, reservation pages, and sales pages.
+* **Themed Designs:** Thoughtfully crafted visual themes with carefully selected color schemes and element layouts to ensure a user-friendly interface.
+
+This feature significantly streamlines your workflow and provides a robust starting point for many different types of projects.
+

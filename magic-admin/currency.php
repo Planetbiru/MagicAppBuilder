@@ -3,34 +3,35 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
-use MagicApp\Field;
-use MagicApp\PicoModule;
-use MagicApp\UserAction;
-use MagicAppTemplate\AppEntityLanguageImpl;
-use MagicAppTemplate\AppIncludeImpl;
-use MagicAppTemplate\AppValidatorMessage;
-use MagicAppTemplate\ApplicationMenu;
-use MagicAppTemplate\AppUserPermissionImpl;
-use MagicAppTemplate\Entity\App\AppModuleGroupImpl;
+use MagicObject\MagicObject;
+use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
-use MagicObject\Exceptions\InvalidValueException;
-use MagicObject\MagicObject;
+use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicObject\Request\PicoFilterConstant;
-use MagicObject\SetterGetter;
+use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicApp\Field;
+use MagicApp\PicoModule;
+use MagicApp\UserAction;
+use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppUserPermissionImpl;
+use MagicAdmin\Entity\Data\Currency;
+use MagicAdmin\Entity\Data\CurrencyTrash;
+use MagicApp\XLSX\DocumentWriter;
+use MagicApp\XLSX\XLSXDataFormat;
+
 
 require_once __DIR__ . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "module-group", $appLanguage->getModuleGroup());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "currency", $appLanguage->getCurrency());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -45,33 +46,23 @@ $dataFilter = null;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$moduleGroup = new AppModuleGroupImpl(null, $database);
-	$moduleGroup->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$moduleGroup->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$moduleGroup->setTarget($inputPost->getTarget(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$moduleGroup->setIcon($inputPost->getIcon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$moduleGroup->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$moduleGroup->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$moduleGroup->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$moduleGroup->setAdminCreate($currentAction->getUserId());
-	$moduleGroup->setTimeCreate($currentAction->getTime());
-	$moduleGroup->setIpCreate($currentAction->getIp());
-	$moduleGroup->setAdminEdit($currentAction->getUserId());
-	$moduleGroup->setTimeEdit($currentAction->getTime());
-	$moduleGroup->setIpEdit($currentAction->getIp());
+	$currency = new Currency(null, $database);
+	$currency->setCurrencyId($inputPost->getCurrencyId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$currency->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$currency->setSymbol($inputPost->getSymbol(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$currency->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$currency->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$currency->setAdminCreate($currentAction->getUserId());
+	$currency->setTimeCreate($currentAction->getTime());
+	$currency->setIpCreate($currentAction->getIp());
+	$currency->setAdminEdit($currentAction->getUserId());
+	$currency->setTimeEdit($currentAction->getTime());
+	$currency->setIpEdit($currentAction->getIp());
 	try
 	{
-		$moduleGroup->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
-		$moduleGroup->insert();
-		$newId = $moduleGroup->getModuleGroupId();
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->module_group_id, $newId);
-	}
-	catch(InvalidValueException $e)
-	{
-		$currentModule->setErrorMessage($e->getMessage());
-		$currentModule->setErrorField($e->getPropertyName());
-		$currentModule->setCurrentAction(UserAction::CREATE);
-		$currentModule->setFormData($inputPost->formData());
+		$currency->insert();
+		$newId = $currency->getCurrencyId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->currency_id, $newId);
 	}
 	catch(Exception $e)
 	{
@@ -80,17 +71,15 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
-	$specification = PicoSpecification::getInstanceOf(Field::of()->moduleGroupId, $inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
+	$specification = PicoSpecification::getInstanceOf(Field::of()->currencyId, $inputPost->getCurrencyId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$moduleGroup = new AppModuleGroupImpl(null, $database);
-	$updater = $moduleGroup->where($specification);
+	$currency = new Currency(null, $database);
+	$updater = $currency->where($specification);
 	$updater->with()
+		->setCurrencyId($inputPost->getCurrencyId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setTarget($inputPost->getTarget(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setIcon($inputPost->getIcon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
+		->setSymbol($inputPost->getSymbol(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
-		->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
 	$updater->setAdminEdit($currentAction->getUserId());
@@ -98,23 +87,13 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$updater->setIpEdit($currentAction->getIp());
 	try
 	{
-		$updater->validate(null, AppValidatorMessage::loadTemplate($currentUser->getLanguageId()));
 		$updater->update();
-		$newId = $inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-		
-		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Clear the application menu cache for all users
-		$applicationMenu->clearMenuCache();
-		
-		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->module_group_id, $newId);
-	}
-	catch(InvalidValueException $e)
-	{
-		$currentModule->setErrorMessage($e->getMessage());
-		$currentModule->setErrorField($e->getPropertyName());
-		$currentModule->setCurrentAction(UserAction::UPDATE);
-		$currentModule->setFormData($inputPost->formData());
+
+		// Update primary key value
+		$newId = $inputPost->getAppBuilderNewPkCurrencyId();
+		$currency = new Currency(null, $database);
+		$currency->where($specification)->setCurrencyId($newId)->update();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->currency_id, $newId);
 	}
 	catch(Exception $e)
 	{
@@ -127,11 +106,11 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$moduleGroup = new AppModuleGroupImpl(null, $database);
+			$currency = new Currency(null, $database);
 			try
 			{
-				$moduleGroup->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleGroupId, $rowId))
+				$currency->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->currencyId, $rowId))
 					->addAnd(
 						PicoSpecification::getInstance()
 							->addOr(PicoPredicate::getInstance()->equals(Field::of()->active, null))
@@ -151,10 +130,6 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 				error_log($e->getMessage());
 			}
 		}
-		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Clear the application menu cache for all users
-		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -164,11 +139,11 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 	{
 		foreach($inputPost->getCheckedRowId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS) as $rowId)
 		{
-			$moduleGroup = new AppModuleGroupImpl(null, $database);
+			$currency = new Currency(null, $database);
 			try
 			{
-				$moduleGroup->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleGroupId, $rowId))
+				$currency->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->currencyId, $rowId))
 					->addAnd(
 						PicoSpecification::getInstance()
 							->addOr(PicoPredicate::getInstance()->equals(Field::of()->active, null))
@@ -188,10 +163,6 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				error_log($e->getMessage());
 			}
 		}
-		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Clear the application menu cache for all users
-		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -204,12 +175,20 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			try
 			{
 				$specification = PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleGroupId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->currencyId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$moduleGroup = new AppModuleGroupImpl(null, $database);
-				$moduleGroup->where($specification)
-					->delete();
+				$currency = new Currency(null, $database);
+				$currency->findOne($specification);
+				if($currency->issetCurrencyId())
+				{
+					$currencyTrash = new CurrencyTrash($currency, $database);
+					$currencyTrash->setAdminDelete($currentAction->getUserId());
+					$currencyTrash->setTimeDelete($currentAction->getTime());
+					$currencyTrash->setIpDelete($currentAction->getIp());
+					$currencyTrash->insert();
+					$currency->delete();
+				}
 			}
 			catch(Exception $e)
 			{
@@ -217,10 +196,6 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 				error_log($e->getMessage());
 			}
 		}
-		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Clear the application menu cache for all users
-		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
@@ -239,11 +214,11 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 				$rowId = $dataItem->getPrimaryKey();
 				$sortOrder = intval($dataItem->getSortOrder());
 				$specification = PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->moduleGroupId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->currencyId, $rowId))
 					->addAnd($dataFilter)
 					;
-				$moduleGroup = new AppModuleGroupImpl(null, $database);
-				$moduleGroup->where($specification)
+				$currency = new Currency(null, $database);
+				$currency->where($specification)
 					->setSortOrder($sortOrder)
 					->update();
 			}
@@ -253,23 +228,20 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 				error_log($e->getMessage());
 			}
 		}
-		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
-		// Clear the application menu cache for all users
-		$applicationMenu->clearMenuCache();
 	}
 	$currentModule->redirectToItself();
 }
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleGroupImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Currency(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
+						
 		<?php if($currentModule->hasErrorField())
-		{
-		?>
+						{
+						?>
 		
 						
 		<div class="alert alert-danger">
@@ -278,11 +250,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		
 						
 		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#createform");
-		}
-		?>
+						}
+						?>
+		
+						
 		<form name="createform" id="createform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
+					<tr>
+						<td><?php echo $appEntityLanguage->getCurrencyId();?></td>
+						<td>
+							<input type="text" class="form-control" name="currency_id" id="currency_id" value="" autocomplete="off" required="required"/>
+						</td>
+					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
@@ -290,33 +270,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getUrl();?></td>
+						<td><?php echo $appEntityLanguage->getSymbol();?></td>
 						<td>
-							<input type="text" class="form-control" name="url" id="url" value="" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getTarget();?></td>
-						<td>
-							<input type="text" class="form-control" name="target" id="target" value="" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIcon();?></td>
-						<td>
-							<input type="text" class="form-control" name="icon" id="icon" value="" autocomplete="off"/>
+							<input type="text" class="form-control" name="symbol" id="symbol" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
 							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1"/> <?php echo $appEntityLanguage->getDefaultData();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -346,21 +308,22 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
-	$specification = PicoSpecification::getInstanceOf(Field::of()->moduleGroupId, $inputGet->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
+	$specification = PicoSpecification::getInstanceOf(Field::of()->currencyId, $inputGet->getCurrencyId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$moduleGroup = new AppModuleGroupImpl(null, $database);
+	$currency = new Currency(null, $database);
 	try{
-		$moduleGroup->findOne($specification);
-		if($moduleGroup->issetModuleGroupId())
+		$currency->findOne($specification);
+		if($currency->issetCurrencyId())
 		{
-$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleGroupImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Currency(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
+						
 		<?php if($currentModule->hasErrorField())
-		{
-		?>
+						{
+						?>
 		
 						
 		<div class="alert alert-danger">
@@ -369,51 +332,41 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		
 						
 		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#updateform");
-		}
-		?>
+						}
+						?>
+		
+						
 		<form name="updateform" id="updateform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getCurrencyId();?></td>
+						<td>
+							<input type="text" class="form-control" name="app_builder_new_pk_currency_id" id="currency_id" value="<?php echo $currency->getCurrencyId();?>" autocomplete="off" required="required"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
-							<input type="text" class="form-control" name="name" id="name" value="<?php echo $moduleGroup->getName();?>" autocomplete="off" required="required"/>
+							<input type="text" class="form-control" name="name" id="name" value="<?php echo $currency->getName();?>" autocomplete="off" required="required"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getUrl();?></td>
+						<td><?php echo $appEntityLanguage->getSymbol();?></td>
 						<td>
-							<input type="text" class="form-control" name="url" id="url" value="<?php echo $moduleGroup->getUrl();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getTarget();?></td>
-						<td>
-							<input type="text" class="form-control" name="target" id="target" value="<?php echo $moduleGroup->getTarget();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIcon();?></td>
-						<td>
-							<input type="text" class="form-control" name="icon" id="icon" value="<?php echo $moduleGroup->getIcon();?>" autocomplete="off"/>
+							<input type="text" class="form-control" name="symbol" id="symbol" value="<?php echo $currency->getSymbol();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
-							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="<?php echo $moduleGroup->getSortOrder();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1" <?php echo $moduleGroup->createCheckedDefaultData();?>/> <?php echo $appEntityLanguage->getDefaultData();?></label>
+							<input type="number" step="1" class="form-control" name="sort_order" id="sort_order" value="<?php echo $currency->getSortOrder();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getActive();?></td>
 						<td>
-							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1" <?php echo $moduleGroup->createCheckedActive();?>/> <?php echo $appEntityLanguage->getActive();?></label>
+							<label><input class="form-check-input" type="checkbox" name="active" id="active" value="1" <?php echo $currency->createCheckedActive();?>/> <?php echo $appEntityLanguage->getActive();?></label>
 						</td>
 					</tr>
 				</tbody>
@@ -425,7 +378,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<button type="submit" class="btn btn-success" name="user_action" id="update_data" value="update"><?php echo $appLanguage->getButtonSave();?></button>
 							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-							<input type="hidden" name="module_group_id" id="primary_key_value" value="<?php echo $moduleGroup->getModuleGroupId();?>"/>
+							<input type="hidden" name="currency_id" id="primary_key_value" value="<?php echo $currency->getCurrencyId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -456,15 +409,32 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
-	$specification = PicoSpecification::getInstanceOf(Field::of()->moduleGroupId, $inputGet->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
+	$specification = PicoSpecification::getInstanceOf(Field::of()->currencyId, $inputGet->getCurrencyId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
-	$moduleGroup = new AppModuleGroupImpl(null, $database);
+	$currency = new Currency(null, $database);
 	try{
-		$subqueryMap = null;
-		$moduleGroup->findOne($specification, null, $subqueryMap);
-		if($moduleGroup->issetModuleGroupId())
+		$subqueryMap = array(
+		"adminCreate" => array(
+			"columnName" => "admin_create",
+			"entityName" => "AdminCreate",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "creator",
+			"propertyName" => "name"
+		), 
+		"adminEdit" => array(
+			"columnName" => "admin_edit",
+			"entityName" => "AdminEdit",
+			"tableName" => "admin",
+			"primaryKey" => "admin_id",
+			"objectName" => "editor",
+			"propertyName" => "name"
+		)
+		);
+		$currency->findOne($specification, null, $subqueryMap);
+		if($currency->issetCurrencyId())
 		{
-$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleGroupImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Currency(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
@@ -472,10 +442,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
 		<?php
-		if(UserAction::isRequireNextAction($inputGet) && UserAction::isRequireApproval($moduleGroup->getWaitingFor()))
+		if(UserAction::isRequireNextAction($inputGet) && UserAction::isRequireApproval($currency->getWaitingFor()))
 		{
 				?>
-				<div class="alert alert-info"><?php echo UserAction::getWaitingForMessage($appLanguage, $moduleGroup->getWaitingFor());?></div>
+				<div class="alert alert-info"><?php echo UserAction::getWaitingForMessage($appLanguage, $currency->getWaitingFor());?></div>
 				<?php
 		}
 		?>
@@ -484,56 +454,48 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getCurrencyId();?></td>
+						<td><?php echo $currency->getCurrencyId();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
-						<td><?php echo $moduleGroup->getName();?></td>
+						<td><?php echo $currency->getName();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getUrl();?></td>
-						<td><?php echo $moduleGroup->getUrl();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getTarget();?></td>
-						<td><?php echo $moduleGroup->getTarget();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getIcon();?></td>
-						<td><?php echo $moduleGroup->getIcon();?></td>
+						<td><?php echo $appEntityLanguage->getSymbol();?></td>
+						<td><?php echo $currency->getSymbol();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
-						<td><?php echo $moduleGroup->getSortOrder();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
-						<td><?php echo $moduleGroup->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
-						<td><?php echo $moduleGroup->dateFormatTimeCreate($appConfig->getDateFormatDetail());?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
-						<td><?php echo $moduleGroup->dateFormatTimeEdit($appConfig->getDateFormatDetail());?></td>
+						<td><?php echo $currency->getSortOrder();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminCreate();?></td>
-						<td><?php echo $moduleGroup->issetCreator() ? $moduleGroup->getCreator()->getName() : "";?></td>
+						<td><?php echo $currency->issetCreator() ? $currency->getCreator()->getName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminEdit();?></td>
-						<td><?php echo $moduleGroup->issetEditor() ? $moduleGroup->getEditor()->getName() : "";?></td>
+						<td><?php echo $currency->issetEditor() ? $currency->getEditor()->getName() : "";?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getTimeCreate();?></td>
+						<td><?php echo $currency->getTimeCreate();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getTimeEdit();?></td>
+						<td><?php echo $currency->getTimeEdit();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpCreate();?></td>
-						<td><?php echo $moduleGroup->getIpCreate();?></td>
+						<td><?php echo $currency->getIpCreate();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpEdit();?></td>
-						<td><?php echo $moduleGroup->getIpEdit();?></td>
+						<td><?php echo $currency->getIpEdit();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getActive();?></td>
-						<td><?php echo $moduleGroup->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
+						<td><?php echo $currency->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -543,11 +505,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td></td>
 						<td>
 							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" id="update_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->module_group_id, $moduleGroup->getModuleGroupId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<button type="button" class="btn btn-primary" id="update_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->currency_id, $currency->getCurrencyId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
 							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
-							<input type="hidden" name="module_group_id" id="primary_key_value" value="<?php echo $moduleGroup->getModuleGroupId();?>"/>
+							<input type="hidden" name="currency_id" id="primary_key_value" value="<?php echo $currency->getCurrencyId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -578,18 +540,16 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguageImpl(new AppModuleGroupImpl(), $appConfig, $currentUser->getLanguageId());
+$appEntityLanguage = new AppEntityLanguageImpl(new Currency(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
 	"name" => PicoSpecification::filter("name", "fulltext")
 );
 $sortOrderMap = array(
+	"currencyId" => "currencyId",
 	"name" => "name",
-	"url" => "url",
-	"target" => "target",
-	"icon" => "icon",
+	"symbol" => "symbol",
 	"sortOrder" => "sortOrder",
-	"defaultData" => "defaultData",
 	"active" => "active"
 );
 
@@ -609,10 +569,67 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 ));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
-$dataLoader = new AppModuleGroupImpl(null, $database);
+$dataLoader = new Currency(null, $database);
 
-$subqueryMap = null;
+$subqueryMap = array(
+"adminCreate" => array(
+	"columnName" => "admin_create",
+	"entityName" => "AdminCreate",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "creator",
+	"propertyName" => "name"
+), 
+"adminEdit" => array(
+	"columnName" => "admin_edit",
+	"entityName" => "AdminEdit",
+	"tableName" => "admin",
+	"primaryKey" => "admin_id",
+	"objectName" => "editor",
+	"propertyName" => "name"
+)
+);
 
+if($inputGet->getUserAction() == UserAction::EXPORT)
+{
+	$exporter = DocumentWriter::getXLSXDocumentWriter();
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+	$sheetName = "Sheet 1";
+
+	$headerFormat = new XLSXDataFormat($dataLoader, 3);
+	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+	$exporter->write($pageData, $fileName, $sheetName, array(
+		$appLanguage->getNumero() => $headerFormat->asNumber(),
+		$appEntityLanguage->getCurrencyId() => $headerFormat->getCurrencyId(),
+		$appEntityLanguage->getName() => $headerFormat->getName(),
+		$appEntityLanguage->getSymbol() => $headerFormat->getSymbol(),
+		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
+		$appEntityLanguage->getAdminCreate() => $headerFormat->asString(),
+		$appEntityLanguage->getAdminEdit() => $headerFormat->asString(),
+		$appEntityLanguage->getTimeCreate() => $headerFormat->getTimeCreate(),
+		$appEntityLanguage->getTimeEdit() => $headerFormat->getTimeEdit(),
+		$appEntityLanguage->getIpCreate() => $headerFormat->getIpCreate(),
+		$appEntityLanguage->getIpEdit() => $headerFormat->getIpEdit(),
+		$appEntityLanguage->getActive() => $headerFormat->asString()
+	), 
+	function($index, $row) use ($appLanguage) {
+		return array(
+			sprintf("%d", $index + 1),
+			$row->getCurrencyId(),
+			$row->getName(),
+			$row->getSymbol(),
+			$row->getSortOrder(),
+			$row->issetCreator() ? $row->getCreator()->getName() : "",
+			$row->issetEditor() ? $row->getEditor()->getName() : "",
+			$row->getTimeCreate(),
+			$row->getTimeEdit(),
+			$row->getIpCreate(),
+			$row->getIpEdit(),
+			$row->optionActive($appLanguage->getYes(), $appLanguage->getNo())
+		);
+	});
+	exit();
+}
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -624,13 +641,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getName();?></span>
 					<span class="filter-control">
-						<input type="text" class="form-control" name="name" value="<?php echo $inputGet->getName();?>" autocomplete="off"/>
+						<input type="text" class="form-control" name="name" value="<?php echo $inputGet->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>" autocomplete="off"/>
 					</span>
 				</span>
 				
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
+				<?php if($userPermission->isAllowedExport()){ ?>
+		
+				<span class="filter-group">
+					<button type="submit" name="user_action" id="export_data" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
+				</span>
+				<?php } ?>
 				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">
@@ -667,8 +690,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-sort data-sort-header"></td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
-								<td class="data-controll data-selector" data-key="module_group_id">
-									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-module-group-id"/>
+								<td class="data-controll data-selector" data-key="currency_id">
+									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-currency-id"/>
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedUpdate()){ ?>
@@ -682,12 +705,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
+								<td data-col-name="currency_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getCurrencyId();?></a></td>
 								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
-								<td data-col-name="url" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUrl();?></a></td>
-								<td data-col-name="target" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTarget();?></a></td>
-								<td data-col-name="icon" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIcon();?></a></td>
+								<td data-col-name="symbol" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSymbol();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
-								<td data-col-name="default_data" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDefaultData();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
 						</thead>
@@ -695,38 +716,36 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<tbody class="data-table-manual-sort" data-offset="<?php echo $pageData->getDataOffset();?>">
 							<?php 
 							$dataIndex = 0;
-							while($moduleGroup = $pageData->fetch())
+							while($currency = $pageData->fetch())
 							{
 								$dataIndex++;
 							?>
 		
-							<tr data-primary-key="<?php echo $moduleGroup->getModuleGroupId();?>" data-sort-order="<?php echo $moduleGroup->getSortOrder();?>" data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>" data-active="<?php echo $moduleGroup->optionActive('true', 'false');?>">
+							<tr data-primary-key="<?php echo $currency->getCurrencyId();?>" data-sort-order="<?php echo $currency->getSortOrder();?>" data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>" data-active="<?php echo $currency->optionActive('true', 'false');?>">
 								<?php if($userPermission->isAllowedSortOrder()){ ?>
 								<td class="data-sort data-sort-body data-sort-handler"></td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
-								<td class="data-selector" data-key="module_group_id">
-									<input type="checkbox" class="checkbox check-slave checkbox-module-group-id" name="checked_row_id[]" value="<?php echo $moduleGroup->getModuleGroupId();?>"/>
+								<td class="data-selector" data-key="currency_id">
+									<input type="checkbox" class="checkbox check-slave checkbox-currency-id" name="checked_row_id[]" value="<?php echo $currency->getCurrencyId();?>"/>
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedUpdate()){ ?>
 								<td>
-									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->module_group_id, $moduleGroup->getModuleGroupId());?>"><span class="fa fa-edit"></span></a>
+									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->currency_id, $currency->getCurrencyId());?>"><span class="fa fa-edit"></span></a>
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td>
-									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->module_group_id, $moduleGroup->getModuleGroupId());?>"><span class="fa fa-folder"></span></a>
+									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->currency_id, $currency->getCurrencyId());?>"><span class="fa fa-folder"></span></a>
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="name"><?php echo $moduleGroup->getName();?></td>
-								<td data-col-name="url"><?php echo $moduleGroup->getUrl();?></td>
-								<td data-col-name="target"><?php echo $moduleGroup->getTarget();?></td>
-								<td data-col-name="icon"><?php echo $moduleGroup->getIcon();?></td>
-								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $moduleGroup->getSortOrder();?></td>
-								<td data-col-name="default_data"><?php echo $moduleGroup->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
-								<td data-col-name="active"><?php echo $moduleGroup->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="currency_id"><?php echo $currency->getCurrencyId();?></td>
+								<td data-col-name="name"><?php echo $currency->getName();?></td>
+								<td data-col-name="symbol"><?php echo $currency->getSymbol();?></td>
+								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $currency->getSortOrder();?></td>
+								<td data-col-name="active"><?php echo $currency->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}
@@ -738,14 +757,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<div class="button-wrapper">
 					<div class="button-area">
 						<?php if($userPermission->isAllowedUpdate()){ ?>
-						<button type="submit" class="btn btn-success" name="user_action" id="activate_selected" value="activate"><?php echo $appLanguage->getButtonActivate();?></button>
-						<button type="submit" class="btn btn-warning" name="user_action" id="deactivate_selected" value="deactivate"><?php echo $appLanguage->getButtonDeactivate();?></button>
+						<button type="submit" class="btn btn-success" name="user_action" id="activate_selected" value="activate" data-confirmation="true" data-event="false" data-onclik-title="<?php echo htmlspecialchars($appLanguage->getTitleActivateConfirmation());?>" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningActivateConfirmation());?>" data-ok-button-label="<?php echo htmlspecialchars($appLanguage->getButtonOk());?>" data-cancel-button-label="<?php echo htmlspecialchars($appLanguage->getButtonCancel());?>"><?php echo $appLanguage->getButtonActivate();?></button>
+						<button type="submit" class="btn btn-warning" name="user_action" id="deactivate_selected" value="deactivate" data-confirmation="true" data-event="false" data-onclik-title="<?php echo htmlspecialchars($appLanguage->getTitleDeactivateConfirmation());?>" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeactivateConfirmation());?>" data-ok-button-label="<?php echo htmlspecialchars($appLanguage->getButtonOk());?>" data-cancel-button-label="<?php echo htmlspecialchars($appLanguage->getButtonCancel());?>"><?php echo $appLanguage->getButtonDeactivate();?></button>
 						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
-						<button type="submit" class="btn btn-danger" name="user_action" id="delete_selected" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
+						<button type="submit" class="btn btn-danger" name="user_action" id="delete_selected" value="delete" data-confirmation="true" data-event="false" data-onclik-title="<?php echo htmlspecialchars($appLanguage->getTitleDeleteConfirmation());?>" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>" data-ok-button-label="<?php echo htmlspecialchars($appLanguage->getButtonOk());?>" data-cancel-button-label="<?php echo htmlspecialchars($appLanguage->getButtonCancel());?>"><?php echo $appLanguage->getButtonDelete();?></button>
 						<?php } ?>
 						<?php if($userPermission->isAllowedSortOrder()){ ?>
-						<button type="submit" class="btn btn-primary" name="user_action" id="save_current_order" value="sort_order" disabled="disabled"><?php echo $appLanguage->getButtonSaveCurrentOrder();?></button>
+						<button type="submit" class="btn btn-primary" name="user_action" id="save_current_order" value="sort_order" data-confirmation="true" data-event="false" data-onclik-title="<?php echo htmlspecialchars($appLanguage->getTitleSortOrderConfirmation());?>" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningSortOrderConfirmation());?>" data-ok-button-label="<?php echo htmlspecialchars($appLanguage->getButtonOk());?>" data-cancel-button-label="<?php echo htmlspecialchars($appLanguage->getButtonCancel());?>" disabled="disabled"><?php echo $appLanguage->getButtonSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>

@@ -14,7 +14,7 @@ use MagicObject\MagicObject;
  * For detailed guidance on using the MagicObject ORM, refer to the official tutorial:
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#orm
  * 
- * @package MagicAdmin\Entity\Data
+ * @package AppBuilder\EntityInstaller
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="general_cache")
