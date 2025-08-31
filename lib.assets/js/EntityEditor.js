@@ -2093,11 +2093,11 @@ class EntityEditor {
 
                 _this.showConfirmationDialog(message, title, captionOk, captionCancel, function(isOk) {
                     if (isOk) {
-                        _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+                        _this.showEntityDataDialog(entity, index, `Entity Data - ${entity.name}`);
                     }
                 });
             } else {
-                _this.showEntityDataDialog(entity, `Entity Data - ${entity.name}`);
+                _this.showEntityDataDialog(entity, index, `Entity Data - ${entity.name}`);
             }
         }
         else
@@ -3480,7 +3480,6 @@ class EntityEditor {
             const text = await navigator.clipboard.readText();            
 
             if (/create\s+table/i.test(text.trim()) || /insert\s+into/i.test(text.trim())) {
-                console.log('parse');
                 this.parseCreateTable(text, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
@@ -4322,15 +4321,18 @@ class EntityEditor {
      * Displays a dialog showing editable tabular data for a given entity.
      *
      * @param {Object} entity - The entity metadata containing column definitions and data.
+     * @param {Int} index - Entity index.
      * @param {string} title - The title to be displayed on the modal dialog.
      *
      * @returns {void}
      */
-    showEntityDataDialog(entity, title) {
+    showEntityDataDialog(entity, index, title) {
         const modal = document.querySelector('#entityDataEditorModal');
         const modalHeader = modal.querySelector('.modal-header h3');
         const modalBody = modal.querySelector('.modal-body');
         const data = entity.data || [];
+
+        modal.dataset.index = index;
 
         modalHeader.innerHTML = title || 'Entity Data';
         modalBody.innerHTML = ''; // Clear previous content
@@ -4575,8 +4577,9 @@ class EntityEditor {
      * or null if the table body is not found.
      */
     addData() {
-        const entity = this.entities[this.currentEntityIndex];
         const modal = document.querySelector('#entityDataEditorModal');
+        let index = parseInt(modal.dataset.index);
+        const entity = this.entities[index];
         const tableBody = modal.querySelector('.data-preview-table tbody');
 
         // If the table body is not found, exit the function.
@@ -4628,8 +4631,9 @@ class EntityEditor {
      * @returns {void}
      */
     saveData() {
-        const entity = this.entities[this.currentEntityIndex];
         const modal = document.querySelector('#entityDataEditorModal');
+        let index = parseInt(modal.dataset.index);
+        const entity = this.entities[index];
         const inputs = modal.querySelectorAll('.data-preview-table input');
 
         const rowDataMap = {};
@@ -4648,8 +4652,7 @@ class EntityEditor {
         const newData = Object.keys(rowDataMap)
             .sort((a, b) => parseInt(a) - parseInt(b))
             .map(rowKey => rowDataMap[rowKey]);
-
-        entity.data = newData;
+        entity.setData(newData);
         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
         this.exportToSQL();

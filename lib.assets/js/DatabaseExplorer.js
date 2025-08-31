@@ -544,7 +544,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const text = await navigator.clipboard.readText();
 
                 if (/create\s+table/i.test(text.trim()) || /insert\s+into/i.test(text.trim())) {
-                    console.log('ok');
                     editor.parseCreateTable(text, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
