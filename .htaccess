@@ -53,6 +53,12 @@ AddType application/wasm .wasm
     # Redirect access to .database files in any directory to 403.php
     RewriteRule ^.*\.database$                        403.php [L]
 
+    # Redirect access to .db files in any directory to 403.php
+    RewriteRule ^.*\.db$                              403.php [L]
+
+    # Redirect access to .sqlite files in any directory to 403.php
+    RewriteRule ^.*\.sqlite$                          403.php [L]
+
     # Redirect access to Dockerfile in any directory to 403.php
     RewriteRule ^.*Dockerfile$                        403.php [L]
 

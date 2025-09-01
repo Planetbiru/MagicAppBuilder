@@ -14,7 +14,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicAdmin\AppEntityLanguageImpl;
 use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;

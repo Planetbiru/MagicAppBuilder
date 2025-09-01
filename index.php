@@ -44,6 +44,7 @@ $pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? 
   <script type="text/javascript" src="lib.assets/js/Validator.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/SVGtoPNG.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Star.min.js"></script>
+  <script type="text/javascript" src="lib.assets/wasm/sql-wasm.min.js"></script>
   <link type="text/css" rel="stylesheet" href="lib.assets/css/fontawesome/css/all.min.css" />
 </head>
 

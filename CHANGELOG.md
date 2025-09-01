@@ -2921,9 +2921,9 @@ This is a significant boost to efficiency, especially for workflows involving da
 
 # MagicAppBuilder Version 1.20.0
 
-## New Feature: Starter Package Entities
+## New Feature: Starter Package
 
-Version 1.20.0 introduces the **Starter Package Entities** feature, a new way to quickly jumpstart your application development. This package provides a pre-built foundation, so you don't have to start from scratch.
+Version 1.20.0 introduces the **Starter Package** feature, a new way to quickly jumpstart your application development. This package provides a pre-built foundation, so you don't have to start from scratch.
 
 A **Starter Package** includes a variety of ready-to-use assets:
 
@@ -2932,4 +2932,26 @@ A **Starter Package** includes a variety of ready-to-use assets:
 * **Themed Designs:** Thoughtfully crafted visual themes with carefully selected color schemes and element layouts to ensure a user-friendly interface.
 
 This feature significantly streamlines your workflow and provides a robust starting point for many different types of projects.
+
+## New Feature: Display SQLite File Content in File Manager
+
+Previously, the File Manager displayed SQLite database files (`.sqlite` and `.db`) as binary files, which posed a risk of corruption if the user accidentally edited and saved them.
+Now, MagicAppBuilder can **safely display the structure and contents** of SQLite files directly within the File Manager.
+
+With this feature, you can:
+
+* View table structures without opening an external tool.
+* Inspect table contents in a human-readable format.
+* Avoid accidental file corruption by preventing raw binary editing.
+
+## New Feature: SQLite Download and Export in File Manager
+
+Building on the SQLite viewer, MagicAppBuilder now provides options to manage SQLite files **directly from the File Manager**.
+Developers can:
+
+* **Download SQLite files** safely without leaving the File Manager.
+* **Export individual tables** as SQL statements for easy migration.
+* **Export the entire database** into a complete SQL dump.
+
+This addition makes the File Manager not just a viewer, but also a convenient tool for database export and backup.
 
