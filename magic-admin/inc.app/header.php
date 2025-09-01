@@ -17,7 +17,7 @@ use MagicObject\SecretObject;
     <link rel="icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="stylesheet" href="vendors/datetime-picker/bootstrap-datetimepicker.min.css">
-    <script src="js/MultiSelect.js"></script>
+    <script src="js/MultiSelect.min.js"></script>
     <script src="vendors/jquery/jquery-3.2.1.min.js"></script>
     <script src="vendors/moment/min/moment.min.js"></script>
     <script src="vendors/datetime-picker/bootstrap-datetimepicker.min.js"></script>
