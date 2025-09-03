@@ -1026,6 +1026,7 @@ function openFile(file, extension) {
         selctor.innerHTML = createDatabaseResource();
         curretDatabaseName = getFileBaseName(file);
         loadDatabaseFromUrl('lib.ajax/file-manager-load-file.php?file=' + encodeURIComponent(file));
+        document.querySelector('.sqlite-file-path').textContent = file;
 
         setDisplayMode('database');
         
@@ -1097,7 +1098,7 @@ function loadDatabaseFromUrl(sqliteDatabaseUrl)
               let tableList = document.querySelector('#sqlite-table-sidebar #sqlite-table-list'); // Get sidebar element
               tableList.innerHTML = ''; // Clear previous table names
 
-              if(res1.length && res1[0] && res1[0].values && res1[0].values.length)
+              if(res1?.[0]?.values?.length)
               {
                 res1[0].values.forEach(row => {
                   let tableListItem = document.createElement('li');
@@ -1462,6 +1463,7 @@ function createDatabaseResource() {
         <div class="sqlite-input-area sqlite-header-section">
           <button class="btn btn-primary" id="sqliteDownloadSqlButton" onclick="sqliteDownloadSql()" disabled>Export Table to SQL</button>
           <button class="btn btn-primary" id="sqliteDownloadAllSqlButton" onclick="sqliteDownloadAllSql()" disabled>Export Database to SQL</button>
+          <span class="sql-file-source btn btn-secondary"><span class="sqlite-file-path"></span></span>
         </div>
         <div id="sqlite-output"></div>
       </main>

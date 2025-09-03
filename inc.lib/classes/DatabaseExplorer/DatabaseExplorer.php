@@ -707,10 +707,19 @@ class DatabaseExplorer // NOSONAR
         
         try
         {
-            $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
 
             $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
             $isPgSql = stripos($driver, 'pg') !== false || stripos($driver, 'postgre') !== false;
+            $isSqlite = stripos($driver, 'sqlite') !== false;
+            
+            $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
+
+            if($isSqlite && empty($primaryKeyName) && strtolower($table) == 'sqlite_sequence')
+            {
+                // sqlite_sequence table
+                $primaryKeyName = 'name';
+            }
+
             
             $offset = ($page - 1) * $limit;
             $stmt = $pdo->query("SELECT COUNT(*) AS total FROM $table");
@@ -910,7 +919,17 @@ class DatabaseExplorer // NOSONAR
      */
     public static function updateData($pdo, $applicationId, $databaseName, $schemaName, $table, $primaryKeyValue)
     {
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $isSqlite = stripos($driver, 'sqlite') !== false;
+        
         $primaryKeyName = self::getPrimaryKeyName($pdo, $schemaName, $table);
+
+        if($isSqlite && empty($primaryKeyName) && strtolower($table) == 'sqlite_sequence')
+        {
+            // sqlite_sequence table
+            $primaryKeyName = 'name';
+        }
+
         $dom = new DOMDocument('1.0', 'utf-8');
         
         try {

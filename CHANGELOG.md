@@ -2955,3 +2955,10 @@ Developers can:
 
 This addition makes the File Manager not just a viewer, but also a convenient tool for database export and backup.
 
+## Bug Fixes
+
+* Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.
+  The `sqlite_sequence` table does not have a primary key, so updates were previously not possible.
+  With this fix, updates now use the `name` column as the key in update forms and update actions.
+
+
