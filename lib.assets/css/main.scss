@@ -1334,10 +1334,15 @@ table.sqlite-table-data {
   th,
   td {
     border: 1px solid #ccc;
-    padding: 5px;
+    padding: 5px 8px;
     text-align: left;
     white-space: nowrap;
   }
+}
+
+#sqlite-table-list li a.sqlite-table-content {
+  display: inline-block;
+  width: calc(100% - 20px);
 }
 
 .file-manager-left-panel {
