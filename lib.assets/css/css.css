@@ -1469,6 +1469,26 @@ table.table.table-enum tr > td:last-child {
   white-space: nowrap;
 }
 
+#document-viewer {
+  height: calc(100vh - 120px);
+  overflow: auto;
+  position: relative;
+  padding-top: 10px;
+}
+#document-viewer #sheet-viewer {
+  max-height: calc(100% - 50px);
+  overflow: auto;
+  box-sizing: border-box;
+}
+#document-viewer #sheet-viewer table {
+  border: 1px solid #dddddd;
+  border-collapse: collapse;
+}
+#document-viewer #sheet-viewer table th, #document-viewer #sheet-viewer table td {
+  padding: 5px 8px;
+  border: 1px solid #dddddd;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;

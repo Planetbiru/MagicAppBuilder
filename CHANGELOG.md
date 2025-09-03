@@ -2955,10 +2955,26 @@ Developers can:
 
 This addition makes the File Manager not just a viewer, but also a convenient tool for database export and backup.
 
+## New Feature: Document Viewer in File Manager
+
+MagicAppBuilder now includes a **Document Viewer** in the File Manager. Users can **preview the contents of documents directly in the application** without downloading them.
+
+Supported file types:
+
+* PDF (`.pdf`)
+* Word (`.docx`)
+* Excel (`.xls`, `.xlsx`, `.ods`)
+* Comma Separated Value (`.csv`)
+
+This feature allows users to:
+
+* Quickly inspect document contents in the context of their application directory.
+* Switch between sheets in Excel/ODS files using tabs.
+* Avoid unnecessary downloads when checking file contents.
+
 ## Bug Fixes
 
 * Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.
   The `sqlite_sequence` table does not have a primary key, so updates were previously not possible.
   With this fix, updates now use the `name` column as the key in update forms and update actions.
-
 

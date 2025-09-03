@@ -51,8 +51,16 @@ try {
         "csv"    => "text/csv; charset=UTF-8",
         "tsv"    => "text/tab-separated-values; charset=UTF-8",
         "sh"     => "text/x-shellscript; charset=UTF-8",
-        "bat"    => "text/x-msdos-batch; charset=UTF-8"
+        "bat"    => "text/x-msdos-batch; charset=UTF-8",
+
+        // Added MIME types
+        "pdf"    => "application/pdf",
+        "xls"    => "application/vnd.ms-excel",
+        "xlsx"   => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "ods"    => "application/vnd.oasis.opendocument.spreadsheet",
+        "docx"   => "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ];
+
 
     $contentType = $mimeTypes[$ext] != null ? $mimeTypes[$ext] : "application/octet-stream";
 

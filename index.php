@@ -44,7 +44,18 @@ $pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? 
   <script type="text/javascript" src="lib.assets/js/Validator.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/SVGtoPNG.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Star.min.js"></script>
-  <script type="text/javascript" src="lib.assets/wasm/sql-wasm.min.js"></script>
+
+  <script type="text/javascript" data-src="lib.assets/js/SQliteViewer.min.js" class="script-for-sqlite"></script>
+  <script type="text/javascript" data-src="lib.assets/wasm/sql-wasm.min.js" class="script-for-sqlite"></script>
+
+  <script type="text/javascript" data-src="lib.assets/jszip/jszip.min.js" class="script-for-docucment-viewer"></script>
+  <script type="text/javascript" data-src="lib.assets/docx-preview/docx-preview.min.js" class="script-for-docucment-viewer"></script>
+  <script type="text/javascript" data-src="lib.assets/xlsx/xlsx.full.min.js" class="script-for-docucment-viewer"></script>
+  <script type="text/javascript" data-src="lib.assets/pdfjs/pdf.min.js" class="script-for-docucment-viewer"></script>
+  <script type="text/javascript" data-src="lib.assets/pdfjs/pdf.worker.min.js" class="script-for-docucment-viewer"></script>
+  <script type="text/javascript" data-src="lib.assets/js/DocumentViewer.min.js" class="script-for-docucment-viewer"></script>
+
+
   <link type="text/css" rel="stylesheet" href="lib.assets/css/fontawesome/css/all.min.css" />
 </head>
 

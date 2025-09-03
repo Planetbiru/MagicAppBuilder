@@ -1721,3 +1721,23 @@ table.table.table-enum
 		}
 	}
 }
+
+#document-viewer {
+    height: calc(100vh - 120px); 
+    overflow: auto;
+    position: relative;
+	padding-top: 10px;
+	#sheet-viewer {
+		max-height: calc(100% - 50px); 
+		overflow: auto;
+		box-sizing: border-box; 
+		table{
+			border: 1px solid #dddddd;
+			border-collapse: collapse;
+			th, td {
+				padding: 5px 8px;
+				border: 1px solid #dddddd;
+			}
+		}
+	}
+}
