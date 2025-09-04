@@ -4,13 +4,13 @@
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicApp\AppFormBuilder;
-use MagicApp\AppUserPermission;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicAppTemplate\AppAccountSecurity;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppUserPermissionImpl;
 use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
@@ -32,7 +32,7 @@ $inputGet = new InputGet();
 $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin", $appLanguage->getAdministrator());
-$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
+$userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 if(!$userPermission->allowedAccess($inputGet, $inputPost))

@@ -893,10 +893,14 @@
 </div>
 
 <div class="file-manager-right-panel col col-10">
-<div>File Contents</div>
+
 <div id="file-content">
-<div class="media-display image-mode"></div>
-<div class="code text-mode">
+<div class="content-preview image-mode">
+<div>Image Preview</div>
+<div class="media-display"></div>
+</div>
+<div class="content-preview code text-mode">
+<div>File Contents</div>
 <div class="path-bar d-flex">
 <input type="text" class="file-path form-control me-2" placeholder="File Path">
 <button type="button" class="btn btn-primary btn-open-file">Open</button>
@@ -905,6 +909,10 @@
 <div class="file-editor">
 <textarea id="code" name="code"></textarea>
 </div>
+</div>
+<div class="content-preview database-display database-mode"></div>
+<div class="content-preview document-display document-mode">
+<div id="document-viewer"></div>
 </div>
 </div>
 </div>

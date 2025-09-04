@@ -3,7 +3,6 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
-use MagicApp\AppUserPermission;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
@@ -11,6 +10,7 @@ use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\AppValidatorMessage;
 use MagicAppTemplate\ApplicationMenu;
+use MagicAppTemplate\AppUserPermissionImpl;
 use MagicAppTemplate\Entity\App\AppModuleGroupImpl;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
@@ -31,7 +31,7 @@ $inputGet = new InputGet();
 $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "module-group", $appLanguage->getModuleGroup());
-$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
+$userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 if(!$userPermission->allowedAccess($inputGet, $inputPost))

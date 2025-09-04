@@ -1027,6 +1027,98 @@ p {
 }
 
 /* File Manager Styles */
+#file-content {
+  max-height: calc(100vh - 125px);
+  overflow: auto;
+  position: relative;
+}
+
+#sqlite-table-sidebar {
+  width: 200px;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+  position: absolute;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#sqlite-table-main {
+  margin-left: 200px;
+  margin-right: 0px;
+  padding: 0px 10px 10px 10px;
+  flex-grow: 1;
+  box-sizing: border-box;
+  width: calc(100% - 200px);
+}
+
+#sqlite-output {
+  padding-right: 20px;
+  padding-bottom: 30px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#sqlite-output,
+#selected-data,
+#sqlite-table-container {
+  height: calc(100vh - 195px);
+  overflow: auto;
+}
+
+.data-column {
+  margin-bottom: 5px;
+}
+.data-column input[type=text],
+.data-column textarea {
+  width: 100%;
+  margin-top: 4px;
+}
+
+#sqlite-table-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+#sqlite-table-list li {
+  padding: 5px 8px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+#sqlite-table-list li.highlight {
+  background-color: #eeeeee;
+}
+#sqlite-table-list li a {
+  color: #222222;
+  text-decoration: none;
+}
+
+.sqlite-header-section {
+  padding: 16px 0px 20px 0px;
+  border-bottom: 1px solid #eeeeee;
+  margin-bottom: 10px;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+table.sqlite-table-data {
+  border-collapse: collapse;
+  width: auto;
+  min-width: 600px;
+}
+table.sqlite-table-data th,
+table.sqlite-table-data td {
+  border: 1px solid #ccc;
+  padding: 5px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+#sqlite-table-list li a.sqlite-table-content {
+  display: inline-block;
+  width: calc(100% - 20px);
+}
+
 .file-manager-left-panel {
   padding: 10px 10px 0 10px;
   overflow-y: auto;
@@ -1375,4 +1467,24 @@ table.table.table-enum tr > td:last-child {
 }
 .table-row-container table td, .table-row-container table th {
   white-space: nowrap;
+}
+
+#document-viewer {
+  height: calc(100vh - 120px);
+  overflow: auto;
+  position: relative;
+  padding-top: 10px;
+}
+#document-viewer #sheet-viewer {
+  max-height: calc(100% - 50px);
+  overflow: auto;
+  box-sizing: border-box;
+}
+#document-viewer #sheet-viewer table {
+  border: 1px solid #dddddd;
+  border-collapse: collapse;
+}
+#document-viewer #sheet-viewer table th, #document-viewer #sheet-viewer table td {
+  padding: 5px 8px;
+  border: 1px solid #dddddd;
 }/*# sourceMappingURL=main.css.map */

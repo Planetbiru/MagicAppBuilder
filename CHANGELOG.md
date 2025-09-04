@@ -2918,3 +2918,63 @@ This is a significant boost to efficiency, especially for workflows involving da
 * **Diagram persistence after JSON import** – Fixed an issue where diagrams were not saved after importing entities from a JSON file. Previously, only the entities were stored on the server while the diagrams were lost. Now, both entities and their diagrams are saved properly, ensuring that complex relationship diagrams remain intact after import.
 * **Save Entity Data from Entity Editor** – Fixed an issue where saving data after adding or updating records via the **Entity Editor** did not persist correctly. Now, both new entries and modifications are reliably stored without data loss.
 
+
+# MagicAppBuilder Version 1.20.0
+
+## New Feature: Starter Package
+
+Version 1.20.0 introduces the **Starter Package** feature, a new way to quickly jumpstart your application development. This package provides a pre-built foundation, so you don't have to start from scratch.
+
+A **Starter Package** includes a variety of ready-to-use assets:
+
+* **Table Designs:** Pre-defined table schemas customized for specific application types, such as libraries, hotels, restaurants, or schools.
+* **Source Code and Binaries:** Relevant source code and binary files for the application, including front-end pages, reservation pages, and sales pages.
+* **Themed Designs:** Thoughtfully crafted visual themes with carefully selected color schemes and element layouts to ensure a user-friendly interface.
+
+This feature significantly streamlines your workflow and provides a robust starting point for many different types of projects.
+
+## New Feature: Display SQLite File Content in File Manager
+
+Previously, the File Manager displayed SQLite database files (`.sqlite` and `.db`) as binary files, which posed a risk of corruption if the user accidentally edited and saved them.
+Now, MagicAppBuilder can **safely display the structure and contents** of SQLite files directly within the File Manager.
+
+With this feature, you can:
+
+* View table structures without opening an external tool.
+* Inspect table contents in a human-readable format.
+* Avoid accidental file corruption by preventing raw binary editing.
+
+## New Feature: SQLite Download and Export in File Manager
+
+Building on the SQLite viewer, MagicAppBuilder now provides options to manage SQLite files **directly from the File Manager**.
+Developers can:
+
+* **Download SQLite files** safely without leaving the File Manager.
+* **Export individual tables** as SQL statements for easy migration.
+* **Export the entire database** into a complete SQL dump.
+
+This addition makes the File Manager not just a viewer, but also a convenient tool for database export and backup.
+
+## New Feature: Document Viewer in File Manager
+
+MagicAppBuilder now includes a **Document Viewer** in the File Manager. Users can **preview the contents of documents directly in the application** without downloading them.
+
+Supported file types:
+
+* PDF (`.pdf`)
+* Word (`.docx`)
+* Excel (`.xls`, `.xlsx`, `.ods`)
+* Comma Separated Value (`.csv`)
+
+This feature allows users to:
+
+* Quickly inspect document contents in the context of their application directory.
+* Switch between sheets in Excel/ODS files using tabs.
+* Avoid unnecessary downloads when checking file contents.
+
+## Bug Fixes
+
+* Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.
+  The `sqlite_sequence` table does not have a primary key, so updates were previously not possible.
+  With this fix, updates now use the `name` column as the key in update forms and update actions.
+

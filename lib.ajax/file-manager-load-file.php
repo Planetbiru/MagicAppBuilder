@@ -5,9 +5,6 @@ use MagicObject\Request\InputGet;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-
-$separatorNLT = "\r\n\t";
-
 // Exit if the application is not set up
 if ($appConfig->getApplication() == null) {
     exit();
@@ -15,23 +12,64 @@ if ($appConfig->getApplication() == null) {
 
 $inputGet = new InputGet();
 
-header('Content-type: text/plain');
-
 try {
     // Get the base directory of the active application
-    $baseDirectory = $activeApplication->getBaseApplicationDirectory();
-    // Remove trailing slash if exists
-    $baseDirectory = rtrim($baseDirectory, "/");
+    $baseDirectory = rtrim($activeApplication->getBaseApplicationDirectory(), "/");
 
-    // Construct the full path based on the base directory and the requested directory
-    $file = $baseDirectory . "/" . $inputGet->getFile();
-    $file = FileDirUtil::normalizationPath($file);
+    // Construct the full path
+    $file = FileDirUtil::normalizationPath($baseDirectory . "/" . $inputGet->getFile());
 
-    echo file_get_contents($file);
+    if (!file_exists($file)) {
+        http_response_code(404);
+        exit("File not found");
+    }
+
+    // Detect content type by file extension
+    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    $mimeTypes = [
+        // Database files
+        "sqlite" => "application/x-sqlite3",
+        "db"     => "application/x-sqlite3",
+
+        // Text-based formats
+        "sql"    => "text/plain; charset=UTF-8",
+        "json"   => "application/json; charset=UTF-8",
+        "js"     => "application/javascript; charset=UTF-8",
+        "css"    => "text/css; charset=UTF-8",
+        "scss"   => "text/x-scss; charset=UTF-8",
+        "html"   => "text/html; charset=UTF-8",
+        "htm"    => "text/html; charset=UTF-8",
+        "php"    => "text/x-php; charset=UTF-8",
+        "txt"    => "text/plain; charset=UTF-8",
+        "xml"    => "application/xml; charset=UTF-8",
+        "md"     => "text/markdown; charset=UTF-8",
+        "yml"    => "text/yaml; charset=UTF-8",
+        "yaml"   => "text/yaml; charset=UTF-8",
+        "ini"    => "text/plain; charset=UTF-8",
+        "env"    => "text/plain; charset=UTF-8",
+        "log"    => "text/plain; charset=UTF-8",
+        "csv"    => "text/csv; charset=UTF-8",
+        "tsv"    => "text/tab-separated-values; charset=UTF-8",
+        "sh"     => "text/x-shellscript; charset=UTF-8",
+        "bat"    => "text/x-msdos-batch; charset=UTF-8",
+
+        // Added MIME types
+        "pdf"    => "application/pdf",
+        "xls"    => "application/vnd.ms-excel",
+        "xlsx"   => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "ods"    => "application/vnd.oasis.opendocument.spreadsheet",
+        "docx"   => "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ];
+
+
+    $contentType = $mimeTypes[$ext] != null ? $mimeTypes[$ext] : "application/octet-stream";
+
+    header("Content-Type: $contentType");
+    header("Content-Length: " . filesize($file));
+    readfile($file);
+    exit();
 
 } catch (Exception $e) {
-    // Log any errors that occur
     error_log($e->getMessage());
-    echo "{}";
-    // do nothing
+    http_response_code(500);
 }

@@ -3,12 +3,12 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
-use MagicApp\AppUserPermission;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicAppTemplate\AppEntityLanguageImpl;
 use MagicAppTemplate\AppIncludeImpl;
+use MagicAppTemplate\AppUserPermissionImpl;
 use MagicAppTemplate\Entity\App\AppNotificationImpl;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
@@ -27,7 +27,7 @@ $inputGet = new InputGet();
 $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "notification", $appLanguage->getNotification());
-$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
+$userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 $dataFilter = PicoSpecification::getInstance();

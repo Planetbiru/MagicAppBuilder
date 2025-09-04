@@ -725,6 +725,21 @@ function getFileExtension(filename) {
 }
 
 /**
+ * This function returns the base name of a file without its extension
+ * from a given file name or file path.
+ * 
+ * @param {string} filename - The name or path of the file (e.g., 'example.txt', 'folder/image.jpg').
+ * @returns {string} - The file base name without extension (e.g., 'example', 'image').
+ */
+function getFileBaseName(filename) {
+  const base = filename.split(/[\\/]/).pop(); // ambil nama file terakhir
+  const lastDotIndex = base.lastIndexOf('.');
+
+  if (lastDotIndex === -1) return base; // tidak ada ekstensi
+  return base.substring(0, lastDotIndex);
+}
+
+/**
  * Formats the entire content of the CodeMirror editor.
  * 
  * This function automatically formats the content of the editor by adjusting the indentation 
@@ -973,7 +988,7 @@ function openFile(file, extension) {
       extension = getFileExtension(file); // Get the file extension if not provided 
     }
     // List of non-text extensions (images, videos, audio, etc.)
-    const nonTextExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'mp4', 'mp3', 'avi', 'exe', 'pdf'];
+    const nonTextExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'mp4', 'mp3', 'avi', 'pdf', 'xls', 'xlsx', 'ods', 'csv', 'docx', 'sqlite', 'db'];
 
     // Check if the file extension is not for text files or supported images
     if (!nonTextExtensions.includes(extension.toLowerCase())) {
@@ -981,6 +996,7 @@ function openFile(file, extension) {
         {
             changeMode(file, extension); 
         }
+        setDisplayMode('text');
         openTextFile(file, extension);
     } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico'].includes(extension.toLowerCase())) {
         setDisplayMode('image');
@@ -1002,10 +1018,181 @@ function openFile(file, extension) {
             .catch(error => {
                 decreaseAjaxPending();
             });
+    } else if (['sqlite', 'db'].includes(extension.toLowerCase())) {
+
+        // database-display
+
+        initDatabaseOnce(file);
+        setDisplayMode('database');
+        
+    } else if (['pdf', 'xls', 'xlsx', 'csv', 'ods', 'docx'].includes(extension.toLowerCase())) {
+        // database-display
+        initDocumentViewerOnce(file);
+        setDisplayMode('document');
+        
     } else {
         // For unsupported file extensions, display an error message
         fileDiv.textContent = 'Cannot open this file.'; // Display error message for unsupported file types
     }
+}
+
+/**
+ * Initialize the database view once by ensuring all SQLite-related scripts are loaded only once.
+ *
+ * This function finds all <script> elements with the class `script-for-sqlite`
+ * and loads each script from its `data-src` attribute if it has not been loaded yet.
+ * It waits until all required scripts are fully loaded before running the database initialization.
+ *
+ * @param {string} file - The file path of the SQLite database to load.
+ */
+function initDatabaseOnce(file) {
+    const scriptTags = Array.from(document.querySelectorAll('.script-for-sqlite'));
+
+    if (scriptTags.length === 0) {
+        console.error("No <script class='script-for-sqlite'> elements found.");
+        return;
+    }
+
+    // Check if all scripts are already loaded
+    const allLoaded = scriptTags.every(el => el.dataset.loaded === "true");
+    if (allLoaded) {
+        runDatabaseInit(file);
+        return;
+    }
+
+    // Load each script if not loaded yet
+    let remaining = scriptTags.filter(el => el.dataset.loaded !== "true").length;
+
+    scriptTags.forEach(scriptTag => {
+        if (scriptTag.dataset.loaded === "true") return;
+
+        const url = scriptTag.getAttribute('data-src');
+        if (!url) {
+            console.warn("Missing data-src for script:", scriptTag);
+            remaining--;
+            return;
+        }
+
+        const newScript = document.createElement('script');
+        newScript.src = url;
+
+        newScript.onload = function() {
+            // Mark script as loaded
+            scriptTag.dataset.loaded = "true";
+            remaining--;
+
+            // When all scripts have finished loading, run initialization
+            if (remaining === 0) {
+                runDatabaseInit(file);
+            }
+        };
+
+        newScript.onerror = function() {
+            console.error("Failed to load script:", url);
+            remaining--;
+        };
+
+        document.body.appendChild(newScript);
+    });
+}
+
+/**
+ * Run the database initialization logic after all SQLite scripts have been loaded.
+ *
+ * This function updates the database display, sets the current database name,
+ * loads database content from the server, updates the file path display,
+ * and switches the UI into "database" display mode.
+ *
+ * @param {string} file - The file path of the SQLite database being displayed.
+ */
+function runDatabaseInit(file) {
+    // Update the database display content
+    let selctor = document.querySelector('.database-display');
+    selctor.innerHTML = createDatabaseResource();
+
+    // Set the current database name from the file name
+    curretDatabaseName = getFileBaseName(file);
+
+    // Load the database content from the server
+    loadDatabaseFromUrl('lib.ajax/file-manager-load-file.php?file=' + encodeURIComponent(file));
+
+    // Show the SQLite file path in the UI
+    document.querySelector('.sqlite-file-path').textContent = file;
+
+    // Switch UI mode to "database"
+    setDisplayMode('database');
+}
+
+/**
+ * Initialize the document viewer once by ensuring all related scripts are loaded only once.
+ *
+ * This function finds all <script> elements with the class `script-for-document-viewer`
+ * and loads each script from its `data-src` attribute if it has not been loaded yet.
+ * It waits until all required scripts are fully loaded before running the document viewer initialization.
+ *
+ * @param {string} file - The URL or file path of the document to preview.
+ */
+function initDocumentViewerOnce(file) {
+    const scriptTags = Array.from(document.querySelectorAll('.script-for-document-viewer'));
+
+    if (scriptTags.length === 0) {
+        console.error("No <script class='script-for-document-viewer'> elements found.");
+        return;
+    }
+
+    // Check if all scripts are already loaded
+    const allLoaded = scriptTags.every(el => el.dataset.loaded === "true");
+    if (allLoaded) {
+        runDocumentViewerInit(file);
+        return;
+    }
+
+    // Load each script if not loaded yet
+    let remaining = scriptTags.filter(el => el.dataset.loaded !== "true").length;
+
+    scriptTags.forEach(scriptTag => {
+        if (scriptTag.dataset.loaded === "true") return;
+
+        const url = scriptTag.getAttribute('data-src');
+        if (!url) {
+            console.warn("Missing data-src for script:", scriptTag);
+            remaining--;
+            return;
+        }
+
+        const newScript = document.createElement('script');
+        newScript.src = url;
+
+        newScript.onload = function() {
+            // Mark script as loaded
+            scriptTag.dataset.loaded = "true";
+            remaining--;
+
+            // When all scripts have finished loading, run initialization
+            if (remaining === 0) {
+                runDocumentViewerInit(file);
+            }
+        };
+
+        newScript.onerror = function() {
+            console.error("Failed to load script:", url);
+            remaining--;
+        };
+
+        document.body.appendChild(newScript);
+    });
+}
+
+/**
+ * Run the document viewer initialization logic after all required scripts have been loaded.
+ *
+ * This function previews the document file, updates the UI, and sets the display mode.
+ *
+ * @param {string} file - The URL or file path of the document being displayed.
+ */
+function runDocumentViewerInit(file) {
+    previewFile('lib.ajax/file-manager-load-file.php?file=' + encodeURIComponent(file));
+    setDisplayMode('document');
 }
 
 /**
@@ -1077,10 +1264,24 @@ function openTextFile(file, extension) {
 function setDisplayMode(mode) {
     if (mode === 'text') {
         document.querySelector('.image-mode').style.display = 'none';  // Hide the image viewer
+        document.querySelector('.database-mode').style.display = 'none';  // Hide the database viewer
+        document.querySelector('.document-mode').style.display = 'none';  // Hide the document viewer
         document.querySelector('.text-mode').style.display = 'block';  // Show the text editor
     } else if (mode === 'image') {
         document.querySelector('.text-mode').style.display = 'none';  // Hide the text editor
+        document.querySelector('.database-mode').style.display = 'none';  // Hide the database viewer
+        document.querySelector('.document-mode').style.display = 'none';  // Hide the document viewer
         document.querySelector('.image-mode').style.display = 'block';  // Show the image viewer
+    } else if (mode === 'database') {
+        document.querySelector('.text-mode').style.display = 'none';  // Hide the text editor
+        document.querySelector('.image-mode').style.display = 'none';  // Hide the image viewer
+        document.querySelector('.document-mode').style.display = 'none';  // Hide the document viewer
+        document.querySelector('.database-mode').style.display = 'block';  // Show the database viewer
+    } else if (mode === 'document') {
+        document.querySelector('.text-mode').style.display = 'none';  // Hide the text editor
+        document.querySelector('.image-mode').style.display = 'none';  // Hide the image viewer
+        document.querySelector('.database-mode').style.display = 'none';  // Hide the database viewer
+        document.querySelector('.document-mode').style.display = 'block';  // Show the document viewer
     }
 }
 
