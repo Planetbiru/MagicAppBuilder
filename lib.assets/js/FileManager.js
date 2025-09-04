@@ -1039,17 +1039,17 @@ function openFile(file, extension) {
 /**
  * Initialize the database view once by ensuring all SQLite-related scripts are loaded only once.
  *
- * This function finds all <script> elements with the class `script-for-sqlite`
+ * This function finds all <script> elements with the class `script-for-sqlite-viewer`
  * and loads each script from its `data-src` attribute if it has not been loaded yet.
  * It waits until all required scripts are fully loaded before running the database initialization.
  *
  * @param {string} file - The file path of the SQLite database to load.
  */
 function initDatabaseOnce(file) {
-    const scriptTags = Array.from(document.querySelectorAll('.script-for-sqlite'));
+    const scriptTags = Array.from(document.querySelectorAll('.script-for-sqlite-viewer'));
 
     if (scriptTags.length === 0) {
-        console.error("No <script class='script-for-sqlite'> elements found.");
+        console.error("No <script class='script-for-sqlite-viewer'> elements found.");
         return;
     }
 
