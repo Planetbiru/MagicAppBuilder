@@ -106,7 +106,8 @@ class Column {
      *
      * Examples:
      * - BOOLEAN(1) → BOOLEAN
-     * - bool(1) → bool
+     * - BOOL(1) → BOOL
+     * - BIT(1) → BIT
      * - VARCHAR(255) → VARCHAR(255) (unchanged)
      *
      * @param {string} type - The original SQL column type (may include parameters).
@@ -117,13 +118,13 @@ class Column {
 
         const match = type.match(/^(\w+)\s*\((\d+)\)$/i); // NOSONAR
         if (match) {
-            const baseType = match[1].toLowerCase();
-            if (baseType === 'boolean' || baseType === 'bool') {
-                return baseType.toUpperCase(); // Normalize to uppercase if preferred
+            const baseType = match[1].toUpperCase();
+            if (baseType === 'BOOLEAN' || baseType === 'BOOL' || baseType === 'BIT') {
+                return baseType; // Normalize to uppercase if preferred
             }
         }
 
-        return type;
+        return type.toUpperCase();
     }
 
 
@@ -147,26 +148,30 @@ class Column {
      */
     toSQL(dialect = 'mysql', separatePrimaryKey = false) // NOSONAR
     {
-        let typeKey = this.type.toLowerCase();
-        if(typeKey == 'tinyint' && this.length == 1)
-        {
-            typeKey = 'tinyint1';
+        // Use uppercase for consistency
+        let typeKey = this.type.toUpperCase();
+        if (typeKey === 'TINYINT' && this.length == 1) {
+            typeKey = 'TINYINT1';
         }
 
-        // Ensure typeMap is a valid object, default to mysql if the dialect isn't found
+        // Ensure typeMap is a valid object, default to MySQL if the dialect isn't found
         let typeMap = DIALECT_TYPE_MAP[dialect] || DIALECT_TYPE_MAP.mysql;
-        let mappedType = typeMap[typeKey] || this.type;
-        
-        mappedType = this.fixColumnType(mappedType);
+        let mappedType = typeMap[typeKey.toLowerCase()] || this.type;
 
-        if(mappedType == 'BIGINT' && dialect == 'mysql')
-        {
+        // Force the final type to uppercase
+        mappedType = this.fixColumnType(mappedType).toUpperCase();
+
+        if (mappedType === 'BIGINT' && dialect === 'mysql') {
             this.length = '20';
         }
-        
-        const isEnumOrSet = ['enum', 'set'].includes(typeKey);
-        const isRangeType = ['numeric', 'decimal', 'double', 'float'].includes(typeKey);
-        const isLengthType = ['varchar', 'char', 'binary', 'varbinary', 'bit', 'tinyint', 'smallint', 'mediumint', 'int', 'bigint'].includes(typeKey);
+
+        // All constants are compared in UPPERCASE
+        const isEnumOrSet = ['ENUM', 'SET'].includes(typeKey);
+        const isRangeType = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'].includes(typeKey);
+        const isLengthType = [
+            'VARCHAR', 'CHAR', 'BINARY', 'VARBINARY',
+            'BIT', 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'BIGINT'
+        ].includes(typeKey);
 
         let columnDef = `${this.name} ${mappedType}`;
 
@@ -184,12 +189,9 @@ class Column {
         }
         // Length types
         else if (isLengthType && this.length) {
-            if(dialect == 'sqlite' && this.primaryKey && this.autoIncrement && this.type.toLowerCase().indexOf('int') !== -1)
-            {
+            if (dialect === 'sqlite' && this.primaryKey && this.autoIncrement && typeKey.includes('INT')) {
                 columnDef += '';
-            }
-            else
-            {
+            } else {
                 columnDef += `(${this.length})`;
             }
         }
@@ -197,12 +199,9 @@ class Column {
         // NOT NULL / NULL
         if (!this.primaryKey) {
             columnDef += this.nullable ? ' NULL' : ' NOT NULL';
-        } else if(separatePrimaryKey)
-        {
+        } else if (separatePrimaryKey) {
             columnDef += ' NOT NULL';
-        }
-        else
-        {
+        } else {
             columnDef += ' NOT NULL PRIMARY KEY';
         }
 
@@ -218,22 +217,17 @@ class Column {
         if (this.hasDefault()) {
             if (this.isTypeBoolean(this.type, this.length)) {
                 columnDef += ` DEFAULT ${this.toBoolean(this.default, dialect)}`;
-            } 
-            else if (typeMap && this.isTypeNumeric(this.type, Object.values(typeMap)) && !isNaN(this.default)) {
+            } else if (typeMap && this.isTypeNumeric(this.type, Object.values(typeMap)) && !isNaN(this.default)) {
                 columnDef += ` DEFAULT ${this.default}`;
-            } 
-            else if(isNaN(this.default))
-            {
+            } else if (isNaN(this.default)) {
                 columnDef += '';
-            }
-            else {
+            } else {
                 columnDef += ` DEFAULT ${this.fixDefaultColumnValue(this.default, dialect)}`;
             }
         }
 
         return columnDef;
     }
-
 
     /**
      * Converts a string with quotes into a numeric string without quotes.
