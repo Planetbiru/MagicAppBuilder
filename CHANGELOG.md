@@ -2972,6 +2972,14 @@ This feature allows users to:
 * Switch between sheets in Excel/ODS files using tabs.
 * Avoid unnecessary downloads when checking file contents.
 
+### **New Feature: Automatic Snake Case Naming on SQL Import**
+
+When importing a database from an SQL file in the **Entity Editor**, MagicAppBuilder now automatically converts the database structure and its contents to a **snake case** naming convention. This feature ensures consistency and simplifies the process of integrating external databases by standardizing column and table names.
+
+### **New Feature: Smart SQLite Database File Selection**
+
+In the **Application Settings**, the "Database File Path" field now provides a convenient way to manage your SQLite files. By clearing this field and double-clicking on it, you can now view and select all other SQLite database files (`.sqlite` and `.db`) that exist in the same directory as your current database. This allows you to quickly switch between or reuse previously created databases without having to browse for them manually.
+
 ## Bug Fixes
 
 * Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.

@@ -89,6 +89,18 @@ if($appConfig->getSessions() == null)
     $appConfig->setSessions(new SecretObject()); 
 }
 $cfgDatabase = new SecretObject($appConfig->getDatabase());
+
+$databaseFiles = array();
+if($cfgDatabase->getDatabaseFilePath() != "")
+{
+    $dirname = dirname($cfgDatabase->getDatabaseFilePath());
+    $dbFiles = glob($dirname . "/*.db");
+    $sqliteFiles = glob($dirname . "/*.sqlite");
+
+    $databaseFiles = array_merge($dbFiles, $sqliteFiles);
+}
+
+
 $cfgSession = new SecretObject($appConfig->getSessions());
 $cfgAccountSecurity = new SecretObject($appConfig->getAccountSecurity());
 $app = new SecretObject($appConfig->getApplication());
@@ -315,7 +327,18 @@ $nameInIndonesian = array(
                             </tr>
                             <tr class="database-credential file-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Database File Path</td>
-                                <td><span class="directory-container input-with-checker" data-isfile="true"><input class="form-control" type="text" name="database_database_file_path" id="database_database_file_path" value="<?php echo $cfgDatabase->getDatabaseFilePath(); ?>"></span></td>
+                                <td><span class="directory-container input-with-checker" data-isfile="true"><input class="form-control" type="text" name="database_database_file_path" id="database_database_file_path" value="<?php echo $cfgDatabase->getDatabaseFilePath(); ?>" list="databasefilelist"></span>
+                                    <datalist id="databasefilelist">
+                                        <?php
+                                        foreach($databaseFiles as $dbFile)
+                                        {
+                                          ?>
+                                          <option><?php echo $dbFile;?></option>
+                                          <?php  
+                                        }
+                                        ?>
+                                    </datalist>
+                            </td>
                             </tr>
                             <tr class="database-credential nonfile-base" data-current-database-type="<?php echo $databases->getSelectedBase();?>">
                                 <td>Host</td>
