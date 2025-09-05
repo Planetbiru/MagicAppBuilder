@@ -1339,18 +1339,19 @@ class EntityEditor {
      * @returns {Array} entities - An array of Entity objects, each containing Column objects based on the provided table data.
      */
     createEntitiesFromSQL(tables) {
+        let _this = this;
         const entities = [];
 
         // Iterate over each entity in the JSON data
         tables.forEach((table, index) => {
             // Create a new Entity instance
-            let entity = new Entity(table.tableName, index);
+            let entity = new Entity(_this.snakeize(table.tableName), index);
             
             // Iterate over each column in the entity's columns array
             table.columns.forEach(columnData => {
                 // Create a new Column instance
                 const column = new Column(
-                    columnData.Field,
+                    _this.snakeize(columnData.Field),
                     columnData.Type.toUpperCase(),
                     columnData.Length,
                     columnData.Nullable,
@@ -2876,8 +2877,11 @@ class EntityEditor {
 
                 const tableParser = new TableParser(translatedContents); // Parse translated SQL structure (CREATE TABLE)
                 tableParser.parseData(contents); // Parse original SQL content (INSERT INTO) to extract row data
+                
+                // Convert data to snake case
+                let snakeData = _this.snakeizeObjectKeys(tableParser.data);
 
-                const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
+                const importedEntities = _this.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
 
                 if(importedEntities && importedEntities.length)
                 {
@@ -2887,8 +2891,8 @@ class EntityEditor {
 
                         importedEntities.forEach((entity) => {
                             const tableName = entity.name;
-                            if (tableParser.data?.[tableName]) {
-                                entity.setData(tableParser.data[tableName]); // Assign row data if available
+                            if (snakeData[tableName]) {
+                                entity.setData(_this.snakeizeData(snakeData[tableName], entity.columns)); // Assign row data if available
                             }
                         });
 
@@ -2896,36 +2900,42 @@ class EntityEditor {
                         _this.clearDiagrams();  // Remove all diagrams
                         _this.renderEntities(); // Render the imported entities in the interface
                     } else {
+                        if(!_this.entities)
+                        {
+                            // Bug fix if entities is null
+                            _this.entities = [];
+                        }
                         // Merge imported entities with existing ones
                         const existing = _this.entities.map(e => e.name);
 
                         importedEntities.forEach((entity) => {
+                            let tableName = entity.name;
                             if (!existing.includes(entity.name)) {
                                 entity.index = _this.entities.length;
 
-                                if (tableParser.data?.[entity.name]) {
-                                    entity.setData(tableParser.data[entity.name]); // Assign row data if available
+                                if (snakeData[tableName]) {
+                                    entity.setData(_this.snakeizeData(snakeData[tableName], entity.columns)); // Assign row data if available
                                 }
 
                                 _this.entities.push(entity);
                             }
-                            else if (tableParser.data?.[entity.name]) {
-                                _this.getEntityByName(entity.name).appendData(tableParser.data[entity.name]); // Assign row data if available
+                            else if (snakeData[tableName]) {
+                                _this.getEntityByName(tableName).appendData(_this.snakeizeData(snakeData[tableName], entity.columns)); // Assign row data if available
                             }
                         });
 
                         _this.renderEntities(); // Refresh UI to reflect changes
                     }
                 }
-                else if(tableParser.data)
+                else if(snakeData)
                 {
-                    for (const tableName in tableParser.data) {
-                        if (tableParser.data.hasOwnProperty(tableName)) {
+                    for (const tableName in snakeData) {
+                        if (snakeData.hasOwnProperty(tableName)) {
                             // Find the existing entity by name
                             const existingEntity = _this.getEntityByName(tableName);
                             if (existingEntity) {
                                 // Append the new data, which is handled by the appendData function
-                                existingEntity.appendData(tableParser.data[tableName]);                             
+                                existingEntity.appendData(snakeData[tableName]);                             
                             }
                         }
                     }
@@ -3810,6 +3820,27 @@ class EntityEditor {
             }
         }
         return result;
+    }
+    
+    /**
+     * Transforms all keys of an object to snake_case.
+     *
+     * This function iterates through the properties of the given object,
+     * converts each key to snake_case using a separate `snakeize` method,
+     * and creates a new object with the transformed keys.
+     *
+     * @param {object} data The object whose keys need to be snakeized.
+     * @returns {object} A new object with all keys converted to snake_case.
+     */
+    snakeizeObjectKeys(data) {
+        const snakeData = {};
+        for (const key in data) {
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+                const snakeKey = this.snakeize(key);
+                snakeData[snakeKey] = data[key];
+            }
+        }
+        return snakeData;
     }
 
     /**
