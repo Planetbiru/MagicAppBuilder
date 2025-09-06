@@ -1,0 +1,98 @@
+.btn {
+    padding: .175rem .5rem;
+}
+
+.btn-group {
+    &>.btn {
+        white-space: nowrap;
+        padding: .175rem .75rem;
+    }
+}
+
+.form-control {
+    height: calc(1em + 0.75rem + 2px);
+    padding: 0rem 0.5rem;
+    line-height: 1;
+}
+
+.custom-file-input,
+.custom-file,
+.custom-file-label {
+  height: calc(1.12em + 0.75rem + 2px);
+  padding: 0.125rem 0.75rem;
+  line-height: 1.5;
+}
+.custom-file-label::after {
+  top: -4px;
+}
+.input-group > .input-group-append > .btn{
+    padding: 0.125rem 0.75rem;
+}
+
+#previewJson, #previewYaml{
+    height: 400px;
+    max-height: calc(100vh - 120px);
+    border: 1px solid #dddddd;
+    padding: 1rem;
+    background-color: #FAFAFA;
+}
+
+.drag {
+  cursor: default;   /* arrow */
+}
+.dragging {
+  cursor: default !important; /* paksa arrow saat dragging */
+}
+
+.main, .dbm-sidebar{
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+}
+
+/* Chrome, Edge, Safari */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.dbm-container{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.input-group-file{
+    overflow: hidden;
+    position: relative;
+}
+
+#fileInput{
+  position: absolute;
+  left:-100000px;
+  width: 1px;
+  height: 1px;
+}
+
+#selectedFile::after{
+  content: attr(data-label);
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+.dark-mode{
+  #selectedFile{
+    background-color: #212529;
+    border-color: #464646;
+    &::after{
+      content: attr(data-label);
+      color: #e8e8e8;
+      background-color: #135b24;
+      border-color: #156027;
+    }
+  }
+}

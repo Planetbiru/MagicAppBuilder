@@ -566,6 +566,13 @@ select:focus {
 
   background-color: $color-dark;
   color: $color-text-dark;
+  .card, .custom-file-label{
+    background-color: $color-dark;
+    color: $color-text-dark;
+  }
+  .input-group-file{
+
+  }
 
   .alert-info {
     color: #e4e4e4;
