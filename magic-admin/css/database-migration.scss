@@ -1,3 +1,13 @@
+$color-light: #f8f9fa;
+$color-dark: #212529;
+$color-hover: #495057;
+$color-link: #FAFAFA;
+$color-input: #dee2e6;
+$color-input-dark: #464646;
+$color-border-dark: #212529;
+$color-text-light: #212529;
+$color-text-dark: #e4e6e8;
+
 .btn {
     padding: .175rem .5rem;
 }
@@ -94,5 +104,10 @@ input[type=number] {
       background-color: #135b24;
       border-color: #156027;
     }
+  }
+  #previewJson, #previewYaml{
+    background-color: $color-dark;
+    color: $color-text-dark;
+    border-color: #444;
   }
 }

@@ -6,7 +6,7 @@
 
 // --- State ---
 // Global application state holding configuration, tables, and scripts
-const state = {
+let state = {
     /** @type {object} - Configuration for the target database. */
     databaseTarget: { driver: '', host: '', port: '', username: '', password: '', databaseFilePath: '', databaseName: '', databseSchema: '', timeZone: '' },
     /** @type {object} - Configuration for the source database. */
@@ -490,6 +490,13 @@ jQuery(function(){
     $('#btnClearAll').on('click', () => { 
         listEl.empty(); 
         state.table=[]; 
+        $('.dbm-sidebar').find('input[type="text"], input[type="number"], input[type="password"]').val('');
+        state = {
+            databaseTarget: { driver: '', host: '', port: '', username: '', password: '', databaseFilePath: '', databaseName: '', databseSchema: '', timeZone: '' },
+            databaseSource: { driver: '', host: '', port: '', username: '', password: '', databaseFilePath: '', databaseName: '', databseSchema: '', timeZone: '' },
+            maximumRecord: 100,
+            table: []
+        };
         refreshPreviews(); 
         saveDraft(); 
     });
