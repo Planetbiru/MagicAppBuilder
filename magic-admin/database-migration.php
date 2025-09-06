@@ -36,97 +36,97 @@ require_once $appInclude->mainAppHeader(__DIR__);
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getDriver();?></label>
-                            <input class="form-control" data-path="databaseTarget.driver" />
+                            <input type="text" class="form-control" data-path="databaseTarget.driver" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getHost();?></label>
-                            <input class="form-control" data-path="databaseTarget.host" />
+                            <input type="text" class="form-control" data-path="databaseTarget.host" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getPort();?></label>
-                            <input class="form-control" type="number" data-path="databaseTarget.port" />
+                            <input type="number" class="form-control" data-path="databaseTarget.port" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getUsername();?></label>
-                            <input class="form-control" data-path="databaseTarget.username" />
+                            <input type="text" class="form-control" data-path="databaseTarget.username" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getPassword();?></label>
-                            <input class="form-control" data-path="databaseTarget.password" />
+                            <input type="text" class="form-control" data-path="databaseTarget.password" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getDatabaseFilePath();?></label>
-                            <input class="form-control" data-path="databaseTarget.databaseFilePath" />
+                            <input type="text" class="form-control" data-path="databaseTarget.databaseFilePath" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getDatabaseName();?></label>
-                            <input class="form-control" data-path="databaseTarget.databaseName" />
+                            <input type="text" class="form-control" data-path="databaseTarget.databaseName" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getSchema();?></label>
-                            <input class="form-control" data-path="databaseTarget.databseSchema" />
+                            <input type="text" class="form-control" data-path="databaseTarget.databseSchema" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label><?php echo $appLanguage->getTimeZone();?></label>
-                        <input class="form-control" data-path="databaseTarget.timeZone" />
+                        <input type="text" class="form-control" data-path="databaseTarget.timeZone" />
                     </div>
 
                     <h6 class="h6"><?php echo $appLanguage->getDatabaseSource();?></h6>
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getDriver();?></label>
-                            <input class="form-control" data-path="databaseSource.driver" />
+                            <input type="text" class="form-control" data-path="databaseSource.driver" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getHost();?></label>
-                            <input class="form-control" data-path="databaseSource.host" />
+                            <input type="text" class="form-control" data-path="databaseSource.host" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getPort();?></label>
-                            <input class="form-control" type="number" data-path="databaseSource.port" />
+                            <input type="number" class="form-control" data-path="databaseSource.port" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getUsername();?></label>
-                            <input class="form-control" data-path="databaseSource.username" />
+                            <input type="text" class="form-control" data-path="databaseSource.username" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getPassword();?></label>
-                            <input class="form-control" data-path="databaseSource.password" />
+                            <input type="text" class="form-control" data-path="databaseSource.password" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getDatabaseFilePath();?></label>
-                            <input class="form-control" data-path="databaseSource.databaseFilePath" />
+                            <input type="text" class="form-control" data-path="databaseSource.databaseFilePath" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getDatabaseName();?></label>
-                            <input class="form-control" data-path="databaseSource.databaseName" />
+                            <input type="text" class="form-control" data-path="databaseSource.databaseName" />
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getSchema();?></label>
-                            <input class="form-control" data-path="databaseSource.databseSchema" />
+                            <input type="text" class="form-control" data-path="databaseSource.databseSchema" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label><?php echo $appLanguage->getTimeZone();?></label>
-                        <input class="form-control" data-path="databaseSource.timeZone" />
+                        <input type="text" class="form-control" data-path="databaseSource.timeZone" />
                     </div>
 
                     <div class="form-group">
                         <label><?php echo $appLanguage->getMaximumRecord();?></label>
-                        <input class="form-control" type="number" data-path="maximumRecord" value="100" />
+                        <input type="number" class="form-control" data-path="maximumRecord" value="100" />
                     </div>
 
                     <div class="toolbar d-flex flex-md-column flex-wrap">

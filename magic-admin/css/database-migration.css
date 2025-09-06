@@ -95,4 +95,9 @@ input[type=number] {
   color: #e8e8e8;
   background-color: #135b24;
   border-color: #156027;
+}
+.dark-mode #previewJson, .dark-mode #previewYaml {
+  background-color: #212529;
+  color: #e4e6e8;
+  border-color: #444;
 }/*# sourceMappingURL=database-migration.css.map */
