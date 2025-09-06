@@ -466,6 +466,10 @@ select:focus {
   background-color: #212529;
   color: #e4e6e8;
 }
+.dark-mode .card, .dark-mode .custom-file-label {
+  background-color: #212529;
+  color: #e4e6e8;
+}
 .dark-mode .alert-info {
   color: #e4e4e4;
   background-color: #212529;

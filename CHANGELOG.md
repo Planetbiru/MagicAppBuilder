@@ -2980,6 +2980,18 @@ When importing a database from an SQL file in the **Entity Editor**, MagicAppBui
 
 In the **Application Settings**, the "Database File Path" field now provides a convenient way to manage your SQLite files. By clearing this field and double-clicking on it, you can now view and select all other SQLite database files (`.sqlite` and `.db`) that exist in the same directory as your current database. This allows you to quickly switch between or reuse previously created databases without having to browse for them manually.
 
+## New Feature: Database Migration Tool
+
+MagicAppBuilder introduces the **Database Migration Tool**, designed to help developers migrate data from an old (legacy) database into a new database structure tailored for MagicAppBuilder.
+
+When revamping an application with MagicAppBuilder, database structures often need adjustments to fully support its features. Manually transferring data between old and new schemas can be time-consuming and error-prone.
+
+With this tool:
+
+* Developers can configure automatic data migration using **MagicObject**.
+* MagicAppBuilder generates the required migration configuration, eliminating the need to write it manually.
+* This significantly reduces effort and ensures that data from legacy databases can be reused seamlessly in the new system.
+
 ## Bug Fixes
 
 * Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.
