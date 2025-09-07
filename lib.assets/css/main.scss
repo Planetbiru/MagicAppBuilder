@@ -1262,6 +1262,9 @@ white-space: nowrap;
 		padding: 0;
 	}
 }
+.image-mode, .database-mode, .document-mode, .frame-mode{
+	display: none;
+}
 
 #sqlite-table-sidebar {
   width: 200px; // Fixed width for sidebar

@@ -69,7 +69,7 @@ try {
         "svg"    => "image/svg+xml"
     ];
 
-    $contentType = $mimeTypes[$ext] != null ? $mimeTypes[$ext] : "application/octet-stream";
+    $contentType = isset($mimeTypes[$ext]) ? $mimeTypes[$ext] : "application/octet-stream";
 
     header("Content-Type: $contentType");
     header("Content-Length: " . filesize($file));
