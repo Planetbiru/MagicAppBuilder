@@ -66,7 +66,22 @@ try {
         "woff"   => "font/woff",
         "woff2"  => "font/woff2",
         "eot"    => "application/vnd.ms-fontobject",
-        "svg"    => "image/svg+xml"
+        "svg"    => "image/svg+xml",
+
+        "mp3"  => "audio/mpeg",
+        "wav"  => "audio/wav",
+        "m4a"  => "audio/mp4",
+        "flac" => "audio/flac",
+        
+        "mp4"  => "video/mp4",
+        "ogg"  => "video/ogg",
+        "webm" => "video/webm",
+        "avi"  => "video/x-msvideo",
+        "mov"  => "video/quicktime",
+        "wmv"  => "video/x-ms-wmv",
+        "flv"  => "video/x-flv",
+        "mkv"  => "video/x-matroska",
+        "3gp"  => "video/3gpp",
     ];
 
     $contentType = isset($mimeTypes[$ext]) ? $mimeTypes[$ext] : "application/octet-stream";
