@@ -5385,13 +5385,12 @@ class EntityEditor {
             (isOk) => {
                 if(isOk)
                 {
-                    _this.entities = [];
-                    _this.renderEntities();
-                    _this.callbackSaveEntity(_this.entities);
-
                     _this.diagrams = [];
                     _this.destroyAllDiagram();
                     _this.callbackSaveDiagram(_this.diagrams);
+                    _this.entities = [];
+                    _this.renderEntities();
+                    _this.callbackSaveEntity(_this.entities);
                 }
             }
         );
