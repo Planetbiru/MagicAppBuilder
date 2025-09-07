@@ -1030,14 +1030,22 @@ p {
 #file-content iframe, #frame-viewer iframe {
   border: none;
   width: 100%;
-  height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
   margin: 0;
   padding: 0;
   display: block !important;
 }
+#file-content iframe.video-frame, #frame-viewer iframe.video-frame {
+  height: calc(100vh - 120px);
+}
+#file-content iframe.audio-frame, #frame-viewer iframe.audio-frame {
+  max-height: 50px;
+  height: 50px;
+}
 
 .image-mode, .database-mode, .document-mode, .frame-mode {
   display: none;
+  width: calc(100% - 16px);
 }
 
 #sqlite-table-sidebar {
@@ -1127,7 +1135,7 @@ table.sqlite-table-data td {
 }
 
 .file-manager-left-panel {
-  padding: 10px 10px 0 10px;
+  padding: 10px 10px 0 16px;
   overflow-y: auto;
 }
 
