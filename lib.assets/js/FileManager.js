@@ -988,7 +988,10 @@ function openFile(file, extension) {
       extension = getFileExtension(file); // Get the file extension if not provided 
     }
     // List of non-text extensions (images, videos, audio, etc.)
-    const nonTextExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'mp4', 'mp3', 'avi', 'pdf', 'xls', 'xlsx', 'ods', 'csv', 'docx', 'sqlite', 'db'];
+    const nonTextExtensions = [
+      'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico', 'mp4', 'mp3', 'avi', 'pdf', 
+      'xls', 'xlsx', 'ods', 'csv', 'docx', 'sqlite', 'db', 'ttf', 'otf', 'woff', 'woff2', 'eot'
+    ];
 
     // Check if the file extension is not for text files or supported images
     if (!nonTextExtensions.includes(extension.toLowerCase())) {
@@ -998,7 +1001,7 @@ function openFile(file, extension) {
         }
         setDisplayMode('text');
         openTextFile(file, extension);
-    } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico'].includes(extension.toLowerCase())) {
+    } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico'].includes(extension.toLowerCase())) {
         setDisplayMode('image');
         // For supported image extensions, use the server-side script to load the image as base64
         increaseAjaxPending();
@@ -1030,10 +1033,42 @@ function openFile(file, extension) {
         initDocumentViewerOnce(file);
         setDisplayMode('document');
         
+    } else if (['ttf', 'otf', 'woff', 'woff2', 'eot'].includes(extension.toLowerCase())) {
+        // font-display
+        initFontViewerOnce(file);
+        setDisplayMode('frame');
     } else {
         // For unsupported file extensions, display an error message
         fileDiv.textContent = 'Cannot open this file.'; // Display error message for unsupported file types
     }
+}
+
+/**
+ * Initialize the frame viewer once with the given file.
+ * 
+ * This function loads a file into an iframe viewer element (#frame-viewer).
+ * The file will be rendered by the file manager loader.
+ *
+ * @param {string} file - Path of the file to display in the frame viewer.
+ */
+function initFrameViewerOnce(file) {
+  $('#frame-viewer').html(
+    `<iframe src="lib.ajax/file-manager-load-file.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
+  );
+}
+
+/**
+ * Initialize the font viewer once with the given font file.
+ * 
+ * This function loads a font file into an iframe viewer element (#frame-viewer).
+ * The file will be rendered by the font viewer handler.
+ *
+ * @param {string} file - Path of the font file to display in the font viewer.
+ */
+function initFontViewerOnce(file) {
+  $('#frame-viewer').html(
+    `<iframe src="lib.ajax/file-managet-font-viewer.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
+  );
 }
 
 /**
@@ -1262,27 +1297,11 @@ function openTextFile(file, extension) {
  * @param {string} mode - The mode to set ('text' or 'image').
  */
 function setDisplayMode(mode) {
-    if (mode === 'text') {
-        document.querySelector('.image-mode').style.display = 'none';  // Hide the image viewer
-        document.querySelector('.database-mode').style.display = 'none';  // Hide the database viewer
-        document.querySelector('.document-mode').style.display = 'none';  // Hide the document viewer
-        document.querySelector('.text-mode').style.display = 'block';  // Show the text editor
-    } else if (mode === 'image') {
-        document.querySelector('.text-mode').style.display = 'none';  // Hide the text editor
-        document.querySelector('.database-mode').style.display = 'none';  // Hide the database viewer
-        document.querySelector('.document-mode').style.display = 'none';  // Hide the document viewer
-        document.querySelector('.image-mode').style.display = 'block';  // Show the image viewer
-    } else if (mode === 'database') {
-        document.querySelector('.text-mode').style.display = 'none';  // Hide the text editor
-        document.querySelector('.image-mode').style.display = 'none';  // Hide the image viewer
-        document.querySelector('.document-mode').style.display = 'none';  // Hide the document viewer
-        document.querySelector('.database-mode').style.display = 'block';  // Show the database viewer
-    } else if (mode === 'document') {
-        document.querySelector('.text-mode').style.display = 'none';  // Hide the text editor
-        document.querySelector('.image-mode').style.display = 'none';  // Hide the image viewer
-        document.querySelector('.database-mode').style.display = 'none';  // Hide the database viewer
-        document.querySelector('.document-mode').style.display = 'block';  // Show the document viewer
-    }
+    const modes = ['text', 'image', 'database', 'document', 'frame'];
+    modes.forEach(m => {
+      const el = document.querySelector(`.${m}-mode`);
+      if (el) el.style.display = m === mode ? 'block' : 'none';
+    });
 }
 
 
