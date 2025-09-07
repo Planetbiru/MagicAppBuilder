@@ -1251,6 +1251,7 @@ white-space: nowrap;
 #file-content, #frame-viewer{
 	width: 100%;
 	height: calc(100vh - 120px);
+	max-height: calc(100vh - 120px);
 	overflow: auto;
 	position: relative;
 	iframe{
