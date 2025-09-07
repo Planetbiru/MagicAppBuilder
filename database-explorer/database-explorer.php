@@ -465,6 +465,9 @@ if(!isset($databaseName))
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
+            <li class="dropdown-divider"></li>
+            <li id="menu-delete-diagram"><a href="javascript:;" onclick="editor.deleteAllDiagrams();">Delete All Diagrams</a></li>
+            <li id="menu-delete-entity"><a href="javascript:;" onclick="editor.deleteAllEntities();">Delete All Entities</a></li>
         </ul>
     </div>
 </body>

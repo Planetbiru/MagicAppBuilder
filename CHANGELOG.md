@@ -2992,6 +2992,19 @@ With this tool:
 * MagicAppBuilder generates the required migration configuration, eliminating the need to write it manually.
 * This significantly reduces effort and ensures that data from legacy databases can be reused seamlessly in the new system.
 
+## New Feature: Bulk Delete Entities and Diagrams in Entity Editor
+
+A new **context menu option** has been added to the **Entity Editor** that allows users to **delete all entities and diagrams at once**.
+Previously, users had to remove them one by one, which was time-consuming.
+
+With this new feature:
+
+* You can clear all entities and diagrams in a single action.
+* A confirmation dialog ensures you are aware that this action is **irreversible**.
+* Both entity and diagram data are updated consistently after deletion.
+
+This provides a faster way to reset your project when starting over or cleaning up the Entity Editor.
+
 ## Bug Fixes
 
 * Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.

@@ -5363,6 +5363,103 @@ class EntityEditor {
         }
     }
 
+    /**
+     * Deletes all entities after user confirmation.
+     *
+     * This action is irreversible. The method shows a confirmation dialog to the user.
+     * If the user confirms:
+     * - All entities will be deleted.
+     * - All diagrams will also be deleted.
+     * Afterward, the `callbackSaveEntity` and `callbackSaveDiagram` functions
+     * will be triggered to persist the changes.
+     */
+    deleteAllEntities()
+    {
+        let _this = this;
+        hideContextMenu();
+        this.showConfirmationDialog(
+            `Deleting all entities cannot be undone. This action will also delete all diagrams.<br>It is recommended to create a backup before proceeding.<br><br>Are you sure you want to delete them now?`,
+            'Delete All Entities',
+            'Confirm',
+            'Cancel',
+            (isOk) => {
+                if(isOk)
+                {
+                    _this.entities = [];
+                    _this.renderEntities();
+                    _this.callbackSaveEntity(_this.entities);
+
+                    _this.diagrams = [];
+                    _this.destroyAllDiagram();
+                    _this.callbackSaveDiagram(_this.diagrams);
+                }
+            }
+        );
+
+    }
+
+
+    /**
+     * Deletes all diagrams after user confirmation.
+     *
+     * This action is irreversible. The method shows a confirmation dialog to the user.
+     * If the user confirms, all diagrams will be deleted and the `callbackSaveDiagram`
+     * function will be triggered to persist the changes.
+     */
+    deleteAllDiagrams()
+    {
+        let _this = this;
+        hideContextMenu();
+        this.showConfirmationDialog(
+            `Deleting all diagrams cannot be undone. It is recommended to create a backup before proceeding.<br>Are you sure you want to delete them now?`,
+            'Delete All Diagrams',
+            'Confirm',
+            'Cancel',
+            (isOk) => {
+                if(isOk)
+                {
+                    _this.diagrams = [];
+                    _this.destroyAllDiagram();
+                    _this.callbackSaveDiagram(_this.diagrams);
+                }
+            }
+        );
+
+    }
+
+    /**
+     * Removes all diagram-related elements from the DOM.
+     *
+     * This method performs the following:
+     * - Removes all diagram tabs inside `.diagram-list.tabs`.
+     * - Removes all diagram entities inside `.diagram-container`.
+     *
+     * It selects elements using `querySelectorAll()` and iterates through them
+     * to remove each from its parent node. After execution, no diagram tabs
+     * or entities will remain in the DOM.
+     *
+     * @returns {void}
+     */
+    destroyAllDiagram()
+    {
+        let tabs = document.querySelectorAll('.entities-container .diagram-list.tabs .diagram-tab');
+        let diagrams = document.querySelectorAll('.entities-container .diagram-container .diagram-entity');
+
+        if (tabs?.length)
+        {
+            tabs.forEach(tab => {
+                tab.parentNode.removeChild(tab);
+            });
+        }
+
+        if (diagrams?.length)
+        {
+            diagrams.forEach(diagram => {
+                diagram.parentNode.removeChild(diagram);
+            });
+        }
+    }
+
 }
 
 
