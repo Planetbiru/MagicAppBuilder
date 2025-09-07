@@ -50,7 +50,7 @@ $pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? 
   <script type="text/javascript" data-src="lib.assets/wasm/sql-wasm.min.js" class="script-for-sqlite-viewer"></script>
 
   <!-- Document Viewer -->
-  <script type="text/javascript" data-src="lib.assets/jszip/jszip.min.js" class="script-for-document-viewer"></script>
+  <script type="text/javascript" data-src="lib.assets/docx-preview/jszip.min.js" class="script-for-document-viewer"></script>
   <script type="text/javascript" data-src="lib.assets/docx-preview/docx-preview.min.js" class="script-for-document-viewer"></script>
   <script type="text/javascript" data-src="lib.assets/xlsx/xlsx.full.min.js" class="script-for-document-viewer"></script>
   <script type="text/javascript" data-src="lib.assets/pdfjs/pdf.min.js" class="script-for-document-viewer"></script>
