@@ -3005,6 +3005,22 @@ With this new feature:
 
 This provides a faster way to reset your project when starting over or cleaning up the Entity Editor.
 
+## New Feature: Font Viewer in File Manager
+
+MagicAppBuilder now includes a **Font Viewer** in the File Manager. Users can **preview how text looks using a font file directly in the application**, without needing to install or open it in an external tool.
+
+Supported font types:
+
+* TrueType Font (`.ttf`)
+* OpenType Font (`.otf`)
+* Web Open Font Format (`.woff`, `.woff2`)
+
+With this feature, you can:
+
+* View sample text rendered with the selected font.
+* Easily compare multiple fonts to distinguish their visual differences.
+* Avoid the hassle of manually installing fonts just to preview them.
+
 ## Bug Fixes
 
 * Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.

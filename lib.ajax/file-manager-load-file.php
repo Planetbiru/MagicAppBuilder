@@ -58,9 +58,16 @@ try {
         "xls"    => "application/vnd.ms-excel",
         "xlsx"   => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "ods"    => "application/vnd.oasis.opendocument.spreadsheet",
-        "docx"   => "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ];
+        "docx"   => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 
+        // Font formats
+        "ttf"    => "font/ttf",
+        "otf"    => "font/otf",
+        "woff"   => "font/woff",
+        "woff2"  => "font/woff2",
+        "eot"    => "application/vnd.ms-fontobject",
+        "svg"    => "image/svg+xml"
+    ];
 
     $contentType = $mimeTypes[$ext] != null ? $mimeTypes[$ext] : "application/octet-stream";
 

@@ -1027,10 +1027,18 @@ p {
 }
 
 /* File Manager Styles */
-#file-content {
-  max-height: calc(100vh - 125px);
+#file-content, #frame-viewer {
+  width: 100%;
+  height: calc(100vh - 120px);
   overflow: auto;
   position: relative;
+}
+#file-content iframe, #frame-viewer iframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 #sqlite-table-sidebar {
