@@ -1035,7 +1035,7 @@ p {
   padding: 0;
   display: block !important;
 }
-#file-content iframe.video-frame, #file-content iframe.video-frame, #frame-viewer iframe.video-frame, #frame-viewer iframe.video-frame {
+#file-content iframe.video-frame, #file-content iframe.font-frame, #frame-viewer iframe.video-frame, #frame-viewer iframe.font-frame {
   height: calc(100vh - 120px);
 }
 #file-content iframe.audio-frame, #frame-viewer iframe.audio-frame {
