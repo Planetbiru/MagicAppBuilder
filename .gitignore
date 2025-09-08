@@ -7,3 +7,6 @@ tmp/*
 inc.cfg/*
 inc.database/*
 magic-admin/update/*
+
+inc.lib/vendor/planetbiru/magic-object/.git/*
+inc.lib/vendor/planetbiru/magic-app/.git/*
