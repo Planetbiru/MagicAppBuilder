@@ -1027,14 +1027,6 @@ input[type=number][name="database_port"] {
 .database-explorer {
 	position: relative;
 	height: calc(100vh - 100px);
-
-	iframe {
-		border: none;
-		width: 100%;
-		height: 100%;
-		margin: 0;
-		padding: 0;
-	}
 }
 
 .input-label {
@@ -1248,10 +1240,34 @@ white-space: nowrap;
 
 /* File Manager Styles */
 
-#file-content{
-	max-height: calc(100vh - 125px);
+#file-content, #frame-viewer{
+	width: calc(100%);
+	height: calc(100vh - 120px);
+	max-height: calc(100vh - 120px);
 	overflow: auto;
 	position: relative;
+	iframe{
+		border: none;
+		width: 100%;
+		max-height: calc(100vh - 120px);
+		margin: 0;
+		padding: 0;
+		display: block !important;
+		&.video-frame, &.video-frame
+		{
+			height: calc(100vh - 120px);
+		}
+		&.audio-frame
+		{
+			max-height: 50px;
+			height: 50px;
+		}
+	}
+}
+
+.image-mode, .database-mode, .document-mode, .frame-mode{
+	display: none;
+	width: calc(100% - 16px);
 }
 
 #sqlite-table-sidebar {
@@ -1346,7 +1362,7 @@ table.sqlite-table-data {
 }
 
 .file-manager-left-panel {
-	padding: 10px 10px 0 10px;
+	padding: 10px 10px 0 16px;
 	overflow-y: auto;
 }
 .file-manager-right-panel {
@@ -1728,7 +1744,7 @@ table.table.table-enum
     position: relative;
 	padding-top: 10px;
 	#sheet-viewer {
-		max-height: calc(100% - 50px); 
+		max-height: calc(100% - 54px); 
 		overflow: auto;
 		box-sizing: border-box; 
 		table{
