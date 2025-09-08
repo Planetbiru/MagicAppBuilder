@@ -75,9 +75,12 @@ function initFileManager()
           // Get the name (file or directory) from data attributes
           let itemName = '';
           let itemType = target.dataset.type; // Accessing data-type
+          let fileExtension = '';
 
           if (itemType === 'file') {
               itemName = target.querySelector("span").dataset.file;
+              fileExtension = target.querySelector("span").dataset.extension;
+              fileExtension = fileExtension.toLowerCase();
           } else if (itemType === 'dir') {
               itemName = target.querySelector("span").dataset.dir;
           }
@@ -94,12 +97,25 @@ function initFileManager()
           
           // Add appropriate menu options for file or directory
           if (itemType === 'file') {
-              menuList.innerHTML = `
-              <li data-type="file" data-operation="open" data-file="${itemName}">Open File</li>
-              <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
-              <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
-              <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
-              `;
+              if(['svg'].includes(fileExtension))
+              {
+                menuList.innerHTML = `
+                <li data-type="file" data-operation="view-image" data-file="${itemName}">View Image</li>
+                <li data-type="file" data-operation="open" data-file="${itemName}">Open as Text</li>
+                <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
+                <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
+                <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
+                `;
+              }
+              else
+              {
+                menuList.innerHTML = `
+                <li data-type="file" data-operation="open" data-file="${itemName}">Open File</li>
+                <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
+                <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
+                <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
+                `;
+              }
               // If contextMenu.style.top + contextMenu.style.height > window.innerHeight, adjust the position
               if (menuY + contextMenu.offsetHeight > window.innerHeight) {
                 menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
@@ -176,6 +192,10 @@ function initFileManager()
         
         // Action based on the clicked option
         switch (clickedOption) {
+            case "view-image":
+              viewImage(name); // Create a new file in the root directory
+              setDisplayMode('image');
+              break;
             case "root-new-file":
               createNewFile(''); // Create a new file in the root directory
               break;
@@ -1013,25 +1033,9 @@ function openFile(file, extension) {
         setDisplayMode('text');
         openTextFile(file, extension);
     } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico'].includes(lowerExtension)) {
-        setDisplayMode('image');
         // For supported image extensions, use the server-side script to load the image as base64
-        increaseAjaxPending();
-        fetch('lib.ajax/file-manager-load-image.php?file=' + encodeURIComponent(file))
-            .then(response => response.text())
-            .then(base64ImageData => {
-                let mediaDisplay = document.querySelector('.media-display');
-                // Create an <img> element to display the image
-                const img = document.createElement('img');
-                img.src = base64ImageData; // Set the base64 image data as the source
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '400px';
-                mediaDisplay.innerHTML = '';
-                mediaDisplay.appendChild(img); // Append the image to the file content div
-                decreaseAjaxPending();
-            })
-            .catch(error => {
-                decreaseAjaxPending();
-            });
+        viewImage(file);
+        setDisplayMode('image');
     } else if (['sqlite', 'db'].includes(lowerExtension)) {
 
         // database-display
@@ -1061,6 +1065,40 @@ function openFile(file, extension) {
         fileDiv.textContent = 'Cannot open this file.'; // Display error message for unsupported file types
     }
     
+}
+
+/**
+ * Display an image in the media display area by fetching it from the server.
+ *
+ * This function sends a request to the server to load an image file as
+ * Base64-encoded data, then dynamically creates an <img> element and injects
+ * it into the `.media-display` container.
+ *
+ * It also manages AJAX pending counters using `increaseAjaxPending()` and
+ * `decreaseAjaxPending()`.
+ *
+ * @function viewImage
+ * @param {string} file - The relative or absolute path of the image file to load.
+ * @returns {void}
+ */
+function viewImage(file) {
+  increaseAjaxPending();
+  fetch('lib.ajax/file-manager-load-image.php?file=' + encodeURIComponent(file))
+    .then(response => response.text())
+    .then(base64ImageData => {
+      let mediaDisplay = document.querySelector('.media-display');
+      // Create an <img> element to display the image
+      const img = document.createElement('img');
+      img.src = base64ImageData; // Set the base64 image data as the source
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '400px';
+      mediaDisplay.innerHTML = '';
+      mediaDisplay.appendChild(img); // Append the image to the display
+      decreaseAjaxPending();
+    })
+    .catch(error => {
+      decreaseAjaxPending();
+    });
 }
 
 /**

@@ -113,6 +113,13 @@ ul {
     content: '\f021'; /* Font Awesome icon for refresh (reset) */
     color: #2196F3; /* Blue for reset */
 }
+
+/* Icon for 'view-image' operation (Teal for image preview) */
+.context-menu [data-operation="view-image"]::before {
+    content: '\f03e'; /* Font Awesome icon for image */
+    color: #009688; /* Teal for image preview */
+}
+
 }
 
 .context-menu .dropdown-divider {
