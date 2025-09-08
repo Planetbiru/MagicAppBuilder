@@ -89,6 +89,21 @@ In many cases, rapid development is not the only challenge. **Organizations toda
 -   Supports MySQL, MariaDB, and PostgreSQL databases, allowing users to switch between them without needing application upgrades or modifications.
 
 
+### 🔀 Multiple Database Connection
+
+-   Applications can connect to multiple databases and DBMS at the same time
+
+    Supported DBMS:
+
+    * MySQL
+
+    * MariaDB
+
+    * PostgreSQL
+
+    * SQLite
+
+
 ### ⬆️ Scalability
 
 -   Users can perform horizontal scaling for both the application and the database without requiring application upgrades or modifications.
