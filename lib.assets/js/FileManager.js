@@ -1043,7 +1043,7 @@ function openFile(file, extension) {
         
     } else if (['ttf', 'otf', 'woff', 'woff2', 'eot'].includes(lowerExtension)) {
         // font-display
-        initFontViewerOnce(file);
+        initFontViewerOnce(file, 'font-frame');
         setDisplayMode('frame');
     } else if(['mp4', 'ogg', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp'].includes(lowerExtension) ) { 
         // video-display
@@ -1063,10 +1063,11 @@ function openFile(file, extension) {
 /**
  * Initialize the frame viewer once with the given file.
  * 
- * This function loads a file into an iframe viewer element (#frame-viewer).
- * The file will be rendered by the file manager loader.
+ * Loads a file into the frame viewer element (#frame-viewer) by embedding
+ * it in an iframe. The file will be rendered by the file manager loader.
  *
  * @param {string} file - Path of the file to display in the frame viewer.
+ * @param {string} className - CSS class name(s) to apply to the iframe element.
  */
 function initFrameViewerOnce(file, className) {
   $('#frame-viewer').html(
@@ -1077,16 +1078,18 @@ function initFrameViewerOnce(file, className) {
 /**
  * Initialize the font viewer once with the given font file.
  * 
- * This function loads a font file into an iframe viewer element (#frame-viewer).
- * The file will be rendered by the font viewer handler.
+ * Loads a font file into the frame viewer element (#frame-viewer) by embedding
+ * it in an iframe. The file will be rendered by the font viewer handler.
  *
  * @param {string} file - Path of the font file to display in the font viewer.
+ * @param {string} className - CSS class name(s) to apply to the iframe element.
  */
-function initFontViewerOnce(file) {
+function initFontViewerOnce(file, className) {
   $('#frame-viewer').html(
-    `<iframe src="lib.ajax/file-managet-font-viewer.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
+    `<iframe class="${className}" src="lib.ajax/file-managet-font-viewer.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
   );
 }
+
 
 /**
  * Initialize the database view once by ensuring all SQLite-related scripts are loaded only once.

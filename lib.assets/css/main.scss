@@ -1253,7 +1253,7 @@ white-space: nowrap;
 		margin: 0;
 		padding: 0;
 		display: block !important;
-		&.video-frame
+		&.video-frame, &.font-frame
 		{
 			height: calc(100vh - 120px);
 		}
@@ -1264,6 +1264,7 @@ white-space: nowrap;
 		}
 	}
 }
+
 .image-mode, .database-mode, .document-mode, .frame-mode{
 	display: none;
 	width: calc(100% - 16px);
