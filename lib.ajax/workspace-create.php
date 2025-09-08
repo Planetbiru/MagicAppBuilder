@@ -2,8 +2,10 @@
 
 use AppBuilder\EntityInstaller\EntityAdminWorkspace;
 use AppBuilder\EntityInstaller\EntityWorkspace;
+use AppBuilder\Util\ChartDataUtil;
 use AppBuilder\Util\FileDirUtil;
 use AppBuilder\Util\ResponseUtil;
+use MagicAdmin\Entity\Data\WorkspaceCreated;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
 
@@ -59,6 +61,8 @@ try
         $workspaceAdmin->setIpEdit($_SERVER['REMOTE_ADDR']);
         $workspaceAdmin->setActive(true);
         $workspaceAdmin->insert();
+
+        ChartDataUtil::updateChartData(new EntityAdminWorkspace(null, $databaseBuilder), new WorkspaceCreated(null, $databaseBuilder), date('Ym'));
 
         // Scan new workspace
         $_GET['workspaceId'] = $workspaceId;

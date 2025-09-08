@@ -3,6 +3,7 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
+use AppBuilder\Util\ChartDataUtil;
 use MagicObject\MagicObject;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
@@ -21,6 +22,7 @@ use MagicApp\UserAction;
 use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\AppUserPermissionExtended;
 use MagicAdmin\Entity\Data\Admin;
+use MagicAdmin\Entity\Data\AdminCreated;
 use MagicAdmin\Entity\Data\AdminLevelMin;
 use MagicAdmin\Entity\Data\AdminWorkspace;
 use MagicAdmin\Entity\Data\ApplicationMin;
@@ -116,7 +118,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 		{
 			setAdminWorkspace($database, $newId, $admin->getWorkspaceId(), $entityAdmin->getAdminId());
 		}
-
+		ChartDataUtil::updateChartData(new Admin(null, $databaseBuilder), new AdminCreated(null, $databaseBuilder), date('Ym'));
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->admin_id, $newId);
 	}
 	catch(Exception $e)

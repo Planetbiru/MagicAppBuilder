@@ -826,7 +826,9 @@ function loadDirContent(dir, subDirUl, subdirLi, reset) {
  */
 function displayDirContent(dirs, subDirUl, reset) {
     subDirUl.innerHTML = '';
-    dirs.forEach(function (dir) {
+    if(dirs?.length)
+    {
+      dirs.forEach(function (dir) {
         if (dir.type === 'dir') { // If the item is a directory
             const dirLi = document.createElement('li');
             dirLi.dataset.type = dir.type;
@@ -851,7 +853,8 @@ function displayDirContent(dirs, subDirUl, reset) {
             fileLi.appendChild(fileSpan);
             subDirUl.appendChild(fileLi); // Append the file <li> to the subdirectory <ul>
         }
-    }); 
+      }); 
+    }
 }
 
 /**

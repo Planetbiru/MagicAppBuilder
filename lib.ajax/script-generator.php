@@ -2,10 +2,14 @@
 
 use AppBuilder\ScriptGeneratorMicroservices;
 use AppBuilder\ScriptGeneratorMonolith;
+use AppBuilder\Util\ChartDataUtil;
 use AppBuilder\Util\Composer\ComposerUtil;
+use AppBuilder\Util\ModuleUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use AppBuilder\Util\ResponseUtil;
+use MagicAdmin\Entity\Data\Module;
+use MagicAdmin\Entity\Data\ModuleCreated;
 
 // Start measuring execution time
 $timeStart = microtime(true);
@@ -86,7 +90,11 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
             $scriptGenerator->updateMenu($appConfig->getApplication(), $request);
         }
     }
+
+    ModuleUtil::saveModule($applicationId, new Module(null, $databaseBuilder), $request, $currentAction->getTime(), $currentAction->getUserId(), $currentAction->getIp());
+    ChartDataUtil::updateChartData(new Module(null, $databaseBuilder), new ModuleCreated(null, $databaseBuilder), date('Ym'));
 }
+
 
 $timeEnd = microtime(true);
 $time = $timeEnd - $timeStart;

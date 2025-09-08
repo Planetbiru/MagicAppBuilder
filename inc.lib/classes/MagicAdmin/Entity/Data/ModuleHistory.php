@@ -5,9 +5,9 @@ namespace MagicAdmin\Entity\Data;
 use MagicObject\MagicObject;
 
 /**
- * The Module class represents an entity in the "module" table.
+ * The ModuleHistory class represents an entity in the "module" table.
  *
- * This entity maps to the "module" table in the database and supports ORM (Object-Relational Mapping) operations. 
+ * This entity maps to the "module_history" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
  * Ensure to include the appropriate "use" statement if related entities are defined in a different namespace.
  * 
@@ -19,19 +19,37 @@ use MagicObject\MagicObject;
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="module")
  */
-class Module extends MagicObject
+class ModuleHistory extends MagicObject
 {
 	/**
-	 * Module ID
+	 * Module History ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
+	 * @Column(name="module_history_id", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Module ID")
+	 * @var string
+	 */
+	protected $moduleHistoryId;
+    
+    /**
+	 * Module ID
+	 * 
 	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Module ID")
 	 * @var string
 	 */
 	protected $moduleId;
+	
+	/**
+	 * Module
+	 * 
+	 * @JoinColumn(name="module_id", referenceColumnName="module_id")
+	 * @Label(content="Module")
+	 * @var Module
+	 */
+	protected $module;
 
 	/**
 	 * Application ID
@@ -47,54 +65,9 @@ class Module extends MagicObject
 	 * 
 	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
 	 * @Label(content="Application")
-	 * @var ApplicationMin
+	 * @var EntityApplication
 	 */
 	protected $application;
-	
-	/**
-	 * Name
-	 * 
-	 * @Column(name="name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="Name")
-	 * @var string
-	 */
-	protected $name;
-	
-	/**
-	 * Module Code
-	 * 
-	 * @Column(name="module_code", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="Module Code")
-	 * @var string
-	 */
-	protected $moduleCode;
-
-	/**
-	 * File Name
-	 * 
-	 * @Column(name="file_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="File Name")
-	 * @var string
-	 */
-	protected $fileName;
-
-	/**
-	 * Directory Name
-	 * 
-	 * @Column(name="directory_name", type="varchar(1024)", length=1024, nullable=true)
-	 * @Label(content="Directory Name")
-	 * @var string
-	 */
-	protected $directoryName;
-
-	/**
-	 * Reference Value
-	 * 
-	 * @Column(name="reference_value", type="text", nullable=true)
-	 * @Label(content="Reference Value")
-	 * @var string
-	 */
-	protected $referenceValue;
 
 	/**
 	 * Time Create
@@ -106,15 +79,6 @@ class Module extends MagicObject
 	protected $timeCreate;
 
 	/**
-	 * Time Edit
-	 * 
-	 * @Column(name="time_edit", type="timestamp", length=26, nullable=true)
-	 * @Label(content="Time Edit")
-	 * @var string
-	 */
-	protected $timeEdit;
-
-	/**
 	 * Admin Create
 	 * 
 	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
@@ -122,15 +86,15 @@ class Module extends MagicObject
 	 * @var string
 	 */
 	protected $adminCreate;
-
+	
 	/**
-	 * Admin Edit
+	 * Admin
 	 * 
-	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin Edit")
-	 * @var string
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id")
+	 * @Label(content="Admin")
+	 * @var Admin
 	 */
-	protected $adminEdit;
+	protected $admin;
 
 	/**
 	 * IP Create
@@ -140,14 +104,5 @@ class Module extends MagicObject
 	 * @var string
 	 */
 	protected $ipCreate;
-
-	/**
-	 * IP Edit
-	 * 
-	 * @Column(name="ip_edit", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="IP Edit")
-	 * @var string
-	 */
-	protected $ipEdit;
 
 }
