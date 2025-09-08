@@ -1,5 +1,5 @@
-let templateColorMode = window.localStorage.getItem('MagicAppBuilder.colorMode');
-let templateHideSidebar = window.localStorage.getItem('MagicAppBuilder.sidebarHidden');
+let templateColorMode = window.localStorage.getItem('MagicAdmin.colorMode');
+let templateHideSidebar = window.localStorage.getItem('MagicAdmin.sidebarHidden');
 let themeDark = '#212529';
 let themeLight = '#f8f9fa';
 if(templateColorMode == null || templateColorMode == '')

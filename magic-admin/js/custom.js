@@ -892,7 +892,7 @@ function initPage() {
         document.body.classList.toggle('sidebar-show'); // Hide or show the sidebar for small screens
       }
       let hidden = document.body.classList.contains('sidebar-hidden');
-      window.localStorage.setItem('MagicAppBuilder.sidebarHidden', hidden ? 'true' : 'false');
+      window.localStorage.setItem('MagicAdmin.sidebarHidden', hidden ? 'true' : 'false');
     });
   });
 
@@ -909,7 +909,7 @@ function initPage() {
       colorMode = 'light-mode';
       document.querySelector('meta[name="theme-color"]').setAttribute('content', themeLight);
     }
-    window.localStorage.setItem('MagicAppBuilder.colorMode', colorMode);
+    window.localStorage.setItem('MagicAdmin.colorMode', colorMode);
   });
 }
 

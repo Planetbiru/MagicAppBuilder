@@ -3027,3 +3027,11 @@ With this feature, you can:
   The `sqlite_sequence` table does not have a primary key, so updates were previously not possible.
   With this fix, updates now use the `name` column as the key in update forms and update actions.
 
+
+# MagicAppBuilder Version 1.20.1
+
+## Enhancement: Improved Local Storage Keys
+
+This update fixes a bug where changes made to the color mode or sidebar status in MagicAdmin would also affect the generated app, and vice versa. Now, MagicAdmin uses separate local storage keys, so your settings in one won't interfere with the other.
+
+
