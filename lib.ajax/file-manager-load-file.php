@@ -58,11 +58,33 @@ try {
         "xls"    => "application/vnd.ms-excel",
         "xlsx"   => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "ods"    => "application/vnd.oasis.opendocument.spreadsheet",
-        "docx"   => "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "docx"   => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+        // Font formats
+        "ttf"    => "font/ttf",
+        "otf"    => "font/otf",
+        "woff"   => "font/woff",
+        "woff2"  => "font/woff2",
+        "eot"    => "application/vnd.ms-fontobject",
+        "svg"    => "image/svg+xml",
+
+        "mp3"  => "audio/mpeg",
+        "wav"  => "audio/wav",
+        "m4a"  => "audio/mp4",
+        "flac" => "audio/flac",
+        
+        "mp4"  => "video/mp4",
+        "ogg"  => "video/ogg",
+        "webm" => "video/webm",
+        "avi"  => "video/x-msvideo",
+        "mov"  => "video/quicktime",
+        "wmv"  => "video/x-ms-wmv",
+        "flv"  => "video/x-flv",
+        "mkv"  => "video/x-matroska",
+        "3gp"  => "video/3gpp",
     ];
 
-
-    $contentType = $mimeTypes[$ext] != null ? $mimeTypes[$ext] : "application/octet-stream";
+    $contentType = isset($mimeTypes[$ext]) ? $mimeTypes[$ext] : "application/octet-stream";
 
     header("Content-Type: $contentType");
     header("Content-Length: " . filesize($file));

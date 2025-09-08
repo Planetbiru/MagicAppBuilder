@@ -40,7 +40,7 @@ if ($inputPost->getDatabaseName() !== null) {
             $data = array('entities' => array(), 'diagrams' => array());
         }
 
-        if (strlen($diagrams) > 10) {
+        if (strlen($diagrams) > 0) {
             $data['diagrams'] = json_decode($diagrams);
             file_put_contents($path, json_encode($data));
         }

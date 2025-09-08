@@ -2980,6 +2980,47 @@ When importing a database from an SQL file in the **Entity Editor**, MagicAppBui
 
 In the **Application Settings**, the "Database File Path" field now provides a convenient way to manage your SQLite files. By clearing this field and double-clicking on it, you can now view and select all other SQLite database files (`.sqlite` and `.db`) that exist in the same directory as your current database. This allows you to quickly switch between or reuse previously created databases without having to browse for them manually.
 
+## New Feature: Database Migration Tool
+
+MagicAppBuilder introduces the **Database Migration Tool**, designed to help developers migrate data from an old (legacy) database into a new database structure tailored for MagicAppBuilder.
+
+When revamping an application with MagicAppBuilder, database structures often need adjustments to fully support its features. Manually transferring data between old and new schemas can be time-consuming and error-prone.
+
+With this tool:
+
+* Developers can configure automatic data migration using **MagicObject**.
+* MagicAppBuilder generates the required migration configuration, eliminating the need to write it manually.
+* This significantly reduces effort and ensures that data from legacy databases can be reused seamlessly in the new system.
+
+## New Feature: Bulk Delete Entities and Diagrams in Entity Editor
+
+A new **context menu option** has been added to the **Entity Editor** that allows users to **delete all entities and diagrams at once**.
+Previously, users had to remove them one by one, which was time-consuming.
+
+With this new feature:
+
+* You can clear all entities and diagrams in a single action.
+* A confirmation dialog ensures you are aware that this action is **irreversible**.
+* Both entity and diagram data are updated consistently after deletion.
+
+This provides a faster way to reset your project when starting over or cleaning up the Entity Editor.
+
+## New Feature: Font Viewer in File Manager
+
+MagicAppBuilder now includes a **Font Viewer** in the File Manager. Users can **preview how text looks using a font file directly in the application**, without needing to install or open it in an external tool.
+
+Supported font types:
+
+* TrueType Font (`.ttf`)
+* OpenType Font (`.otf`)
+* Web Open Font Format (`.woff`, `.woff2`)
+
+With this feature, you can:
+
+* View sample text rendered with the selected font.
+* Easily compare multiple fonts to distinguish their visual differences.
+* Avoid the hassle of manually installing fonts just to preview them.
+
 ## Bug Fixes
 
 * Fixed update mechanism for the `sqlite_sequence` table in SQLite databases.
