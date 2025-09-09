@@ -3042,8 +3042,7 @@ The update adds two new columns, **`name`** and **`module_code`**, to the **`Mod
 
 A new **Dashboard Chart** feature has been added to provide an overview of user activity. This chart displays monthly statistics for the following metrics:
     * `application_created`
-    * `admin_created`
-    * `application_group_created`
-    * `notification_sent`
-    * `message_received`
     * `module_created`
+    * `workspace_created`
+    * `admin_created`
+

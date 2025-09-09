@@ -7,6 +7,9 @@ menu:
     icon: "fas fa-folder"
     href: "#submenu1"
     submenu:
+      - title: "Module"
+        icon: "fas fa-puzzle-piece"
+        href: "module.php"
       - title: "Application"
         icon: "fas fa-microchip"
         href: "application.php"

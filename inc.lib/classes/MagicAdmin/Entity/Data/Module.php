@@ -119,18 +119,38 @@ class Module extends MagicObject
 	 * 
 	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminCreate;
+
+	/**
+	 * Creator
+	 * 
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id", referenceTableName="admin")
+	 * @Label(content="Creator")
+	 * @var Admin
+	 */
+	protected $creator;
 
 	/**
 	 * Admin Edit
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Edit")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminEdit;
+
+	/**
+	 * Editor
+	 * 
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id", referenceTableName="admin")
+	 * @Label(content="Editor")
+	 * @var Admin
+	 */
+	protected $editor;
 
 	/**
 	 * IP Create
