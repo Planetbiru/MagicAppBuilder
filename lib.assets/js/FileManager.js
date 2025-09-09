@@ -1014,12 +1014,12 @@ function openFile(file, extension) {
 
 
     const nonTextExtensions = [
-      'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico', 
-      'pdf', 'xls', 'xlsx', 'ods', 'csv', 'docx', 
-      'sqlite', 'db', 
-      'ttf', 'otf', 'woff', 'woff2', 'eot',
-      'mp3', 'wav', 'flac', 'm4a', 
-      'mp4', 'ogg', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp'
+      'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico', // image
+      'pdf', 'xls', 'xlsx', 'ods', 'csv', 'docx', // document
+      'sqlite', 'db', // SQLite database
+      'ttf', 'otf', 'woff', 'woff2', 'eot', // font
+      'mp3', 'wav', 'flac', 'm4a', // audio
+      'mp4', 'ogg', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp' // video
     ];
 
     let lowerExtension = extension.toLowerCase();
@@ -1030,8 +1030,8 @@ function openFile(file, extension) {
         {
             changeMode(file, extension); 
         }
-        setDisplayMode('text');
         openTextFile(file, extension);
+        setDisplayMode('text');
     } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico'].includes(lowerExtension)) {
         // For supported image extensions, use the server-side script to load the image as base64
         viewImage(file);

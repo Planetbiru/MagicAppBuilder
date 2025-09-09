@@ -76,7 +76,7 @@ unset($config);
     <?php endforeach; ?>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="vendors/chartjs/chart.js"></script>
 <script>
 function createLineChart(canvasId, labels, data, label, title, color) {
     const ctx = document.getElementById(canvasId);
