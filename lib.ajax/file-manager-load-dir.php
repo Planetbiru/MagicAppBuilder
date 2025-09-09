@@ -9,6 +9,8 @@ $separatorNLT = "\r\n\t";
 
 // Exit if the application is not set up
 if ($appConfig->getApplication() == null) {
+    header('Content-type: application/json');
+    echo "[]";
     exit();
 }
 
@@ -33,6 +35,6 @@ try {
 } catch (Exception $e) {
     // Log any errors that occur
     error_log($e->getMessage());
-    echo "{}";
+    echo "[]";
     // do nothing
 }

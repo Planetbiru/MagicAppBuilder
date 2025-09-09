@@ -11,8 +11,8 @@ use MagicAdmin\AppIncludeImpl;
 use MagicAdmin\AppUserPermissionExtended;
 use MagicAdmin\Entity\Data\AdminCreated;
 use MagicAdmin\Entity\Data\ApplicationCreated;
-use MagicAdmin\Entity\Data\ApplicationGroupCreated;
 use MagicAdmin\Entity\Data\ModuleCreated;
+use MagicAdmin\Entity\Data\WorkspaceCreated;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
@@ -28,166 +28,110 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
     exit();
 }
 
-$dataFilter = null;
-
 require_once $appInclude->mainAppHeader(__DIR__);
 
 $periods = ChartDataUtil::getLastMonth(12);
-$applicationMonthly = ChartDataUtil::getData(new ApplicationCreated($databaseBuilder), $periods);
-$adminMonthly = ChartDataUtil::getData(new AdminCreated($databaseBuilder), $periods);
-$applicationGroupMonthly = ChartDataUtil::getData(new ApplicationGroupCreated($databaseBuilder), $periods);
-$moduleMonthly = ChartDataUtil::getData(new ModuleCreated($databaseBuilder), $periods);
+
+$datasets = [
+    "applicationMonthly" => [
+        "entity" => new ApplicationCreated(null, $databaseBuilder),
+        "label"  => $appLanguage->getNewApplication(),
+        "title"  => $appLanguage->getNewApplicationPerMonth()
+    ],
+    "moduleMonthly" => [
+        "entity" => new ModuleCreated(null, $databaseBuilder),
+        "label"  => $appLanguage->getNewModule(),
+        "title"  => $appLanguage->getNewModulePerMonth()
+    ],
+    "workspaceMonthly" => [
+        "entity" => new WorkspaceCreated(null, $databaseBuilder),
+        "label"  => $appLanguage->getNewWorkspace(),
+        "title"  => $appLanguage->getNewWorkspacePerMonth()
+    ],
+    "adminMonthly" => [
+        "entity" => new AdminCreated(null, $databaseBuilder),
+        "label"  => $appLanguage->getNewAdmin(),
+        "title"  => $appLanguage->getNewAdminPerMonth()
+    ],
+];
+
+foreach ($datasets as $id => &$config) {
+    $data = ChartDataUtil::getData($config["entity"], $periods);
+    $config["labels"] = array_keys($data);
+    $config["data"]   = array_values($data);
+}
+unset($config);
 
 ?>
 <style>
-	canvas{
-		width: 100%;
-	}
+    canvas{
+        width: 100%;
+    }
 </style>
 <div class="row">
-    <div class="col col-12 col-lg-6">
-        <canvas id="applicationMonthly"></canvas>
-    </div>
-    <div class="col col-12 col-lg-6">
-        <canvas id="adminMonthly"></canvas>
-    </div>
+    <?php foreach ($datasets as $id => $config): ?>
+        <div class="col col-12 col-lg-6">
+            <canvas id="<?= $id ?>"></canvas>
+        </div>
+    <?php endforeach; ?>
 </div>
-<div class="row">
-    <div class="col col-12 col-lg-6">
-        <canvas id="applicationGroupMonthly"></canvas>
-    </div>
-    <div class="col col-12 col-lg-6">
-        <canvas id="moduleMonthly"></canvas>
-    </div>
-</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-	
-let applicationMonthlyLabels = <?php echo json_encode(array_keys($applicationMonthly)); ?>;
-let applicationMonthlyData = <?php echo json_encode(array_values($applicationMonthly)); ?>;
-
-let adminMonthlyLabels = <?php echo json_encode(array_keys($adminMonthly)); ?>;
-let adminMonthlyData = <?php echo json_encode(array_values($adminMonthly)); ?>;
-
-let applicationGroupMonthlyLabels = <?php echo json_encode(array_keys($applicationGroupMonthly)); ?>;
-let applicationGroupMonthlyData = <?php echo json_encode(array_values($applicationGroupMonthly)); ?>;
-
-let moduleMonthlyLabels = <?php echo json_encode(array_keys($moduleMonthly)); ?>;
-let moduleMonthlyData = <?php echo json_encode(array_values($moduleMonthly)); ?>;
-
-const ctx1 = document.getElementById('applicationMonthly');
-const applicationMonthly = new Chart(ctx1, {
-    type: 'line',
-    data: {
-        labels: applicationMonthlyLabels,
-        datasets: [{
-            label: 'New Application',
-            data: applicationMonthlyData,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.3
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'New Application per Month'
-            }
+function createLineChart(canvasId, labels, data, label, title, color) {
+    const ctx = document.getElementById(canvasId);
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                borderColor: color,
+                backgroundColor: color.replace('1)', '0.2)'),
+                fill: true,
+                tension: 0.3
+            }]
         },
-        scales: {
-            y: { beginAtZero: true }
-        }
-    }
-});
-
-const ctx2 = document.getElementById('adminMonthly');
-const adminMonthly = new Chart(ctx2, {
-    type: 'line',
-    data: {
-        labels: adminMonthlyLabels,
-        datasets: [{
-            label: 'New Admin',
-            data: adminMonthlyData,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.3
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'New Admin per Month'
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
             }
-        },
-        scales: {
-            y: { beginAtZero: true }
         }
-    }
-});
+    });
+}
 
+// Data PHP ke JS
+const chartConfigs = <?php echo json_encode($datasets); ?>;
 
+const colors = [
+    'rgba(75, 192, 192, 1)',
+    'rgba(255, 99, 132, 1)',
+    'rgba(54, 162, 235, 1)',
+    'rgba(255, 159, 64, 1)'
+];
 
-const ctx3 = document.getElementById('applicationGroupMonthly');
-const applicationGroupMonthly = new Chart(ctx3, {
-    type: 'line',
-    data: {
-        labels: applicationGroupMonthlyLabels,
-        datasets: [{
-            label: 'New Application Group',
-            data: applicationGroupMonthlyData,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.3
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'New Application Group per Month'
-            }
-        },
-        scales: {
-            y: { beginAtZero: true }
-        }
-    }
-});
-
-const ctx4 = document.getElementById('moduleMonthly');
-const moduleMonthly = new Chart(ctx4, {
-    type: 'line',
-    data: {
-        labels: moduleMonthlyLabels,
-        datasets: [{
-            label: 'New Module',
-            data: moduleMonthlyData,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.3
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'New Module per Month'
-            }
-        },
-        scales: {
-            y: { beginAtZero: true }
-        }
-    }
-});
+const charts = {};
+let i = 0;
+for (const [id, cfg] of Object.entries(chartConfigs)) {
+    const color = colors[i % colors.length];
+    charts[id] = createLineChart(
+        id,
+        cfg.labels,
+        cfg.data,
+        cfg.label,
+        cfg.title,
+        color
+    );
+    i++;
+}
 
 // Function to debounce events to prevent excessive calls
 function debounce(func, wait) {
@@ -202,15 +146,12 @@ function debounce(func, wait) {
     };
 }
 
-// Create a debounced resize handler
+// Resize handler untuk semua chart
 const handleResize = debounce(() => {
-    applicationChart.resize();
-    adminChart.resize();
-}, 250); // Resize after 250ms of no activity
+    Object.values(charts).forEach(chart => chart.resize());
+}, 250);
 
-// Add a window resize event listener
 window.addEventListener('resize', handleResize);
-
 </script>
 
 <?php

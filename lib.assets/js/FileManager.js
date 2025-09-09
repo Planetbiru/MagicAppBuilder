@@ -75,9 +75,12 @@ function initFileManager()
           // Get the name (file or directory) from data attributes
           let itemName = '';
           let itemType = target.dataset.type; // Accessing data-type
+          let fileExtension = '';
 
           if (itemType === 'file') {
               itemName = target.querySelector("span").dataset.file;
+              fileExtension = target.querySelector("span").dataset.extension;
+              fileExtension = fileExtension.toLowerCase();
           } else if (itemType === 'dir') {
               itemName = target.querySelector("span").dataset.dir;
           }
@@ -94,12 +97,25 @@ function initFileManager()
           
           // Add appropriate menu options for file or directory
           if (itemType === 'file') {
-              menuList.innerHTML = `
-              <li data-type="file" data-operation="open" data-file="${itemName}">Open File</li>
-              <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
-              <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
-              <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
-              `;
+              if(['svg'].includes(fileExtension))
+              {
+                menuList.innerHTML = `
+                <li data-type="file" data-operation="view-image" data-file="${itemName}">View Image</li>
+                <li data-type="file" data-operation="open" data-file="${itemName}">Open as Text</li>
+                <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
+                <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
+                <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
+                `;
+              }
+              else
+              {
+                menuList.innerHTML = `
+                <li data-type="file" data-operation="open" data-file="${itemName}">Open File</li>
+                <li data-type="file" data-operation="rename" data-file="${itemName}">Rename File</li>
+                <li data-type="file" data-operation="download" data-file="${itemName}">Download File</li>
+                <li data-type="file" data-operation="delete" data-file="${itemName}">Delete File</li>
+                `;
+              }
               // If contextMenu.style.top + contextMenu.style.height > window.innerHeight, adjust the position
               if (menuY + contextMenu.offsetHeight > window.innerHeight) {
                 menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
@@ -176,6 +192,10 @@ function initFileManager()
         
         // Action based on the clicked option
         switch (clickedOption) {
+            case "view-image":
+              viewImage(name); // Create a new file in the root directory
+              setDisplayMode('image');
+              break;
             case "root-new-file":
               createNewFile(''); // Create a new file in the root directory
               break;
@@ -826,7 +846,9 @@ function loadDirContent(dir, subDirUl, subdirLi, reset) {
  */
 function displayDirContent(dirs, subDirUl, reset) {
     subDirUl.innerHTML = '';
-    dirs.forEach(function (dir) {
+    if(dirs?.length)
+    {
+      dirs.forEach(function (dir) {
         if (dir.type === 'dir') { // If the item is a directory
             const dirLi = document.createElement('li');
             dirLi.dataset.type = dir.type;
@@ -851,7 +873,8 @@ function displayDirContent(dirs, subDirUl, reset) {
             fileLi.appendChild(fileSpan);
             subDirUl.appendChild(fileLi); // Append the file <li> to the subdirectory <ul>
         }
-    }); 
+      }); 
+    }
 }
 
 /**
@@ -988,88 +1011,126 @@ function openFile(file, extension) {
       extension = getFileExtension(file); // Get the file extension if not provided 
     }
     // List of non-text extensions (images, videos, audio, etc.)
+
+
     const nonTextExtensions = [
-      'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico', 'mp4', 'mp3', 'avi', 'pdf', 
-      'xls', 'xlsx', 'ods', 'csv', 'docx', 'sqlite', 'db', 'ttf', 'otf', 'woff', 'woff2', 'eot'
+      'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico', 
+      'pdf', 'xls', 'xlsx', 'ods', 'csv', 'docx', 
+      'sqlite', 'db', 
+      'ttf', 'otf', 'woff', 'woff2', 'eot',
+      'mp3', 'wav', 'flac', 'm4a', 
+      'mp4', 'ogg', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp'
     ];
 
+    let lowerExtension = extension.toLowerCase();
+
     // Check if the file extension is not for text files or supported images
-    if (!nonTextExtensions.includes(extension.toLowerCase())) {
+    if (!nonTextExtensions.includes(lowerExtension)) {
         if(currentMode === null)
         {
             changeMode(file, extension); 
         }
         setDisplayMode('text');
         openTextFile(file, extension);
-    } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico'].includes(extension.toLowerCase())) {
-        setDisplayMode('image');
+    } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'ico'].includes(lowerExtension)) {
         // For supported image extensions, use the server-side script to load the image as base64
-        increaseAjaxPending();
-        fetch('lib.ajax/file-manager-load-image.php?file=' + encodeURIComponent(file))
-            .then(response => response.text())
-            .then(base64ImageData => {
-                let mediaDisplay = document.querySelector('.media-display');
-                // Create an <img> element to display the image
-                const img = document.createElement('img');
-                img.src = base64ImageData; // Set the base64 image data as the source
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '400px';
-                mediaDisplay.innerHTML = '';
-                mediaDisplay.appendChild(img); // Append the image to the file content div
-                decreaseAjaxPending();
-            })
-            .catch(error => {
-                decreaseAjaxPending();
-            });
-    } else if (['sqlite', 'db'].includes(extension.toLowerCase())) {
+        viewImage(file);
+        setDisplayMode('image');
+    } else if (['sqlite', 'db'].includes(lowerExtension)) {
 
         // database-display
 
         initDatabaseOnce(file);
         setDisplayMode('database');
         
-    } else if (['pdf', 'xls', 'xlsx', 'csv', 'ods', 'docx'].includes(extension.toLowerCase())) {
+    } else if (['pdf', 'xls', 'xlsx', 'csv', 'ods', 'docx'].includes(lowerExtension)) {
         // database-display
         initDocumentViewerOnce(file);
         setDisplayMode('document');
         
-    } else if (['ttf', 'otf', 'woff', 'woff2', 'eot'].includes(extension.toLowerCase())) {
+    } else if (['ttf', 'otf', 'woff', 'woff2', 'eot'].includes(lowerExtension)) {
         // font-display
-        initFontViewerOnce(file);
+        initFontViewerOnce(file, 'font-frame');
+        setDisplayMode('frame');
+    } else if(['mp4', 'ogg', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp'].includes(lowerExtension) ) { 
+        // video-display
+        initFrameViewerOnce(file, 'video-frame');
+        setDisplayMode('frame');
+    } else if(['mp3', 'wav', 'flac', 'm4a'].includes(lowerExtension) ) { 
+        // video-display
+        initFrameViewerOnce(file, 'audio-frame');
         setDisplayMode('frame');
     } else {
         // For unsupported file extensions, display an error message
         fileDiv.textContent = 'Cannot open this file.'; // Display error message for unsupported file types
     }
+    
+}
+
+/**
+ * Display an image in the media display area by fetching it from the server.
+ *
+ * This function sends a request to the server to load an image file as
+ * Base64-encoded data, then dynamically creates an <img> element and injects
+ * it into the `.media-display` container.
+ *
+ * It also manages AJAX pending counters using `increaseAjaxPending()` and
+ * `decreaseAjaxPending()`.
+ *
+ * @function viewImage
+ * @param {string} file - The relative or absolute path of the image file to load.
+ * @returns {void}
+ */
+function viewImage(file) {
+  increaseAjaxPending();
+  fetch('lib.ajax/file-manager-load-image.php?file=' + encodeURIComponent(file))
+    .then(response => response.text())
+    .then(base64ImageData => {
+      let mediaDisplay = document.querySelector('.media-display');
+      // Create an <img> element to display the image
+      const img = document.createElement('img');
+      img.src = base64ImageData; // Set the base64 image data as the source
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '400px';
+      mediaDisplay.innerHTML = '';
+      mediaDisplay.appendChild(img); // Append the image to the display
+      decreaseAjaxPending();
+    })
+    .catch(error => {
+      decreaseAjaxPending();
+    });
 }
 
 /**
  * Initialize the frame viewer once with the given file.
  * 
- * This function loads a file into an iframe viewer element (#frame-viewer).
- * The file will be rendered by the file manager loader.
+ * Loads a file into the frame viewer element (#frame-viewer) by embedding
+ * it in an iframe. The file will be rendered by the file manager loader.
  *
  * @param {string} file - Path of the file to display in the frame viewer.
+ * @param {string} className - CSS class name(s) to apply to the iframe element.
  */
-function initFrameViewerOnce(file) {
+function initFrameViewerOnce(file, className) {
   $('#frame-viewer').html(
-    `<iframe src="lib.ajax/file-manager-load-file.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
+    `<iframe class="${className}" src="lib.ajax/file-manager-load-file.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
   );
 }
 
 /**
  * Initialize the font viewer once with the given font file.
  * 
- * This function loads a font file into an iframe viewer element (#frame-viewer).
- * The file will be rendered by the font viewer handler.
+ * Loads a font file into the frame viewer element (#frame-viewer) by embedding
+ * it in an iframe. The file will be rendered by the font viewer handler.
  *
  * @param {string} file - Path of the font file to display in the font viewer.
+ * @param {string} className - CSS class name(s) to apply to the iframe element.
  */
-function initFontViewerOnce(file) {
+function initFontViewerOnce(file, className) {
   $('#frame-viewer').html(
-    `<iframe src="lib.ajax/file-managet-font-viewer.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
+    `<iframe class="${className}" src="lib.ajax/file-managet-font-viewer.php?file=${encodeURIComponent(file)}" frameborder="0"></iframe>`
   );
 }
+
 
 /**
  * Initialize the database view once by ensuring all SQLite-related scripts are loaded only once.
@@ -1302,6 +1363,12 @@ function setDisplayMode(mode) {
       const el = document.querySelector(`.${m}-mode`);
       if (el) el.style.display = m === mode ? 'block' : 'none';
     });
+    if(['text', 'image', 'database', 'document'].includes(mode))
+    {
+      // Clear frame
+      // Important to stop video or audio
+      $('#frame-viewer').html('');
+    }
 }
 
 
