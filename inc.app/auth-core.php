@@ -65,6 +65,6 @@ if(!isset($databaseConfig))
 // Initialize action context with user ID, IP address, and timestamp.
 // This context will be used when updating the application database.
 $currentAction = new SetterGetter();
-$currentAction->setUserId($entityAdmin->getAdminId());
+$currentAction->setUserId("superuser");
 $currentAction->setIp($_SERVER['REMOTE_ADDR']);
 $currentAction->setTime(date('Y-m-d H:i:s'));

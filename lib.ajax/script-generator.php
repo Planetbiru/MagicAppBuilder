@@ -91,7 +91,7 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
         }
     }
 
-    ModuleUtil::saveModule($activeApplication->getApplicationId(), new Module(null, $databaseBuilder), $request, $currentAction->getTime(), $currentAction->getUserId(), $currentAction->getIp());
+    ModuleUtil::saveModule($activeApplication->getApplicationId(), new Module(null, $databaseBuilder), $request, $currentAction->getTime(), $entityAdmin->getAdminId(), $currentAction->getIp());
     ChartDataUtil::updateChartData(new Module(null, $databaseBuilder), new ModuleCreated(null, $databaseBuilder), date('Ym'));
 }
 
