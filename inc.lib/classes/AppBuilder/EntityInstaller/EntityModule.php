@@ -34,24 +34,6 @@ class EntityModule extends MagicObject
 	protected $moduleId;
 
 	/**
-	 * Admin ID
-	 * 
-	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin ID")
-	 * @var string
-	 */
-	protected $adminId;
-
-	/**
-	 * Admin
-	 * 
-	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
-	 * @Label(content="Admin")
-	 * @var EntityAdmin
-	 */
-	protected $admin;
-
-	/**
 	 * Application ID
 	 * 
 	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
@@ -59,15 +41,24 @@ class EntityModule extends MagicObject
 	 * @var string
 	 */
 	protected $applicationId;
-
+	
 	/**
-	 * Application
+	 * Name
 	 * 
-	 * @JoinColumn(name="application_id", referenceColumnName="application_id")
-	 * @Label(content="Application")
-	 * @var EntityApplication
+	 * @Column(name="name", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Name")
+	 * @var string
 	 */
-	protected $application;
+	protected $name;
+	
+	/**
+	 * Module Code
+	 * 
+	 * @Column(name="module_code", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Module Code")
+	 * @var string
+	 */
+	protected $moduleCode;
 
 	/**
 	 * File Name

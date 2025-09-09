@@ -34,24 +34,6 @@ class Module extends MagicObject
 	protected $moduleId;
 
 	/**
-	 * Admin ID
-	 * 
-	 * @Column(name="admin_id", type="varchar(40)", length=40, nullable=true)
-	 * @Label(content="Admin ID")
-	 * @var string
-	 */
-	protected $adminId;
-
-	/**
-	 * Admin
-	 * 
-	 * @JoinColumn(name="admin_id", referenceColumnName="admin_id")
-	 * @Label(content="Admin")
-	 * @var AdminMin
-	 */
-	protected $admin;
-
-	/**
 	 * Application ID
 	 * 
 	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=true)
@@ -68,6 +50,24 @@ class Module extends MagicObject
 	 * @var ApplicationMin
 	 */
 	protected $application;
+	
+	/**
+	 * Name
+	 * 
+	 * @Column(name="name", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Name")
+	 * @var string
+	 */
+	protected $name;
+	
+	/**
+	 * Module Code
+	 * 
+	 * @Column(name="module_code", type="varchar(1024)", length=1024, nullable=true)
+	 * @Label(content="Module Code")
+	 * @var string
+	 */
+	protected $moduleCode;
 
 	/**
 	 * File Name
@@ -119,18 +119,38 @@ class Module extends MagicObject
 	 * 
 	 * @Column(name="admin_create", type="varchar(40)", length=40, nullable=true, updatable=false)
 	 * @Label(content="Admin Create")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminCreate;
+
+	/**
+	 * Creator
+	 * 
+	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id", referenceTableName="admin")
+	 * @Label(content="Creator")
+	 * @var Admin
+	 */
+	protected $creator;
 
 	/**
 	 * Admin Edit
 	 * 
 	 * @Column(name="admin_edit", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Admin Edit")
+	 * @MaxLength(value=40)
 	 * @var string
 	 */
 	protected $adminEdit;
+
+	/**
+	 * Editor
+	 * 
+	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id", referenceTableName="admin")
+	 * @Label(content="Editor")
+	 * @var Admin
+	 */
+	protected $editor;
 
 	/**
 	 * IP Create

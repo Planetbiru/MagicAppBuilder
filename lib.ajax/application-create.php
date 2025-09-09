@@ -2,8 +2,11 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\ScriptGenerator;
+use AppBuilder\Util\ChartDataUtil;
 use AppBuilder\Util\FileDirUtil;
 use MagicAdmin\Entity\Data\Admin;
+use MagicAdmin\Entity\Data\Application;
+use MagicAdmin\Entity\Data\ApplicationCreated;
 use MagicObject\SecretObject;
 use MagicObject\Request\InputPost;
 use MagicObject\Constants\PicoHttpStatus;
@@ -546,6 +549,7 @@ try
         ->setWorkspaceId($workspaceId)
         ->setApplicationId($newAppId)
         ->update();
+    ChartDataUtil::updateChartData(new Application(null, $databaseBuilder), new ApplicationCreated(null, $databaseBuilder), date('Ym'));
 }
 catch(Exception $e)
 {

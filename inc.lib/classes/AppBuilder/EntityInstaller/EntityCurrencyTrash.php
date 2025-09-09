@@ -5,7 +5,7 @@ namespace AppBuilder\EntityInstaller;
 use MagicObject\MagicObject;
 
 /**
- * The CurrencyTrash class represents an entity in the "currency_trash" table.
+ * The EntityCurrencyTrash class represents an entity in the "currency_trash" table.
  *
  * This entity maps to the "currency_trash" table in the database and supports ORM (Object-Relational Mapping) operations. 
  * You can establish relationships with other entities using the JoinColumn annotation. 
@@ -19,7 +19,7 @@ use MagicObject\MagicObject;
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="currency_trash")
  */
-class CurrencyTrash extends MagicObject
+class EntityCurrencyTrash extends MagicObject
 {
 	/**
 	 * Currency Trash ID

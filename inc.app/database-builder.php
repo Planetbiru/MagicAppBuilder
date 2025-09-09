@@ -3,6 +3,9 @@
 use AppBuilder\AppInstaller;
 use AppBuilder\EntityInstaller\EntityAdmin;
 use AppBuilder\EntityInstaller\EntityAdminLevel;
+use AppBuilder\Util\ChartDataUtil;
+use MagicAdmin\Entity\Data\Admin;
+use MagicAdmin\Entity\Data\AdminCreated;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Database\PicoDatabaseType;
 use MagicObject\Util\Database\PicoDatabaseUtil;
@@ -171,6 +174,8 @@ if($databaseConfigured)
                 $admin->setIpEdit($ipAddress);
                 $admin->setActive(true);
                 $admin->insert();
+
+                ChartDataUtil::updateChartData(new Admin(null, $databaseBuilder), new AdminCreated(null, $databaseBuilder), date('Ym'));
             }
             catch(Exception $e)
             {
