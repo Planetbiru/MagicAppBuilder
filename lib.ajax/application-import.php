@@ -64,7 +64,9 @@ header('Content-Type: application/json');
 
 if ($inputPost->getUserAction() == 'preview' && $inputFile->file) {
     $file1 = $inputFile->file;
-
+    if(class_exists('ZipArchive') === false) {
+        throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+    }
     foreach ($file1->getAll() as $fileItem) {
         $temporaryName = $fileItem->getTmpName();
         $name = $fileItem->getName();
@@ -124,6 +126,9 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
         $adminId = $entityAdmin->getAdminId();
         $author = $entityAdmin->getName();
         $workspaceDirectory = FileDirUtil::normalizePath($workspace->getDirectory() . "/applications");
+        if(class_exists('ZipArchive') === false) {
+            throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+        }
         foreach ($file1->getAll() as $fileItem) {
             $temporaryName = $fileItem->getTmpName();
             $name = $fileItem->getName();
