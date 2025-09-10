@@ -713,6 +713,7 @@ textarea.description-textarea {
 
 [data-no-table="true"] textarea[name="query"] {
     height: calc(100vh - 105px);
+    max-height: calc(100vh - 105px);
 }
 
 a.all-table {
