@@ -3041,13 +3041,29 @@ The update adds two new columns, **`name`** and **`module_code`**, to the **`Mod
 ## New Feature: Dashboard Charts
 
 A new **Dashboard Chart** feature has been added to provide an overview of user activity. This chart displays monthly statistics for the following metrics:
-    * `application_created`
-    * `module_created`
-    * `workspace_created`
-    * `admin_created`
+
+* `application_created`
+* `module_created`
+* `workspace_created`
+* `admin_created`
+
+## New Feature: Show/Hide Application
+
+When a workspace contains too many applications, users may find it less convenient to navigate. In this release, MagicAppBuilder introduces a **Show/Hide Application** feature.
+
+* Users can click the **eye-slash icon** to hide an application from their workspace view.
+* Hidden applications are only hidden for the current user (user-specific visibility).
+* To restore visibility, users can click the **Show Hidden** button to reveal hidden apps, then click the **eye icon** to unhide them.
+
+This feature gives users more control and flexibility to manage their workspace and keep it clutter-free.
 
 ## Bug Fix: Primary Key Update with Approval
 
-Previously, when updating a record with an approval process, the **primary key** did not change even after approval.  
+Previously, when updating a record with an approval process, the **primary key** did not change even after approval.
 This issue has been fixed — now the primary key is correctly updated once the approval process is completed.
+
+## Bug Fix: Handle Missing ZipArchive Module in PHP
+
+In some environments, the **ZipArchive** extension may not be available in PHP, which previously caused errors during module packaging or export.
+This update adds **exception handling** to gracefully detect when `ZipArchive` is unavailable and display a clear error message instead of failing silently.
 

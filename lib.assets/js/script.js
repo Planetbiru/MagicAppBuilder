@@ -3164,6 +3164,12 @@ let initAll = function () {
     loadAllResource();
   });
 
+  $(document).on('click', '.show-hidden-application', function (e) {
+    e.preventDefault();
+    resetApplicationSearch();
+    loadAllResource(true);
+  });
+
   $(document).on('click', '.button-save-workspace', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
@@ -4342,12 +4348,14 @@ function loadWorkspaceList() {
  * the server. The returned data is used to update the `.application-card` element.
  * It also identifies the currently selected application, updates the `application-id`
  * in `localStorage`, and sets the `application-id` meta tag with the selected value.
+ * @param {boolean} showHidden - Whether to include hidden applications in the list.
  */
-function loadApplicationList() {
+function loadApplicationList(showHidden = false) {
   increaseAjaxPending();
   $.ajax({
     type: 'GET',
     url: 'lib.ajax/application-list.php',
+    data: { showHidden: showHidden ? 1 : 0 },
     success: function (data) {
       decreaseAjaxPending();
       $('.application-card').empty().append(data);
@@ -4442,10 +4450,11 @@ function updateQuery()
  * - Languages
  * - Menus
  * It also updates queries, entity diagrams, and files, and initializes tooltips.
+ * @param {boolean} showHidden - A flag to indicate whether to show certain resources.
  */
-function loadAllResource() {
+function loadAllResource(showHidden = false) {
   loadWorkspaceList();
-  loadApplicationList();
+  loadApplicationList(showHidden);
   loadPathList();
   loadLanguageList();
   

@@ -1,67 +1,85 @@
 jQuery(function($) {
-    // Use a more concise selector for both links
-    $(document).on('click', '.application-item .card-body .mark-stared, .application-item .card-body .mark-unstared', function(event) {
-        // Prevent the default link behavior
+    // Handle both Application & Workspace star toggle
+    $(document).on('click', '.application-item .card-body .mark-stared, .application-item .card-body .mark-unstared, .workspace-item .card-body .mark-stared, .workspace-item .card-body .mark-unstared',
+        function(event) {
+            event.preventDefault();
+
+            const clickedElement = $(this);
+            const card = clickedElement.closest('.application-item, .workspace-item');
+
+            let type, id, url, reloadCallback;
+
+            if (card.hasClass('application-item')) {
+                type = 'application';
+                id = card.attr('data-application-id');
+                url = 'lib.ajax/set-star-application.php';
+                reloadCallback = loadApplicationList;
+            } else if (card.hasClass('workspace-item')) {
+                type = 'workspace';
+                id = card.attr('data-workspace-id');
+                url = 'lib.ajax/set-star-workspace.php';
+                reloadCallback = loadWorkspaceList;
+            }
+
+            const isStared = clickedElement.find('i').hasClass('fa-solid');
+            const newStarStatus = !isStared;
+
+            increaseAjaxPending();
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    [`${type}Id`]: id,
+                    star: newStarStatus ? 1 : 0
+                },
+                success: function(response) {
+                    decreaseAjaxPending();
+                    reloadCallback();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    decreaseAjaxPending();
+                    console.error(`Failed to change ${type} star status:`, textStatus, errorThrown);
+                }
+            });
+        }
+    );
+
+
+
+    $(document).on('click', '.application-item .card-body .mark-hidden, .application-item .card-body .mark-unhidden', function(event) {
         event.preventDefault();
 
         const clickedElement = $(this);
         const card = clickedElement.closest('.application-item');
         const applicationId = card.attr('data-application-id');
 
-        // Determine the star status based on the current icon class.
-        // If the icon is "solid" (fa-solid fa-star), it's currently stared and will be changed to unstared (false).
-        const isStared = clickedElement.find('i').hasClass('fa-solid');
-        const newStarStatus = !isStared;
+        const isHidden = clickedElement.hasClass('mark-unhidden'); 
+        // mark-unhidden = currently visible (eye), next action = hide
+        // mark-hidden   = currently hidden (eye-slash), next action = unhide
+        const newHiddenStatus = !isHidden;
+        if(newHiddenStatus)
+        {
+            $('.application-item[data-application-id="' + applicationId + '"]').parent().addClass('d-none');
+        }
+
         increaseAjaxPending();
         $.ajax({
-            url: 'lib.ajax/set-star-application.php',
+            url: 'lib.ajax/set-hidden-application.php',
             type: 'POST',
             data: {
                 applicationId: applicationId,
-                star: newStarStatus ? 1 : 0 // Sending 1 or 0 is more common and consistent
+                hidden: newHiddenStatus ? 1 : 0
             },
             success: function(response) {
                 decreaseAjaxPending();
-                loadApplicationList();
+                if(!newHiddenStatus)
+                {
+                    loadApplicationList(true);
+                }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 decreaseAjaxPending();
-                // Show an error message if the request fails
-                console.error("Failed to change star status:", textStatus, errorThrown);
-            }
-        });
-    });
-
-    
-    // Use a more concise selector for both links
-    $(document).on('click', '.workspace-item .card-body .mark-stared, .workspace-item .card-body .mark-unstared', function(event) {
-        // Prevent the default link behavior
-        event.preventDefault();
-
-        const clickedElement = $(this);
-        const card = clickedElement.closest('.workspace-item');
-        const workspaceId = card.attr('data-workspace-id');
-
-        // Determine the star status based on the current icon class.
-        // If the icon is "solid" (fa-solid fa-star), it's currently stared and will be changed to unstared (false).
-        const isStared = clickedElement.find('i').hasClass('fa-solid');
-        const newStarStatus = !isStared;
-        increaseAjaxPending();
-        $.ajax({
-            url: 'lib.ajax/set-star-workspace.php',
-            type: 'POST',
-            data: {
-                workspaceId: workspaceId,
-                star: newStarStatus ? 1 : 0 // Sending 1 or 0 is more common and consistent
-            },
-            success: function(response) {
-                decreaseAjaxPending();
-                loadWorkspaceList();
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                // Show an error message if the request fails
-                decreaseAjaxPending();
-                console.error("Failed to change star status:", textStatus, errorThrown);
+                console.error("Failed to change hidden status:", textStatus, errorThrown);
             }
         });
     });
