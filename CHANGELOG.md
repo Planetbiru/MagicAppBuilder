@@ -3046,3 +3046,8 @@ A new **Dashboard Chart** feature has been added to provide an overview of user 
     * `workspace_created`
     * `admin_created`
 
+## Bug Fix: Primary Key Update with Approval
+
+Previously, when updating a record with an approval process, the **primary key** did not change even after approval.  
+This issue has been fixed — now the primary key is correctly updated once the approval process is completed.
+

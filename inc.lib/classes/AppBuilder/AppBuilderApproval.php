@@ -182,6 +182,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1. parent::TAB1.$this->createConstructor($objectApprovalName, $entityApprovalName, $objectName);
 
         $inputFile = 0;
+        $includePrimaryKey = false;
         foreach($appFields as $field)
         {
             if($this->isInputFile($field->getDataType()))
@@ -190,6 +191,10 @@ class AppBuilderApproval extends AppBuilderBase
             }
             else
             {
+                if($primaryKeyName == $field->getFieldName())
+                {
+                    $includePrimaryKey = true;
+                }
                 $line = parent::TAB1.$this->createSetter($objectApprovalName, $field->getFieldName(), $field->getInputFilter(), $primaryKeyName, true).";";
                 if($line != null)
                 {
@@ -210,8 +215,10 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperAdminEdit."(".$this->fixVariableInput($this->getCurrentAction()->getUserFunction()).");";
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperTimeEdit."(".$this->fixVariableInput($this->getCurrentAction()->getTimeFunction()).");";
         $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperIpEdit."(".$this->fixVariableInput($this->getCurrentAction()->getIpFunction()).");";
-        
-        $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName.parent::BRACKETS.");";
+        if(!$includePrimaryKey)
+        {
+            $lines[] = parent::TAB1.parent::TAB1.parent::VAR.$objectApprovalName.parent::CALL_SET.$upperPrimaryKeyName."(".parent::VAR.$objectName.parent::CALL_GET.$upperPrimaryKeyName."());";
+        }
 
         if($this->appFeatures->isValidationRequired())
         {
@@ -499,6 +506,10 @@ class AppBuilderApproval extends AppBuilderBase
                 $toBeCopied[] = AppBuilderBase::getStringOf($prop);
             }
         }
+        if($primaryKeyName != null && !in_array($primaryKeyName, $this->skipedAutoSetter))
+        {
+            $toBeCopied[] = AppBuilderBase::getStringOf($camelPkName);
+        }
         $entityInfoName = "entityInfo";
         $entityApvInfoName = "entityApvInfo";
         $userAction = 'UserAction::APPROVE';
@@ -623,7 +634,7 @@ class AppBuilderApproval extends AppBuilderBase
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// List of properties to be copied from $entityApprovalName to $entityName when the user approves data modification.";
         $lines[] = parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1."// You can modify this list by adding or removing fields as needed.".parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::VAR."columnToBeCopied = array(".parent::NEW_LINE
-        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.implode(', '.parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1, $toBeCopied).parent::NEW_LINE
+        .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.implode(', '.parent::NEW_LINE.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1, $toBeCopied).parent::NEW_LINE
         .parent::TAB1.parent::TAB1.parent::TAB1.parent::TAB1.");";
         $lines[] = "";
 
