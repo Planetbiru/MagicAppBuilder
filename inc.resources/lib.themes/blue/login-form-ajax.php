@@ -4,7 +4,7 @@
 
             <div class="modal-header">
                 <h5 class="modal-title"><?php echo $appLanguage->getSessionExpired(); ?></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="<?php echo $appLanguage->getClose(); ?>">
+                <button type="button" class="close" data-dismiss="modal" aria-label="<?php echo $appLanguage->getButtonClose(); ?>">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -14,12 +14,12 @@
                     <p><?php echo $appLanguage->getSessionExpiredMessage(); ?></p>
 
                     <div class="form-group">
-                        <label for="loginUsername"><?php echo $appLanguage->getUsername(); ?></label>
+                        <label for="loginUsername"><?php echo $appLanguage->getLabelUsername(); ?></label>
                         <input type="text" class="form-control" id="loginUsername" name="username" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="loginPassword"><?php echo $appLanguage->getPassword(); ?></label>
+                        <label for="loginPassword"><?php echo $appLanguage->getLabelPassword(); ?></label>
                         <input type="password" class="form-control" id="loginPassword" name="password" required>
                     </div>
 
@@ -30,8 +30,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="loginAjax()"><?php echo $appLanguage->getLogin(); ?></button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $appLanguage->getCancel(); ?></button>
+                    <button type="button" class="btn btn-primary" onclick="loginAjax()"><?php echo $appLanguage->getButtonLogin(); ?></button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $appLanguage->getButtonCancel(); ?></button>
                 </div>
             </form>
 
