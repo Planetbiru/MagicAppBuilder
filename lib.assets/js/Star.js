@@ -76,6 +76,10 @@ jQuery(function($) {
                 {
                     loadApplicationList(true);
                 }
+                else if(applicationId == $('meta[name="application-id"]').attr('content'))
+                {
+                    loadAllResource();
+                }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 decreaseAjaxPending();

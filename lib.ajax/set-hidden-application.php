@@ -23,6 +23,11 @@ if(isset($adminId) && !empty($adminId) && $applicationId)
         $hiddenApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
         $hiddenApplication->setHidden($hidden);
         $hiddenApplication->update();
+
+        if($hidden && $entityAdmin->getApplicationId() === $applicationId)
+        {
+            $entityAdmin->setApplicationId(null)->update();
+        }
     }
     catch(Exception $e)
     {
