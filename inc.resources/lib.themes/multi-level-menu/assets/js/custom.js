@@ -16,6 +16,7 @@ function getFormUrl(form, formData) {
   return `${baseUrl}?${params.toString()}`;
 }
 
+
 /**
  * Performs a GET request via AJAX to the specified URL and updates the content of a given section.
  *
@@ -35,14 +36,48 @@ function fetchUrl(url, section) {
       'X-Requested-With': 'XMLHttpRequest'
     }
   })
-    .then(response => response.text())
+    .then(response => {
+      if (response.status === 401) {
+        // Hapus modal lama kalau ada
+        const oldForm = document.querySelector('.ajax-login-form');
+        if (oldForm) {
+          oldForm.remove();
+        }
+
+        // Ambil isi response (form login) dan tampilkan modal
+        return response.text().then(content => {
+          console.log(content);
+          const wrapper = document.createElement('div');
+          wrapper.classList.add('ajax-login-form');
+          wrapper.innerHTML = content;
+          document.body.appendChild(wrapper);
+
+          // Cari modal di dalam konten baru
+          const loginModal = wrapper.querySelector('.loginModal');
+          if (loginModal) {
+            $(loginModal).modal({
+              backdrop: 'static',
+              keyboard: false,
+              show: true
+            });
+          } else {
+            console.warn('Login modal element not found in response HTML');
+          }
+
+          return null; // hentikan chain
+        });
+      }
+      return response.text();
+    })
     .then(html => {
+      if (!html) return; // stop jika sudah handle 401
+
       section.innerHTML = html;
 
-      // Update browser URL without reload
+      // Update browser URL tanpa reload
       history.pushState(null, '', url);
 
-      // Re-initialize sorting features if needed
+      // Re-init sorting
       const table = section.querySelector('table');
       if (table) {
         makeTableSortable(table);
@@ -55,6 +90,58 @@ function fetchUrl(url, section) {
     })
     .catch(error => {
       console.error('AJAX form error:', error);
+    });
+}
+
+/**
+ * Sends an AJAX login request to the server using Fetch API.
+ *
+ * This function:
+ * - Retrieves username and password from the login modal input fields.
+ * - Sends credentials to `login.php` via a POST request with `application/x-www-form-urlencoded` encoding.
+ * - Handles the response:
+ *    - On success (`200`, `201`, `204`, etc.), the login modal is hidden.
+ *    - On unauthorized (`401`), an error message inside the modal is displayed.
+ *    - On unexpected status codes, an error message is displayed and a warning is logged.
+ * - Handles network or fetch-related errors by showing the error message as well.
+ *
+ * @function loginAjax
+ * @returns {void}
+ */
+function loginAjax() {
+  // Get username and password values from modal input fields
+  let username = document.querySelector('.loginModal input[name="username"]').value;
+  let password = document.querySelector('.loginModal input[name="password"]').value;
+
+  // Send AJAX request to login.php
+  fetch('login.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+  })
+    .then(response => {
+      if (response.ok) {
+        // ✅ Success: Hide login modal if login is successful
+        $('.loginModal').modal('hide');
+      } else if (response.status === 401) {
+        // ❌ Unauthorized: Show login error message
+        const errorBox = document.querySelector('.loginModal .login-error');
+        if (errorBox) errorBox.style.display = 'block';
+      } else {
+        // ⚠️ Unexpected status code: Still show error message and log warning
+        const errorBox = document.querySelector('.loginModal .login-error');
+        if (errorBox) errorBox.style.display = 'block';
+        console.warn('Unexpected login response status:', response.status);
+      }
+    })
+    .catch(error => {
+      // 🚨 Network or fetch error: Show error message and log error
+      const errorBox = document.querySelector('.loginModal .login-error');
+      if (errorBox) errorBox.style.display = 'block';
+      console.error('Login AJAX error:', error);
     });
 }
 
@@ -502,8 +589,37 @@ function initAjaxSupport() {
           },
           body: formData
         })
-          .then(response => response.text())
+          .then(response => {
+            if (response.status === 401) {
+              // Hapus modal lama kalau ada
+              const oldForm = document.querySelector('.ajax-login-form');
+              if (oldForm) {
+                oldForm.remove();
+              }
+              // Ambil isi response (form login) dan tampilkan modal
+              return response.text().then(content => {
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('ajax-login-form');
+                wrapper.innerHTML = content;
+                document.body.appendChild(wrapper);
+                // Cari modal di dalam konten baru
+                const loginModal = wrapper.querySelector('.loginModal');
+                if (loginModal) {
+                  $(loginModal).modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true
+                  });
+                } else {
+                  console.warn('Login modal element not found in response HTML');
+                }
+                return null;
+              });
+            }
+            return response.text();
+          })
           .then(html => {
+            if (!html) return;
             section.innerHTML = html;
             const table = section.querySelector('table');
             if (table) {

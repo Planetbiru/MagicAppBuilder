@@ -3072,3 +3072,10 @@ This issue has been fixed — now the primary key is correctly updated once the 
 In some environments, the **ZipArchive** extension may not be available in PHP, which previously caused errors during module packaging or export.
 This update adds **exception handling** to gracefully detect when `ZipArchive` is unavailable and display a clear error message instead of failing silently.
 
+## Bug Fix: Login Form with AJAX Content Loading
+
+Previously, when a session expired, the application rendered the full login page directly into the section where AJAX content was supposed to be loaded.  
+Starting from this version, the server now responds with a **401 status code** on session expiration. The response body contains a **specialized login form HTML** designed exclusively for AJAX requests, instead of the full login page.  
+
+This allows the application to properly display the login form as a **modal dialog**, rather than misinterpreting it as part of the requested content.
+
