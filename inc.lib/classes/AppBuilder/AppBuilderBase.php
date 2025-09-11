@@ -2568,6 +2568,7 @@ $subqueryMap = '.$referece.';
         $edit->appendChild($spanEdit);
         
         $td2 = $dom->createElement('td');
+        $td2->setAttribute('class', 'data-editor');
         
         $td2->appendChild($dom->createTextNode(self::N_TAB7)); 
         $td2->appendChild($edit);
@@ -2589,14 +2590,15 @@ $subqueryMap = '.$referece.';
         $spanDetail->appendChild($dom->createTextNode(''));
         $detail->appendChild($spanDetail);
         
-        $td2 = $dom->createElement('td');
+        $td3 = $dom->createElement('td');
+        $td3->setAttribute('class', 'data-viewer');
         
-        $td2->appendChild($dom->createTextNode(self::N_TAB7)); 
-        $td2->appendChild($detail);
-        $td2->appendChild($dom->createTextNode(self::N_TAB6)); 
+        $td3->appendChild($dom->createTextNode(self::N_TAB7)); 
+        $td3->appendChild($detail);
+        $td3->appendChild($dom->createTextNode(self::N_TAB6)); 
         
         $trh->appendChild($dom->createTextNode(self::N_TAB6)); 
-        $trh->appendChild($td2);
+        $trh->appendChild($td3);
         $trh->appendChild($dom->createTextNode(self::N_TAB6.self::PHP_OPEN_TAG.'} '.self::PHP_CLOSE_TAG));
         // detail end
         
@@ -2641,6 +2643,10 @@ $subqueryMap = '.$referece.';
             if($this->appFeatures->isSortOrder() && PicoStringUtil::camelize($this->entityInfo->getSortOrder()) == PicoStringUtil::camelize($field->getFieldName()))
             {
                 $td->setAttribute('class', 'data-sort-order-column');
+            }
+            else
+            {
+                $td->setAttribute('class', 'data-column');
             }            
             $value = $this->createDetailValue($dom, $objectName, $field);          
             $td->appendChild($value);           
