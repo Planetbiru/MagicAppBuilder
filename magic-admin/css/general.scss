@@ -453,6 +453,9 @@ thead .data-sort-header {
       text-align: right;
       padding-right: 4px;
     }
+    &.data-column{
+      padding-right: 6px;
+    }
   }
 
   .data-selector {

@@ -3034,6 +3034,11 @@ With this feature, you can:
 
 This update fixes a bug where changes made to the color mode or sidebar status in MagicAdmin would also affect the generated app, and vice versa. Now, MagicAdmin uses separate local storage keys, so your settings in one won't interfere with the other.
 
+## Enhancement: Improved Data List Appearance
+
+The **Data List** view has been enhanced with additional styling classes for data columns, making the display more visually appealing.
+Previously, column data appeared too tightly packed, making it harder to read. Now, spacing and styling improvements make the data clearer and easier to distinguish between columns.
+
 ## New Feature: Module Tracking and History
 
 The update adds two new columns, **`name`** and **`module_code`**, to the **`Module`** entity. This allows the system to track and record every time a user creates or modifies a module. These changes are then stored in a new entity called **`ModuleHistory`**, which provides a record of module creation activities.
