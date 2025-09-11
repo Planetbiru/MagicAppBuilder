@@ -3034,6 +3034,11 @@ With this feature, you can:
 
 This update fixes a bug where changes made to the color mode or sidebar status in MagicAdmin would also affect the generated app, and vice versa. Now, MagicAdmin uses separate local storage keys, so your settings in one won't interfere with the other.
 
+## Enhancement: Improved Data List Appearance
+
+The **Data List** view has been enhanced with additional styling classes for data columns, making the display more visually appealing.
+Previously, column data appeared too tightly packed, making it harder to read. Now, spacing and styling improvements make the data clearer and easier to distinguish between columns.
+
 ## New Feature: Module Tracking and History
 
 The update adds two new columns, **`name`** and **`module_code`**, to the **`Module`** entity. This allows the system to track and record every time a user creates or modifies a module. These changes are then stored in a new entity called **`ModuleHistory`**, which provides a record of module creation activities.
@@ -3066,4 +3071,11 @@ This issue has been fixed — now the primary key is correctly updated once the 
 
 In some environments, the **ZipArchive** extension may not be available in PHP, which previously caused errors during module packaging or export.
 This update adds **exception handling** to gracefully detect when `ZipArchive` is unavailable and display a clear error message instead of failing silently.
+
+## Bug Fix: Login Form with AJAX Content Loading
+
+Previously, when a session expired, the application rendered the full login page directly into the section where AJAX content was supposed to be loaded.  
+Starting from this version, the server now responds with a **401 status code** on session expiration. The response body contains a **specialized login form HTML** designed exclusively for AJAX requests, instead of the full login page.  
+
+This allows the application to properly display the login form as a **modal dialog**, rather than misinterpreting it as part of the requested content.
 
