@@ -2,6 +2,7 @@
 
 namespace MagicApp\Utility;
 
+use Exception;
 use MagicApp\Exceptions\InvalidDownloadException;
 use ZipArchive;
 
@@ -68,7 +69,9 @@ class ZipDownloader
         if (empty($folderPath) || !is_dir($folderPath)) {
             throw new InvalidDownloadException(self::FOLDER_NOT_FOUND . $folderPath);
         }
-
+        if(class_exists('ZipArchive') === false) {
+            throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+        }
         $zip = new ZipArchive();
         $zipFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $zipFileName;
 
@@ -97,7 +100,9 @@ class ZipDownloader
         if (empty($filePaths) || !is_array($filePaths)) {
             throw new InvalidDownloadException('Invalid file paths provided.');
         }
-
+        if(class_exists('ZipArchive') === false) {
+            throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+        }
         $zip = new ZipArchive();
         $zipFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $zipFileName;
 
@@ -133,7 +138,9 @@ class ZipDownloader
         if (empty($filePaths) || !is_array($filePaths)) {
             throw new InvalidDownloadException('Invalid file paths provided.');
         }
-
+        if(class_exists('ZipArchive') === false) {
+            throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+        }
         $zip = new ZipArchive();
         $zipFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $zipFileName;
 

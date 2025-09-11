@@ -27,7 +27,9 @@ try {
     $name = FileDirUtil::normalizationPath($name);
     
     $type = $inputGet->getType();
-    
+    if(class_exists('ZipArchive') === false) {
+        throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+    }
     
     if (file_exists($name)) {
         if($type == "file") {

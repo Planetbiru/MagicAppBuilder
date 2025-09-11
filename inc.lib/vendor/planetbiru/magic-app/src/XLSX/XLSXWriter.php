@@ -2,6 +2,7 @@
 
 namespace MagicApp\XLSX;
 
+use Exception;
 use ZipArchive;
 
 /*
@@ -284,6 +285,9 @@ class XLSXWriter //NOSONAR
 				return;
 			}
 		}
+		if(class_exists('ZipArchive') === false) {
+            throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+        }
 		$zip = new ZipArchive();
 		if (empty($this->sheets)) {
 			self::log("Error in " . __CLASS__ . "::" . __FUNCTION__ . ", no worksheets defined.");

@@ -21,6 +21,10 @@ try {
         throw new FileNotFoundException("Invalid project directory");
     }
 
+    if(class_exists('ZipArchive') === false) {
+        throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+    }
+
     // Create temporary zip file
     $zipFilename = tempnam(sys_get_temp_dir(), 'app_export_');
     $zip = new ZipArchive();

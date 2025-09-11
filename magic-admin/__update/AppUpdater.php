@@ -137,6 +137,9 @@ class AppUpdater
      */
     public function replaceFromZip()
     {
+        if(class_exists('ZipArchive') === false) {
+            throw new Exception("ZipArchive class is not available. Please ensure the PHP zip extension is installed and enabled.");
+        }
         $zip = new ZipArchive();
         if ($zip->open($this->zipFile) !== true) {
             throw new \UpdateException("Unable to open ZIP archive.");

@@ -1,17 +1,40 @@
 <?php
 
-use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\FileDirUtil;
+use MagicAdmin\Entity\Data\Application;
+use MagicAdmin\Entity\Data\ApplicationHidden;
 use MagicAdmin\Entity\Data\StarApplication;
 use MagicApp\Field;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
+use MagicObject\Request\InputGet;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-$applicationFinder = new EntityApplication(null, $databaseBuilder);
+$inputGet = new InputGet();
+$showHidden = $inputGet->getShowHidden();
+
+function isHidden($databaseBuilder, $adminId, $applicationId)
+{
+    if(!isset($adminId) || empty($adminId) || !isset($applicationId) || empty($applicationId))
+    {
+        return false;
+    }
+    try
+    {
+        $hiddenApplication = new ApplicationHidden(null, $databaseBuilder);
+        $hiddenApplication->findOneByAdminIdAndApplicationId($adminId, $applicationId);
+        return $hiddenApplication->getHidden();
+    }
+    catch(Exception $e)
+    {
+        return false;
+    }
+}
+
+$applicationFinder = new Application(null, $databaseBuilder);
 $myApprlication = array();
 
 $adminId = isset($entityAdmin) && $entityAdmin->issetAdminId() ? $entityAdmin->getAdminId() : null;
@@ -39,7 +62,11 @@ try
     $pageData = $applicationFinder->findAll($specs, null, $sorts);
     foreach ($pageData->getResult() as $application) {
         $application->setStared(isset($stars[$application->getApplicationId()]) && $stars[$application->getApplicationId()]);
-        $myApprlication[] = $application;
+        $application->setHidden(isHidden($databaseBuilder, $adminId, $application->getApplicationId()));
+        if($showHidden || !$application->isHidden())
+        {
+            $myApprlication[] = $application;
+        }
     }
     foreach ($myApprlication as $application)
     {
@@ -81,18 +108,26 @@ try
         data-application-id="<?php echo $app->getId();?>" 
         data-application-name="<?php echo htmlspecialchars($app->getName());?>"
         data-path="<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"
+        data-show-hidden="<?php $showHidden ? 'true' : 'false'; ?>"
     >
         <div class="card-body">
             <h5 class="card-title">
                 <span><?php echo htmlspecialchars($app->getName()); ?></span>
-                <span>
-                <?php if ($stared){ ?>
-                    <a class="mark-unstared" href="#"><i class="fa-solid fa-star"></i></a>
-                <?php } else { ?>
-                    <a class="mark-stared" href="#"><i class="fa-regular fa-star"></i></a>
-                <?php } ?>
+                <span class="float-end">
+                    <?php if ($stared){ ?>
+                        <a class="mark-unstared me-2" href="#"><i class="fa-solid fa-star"></i></a>
+                    <?php } else { ?>
+                        <a class="mark-stared me-2" href="#"><i class="fa-regular fa-star"></i></a>
+                    <?php } ?>
+
+                    <?php if ($application->isHidden()){ ?>
+                        <a class="mark-unhidden" href="#"><i class="fa-solid fa-eye"></i></a>
+                    <?php } else { ?>
+                        <a class="mark-hidden" href="#"><i class="fa-solid fa-eye-slash"></i></a>
+                    <?php } ?>
                 </span>
             </h5>
+
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $applicationUrl; ?></h6>
             <p class="card-text"><?php echo $app->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-setting">
@@ -162,18 +197,26 @@ try
         data-application-id="<?php echo $app->getId();?>" 
         data-application-name="<?php echo htmlspecialchars($app->getName());?>"
         data-path="<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"
+        data-show-hidden="<?php $showHidden ? 'true' : 'false'; ?>"
     >
         <div class="card-body">
             <h5 class="card-title">
                 <span><?php echo htmlspecialchars($app->getName()); ?></span>
-                <span>
-                <?php if ($stared){ ?>
-                    <a class="mark-unstared" href="#"><i class="fa-solid fa-star"></i></a>
-                <?php } else { ?>
-                    <a class="mark-stared" href="#"><i class="fa-regular fa-star"></i></a>
-                <?php } ?>
+                <span class="float-end">
+                    <?php if ($stared){ ?>
+                        <a class="mark-unstared me-2" href="#"><i class="fa-solid fa-star"></i></a>
+                    <?php } else { ?>
+                        <a class="mark-stared me-2" href="#"><i class="fa-regular fa-star"></i></a>
+                    <?php } ?>
+
+                    <?php if ($application->isHidden()){ ?>
+                        <a class="mark-unhidden" href="#"><i class="fa-solid fa-eye"></i></a>
+                    <?php } else { ?>
+                        <a class="mark-hidden" href="#"><i class="fa-solid fa-eye-slash"></i></a>
+                    <?php } ?>
                 </span>
             </h5>
+
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $applicationUrl; ?></h6>
             <p class="card-text"><?php echo $app->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-tn btn-primary button-application-setting">
