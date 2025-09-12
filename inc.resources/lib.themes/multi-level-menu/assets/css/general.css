@@ -726,4 +726,9 @@ tr[data-active=false] td {
 #menuSearchResults .list-group-item a:hover {
   text-decoration: none;
   color: #f9fcff;
+}
+
+.main-menu-container {
+  height: calc(100vh - 52px);
+  overflow-y: auto;
 }/*# sourceMappingURL=general.css.map */

@@ -351,69 +351,113 @@ class PicoDatabaseUtilBase // NOSONAR
      *
      * @param PicoDatabase $databaseSource The source database from which to import data.
      * @param PicoDatabase $databaseTarget The target database where data will be inserted.
-     * @param string $tableNameSource The name of the source table.
-     * @param string $tableNameTarget The name of the target table.
      * @param SecretObject $tableInfo Information about the table, including mapping and constraints.
      * @param int $maxRecord The maximum number of records to process in a single batch.
      * @param callable $callbackFunction A callback function to handle the generated SQL statements.
-     * @return bool true on success, false on failure.
+     * @param int|null $limit Maximum number of rows to fetch from the source table (per call).
+     * @param int|null $offset The starting row offset.
+     * @return bool true if there may still be more data after this batch, false if finished.
      */
-    public function importDataTable($databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget, $tableInfo, $maxRecord, $callbackFunction)
-    {
+    public function importDataTable(
+        $databaseSource,
+        $databaseTarget,
+        $tableInfo,
+        $maxRecord,
+        $callbackFunction,
+        $limit = null,
+        $offset = null
+    ) {
+        $tableNameTarget = $tableInfo->getTarget();
+        $tableNameSource = $tableInfo->getSource();
         $maxRecord = $this->getMaxRecord($tableInfo, $maxRecord);
-        try
-        {
+
+        try {
             $columns = $this->showColumns($databaseTarget, $tableNameTarget);
+
             $queryBuilderSource = new PicoDatabaseQueryBuilder($databaseSource);
-            $sourceTable = $tableInfo->getSource();
             $queryBuilderSource->newQuery()
                 ->select("*")
-                ->from($sourceTable);
+                ->from($tableNameSource);
+
+            if (isset($limit) && $limit >= 0) {
+                $queryBuilderSource->limit($limit);
+            }
+            if (isset($offset) && $offset >= 0) {
+                $queryBuilderSource->offset($offset);
+            }
+
             $stmt = $databaseSource->query($queryBuilderSource);
-            $records = array();
-            while($data = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
-            {
+
+            $records = [];
+            $rowCount = 0;
+
+            while ($data = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+                $rowCount++;
                 $data = $this->processDataMapping($data, $columns, $tableInfo->getMap());
-                if(count($records) < $maxRecord)
-                {
-                    $records[] = $data;
-                }
-                else
-                {
-                    if(isset($callbackFunction) && is_callable($callbackFunction))
-                    {
+
+                $records[] = $data;
+
+                if (count($records) >= $maxRecord) {
+                    if (isset($callbackFunction) && is_callable($callbackFunction)) {
                         $sql = $this->insert($tableNameTarget, $records);
                         call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
                     }
-                    // reset buffer
-                    $records = array();
+                    $records = []; // reset buffer
                 }
             }
-            if(!empty($records) && isset($callbackFunction) && is_callable($callbackFunction))
-            {
+
+            // flush last batch
+            if (!empty($records) && isset($callbackFunction) && is_callable($callbackFunction)) {
                 $sql = $this->insert($tableNameTarget, $records);
                 call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
             }
-        }
-        catch(Exception $e)
-        {
-            error_log($e->getMessage());
+
+            // Check if there are more rows to fetch
+            if ($limit !== null && $rowCount === $limit) {
+                return true; 
+            }
             return false;
+
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return false; 
         }
-        return true;
     }
 
+
     /**
-     * Imports data from the source database to the target database.
+     * Executes a full data import process from a source database to a target database.
      *
-     * This method connects to the source and target databases, executes any pre-import scripts,
-     * transfers data from the source tables to the target tables, and executes any post-import scripts.
+     * This method performs the following steps:
+     * - Establishes connections to both source and target databases using configuration details.
+     * - Executes optional pre-import SQL scripts for each table (only on the first batch).
+     * - Transfers data from source tables to corresponding target tables, in chunks if needed.
+     * - Executes optional post-import SQL scripts for each table (only after the last batch).
      *
-     * @param SecretObject $config Configuration object containing database and table details.
-     * @param callable $callbackFunction Callback function to execute SQL scripts.
-     * @return bool Returns true on successful import, false on failure.
+     * The import process is table-driven, with each table configuration specifying:
+     * - Source and target table names.
+     * - Pre/post import SQL scripts.
+     * - Mapping rules and other metadata.
+     *
+     * Data transfer is delegated to {@see importDataTable}, which returns whether more data
+     * remains to be imported. As long as data remains, this method should be called again
+     * with incremented offset until all data has been processed.
+     *
+     * @param SecretObject $config Configuration object containing:
+     *   - Source and target database connection parameters.
+     *   - Table mappings with source/target names and optional scripts.
+     *   - Maximum record limits for import operations.
+     * @param callable $callbackFunction A user-defined function with the signature:
+     *   function(string $sql, string $sourceTable, string $targetTable, PicoDatabase $sourceDb, PicoDatabase $targetDb): void
+     *   Used to execute pre/post import SQL scripts and generated INSERT statements.
+     * @param string|null $tableName Optional specific table to import; null = import all tables.
+     * @param int|null $limit Maximum number of rows to fetch per query (chunk size).
+     * @param int|null $offset Row offset for pagination during chunked imports.
+     *
+     * @return bool True if there may still be more data remaining; false if the import
+     *              process has finished and post-import scripts have been executed.
      */
-    public function importData($config, $callbackFunction)
+    public function importData($config, $callbackFunction, $tableName = null, $limit = null, $offset = null)
     {
         $databaseConfigSource = $config->getDatabaseSource();
         $databaseConfigTarget = $config->getDatabaseTarget();
@@ -430,24 +474,31 @@ class PicoDatabaseUtilBase // NOSONAR
             // query pre import data
             foreach($tables as $tableInfo)
             {
+                
                 $tableNameTarget = $tableInfo->getTarget();
                 $tableNameSource = $tableInfo->getSource();
-                $preImportScript = $tableInfo->getPreImportScript();
-                if($this->isNotEmpty($preImportScript))
+                if($this->shoudCreatePreImportScript($tableNameTarget, $tableName, $limit, $offset))
                 {
-                    foreach($preImportScript as $sql)
+                    $preImportScript = $tableInfo->getPreImportScript();
+                    if($this->isNotEmpty($preImportScript))
                     {
-                        call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
+                        foreach($preImportScript as $sql)
+                        {
+                            call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget, $databaseSource, $databaseTarget);
+                        }
                     }
                 }
+                
             }
 
             // import data
+            $hashRemaining = true;
             foreach($tables as $tableInfo)
             {
                 $tableNameTarget = $tableInfo->getTarget();
                 $tableNameSource = $tableInfo->getSource();
-                $this->importDataTable($databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget, $tableInfo, $maxRecord, $callbackFunction);
+                $remaining = $this->importDataTable($databaseSource, $databaseTarget, $tableInfo, $maxRecord, $callbackFunction, $limit, $offset);
+                $hashRemaining = $hashRemaining && $remaining;
             }
 
             // query post import data
@@ -455,12 +506,15 @@ class PicoDatabaseUtilBase // NOSONAR
             {
                 $tableNameTarget = $tableInfo->getTarget();
                 $tableNameSource = $tableInfo->getSource();
-                $postImportScript = $tableInfo->getPostImportScript();
-                if($this->isNotEmpty($postImportScript))
+                if(!$hashRemaining)
                 {
-                    foreach($postImportScript as $sql)
+                    $postImportScript = $tableInfo->getPostImportScript();
+                    if($this->isNotEmpty($postImportScript))
                     {
-                        call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
+                        foreach($postImportScript as $sql)
+                        {
+                            call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget, $databaseSource, $databaseTarget);
+                        }
                     }
                 }
             }
@@ -471,6 +525,35 @@ class PicoDatabaseUtilBase // NOSONAR
             return false;
         }
         return true;
+    }
+
+    /**
+     * Determines whether the pre-import script for a given table should be executed.
+     *
+     * Pre-import scripts are executed in two cases:
+     * - When no specific table name is provided (all tables are being imported).
+     * - When the current table matches the specified table name, and the offset
+     *   is either not set or equal to zero (meaning this is the first batch).
+     *
+     * This ensures that pre-import scripts run only once at the start of an import,
+     * and are not repeated for subsequent chunks.
+     *
+     * @param string $tableNameTarget The target table name defined in the configuration.
+     * @param string|null $tableName  The specific table being imported, or null if all tables are included.
+     * @param int|null $offset        The current data offset; pre-import runs only if offset is null or zero.
+     *
+     * @return bool True if the pre-import script should be executed, false otherwise.
+     */
+    public function shoudCreatePreImportScript($tableNameTarget, $tableName, $offset)
+    {
+        if(!isset($tableName))
+        {
+            return true;
+        }
+        else
+        {
+            return $tableNameTarget == $tableName && (!isset($offset) || $offset === 0);
+        }
     }
 
     /**

@@ -457,8 +457,11 @@ class PicoPageData // NOSONAR
                 $objectName = $info['objectName'];
                 $objectNameSub = $info['objectName'];
 
-                $data[$objectName] = isset($row[$objectNameSub])
-                    ? (new MagicObject())->set($info['primaryKey'], $row[$info['columnName']])->set($info['propertyName'], $row[$objectNameSub])
+                $primaryKeyValue = isset($info['columnName']) && isset($row[$info['columnName']]) ? $row[$info['columnName']] : null;
+                $propertyValue = isset($row[$objectNameSub]) ? $row[$objectNameSub] : null;
+
+                $data[$objectName] = ($propertyValue !== null)
+                    ? (new MagicObject())->set($info['primaryKey'], $primaryKeyValue)->set($info['propertyName'], $propertyValue)
                     : new MagicObject();
             }
         } else {

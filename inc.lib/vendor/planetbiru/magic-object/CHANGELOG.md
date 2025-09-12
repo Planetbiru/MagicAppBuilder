@@ -1254,7 +1254,7 @@ database:
 This feature gives developers better control over database connectivity, especially in environments with slow or unreliable networks, by preventing applications from hanging indefinitely during connection attempts.
 
 
-# MagicObject Version 3.17.1
+# MagicObject v3.17.1 — Release Notes
 
 ## What’s Changed
 

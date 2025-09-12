@@ -875,3 +875,8 @@ tr[data-active="false"] td{
     }
   }
 }
+
+.main-menu-container {
+  height: calc(100vh - 52px);
+  overflow-y: auto;
+}
