@@ -67,32 +67,8 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
     if (!file_exists(dirname($path))) {
         mkdir(dirname($path), 0755, true);
     }
-    foreach($request->getFields() as $field)
-    {
-        $dataFormat = $field->getDataFormat();
-        $referenceData = $field->getReferenceData();
-        $referenceFilter = $field->getReferenceFilter();
-        
-        // Ensure dataFormat is an object instead of an empty array
-        if(empty($dataFormat))
-        {
-            $field->setDataFormat(new stdClass);
-        }
-        // Ensure referenceData is an object instead of an empty array
-        if(empty($referenceData))
-        {
-            $field->setReferenceData(new stdClass);
-        }
-        // Ensure referenceFilter is an object instead of an empty array
-        if(empty($referenceFilter))
-        {
-            $field->setReferenceFilter(new stdClass);
-        }
-    }
 
-    // Save the request data to the JSON file
-    $options = $builderConfig->getData()->getPrettifyModuleData() ? JSON_PRETTY_PRINT : 0;
-    file_put_contents($path, json_encode(json_decode((string) $request), $options));
+    
     
     $fileGenerated = 0;
 
@@ -115,6 +91,32 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
 
     ModuleUtil::saveModule($activeApplication->getApplicationId(), new Module(null, $databaseBuilder), $request, $currentAction->getTime(), $entityAdmin->getAdminId(), $currentAction->getIp());
     ChartDataUtil::updateChartData(new Module(null, $databaseBuilder), new ModuleCreated(null, $databaseBuilder), date('Ym'));
+
+    foreach($request->getFields() as $field)
+    {
+        $dataFormat = $field->getDataFormat();
+        $referenceData = $field->getReferenceData();
+        $referenceFilter = $field->getReferenceFilter();
+        
+        // Ensure dataFormat is an object instead of an empty array
+        if(empty($dataFormat))
+        {
+            $field->setDataFormat(new stdClass);
+        }
+        // Ensure referenceData is an object instead of an empty array
+        if(empty($referenceData))
+        {
+            $field->setReferenceData(new stdClass);
+        }
+        // Ensure referenceFilter is an object instead of an empty array
+        if(empty($referenceFilter))
+        {
+            $field->setReferenceFilter(new stdClass);
+        }
+    }
+    // Save the request data to the JSON file
+    $options = $builderConfig->getData()->getPrettifyModuleData() ? JSON_PRETTY_PRINT : 0;
+    file_put_contents($path, json_encode(json_decode((string) $request), $options));
 }
 
 
