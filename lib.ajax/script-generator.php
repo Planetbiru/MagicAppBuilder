@@ -67,6 +67,28 @@ if ((isset($_POST) && !empty($_POST)) || (isset($_SERVER["CONTENT_TYPE"]) && str
     if (!file_exists(dirname($path))) {
         mkdir(dirname($path), 0755, true);
     }
+    foreach($request->getFields() as $field)
+    {
+        $dataFormat = $field->getDataFormat();
+        $referenceData = $field->getReferenceData();
+        $referenceFilter = $field->getReferenceFilter();
+        
+        // Ensure dataFormat is an object instead of an empty array
+        if(empty($dataFormat))
+        {
+            $field->setDataFormat(new stdClass);
+        }
+        // Ensure referenceData is an object instead of an empty array
+        if(empty($referenceData))
+        {
+            $field->setReferenceData(new stdClass);
+        }
+        // Ensure referenceFilter is an object instead of an empty array
+        if(empty($referenceFilter))
+        {
+            $field->setReferenceFilter(new stdClass);
+        }
+    }
 
     // Save the request data to the JSON file
     $options = $builderConfig->getData()->getPrettifyModuleData() ? JSON_PRETTY_PRINT : 0;

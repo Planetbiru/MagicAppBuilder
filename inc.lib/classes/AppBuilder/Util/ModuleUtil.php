@@ -57,7 +57,7 @@ class ModuleUtil
         $module->setName($moduleName);
         $module->setModuleCode($moduleCode);
         $module->setFileName($moduleFile);
-        $module->setDirectory($target);
+        $module->setDirectoryName($target);
 
         // Metadata
         $module->setTimeCreate($timeCreate);
