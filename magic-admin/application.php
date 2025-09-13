@@ -401,11 +401,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getProjectDirectory();?></td>
-						<td><?php echo $application->getProjectDirectory();?></td>
+						<td><a href="vscode://file/<?php echo str_replace("\\", "/", $application->getProjectDirectory());?>"><?php echo $application->getProjectDirectory();?></a></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getBaseApplicationDirectory();?></td>
-						<td><?php echo $application->getBaseApplicationDirectory();?></td>
+						<td><a href="vscode://file/<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"><?php echo $application->getBaseApplicationDirectory();?></a></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getUrl();?></td>
@@ -750,7 +750,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="architecture"><?php echo isset($mapForArchitecture) && isset($mapForArchitecture[$application->getArchitecture()]) && isset($mapForArchitecture[$application->getArchitecture()]["label"]) ? $mapForArchitecture[$application->getArchitecture()]["label"] : "";?></td>
 								<td data-col-name="workspace_id"><?php echo $application->issetWorkspace() ? $application->getWorkspace()->getName() : "";?></td>
 								<td data-col-name="author"><?php echo $application->getAuthor();?></td>
-								<td data-col-name="base_application_directory"><?php echo $application->getBaseApplicationDirectory();?></td>
+								<td data-col-name="base_application_directory"><a href="vscode://file/<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"><?php echo $application->getBaseApplicationDirectory();?></a></td>
 								<td data-col-name="url"><a href="<?php echo $application->getUrl();?>" target="_blank"><?php echo $application->getUrl();?></a></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $application->getSortOrder();?></td>
 								<td data-col-name="time_create"><?php echo $application->getTimeCreate();?></td>
