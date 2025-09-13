@@ -86,9 +86,34 @@ class Column {
      */
     constructor(name, type = "VARCHAR", length = "", nullable = false, defaultValue = "", primaryKey = false, autoIncrement = false, values = "", description = "") //NOSONAR
     {
-        if(type.toUpperCase().indexOf('BIGINT') !== -1 && (length == null || length == 0 || length == ''))
-        {
+        const typeUpper = type.toUpperCase();
+
+        // Set default length for BIGINT
+        if (typeUpper.includes('BIGINT') && (!length || length == 0)) {
             length = '20';
+        }
+
+        // Normalize default value for numeric types
+        if (
+            (typeUpper.includes('INT') && !typeUpper.includes('TINYINT(1)')) ||
+            typeUpper.includes('FLOAT') ||
+            typeUpper.includes('DOUBLE')
+        ) {
+            if (typeof defaultValue === 'string' && defaultValue.includes("'")) {
+                defaultValue = this.toNumeric(defaultValue);
+            }
+        }
+        // Normalize default value for boolean types
+        else if (
+            (typeUpper.includes('TINYINT(1)') || typeUpper.includes('BOOL') || typeUpper.includes('BIT')) &&
+            length == 1 &&
+            typeof defaultValue === 'string'
+        ) {
+            if (["'1'", '"1"', '1'].includes(defaultValue)) {
+                defaultValue = 'TRUE';
+            } else if (["'0'", '"0"', '0'].includes(defaultValue)) {
+                defaultValue = 'FALSE';
+            }
         }
         this.name = name;
         this.type = type;
@@ -367,7 +392,7 @@ class Column {
      */
     toBoolean(value, dialect) {
         const val = typeof value === 'string' ? value.trim().toLowerCase() : String(value).toLowerCase();
-        const isTrue = val === 'true' || val === '1' || parseInt(val) !== 0;
+        const isTrue = val === 'true' || val === '1';
 
         const useNumeric = ['sqlite', 'sqlserver'].includes(dialect.toLowerCase());
         
