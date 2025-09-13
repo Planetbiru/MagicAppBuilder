@@ -695,6 +695,28 @@ tr[data-active=false] td {
   border-color: #444;
 }
 
+.main-menu-container {
+  height: calc(100vh - 52px);
+  overflow-y: auto;
+  /* If there is a sibling with the .show class */
+}
+.main-menu-container .nav-link[data-toggle=collapse]::after {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "\f105";
+  float: right;
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+.main-menu-container .nav-link[data-toggle=collapse] + .show,
+.main-menu-container .nav-link[data-toggle=collapse] ~ .show {
+  /* marker only, not used directly */
+}
+.main-menu-container .nav-link[data-toggle=collapse]:has(+ .show)::after,
+.main-menu-container .nav-link[data-toggle=collapse]:has(~ .show)::after {
+  transform: rotate(90deg);
+}
+
 select[multiple].form-control {
   height: 38px;
 }
