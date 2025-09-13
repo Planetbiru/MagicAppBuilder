@@ -3079,3 +3079,13 @@ Starting from this version, the server now responds with a **401 status code** o
 
 This allows the application to properly display the login form as a **modal dialog**, rather than misinterpreting it as part of the requested content.
 
+## Bug Fix: Subquery Handling in Database Access
+
+Fixed an issue with **subquery execution** when retrieving data from the database.
+This problem was resolved by upgrading the **MagicObject** library to improve query handling and reliability.
+
+## Bug Fix: Column.toBoolean() in Entity Editor
+
+Fixed an error in the **`Column.toBoolean()`** function when generating **`CREATE TABLE`** statements in the **Entity Editor**.
+Now, boolean columns are correctly converted and included in the generated SQL.
+
