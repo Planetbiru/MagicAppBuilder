@@ -506,12 +506,3 @@ Whether you're building standard data entry modules or complex enterprise system
 In today’s fast-moving development landscape, **MagicAppBuilder** enables teams to stay ahead—focusing on innovation rather than boilerplate code.
 
 Subscribe to our YouTube channel https://www.youtube.com/@maliktamvan
-
-
-## Support MagicAppBuilder Development
-
-MagicAppBuilder is actively developed to help the developer community build applications faster and more efficiently. If you find this project useful or would like to support further development, you can make a donation via PayPal. Your contribution will be used to add new features, fix bugs, and improve documentation.
-
-Thank you for your support!
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DMHFJ6LR7FGQS)
