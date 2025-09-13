@@ -510,9 +510,7 @@ Subscribe to our YouTube channel https://www.youtube.com/@maliktamvan
 
 ## Support MagicAppBuilder Development
 
-MagicAppBuilder is actively developed to help the developer community build applications faster and more efficiently.  
-If you find this project useful or would like to support further development, you can make a donation via PayPal.  
-Your contribution will be used to add new features, fix bugs, and improve documentation.
+MagicAppBuilder is actively developed to help the developer community build applications faster and more efficiently. If you find this project useful or would like to support further development, you can make a donation via PayPal. Your contribution will be used to add new features, fix bugs, and improve documentation.
 
 Thank you for your support!
 
