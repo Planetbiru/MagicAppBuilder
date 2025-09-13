@@ -318,6 +318,9 @@ table.responsive-three-cols > tbody > tr > td:nth-child(1) {
 .data-wrapper .table {
   margin-bottom: 0;
 }
+.data-wrapper .table [data-col-name] {
+  padding-right: 0.125rem;
+}
 
 .table-sort-by-column thead td a {
   display: block;
