@@ -20,7 +20,9 @@ if($inputPost->getFieldName() != null && $inputPost->getKey() != null && $inputP
     {
         mkdir(dirname($path), 0755, true);
     }
-    file_put_contents($path, $inputPost->getValue());
+    $options = $builderConfig->getData()->getPrettifyModuleData() ? JSON_PRETTY_PRINT : 0;
+    $content = json_encode(json_decode((string) $inputPost->getValue()), $options);
+    file_put_contents($path, $content);
 }
 ResponseUtil::sendJSON(new stdClass);
 exit();
