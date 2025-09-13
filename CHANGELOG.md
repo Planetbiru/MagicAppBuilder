@@ -3097,6 +3097,11 @@ Now, boolean columns are correctly converted and included in the generated SQL.
 The **MagicAdmin** menu interface has been improved to support scrolling when the content overflows.
 This ensures that all menu items remain accessible, even on smaller screens or when many items are present.
 
+## Enhancement: Visual Indicators for Collapsible Menus
+
+All **collapsible menus** in MagicAdmin now include a **visual marker (icon)** to distinguish between menus that contain submenus and those that do not.
+This provides clearer navigation cues and helps users quickly identify expandable sections.
+
 ## New Feature: Open Application and Project Directories in VS Code
 
 From the application menu, users can now quickly open both the **application directory** and the **project directory** directly in **Visual Studio Code**.
@@ -3109,7 +3114,8 @@ When saving **module configurations**, **data references**, and **filter referen
 * This option is controlled through the `core.yml` setting:
 
   ```yaml
-  data.prettify_module_data: true | false
+  data:
+    prettify_module_data: true | false
   ```
 * Default: **`false`**
 
