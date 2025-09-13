@@ -693,4 +693,9 @@ tr[data-active=false] td {
 .dark-mode .btn-secondary:hover {
   background-color: #444;
   border-color: #444;
+}
+
+.main-menu-container {
+  height: calc(100vh - 52px);
+  overflow-y: auto;
 }/*# sourceMappingURL=general.css.map */

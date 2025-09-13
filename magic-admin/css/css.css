@@ -695,6 +695,11 @@ tr[data-active=false] td {
   border-color: #444;
 }
 
+.main-menu-container {
+  height: calc(100vh - 52px);
+  overflow-y: auto;
+}
+
 select[multiple].form-control {
   height: 38px;
 }

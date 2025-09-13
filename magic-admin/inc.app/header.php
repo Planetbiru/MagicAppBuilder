@@ -33,14 +33,16 @@ use MagicObject\SecretObject;
     <div class="sidebar" id="sidebar">
         <button class="button-transparent toggle-sidebar"><i class="fas fa-times"></i></button>
         <h4 class="text-white text-center"><a href="./"><?php echo $appLanguage->getDashboard();?></a></h4>
-        <?php
-        // Sample JSON data (can be replaced with your own)
-        $menuLoader = new SecretObject();
-        $jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
+        <div class="main-menu-container">
+            <?php
+            $menuLoader = new SecretObject();
+            $jsonData = $menuLoader->loadYamlFile(__DIR__ . "/menu.yml", false, true, true);
 
-        // Call the function to generate the sidebar
-        echo AdminPage::generateSidebar($jsonData, basename($_SERVER['PHP_SELF']), $appLanguage);
-        ?>
+            // Call the function to generate the sidebar
+            echo AdminPage::generateSidebar($jsonData, basename($_SERVER['PHP_SELF']), $appLanguage);
+            ?>
+        </div>
+        
     </div>
 
     <!-- Main Content -->
