@@ -3089,3 +3089,30 @@ This problem was resolved by upgrading the **MagicObject** library to improve qu
 Fixed an error in the **`Column.toBoolean()`** function when generating **`CREATE TABLE`** statements in the **Entity Editor**.
 Now, boolean columns are correctly converted and included in the generated SQL.
 
+
+# MagicAppBuilder Version 1.21.1
+
+## Enhancement: Scrollable Menu in MagicAdmin
+
+The **MagicAdmin** menu interface has been improved to support scrolling when the content overflows.
+This ensures that all menu items remain accessible, even on smaller screens or when many items are present.
+
+## New Feature: Open Application and Project Directories in VS Code
+
+From the application menu, users can now quickly open both the **application directory** and the **project directory** directly in **Visual Studio Code**.
+This addition streamlines the workflow for developers by reducing the steps needed to navigate to the relevant folders.
+
+## New Feature: JSON Prettify Option for Module Configuration
+
+When saving **module configurations**, **data references**, and **filter references**, users now have the option to store JSON in a **prettified (formatted)** style.
+
+* This option is controlled through the `core.yml` setting:
+
+  ```yaml
+  data.prettify_module_data: true | false
+  ```
+* Default: **`false`**
+
+  * Produces smaller files, optimizing storage and processing speed.
+* When set to **`true`**, JSON files become more human-readable, making it easier for users to manually inspect or analyze configuration data.
+
