@@ -395,6 +395,9 @@ table.responsive-three-cols {
 
   .table {
     margin-bottom: 0;
+    [data-col-name] {
+      padding-right: 0.125rem;
+    }
   }
 }
 
@@ -884,3 +887,4 @@ tr[data-active="false"] td {
   }
 
 }
+
