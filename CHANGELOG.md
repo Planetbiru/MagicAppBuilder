@@ -3122,3 +3122,13 @@ When saving **module configurations**, **data references**, and **filter referen
   * Produces smaller files, optimizing storage and processing speed.
 * When set to **`true`**, JSON files become more human-readable, making it easier for users to manually inspect or analyze configuration data.
 
+## New Feature: Browser Language Detection
+
+Before a user logs in or when a session expires, the application previously had no information about the user's preferred language and would fall back to the **default language**.
+With this update, MagicAppBuilder now detects the **browser's language setting**:
+
+* If the detected language is available in the application, it will be used automatically.
+* If the detected language is not available, the system will gracefully fall back to the **default language**.
+
+This improves the user experience by providing localized interfaces without requiring additional setup.
+
