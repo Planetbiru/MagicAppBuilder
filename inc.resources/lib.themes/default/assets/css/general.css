@@ -714,16 +714,27 @@ tr[data-active=false] td {
 }
 
 #menuSearchResults .list-group-item {
+  padding: 0;
+}
+#menuSearchResults .list-group-item a {
+  display: block;
   padding: 0.4rem 0.75rem;
+}
+#menuSearchResults .list-group-item a:hover {
+  text-decoration: none;
+}
+#menuSearchResults .list-group-item:hover {
+  background-color: #eaeaea;
+}
+
+.dark-mode #menuSearchResults .list-group-item {
   background-color: #464646;
   border-color: #212529;
   color: #e4e6e8;
 }
-#menuSearchResults .list-group-item a {
-  display: block;
+.dark-mode #menuSearchResults .list-group-item a {
   color: #e4e6e8;
 }
-#menuSearchResults .list-group-item a:hover {
-  text-decoration: none;
+.dark-mode #menuSearchResults .list-group-item a:hover {
   color: #f9fcff;
 }/*# sourceMappingURL=general.css.map */
