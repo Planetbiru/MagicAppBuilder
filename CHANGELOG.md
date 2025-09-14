@@ -3135,3 +3135,13 @@ To prevent errors and function failures, MagicAppBuilder now includes a robust f
 
 This ensures that network-dependent features—such as retrieving data from external APIs or other web resources—remain fully functional, even on server environments without cURL. This change significantly improves the stability and portability of the application.
 
+## New Feature: Browser Language Detection
+
+Before a user logs in or when a session expires, the application previously had no information about the user's preferred language and would fall back to the **default language**.
+With this update, MagicAppBuilder now detects the **browser's language setting**:
+
+* If the detected language is available in the application, it will be used automatically.
+* If the detected language is not available, the system will gracefully fall back to the **default language**.
+
+This improves the user experience by providing localized interfaces without requiring additional setup.
+
