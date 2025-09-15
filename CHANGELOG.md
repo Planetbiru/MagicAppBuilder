@@ -3135,4 +3135,3 @@ To prevent errors and function failures, MagicAppBuilder now includes a robust f
 
 This ensures that network-dependent features—such as retrieving data from external APIs or other web resources—remain fully functional, even on server environments without cURL. This change significantly improves the stability and portability of the application.
 
-
