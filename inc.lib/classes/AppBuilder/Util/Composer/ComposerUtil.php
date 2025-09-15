@@ -12,7 +12,7 @@ use Exception;
 /**
  * Class ComposerUtil
  *
- * Utility class for interacting with Composer packages. 
+ * Utility class for interacting with Composer packages.
  * This class provides methods to retrieve version information for the MagicApp package from Packagist.
  */
 class ComposerUtil
@@ -46,33 +46,58 @@ class ComposerUtil
         $url = self::PACKAGE_URL;
         $html = "";
 
-        try 
-        {
-            $html = @file_get_contents($url);
+        if (function_exists('curl_init')) {
+            // Use cURL if available
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => false,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_SSL_VERIFYPEER => true,
+            ]);
 
-            if ($html === false) 
-            {
-                throw new ConnectionException("Failed to retrieve content from URL: $url");
+            $html = curl_exec($ch);
+            if ($html === false) {
+                throw new ConnectionException('cURL error: ' . curl_error($ch));
             }
+            curl_close($ch);
+        } else {
+            // Fallback to PHP streams
+            $options = [
+                'http' => [
+                    'method' => 'GET',
+                    'timeout' => 10,
+                    'ignore_errors' => true
+                ],
+                'ssl' => [
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                ]
+            ];
+            $context = stream_context_create($options);
             
+            $html = @file_get_contents($url, false, $context);
+            if ($html === false) {
+                throw new ConnectionException("Failed to retrieve content from URL: $url. Check your internet connection or server configuration.");
+            }
+        }
+        
+        try {
             $doc = new DOMDocument();
             @$doc->loadHTML($html);
             $versionPath = new DOMXPath($doc);
             $versionList = $versionPath->query("//*[contains(@class, 'versions')]/ul");
             $versions = array();
 
-            if (self::isValidDomPath($versionList)) 
-            {
-                foreach ($versionList->item(0)->childNodes as $child) 
-                {
-                    if (isset($child)) 
-                    {
+            if (self::isValidDomPath($versionList)) {
+                foreach ($versionList->item(0)->childNodes as $child) {
+                    if (isset($child)) {
                         $attributes = $child->attributes;
                         $version = trim($child->textContent);
-                        if (!empty($version) && stripos($version, 'dev-') === false) 
-                        {
+                        if (!empty($version) && stripos($version, 'dev-') === false) {
                             $versions[] = array(
-                                "key" => $version, 
+                                "key" => $version,
                                 "value" => $version,
                                 "latest" => self::hasClass($attributes, "open")
                             );
@@ -80,11 +105,9 @@ class ComposerUtil
                     }
                 }
             }
-            return $versions;   
-        } 
-        catch (Exception $e) 
-        {
-            throw new ConnectionException("Failed to retrieve content from URL: $url");
+            return $versions;
+        } catch (Exception $e) {
+            throw new ConnectionException("An error occurred while parsing content from URL: $url", 0, $e);
         }
     }
     
@@ -97,14 +120,11 @@ class ComposerUtil
      */
     public static function hasClass($attributes, $className)
     {
-        for ($i = 0; $i < $attributes->length; $i++) 
-        {
-            if ($attributes->item($i)->name === "class") 
-            {
+        for ($i = 0; $i < $attributes->length; $i++) {
+            if ($attributes->item($i)->name === "class") {
                 $classes = $attributes->item($i)->value;
                 $arr = explode(" ", $classes);
-                if (in_array($className, $arr)) 
-                {
+                if (in_array($className, $arr)) {
                     return true;
                 }
             }
@@ -141,12 +161,15 @@ class ComposerUtil
         }
 
         // 2. Fallback: Use stream context
-
         $options = [
             'http' => [
                 'method' => 'HEAD',
                 'timeout' => $timeout,
-                'ignore_errors' => true, // Allow to read response headers even on HTTP errors
+                'ignore_errors' => true,
+            ],
+            'ssl' => [
+                'verify_peer' => true,
+                'verify_peer_name' => true,
             ]
         ];
         $context = stream_context_create($options);
@@ -156,16 +179,13 @@ class ComposerUtil
             return false;
         }
 
-        // Extract HTTP status code
         if (is_array($headers) && isset($headers[0])) {
             preg_match('/HTTP\/\d+\.\d+\s+(\d+)/', $headers[0], $matches);
             $httpCode = isset($matches[1]) ? (int)$matches[1] : 0;
 
-            return $httpCode === 200;
+            return $httpCode >= 200 && $httpCode < 300;
         }
 
         return false;
     }
-
-
 }

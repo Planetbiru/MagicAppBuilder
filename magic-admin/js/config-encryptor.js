@@ -387,3 +387,200 @@ function toEnvName(str) {
         .replace(/[^A-Za-z0-9_]/g, '_')
         .toUpperCase();
 }
+
+/**
+ * Converts a JavaScript object/array to an XML string.
+ *
+ * @param {Object|Array} data     The input object/array to convert.
+ * @param {string} rootName       The name of the root XML element.
+ * @param {string} itemName       The name to use for array items.
+ * @returns {string}              The resulting XML string.
+ */
+function toXml(data, rootName = "root", itemName = "item") {
+    const doc = document.implementation.createDocument("", "", null);
+    const root = doc.createElement(rootName);
+    doc.appendChild(root);
+
+    arrayToXml(data, root, rootName, itemName, doc);
+
+    const serializer = new XMLSerializer();
+    const rawXml = serializer.serializeToString(doc);
+
+    return formatXml(rawXml); // pretty print
+}
+
+/**
+ * Recursively converts object/array to XML nodes
+ */
+function arrayToXml(data, parent, parentName, itemName, doc) {
+    if (Array.isArray(data)) {
+        data.forEach(item => {
+            const child = doc.createElement(itemName);
+            parent.appendChild(child);
+            arrayToXml(item, child, parentName, itemName, doc);
+        });
+    } else if (typeof data === "object" && data !== null) {
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                const value = data[key];
+                if (Array.isArray(value)) {
+                    value.forEach(subItem => {
+                        const child = doc.createElement(key);
+                        parent.appendChild(child);
+                        arrayToXml(subItem, child, key, itemName, doc);
+                    });
+                } else if (typeof value === "object" && value !== null) {
+                    const child = doc.createElement(key);
+                    parent.appendChild(child);
+                    arrayToXml(value, child, key, itemName, doc);
+                } else {
+                    const child = doc.createElement(key);
+                    child.textContent = value;
+                    parent.appendChild(child);
+                }
+            }
+        }
+    } else {
+        parent.textContent = data;
+    }
+}
+
+/**
+ * Simple XML formatter with indentation
+ */
+function formatXml(xml) {
+    const PADDING = "  "; // 2 spaces
+    let formatted = "";
+    let pad = 0;
+
+    // tambahkan newline antar tag
+    xml = xml.replace(/>\s*</g, ">\n<");
+
+    xml.split("\n").forEach(node => {
+        node = node.trim();
+        if (!node) return;
+
+        if (/^<\//.test(node)) {
+            // closing tag
+            pad -= 1;
+            formatted += PADDING.repeat(pad) + node + "\n";
+        } else if (/^<[^>]+\/>/.test(node)) {
+            // self closing
+            formatted += PADDING.repeat(pad) + node + "\n";
+        } else if (/^<[^>]+>.*<\/[^>]+>$/.test(node)) {
+            // open + close di baris yang sama
+            formatted += PADDING.repeat(pad) + node + "\n";
+        } else if (/^<[^>]+>/.test(node)) {
+            // opening tag
+            formatted += PADDING.repeat(pad) + node + "\n";
+            pad += 1;
+        } else {
+            // text node
+            formatted += PADDING.repeat(pad) + node + "\n";
+        }
+    });
+
+    return formatted.trim();
+}
+
+
+/**
+ * Recursively adds object/array data to an XML element.
+ *
+ * @param {any} data              The data to convert (array, object, or scalar).
+ * @param {Element} xmlElement    The XML element to append to.
+ * @param {string} currentName    The current element name.
+ * @param {string} itemName       The name to use for array items.
+ * @param {Document} doc          The XML document instance.
+ */
+function arrayToXml(data, parent, parentName, itemName, doc) {
+    if (Array.isArray(data)) {
+        data.forEach(item => {
+            const child = doc.createElement(itemName);
+            parent.appendChild(child);
+            arrayToXml(item, child, parentName, itemName, doc);
+        });
+    } else if (typeof data === "object" && data !== null) {
+        Object.entries(data).forEach(([key, value]) => {
+            if (Array.isArray(value)) {
+                // array → buat banyak <item>
+                const wrapper = doc.createElement(key);
+                parent.appendChild(wrapper);
+                value.forEach(v => {
+                    const child = doc.createElement(itemName);
+                    wrapper.appendChild(child);
+                    arrayToXml(v, child, key, itemName, doc);
+                });
+            } else if (typeof value === "object" && value !== null) {
+                const child = doc.createElement(key);
+                parent.appendChild(child);
+                arrayToXml(value, child, key, itemName, doc);
+            } else {
+                const child = doc.createElement(key);
+                child.textContent = value;
+                parent.appendChild(child);
+            }
+        });
+    } else {
+        parent.textContent = data;
+    }
+}
+
+
+/**
+ * Converts a YAML string to an XML string.
+ * @param {*} input - The input YAML string.
+ * @returns string - The resulting XML string.
+ */
+function yamlToXml(input)
+{
+    const data = jsyaml.load(input);
+    return toXml(data, "root", "item");
+}
+
+/**
+ * Copy Yaml to clipboard
+ * Copies the YAML content from the associated textarea to the clipboard.
+ * @param {*} button - The button element that was clicked.
+ */
+function copyYaml(button) {
+    let textarea = button.closest('.form-group').querySelector('textarea');
+    let originalText = button.textContent;
+    let yaml = textarea.value;
+    button.disabled = true;
+    // Copy to clipboard
+    navigator.clipboard.writeText(yaml).then(() => {
+        // Show success message
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+    });
+}
+
+/**
+ * Copy Xml to clipboard
+ * Converts the YAML in the associated textarea to XML and copies it to the clipboard.
+ * @param {*} button - The button element that was clicked.
+ */
+function copyXml(button) {
+    let textarea = button.closest('.form-group').querySelector('textarea');
+    let originalText = button.textContent;
+    let yaml = textarea.value;
+    let xml = yamlToXml(yaml);
+    button.disabled = true;
+    // Copy to clipboard
+    navigator.clipboard.writeText(xml).then(() => {
+        // Show success message
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+    });
+}

@@ -3090,35 +3090,49 @@ Fixed an error in the **`Column.toBoolean()`** function when generating **`CREAT
 Now, boolean columns are correctly converted and included in the generated SQL.
 
 
-# MagicAppBuilder Version 1.21.1
+# MagicAppBuilder Version 1.22.0
 
 ## Enhancement: Scrollable Menu in MagicAdmin
 
-The **MagicAdmin** menu interface has been improved to support scrolling when the content overflows.
-This ensures that all menu items remain accessible, even on smaller screens or when many items are present.
+The **MagicAdmin** menu interface has been improved to support scrolling when the content overflows. This ensures that all menu items remain accessible, even on smaller screens or when many items are present.
 
 ## Enhancement: Visual Indicators for Collapsible Menus
 
-All **collapsible menus** in MagicAdmin now include a **visual marker (icon)** to distinguish between menus that contain submenus and those that do not.
-This provides clearer navigation cues and helps users quickly identify expandable sections.
+All **collapsible menus** in MagicAdmin now include a **visual marker (icon)** to distinguish between menus that contain submenus and those that do not. This provides clearer navigation cues and helps users quickly identify expandable sections.
 
 ## New Feature: Open Application and Project Directories in VS Code
 
-From the application menu, users can now quickly open both the **application directory** and the **project directory** directly in **Visual Studio Code**.
-This addition streamlines the workflow for developers by reducing the steps needed to navigate to the relevant folders.
+From the application menu, users can now quickly open both the **application directory** and the **project directory** directly in **Visual Studio Code**. This addition streamlines the workflow for developers by reducing the steps needed to navigate to the relevant folders.
 
 ## New Feature: JSON Prettify Option for Module Configuration
 
 When saving **module configurations**, **data references**, and **filter references**, users now have the option to store JSON in a **prettified (formatted)** style.
 
-* This option is controlled through the `core.yml` setting:
+  * This option is controlled through the `core.yml` setting:
 
-  ```yaml
-  data:
-    prettify_module_data: true | false
-  ```
-* Default: **`false`**
+    ```yaml
+    data:
+      prettify_module_data: true | false
+    ```
 
-  * Produces smaller files, optimizing storage and processing speed.
-* When set to **`true`**, JSON files become more human-readable, making it easier for users to manually inspect or analyze configuration data.
+  * Default: **`false`**
+
+      * Produces smaller files, optimizing storage and processing speed.
+
+  * When set to **`true`**, JSON files become more human-readable, making it easier for users to manually inspect or analyze configuration data.
+
+## New Feature: Application Config Generator – YAML to XML Conversion
+
+The **Application Config Generator** now supports converting **YAML configuration files into XML** format.
+
+YAML is highly sensitive to indentation, and a single indentation error can cause configurations to be misread or even break the entire system. By introducing XML as an alternative format, MagicAppBuilder provides a more robust option that is less prone to formatting errors.
+
+With this feature, users can choose between YAML and XML depending on their preference and the complexity of their configuration, ensuring greater flexibility and reliability in application setup.
+
+## Technical Enhancement: HTTP Request Fallback
+
+To prevent errors and function failures, MagicAppBuilder now includes a robust fallback mechanism for making HTTP requests. If the **`cURL`** PHP extension is unavailable, the application will automatically switch to using **PHP streams** to communicate with the server.
+
+This ensures that network-dependent features—such as retrieving data from external APIs or other web resources—remain fully functional, even on server environments without cURL. This change significantly improves the stability and portability of the application.
+
 

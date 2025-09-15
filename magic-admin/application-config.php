@@ -86,7 +86,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
     <div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
     <?php
     $inputGet = new InputGet();
-	$appId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+	  $appId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
     if(!empty($appId))
     {
@@ -109,12 +109,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
         <div class="form-group">
           <label for="yamlInput"><?php echo $appLanguage->getYamlInput();?></label>
           <textarea id="yamlInput" class="form-control" rows="5" spellcheck="false"><?php echo $yaml;?></textarea>
+          <div class="button-area">
+            <button class="btn btn-primary copy-yaml" onclick="copyYaml(this)"><?php echo $appLanguage->getCopyYaml();?></button>
+            <button class="btn btn-primary copy-xml" onclick="copyXml(this)"><?php echo $appLanguage->getCopyXml();?></button>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="form-group">
           <label for="yamlOutput"><?php echo $appLanguage->getYamlOutput();?></label>
           <textarea id="yamlOutput" class="form-control" rows="5" spellcheck="false"></textarea>
+          <div class="button-area">
+            <button class="btn btn-primary copy-yaml" onclick="copyYaml(this)"><?php echo $appLanguage->getCopyYaml();?></button>
+            <button class="btn btn-primary copy-xml" onclick="copyXml(this)"><?php echo $appLanguage->getCopyXml();?></button>
+          </div>
         </div>
       </div>
     </div>
