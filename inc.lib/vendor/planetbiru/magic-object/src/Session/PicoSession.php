@@ -3,7 +3,6 @@
 namespace MagicObject\Session;
 
 use MagicObject\SecretObject;
-use MagicObject\Util\PicoStringUtil;
 use stdClass;
 
 /**
@@ -64,7 +63,7 @@ class PicoSession
         }
         if ($sessConf && $sessConf->getSaveHandler() == "redis") {
             $redisParams = $this->getRedisParams($sessConf);
-            $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth);
+            $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth, $redisParams->db);
         } elseif ($sessConf && $sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
             $this->saveToFiles($sessConf->getSavePath());
         }
@@ -74,17 +73,31 @@ class PicoSession
      * Extracts Redis connection parameters from a session configuration object.
      *
      * Parses the Redis `save_path` (in URL format) from the given SecretObject instance
-     * and returns a stdClass object containing the Redis host, port, and optional authentication.
+     * and returns a stdClass object containing the Redis connection details.
      *
-     * Example save path formats:
+     * Supported save path formats:
      * - tcp://127.0.0.1:6379
      * - tcp://[::1]:6379
      * - tcp://localhost:6379?auth=yourpassword
+     * - tcp://localhost:6379?password=yourpassword
+     * - tcp://localhost:6379?db=3
+     * - tcp://localhost:6379?dbindex=3
+     * - tcp://localhost:6379?database=3
+     *
+     * Recognized query parameters:
+     * - `auth` or `password` : Redis authentication password
+     * - `db`, `dbindex`, or `database` : Redis logical database index (default: 0)
+     * - Any other query parameters are preserved in `options`
      *
      * @param SecretObject $sessConf Session configuration object containing the Redis save path.
-     * @return stdClass An object with the properties: `host` (string), `port` (int), and `auth` (string|null).
+     * @return stdClass An object with the properties:
+     *                  - `host` (string)   : Redis hostname or IP address
+     *                  - `port` (int)      : Redis port number
+     *                  - `auth` (string|null) : Authentication password (if any)
+     *                  - `db` (int)        : Redis database index (default: 0)
+     *                  - `options` (array) : All parsed query parameters
      */
-    private function getRedisParams($sessConf)
+    private function getRedisParams($sessConf) // NOSONAR
     {
         $path = $sessConf->getSavePath();
 
@@ -119,14 +132,28 @@ class PicoSession
         $host = isset($parsed['host']) ? $parsed['host'] : '';
         $port = isset($parsed['port']) ? $parsed['port'] : 0;
         $auth = null;
+        $db   = 0;   // default Redis DB
+        $opts = [];
 
-        // Parse query string to extract authentication token if available
         if (isset($parsed['query'])) {
             parse_str($parsed['query'], $parsedStr);
-            $auth = isset($parsedStr['auth']) ? $parsedStr['auth'] : null;
+
+            if (isset($parsedStr['auth'])) {
+                $auth = $parsedStr['auth'];
+            } elseif (isset($parsedStr['password'])) {
+                $auth = $parsedStr['password'];
+            }
+            if (isset($parsedStr['db'])) {
+                $db = (int)$parsedStr['db'];
+            } elseif (isset($parsedStr['dbindex'])) {
+                $db = (int)$parsedStr['dbindex'];
+            } elseif (isset($parsedStr['database'])) {
+                $db = (int)$parsedStr['database'];
+            }
+
+            $opts = $parsedStr;
         }
 
-        // Set default Redis port if not explicitly defined
         if (!empty($host) && $port == 0) {
             $port = 6379;
         }
@@ -135,10 +162,11 @@ class PicoSession
         $params->host = $host;
         $params->port = $port;
         $params->auth = $auth;
+        $params->db   = $db;
+        $params->options = $opts;
 
         return $params;
     }
-
 
     /**
      * Returns the instance of PicoSession.
@@ -392,19 +420,43 @@ class PicoSession
      * @param string|null $auth Optional authentication password for Redis.
      * @return self Returns the current instance to allow method chaining.
      */
-    public function saveToRedis($host, $port, $auth = null)
+    public function saveToRedis($host, $port, $auth = null, $db = null)
     {
+        $params = array();
+        if(isset($db) && is_int($db))
+        {
+            $params['database'] = (int)$db;
+        }
         if(isset($auth))
         {
-            $path = sprintf("tcp://%s:%d?auth=%s", $host, $port, $auth);
+            $params['auth'] = $auth;
         }
-        else
+        $path = sprintf("tcp://%s:%d", $host, $port);
+        if(!empty($params))
         {
-            $path = sprintf("tcp://%s:%d", $host, $port);
+            $path .= "?" . $this->httpBuildQuery($params);
         }
         ini_set("session.save_handler", "redis");
         ini_set("session.save_path", $path);
         return $this;
+    }
+
+    /**
+     * Builds a URL-encoded query string from an associative array.
+     *
+     * This method constructs a query string suitable for use in URLs or HTTP requests
+     * by encoding the keys and values of the provided associative array.
+     *
+     * @param array $params An associative array of key-value pairs to be converted into a query string.
+     * @return string A URL-encoded query string.
+     */
+    private function httpBuildQuery($params)
+    {
+        $pairs = [];
+        foreach ($params as $key => $value) {
+            $pairs[] = urlencode($key) . '=' . urlencode($value);
+        }
+        return implode('&', $pairs);
     }
 
     /**

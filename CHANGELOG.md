@@ -3108,18 +3108,18 @@ From the application menu, users can now quickly open both the **application dir
 
 When saving **module configurations**, **data references**, and **filter references**, users now have the option to store JSON in a **prettified (formatted)** style.
 
-  * This option is controlled through the `core.yml` setting:
+* This option is controlled through the `core.yml` setting:
 
-    ```yaml
-    data:
-      prettify_module_data: true | false
-    ```
+  ```yaml
+  data:
+    prettify_module_data: true | false
+  ```
 
-  * Default: **`false`**
+* Default: **`false`**
 
-      * Produces smaller files, optimizing storage and processing speed.
+  * Produces smaller files, optimizing storage and processing speed.
 
-  * When set to **`true`**, JSON files become more human-readable, making it easier for users to manually inspect or analyze configuration data.
+* When set to **`true`**, JSON files become more human-readable, making it easier for users to manually inspect or analyze configuration data.
 
 ## New Feature: Application Config Generator – YAML to XML Conversion
 
@@ -3147,18 +3147,21 @@ This improves the user experience by providing localized interfaces without requ
 
 ## Bug Fix: Selective Configuration Encryption
 
-Previously, MagicAppBuilder encrypted **all application configuration properties**, which was neither efficient nor flexible.  
-With this fix, only the properties explicitly designated by the user are encrypted—for example, **database** and **Redis** credentials.  
+Previously, MagicAppBuilder encrypted **all application configuration properties**, which was neither efficient nor flexible.
+With this fix, only the properties explicitly designated by the user are encrypted—for example, **database** and **Redis** credentials.
 
 This ensures a better balance between **security, performance, and usability**, while giving users fine-grained control over which sensitive data should be protected.
 
-## New Feature: Browser Language Detection
+## Dependency Upgrade: MagicObject 3.19.0
 
-Before a user logs in or when a session expires, the application previously had no information about the user's preferred language and would fall back to the **default language**.
-With this update, MagicAppBuilder now detects the **browser's language setting**:
+MagicAppBuilder now bundles **MagicObject 3.19.0**, which includes several enhancements, most notably:
 
-* If the detected language is available in the application, it will be used automatically.
-* If the detected language is not available, the system will gracefully fall back to the **default language**.
+* **PicoSession Redis Database Parameter**
+  Developers can now specify a **Redis database index** in the session save path, allowing session data to be isolated in different Redis databases.
 
-This improves the user experience by providing localized interfaces without requiring additional setup.
+  Example:
+
+  ```
+  tcp://localhost:6379?db=3
+  ```
 

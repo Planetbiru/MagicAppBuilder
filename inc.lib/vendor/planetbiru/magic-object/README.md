@@ -603,3 +603,11 @@ A tutorial is available here: https://github.com/Planetbiru/MagicObject/blob/mai
 # Contributors
 
 1. Kamshory - https://github.com/kamshory/
+
+# Support MagicObject Development
+
+MagicObject is actively developed to help the developer community build applications faster and more efficiently. If you find this project useful or would like to support further development, you can make a donation via PayPal. Your contribution will be used to add new features, fix bugs, and improve documentation.
+
+Thank you for your support!
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DMHFJ6LR7FGQS)
