@@ -236,6 +236,11 @@ class ApplicationMenu // NOSONAR
      */
     public function isMenuSelected($currentHref, $href)
     {
+        if(strpos($currentHref, '?') !== false)
+        {
+            // If href contains query parameters, ignore them for matching
+            $currentHref = substr($currentHref, 0, strpos($currentHref, '?'));
+        }
         // Normalize both paths by ensuring leading and trailing slashes
         $normalizedCurrent = '/' . trim($currentHref, '/') . '/';
         $normalizedHref = '/' . trim($href, '/') . '/';

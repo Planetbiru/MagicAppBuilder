@@ -55,7 +55,6 @@ class PicoSession // NOSONAR
      */
     public function __construct($sessConf = null)
     {
-        error_log(json_encode($sessConf));
         if ($sessConf && $sessConf->getName() != "") {
             $this->setSessionName($sessConf->getName());
         }
@@ -68,7 +67,6 @@ class PicoSession // NOSONAR
         } elseif ($sessConf && $sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
             $this->saveToFiles($sessConf->getSavePath());
         } elseif ($sessConf && $sessConf->getSaveHandler() == "sqlite" && $sessConf->getSavePath() != "") {
-            error_log($sessConf->getSavePath());
             $handler = new SqliteSessionHandler($sessConf->getSavePath());
             session_set_save_handler(
                 [$handler, 'open'],
