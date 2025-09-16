@@ -3090,22 +3090,19 @@ Fixed an error in the **`Column.toBoolean()`** function when generating **`CREAT
 Now, boolean columns are correctly converted and included in the generated SQL.
 
 
-# MagicAppBuilder Version 1.21.1
+# MagicAppBuilder Version 1.22.0
 
 ## Enhancement: Scrollable Menu in MagicAdmin
 
-The **MagicAdmin** menu interface has been improved to support scrolling when the content overflows.
-This ensures that all menu items remain accessible, even on smaller screens or when many items are present.
+The **MagicAdmin** menu interface has been improved to support scrolling when the content overflows. This ensures that all menu items remain accessible, even on smaller screens or when many items are present.
 
 ## Enhancement: Visual Indicators for Collapsible Menus
 
-All **collapsible menus** in MagicAdmin now include a **visual marker (icon)** to distinguish between menus that contain submenus and those that do not.
-This provides clearer navigation cues and helps users quickly identify expandable sections.
+All **collapsible menus** in MagicAdmin now include a **visual marker (icon)** to distinguish between menus that contain submenus and those that do not. This provides clearer navigation cues and helps users quickly identify expandable sections.
 
 ## New Feature: Open Application and Project Directories in VS Code
 
-From the application menu, users can now quickly open both the **application directory** and the **project directory** directly in **Visual Studio Code**.
-This addition streamlines the workflow for developers by reducing the steps needed to navigate to the relevant folders.
+From the application menu, users can now quickly open both the **application directory** and the **project directory** directly in **Visual Studio Code**. This addition streamlines the workflow for developers by reducing the steps needed to navigate to the relevant folders.
 
 ## New Feature: JSON Prettify Option for Module Configuration
 
@@ -3117,8 +3114,78 @@ When saving **module configurations**, **data references**, and **filter referen
   data:
     prettify_module_data: true | false
   ```
+
 * Default: **`false`**
 
   * Produces smaller files, optimizing storage and processing speed.
+
 * When set to **`true`**, JSON files become more human-readable, making it easier for users to manually inspect or analyze configuration data.
+
+## New Feature: Application Config Generator – YAML to XML Conversion
+
+The **Application Config Generator** now supports converting **YAML configuration files into XML** format.
+
+YAML is highly sensitive to indentation, and a single indentation error can cause configurations to be misread or even break the entire system. By introducing XML as an alternative format, MagicAppBuilder provides a more robust option that is less prone to formatting errors.
+
+With this feature, users can choose between YAML and XML depending on their preference and the complexity of their configuration, ensuring greater flexibility and reliability in application setup.
+
+## Technical Enhancement: HTTP Request Fallback
+
+To prevent errors and function failures, MagicAppBuilder now includes a robust fallback mechanism for making HTTP requests. If the **`cURL`** PHP extension is unavailable, the application will automatically switch to using **PHP streams** to communicate with the server.
+
+This ensures that network-dependent features—such as retrieving data from external APIs or other web resources—remain fully functional, even on server environments without cURL. This change significantly improves the stability and portability of the application.
+
+## New Feature: Browser Language Detection
+
+Before a user logs in or when a session expires, the application previously had no information about the user's preferred language and would fall back to the **default language**.
+With this update, MagicAppBuilder now detects the **browser's language setting**:
+
+* If the detected language is available in the application, it will be used automatically.
+* If the detected language is not available, the system will gracefully fall back to the **default language**.
+
+This improves the user experience by providing localized interfaces without requiring additional setup.
+
+## Bug Fix: Selective Configuration Encryption
+
+Previously, MagicAppBuilder encrypted **all application configuration properties**, which was neither efficient nor flexible.
+With this fix, only the properties explicitly designated by the user are encrypted—for example, **database** and **Redis** credentials.
+
+This ensures a better balance between **security, performance, and usability**, while giving users fine-grained control over which sensitive data should be protected.
+
+## Dependency Upgrade: MagicObject 3.19.0
+
+MagicAppBuilder now bundles **MagicObject 3.19.0**, which includes several enhancements, most notably:
+
+* **PicoSession Redis Database Parameter**
+  Developers can now specify a **Redis database index** in the session save path, allowing session data to be isolated in different Redis databases.
+
+  Example:
+
+  ```
+  tcp://localhost:6379?db=3
+  ```
+
+## New Feature: `SqliteSessionHandler`
+
+A new **`SqliteSessionHandler`** class has been introduced under `MagicObject\Session`.
+This provides a **persistent session storage** mechanism using **SQLite** as the backend.
+
+### Features
+
+* Stores sessions in a **SQLite database file** instead of filesystem or memory.
+* Automatically **creates the session table** if it does not exist.
+* Implements the full session lifecycle:
+
+  * **open** — Initializes session.
+  * **read** — Reads serialized session data.
+  * **write** — Writes or updates session data.
+  * **destroy** — Removes a session by ID.
+  * **gc** — Garbage collects expired sessions.
+* Ensures **safe storage** even when multiple PHP processes are running.
+
+### Why It Matters?
+
+* **Portability:** No dependency on Redis or Memcached — only requires SQLite.
+* **Lightweight:** Suitable for shared hosting or small applications.
+* **Reliability:** Prevents session loss when PHP restarts, unlike file-based sessions.
 

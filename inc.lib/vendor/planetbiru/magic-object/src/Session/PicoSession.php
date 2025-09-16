@@ -3,7 +3,6 @@
 namespace MagicObject\Session;
 
 use MagicObject\SecretObject;
-use MagicObject\Util\PicoStringUtil;
 use stdClass;
 
 /**
@@ -17,7 +16,7 @@ use stdClass;
  * @package MagicObject\Session
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoSession
+class PicoSession // NOSONAR
 {
     const SESSION_STARTED = true;
     const SESSION_NOT_STARTED = false;
@@ -64,9 +63,20 @@ class PicoSession
         }
         if ($sessConf && $sessConf->getSaveHandler() == "redis") {
             $redisParams = $this->getRedisParams($sessConf);
-            $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth);
+            $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth, $redisParams->db);
         } elseif ($sessConf && $sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
             $this->saveToFiles($sessConf->getSavePath());
+        } elseif ($sessConf && $sessConf->getSaveHandler() == "sqlite" && $sessConf->getSavePath() != "") {
+            $handler = new SqliteSessionHandler($sessConf->getSavePath());
+            session_set_save_handler(
+                [$handler, 'open'],
+                [$handler, 'close'],
+                [$handler, 'read'],
+                [$handler, 'write'],
+                [$handler, 'destroy'],
+                [$handler, 'gc']
+            );
+            register_shutdown_function('session_write_close');
         }
     }
 
@@ -84,7 +94,7 @@ class PicoSession
      * @param SecretObject $sessConf Session configuration object containing the Redis save path.
      * @return stdClass An object with the properties: `host` (string), `port` (int), and `auth` (string|null).
      */
-    private function getRedisParams($sessConf)
+    private function getRedisParams($sessConf) // NOSONAR
     {
         $path = $sessConf->getSavePath();
 
@@ -119,14 +129,28 @@ class PicoSession
         $host = isset($parsed['host']) ? $parsed['host'] : '';
         $port = isset($parsed['port']) ? $parsed['port'] : 0;
         $auth = null;
+        $db   = 0;   // default Redis DB
+        $opts = [];
 
-        // Parse query string to extract authentication token if available
         if (isset($parsed['query'])) {
             parse_str($parsed['query'], $parsedStr);
-            $auth = isset($parsedStr['auth']) ? $parsedStr['auth'] : null;
+
+            if (isset($parsedStr['auth'])) {
+                $auth = $parsedStr['auth'];
+            } elseif (isset($parsedStr['password'])) {
+                $auth = $parsedStr['password'];
+            }
+            if (isset($parsedStr['db'])) {
+                $db = (int)$parsedStr['db'];
+            } elseif (isset($parsedStr['dbindex'])) {
+                $db = (int)$parsedStr['dbindex'];
+            } elseif (isset($parsedStr['database'])) {
+                $db = (int)$parsedStr['database'];
+            }
+
+            $opts = $parsedStr;
         }
 
-        // Set default Redis port if not explicitly defined
         if (!empty($host) && $port == 0) {
             $port = 6379;
         }
@@ -135,10 +159,11 @@ class PicoSession
         $params->host = $host;
         $params->port = $port;
         $params->auth = $auth;
+        $params->db   = $db;
+        $params->options = $opts;
 
         return $params;
     }
-
 
     /**
      * Returns the instance of PicoSession.
@@ -392,19 +417,43 @@ class PicoSession
      * @param string|null $auth Optional authentication password for Redis.
      * @return self Returns the current instance to allow method chaining.
      */
-    public function saveToRedis($host, $port, $auth = null)
+    public function saveToRedis($host, $port, $auth = null, $db = null)
     {
-        if(isset($auth))
+        $params = array();
+        if(isset($db) && is_int($db))
         {
-            $path = sprintf("tcp://%s:%d?auth=%s", $host, $port, $auth);
+            $params['database'] = (int)$db;
         }
-        else
+        if(isset($auth) && !empty($auth))
         {
-            $path = sprintf("tcp://%s:%d", $host, $port);
+            $params['auth'] = $auth;
+        }
+        $path = sprintf("tcp://%s:%d", $host, $port);
+        if(!empty($params))
+        {
+            $path .= "?" . $this->httpBuildQuery($params);
         }
         ini_set("session.save_handler", "redis");
         ini_set("session.save_path", $path);
         return $this;
+    }
+
+    /**
+     * Builds a URL-encoded query string from an associative array.
+     *
+     * This method constructs a query string suitable for use in URLs or HTTP requests
+     * by encoding the keys and values of the provided associative array.
+     *
+     * @param array $params An associative array of key-value pairs to be converted into a query string.
+     * @return string A URL-encoded query string.
+     */
+    private function httpBuildQuery($params)
+    {
+        $pairs = [];
+        foreach ($params as $key => $value) {
+            $pairs[] = urlencode($key) . '=' . urlencode($value);
+        }
+        return implode('&', $pairs);
     }
 
     /**

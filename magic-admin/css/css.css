@@ -720,6 +720,10 @@ tr[data-active=false] td {
   transform: rotate(90deg);
 }
 
+.button-area {
+  padding-top: 0.5rem;
+}
+
 select[multiple].form-control {
   height: 38px;
 }

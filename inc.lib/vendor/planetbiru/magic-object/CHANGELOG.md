@@ -1284,3 +1284,110 @@ CREATE TABLE useraccount (...);
 * **No naming strategy changes** were introduced. Table names remain exactly the same; only the surrounding quotes are removed.
 * If your schema relies on **case-sensitive identifiers** or **reserved keywords**, you may still need to add quotes manually.
 
+
+# MagicObject Version 3.18.0
+
+## Enhancement: Database Migration
+
+A new parameter has been added to **Database Migration** to provide greater flexibility.
+Previously, all migration queries had to be dumped into a SQL file before execution.
+With this update, developers can now choose to **run queries directly on the target database**, reducing steps and improving efficiency in deployment workflows.
+
+This makes migrations faster, easier to automate, and less error-prone—especially useful for CI/CD pipelines.
+
+## Bug Fixes: Undefined Array Index in `PicoPageData::applySubqueryResult()`
+
+Fixed an issue where an **undefined array index** error could occur when the provided data structure did not match the expected format.
+This patch ensures more robust handling of unexpected input, improving the **stability and reliability** of query result processing.
+
+
+# MagicObject Version 3.19.0
+
+## New Feature: `XmlToJsonParser` Utility Class
+
+A new utility class **`XmlToJsonParser`** has been introduced to parse XML documents into PHP arrays/JSON.
+It supports:
+
+* **Custom flattener element**: users can configure which XML elements should be treated as array items (e.g., `<entry>`, `<item>`, etc.).
+* **Consistent output**: empty XML elements are automatically converted into `null` instead of empty arrays.
+* **Round-trip support**: arrays can also be converted back into XML, with configurable wrapper element names.
+
+This allows developers to manage application configuration using XML files, which are **less error-prone compared to YAML**, especially in environments where indentation issues are common.
+
+**Example Usage:**
+
+```php
+$parser = new XmlToJsonParser(['entry', 'item']);
+$config = $parser->parse(file_get_contents('config.xml'));
+```
+
+## Enhancement: `PicoCurlUtil` — Alternative to `curl`
+
+A new class **`PicoCurlUtil`** has been added under `MagicObject\Util`.
+This class provides an interface for making HTTP requests with **automatic fallback**:
+
+* Uses **cURL** if the PHP `curl` extension is available.
+* Falls back to **PHP streams** (`file_get_contents` + stream context) when `curl` is not available.
+
+### Features
+
+* Supports **GET** and **POST** requests (with planned extensions for PUT, DELETE, etc.).
+* Allows setting **headers**, request body, and **SSL verification options**.
+* Provides access to **response headers**, **body**, and **HTTP status code**.
+* Automatically throws **`CurlException`** on error, for consistent error handling.
+
+**Example Usage:**
+
+```php
+use MagicObject\Util\PicoCurlUtil;
+
+$http = new PicoCurlUtil();
+$response = $http->get("https://example.com/api/data");
+
+if ($http->getHttpCode() === 200) {
+    echo $response;
+}
+```
+
+### Why It Matters?
+
+* **Greater Flexibility:** Developers can now use XML configuration files instead of YAML.
+* **Better Portability:** Applications can run even in environments where the `curl` extension is not installed.
+* **Consistent API:** Whether using cURL or streams, you always interact via `PicoCurlUtil`.
+
+## Enhancement: PicoSession Redis Database Parameter
+
+**PicoSession** now supports specifying a **Redis database index** via the session save path.
+This allows developers to isolate sessions in different Redis databases (e.g., separating staging and production data) without requiring additional Redis instances.
+The parameter can be set using query options like `db`, `dbindex`, or `database` in the Redis connection string.
+
+Example:
+
+```
+tcp://localhost:6379?db=3
+```
+
+## New Feature: `SqliteSessionHandler`
+
+A new **`SqliteSessionHandler`** class has been introduced under `MagicObject\Session`.
+This provides a **persistent session storage** mechanism using **SQLite** as the backend.
+
+### Features
+
+* Stores sessions in a **SQLite database file** instead of filesystem or memory.
+* Automatically **creates the session table** if it does not exist.
+* Implements the full session lifecycle:
+
+  * **open** — Initializes session.
+  * **read** — Reads serialized session data.
+  * **write** — Writes or updates session data.
+  * **destroy** — Removes a session by ID.
+  * **gc** — Garbage collects expired sessions.
+* Ensures **safe storage** even when multiple PHP processes are running.
+
+### Why It Matters?
+
+* **Portability:** No dependency on Redis or Memcached — only requires SQLite.
+* **Lightweight:** Suitable for shared hosting or small applications.
+* **Reliability:** Prevents session loss when PHP restarts, unlike file-based sessions.
+

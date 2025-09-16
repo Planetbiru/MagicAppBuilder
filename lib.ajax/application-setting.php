@@ -457,6 +457,7 @@ $nameInIndonesian = array(
                                     <select class="form-control" name="sessions_save_handler" id="sessions_save_handler">
                                     <option value="files" <?php echo $cfgSession->getSaveHandler() == 'files' ? $constSelected : ''; ?>>files</option>
                                     <option value="redis" <?php echo $cfgSession->getSaveHandler() == 'redis' ? $constSelected : ''; ?>>redis</option>
+                                    <option value="sqlite" <?php echo $cfgSession->getSaveHandler() == 'sqlite' ? $constSelected : ''; ?>>sqlite</option>
                                     </select>
                                 </td>
                             </tr>

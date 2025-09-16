@@ -3,7 +3,7 @@
 namespace AppBuilder\Util;
 
 use AppBuilder\Exception\PlatformException;
-use Exception;
+use MagicObject\Util\PicoCurlUtil;
 
 /**
  * GitAPI class allows interaction with GitHub, GitLab, and Bitbucket APIs for repository management.
@@ -40,6 +40,11 @@ class GitAPI
     private $apiUrl;   
 
     /**
+     * @var PicoCurlUtil
+     */
+    private $picoCurl;
+
+    /**
      * Constructor to initialize the API with platform, token, and optional username (for GitHub and Bitbucket).
      *
      * @param string $platform The platform ('github', 'gitlab', or 'bitbucket')
@@ -52,6 +57,7 @@ class GitAPI
         $this->platform = strtolower($platform);
         $this->token = $token;
         $this->username = $username;
+        $this->picoCurl = new PicoCurlUtil();
 
         // Set API base URL depending on the platform
         if ($this->platform == 'github') {
@@ -70,9 +76,6 @@ class GitAPI
      * These headers include authentication tokens and content type specifications.
      *
      * @return array An associative array of request headers.
-     *              For GitHub: Authorization token, Content-Type, and User-Agent.
-     *              For GitLab: PRIVATE-TOKEN, Content-Type, and User-Agent.
-     *              For Bitbucket: Authorization header, Content-Type, and User-Agent.
      */
     public function getRequestHeaders()
     {
@@ -80,21 +83,21 @@ class GitAPI
         $headers = [];
         if ($this->platform == 'github') {
             $headers = [
-                "Authorization: token " . $this->token,   // GitHub authentication token
+                "Authorization: token " . $this->token,  // GitHub authentication token
                 
             ];
         } elseif ($this->platform == 'gitlab') {
             $headers = [
-                "PRIVATE-TOKEN: " . $this->token,         // GitLab private token
+                "PRIVATE-TOKEN: " . $this->token,        // GitLab private token
             ];
         } else {
             $headers = [
-                "Authorization: Bearer " . $this->token,  // Bitbucket Bearer token
+                "Authorization: Bearer " . $this->token, // Bitbucket Bearer token
             ];
         }
         
-        $headers[] = "Content-Type: application/json";    // Specify that the content is in JSON format
-        $headers[] = "User-Agent: MagicAppBuilder";       // Custom User-Agent header for identifying the application
+        $headers[] = "Content-Type: application/json";     // Specify that the content is in JSON format
+        $headers[] = "User-Agent: MagicAppBuilder";      // Custom User-Agent header for identifying the application
         
         return $headers;
     }
@@ -134,15 +137,8 @@ class GitAPI
         // Set headers for authentication
         $headers = $this->getRequestHeaders();
 
-        // Send POST request to the API
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        $response = curl_exec($ch);
-        curl_close($ch);
+        // Use PicoCurlUtil to send the POST request
+        $response = $this->picoCurl->post($url, $data, $headers);
 
         // Return the response as an array
         return json_decode($response, true);
@@ -260,7 +256,7 @@ class GitAPI
      * @param string $repoName The name of the repository
      * @return array The list of branches as an array
      */
-    public function listBranches($repoName) // NOSONAR
+    public function listBranches($repoName)
     {
         // Construct the URL for listing branches
         $url = $this->apiUrl;
@@ -276,13 +272,8 @@ class GitAPI
         // Set headers for authentication
         $headers = $this->getRequestHeaders();
 
-        // Send GET request to fetch the branches
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $response = curl_exec($ch);
-        curl_close($ch);
+        // Use PicoCurlUtil to send the GET request
+        $response = $this->picoCurl->get($url, $headers);
 
         // Return the response as an array of branches
         $branches = json_decode($response, true);
@@ -308,12 +299,7 @@ class GitAPI
                 // If there's a next page, make another request to get more branches
                 if (isset($branches['next'])) {
                     $url = $branches['next'];
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                    $response = curl_exec($ch);
-                    curl_close($ch);
+                    $response = $this->picoCurl->get($url, $headers);
                     $branches = json_decode($response, true);
                 } else {
                     break;
@@ -399,13 +385,8 @@ class GitAPI
         // Set headers for authentication
         $headers = $this->getRequestHeaders();
 
-        // Send GET request to fetch repository info
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $response = curl_exec($ch);
-        curl_close($ch);
+        // Use PicoCurlUtil to send the GET request
+        $response = $this->picoCurl->get($url, $headers);
 
         // Return the response as an array
         return json_decode($response, true);
@@ -432,22 +413,13 @@ class GitAPI
 
         // Set headers for authentication
         $headers = $this->getRequestHeaders();
+        
+        // Use PicoCurlUtil to send the GET request
+        $this->picoCurl->get($url, $headers);
+        $httpCode = $this->picoCurl->getHttpCode();
 
-        // Send GET request to check repository existence
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        // If response is empty or error, the repository doesn't exist
-        $response = json_decode($response, true);
-        if ($response && isset($response['message']) && $response['message'] == 'Not Found') {
-            return false;
-        }
-
-        return true; // Repository exists
+        // A 200 HTTP code indicates the repository exists
+        return $httpCode === 200;
     }
     
     /**
@@ -471,34 +443,3 @@ class GitAPI
     }
 
 }
-
-
-// Example Usage:
-
-try {
-    // Initialize GitHub API
-    $gitHub = new GitAPI('github', 'your-github-access-token', 'your-github-username');
-    $repoResponse = $gitHub->createRepository('new-github-repository');
-    echo json_encode($repoResponse);
-
-    // Initialize GitLab API
-    $gitLab = new GitAPI('gitlab', 'your-gitlab-access-token');
-    $repoResponse = $gitLab->createRepository('new-gitlab-repository');
-    echo json_encode($repoResponse);
-    
-    // Pull changes from a GitHub repository
-    $output = $gitHub->pull('/path/to/your/github/repo');
-    echo implode("\n", $output);
-    
-    // Push changes to a GitLab repository
-    $output = $gitLab->push('/path/to/your/gitlab/repo');
-    echo implode("\n", $output);
-    
-    // Switch branch on GitHub repository
-    $output = $gitHub->switchBranch('/path/to/your/github/repo', 'main');
-    echo implode("\n", $output);
-    
-} catch (Exception $e) {
-    echo 'Error: ' . $e->getMessage();
-}
-

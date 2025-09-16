@@ -457,7 +457,7 @@ class PicoDatabaseUtilBase // NOSONAR
      * @return bool True if there may still be more data remaining; false if the import
      *              process has finished and post-import scripts have been executed.
      */
-    public function importData($config, $callbackFunction, $tableName = null, $limit = null, $offset = null)
+    public function importData($config, $callbackFunction, $tableName = null, $limit = null, $offset = null) // NOSONAR
     {
         $databaseConfigSource = $config->getDatabaseSource();
         $databaseConfigTarget = $config->getDatabaseTarget();
