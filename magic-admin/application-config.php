@@ -86,7 +86,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
     <div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
     <?php
     $inputGet = new InputGet();
-	$appId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+	  $appId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
     if(!empty($appId))
     {
@@ -109,12 +109,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
         <div class="form-group">
           <label for="yamlInput"><?php echo $appLanguage->getYamlInput();?></label>
           <textarea id="yamlInput" class="form-control" rows="5" spellcheck="false"><?php echo $yaml;?></textarea>
+          <div class="button-area">
+            <button class="btn btn-primary copy-yaml" onclick="copyYaml(this)" data-copied-caption="<?php echo $appLanguage->getCopied();?>"><?php echo $appLanguage->getButtonCopyYaml();?></button>
+            <button class="btn btn-primary copy-xml" onclick="copyXml(this)" data-copied-caption="<?php echo $appLanguage->getCopied();?>"><?php echo $appLanguage->getButtonCopyXml();?></button>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="form-group">
           <label for="yamlOutput"><?php echo $appLanguage->getYamlOutput();?></label>
           <textarea id="yamlOutput" class="form-control" rows="5" spellcheck="false"></textarea>
+          <div class="button-area">
+            <button class="btn btn-primary copy-yaml" onclick="copyYaml(this)" data-copied-caption="<?php echo $appLanguage->getCopied();?>"><?php echo $appLanguage->getButtonCopyYaml();?></button>
+            <button class="btn btn-primary copy-xml" onclick="copyXml(this)" data-copied-caption="<?php echo $appLanguage->getCopied();?>"><?php echo $appLanguage->getButtonCopyXml();?></button>
+          </div>
         </div>
       </div>
     </div>
@@ -125,12 +133,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
         <div class="form-group">
           <label for="envMapping"><?php echo $appLanguage->getEnvironmentVariablesMapping();?></label>
           <textarea id="envMapping" class="form-control" rows="5" readonly spellcheck="false"></textarea>
+          <div class="button-area">
+            <button class="btn btn-primary copy-env" onclick="copyEnv(this)" data-copied-caption="<?php echo $appLanguage->getCopied();?>"><?php echo $appLanguage->getButtonCopy();?></button>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="form-group">
           <label for="envScript"><?php echo $appLanguage->getEnvironmentScript();?></label>
           <textarea id="envScript" class="form-control" rows="5" readonly spellcheck="false"></textarea>
+          <div class="button-area">
+            <button class="btn btn-primary copy-env" onclick="copyEnv(this)" data-copied-caption="<?php echo $appLanguage->getCopied();?>"><?php echo $appLanguage->getButtonCopy();?></button>
+          </div>
         </div>
       </div>
     </div>
@@ -165,7 +179,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 
     <!-- Action Buttons -->
     <button class="btn btn-info mr-2" onclick="generatePlaceholder()"><?php echo $appLanguage->getButtonGeneratePlaceholder();?></button>
-    <button class="btn btn-primary mr-2" onclick="encryptYamlEnv()"><?php echo $appLanguage->getButtonEncryptGeneratePlaceholder();?></button>
+    <button class="btn btn-primary mr-2" onclick="encryptYamlEnvRecursive()"><?php echo $appLanguage->getButtonEncryptGeneratePlaceholder();?></button>
     <button class="btn btn-success mr-2" onclick="encryptYaml()"><?php echo $appLanguage->getButtonEncrypt();?></button>
     <button class="btn btn-warning text-white" onclick="decryptYaml()"><?php echo $appLanguage->getButtonDecrypt();?></button>
 

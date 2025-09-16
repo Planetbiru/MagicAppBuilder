@@ -718,4 +718,8 @@ tr[data-active=false] td {
 .main-menu-container .nav-link[data-toggle=collapse]:has(+ .show)::after,
 .main-menu-container .nav-link[data-toggle=collapse]:has(~ .show)::after {
   transform: rotate(90deg);
+}
+
+.button-area {
+  padding-top: 0.5rem;
 }/*# sourceMappingURL=general.css.map */
