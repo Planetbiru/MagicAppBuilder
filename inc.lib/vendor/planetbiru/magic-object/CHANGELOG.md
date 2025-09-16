@@ -1367,3 +1367,27 @@ Example:
 tcp://localhost:6379?db=3
 ```
 
+## New Feature: `SqliteSessionHandler`
+
+A new **`SqliteSessionHandler`** class has been introduced under `MagicObject\Session`.
+This provides a **persistent session storage** mechanism using **SQLite** as the backend.
+
+### Features
+
+* Stores sessions in a **SQLite database file** instead of filesystem or memory.
+* Automatically **creates the session table** if it does not exist.
+* Implements the full session lifecycle:
+
+  * **open** — Initializes session.
+  * **read** — Reads serialized session data.
+  * **write** — Writes or updates session data.
+  * **destroy** — Removes a session by ID.
+  * **gc** — Garbage collects expired sessions.
+* Ensures **safe storage** even when multiple PHP processes are running.
+
+### Why It Matters?
+
+* **Portability:** No dependency on Redis or Memcached — only requires SQLite.
+* **Lightweight:** Suitable for shared hosting or small applications.
+* **Reliability:** Prevents session loss when PHP restarts, unlike file-based sessions.
+

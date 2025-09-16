@@ -16,7 +16,7 @@ use stdClass;
  * @package MagicObject\Session
  * @link https://github.com/Planetbiru/MagicObject
  */
-class PicoSession
+class PicoSession // NOSONAR
 {
     const SESSION_STARTED = true;
     const SESSION_NOT_STARTED = false;
@@ -55,6 +55,7 @@ class PicoSession
      */
     public function __construct($sessConf = null)
     {
+        error_log(json_encode($sessConf));
         if ($sessConf && $sessConf->getName() != "") {
             $this->setSessionName($sessConf->getName());
         }
@@ -66,6 +67,18 @@ class PicoSession
             $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth, $redisParams->db);
         } elseif ($sessConf && $sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
             $this->saveToFiles($sessConf->getSavePath());
+        } elseif ($sessConf && $sessConf->getSaveHandler() == "sqlite" && $sessConf->getSavePath() != "") {
+            error_log($sessConf->getSavePath());
+            $handler = new SqliteSessionHandler($sessConf->getSavePath());
+            session_set_save_handler(
+                [$handler, 'open'],
+                [$handler, 'close'],
+                [$handler, 'read'],
+                [$handler, 'write'],
+                [$handler, 'destroy'],
+                [$handler, 'gc']
+            );
+            register_shutdown_function('session_write_close');
         }
     }
 
@@ -73,29 +86,15 @@ class PicoSession
      * Extracts Redis connection parameters from a session configuration object.
      *
      * Parses the Redis `save_path` (in URL format) from the given SecretObject instance
-     * and returns a stdClass object containing the Redis connection details.
+     * and returns a stdClass object containing the Redis host, port, and optional authentication.
      *
-     * Supported save path formats:
+     * Example save path formats:
      * - tcp://127.0.0.1:6379
      * - tcp://[::1]:6379
      * - tcp://localhost:6379?auth=yourpassword
-     * - tcp://localhost:6379?password=yourpassword
-     * - tcp://localhost:6379?db=3
-     * - tcp://localhost:6379?dbindex=3
-     * - tcp://localhost:6379?database=3
-     *
-     * Recognized query parameters:
-     * - `auth` or `password` : Redis authentication password
-     * - `db`, `dbindex`, or `database` : Redis logical database index (default: 0)
-     * - Any other query parameters are preserved in `options`
      *
      * @param SecretObject $sessConf Session configuration object containing the Redis save path.
-     * @return stdClass An object with the properties:
-     *                  - `host` (string)   : Redis hostname or IP address
-     *                  - `port` (int)      : Redis port number
-     *                  - `auth` (string|null) : Authentication password (if any)
-     *                  - `db` (int)        : Redis database index (default: 0)
-     *                  - `options` (array) : All parsed query parameters
+     * @return stdClass An object with the properties: `host` (string), `port` (int), and `auth` (string|null).
      */
     private function getRedisParams($sessConf) // NOSONAR
     {
@@ -427,7 +426,7 @@ class PicoSession
         {
             $params['database'] = (int)$db;
         }
-        if(isset($auth))
+        if(isset($auth) && !empty($auth))
         {
             $params['auth'] = $auth;
         }
