@@ -3145,3 +3145,10 @@ With this update, MagicAppBuilder now detects the **browser's language setting**
 
 This improves the user experience by providing localized interfaces without requiring additional setup.
 
+## Bug Fix: Selective Configuration Encryption
+
+Previously, MagicAppBuilder encrypted **all application configuration properties**, which was neither efficient nor flexible.  
+With this fix, only the properties explicitly designated by the user are encrypted—for example, **database** and **Redis** credentials.  
+
+This ensures a better balance between **security, performance, and usability**, while giving users fine-grained control over which sensitive data should be protected.
+

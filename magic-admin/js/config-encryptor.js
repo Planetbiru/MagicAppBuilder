@@ -337,33 +337,30 @@ function encryptYamlEnv() {
     const key = document.getElementById('keyInput').value.trim();
     const osType = document.getElementById('osSelect').value;
     const envMapping = {};
+    const props = getPropertiesToProcess(); // Ambil daftar properti yang ingin dienkripsi
+
     try {
         const data = jsyaml.load(input);
 
-        // Encrypt first
-        function encryptAll(obj, prefix, mapping) {
-            if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
-                const envName = `${toEnvName(prefix)}`;
-                const value = String(obj);
-                const encrypted = CryptoJS.AES.encrypt(value, key).toString();
-                mapping[envName] = encrypted; // Store encrypted value
-                return `\${${envName}}`; // Replace with placeholder
-            } else if (Array.isArray(obj)) {
-                return obj.map((item, idx) => encryptAll(item, `${prefix}_${idx}`, mapping));
-            } else if (typeof obj === 'object' && obj !== null) {
-                const result = {};
-                for (let k in obj) {
-                    if (Object.prototype.hasOwnProperty.call(obj, k)) {
-                        result[k] = encryptAll(obj[k], `${prefix}_${k}`, mapping);
-                    }
-                }
-                return result;
+        // Hanya enkripsi properti yang dipilih
+        for (let prop of props) {
+            const keys = prop.split('.');
+            let ref = data;
+            for (let i = 0; i < keys.length - 1; i++) {
+                ref = ref[keys[i]];
+                if (!ref) break;
             }
-            return obj;
+            const last = keys[keys.length - 1];
+            if (ref && Object.prototype.hasOwnProperty.call(ref, last) && ref[last] !== undefined) {
+                const envName = toEnvName(prop);
+                const value = String(ref[last]);
+                const encrypted = CryptoJS.AES.encrypt(value, key).toString();
+                envMapping[envName] = encrypted;
+                ref[last] = `\${${envName}}`; // Ganti dengan placeholder ENV
+            }
         }
 
-        const outputObj = encryptAll(data, "root", envMapping);
-        const output = jsyaml.dump(outputObj, { lineWidth: 160 });
+        const output = jsyaml.dump(data, { lineWidth: 160 });
 
         document.getElementById('yamlOutput').value = output;
         document.getElementById('envMapping').value = Object.entries(envMapping)
@@ -539,6 +536,30 @@ function yamlToXml(input)
 }
 
 /**
+ * Copy envioronemnt variable to clipboard
+ * Copies the envioronemnt variable content from the associated textarea to the clipboard.
+ * @param {*} button - The button element that was clicked.
+ */
+function copyEnv(button) {
+    let textarea = button.closest('.form-group').querySelector('textarea');
+    let originalText = button.textContent;
+    let yaml = textarea.value;
+    button.disabled = true;
+    // Copy to clipboard
+    navigator.clipboard.writeText(yaml).then(() => {
+        // Show success message
+        button.textContent = button.dataset.copiedCaption || 'Copied!';
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+    });
+}
+
+
+/**
  * Copy Yaml to clipboard
  * Copies the YAML content from the associated textarea to the clipboard.
  * @param {*} button - The button element that was clicked.
@@ -551,7 +572,7 @@ function copyYaml(button) {
     // Copy to clipboard
     navigator.clipboard.writeText(yaml).then(() => {
         // Show success message
-        button.textContent = 'Copied!';
+        button.textContent = button.dataset.copiedCaption || 'Copied!';
         setTimeout(() => {
             button.textContent = originalText;
             button.disabled = false;
@@ -575,7 +596,7 @@ function copyXml(button) {
     // Copy to clipboard
     navigator.clipboard.writeText(xml).then(() => {
         // Show success message
-        button.textContent = 'Copied!';
+        button.textContent = button.dataset.copiedCaption || 'Copied!';
         setTimeout(() => {
             button.textContent = originalText;
             button.disabled = false;
@@ -583,4 +604,67 @@ function copyXml(button) {
     }).catch(err => {
         console.error('Failed to copy text: ', err);
     });
+}
+
+/**
+ * Encrypts selected properties and generates environment variable placeholders recursively.
+ * @param {*} obj The object, array, or primitive value to encrypt.
+ * @param {string} key The encryption key.
+ * @param {Object} envMapping The mapping object to store environment variable names and values.
+ * @param {boolean} [skipEncrypt=false] If true, the values are stored as plaintext in the mapping.
+ * @returns {*} The encrypted object, array, or string with placeholders.
+ */
+function encryptYamlEnvRecursive() {
+    const input = document.getElementById('yamlInput').value;
+    const key = document.getElementById('keyInput').value.trim();
+    const osType = document.getElementById('osSelect').value;
+    const envMapping = {};
+    const props = getPropertiesToProcess(); // e.g. ["database"]
+
+    try {
+        const data = jsyaml.load(input);
+
+        // Fungsi rekursif untuk mengenkripsi semua scalar property
+        function encryptScalars(obj, path) {
+            if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
+                const envName = toEnvName(path);
+                const encrypted = CryptoJS.AES.encrypt(String(obj), key).toString();
+                envMapping[envName] = encrypted;
+                return `\${${envName}}`;
+            } else if (Array.isArray(obj)) {
+                return obj.map((item, idx) => encryptScalars(item, `${path}_${idx}`));
+            } else if (typeof obj === 'object' && obj !== null) {
+                let result = {};
+                for (let prop in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                        result[prop] = encryptScalars(obj[prop], `${path}_${prop}`);
+                    }
+                }
+                return result;
+            }
+            return obj;
+        }
+
+        // Proses setiap property yang dipilih
+        for (let prop of props) {
+            const keys = prop.split('.');
+            let ref = data;
+            for (let i = 0; i < keys.length - 1; i++) {
+                ref = ref[keys[i]];
+                if (!ref) break;
+            }
+            const last = keys[keys.length - 1];
+            if (ref && Object.prototype.hasOwnProperty.call(ref, last) && ref[last] !== undefined) {
+                ref[last] = encryptScalars(ref[last], prop);
+            }
+        }
+
+        const output = jsyaml.dump(data, { lineWidth: 160 });
+        document.getElementById('yamlOutput').value = output;
+        document.getElementById('envMapping').value = Object.entries(envMapping)
+            .map(([k, v]) => `${k}=${v}`).join('\n');
+        document.getElementById('envScript').value = generateEnvScript(envMapping, osType);
+    } catch (e) {
+        document.getElementById('yamlOutput').value = 'Error: ' + e.message;
+    }
 }
