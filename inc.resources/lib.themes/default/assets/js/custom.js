@@ -588,18 +588,15 @@ function initAjaxSupport() {
         })
           .then(response => {
             if (response.status === 401) {
-              // Hapus modal lama kalau ada
               const oldForm = document.querySelector('.ajax-login-form');
               if (oldForm) {
                 oldForm.remove();
               }
-              // Ambil isi response (form login) dan tampilkan modal
-              return response.text().then(content => {
+              return response.text().then(content => /*NOSONAR*/{
                 const wrapper = document.createElement('div');
                 wrapper.classList.add('ajax-login-form');
                 wrapper.innerHTML = content;
                 document.body.appendChild(wrapper);
-                // Cari modal di dalam konten baru
                 const loginModal = wrapper.querySelector('.loginModal');
                 if (loginModal) {
                   $(loginModal).modal({
@@ -1159,10 +1156,11 @@ function initSearchMenu() {
         results.push({ text, href });
       }
     });
+    let notFoundLabel = $input.closest('.menu-search-box').attr('data-no-match-found');
 
     // If no results were found, display a "No matches found" message
     if (results.length === 0) {
-      $results.append('<li class="list-group-item text-muted">No matches found</li>');
+      $results.append(`<li class="list-group-item text-muted"><div class="data-no-match-found">${notFoundLabel}</div></li>`);
     } else {
       // Otherwise, append each found result as a list item with a link
       results.forEach(item => {

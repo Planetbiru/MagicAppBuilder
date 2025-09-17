@@ -363,7 +363,7 @@ thead .data-sort-header::before {
 }
 .table-row td.data-number {
   text-align: right;
-  padding-right: 4px;
+  padding-right: 0.5rem;
 }
 .table-row td.data-column {
   padding-right: 6px;
@@ -737,6 +737,15 @@ tr[data-active=false] td {
 }
 .dark-mode #menuSearchResults .list-group-item a:hover {
   color: #f9fcff;
+}
+
+.main-menu-container {
+  height: calc(100vh - 131px);
+  overflow-y: auto;
+}
+
+.data-no-match-found {
+  padding: 5px 12px;
 }
 
 select[multiple].form-control {
