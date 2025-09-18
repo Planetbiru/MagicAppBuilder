@@ -41,6 +41,11 @@ class SqliteSessionHandler
      */
     public function __construct($path)
     {
+        // If path is a directory, append default filename
+        if (is_dir($path)) {
+            $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . "sessions.sqlite";
+        }
+
         // Ensure the parent directory exists
         $dir = dirname($path);
         if (!is_dir($dir)) {
@@ -68,8 +73,9 @@ class SqliteSessionHandler
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS {$this->table} (
                 id TEXT PRIMARY KEY,
-                data TEXT,
-                timestamp INTEGER
+                data BLOB,
+                time_creation INTEGER,
+                last_access INTEGER
             )
         ");
     }
@@ -106,10 +112,23 @@ class SqliteSessionHandler
      */
     public function read($id)
     {
+        // Get session data
         $stmt = $this->pdo->prepare("SELECT data FROM {$this->table} WHERE id = :id");
-        $stmt->execute(array(':id' => $id));
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Fetch the row
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if ($row) {
+            // Update last access time meskipun data tidak berubah
+            $stmt = $this->pdo->prepare("UPDATE {$this->table} SET last_access = :time WHERE id = :id");
+            $stmt->bindValue(':time', time(), PDO::PARAM_INT);
+            $stmt->bindValue(':id', $id, PDO::PARAM_STR);
+            $stmt->execute();
+        }
+
+        // Return session data or empty string if not found
         return isset($row['data']) ? $row['data'] : '';
     }
 
@@ -123,18 +142,22 @@ class SqliteSessionHandler
      */
     public function write($id, $data)
     {
+        // Current timestamp
         $time = time();
+
+        // Use INSERT ... ON CONFLICT untuk SQLite
         $stmt = $this->pdo->prepare("
-            INSERT INTO {$this->table} (id, data, timestamp)
-            VALUES (:id, :data, :time)
-            ON CONFLICT(id) DO UPDATE SET data = :data, timestamp = :time
+            INSERT INTO {$this->table} (id, data, time_creation, last_access)
+            VALUES (:id, :data, :time, :time)
+            ON CONFLICT(id) DO UPDATE SET data = :data, last_access = :time
         ");
 
-        return $stmt->execute(array(
-            ':id'   => $id,
-            ':data' => $data,
-            ':time' => $time
-        ));
+        // Bind parameters
+        $stmt->bindValue(':id', $id, PDO::PARAM_STR); // Use PARAM_STR for text data
+        $stmt->bindValue(':data', $data, PDO::PARAM_LOB); // Use PARAM_LOB for binary data
+        $stmt->bindValue(':time', $time, PDO::PARAM_INT); // Use PARAM_INT for integer data
+
+        return $stmt->execute();
     }
 
     /**
@@ -146,6 +169,7 @@ class SqliteSessionHandler
      */
     public function destroy($id)
     {
+        // Delete session record
         $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = :id");
         return $stmt->execute(array(':id' => $id));
     }
@@ -161,7 +185,8 @@ class SqliteSessionHandler
      */
     public function gc($maxlifetime)
     {
+        // Calculate the cutoff time
         $old = time() - $maxlifetime;
-        return $this->pdo->exec("DELETE FROM {$this->table} WHERE timestamp < $old") !== false;
+        return $this->pdo->exec("DELETE FROM {$this->table} WHERE last_access < $old") !== false;
     }
 }
