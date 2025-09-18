@@ -274,7 +274,7 @@ if($inputGet->getUserAction() == 'generate')
 $appEntityLanguage = new AppEntityLanguageImpl(new AppAdminRoleImpl(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"adminLevelId" => PicoSpecification::filter("adminLevelId", "fulltext")
+	"adminLevelId" => PicoSpecification::filter("adminLevelId", "string")
 );
 $sortOrderMap = array(
 	"moduleId" => "moduleId",

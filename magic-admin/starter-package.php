@@ -659,8 +659,8 @@ $appEntityLanguage = new AppEntityLanguageImpl(new StarterPackage(), $appConfig,
 
 $specMap = array(
 	"name" => PicoSpecification::filter("name", "fulltext"),
-	"licenseId" => PicoSpecification::filter("licenseId", "fulltext"),
-	"currencyId" => PicoSpecification::filter("currencyId", "fulltext")
+	"licenseId" => PicoSpecification::filter("licenseId", "string"),
+	"currencyId" => PicoSpecification::filter("currencyId", "string")
 );
 $sortOrderMap = array(
 	"name" => "name",

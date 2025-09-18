@@ -3189,3 +3189,15 @@ This provides a **persistent session storage** mechanism using **SQLite** as the
 * **Lightweight:** Suitable for shared hosting or small applications.
 * **Reliability:** Prevents session loss when PHP restarts, unlike file-based sessions.
 
+## Enhancement: Optimized Filter Operations in Magic Admin
+
+Filtering in **Magic Admin** has been enhanced for improved **performance and accuracy**.
+
+* Previously, all filters used **full-text operations**, which could be inefficient for certain columns.
+* With this update:
+
+  * Filters applied to **foreign key columns** now use **exact string matching** instead of full-text search.
+  * This results in **faster queries** and more **reliable search results** when dealing with relational data.
+
+This change ensures that data lookups, especially those involving references between entities, are both **quicker** and **more precise**.
+

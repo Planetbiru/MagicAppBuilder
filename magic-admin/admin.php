@@ -800,8 +800,8 @@ $mapForGender = array(
 $specMap = array(
 	"name" => PicoSpecification::filter("name", "fulltext"),
 	"username" => PicoSpecification::filter("username", "fulltext"),
-	"adminLevelId" => PicoSpecification::filter("adminLevelId", "fulltext"),
-	"gender" => PicoSpecification::filter("gender", "fulltext")
+	"adminLevelId" => PicoSpecification::filter("adminLevelId", "string"),
+	"gender" => PicoSpecification::filter("gender", "string")
 );
 $sortOrderMap = array(
 	"name" => "name",

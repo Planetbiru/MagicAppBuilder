@@ -213,18 +213,20 @@ else
 $appEntityLanguage = new AppEntityLanguageImpl(new Module(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"applicationId" => PicoSpecification::filter("applicationId", "fulltext"),
+	"applicationId" => PicoSpecification::filter("applicationId", "string"),
 	"name" => PicoSpecification::filter("name", "fulltext"),
 	"moduleCode" => PicoSpecification::filter("moduleCode", "fulltext"),
-	"adminCreate" => PicoSpecification::filter("adminCreate", "fulltext"),
-	"adminEdit" => PicoSpecification::filter("adminEdit", "fulltext")
+	"adminCreate" => PicoSpecification::filter("adminCreate", "string"),
+	"adminEdit" => PicoSpecification::filter("adminEdit", "string")
 );
 $sortOrderMap = array(
-	"applicationId" => "applicationId",
+	"applicationId" => "application.name",
 	"name" => "name",
 	"moduleCode" => "moduleCode",
 	"fileName" => "fileName",
-	"directoryName" => "directoryName"
+	"directoryName" => "directoryName",
+	"timeCreate" => "timeCreate",
+	"timeEdit" => "timeEdit"
 );
 
 // You can define your own specifications
@@ -398,6 +400,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="module_code" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getModuleCode();?></a></td>
 								<td data-col-name="file_name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFileName();?></a></td>
 								<td data-col-name="directory_name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDirectoryName();?></a></td>
+								<td data-col-name="time_create" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTimeCreate();?></a></td>
+								<td data-col-name="time_edit" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTimeEdit();?></a></td>
 							</tr>
 						</thead>
 					
@@ -416,16 +420,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
-								<td>
+								<td class="data-viewer">
 									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->module_id, $module->getModuleId());?>"><span class="fa fa-folder"></span></a>
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="application_id"><?php echo $module->issetApplication() ? $module->getApplication()->getName() : "";?></td>
-								<td data-col-name="name"><?php echo $module->getName();?></td>
-								<td data-col-name="module_code"><?php echo $module->getModuleCode();?></td>
-								<td data-col-name="file_name"><?php echo $module->getFileName();?></td>
-								<td data-col-name="directory_name"><?php echo $module->getDirectoryName();?></td>
+								<td data-col-name="application_id" class="data-column"><?php echo $module->issetApplication() ? $module->getApplication()->getName() : "";?></td>
+								<td data-col-name="name" class="data-column"><?php echo $module->getName();?></td>
+								<td data-col-name="module_code" class="data-column"><?php echo $module->getModuleCode();?></td>
+								<td data-col-name="file_name" class="data-column"><?php echo $module->getFileName();?></td>
+								<td data-col-name="directory_name" class="data-column"><?php echo $module->getDirectoryName();?></td>
+								<td data-col-name="time_create" class="data-column"><?php echo $module->getTimeCreate();?></td>
+								<td data-col-name="time_edit" class="data-column"><?php echo $module->getTimeEdit();?></td>
 							</tr>
 							<?php 
 							}
