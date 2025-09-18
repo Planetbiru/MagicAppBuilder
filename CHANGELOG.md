@@ -3201,3 +3201,44 @@ Filtering in **Magic Admin** has been enhanced for improved **performance and ac
 
 This change ensures that data lookups, especially those involving references between entities, are both **quicker** and **more precise**.
 
+
+# MagicAppBuilder Version 1.23.0
+
+## New Feature: Redis Explorer
+
+MagicAppBuilder now includes a built-in **Redis Explorer**, an interface for exploring and managing data stored in **Redis**.
+
+### Key Features
+
+* **Database Selector**
+  Users can switch between Redis databases (0–15) directly from the interface.
+
+* **Key Filtering**
+  Supports pattern-based search to display only matching keys.
+
+* **Pagination**
+  Keys are displayed with pagination for easier navigation, even with very large datasets.
+
+* **Key Management**
+
+  * **Create**: Add new keys with values.
+  * **Update**: Edit values of existing keys.
+  * **Delete**: Remove specific keys with confirmation.
+  * **Bulk Delete**: Delete all keys that match a selected pattern.
+
+### Benefits
+
+With this feature, developers and system administrators can:
+
+* Quickly inspect Redis contents without relying on the CLI.
+* Manage Redis data directly from the MagicAppBuilder panel.
+* Speed up debugging and application administration.
+
+### Security Note
+
+The Redis Explorer provides powerful capabilities to view and modify data. For security reasons:
+
+* **Do not enable Redis Explorer in production environments.**
+* Use it only in development or testing setups.
+* Ensure proper authentication and restricted access to the interface.
+
