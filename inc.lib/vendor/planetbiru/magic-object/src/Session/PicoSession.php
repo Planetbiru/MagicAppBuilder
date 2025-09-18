@@ -194,7 +194,7 @@ class PicoSession // NOSONAR
     }
 
     /**
-     * (Re)starts the session.
+     * (Re)starts the session and update cookie.
      *
      * This method starts a session if it hasn't been started already.
      *
@@ -204,6 +204,7 @@ class PicoSession // NOSONAR
     {
         if ($this->_sessionState == self::SESSION_NOT_STARTED) {
             $this->_sessionState = @session_start();
+            $this->refreshSessionCookie();
         }
         return $this->_sessionState;
     }
@@ -498,6 +499,32 @@ class PicoSession // NOSONAR
     {
         @session_id($id);
         return $this;
+    }
+
+    /**
+     * Refreshes the session cookie to extend its lifetime.
+     *
+     * Call this to implement sliding expiration (extend session expiry each request).
+     *
+     * @return void
+     */
+    public function refreshSessionCookie()
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                session_id(),
+                [
+                    'expires'  => time() + $params['lifetime'],
+                    'path'     => $params['path'],
+                    'domain'   => $params['domain'],
+                    'secure'   => $params['secure'],
+                    'httponly' => $params['httponly'],
+                    'samesite' => isset($params['samesite']) ? $params['samesite'] : self::SAME_SITE_STRICT
+                ]
+            );
+        }
     }
 
     /**
