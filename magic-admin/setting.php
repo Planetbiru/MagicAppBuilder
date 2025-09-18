@@ -362,7 +362,7 @@ else
 $appEntityLanguage = new AppEntityLanguageImpl(new Setting(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"settingId" => PicoSpecification::filter("settingId", "fulltext")
+	"settingId" => PicoSpecification::filter("settingId", "string")
 );
 $sortOrderMap = array(
 	"settingId" => "settingId",

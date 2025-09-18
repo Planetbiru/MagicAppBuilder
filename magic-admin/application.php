@@ -493,8 +493,8 @@ $mapForArchitecture = array(
 );
 $specMap = array(
 	"name" => PicoSpecification::filter("name", "fulltext"),
-	"architecture" => PicoSpecification::filter("architecture", "fulltext"),
-	"workspaceId" => PicoSpecification::filter("workspaceId", "fulltext")
+	"architecture" => PicoSpecification::filter("architecture", "string"),
+	"workspaceId" => PicoSpecification::filter("workspaceId", "string")
 );
 $sortOrderMap = array(
 	"applicationId" => "applicationId",

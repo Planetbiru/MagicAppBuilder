@@ -213,11 +213,11 @@ else
 $appEntityLanguage = new AppEntityLanguageImpl(new Module(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"applicationId" => PicoSpecification::filter("applicationId", "fulltext"),
+	"applicationId" => PicoSpecification::filter("applicationId", "string"),
 	"name" => PicoSpecification::filter("name", "fulltext"),
 	"moduleCode" => PicoSpecification::filter("moduleCode", "fulltext"),
-	"adminCreate" => PicoSpecification::filter("adminCreate", "fulltext"),
-	"adminEdit" => PicoSpecification::filter("adminEdit", "fulltext")
+	"adminCreate" => PicoSpecification::filter("adminCreate", "string"),
+	"adminEdit" => PicoSpecification::filter("adminEdit", "string")
 );
 $sortOrderMap = array(
 	"applicationId" => "application.name",

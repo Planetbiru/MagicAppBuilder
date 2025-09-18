@@ -742,9 +742,9 @@ $appEntityLanguage = new AppEntityLanguageImpl(new AppMessageImpl(), $appConfig,
 
 $specMap = array(
 	"subject" => PicoSpecification::filter("subject", "fulltext"),
-	"senderId" => PicoSpecification::filter("senderId", "fulltext"),
-	"receiverId" => PicoSpecification::filter("receiverId", "fulltext"),
-	"messageFolderId" => PicoSpecification::filter("messageFolderId", "fulltext")
+	"senderId" => PicoSpecification::filter("senderId", "string"),
+	"receiverId" => PicoSpecification::filter("receiverId", "string"),
+	"messageFolderId" => PicoSpecification::filter("messageFolderId", "string")
 );
 $sortOrderMap = array(
 	"subject" => "subject",
