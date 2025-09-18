@@ -55,28 +55,31 @@ class PicoSession // NOSONAR
      */
     public function __construct($sessConf = null)
     {
-        if ($sessConf && $sessConf->getName() != "") {
-            $this->setSessionName($sessConf->getName());
-        }
-        if ($sessConf && $sessConf->getMaxLifeTime() > 0) {
-            $this->setSessionMaxLifeTime($sessConf->getMaxLifeTime());
-        }
-        if ($sessConf && $sessConf->getSaveHandler() == "redis") {
-            $redisParams = $this->getRedisParams($sessConf);
-            $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth, $redisParams->db);
-        } elseif ($sessConf && $sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
-            $this->saveToFiles($sessConf->getSavePath());
-        } elseif ($sessConf && $sessConf->getSaveHandler() == "sqlite" && $sessConf->getSavePath() != "") {
-            $handler = new SqliteSessionHandler($sessConf->getSavePath());
-            session_set_save_handler(
-                [$handler, 'open'],
-                [$handler, 'close'],
-                [$handler, 'read'],
-                [$handler, 'write'],
-                [$handler, 'destroy'],
-                [$handler, 'gc']
-            );
-            register_shutdown_function('session_write_close');
+        if(isset($sessConf))
+        {
+            if ($sessConf->getName() != "") {
+                $this->setSessionName($sessConf->getName());
+            }
+            if ($sessConf->getMaxLifeTime() > 0) {
+                $this->setSessionMaxLifeTime($sessConf->getMaxLifeTime());
+            }
+            if ($sessConf->getSaveHandler() == "redis") {
+                $redisParams = $this->getRedisParams($sessConf);
+                $this->saveToRedis($redisParams->host, $redisParams->port, $redisParams->auth, $redisParams->db);
+            } elseif ($sessConf->getSaveHandler() == "files" && $sessConf->getSavePath() != "") {
+                $this->saveToFiles($sessConf->getSavePath());
+            } elseif ($sessConf->getSaveHandler() == "sqlite" && $sessConf->getSavePath() != "") {
+                $handler = new SqliteSessionHandler($sessConf->getSavePath());
+                session_set_save_handler(
+                    [$handler, 'open'],
+                    [$handler, 'close'],
+                    [$handler, 'read'],
+                    [$handler, 'write'],
+                    [$handler, 'destroy'],
+                    [$handler, 'gc']
+                );
+                register_shutdown_function('session_write_close');
+            }
         }
     }
 
