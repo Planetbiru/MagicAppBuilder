@@ -142,17 +142,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "7782e665b12b01bb10aea89a245858639f0f056e"
+                "reference": "b14d3b3c8474a8c47047238388dda25c54c750cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/7782e665b12b01bb10aea89a245858639f0f056e",
-                "reference": "7782e665b12b01bb10aea89a245858639f0f056e",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/b14d3b3c8474a8c47047238388dda25c54c750cf",
+                "reference": "b14d3b3c8474a8c47047238388dda25c54c750cf",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
-                "planetbiru/magic-object": "^3.17"
+                "planetbiru/magic-object": "^3.19"
             },
             "type": "library",
             "autoload": {
@@ -174,7 +174,7 @@
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
                 "source": "https://github.com/Planetbiru/MagicApp/tree/3.18.0"
             },
-            "time": "2025-09-12T13:01:54+00:00"
+            "time": "2025-09-18T01:20:25+00:00"
         },
         {
             "name": "planetbiru/magic-object",
@@ -182,12 +182,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "ce9a4df48fe2a1cc8856ba6902c2b6a775a4aca4"
+                "reference": "ce6396321a8d67e472d0e3d3c1e13af686620ae0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/ce9a4df48fe2a1cc8856ba6902c2b6a775a4aca4",
-                "reference": "ce9a4df48fe2a1cc8856ba6902c2b6a775a4aca4",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/ce6396321a8d67e472d0e3d3c1e13af686620ae0",
+                "reference": "ce6396321a8d67e472d0e3d3c1e13af686620ae0",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
                 "source": "https://github.com/Planetbiru/MagicObject/tree/3.19.0"
             },
-            "time": "2025-09-16T23:47:11+00:00"
+            "time": "2025-09-17T21:35:41+00:00"
         }
     ],
     "packages-dev": [],
