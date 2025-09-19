@@ -3242,3 +3242,13 @@ The Redis Explorer provides powerful capabilities to view and modify data. For s
 * Use it only in development or testing setups.
 * Ensure proper authentication and restricted access to the interface.
 
+## Improvement
+
+* **Improved login form behavior when session expires**
+  Previously, the login form was displayed inside the AJAX-loaded content area, which could break the application layout. Now, the login form is displayed as a **modal**, ensuring a consistent and non-intrusive user experience.
+
+## Bug Fix
+
+* **Fixed session cookie lifetime handling**
+  Due to differences in configuration naming, the session lifetime value was not being read correctly, causing the application to fall back to the default value. This issue has been resolved through an **upgrade of MagicObject**, which now correctly reads and applies the configured session lifetime.
+
