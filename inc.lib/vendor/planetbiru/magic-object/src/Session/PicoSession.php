@@ -512,18 +512,37 @@ class PicoSession // NOSONAR
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
             $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                session_id(),
-                [
-                    'expires'  => time() + $params['lifetime'],
-                    'path'     => $params['path'],
-                    'domain'   => $params['domain'],
-                    'secure'   => $params['secure'],
-                    'httponly' => $params['httponly'],
+            
+            $name  = session_name();
+            $value = session_id();
+            $path  = isset($params['path']) ? $params['path'] : '/';
+            $secure = $params['secure'] ? true : false;
+            $httponly = $params['httponly'] ? true : false;
+
+            if (PHP_VERSION_ID >= 70300) {
+                $options = [
+                    'path'     => $path,
+                    'secure'   => $secure,
+                    'httponly' => $httponly,
                     'samesite' => isset($params['samesite']) ? $params['samesite'] : self::SAME_SITE_STRICT
-                ]
-            );
+                ];
+
+                // hanya tambahkan expires kalau lifetime > 0
+                if ($params['lifetime'] > 0) {
+                    $options['expires'] = time() + $params['lifetime'];
+                }
+
+                // hanya tambahkan domain kalau tidak kosong
+                if (!empty($params['domain'])) {
+                    $options['domain'] = $params['domain'];
+                }
+
+                setcookie($name, $value, $options);
+
+            } else {
+                $expires = $params['lifetime'] > 0 ? time() + $params['lifetime'] : 0;
+                setcookie($name, $value, $expires, $path, !empty($params['domain']) ? $params['domain'] : '', $secure, $httponly);
+            }
         }
     }
 
