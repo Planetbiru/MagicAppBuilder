@@ -1,4 +1,14 @@
-<!DOCTYPE html>
+<?php
+
+if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
+{
+    // Show show login form for ajax requests
+    header('HTTP/1.1 401 Unauthorized', true, 401);
+    require_once __DIR__ . "/login-form-ajax.php";
+}
+else
+{
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -62,3 +72,5 @@
     </div>
 </body>
 </html>
+<?php
+}
