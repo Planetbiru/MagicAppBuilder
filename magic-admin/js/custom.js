@@ -44,7 +44,7 @@ function fetchUrl(url, section) {
 
         // Ambil isi response (form login) dan tampilkan modal
         return response.text().then(content => {
-          
+
           const wrapper = document.createElement('div');
           wrapper.classList.add('ajax-login-form');
           wrapper.innerHTML = content;
@@ -566,7 +566,7 @@ function initAjaxSupport() {
     if (!form) return;
 
     const section = form.closest('.data-section');
-    const isAjax = section && section.dataset.ajaxSupport === "true";
+    const isAjax = section && section.dataset.ajaxSupport === 'true';
     const needsConfirmation = target.dataset.confirmation === 'true';
 
     // Encapsulated form submission logic (AJAX or standard)
@@ -592,7 +592,7 @@ function initAjaxSupport() {
               if (oldForm) {
                 oldForm.remove();
               }
-              return response.text().then(content => /*NOSONAR*/{
+              return response.text().then(content => /*NOSONAR*/ {
                 const wrapper = document.createElement('div');
                 wrapper.classList.add('ajax-login-form');
                 wrapper.innerHTML = content;
