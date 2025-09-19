@@ -45,7 +45,7 @@ function fetchUrl(url, section) {
 
         // Ambil isi response (form login) dan tampilkan modal
         return response.text().then(content => {
-          console.log(content);
+          
           const wrapper = document.createElement('div');
           wrapper.classList.add('ajax-login-form');
           wrapper.innerHTML = content;

@@ -22,7 +22,7 @@ require_once __DIR__ . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "redis", $appLanguage->getRedisExplorer());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "redis-explorer", $appLanguage->getRedisExplorer());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -75,7 +75,7 @@ if($selectedDb != $defaultDb)
 // Require login
 // =====================
 if (empty($_SESSION['rc'])) {
-  // display login form
+// display login form
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-insert">
@@ -131,7 +131,6 @@ try {
 	require_once $appInclude->mainAppFooter(__DIR__);
 	exit();
   }
-
 
   if (!$redisConnection->select($selectedDb)) {
 	require_once $appInclude->mainAppHeader(__DIR__);
@@ -557,7 +556,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</select>
 					</span>
 				</span>
-
 			
                 <span class="filter-group">
 					<span class="filter-label"><?php echo $appLanguage->getRedisKey();?></span>
@@ -703,4 +701,3 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 /*ajaxSupport*/
 }
-
