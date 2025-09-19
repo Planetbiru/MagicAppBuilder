@@ -209,7 +209,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                     <button class="btn btn-sm btn-outline-secondary ghost btn-up" title="<?php echo $appLanguage->getMoveUp();?>">↑</button>
                     <button class="btn btn-sm btn-outline-secondary ghost btn-down" title="<?php echo $appLanguage->getMoveDown();?>">↓</button>
                     <button class="btn btn-sm btn-danger btn-del" title="<?php echo $appLanguage->getDelete();?>"><?php echo $appLanguage->getDelete();?></button>
-                    <button class="btn btn-sm btn-outline-info ghost btn-toggle" title="<?php echo $appLanguage->getDetail();?>"><?php echo $appLanguage->getDetail();?> ▸</button>
+                    <button class="btn btn-sm btn-outline-info ghost btn-toggle" title="<?php echo $appLanguage->getDetail();?>"><?php echo $appLanguage->getButtonDetail();?> ▸</button>
                 </div>
             </div>
             <details>

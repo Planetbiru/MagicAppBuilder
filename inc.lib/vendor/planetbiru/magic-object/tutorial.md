@@ -1375,7 +1375,7 @@ database:
   salt: ${APP_DATABASE_SALT}
 session:
   name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
+  max_lifetime: 86400
 vocal_guide_instrument: piano
 ```
 
@@ -2827,7 +2827,7 @@ database:
   salt: Asia/Jakarta
 session:
   name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
+  max_lifetime: 86400
   save_handler: files
   save_path: /tmp/session
 vocal_guide_instrument: piano
@@ -2854,7 +2854,7 @@ database:
     salt: hdsBgcmvq/rzfNUuhgQiBop4Hp4wqd5w03Il9zaOshK0LgGtaEK1WTcPx5OdL+9VvhmZvs7g/jDGYjYoHwXjIg==
 session:
     name: 4u5xAE2K74pUxZyIVsphoYUka3vpnzUx7op6CnELtdWNEepz/jQLaKynItFt5dx6bv7wjBUFL1AaZaA4ypw/CP6xtR5WFQy+RV6V8VqYM8o=
-    max_life_time: cspEenRp8+kwUY1RNvmEdWcLqmsRZ+UJZVjY4JwRsuIIfkr+J0w1SYCuRMzMtHG4/hZ5tlXhtGdRZyM7quCbZg==
+    max_lifetime: cspEenRp8+kwUY1RNvmEdWcLqmsRZ+UJZVjY4JwRsuIIfkr+J0w1SYCuRMzMtHG4/hZ5tlXhtGdRZyM7quCbZg==
     save_handler: LIlCCaWHVqg9R4G6ghxDZnuenMLgSI6HjiW+tVGNDa7UyIA7FkFtOgOJtvT/EolUc+kkJSXiMo+76QhvFFq8Dg==
     save_path: CZijzyucTzrj3tZ1M9PbQ6Hky1+4Gz3RnXwZNSe9/SL+9QZdpK4PoW2TSLsuQ+cKBgKgkncd7JXWgA3CFg0f1A==
 result_per_page: 20
@@ -3808,7 +3808,7 @@ Session variables keep information about one single user, and are available to a
 ```yaml
 session:
   name: ${SESSION_NAME}
-  max_life_time: ${SESSION_MAX_LIFE_TIME}
+  max_lifetime: ${SESSION_MAX_LIFE_TIME}
   save_handler: ${SESSION_SAVE_HANDLER}
   save_path: ${SESSION_SAVE_PATH}
   cookie_lifetime: ${SESSION_COOKIE_LIFETIME}
@@ -3822,7 +3822,7 @@ session:
   
 -   **name**: Specifies the name of the session. The value `${SESSION_NAME}` refers to an environment variable or a parameter that should be defined elsewhere in the application or server environment. It determines the session's name identifier.
     
--   **max_life_time**: Defines the maximum lifetime of the session in seconds. The value `${SESSION_MAX_LIFE_TIME}` is expected to come from an environment variable or configuration setting, controlling how long the session will last before it expires.
+-   **max_lifetime**: Defines the maximum lifetime of the session in seconds. The value `${SESSION_MAX_LIFE_TIME}` is expected to come from an environment variable or configuration setting, controlling how long the session will last before it expires.
     
 -   **save_handler**: Specifies the handler used to save session data. In this case, `${SESSION_SAVE_HANDLER}` likely refers to the session handler, such as `redis`, `files`, or `database`, depending on the server configuration.
     
@@ -3865,7 +3865,7 @@ $sessions->startSession();
 ```yaml
 session:
   name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
+  max_lifetime: 86400
   save_handler: redis
   save_path: tcp://127.0.0.1:6379?auth=myredispass
 ```
@@ -3875,7 +3875,7 @@ or
 ```yaml
 session:
   name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
+  max_lifetime: 86400
   save_handler: redis
   save_path: tcp://127.0.0.1:6379?auth=${REDIS_AUTH}
 ```
@@ -3889,7 +3889,7 @@ For example:
 ```yaml
 session:
   name: ${SESSION_NAME}
-  max_life_time: ${SESSION_MAX_LIFE_TIME}
+  max_lifetime: ${SESSION_MAX_LIFE_TIME}
   save_handler: ${SESSION_SAVE_HANDLER}
   save_path: ${SESSION_SAVE_PATH}
   cookie_lifetime: ${SESSION_COOKIE_LIFETIME}

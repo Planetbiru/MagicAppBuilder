@@ -30,7 +30,7 @@ try
     // fix data type
     $databaseConfig->setPort(intval($databaseConfig->getPort()));
     $databaseConfig->setConnectionTimeout(intval($databaseConfig->getConnectionTimeout()));
-    $sessionsConfig->setMaxLifeTime(intval($sessionsConfig->getMaxLifeTime()));
+    $sessionsConfig->setMaxLifetime(intval($sessionsConfig->getMaxLifetime()));
 
     $appConfig = new SecretObject(null);
 

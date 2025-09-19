@@ -668,11 +668,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</div>
 				</div>
 			</form>
-			<div class="pagination pagination-bottom">
-			    <div class="pagination-number">
-			    <?php echo $pageControl; ?>
-			    </div>
-			</div>
+			<nav>
+				<ul class="pagination">
+					<?php for ($p = 1; $p <= $totalPages; $p++) { ?><li class="page-item<?php echo $p == $currentPage ? ' active' : ''; ?>"><a class="page-link" href="?filter=<?php echo urlencode($keyPattern); ?>&page=<?php echo $p; ?>&db=<?php echo $selectedDb; ?>">
+						<?php echo $p; ?></a></li><?php } ?>
+				</ul>
+			</nav>
 			
 			<?php 
 			}

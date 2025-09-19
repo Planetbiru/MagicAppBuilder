@@ -60,8 +60,8 @@ class PicoSession // NOSONAR
             if ($sessConf->getName() != "") {
                 $this->setSessionName($sessConf->getName());
             }
-            if ($sessConf->getMaxLifeTime() > 0) {
-                $this->setSessionMaxLifeTime($sessConf->getMaxLifeTime());
+            if ($sessConf->getMaxLifetime() > 0) {
+                $this->setSessionMaxLifetime($sessConf->getMaxLifetime());
             }
             if ($sessConf->getSaveHandler() == "redis") {
                 $redisParams = $this->getRedisParams($sessConf);
@@ -175,18 +175,18 @@ class PicoSession // NOSONAR
      * This method ensures that only one instance of PicoSession is created (Singleton pattern).
      *
      * @param string|null $name Session name.
-     * @param int $maxLifeTime Maximum lifetime of the session.
+     * @param int $maxLifetime Maximum lifetime of the session.
      * @return self The instance of PicoSession.
      */
-    public static function getInstance($name = null, $maxLifeTime = 0)
+    public static function getInstance($name = null, $maxLifetime = 0)
     {
         if (!isset(self::$_instance)) {
             self::$_instance = new self;
             if (isset($name)) {
                 self::$_instance->setSessionName($name);
             }
-            if ($maxLifeTime > 0) {
-                self::$_instance->setSessionMaxLifeTime($maxLifeTime);
+            if ($maxLifetime > 0) {
+                self::$_instance->setSessionMaxLifetime($maxLifetime);
             }
         }
         self::$_instance->startSession();
@@ -403,7 +403,7 @@ class PicoSession // NOSONAR
      * @param int $lifeTime Maximum lifetime for the session in seconds.
      * @return self Returns the current instance for method chaining.
      */
-    public function setSessionMaxLifeTime($lifeTime)
+    public function setSessionMaxLifetime($lifeTime)
     {
         ini_set("session.gc_maxlifetime", $lifeTime);
         ini_set("session.cookie_lifetime", $lifeTime);

@@ -94,7 +94,7 @@ database:
   salt: ${APP_DATABASE_SALT}
 session:
   name: MUSICPRODUCTIONMANAGER
-  max_life_time: 86400
+  max_lifetime: 86400
 vocal_guide_instrument: piano
 ```
 

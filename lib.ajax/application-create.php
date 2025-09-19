@@ -299,7 +299,7 @@ $newApp->setGlobalVariableDatabase('database');
 
 $cfgSession = new SecretObject();
 $cfgSession->setName('MAGICSESSION');
-$cfgSession->setMaxLifeTime(86400);
+$cfgSession->setMaxLifetime(86400);
 $cfgSession->setSaveHandler('files');
 $cfgSession->setSavePath('');
 $cfgSession->setCookiePath('/');

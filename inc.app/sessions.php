@@ -8,7 +8,7 @@ if($builderConfig != null && $builderConfig->getSessions() != null)
     $sessionConfig = $builderConfig->getSessions();
     $sessions = new PicoSession($sessionConfig);
 
-    $appCookieMaxLifeTime = $sessionConfig->getMaxLifeTime();
+    $appCookieMaxLifeTime = $sessionConfig->getMaxLifetime();
     $appCookiePath = $sessionConfig->getCookiePath();
     $appCookieDomain = $sessionConfig->getCookieDomain();
     $appCookieSecure = $sessionConfig->isCookieSecure();

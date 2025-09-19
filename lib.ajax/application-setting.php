@@ -449,7 +449,7 @@ $nameInIndonesian = array(
                             </tr>
                             <tr>
                                 <td>Session Life Time</td>
-                                <td><input class="form-control" type="number" min="0" step="1" name="sessions_max_life_time" id="sessions_max_life_time" value="<?php echo $cfgSession->getMaxLifeTime(); ?>"></td>
+                                <td><input class="form-control" type="number" min="0" step="1" name="sessions_max_lifetime" id="sessions_max_lifetime" value="<?php echo $cfgSession->getMaxLifetime(); ?>"></td>
                             </tr>
                             <tr>
                                 <td>Session Save Handler</td>
