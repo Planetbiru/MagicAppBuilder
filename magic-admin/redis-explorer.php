@@ -3,7 +3,7 @@
 // This script is generated automatically by MagicAppBuilder
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
-use MagicObject\MagicObject;
+use AppBuilder\Util\RedisExplorer;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoSortable;
@@ -19,182 +19,10 @@ use MagicAppTemplate\AppUserPermissionImpl;
 
 require_once __DIR__ . "/inc.app/auth.php";
 
-class RedisExplorer
-{
-    private $redis;
-
-    public function __construct($connection)
-    {
-        $this->redis = $connection;
-    }
-
-    public function insert($key, $type, $data, $ttl)
-    {
-        // Insert logic here
-        $this->redis->set($key, $data);
-        if ($ttl > 0) {
-            $this->redis->expire($key, $ttl);
-        }
-    }
-
-    public function findAll($specification, $pageable, $sortable, $withTotalResult = false, $fields = null, $findOption = MagicObject::FIND_OPTION_FETCH_DATA)
-    {
-        // Find all logic here
-        $keys = $this->redis->keys('*'); // Simplified for example
-        $results = [];
-        foreach ($keys as $key) {
-            $data = $this->redis->get($key);
-            $results[] = new MagicObject([
-                'key' => $key,
-                'data' => $data,
-                'type' => 'string', // Simplified for example
-                'ttl' => $this->redis->ttl($key)
-            ]);
-        }
-        return new MagicObject([
-            'totalResult' => count($results),
-            'data' => $results
-        ]);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param string $key
-     * @return MagicObject
-     */
-    public function findOne($key)
-    {
-        // Find one logic here
-        $data = $this->redis->get($key);
-        if ($data !== false) {
-            new MagicObject([
-                'key' => $key,
-                'data' => $data,
-                'type' => 'string', // Simplified for example
-                'ttl' => $this->redis->ttl($key)
-            ]);
-        }
-        return new MagicObject();
-    }
-
-    public function delete($key)
-    {
-        // Delete logic here
-        return $this->redis->del($key);
-    }
-
-    public function issetKey($key)
-    {
-        return $this->redis->exists($key);
-    }
-    public static function renderError($appInclude, $message)
-    {
-?>
-<div class="page page-jambi page-insert">
-	<div class="jambi-wrapper">
-      <div class="alert alert-danger">
-        <h4 class="alert-heading">Error</h4>
-        <p><?php echo htmlspecialchars($message); ?></p>
-        <hr>
-        <form method="post">
-          <button type="submit" name="logout" value="1" class="btn btn-primary">Back</button>
-        </form>
-      </div>
-    </div>
-	</div>
-
-<?php
-    }
-    /**
-   * Count the total number of keys matching a pattern using SCAN.
-   *
-   * This method uses the Redis SCAN command to avoid blocking the server when iterating over large datasets.
-   *
-   * @param Redis  $redis   Redis client instance
-   * @param string $pattern Pattern to match keys (e.g., 'user:*')
-   * @return int            Total number of matching keys
-   */
-  public static function countKeysWithScan($redis, $pattern)
-  {
-    $count = 0;
-    $it = null;
-
-    // Iterate over keys in batches using SCAN
-    while (($keys = $redis->scan($it, $pattern)) !== false) {
-      $count += count($keys);
-    }
-
-    return $count;
-  }
-
-  /**
-   * Get a list of keys for a specific page using SCAN.
-   *
-   * Useful for paginating through keys without loading all keys into memory at once.
-   *
-   * @param Redis  $redis   Redis client instance
-   * @param string $pattern Pattern to match keys
-   * @param int    $offset  Offset from the start of the result set
-   * @param int    $limit   Maximum number of keys to return
-   * @return array          Array of matching keys for the given page
-   */
-  public static function getKeysByPageWithScan($redis, $pattern, $offset, $limit)
-  {
-    $it = null;
-    $found = array();
-
-    // Iterate through keys in batches
-    while (($keys = $redis->scan($it, $pattern)) !== false) {
-      foreach ($keys as $key) {
-        // Stop when we have reached the desired page range
-        if (count($found) >= $offset + $limit) {
-          break 2;
-        }
-        $found[] = $key;
-      }
-    }
-
-    // Return only the keys in the requested offset/limit range
-    return array_slice($found, $offset, $limit);
-  }
-
-  /**
-   * Get the value of a Redis key based on its type.
-   *
-   * Supports STRING, LIST, SET, SORTED SET (ZSET), and HASH.
-   *
-   * @param Redis  $redis Redis client instance
-   * @param string $key   Redis key name
-   * @param int    $type  Redis key type (e.g., Redis::REDIS_STRING)
-   * @return string       Formatted value as a string or JSON-encoded representation
-   */
-  public static function getRedisValue($redis, $key, $type)
-  {
-    $value = "";
-
-    // Retrieve the value depending on the key type
-    if ($type === Redis::REDIS_STRING) {
-      $value = $redis->get($key);
-    } elseif ($type === Redis::REDIS_LIST) {
-      $value = implode(', ', $redis->lRange($key, 0, -1));
-    } elseif ($type === Redis::REDIS_SET) {
-      $value = implode(', ', $redis->sMembers($key));
-    } elseif ($type === Redis::REDIS_ZSET) {
-      $value = json_encode($redis->zRange($key, 0, -1, true));
-    } elseif ($type === Redis::REDIS_HASH) {
-      $value = json_encode($redis->hGetAll($key));
-    } else {
-      $value = '(unknown type)';
-    }
-    return $value;
-  }
-}
-
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "redis", $appLanguage->getRedis());
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "redis", $appLanguage->getRedisExplorer());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -205,44 +33,48 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 }
 
 if (isset($_POST['logout']) || isset($_GET['logout'])) {
-  unset($_SESSION['redis_config']);
-  header("Location: ?");
-  exit();
+	unset($_SESSION['rc']);
+	header("Location: ?");
+	exit();
 }
 
 if (isset($_POST['login'])) {
-  $_SESSION['redis_config'] = [
-    'host'     => trim($_POST['redis_host']),
-    'port'     => (int)$_POST['redis_port'],
-    'password' => trim($_POST['redis_password']),
-    'db'       => isset($_POST['redis_db']) ? (int)$_POST['redis_db'] : 0,
-    'timeout'  => isset($_POST['redis_timeout']) ? (float)$_POST['redis_timeout'] : 5.0,
-  ];
+	$_SESSION['rc'] = [
+		'h'     => trim($_POST['redis_host']),
+		'p'     => (int)$_POST['redis_port'],
+		's' => trim($_POST['redis_password']),
+		'd'       => isset($_POST['redis_db']) ? (int)$_POST['redis_db'] : 0,
+		't'  => isset($_POST['redis_timeout']) ? (float)$_POST['redis_timeout'] : 5.0,
+	];
 
-  header("Location: ?");
-  exit();
+	header("Location: ?");
+	exit();
 }
 
 
 // =====================
 // Load config from session
 // =====================
-$cfg = isset($_SESSION['redis_config']) ? $_SESSION['redis_config'] : array();
+$cfg = isset($_SESSION['rc']) ? $_SESSION['rc'] : array();
 
-$redisHost     = isset($cfg['host'])     ? $cfg['host']     : 'localhost';
-$redisPort     = isset($cfg['port'])     ? (int)$cfg['port'] : 6379;
-$redisPassword = isset($cfg['password']) ? $cfg['password'] : '';
-$defaultDb     = isset($cfg['db'])       ? (int)$cfg['db']   : 0;
-$redisTimeout  = isset($cfg['timeout'])  ? (float)$cfg['timeout'] : 5.0;
+$redisHost     = isset($cfg['h']) ? $cfg['h'] : 'localhost';
+$redisPort     = isset($cfg['p']) ? (int)$cfg['p'] : 6379;
+$redisPassword = isset($cfg['s']) ? $cfg['s'] : '';
+$defaultDb     = isset($cfg['d']) ? (int)$cfg['d'] : 0;
+$redisTimeout  = isset($cfg['t']) ? (float)$cfg['t'] : 5.0;
 
-$selectedDb = isset($_GET['db']) ? $_GET['db'] : (isset($_POST['db']) ? $_POST['db'] : $defaultDb);
+$selectedDb = isset($_GET['redis_db']) ? $_GET['redis_db'] : (isset($_POST['redis_db']) ? $_POST['redis_db'] : $defaultDb);
 $selectedDb = max(0, (int)$selectedDb);
 
+if($selectedDb != $defaultDb)
+{
+	$_SESSION['rc']['d'] = $selectedDb;
+}
 
 // =====================
 // Require login
 // =====================
-if (empty($_SESSION['redis_config'])) {
+if (empty($_SESSION['rc'])) {
   // display login form
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
@@ -250,33 +82,32 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
       <form method="post">
         <div class="form-group">
-          <label>Host</label>
+          <label><?php echo $appLanguage->getRedisHost();?></label>
           <input type="text" name="redis_host" class="form-control" value="localhost" required>
         </div>
         <div class="form-group">
-          <label>Port</label>
+          <label><?php echo $appLanguage->getRedisPort();?></label>
           <input type="number" name="redis_port" class="form-control" value="6379" min="1" required>
         </div>
         <div class="form-group">
-          <label>Password (optional)</label>
+          <label><?php echo $appLanguage->getRedisPassword();?></label>
           <input type="password" name="redis_password" class="form-control">
         </div>
         <div class="form-group">
-          <label>Default DB</label>
+          <label><?php echo $appLanguage->getDefaultDatabase();?></label>
           <input type="number" name="redis_db" class="form-control" value="0" min="0">
         </div>
         <div class="form-group">
-          <label>Timeout (seconds)</label>
+          <label><?php echo $appLanguage->getTimeOut();?></label>
           <input type="number" step="0.1" min="0" name="redis_timeout" class="form-control" value="5.0">
         </div>
-        <button type="submit" name="login" value="1" class="btn btn-primary">Connect</button>
+        <button type="submit" name="login" value="1" class="btn btn-primary"><?php echo $appLanguage->getButtonConnect();?></button>
       </form>
     </div>
 <?php
 require_once $appInclude->mainAppFooter(__DIR__);
   exit();
 }
-
 
 // =====================
 // Initialize Redis connection
@@ -286,46 +117,43 @@ try {
   if (!extension_loaded('redis')) {
     throw new Exception('The Redis extension is not loaded. Please install and enable it in your PHP configuration.');
   }
-  $redisConnection = new Redis();
+  $redisConnection = new \Redis();
   if (!$redisConnection->connect($redisHost, $redisPort, $redisTimeout)) {
 	require_once $appInclude->mainAppHeader(__DIR__);
-    RedisExplorer::renderError($appInclude, "Failed to connect to Redis server at {$redisHost}:{$redisPort}");
+    RedisExplorer::renderError($appLanguage, "Failed to connect to Redis server at {$redisHost}:{$redisPort}");
 	require_once $appInclude->mainAppFooter(__DIR__);
 	exit();
   }
 
   if (!empty($redisPassword) && !$redisConnection->auth($redisPassword)) {
 	require_once $appInclude->mainAppHeader(__DIR__);
-    RedisExplorer::renderError($appInclude, 'Redis authentication failed.');
+    RedisExplorer::renderError($appLanguage, 'Redis authentication failed.');
 	require_once $appInclude->mainAppFooter(__DIR__);
 	exit();
   }
-
 
 
   if (!$redisConnection->select($selectedDb)) {
 	require_once $appInclude->mainAppHeader(__DIR__);
-    RedisExplorer::renderError($appInclude, "Failed to select Redis database index: {$selectedDb}");
+    RedisExplorer::renderError($appLanguage, "Failed to select Redis database index: {$selectedDb}");
 	require_once $appInclude->mainAppFooter(__DIR__);
 	exit();
   }
 
-  $redisConnection->setOption(Redis::OPT_READ_TIMEOUT, $redisTimeout);
+  $redisConnection->setOption(\Redis::OPT_READ_TIMEOUT, $redisTimeout);
 } catch (Exception $e) {
   require_once $appInclude->mainAppHeader(__DIR__);
-  RedisExplorer::renderError($appInclude, 'Error: ' . $e->getMessage());
+  RedisExplorer::renderError($appLanguage, 'Error: ' . $e->getMessage());
   require_once $appInclude->mainAppFooter(__DIR__);
   exit();
 }
-
-
 
 // =====================
 // Request parameters
 // =====================
 $keyPattern = isset($_GET['filter']) ? $_GET['filter'] : '*';
 $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$pageSize    = 3;
+$pageSize    = $dataControlConfig->getPageSize();
 $offset      = ($currentPage - 1) * $pageSize;
 
 // =====================
@@ -334,15 +162,14 @@ $offset      = ($currentPage - 1) * $pageSize;
 $totalKeys  = RedisExplorer::countKeysWithScan($redisConnection, $keyPattern);
 $totalPages = max(1, ceil($totalKeys / $pageSize));
 $keys       = RedisExplorer::getKeysByPageWithScan($redisConnection, $keyPattern, $offset, $pageSize);
-
 $dataFilter = null;
 
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
-	$redisKey = ($inputPost->getKey(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$redisType = ($inputPost->getType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$redisData = ($inputPost->getData(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$redisTtl = ($inputPost->getTtl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$redisKey = $inputPost->getKey(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+	$redisType = $inputPost->getType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+	$redisData = $inputPost->getData(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+	$redisTtl = $inputPost->getTtl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
     
 	try
 	{
@@ -360,11 +187,10 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
-
-    $redisKey = ($inputPost->getKey(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-    $redisType = ($inputPost->getType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-    $redisData = ($inputPost->getData(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-    $redisTtl = ($inputPost->getTtl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+    $redisKey = $inputPost->getAppBuilderNewPkKey(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+    $redisType = $inputPost->getType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+    $redisData = $inputPost->getData(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+    $redisTtl = $inputPost->getTtl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
 	try
 	{
@@ -409,23 +235,30 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 						
 		<?php if($currentModule->hasErrorField())
-						{
-						?>
-		
-						
+		{
+		?>			
 		<div class="alert alert-danger">
 			<?php echo $currentModule->getErrorMessage(); ?>
-		</div>
-		
-						
+		</div>		
 		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#createform");
-						}
-						?>
-		
+		}
+		?>
 						
 		<form name="createform" id="createform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
+					<tr>
+						<td><?php echo $appLanguage->getRedisDatabase();?></td>
+						<td>
+							<select class="form-control mr-2" name="redis_db" id="redis_db">
+							<?php for ($redis_db = 0; $redis_db < 16; $redis_db++) { ?>
+								<option value="<?php echo $redis_db; ?>" <?php if ($selectedDb == $redis_db) echo 'selected'; ?>>
+								<?php echo $redis_db; ?>
+								</option>
+							<?php } ?>
+							</select>
+						</td>
+					</tr>
 					<tr>
 						<td><?php echo $appLanguage->getRedisKey();?></td>
 						<td>
@@ -484,8 +317,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 						
 		<?php if($currentModule->hasErrorField())
-						{
-						?>
+		{
+		?>
 		
 						
 		<div class="alert alert-danger">
@@ -494,13 +327,25 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		
 						
 		<?php $currentModule->restoreFormData($currentModule->getFormData(), $currentModule->getErrorField(), "#updateform");
-						}
-						?>
-		
+		}
+		?>
+
 						
 		<form name="updateform" id="updateform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
+					<tr>
+						<td><?php echo $appLanguage->getRedisDatabase();?></td>
+						<td>
+							<select class="form-control mr-2" name="redis_db" id="redis_db">
+							<?php for ($redis_db = 0; $redis_db < 16; $redis_db++) { ?>
+								<option value="<?php echo $redis_db; ?>" <?php if ($selectedDb == $redis_db) echo 'selected'; ?>>
+								<?php echo $redis_db; ?>
+								</option>
+							<?php } ?>
+							</select>
+						</td>
+					</tr>
 					<tr>
 						<td><?php echo $appLanguage->getRedisKey();?></td>
 						<td>
@@ -565,8 +410,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
-	$specification = PicoSpecification::getInstanceOf(Field::of()->key, $inputGet->getKey(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
-	$specification->addAnd($dataFilter);
+	$specification = $inputGet->getKey(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 	$redisExplorer = new RedisExplorer($redisConnection);
 	try{
 		$redis = $redisExplorer->findOne($specification);
@@ -592,6 +436,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appLanguage->getRedisDatabase();?></td>
+						<td>
+							<?php echo $selectedDb;?>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appLanguage->getRedisKey();?></td>
 						<td><?php echo $redis->getKey();?></td>
 					</tr>
@@ -615,7 +465,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td></td>
 						<td>
 							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" id="update_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->key, $redis->getKey());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<button type="button" class="btn btn-primary" id="update_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->key, $redis->getKey(), ['redis_db'=>$selectedDb]);?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
 							<button type="button" class="btn btn-primary" id="back_to_list" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
@@ -675,19 +525,44 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new RedisExplorer($redisConnection);
 
+$redisExplorer = new RedisExplorer($redisConnection);
 
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
+
+
 ?>
+<style>
+	.pagination{
+		text-align: center;
+	}
+	.pagination .page-item{
+		display: inline-block;
+	}
+</style>
 <div class="page page-jambi page-list">
 	<div class="jambi-wrapper">
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appLanguage->getDatabase();?></span>
+					<span class="filter-control">
+					<select class="form-control mr-2" name="redis_db" id="redis_db" onchange="this.form.submit()">
+					<?php for ($redis_db = 0; $redis_db < 16; $redis_db++) { ?>
+						<option value="<?php echo $redis_db; ?>" <?php if ($selectedDb == $redis_db) echo 'selected'; ?>>
+						<?php echo $redis_db; ?>
+						</option>
+					<?php } ?>
+					</select>
+					</span>
+				</span>
+
+			
                 <span class="filter-group">
 					<span class="filter-label"><?php echo $appLanguage->getRedisKey();?></span>
 					<span class="filter-control">
-						<input type="text" class="form-control" name="key" value="<?php echo $inputGet->getKey(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>" autocomplete="off"/>
+						<input type="text" class="form-control" name="filter" value="<?php echo $inputGet->getFilter(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>" autocomplete="off"/>
 					</span>
 				</span>
 				<span class="filter-group">
@@ -698,28 +573,25 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="button" class="btn btn-primary" id="add_data" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
 				</span>
+				<span class="filter-group">
+					<button class="btn btn-danger" type="button" onclick="window.location='?logout'"><?php echo $appLanguage->getButtonDisconnect();?></button>
+				</span>
 				<?php } ?>
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
 			<?php } /*ajaxSupport*/ ?>
 			<?php try{
-				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, null, MagicObject::FIND_OPTION_NO_FETCH_DATA);
-				if($pageData->getTotalResult() > 0)
+				if(!empty($keys))
 				{		
-				    $pageControl = $pageData->getPageControl(Field::of()->page, $currentModule->getSelf())
-				    ->setNavigation(
-				        $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
-				        $dataControlConfig->getFirst(), $dataControlConfig->getLast()
-				    )
-				    ->setPageRange($dataControlConfig->getPageRange())
-				    ;
+				    
 			?>
-			<div class="pagination pagination-top">
-			    <div class="pagination-number">
-			    <?php echo $pageControl; ?>
-			    </div>
-			</div>
+			<nav>
+				<ul class="pagination">
+					<?php for ($p = 1; $p <= $totalPages; $p++) { ?><li class="page-item<?php echo $p == $currentPage ? ' active' : ''; ?>"><a class="page-link" href="?filter=<?php echo urlencode($keyPattern); ?>&page=<?php echo $p; ?>&db=<?php echo $selectedDb; ?>">
+						<?php echo $p; ?></a></li><?php } ?>
+				</ul>
+			</nav>
 			<form action="" method="post" class="data-form">
 				<div class="data-wrapper">
 					<table class="table table-row table-sort-by-column">
@@ -748,15 +620,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							</tr>
 						</thead>
 					
-						<tbody data-offset="<?php echo $pageData->getDataOffset();?>">
+						<tbody data-offset="<?php echo 0;?>">
 							<?php 
 							$dataIndex = 0;
-							while($redis = $pageData->fetch())
+							foreach($keys as $key)
 							{
+								
 								$dataIndex++;
+								$redis = $redisExplorer->findOne($key);
+								
 							?>
 		
-							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
+							<tr data-number="<?php echo 0 + $dataIndex;?>">
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="key">
 									<input type="checkbox" class="checkbox check-slave checkbox-key" name="checked_row_id[]" value="<?php echo $redis->getKey();?>"/>
@@ -764,15 +639,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<?php if($userPermission->isAllowedUpdate()){ ?>
 								<td class="data-editor">
-									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->key, $redis->getKey());?>"><span class="fa fa-edit"></span></a>
+									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->key, $redis->getKey(), ['redis_db'=>$selectedDb]);?>"><span class="fa fa-edit"></span></a>
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td class="data-viewer">
-									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->key, $redis->getKey());?>"><span class="fa fa-folder"></span></a>
+									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->key, $redis->getKey(), ['redis_db'=>$selectedDb]);?>"><span class="fa fa-folder"></span></a>
 								</td>
 								<?php } ?>
-								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
+								<td class="data-number"><?php echo 0 + $dataIndex;?></td>
 								<td data-col-name="key" class="data-column"><?php echo $redis->getKey();?></td>
 								<td data-col-name="type" class="data-column"><?php echo $redis->getType();?></td>
 								<td data-col-name="data" class="data-column"><?php echo $redis->getData();?></td>
