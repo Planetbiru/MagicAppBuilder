@@ -1391,3 +1391,25 @@ This provides a **persistent session storage** mechanism using **SQLite** as the
 * **Lightweight:** Suitable for shared hosting or small applications.
 * **Reliability:** Prevents session loss when PHP restarts, unlike file-based sessions.
 
+# MagicObject Version 3.20.0
+
+## Change: Removal of Math-Related Classes
+
+In this release, several math-related classes have been **removed** from MagicObject to keep the core library lightweight and focused.
+
+### Removed Modules
+
+1. Complex Numbers  
+2. Matrix Operations  
+3. Geometry Utilities  
+
+### Migration
+
+These classes are **not discontinued**, but have been moved into a **new dedicated repository**:
+
+👉 [Planetbiru/Math](https://github.com/Planetbiru/Math)
+
+Developers who rely on these math utilities should install the new package separately:
+
+```bash
+composer require planetbiru/math
