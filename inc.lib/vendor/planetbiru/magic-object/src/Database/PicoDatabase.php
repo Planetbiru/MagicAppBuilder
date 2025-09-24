@@ -1378,4 +1378,28 @@ class PicoDatabase // NOSONAR
 
         return $this;
     }
+
+    /**
+     * Checks whether the PDO connection is fully active and able to execute queries.
+     *
+     * This method not only verifies that a TCP connection to the database exists, 
+     * but also ensures that PHP can successfully execute a simple SQL statement 
+     * on the target database. By running `SELECT 1 + 1 AS two`, it validates 
+     * both the connection and query execution capability.
+     *
+     * @return bool True if the connection and query execution are successful, false otherwise.
+     */
+    public function isPdoConnected()
+    {
+        try {
+            $stmt = $this->databaseConnection->query("SELECT 1 + 1 AS two");
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return isset($row) && isset($row['two']) && $row['two'] == 2;
+        } catch (PDOException $e) {
+            // If an error occurs, assume the connection/query is not valid
+        }
+        return false;
+    }
+
+
 }
