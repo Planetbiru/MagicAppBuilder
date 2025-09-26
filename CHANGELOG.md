@@ -3260,3 +3260,6 @@ Users can now freely define the system module path in the application instead of
 This provides greater flexibility for developing applications and integrating them with other systems.  
 Users can create their own files and logic in the application root without worrying about interfering with or mixing them with the system modules.
 
+## Add MagicMath
+
+The math class that was previously in MagicObject has been moved to MagicMath. MagicAppBuilder adds the MagicMath dependency to the application.
