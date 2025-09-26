@@ -15,6 +15,6 @@ namespace AppBuilder;
  */
 class AppArchitecture
 {
-    const MONOLITH = "monolith"; // Monolith application architecture
+    const MONOLITH      = "monolith";      // Monolith application architecture
     const MICROSERVICES = "microservices"; // Microservices application architecture
 }

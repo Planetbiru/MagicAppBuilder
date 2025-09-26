@@ -3,8 +3,18 @@
 namespace AppBuilder;
 
 use MagicObject\Generator\PicoEntityGenerator;
-use stdClass;
 
+/**
+ * Class ScriptGeneratorMonolith
+ *
+ * Kelas ini bertanggung jawab untuk menghasilkan skrip modul untuk aplikasi dengan arsitektur monolitik.
+ * Ini memperluas fungsionalitas dari `ScriptGenerator` dasar dan mengoordinasikan pembuatan
+ * file modul lengkap, termasuk operasi CRUD, antarmuka pengguna (GUI), dan entitas terkait.
+ * Kelas ini menangani berbagai fitur seperti alur kerja persetujuan, fungsionalitas tempat sampah (trash),
+ * validasi input, dan pembuatan file entitas yang diperlukan.
+ *
+ * @package AppBuilder
+ */
 class ScriptGeneratorMonolith extends ScriptGenerator
 {
     /**
