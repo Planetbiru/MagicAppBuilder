@@ -916,7 +916,11 @@ class ScriptGenerator //NOSONAR
             }
             $depth = substr_count($path, "/");
             $destinationDir = $appConf->getBaseApplicationDirectory() . $path;
-            $dirname = "dirname(__DIR__, $depth)";
+            
+            for($i = 0; $i < $depth; $i++)
+            {
+                $dirname = "dirname($dirname)";
+            }
         }
         
         $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf, $depth, $dirname) {
