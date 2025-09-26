@@ -4,13 +4,10 @@ namespace AppBuilder;
 
 use AppBuilder\AppArchitecture;
 use AppBuilder\AppBuilder;
-use AppBuilder\AppBuilderApproval;
 use AppBuilder\AppBuilderBase;
 use AppBuilder\AppFeatures;
 use AppBuilder\AppField;
 use AppBuilder\AppSecretObject;
-use AppBuilder\AppSection;
-use AppBuilder\EntityApvInfo;
 use AppBuilder\EntityInfo;
 use Exception;
 use MagicObject\Database\PicoDatabase;
@@ -22,6 +19,16 @@ use MagicObject\Util\PicoStringUtil;
 use MagicObject\Util\PicoYamlUtil;
 use stdClass;
 
+/**
+ * Class ScriptGenerator
+ *
+ * Kelas dasar untuk generator skrip, menyediakan fungsionalitas umum dan metode bantuan yang digunakan dalam menghasilkan modul aplikasi.
+ * Kelas ini merangkum logika untuk mempersiapkan lingkungan aplikasi, mengelola dependensi Composer, memproses definisi field,
+ * menghasilkan pernyataan `use`, dan memperbarui konfigurasi menu. Subkelas, seperti `ScriptGeneratorMonolith` dan
+ * `ScriptGeneratorMicroservices`, memperluas kelas ini untuk mengimplementasikan logika pembuatan yang spesifik untuk arsitektur masing-masing.
+ *
+ * @package AppBuilder
+ */
 class ScriptGenerator //NOSONAR
 {
     const COMPOSER_PHAR = "composer.phar";
@@ -916,7 +923,11 @@ class ScriptGenerator //NOSONAR
             }
             $depth = substr_count($path, "/");
             $destinationDir = $appConf->getBaseApplicationDirectory() . $path;
-            $dirname = "dirname(__DIR__, $depth)";
+            
+            for($i = 0; $i < $depth; $i++)
+            {
+                $dirname = "dirname($dirname)";
+            }
         }
         
         $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf, $depth, $dirname) {

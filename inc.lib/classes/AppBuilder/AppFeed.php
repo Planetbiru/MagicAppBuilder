@@ -99,9 +99,10 @@ class AppFeed extends PicoObjectToString
      * @param PicoDatabase $databaseBuilder The database connection object used to query the messages.
      * @param EntityAdmin $entityAdmin The admin entity whose messages are being fetched.
      * @param int $limit The maximum number of messages to retrieve.
+     * @param string $path The URL path to open the message.
      * @return self An instance of the class containing the fetched messages.
      */
-    public static function getMessages($databaseBuilder, $entityAdmin, $limit)
+    public static function getMessages($databaseBuilder, $entityAdmin, $limit, $path = 'message.php')
     {
         $instance = new self();
         $finder = new Message(null, $databaseBuilder);
@@ -121,7 +122,7 @@ class AppFeed extends PicoObjectToString
             {
                 $data = new AppFeedData(
                     $record->getMessageId(),
-                    "message.php?user_action=detail&message_id=" . $record->getMessageId(),
+                    $path."?user_action=detail&message_id=" . $record->getMessageId(),
                     $record->getSubject(),
                     $record->getTimeCreate(),
                     strtotime($record->getTimeCreate())

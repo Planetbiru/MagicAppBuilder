@@ -101,23 +101,32 @@ class PicoDatabase // NOSONAR
     /**
      * Creates a PicoDatabase instance from an existing PDO connection.
      *
-     * This static method accepts a PDO connection object, initializes a new 
-     * PicoDatabase instance, and sets up the database connection and type.
-     * It also marks the database as connected and returns the configured 
-     * PicoDatabase object.
+     * This static method accepts a PDO connection object and attempts to extract
+     * database credentials (such as host, port, schema, and timezone) directly 
+     * from the connection. If certain details cannot be retrieved from the PDO 
+     * object (for example, if the driver does not support a specific attribute), 
+     * the method will use the optional $databaseCredentials parameter as a 
+     * fallback source.
      *
-     * @param PDO $pdo The PDO connection object representing an active connection to the database.
+     * The resulting PicoDatabase instance will contain the PDO connection, 
+     * resolved database type, and credentials, and will be marked as connected.
+     *
+     * @param PDO $pdo The PDO connection object representing an active 
+     *                 connection to the database.
+     * @param SecretObject|null $databaseCredentials Optional fallback credentials 
+     *                 to use if details cannot be extracted from the PDO object.
      * @return PicoDatabase Returns a new instance of the PicoDatabase class, 
-     *         with the PDO connection and database type set.
+     *                      configured with the PDO connection, database type, 
+     *                      and credentials.
      */
-    public static function fromPdo($pdo)
+    public static function fromPdo($pdo, $databaseCredentials = null)
     {
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $dbType = self::getDbType($driver);
         $database = new self(new SecretObject());
         $database->databaseConnection = $pdo;
         $database->databaseType = $dbType;
-        $database->databaseCredentials = self::getDatabaseCredentialsFromPdo($pdo, $driver, $dbType);
+        $database->databaseCredentials = self::getDatabaseCredentialsFromPdo($pdo, $driver, $dbType, $databaseCredentials);
         $database->connected = true;
         return $database;
     }
@@ -125,86 +134,112 @@ class PicoDatabase // NOSONAR
     /**
      * Retrieves detailed information about a PDO database connection.
      *
-     * This method extracts and organizes connection details, including:
-     * - Database driver (e.g., 'mysql', 'pgsql', 'sqlite').
-     * - Host and port (if available).
-     * - Database name (derived from the connection DSN).
-     * - Schema (for applicable databases like PostgreSQL).
-     * - Time zone (calculated from the database offset or default PHP time zone).
+     * This method attempts to extract and normalize connection details from a PDO instance.
+     * It uses `PDO::getAttribute(PDO::ATTR_CONNECTION_STATUS)` when supported, and falls back
+     * to values provided in `$databaseCredentials` if the driver does not expose certain attributes.
      *
-     * The extraction process dynamically adapts to the type of database (e.g., MySQL, PostgreSQL, SQLite).
-     * For PostgreSQL, the schema is determined using a database query. Time zone information is calculated 
-     * by converting the database offset to a corresponding PHP time zone where possible.
+     * The extracted details include:
+     * - **Driver**: The PDO driver name (e.g., 'mysql', 'pgsql', 'sqlite').
+     * - **Host/Port**: Parsed from the connection DSN, with fallback to `$databaseCredentials`.
+     * - **Database Name**: Derived from the DSN path or from `$databaseCredentials`.
+     * - **Schema**: Retrieved dynamically for PostgreSQL (via `SELECT current_schema()`),
+     *               or set to the database name for MySQL/MariaDB.
+     * - **Time Zone**: Determined by converting the database offset into a PHP-compatible
+     *                  time zone string when supported, or falling back to the default
+     *                  PHP time zone.
      *
-     * The resulting connection details are encapsulated in a `SecretObject` for secure handling and organized access.
+     * The collected information is encapsulated in a `SecretObject` instance for secure
+     * handling and consistent access.
      *
-     * @param PDO    $pdo    The PDO connection object.
-     * @param string $driver The name of the database driver (e.g., 'mysql', 'pgsql', 'sqlite').
-     * @param string $dbType The database type constant as defined in `PicoDatabaseType`.
+     * @param PDO             $pdo                 The active PDO connection object.
+     * @param string          $driver              The PDO driver name (e.g., 'mysql', 'pgsql', 'sqlite').
+     * @param string          $dbType              The database type constant from `PicoDatabaseType`.
+     * @param SecretObject|null $databaseCredentials Optional fallback credentials if details cannot
+     *                                               be extracted from the PDO connection.
      *
-     * @return SecretObject A `SecretObject` instance containing the following properties:
-     *                      - `driver`: The database driver (e.g., 'mysql', 'pgsql').
-     *                      - `host`: The database host (e.g., 'localhost').
-     *                      - `port`: The database port (e.g., 3306 for MySQL, 5432 for PostgreSQL).
-     *                      - `databaseName`: The name of the database.
-     *                      - `databaseSchema`: The schema name (if applicable, e.g., 'public' for PostgreSQL).
-     *                      - `timeZone`: The database time zone (e.g., 'UTC+02:00').
+     * @return SecretObject Returns a `SecretObject` instance containing:
+     *                      - `driver`: Database driver name.
+     *                      - `host`: Database host, or `null` if unavailable.
+     *                      - `port`: Database port, or `null` if unavailable.
+     *                      - `databaseName`: Name of the database, or `null` if unavailable.
+     *                      - `databaseSchema`: Schema name, where applicable.
+     *                      - `timeZone`: Time zone string.
      *
-     * @throws PDOException If an error occurs during database interaction, such as a query failure or
-     *                      attribute access issue.
+     * @throws Exception This method suppresses most driver-specific warnings, but unexpected
+     *                   exceptions (e.g., query failures for schema detection) may still be thrown.
      */
-    private static function getDatabaseCredentialsFromPdo($pdo, $driver, $dbType)
+    private static function getDatabaseCredentialsFromPdo($pdo, $driver, $dbType, $databaseCredentials = null)
     {
-        // Get the connection status, which includes the DSN (Data Source Name)
-        try
-        {
-            $dsn = $pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS);
-            $dsnParts = parse_url($dsn);
+        try {
+            // Default values
+            $dsn = null;
+            $dsnParts = array();
 
-            // Extract the host from the DSN (if available)
+            // Try to fetch ATTR_CONNECTION_STATUS (not supported by all drivers)
+            try {
+                $dsn = @$pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS); // Suppress warning if unsupported
+                if ($dsn) {
+                    $dsnParts = parse_url($dsn);
+                }
+            } catch (Exception $ignored) {
+                // Ignore errors, fallback will be used
+            }
+
+            // Extract host
             $host = isset($dsnParts['host']) ? $dsnParts['host'] : null;
+            if ($host === null && $databaseCredentials !== null) {
+                $host = $databaseCredentials->getHost();
+            }
 
-            // Extract the port from the DSN (if available)
+            // Extract port
             $port = isset($dsnParts['port']) ? $dsnParts['port'] : null;
+            if ($port === null && $databaseCredentials !== null) {
+                $port = $databaseCredentials->getPort();
+            }
 
-            // Get the database name from the DSN (usually found at the end of the DSN after host and port)
-            $databaseName = isset($dsnParts['path']) ? ltrim($dsnParts['path'], '/') : null;
+            // Extract database name
+            if (isset($dsnParts['path'])) {
+                $databaseName = ltrim($dsnParts['path'], '/');
+            } else {
+                $databaseName = ($databaseCredentials !== null) ? $databaseCredentials->getDatabaseName() : null;
+            }
 
-            // Initialize the schema and time zone
+            // Schema and timezone initialization
             $schema = null;
             $timezone = null;
-            
-            // Retrieve the schema and time zone based on the database type
+
             if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
-                // For PostgreSQL, fetch the current schema and time zone using queries
+                // PostgreSQL: fetch schema and timezone
                 $stmt = $pdo->query('SELECT current_schema()');
-                $schema = $stmt->fetchColumn(); // Fetch the schema name
+                $schema = $stmt->fetchColumn();
                 $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
             }
             else if ($dbType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $dbType == PicoDatabaseType::DATABASE_TYPE_MYSQL) {
-                // For MySQL, the schema is the same as the database name
-                $schema = $databaseName; // MySQL schema is the database name
+                // MySQL/MariaDB: schema is the database name
+                $schema = $databaseName;
                 $timezone = self::convertOffsetToTimeZone(self::getTimeZoneOffset($pdo));
             }
             else {
-                // For other drivers, set schema and time zone to null (or handle it as needed)
+                // Other databases: use default timezone
                 $schema = null;
                 $timezone = date_default_timezone_get();
             }
 
-            // Create and populate the SecretObject with the connection details
-            $databaseCredentials = new SecretObject();
-            $databaseCredentials->setDriver($driver);
-            $databaseCredentials->setHost($host);
-            $databaseCredentials->setPort($port);
-            $databaseCredentials->setDatabaseName($databaseName);
-            $databaseCredentials->setDatabaseSchema($schema);
-            $databaseCredentials->setTimeZone($timezone);
+            // Build the SecretObject with collected credentials
+            $result = new SecretObject();
+            $result->setDriver($driver);
+            $result->setHost($host);
+            $result->setPort($port);
+            $result->setDatabaseName($databaseName);
+            $result->setDatabaseSchema($schema);
+            $result->setTimeZone($timezone);
 
-            // Return the populated SecretObject containing the connection details
-            return $databaseCredentials;
-        }
-        catch (Exception $e) {
+            return $result;
+        } catch (Exception $e) {
+            // If everything fails, return the fallback credentials if provided
+            if ($databaseCredentials !== null) {
+                return $databaseCredentials;
+            }
             return new SecretObject();
         }
     }

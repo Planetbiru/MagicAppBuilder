@@ -7,6 +7,17 @@ use MagicObject\Generator\PicoEntityGenerator;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;
 
+/**
+ * Class AppEntityGenerator
+ *
+ * A specialized entity generator that extends `PicoEntityGenerator` to create custom entity classes for the application.
+ * It handles the generation of main entities, as well as related entities like approval and trash tables. This class
+ * is responsible for merging database schema information with application-specific configurations, such as adding
+ * predecessor and successor fields, handling entity relationships through reference data, and controlling whether
+ * existing entity files should be updated.
+ *
+ * @package AppBuilder
+ */
 class AppEntityGenerator extends PicoEntityGenerator
 {
     /**

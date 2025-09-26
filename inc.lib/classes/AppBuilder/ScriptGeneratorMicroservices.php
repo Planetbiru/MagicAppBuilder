@@ -4,6 +4,18 @@ namespace AppBuilder;
 
 use MagicObject\Generator\PicoEntityGenerator;
 
+/**
+ * Class ScriptGeneratorMicroservices
+ *
+ * Kelas ini bertanggung jawab untuk menghasilkan skrip modul untuk aplikasi dengan arsitektur microservices.
+ * Mirip dengan `ScriptGeneratorMonolith`, kelas ini memperluas `ScriptGenerator` dasar untuk mengoordinasikan
+ * pembuatan file modul, termasuk operasi CRUD dan fitur terkait. Namun, kelas ini secara khusus disesuaikan
+ * untuk lingkungan microservices dengan mengintegrasikan callback API untuk menangani respons dari setiap
+ * operasi, seperti create, update, dan delete. Hal ini memastikan bahwa modul yang dihasilkan dapat berkomunikasi
+ * secara efektif sebagai layanan yang independen.
+ *
+ * @package AppBuilder
+ */
 class ScriptGeneratorMicroservices extends ScriptGenerator
 {
     /**

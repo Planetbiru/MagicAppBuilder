@@ -1,0 +1,18 @@
+{
+    "name": "planetbiru/magic-math",
+    "description": "Helper classes for mathematics",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "MagicMath\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kamshory"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {}
+}

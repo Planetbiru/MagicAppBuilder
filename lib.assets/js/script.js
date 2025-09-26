@@ -204,6 +204,78 @@ String.prototype.replaceAll = function (search, replacement)  //NOSONAR
 };
 
 /**
+ * Handles updating different types of dependencies (MagicObject, MagicApp, Classes)
+ * for a given application, after user confirmation.
+ *
+ * This function shows a confirmation dialog, triggers an AJAX request to update
+ * the selected dependency, and displays toast notifications for success, failure,
+ * or error. It also provides a loading indicator on the clicked button.
+ *
+ * @function updateDependency
+ * @param {string} option - The update option. Possible values:
+ *                          - "update-magic-object"
+ *                          - "update-magic-app"
+ *                          - "update-classes"
+ * @param {HTMLElement} button - The button element that triggered the update action.
+ */
+function updateDependency(option, button) {
+
+  let toBeUpdated = '';
+  if (option == 'update-magic-object') {
+    toBeUpdated = 'MagicObject';
+
+  }
+  else if (option == 'update-magic-app') {
+    toBeUpdated = 'MagicApp';
+
+  }
+  else if (option == 'update-classes') {
+    toBeUpdated = 'Classes';
+  }
+  let message = `Are you sure you want to update ${toBeUpdated}?`;
+  let errorMessage = `Error while update ${toBeUpdated}.`;
+  let successMessage = `${toBeUpdated} updated successfully.`;
+
+  asyncAlert(message, 'Confirmation', [
+    {
+      'caption': 'OK', 'class': 'btn-primary', 'fn': function () {
+        let originalText = $(button).html();
+        $(button).html('<i class="fas fa-spinner fa-spin"></i> Updating...').prop('disabled', true);
+
+        let applicationId = $(button).closest('form').find('[name="application_id"]').val();
+
+        $.ajax({
+          url: 'lib.ajax/application-dependency-update.php',
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            application_id: applicationId,
+            option: option
+          },
+          success: function (response) {
+            if (response.success) {
+              showToast('Success', successMessage);
+            }
+            else {
+              showToast('Failed', errorMessage);
+            }
+          },
+          error: function () {
+            showToast('Error', errorMessage);
+          },
+          complete: function () {
+            $(button).html(originalText).prop('disabled', false);
+          }
+        });
+      }
+    },
+    { 'caption': 'Cancel', 'class': 'btn-secondary', 'fn': function () { } },
+  ]);
+}
+
+    
+
+/**
  * Load main resource
  */
 jQuery(function () {
@@ -895,6 +967,15 @@ function getLocalStorageKey(key) {
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+  $(document).on('click', '.update-magic-object', function() {
+      updateDependency('update-magic-object', this);
+  });
+  $(document).on('click', '.update-magic-app', function() {
+      updateDependency('update-magic-app', this);
+  });
+  $(document).on('click', '.update-classes', function() {
+      updateDependency('update-classes', this);
+  });
   $(document).on('change', '.application-path-selector', function(e){
     if($(this)[0].checked)
     {

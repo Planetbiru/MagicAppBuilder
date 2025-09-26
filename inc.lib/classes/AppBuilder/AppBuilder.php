@@ -5,6 +5,16 @@ namespace AppBuilder;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;
 
+/**
+ * Class AppBuilder
+ *
+ * Kelas ini bertanggung jawab untuk menghasilkan bagian-bagian skrip untuk operasi CRUD (Create, Read, Update, Delete)
+ * dasar dalam sebuah modul aplikasi, khususnya untuk skenario yang tidak memerlukan alur kerja persetujuan (approval).
+ * Sebagai turunan dari `AppBuilderBase`, kelas ini menyediakan implementasi konkret untuk membuat, memperbarui,
+ * menghapus, serta mengaktifkan dan menonaktifkan entitas.
+ *
+ * @package AppBuilder
+ */
 class AppBuilder extends AppBuilderBase
 {
     

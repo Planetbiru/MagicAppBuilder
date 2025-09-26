@@ -5,6 +5,17 @@ namespace AppBuilder;
 use MagicObject\MagicObject;
 use MagicObject\Util\PicoStringUtil;
 
+/**
+ * Class AppBuilderApproval
+ *
+ * Kelas ini bertanggung jawab untuk menghasilkan bagian-bagian skrip untuk modul yang memerlukan alur kerja persetujuan (approval).
+ * Sebagai turunan dari `AppBuilderBase`, kelas ini menyediakan implementasi spesifik untuk membuat, memperbarui, menghapus,
+ * mengaktifkan, dan menonaktifkan entitas di mana setiap tindakan harus melalui proses persetujuan.
+ * Kelas ini juga menghasilkan logika yang sesuai untuk proses persetujuan dan penolakan, memastikan bahwa
+ * perubahan hanya diterapkan setelah otorisasi yang semestinya.
+ *
+ * @package AppBuilder
+ */
 class AppBuilderApproval extends AppBuilderBase
 {
     /**
