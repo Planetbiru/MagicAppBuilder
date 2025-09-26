@@ -9,5 +9,6 @@ return array(
     'SVG\\' => array($vendorDir . '/meyfa/php-svg/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'MagicObject\\' => array($vendorDir . '/planetbiru/magic-object/src'),
+    'MagicMath\\' => array($vendorDir . '/planetbiru/magic-math/src'),
     'MagicApp\\' => array($vendorDir . '/planetbiru/magic-app/src'),
 );

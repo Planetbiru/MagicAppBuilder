@@ -2,7 +2,7 @@
 
 namespace AppBuilder\Util\Entity;
 
-use MagicObject\Geometry\Point;
+use MagicMath\Geometry\Point;
 
 /**
  * Class representing an entity relationship endpoint.

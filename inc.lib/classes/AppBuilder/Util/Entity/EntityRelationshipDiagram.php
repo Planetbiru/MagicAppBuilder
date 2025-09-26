@@ -5,10 +5,10 @@ namespace AppBuilder\Util\Entity;
 use AppBuilder\Util\Error\ErrorChecker;
 use Exception;
 use MagicObject\Database\PicoDatabase;
-use MagicObject\Geometry\Area;
-use MagicObject\Geometry\Point;
-use MagicObject\Geometry\Polygon;
-use MagicObject\Geometry\Rectangle;
+use MagicMath\Geometry\Area;
+use MagicMath\Geometry\Point;
+use MagicMath\Geometry\Polygon;
+use MagicMath\Geometry\Rectangle;
 use ReflectionClass;
 use SVG\Nodes\Shapes\SVGCircle;
 use SVG\Nodes\Shapes\SVGLine;
@@ -19,6 +19,18 @@ use SVG\Nodes\SVGNode;
 use SVG\Nodes\Texts\SVGText;
 use SVG\SVG;
 
+/**
+ * Class EntityRelationshipDiagram
+ *
+ * This class is responsible for generating an Entity-Relationship Diagram (ERD) from a set of entity objects.
+ * It manages the layout, positioning, and visual representation of entities and their relationships. The class
+ * can produce the diagram in various formats, including SVG (`drawERD`), an HTML image map (`getImageMap`),
+ * and a markdown description (`getMarkdown`). It handles the arrangement of entities into a grid, processes
+ * foreign key relationships to draw connecting lines, and provides detailed visual components for tables,
+ * columns, and relationship cardinalities.
+ *
+ * @package AppBuilder\Util\Entity
+ */
 class EntityRelationshipDiagram //NOSONAR
 {
     const NAMESPACE_SEPARATOR = "\\";
