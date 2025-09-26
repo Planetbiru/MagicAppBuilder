@@ -45,7 +45,7 @@ try
     }
     else
     {
-        $appConfig->loadYamlFile($configTemplatePath);
+        $appConfig->loadYamlFile($configTemplatePath, false, true, true);
     }
     $app = $appConfig->getApplication();
 

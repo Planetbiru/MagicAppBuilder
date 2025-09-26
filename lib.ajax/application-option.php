@@ -166,17 +166,36 @@ try
          </div>
       </div>
       <!-- END Application Icon -->
-
-      <!-- BEGIN Trash -->
+      
+      <!-- BEGIN Application Dependency Update -->
       <div class="card">
          <div class="card-header" id="heading4">
             <h5 class="mb-0">
                <button type="button" class="btn" data-toggle="collapse" data-target="#collapse4" aria-expanded="true" aria-controls="collapse4">
-                  Data Restoration
+                  Dependency Update
                </button>
             </h5>
          </div>
          <div id="collapse4" class="collapse collapsed" aria-labelledby="heading4" data-parent="#accordion-option">
+            <div class="card-body">
+               <button type="button" class="btn btn-primary update-magic-object">Update MagicObject</button>
+               <button type="button" class="btn btn-primary update-magic-app">Update MagicApp</button>
+               <button type="button" class="btn btn-primary update-classes">Update Classes</button>
+            </div>
+         </div>
+      </div>
+      <!-- END Application Dependency -->
+
+      <!-- BEGIN Trash -->
+      <div class="card">
+         <div class="card-header" id="heading5">
+            <h5 class="mb-0">
+               <button type="button" class="btn" data-toggle="collapse" data-target="#collapse5" aria-expanded="true" aria-controls="collapse5">
+                  Data Restoration
+               </button>
+            </h5>
+         </div>
+         <div id="collapse5" class="collapse collapsed" aria-labelledby="heading5" data-parent="#accordion-option">
             <div class="card-body">
                <div class="data-container">
                   <form method="post" action="">
@@ -203,7 +222,6 @@ try
     
    <input type="hidden" name="application_id" value="<?php echo $applicationId;?>">
 </form>
-
 
 <?php
 }

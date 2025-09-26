@@ -3263,3 +3263,15 @@ Users can create their own files and logic in the application root without worry
 ## Add MagicMath
 
 The math class that was previously in MagicObject has been moved to MagicMath. MagicAppBuilder adds the MagicMath dependency to the application.
+
+## Enhancement: Application Option
+
+Added functionality:
+
+* Update MagicObject
+* Update MagicApp
+* Update Classes
+
+The **Update Classes** function will update classes from the `MagicAppTemplate` namespace, but not recursively. This is very useful for getting the latest version of existing classes.
+
+
