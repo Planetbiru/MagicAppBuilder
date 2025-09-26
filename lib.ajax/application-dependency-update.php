@@ -73,7 +73,7 @@ try
     
                 $sourceDir = dirname(__DIR__)."/inc.lib/classes/MagicAppTemplate";
                 $destinationDir = $appConf->getBaseApplicationDirectory()."/inc.lib/classes/".$appConf->getBaseApplicationNamespace();
-                $scriptGenerator->copyDirectory($sourceDir, $destinationDir, true, array('php'), function($source, $destination) use ($appConf) {
+                $scriptGenerator->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf) {
                     $content = file_get_contents($source);
                     $baseApplicationNamespace = $appConf->baseApplicationNamespace;
                     $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
