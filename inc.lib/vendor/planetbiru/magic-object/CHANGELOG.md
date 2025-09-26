@@ -1432,3 +1432,34 @@ $dsn = $pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS);
 
 `getDatabaseCredentialsFromPdo($pdo, $driver, $dbType)` will return an empty instance of `SecretObject`.
 
+## Enhancement: Improved `getDatabaseCredentialsFromPdo` Handling
+
+The method **`getDatabaseCredentialsFromPdo`** has been updated to better handle 
+PDO drivers that do not support certain attributes (e.g., `PDO::ATTR_CONNECTION_STATUS`).
+
+### Key Improvements
+
+* **Warning Suppression**  
+  Suppresses warnings when `PDO::getAttribute(PDO::ATTR_CONNECTION_STATUS)` 
+  is not supported by the active PDO driver (e.g., SQLite).
+
+* **Graceful Fallback**  
+  Introduced an optional `$databaseCredentials` parameter, which is used as a 
+  fallback source for host, port, and database name if they cannot be extracted 
+  from the PDO connection.
+
+* **Driver-Agnostic Behavior**  
+  Ensures compatibility across multiple database drivers (MySQL, PostgreSQL, SQLite, etc.) 
+  without causing runtime warnings.
+
+* **Consistent Output**  
+  Always returns a populated `SecretObject` with connection details.  
+  If extraction fails, either the provided `$databaseCredentials` is returned, 
+  or a new empty `SecretObject` is created.
+
+### Why It Matters?
+
+* Prevents noisy **PHP warnings** in environments where PDO drivers expose limited attributes.  
+* Provides a **more reliable and consistent mechanism** for retrieving database credentials.  
+* Ensures **backward compatibility** while making the method more robust in multi-database environments.
+
