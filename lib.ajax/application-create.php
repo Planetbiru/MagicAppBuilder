@@ -185,9 +185,14 @@ if(!file_exists($databaseDirectory))
     mkdir($databaseDirectory, 0755, true);
 }
 
+$systemModulePath = "/";
 $paths = $inputPost->getPaths();
 foreach ($paths as $idx => $val) {
     $paths[$idx]['active'] = $paths[$idx]['active'] == 'true';
+    if($paths[$idx]['active'] == 'true')
+    {
+        $systemModulePath = $paths[$idx]['path'];
+    }
 }
 
 $application->setBaseModuleDirectory($paths);
@@ -538,7 +543,7 @@ if($async)
 else
 {
     $scriptGenerator = new ScriptGenerator();
-    $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication);
+    $scriptGenerator->prepareApplication($builderConfig, $newApp->getApplication(), $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication, $systemModulePath);
 }
 
 try

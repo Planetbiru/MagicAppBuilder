@@ -31,7 +31,7 @@ $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "message-folder", $appLanguage->getMessageFolder());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
-$appInclude = new AppIncludeImpl($appConfig, $currentModule);
+$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);
 
 if(!$userPermission->allowedAccess($inputGet, $inputPost))
 {

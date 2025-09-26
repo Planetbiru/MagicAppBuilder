@@ -834,9 +834,10 @@ class ScriptGenerator //NOSONAR
      * @param bool $onlineInstallation Determines whether Composer should be run in online mode.
      * @param string $magicObjectVersion MagicObject version for offline installation.
      * @param MagicObject $entityApplication Entity application
+     * @param string $path The path to the system module
      * @return self Returns the current instance for method chaining.
      */
-    public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication)
+    public function prepareApplication($builderConfig, $appConf, $baseDir, $onlineInstallation, $magicObjectVersion, $entityApplication, $path = null)
     {
         $this->updateApplicationStatus($entityApplication, "installing-composer");
         $composer = new MagicObject($appConf->getComposer());
@@ -903,11 +904,30 @@ class ScriptGenerator //NOSONAR
         // Not recursive, only copy the files in the directory
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources";
         $destinationDir = $appConf->getBaseApplicationDirectory();
-        $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf) {
+        $depth = 0;
+        $dirname = '__DIR__';
+        if(isset($path))
+        {
+            $path = rtrim($path, "\\/");
+            $path = str_replace("\\", "/", $path);
+            if(!PicoStringUtil::startsWith($path, "/"))
+            {
+                $path = "/".$path;
+            }
+            $depth = substr_count($path, "/");
+            $destinationDir = $appConf->getBaseApplicationDirectory() . $path;
+            $dirname = "dirname(__DIR__, $depth)";
+        }
+        
+        $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf, $depth, $dirname) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
             $content = str_replace('MagicAdmin', $baseApplicationNamespace, $content);
+            if($depth > 0)
+            {
+                $content = str_replace('require_once __DIR__', 'require_once '.$dirname, $content);
+            }
             file_put_contents($destination, $content);
         });
 

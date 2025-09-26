@@ -3252,3 +3252,11 @@ The Redis Explorer provides powerful capabilities to view and modify data. For s
 * **Fixed session cookie lifetime handling**
   Due to differences in configuration naming, the session lifetime value was not being read correctly, causing the application to fall back to the default value. This issue has been resolved through an **upgrade of MagicObject**, which now correctly reads and applies the configured session lifetime.
 
+# MagicAppBuilder Version 1.24.0
+
+## Enhancement: More Flexible System Module Path
+
+Users can now freely define the system module path in the application instead of being restricted to the application root.  
+This provides greater flexibility for developing applications and integrating them with other systems.  
+Users can create their own files and logic in the application root without worrying about interfering with or mixing them with the system modules.
+

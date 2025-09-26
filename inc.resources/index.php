@@ -6,7 +6,7 @@ use MagicAppTemplate\AppIncludeImpl;
 require_once __DIR__ . "/inc.app/auth.php";
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "index", $appLanguage->getHome());
-$appInclude = new AppIncludeImpl($appConfig, $currentModule);
+$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);
 
 require_once $appInclude->mainAppHeader(__DIR__);
 
