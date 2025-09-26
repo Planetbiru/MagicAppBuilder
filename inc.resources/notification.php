@@ -28,7 +28,7 @@ $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "notification", $appLanguage->getNotification());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
-$appInclude = new AppIncludeImpl($appConfig, $currentModule);
+$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);
 
 $dataFilter = PicoSpecification::getInstance();
 $dataFilter->addAnd(PicoPredicate::getInstance()->equals(Field::of()->adminId, $currentAction->getUserId()));

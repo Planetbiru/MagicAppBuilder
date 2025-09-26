@@ -33,7 +33,7 @@ $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "admin", $appLanguage->getAdministrator());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
-$appInclude = new AppIncludeImpl($appConfig, $currentModule);
+$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);
 
 if(!$userPermission->allowedAccess($inputGet, $inputPost))
 {

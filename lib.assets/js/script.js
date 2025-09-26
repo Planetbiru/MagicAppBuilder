@@ -895,7 +895,14 @@ function getLocalStorageKey(key) {
  * Initialize all event handlers and elements
  */
 let initAll = function () {
-
+  $(document).on('change', '.application-path-selector', function(e){
+    if($(this)[0].checked)
+    {
+      $(this).closest('tr').siblings().each(function(){
+        $(this).find('.application-path-selector')[0].checked = false;
+      });
+    }
+  });
   $(document).on('click', '.update-trash-entity', function(e){
     let applicationId = $(this).closest('form').find('[name="application_id"]').val();
     let tables = [];
