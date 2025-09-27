@@ -100,4 +100,16 @@ input[type=number] {
   background-color: #212529;
   color: #e4e6e8;
   border-color: #444;
+}
+
+@media (max-width: 767.98px) {
+  .main-toolbar button {
+    margin-right: 0.25rem;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
+  .main-toolbar button:last-child {
+    margin-right: 0;
+  }
 }/*# sourceMappingURL=database-migration.css.map */

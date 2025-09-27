@@ -129,14 +129,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
                         <input type="number" class="form-control" data-path="maximumRecord" value="100" />
                     </div>
 
-                    <div class="toolbar d-flex flex-md-column flex-wrap">
+                    <div class="toolbar main-toolbar d-flex flex-md-column flex-wrap">
                         <button class="btn btn-primary generate mb-2" id="btnAutogenerate">
                             <?php echo $appLanguage->getAutogenerate();?>
                         </button>
                         <button class="btn btn-success ok mb-2" id="btnAddTable">
                             <?php echo $appLanguage->getAddTable();?>
                         </button>
-                        <button class="btn btn-outline-danger ghost" id="btnClearAll">
+                        <button class="btn btn-outline-danger ghost mb-2" id="btnClearAll">
                             <?php echo $appLanguage->getClear();?>
                         </button>
                     </div>
