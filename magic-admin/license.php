@@ -14,14 +14,16 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
-use MagicAppTemplate\AppEntityLanguageImpl;
+use MagicAdmin\AppEntityLanguageImpl;
+use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
-use MagicAppTemplate\AppIncludeImpl;
+use MagicAdmin\AppIncludeImpl;
 use MagicAppTemplate\AppUserPermissionImpl;
 use MagicAdmin\Entity\Data\License;
-use MagicAdmin\Entity\Data\LicenseTrash;
+use MagicObject\Exceptions\InvalidValueException;
+use MagicAdmin\AppValidatorMessage;
 use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
 
@@ -33,7 +35,7 @@ $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "license", $appLanguage->getLicense());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
-$appInclude = new AppIncludeImpl($appConfig, $currentModule);
+$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);
 
 if(!$userPermission->allowedAccess($inputGet, $inputPost))
 {
@@ -47,12 +49,13 @@ $dataFilter = null;
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$license = new License(null, $database);
+	$license->setLicenseId($inputPost->getLicenseId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$license->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$license->setLicenseType($inputPost->getLicenseType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$license->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$license->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$license->setAllowModification($inputPost->getAllowModification(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$license->setAllowCommercialUse($inputPost->getAllowCommercialUse(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$license->setAllowModification($inputPost->getAllowModification(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$license->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$license->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$license->setAdminCreate($currentAction->getUserId());
@@ -79,12 +82,13 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$license = new License(null, $database);
 	$updater = $license->where($specification);
 	$updater->with()
+		->setLicenseId($inputPost->getLicenseId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setName($inputPost->getName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setLicenseType($inputPost->getLicenseType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setDescription($inputPost->getDescription(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setUrl($inputPost->getUrl(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
-		->setAllowModification($inputPost->getAllowModification(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 		->setAllowCommercialUse($inputPost->getAllowCommercialUse(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
+		->setAllowModification($inputPost->getAllowModification(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 		->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true))
 		->setActive($inputPost->getActive(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true))
 	;
@@ -94,7 +98,11 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	try
 	{
 		$updater->update();
-		$newId = $inputPost->getLicenseId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+
+		// Update primary key value
+		$newId = $inputPost->getAppBuilderNewPkLicenseId();
+		$license = new License(null, $database);
+		$license->where($specification)->setLicenseId($newId)->update();
 		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->license_id, $newId);
 	}
 	catch(Exception $e)
@@ -181,16 +189,8 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 					->addAnd($dataFilter)
 					;
 				$license = new License(null, $database);
-				$license->findOne($specification);
-				if($license->issetLicenseId())
-				{
-					$licenseTrash = new LicenseTrash($license, $database);
-					$licenseTrash->setAdminDelete($currentAction->getUserId());
-					$licenseTrash->setTimeDelete($currentAction->getTime());
-					$licenseTrash->setIpDelete($currentAction->getIp());
-					$licenseTrash->insert();
-					$license->delete();
-				}
+				$license->where($specification)
+					->delete();
 			}
 			catch(Exception $e)
 			{
@@ -260,6 +260,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getLicenseId();?></td>
+						<td>
+							<input type="text" class="form-control" name="license_id" id="license_id" value="" autocomplete="off" required="required"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
 							<input type="text" class="form-control" name="name" id="name" value="" autocomplete="off" required="required"/>
@@ -284,15 +290,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAllowModification();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="allow_modification" id="allow_modification" value="1"/> <?php echo $appEntityLanguage->getAllowModification();?></label>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getAllowCommercialUse();?></td>
 						<td>
 							<label><input class="form-check-input" type="checkbox" name="allow_commercial_use" id="allow_commercial_use" value="1"/> <?php echo $appEntityLanguage->getAllowCommercialUse();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAllowModification();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="allow_modification" id="allow_modification" value="1"/> <?php echo $appEntityLanguage->getAllowModification();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -360,6 +366,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getLicenseId();?></td>
+						<td>
+							<input type="text" class="form-control" name="app_builder_new_pk_license_id" id="license_id" value="<?php echo $license->getLicenseId();?>" autocomplete="off" required="required"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td>
 							<input type="text" class="form-control" name="name" id="name" value="<?php echo $license->getName();?>" autocomplete="off" required="required"/>
@@ -384,15 +396,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAllowModification();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="allow_modification" id="allow_modification" value="1" <?php echo $license->createCheckedAllowModification();?>/> <?php echo $appEntityLanguage->getAllowModification();?></label>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getAllowCommercialUse();?></td>
 						<td>
 							<label><input class="form-check-input" type="checkbox" name="allow_commercial_use" id="allow_commercial_use" value="1" <?php echo $license->createCheckedAllowCommercialUse();?>/> <?php echo $appEntityLanguage->getAllowCommercialUse();?></label>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAllowModification();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="allow_modification" id="allow_modification" value="1" <?php echo $license->createCheckedAllowModification();?>/> <?php echo $appEntityLanguage->getAllowModification();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -454,7 +466,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$subqueryMap = array(
 		"adminCreate" => array(
 			"columnName" => "admin_create",
-			"entityName" => "AdminCreate",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "creator",
@@ -462,7 +474,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"adminEdit" => array(
 			"columnName" => "admin_edit",
-			"entityName" => "AdminEdit",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "editor",
@@ -492,6 +504,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getLicenseId();?></td>
+						<td><?php echo $license->getLicenseId();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getName();?></td>
 						<td><?php echo $license->getName();?></td>
 					</tr>
@@ -505,15 +521,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getUrl();?></td>
-						<td><?php echo $license->getUrl();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAllowModification();?></td>
-						<td><?php echo $license->optionAllowModification($appLanguage->getYes(), $appLanguage->getNo());?></td>
+						<td><a href="<?php echo $license->getUrl();?>" target="_blank"><?php echo $license->getUrl();?></a></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAllowCommercialUse();?></td>
 						<td><?php echo $license->optionAllowCommercialUse($appLanguage->getYes(), $appLanguage->getNo());?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAllowModification();?></td>
+						<td><?php echo $license->optionAllowModification($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
@@ -594,15 +610,17 @@ $appEntityLanguage = new AppEntityLanguageImpl(new License(), $appConfig, $curre
 
 $specMap = array(
 	"name" => PicoSpecification::filter("name", "fulltext"),
-	"licenseType" => PicoSpecification::filter("licenseType", "fulltext")
+	"allowCommercialUse" => PicoSpecification::filter("allowCommercialUse", "boolean"),
+	"allowModification" => PicoSpecification::filter("allowModification", "boolean")
 );
 $sortOrderMap = array(
+	"licenseId" => "licenseId",
 	"name" => "name",
 	"licenseType" => "licenseType",
 	"description" => "description",
 	"url" => "url",
-	"allowModification" => "allowModification",
 	"allowCommercialUse" => "allowCommercialUse",
+	"allowModification" => "allowModification",
 	"sortOrder" => "sortOrder",
 	"active" => "active"
 );
@@ -628,7 +646,7 @@ $dataLoader = new License(null, $database);
 $subqueryMap = array(
 "adminCreate" => array(
 	"columnName" => "admin_create",
-	"entityName" => "AdminCreate",
+	"entityName" => "AdminMin",
 	"tableName" => "admin",
 	"primaryKey" => "admin_id",
 	"objectName" => "creator",
@@ -636,7 +654,7 @@ $subqueryMap = array(
 ), 
 "adminEdit" => array(
 	"columnName" => "admin_edit",
-	"entityName" => "AdminEdit",
+	"entityName" => "AdminMin",
 	"tableName" => "admin",
 	"primaryKey" => "admin_id",
 	"objectName" => "editor",
@@ -659,8 +677,8 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getLicenseType() => $headerFormat->getLicenseType(),
 		$appEntityLanguage->getDescription() => $headerFormat->asString(),
 		$appEntityLanguage->getUrl() => $headerFormat->getUrl(),
-		$appEntityLanguage->getAllowModification() => $headerFormat->asString(),
 		$appEntityLanguage->getAllowCommercialUse() => $headerFormat->asString(),
+		$appEntityLanguage->getAllowModification() => $headerFormat->asString(),
 		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
 		$appEntityLanguage->getAdminCreate() => $headerFormat->asString(),
 		$appEntityLanguage->getAdminEdit() => $headerFormat->asString(),
@@ -678,8 +696,8 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->getLicenseType(),
 			$row->getDescription(),
 			$row->getUrl(),
-			$row->optionAllowModification($appLanguage->getYes(), $appLanguage->getNo()),
 			$row->optionAllowCommercialUse($appLanguage->getYes(), $appLanguage->getNo()),
+			$row->optionAllowModification($appLanguage->getYes(), $appLanguage->getNo()),
 			$row->getSortOrder(),
 			$row->issetCreator() ? $row->getCreator()->getName() : "",
 			$row->issetEditor() ? $row->getEditor()->getName() : "",
@@ -708,9 +726,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getLicenseType();?></span>
+					<span class="filter-label"><?php echo $appEntityLanguage->getAllowCommercialUse();?></span>
 					<span class="filter-control">
-						<input type="text" class="form-control" name="license_type" value="<?php echo $inputGet->getLicenseType(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, false, true);?>" autocomplete="off"/>
+							<select class="form-control" name="allow_commercial_use" data-value="<?php echo $inputGet->getAllowCommercialUse();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAllowCommercialUse(), 'yes');?>><?php echo $appLanguage->getLabelOptionYes();?></option>
+								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAllowCommercialUse(), 'no');?>><?php echo $appLanguage->getLabelOptionNo();?></option>
+							</select>
+					</span>
+				</span>
+				
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getAllowModification();?></span>
+					<span class="filter-control">
+							<select class="form-control" name="allow_modification" data-value="<?php echo $inputGet->getAllowModification();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAllowModification(), 'yes');?>><?php echo $appLanguage->getLabelOptionYes();?></option>
+								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAllowModification(), 'no');?>><?php echo $appLanguage->getLabelOptionNo();?></option>
+							</select>
 					</span>
 				</span>
 				
@@ -774,12 +807,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
+								<td data-col-name="license_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLicenseId();?></a></td>
 								<td data-col-name="name" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getName();?></a></td>
 								<td data-col-name="license_type" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLicenseType();?></a></td>
-								<td data-col-name="description" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDescription();?></a></td>
 								<td data-col-name="url" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUrl();?></a></td>
-								<td data-col-name="allow_modification" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowModification();?></a></td>
 								<td data-col-name="allow_commercial_use" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowCommercialUse();?></a></td>
+								<td data-col-name="allow_modification" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAllowModification();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="active" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getActive();?></a></td>
 							</tr>
@@ -803,24 +836,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td>
+								<td class="data-editor">
 									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->license_id, $license->getLicenseId());?>"><span class="fa fa-edit"></span></a>
 								</td>
 								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
-								<td>
+								<td class="data-viewer">
 									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->license_id, $license->getLicenseId());?>"><span class="fa fa-folder"></span></a>
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="name"><?php echo $license->getName();?></td>
-								<td data-col-name="license_type"><?php echo $license->getLicenseType();?></td>
-								<td data-col-name="description"><?php echo $license->getDescription();?></td>
-								<td data-col-name="url"><?php echo $license->getUrl();?></td>
-								<td data-col-name="allow_modification"><?php echo $license->optionAllowModification($appLanguage->getYes(), $appLanguage->getNo());?></td>
-								<td data-col-name="allow_commercial_use"><?php echo $license->optionAllowCommercialUse($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="license_id" class="data-column"><?php echo $license->getLicenseId();?></td>
+								<td data-col-name="name" class="data-column"><?php echo $license->getName();?></td>
+								<td data-col-name="license_type" class="data-column"><?php echo $license->getLicenseType();?></td>
+								<td data-col-name="url" class="data-column"><a href="<?php echo $license->getUrl();?>" target="_blank"><?php echo $license->getUrl();?></a></td>
+								<td data-col-name="allow_commercial_use" class="data-column"><?php echo $license->optionAllowCommercialUse($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="allow_modification" class="data-column"><?php echo $license->optionAllowModification($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $license->getSortOrder();?></td>
-								<td data-col-name="active"><?php echo $license->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="active" class="data-column"><?php echo $license->optionActive($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}

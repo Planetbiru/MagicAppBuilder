@@ -71,6 +71,7 @@ if($databaseConfigured)
             $databaseBuilder->connect();
         }
         
+        // Install MagicAppBuilder
         $appInstaller = new AppInstaller();
 
         if($databaseBuilder->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL)
@@ -118,6 +119,26 @@ if($databaseConfigured)
                 catch(Exception $e)
                 {
                     error_log($e->getMessage());
+                }
+
+                // Add Licenses
+                $licensePath = __DIR__ . "/license.sql";
+                if(file_exists($licensePath))
+                {
+                    try
+                    {
+                        $licenseSql = file_get_contents($licensePath);
+                        $queries = PicoDatabaseUtil::splitSql($licenseSql);
+                        foreach($queries as $query)
+                        {
+                            $query = $query['query'];
+                            $databaseBuilder->execute($query);
+                        }
+                    }
+                    catch(Exception $e)
+                    {
+                        error_log($e->getMessage());
+                    }
                 }
 
                 // Create adminId manually

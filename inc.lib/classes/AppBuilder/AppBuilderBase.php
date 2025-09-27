@@ -4066,16 +4066,16 @@ $subqueryMap = '.$referece.';
             else if($referenceData->getType() == 'truefalse')
             {
                 $map = (new MagicObject())
-                    ->setValue2((new MagicObject())->setValue('true')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getOptionLabelTrue();'.self::PHP_CLOSE_TAG))
-                    ->setValue3((new MagicObject())->setValue('false')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getOptionLabelFalse();'.self::PHP_CLOSE_TAG));
+                    ->setValue2((new MagicObject())->setValue('true')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getLabelOptionTrue();'.self::PHP_CLOSE_TAG))
+                    ->setValue3((new MagicObject())->setValue('false')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getLabelOptionFalse();'.self::PHP_CLOSE_TAG));
                 
                 $input = $this->appendOptionList($dom, $input, $map, $selected);
             }
             else if($referenceData->getType() == 'yesno')
             {
                 $map = (new MagicObject())
-                    ->setValue2((new MagicObject())->setValue('yes')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getOptionLabelYes();'.self::PHP_CLOSE_TAG))
-                    ->setValue3((new MagicObject())->setValue('no')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getOptionLabelNo();'.self::PHP_CLOSE_TAG));
+                    ->setValue2((new MagicObject())->setValue('yes')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getLabelOptionYes();'.self::PHP_CLOSE_TAG))
+                    ->setValue3((new MagicObject())->setValue('no')->setLabel(self::PHP_OPEN_TAG.'echo $appLanguage->getLabelOptionNo();'.self::PHP_CLOSE_TAG));
                 
                 $input = $this->appendOptionList($dom, $input, $map, $selected);
             }

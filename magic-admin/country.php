@@ -402,7 +402,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$subqueryMap = array(
 		"adminCreate" => array(
 			"columnName" => "admin_create",
-			"entityName" => "AdminCreate",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "creator",
@@ -410,7 +410,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"adminEdit" => array(
 			"columnName" => "admin_edit",
-			"entityName" => "AdminEdit",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "editor",
@@ -555,7 +555,7 @@ $dataLoader = new Country(null, $database);
 $subqueryMap = array(
 "adminCreate" => array(
 	"columnName" => "admin_create",
-	"entityName" => "AdminCreate",
+	"entityName" => "AdminMin",
 	"tableName" => "admin",
 	"primaryKey" => "admin_id",
 	"objectName" => "creator",
@@ -563,7 +563,7 @@ $subqueryMap = array(
 ), 
 "adminEdit" => array(
 	"columnName" => "admin_edit",
-	"entityName" => "AdminEdit",
+	"entityName" => "AdminMin",
 	"tableName" => "admin",
 	"primaryKey" => "admin_id",
 	"objectName" => "editor",
