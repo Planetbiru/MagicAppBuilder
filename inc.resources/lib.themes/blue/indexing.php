@@ -3,6 +3,8 @@
 $themeAssetsPath = $appConfig->getAssets();
 $directories = $appConfig->getApplication()->getBaseModuleDirectory();
 
+$appDocumentTitle = trim($appLanguage->getIndex() . " | " . $appConfig->getApplication()->getName(), " | ");
+
 ?><!DOCTYPE html>
 <html lang="<?php echo $currentUser->getLanguageId();?>">
 
@@ -10,7 +12,7 @@ $directories = $appConfig->getApplication()->getBaseModuleDirectory();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f8f9fa">
-    <title><?php echo $appLanguage->getIndex();?></title>
+    <title><?php echo $appDocumentTitle;?></title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="<?php echo $themeAssetsPath;?>css/bootstrap.min.css">

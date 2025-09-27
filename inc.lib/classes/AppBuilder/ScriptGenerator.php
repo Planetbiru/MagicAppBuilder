@@ -937,7 +937,23 @@ class ScriptGenerator //NOSONAR
             $content = str_replace('MagicAdmin', $baseApplicationNamespace, $content);
             if($depth > 0)
             {
-                $content = str_replace('require_once __DIR__', 'require_once '.$dirname, $content);
+                // Replace __DIR__
+                $pattern = '/require_once\s+__DIR__\s*\.\s*[\'"]\/inc\.app\/auth\.php[\'"]\s*;/';
+                $replace = 'require_once ' . $dirname . ' . "/inc.app/auth.php";';
+                $content = preg_replace($pattern, $replace, $content);
+
+                $pattern = '/require_once\s+__DIR__\s*\.\s*[\'"]\/inc\.app\/app\.php[\'"]\s*;/';
+                $replace = 'require_once ' . $dirname . ' . "/inc.app/app.php";';
+                $content = preg_replace($pattern, $replace, $content);
+
+                $pattern = '/require_once\s+__DIR__\s*\.\s*[\'"]\/inc\.app\/session\.php[\'"]\s*;/';
+                $replace = 'require_once ' . $dirname . ' . "/inc.app/session.php";';
+                $content = preg_replace($pattern, $replace, $content);
+
+                $pattern = '/require_once\s+__DIR__\s*\.\s*[\'"]\/inc\.app\/login\-form\.php[\'"]\s*;/';
+                $replace = 'require_once ' . $dirname . ' . "/inc.app/login-form.php";';
+                $content = preg_replace($pattern, $replace, $content);
+
             }
             file_put_contents($destination, $content);
         });
