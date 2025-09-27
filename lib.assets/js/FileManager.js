@@ -1193,6 +1193,25 @@ function initDatabaseOnce(file) {
 }
 
 /**
+ * Retrieves the `data-path` attribute from the closest ancestor element
+ * that has this attribute, starting from the event target.
+ *
+ * This function is useful for extracting file or directory paths
+ * associated with UI elements that trigger events.
+ *
+ * @param {Event} event - The DOM event (e.g., click event) that triggered the call.
+ * @returns {string|null} The value of the `data-path` attribute, or `null` if no
+ *                        ancestor element with `data-path` is found.
+ * @example
+ * // Assuming an element like <span data-path="/path/to/file.txt">Click me</span>
+ * // getPathFromClick(clickEvent) would return "/path/to/file.txt"
+ */
+function getPathFromClick(event) {
+  const el = event.target.closest('[data-path]');
+  return el ? el.dataset.path : null;
+}
+
+/**
  * Run the database initialization logic after all SQLite scripts have been loaded.
  *
  * This function updates the database display, sets the current database name,
@@ -1203,9 +1222,16 @@ function initDatabaseOnce(file) {
  */
 function runDatabaseInit(file) {
     // Update the database display content
-    let selctor = document.querySelector('.database-display');
-    selctor.innerHTML = createDatabaseResource();
-
+    let selector = document.querySelector('.database-display');
+    selector.innerHTML = createDatabaseResource(file);
+    selector.querySelector('.sql-file-source').addEventListener('click', function(event) {
+      const path = getPathFromClick(event);
+      if (!path) {
+        return;
+      }
+      path = decodeURIComponent(path);
+      downloadFile(path, 'file');
+    });
     // Set the current database name from the file name
     curretDatabaseName = getFileBaseName(file);
 
@@ -1558,4 +1584,3 @@ function initCodeMirror() {
     let h = document.innerHeight - 160;
     fileManagerEditor.setSize(w, h);
 }
-

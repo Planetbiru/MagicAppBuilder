@@ -1170,6 +1170,12 @@ h3 {
   margin: 0;
   list-style-type: none;
   white-space: nowrap;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+#dir-tree li {
+  width: -moz-fit-content;
+  width: fit-content;
 }
 #dir-tree li ul {
   margin: 0;
@@ -1181,6 +1187,11 @@ h3 {
   margin-left: 10px;
   list-style-type: none;
   white-space: nowrap;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+#dir-tree li:hover {
+  color: #0055b1;
 }
 #dir-tree span {
   white-space: nowrap;
