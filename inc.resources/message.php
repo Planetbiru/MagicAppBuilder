@@ -33,7 +33,7 @@ $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "message", $appLanguage->getMessage());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
-$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);
+$appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 $dataFilter = PicoSpecification::getInstance()
 ->addOr(

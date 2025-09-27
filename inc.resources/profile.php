@@ -29,7 +29,7 @@ $inputPost = new InputPost();
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/", "profile", $appLanguage->getAdministratorProfile());
 $userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);
-$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);
+$appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 /**
  * Checks if a given hashed password has been used previously by the admin.

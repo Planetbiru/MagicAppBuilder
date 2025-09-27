@@ -942,6 +942,16 @@ class ScriptGenerator //NOSONAR
             file_put_contents($destination, $content);
         });
 
+        if($depth > 0)
+        {
+            // Create index.php in root directory
+            $content = '<'.'?'.'php
+
+require_once __DIR__ . "/inc.app/indexing.php";';
+            $destination = $appConf->getBaseApplicationDirectory() . "/index.php";
+            file_put_contents($destination, $content);
+        }
+
         $this->updateApplicationStatus($entityApplication, "finish");
         return $this;
     }

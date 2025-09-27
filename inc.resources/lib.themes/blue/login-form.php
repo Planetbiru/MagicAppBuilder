@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<?php $themeAssetsPath = $appConfig->getAssets();?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">

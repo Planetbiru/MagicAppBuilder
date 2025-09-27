@@ -130,7 +130,7 @@ class ScriptGeneratorMicroservices extends ScriptGenerator
         $declaration[] = '';
         $declaration[] = '$currentModule = new PicoModule($appConfig, $database, $appModule, "'.$request->getTarget().'", "'.$request->getModuleCode().'", $appLanguage->get'.$upperModuleName.'());';
         $declaration[] = '$userPermission = new AppUserPermissionImpl($appConfig, $database, $appUserRole, $currentModule, $currentUser);';
-        $declaration[] = '$appInclude = new AppIncludeImpl($appConfig, $currentModule, __DIR__);';
+        $declaration[] = '$appInclude = new AppIncludeImpl($appConfig, $currentModule);';
         $declaration[] = '';
 
         $declaration[] = 'if(!$userPermission->allowedAccess($inputGet, $inputPost))'."\r\n".
