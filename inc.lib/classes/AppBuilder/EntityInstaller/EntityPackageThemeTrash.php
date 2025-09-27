@@ -128,7 +128,7 @@ class EntityPackageThemeTrash extends MagicObject
 	 * 
 	 * @JoinColumn(name="admin_create", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Creator")
-	 * @var AdminCreate
+	 * @var AdminMin
 	 */
 	protected $creator;
 
@@ -147,7 +147,7 @@ class EntityPackageThemeTrash extends MagicObject
 	 * 
 	 * @JoinColumn(name="admin_edit", referenceColumnName="admin_id", referenceTableName="admin")
 	 * @Label(content="Editor")
-	 * @var AdminEdit
+	 * @var AdminMin
 	 */
 	protected $editor;
 

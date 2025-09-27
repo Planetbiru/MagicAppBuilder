@@ -537,7 +537,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		),
 		"adminCreate" => array(
 			"columnName" => "admin_create",
-			"entityName" => "AdminCreate",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "creator",
@@ -545,7 +545,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"adminEdit" => array(
 			"columnName" => "admin_edit",
-			"entityName" => "AdminEdit",
+			"entityName" => "AdminMin",
 			"tableName" => "admin",
 			"primaryKey" => "admin_id",
 			"objectName" => "editor",
