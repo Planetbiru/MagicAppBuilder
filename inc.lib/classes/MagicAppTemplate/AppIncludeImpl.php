@@ -37,6 +37,59 @@ class AppIncludeImpl extends AppInclude
         $rootDirectory = realpath($rootDirectory);
         if(isset($currentDirectory) && !empty($currentDirectory))
         {
+            self::updateAssetsPath($appConfig, $rootDirectory, $currentDirectory);
+        }
+
+        parent::__construct($appConfig, $currentModule, $rootDirectory);
+    }
+
+    /**
+     * Updates the asset path in the application configuration by prepending relative directory traversal strings (`../`).
+     *
+     * This static method calculates the directory depth of the current script relative to the project root
+     * and adjusts the `assets` path in the `$appConfig` object accordingly. This ensures that asset URLs
+     * are resolved correctly from any nested directory.
+     *
+     * @param SecretObject $appConfig The application configuration object, which will be modified.
+     * @param string $currentDirectory The absolute path of the directory where the script is executing.
+     * @param string|null $rootDirectory The absolute path of the project's root directory. If null, it will be determined automatically.
+     * @return void
+     */
+    public static function updateAssetsPath($appConfig, $currentDirectory, $rootDirectory = null)
+    {
+        $currentDirectory = realpath($currentDirectory);
+        $depth = self::getAccessorDepth($currentDirectory, $rootDirectory);
+        if($depth > 0)
+        {
+            // Prepend "../" according to the depth
+            $prefix = str_repeat('../', $depth);
+            $appConfig->setAssets($prefix . $appConfig->getAssets());
+        }
+    }
+
+    /**
+     * Calculates the directory depth of a given path relative to the project's root directory.
+     *
+     * This method determines how many levels deep the `$currentDirectory` is from the `$rootDirectory`.
+     * The result is used to construct relative paths (e.g., for assets). For example, if the root is `/app`
+     * and the current directory is `/app/modules/admin`, the depth is 2.
+     *
+     * @param string|null $currentDirectory The absolute path of the directory to check.
+     * @param string|null $rootDirectory The absolute path of the project's root directory. If null, it will be determined automatically.
+     * @return int The calculated depth as an integer. Returns 0 if the current directory is the root or not within it.
+     */
+    public static function getAccessorDepth($currentDirectory = null, $rootDirectory = null)
+    {
+        $depth = 0;
+        if(!isset($rootDirectory) || empty($rootDirectory))
+        {
+            $rootDirectory = dirname(dirname(dirname(__DIR__)));
+        }
+
+        // Normalize paths
+        $rootDirectory = realpath($rootDirectory);
+        if(isset($currentDirectory) && !empty($currentDirectory))
+        {
             $currentDirectory = realpath($currentDirectory);
 
             // Check if the current directory is inside the root directory
@@ -47,15 +100,9 @@ class AppIncludeImpl extends AppInclude
                 if (!empty($relativePath)) {
                     // Count the depth (number of subdirectories)
                     $depth = substr_count($relativePath, DIRECTORY_SEPARATOR) + 1;
-
-                    // Prepend "../" according to the depth
-                    $prefix = str_repeat('../', $depth);
-
-                    $appConfig->setAssets($prefix . $appConfig->getAssets());
                 }
             }
         }
-
-        parent::__construct($appConfig, $currentModule, $rootDirectory);
+        return $depth;
     }
 }

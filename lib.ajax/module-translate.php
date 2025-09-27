@@ -241,6 +241,7 @@ if($inputPost->getUserAction() == 'get')
         'message_remember_me',
         'profile',
         'setting',
+        'index',
         'login',
         'login_form',
         'logout',
@@ -276,7 +277,6 @@ if($inputPost->getUserAction() == 'get')
         'invalid_credentials',
         'label_username',
         'label_password',
-
     );
 
     $response = array();

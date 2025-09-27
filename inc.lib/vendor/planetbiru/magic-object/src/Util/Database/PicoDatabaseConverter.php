@@ -505,7 +505,7 @@ class PicoDatabaseConverter // NOSONAR
                     }
                     // For SQLite and SQL Server, return as integer 0/1
                     if (stripos($dialect, 'sqlite') !== false || stripos($dialect, 'sqlserver') !== false) {
-                        return $value === true ? 1 : 0;
+                        return ($value === true || $value === '1' || $value === 1) ? 1 : 0;
                     }
                     return ($value === true || $value === '1' || $value === 1) ? "TRUE" : "FALSE";
             case 'bit':

@@ -1,37 +1,24 @@
 <?php
 
-use MagicApp\AppUserActivityLogger;
-use MagicApp\Field;
+use MagicAppTemplate\AppAccountSecurity;
+use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\AppLanguageImpl;
 use MagicAppTemplate\ApplicationMenu;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
-use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
-use MagicAppTemplate\Entity\App\AppModuleImpl;
-use MagicAppTemplate\Entity\App\AppUserActivityImpl;
-use MagicObject\Database\PicoPredicate;
-use MagicObject\Database\PicoSpecification;
 use MagicObject\SecretObject;
 use MagicObject\SetterGetter;
 use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
-use MagicAppTemplate\AppAccountSecurity;
-use MagicAppTemplate\AppIncludeImpl;
 
 require_once __DIR__ . "/app.php";
 require_once __DIR__ . "/session.php";
 
-$appModule = new AppModuleImpl(null, $database);
-$appUserRole = new AppAdminRoleImpl(null, $database);
-$currentUser = new AppAdminImpl(null, $database);
-
-$languageId = 'en';
-
 AppIncludeImpl::updateAssetsPath($appConfig, dirname(realpath($_SERVER['DOCUMENT_ROOT'] . $_SERVER['PHP_SELF'])));
 
+$currentUser = new AppAdminImpl(null, $database);
 if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true")
 {
-    $currentUser = new AppAdminImpl(null, $database);
     $currentUser->setAdminId("superuser");
     $currentUser->setUsername("superuser");
     $hashPassword2 = AppAccountSecurity::generateHash($appConfig, "superuser", 2);
@@ -45,38 +32,7 @@ if($appConfig->getBypassRole() === true || $appConfig->getBypassRole() === "true
     $currentUser->setLanguageId($languageId);
     $currentUser->setActive(true);
 }
-else 
-{
-    try
-    {
-        $appSessionUsername = $sessions->username;
-        $appSessionPassword = $sessions->userPassword;
-        if(empty($appSessionUsername) || empty($appSessionPassword))
-        {
-            require_once __DIR__ . "/login-form.php";
-            exit();
-        }
-        else
-        {
-            $hashPassword = AppAccountSecurity::generateHash($appConfig, $appSessionPassword, 1);   
-            $appSpecsLogin = PicoSpecification::getInstance()
-                ->addAnd(PicoPredicate::getInstance()->like(PicoPredicate::functionLower(Field::of()->username), strtolower($appSessionUsername)))
-                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->password, $hashPassword))
-                ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->active, true))
-                ->addAnd(PicoSpecification::getInstance()
-                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, false))
-                    ->addOr(PicoPredicate::getInstance()->equals(Field::of()->blocked, null))
-                )
-            ;
-            $currentUser->findOne($appSpecsLogin); 
-        }  
-    }
-    catch(Exception $e)
-    {
-        require_once __DIR__ . "/login-form.php";
-        exit();
-    }
-}
+
 $currentAction = new SetterGetter();
 $currentAction->setTime(date('Y-m-d H:i:s'));
 $currentAction->setIp($_SERVER['REMOTE_ADDR']);
@@ -141,4 +97,5 @@ if(file_exists($appMenuPath))
 $curretHref = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
 $appMenu = new ApplicationMenu($database, $appConfig, $currentUser, $appMenuData->valueArray(), $curretHref);
 
-$userActivityLogger = new AppUserActivityLogger($appConfig, new AppUserActivityImpl(null, $database));
+
+require_once dirname(__DIR__) . "/lib.themes/$appCurrentTheme/indexing.php";

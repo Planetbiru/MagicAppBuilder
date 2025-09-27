@@ -1,6 +1,6 @@
-# PHP Math Project
+# PHP MagicMath Project
 
-This repository contains a collection of PHP classes and functions to perform various mathematical operations. The project is designed to be a simple and easy-to-use library.
+This repository contains a collection of PHP classes and functions to perform various Mathematical operations. The project is designed to be a simple and easy-to-use library.
 
 ## Requirements
 
@@ -11,8 +11,8 @@ This repository contains a collection of PHP classes and functions to perform va
 
 1. Clone this repository to your local machine:
     ```bash
-    git clone git@github.com:Planetbiru/Math.git
-    cd Math
+    git clone git@github.com:Planetbiru/MagicMath.git
+    cd MagicMath
     ```
 
 2. Install the project dependencies using Composer:

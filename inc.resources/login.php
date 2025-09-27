@@ -2,6 +2,7 @@
 
 use MagicApp\Field;
 use MagicAppTemplate\AppAccountSecurity;
+use MagicAppTemplate\AppIncludeImpl;
 use MagicAppTemplate\Entity\App\AppAdminImpl;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
@@ -14,7 +15,7 @@ require_once __DIR__ . "/inc.app/session.php";
 $inputPost = new InputPost();
 
 $currentUser = new AppAdminImpl(null, $database);
-
+AppIncludeImpl::updateAssetsPath($appConfig, dirname(realpath($_SERVER['DOCUMENT_ROOT'] . $_SERVER['PHP_SELF'])));
 if($inputPost->getUsername() != null && $inputPost->getPassword() != null)
 {
     $userLoggedIn = false;
