@@ -111,3 +111,15 @@ input[type=number] {
     border-color: #444;
   }
 }
+
+@media (max-width: 767.98px) {
+  .main-toolbar button{
+    margin-right: 0.25rem;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    &:last-child{
+      margin-right: 0;
+    }
+  }
+}
