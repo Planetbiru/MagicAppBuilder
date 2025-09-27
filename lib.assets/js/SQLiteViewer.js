@@ -410,9 +410,10 @@ function sqliteDownloadSql() {
  *  </div>
  *
  * @function createDatabaseResource
+ * @param {string} path - File path
  * @returns {string} HTML string representing the database resource UI layout.
  */
-function createDatabaseResource() {
+function createDatabaseResource(path) {
   return `
     <div id="sqlite-app-container">
       <aside id="sqlite-table-sidebar" class="sqlite-sidebar">
@@ -426,7 +427,7 @@ function createDatabaseResource() {
         <div class="sqlite-input-area sqlite-header-section">
           <button class="btn btn-primary" id="sqliteDownloadSqlButton" onclick="sqliteDownloadSql()" disabled>Export Table to SQL</button>
           <button class="btn btn-primary" id="sqliteDownloadAllSqlButton" onclick="sqliteDownloadAllSql()" disabled>Export Database to SQL</button>
-          <span class="sql-file-source btn btn-secondary"><span class="sqlite-file-path"></span></span>
+          <span class="sql-file-source btn btn-secondary" data-path="${encodeURIComponent(path)}"><span class="sqlite-file-path"></span></span>
         </div>
         <div id="sqlite-output"></div>
       </main>
