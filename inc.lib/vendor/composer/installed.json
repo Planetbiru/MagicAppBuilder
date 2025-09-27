@@ -186,15 +186,15 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicMath.git",
-                "reference": "a304fd390b4debf443534938e2a7c28de1249f39"
+                "reference": "fbe6fd769e0ebd9b1ba9c887cdbc0a634c11bc1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicMath/zipball/a304fd390b4debf443534938e2a7c28de1249f39",
-                "reference": "a304fd390b4debf443534938e2a7c28de1249f39",
+                "url": "https://api.github.com/repos/Planetbiru/MagicMath/zipball/fbe6fd769e0ebd9b1ba9c887cdbc0a634c11bc1b",
+                "reference": "fbe6fd769e0ebd9b1ba9c887cdbc0a634c11bc1b",
                 "shasum": ""
             },
-            "time": "2025-09-26T12:57:29+00:00",
+            "time": "2025-09-27T09:39:01+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -225,18 +225,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "d9773ee4df21114dddc84b64040e3da09e3c1b24"
+                "reference": "213b6c6462fe3bbfc16a31d800306e8694d9f804"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/d9773ee4df21114dddc84b64040e3da09e3c1b24",
-                "reference": "d9773ee4df21114dddc84b64040e3da09e3c1b24",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/213b6c6462fe3bbfc16a31d800306e8694d9f804",
+                "reference": "213b6c6462fe3bbfc16a31d800306e8694d9f804",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4"
             },
-            "time": "2025-09-26T04:30:45+00:00",
+            "time": "2025-09-27T09:35:54+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {

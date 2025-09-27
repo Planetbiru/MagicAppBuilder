@@ -1407,17 +1407,17 @@ In this release, several math-related classes have been **removed** from MagicOb
 
 These classes are **not discontinued**, but have been moved into a **new dedicated repository**:
 
-👉 [Planetbiru/Math](https://github.com/Planetbiru/Math)
+👉 [Planetbiru/MagicMath](https://github.com/Planetbiru/MagicMath)
 
 Developers who rely on these math utilities should install the new package separately:
 
 ```bash
-composer require planetbiru/math
+composer require planetbiru/magic-math
 ```
 
 ## New Feature: PDO Connection Verification Method
 
-A new method isPdoConnected() has been introduced to allow developers to verify not only the TCP-level connection, but also the ability of PHP to execute SQL statements on the database.
+A new method `isPdoConnected()` has been introduced to allow developers to verify not only the TCP-level connection, but also the ability of PHP to execute SQL statements on the database.
 
 Here’s the corrected version with improved grammar and clarity:
 
