@@ -54,7 +54,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getPassword();?></label>
-                            <input type="text" class="form-control" data-path="databaseTarget.password" />
+                            <input type="password" class="form-control" data-path="databaseTarget.password" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -100,7 +100,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                         </div>
                         <div class="form-group col">
                             <label><?php echo $appLanguage->getPassword();?></label>
-                            <input type="text" class="form-control" data-path="databaseSource.password" />
+                            <input type="password" class="form-control" data-path="databaseSource.password" />
                         </div>
                     </div>
                     <div class="form-row">

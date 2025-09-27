@@ -83,23 +83,23 @@ require_once $appInclude->mainAppHeader(__DIR__);
       <form method="post">
         <div class="form-group">
           <label><?php echo $appLanguage->getRedisHost();?></label>
-          <input type="text" name="redis_host" class="form-control" value="localhost" required>
+          <input type="text" name="redis_host" class="form-control" value="localhost" autocomplete="off" required>
         </div>
         <div class="form-group">
           <label><?php echo $appLanguage->getRedisPort();?></label>
-          <input type="number" name="redis_port" class="form-control" value="6379" min="1" required>
+          <input type="number" name="redis_port" class="form-control" value="6379" min="1" autocomplete="off" required>
         </div>
         <div class="form-group">
           <label><?php echo $appLanguage->getRedisPassword();?></label>
-          <input type="password" name="redis_password" class="form-control">
+          <input type="password" name="redis_password" class="form-control" autocomplete="off">
         </div>
         <div class="form-group">
           <label><?php echo $appLanguage->getDefaultDatabase();?></label>
-          <input type="number" name="redis_db" class="form-control" value="0" min="0">
+          <input type="number" name="redis_db" class="form-control" value="0" min="0" autocomplete="off">
         </div>
         <div class="form-group">
           <label><?php echo $appLanguage->getTimeOut();?></label>
-          <input type="number" step="0.1" min="0" name="redis_timeout" class="form-control" value="5.0">
+          <input type="number" step="0.1" min="0" name="redis_timeout" class="form-control" value="5.0" autocomplete="off">
         </div>
         <button type="submit" name="login" value="1" class="btn btn-primary"><?php echo $appLanguage->getButtonConnect();?></button>
       </form>
