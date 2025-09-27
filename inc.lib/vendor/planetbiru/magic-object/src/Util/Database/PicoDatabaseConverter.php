@@ -509,7 +509,7 @@ class PicoDatabaseConverter // NOSONAR
                     }
                     return ($value === true || $value === '1' || $value === 1) ? "TRUE" : "FALSE";
             case 'bit':
-                return $value ? 1 : 0;
+                return ($value === true || $value === '1' || $value === 1) ? 1 : 0;
             case 'float':
             case 'real':
             case 'double':
