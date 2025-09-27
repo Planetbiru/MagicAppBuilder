@@ -589,7 +589,7 @@ class PicoDatabaseConverter // NOSONAR
 
             case 'bool':
             case 'boolean':
-                return $value ? '1' : '0';
+                return ($value === true || $value === '1' || $value === 1) ? '1' : '0';
 
             case 'array':
                 // Convert array to JSON string and escape
