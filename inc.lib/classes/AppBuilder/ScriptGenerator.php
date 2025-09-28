@@ -1005,6 +1005,34 @@ class ScriptGenerator //NOSONAR
 require_once __DIR__ . "/inc.app/indexing.php";';
             $destination = $appConf->getBaseApplicationDirectory() . "/index.php";
             file_put_contents($destination, $content);
+
+            $htaccess = $appConf->getBaseApplicationDirectory() . "/.htaccess";
+            error_log("PATH = $htaccess");
+            if(file_exists($htaccess))
+            {
+                error_log("Fix HTACCESS");
+                $htaccessContent = file_get_contents($htaccess);
+                $filesToComment = [
+                    'login\.php',
+                    'logout\.php',
+                    'profile\.php',
+                    'reset\-password\.php',
+                ];
+
+                foreach ($filesToComment as $file) {
+                    // ^(\s*)   = simpan indentasi
+                    // (?!#)    = pastikan belum ada #
+                    // (RewriteRule.*<file>.*) = seluruh baris RewriteRule yg ada file tsb
+                    $pattern = '/^(\s*)(?!#)(RewriteRule\s+.+\b' . $file . '\b.*)$/mi';
+                    $htaccessContent = preg_replace($pattern, '$1# $2', $htaccessContent);
+                }
+
+
+                error_log($htaccessContent);
+                
+
+                file_put_contents($htaccess, $htaccessContent);
+            }
         }
         foreach($appConf->getBaseModuleDirectory() as $dir)
         {
