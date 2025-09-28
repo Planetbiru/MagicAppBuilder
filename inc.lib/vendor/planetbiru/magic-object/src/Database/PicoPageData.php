@@ -281,6 +281,75 @@ class PicoPageData // NOSONAR
     }
 
     /**
+     * Get the result as an array of stdClass objects or plain values.
+     *
+     * This method converts the internal result set, which may consist of MagicObject instances,
+     * into a plain PHP array. Each MagicObject is recursively converted to a stdClass object
+     * or a scalar value.
+     *
+     * @return array The result set as a plain PHP array.
+     */
+    public function getResultAsArray()
+    {
+        return $this->magicObjectToArray($this->result);
+    }
+
+    /**
+     * Recursively converts a MagicObject, an object, or an array of them into a plain PHP array or stdClass object.
+     *
+     * This method is useful for serialization or for passing the data to components
+     * that expect standard PHP types instead of MagicObject instances.
+     *
+     * @param mixed $data The data to convert. Can be a MagicObject, an array, an object, or a scalar value.
+     * @return mixed The converted data as a plain PHP array, stdClass object, or scalar value.
+     */
+    protected function magicObjectToArray($data)
+    {
+        // Null or scalar -> return directly
+        if (is_null($data) || is_scalar($data)) {
+            return $data;
+        }
+
+        // Array -> recursive
+        if (is_array($data)) {
+            return array_map(function ($item) {
+                return $this->magicObjectToArray($item);
+            }, $data);
+        }
+
+        // Object
+        if (is_object($data)) {
+            // If there is a toArray method in MagicObject
+            if (method_exists($data, 'toArray')) {
+                return $this->magicObjectToArray($data->toArray());
+            }
+
+            // Get public properties
+            $vars = get_object_vars($data);
+
+            // If empty, try using Reflection (for protected/private properties)
+            if (empty($vars)) {
+                $reflect = new \ReflectionClass($data);
+                foreach ($reflect->getProperties() as $prop) {
+                    $prop->setAccessible(true);
+                    $vars[$prop->getName()] = $prop->getValue($data);
+                }
+            }
+
+            // Convert property values recursively
+            $obj = new \stdClass();
+            foreach ($vars as $k => $v) {
+                $obj->$k = $this->magicObjectToArray($v);
+            }
+            return $obj;
+        }
+
+        // Default fallback
+        return $data;
+    }
+
+
+    /**
      * Get the current page number in the pagination context.
      *
      * @return int Current page number.
