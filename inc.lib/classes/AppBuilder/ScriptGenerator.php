@@ -922,7 +922,7 @@ class ScriptGenerator //NOSONAR
         $originalDestionationDir = $destinationDir;
         $depth = 0;
         $dirname = '__DIR__';
-        if(isset($path))
+        if(isset($path) && !empty($path) && trim($path, "\\/") != "")
         {
             $path = rtrim($path, "\\/");
             $path = str_replace("\\", "/", $path);
@@ -930,7 +930,7 @@ class ScriptGenerator //NOSONAR
             {
                 $path = "/".$path;
             }
-            $depth = substr_count($path, "/");
+            $depth = substr_count(trim($path, "\\/")."/", "/");
             $destinationDir = $appConf->getBaseApplicationDirectory() . $path;
             
             for($i = 0; $i < $depth; $i++)
@@ -938,7 +938,6 @@ class ScriptGenerator //NOSONAR
                 $dirname = "dirname($dirname)";
             }
         }
-
         
         $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf, $depth, $dirname, $originalDestionationDir) {
             $content = file_get_contents($source);
@@ -986,8 +985,11 @@ class ScriptGenerator //NOSONAR
             }
 
             $sourcePath = $sourceDir . DIRECTORY_SEPARATOR . $file;
-            $destinationPath = $originalDestionationDir . DIRECTORY_SEPARATOR . $file;
-            copy($sourcePath, $destinationPath);
+            if(is_file($sourcePath))
+            {
+                $destinationPath = $originalDestionationDir . DIRECTORY_SEPARATOR . $file;
+                copy($sourcePath, $destinationPath);
+            }
         }
 
         if($depth > 0)
