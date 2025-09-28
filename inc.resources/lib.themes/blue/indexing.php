@@ -5,6 +5,8 @@ $directories = $appConfig->getApplication()->getBaseModuleDirectory();
 
 $appDocumentTitle = trim($appLanguage->getIndex() . " | " . $appConfig->getApplication()->getName(), " | ");
 
+$depth = substr_count($themeAssetsPath, "../");
+
 ?><!DOCTYPE html>
 <html lang="<?php echo $currentUser->getLanguageId();?>">
 
@@ -50,6 +52,10 @@ $appDocumentTitle = trim($appLanguage->getIndex() . " | " . $appConfig->getAppli
                     $dir = "";
                 }
                 $label = $directory->getName();
+                for($i = 0; $i < $depth; $i++)
+                {
+                    $dir = "../" . $dir;
+                }
             ?>
                 <a href="<?= htmlspecialchars($dir) ?>" 
                    class="btn btn-primary btn-block">
