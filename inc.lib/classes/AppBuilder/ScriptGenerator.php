@@ -920,6 +920,7 @@ class ScriptGenerator //NOSONAR
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources";
         $destinationDir = $appConf->getBaseApplicationDirectory();
         $originalDestionationDir = $destinationDir;
+        $filledPath = [];
         $depth = 0;
         $dirname = '__DIR__';
         if(isset($path) && !empty($path) && trim($path, "\\/") != "")
@@ -930,6 +931,7 @@ class ScriptGenerator //NOSONAR
             {
                 $path = "/".$path;
             }
+            $filledPath[] = $path;
             $depth = substr_count(trim($path, "\\/")."/", "/");
             $destinationDir = $appConf->getBaseApplicationDirectory() . $path;
             
@@ -995,11 +997,46 @@ class ScriptGenerator //NOSONAR
         if($depth > 0)
         {
             // Create index.php in root directory
+            $filledPath[] = "/";
+
+            $destinationDir = $originalDestionationDir;
             $content = '<'.'?'.'php
 
 require_once __DIR__ . "/inc.app/indexing.php";';
             $destination = $appConf->getBaseApplicationDirectory() . "/index.php";
             file_put_contents($destination, $content);
+        }
+        foreach($appConf->getBaseModuleDirectory() as $dir)
+        {
+            $appPath = $dir->getPath();
+            if(isset($appPath) && !empty($appPath) && trim($appPath, "\\/") != "")
+            {
+                $appPath = rtrim($appPath, "\\/");
+                $appPath = str_replace("\\", "/", $appPath);
+                if(!PicoStringUtil::startsWith($appPath, "/"))
+                {
+                    $appPath = "/".$appPath;
+                }
+                if(!in_array($appPath, $filledPath))
+                {
+                    $filledPath[] = $appPath;
+
+                    $depth = substr_count(trim($appPath, "\\/")."/", "/");
+                    $destinationDir = $appConf->getBaseApplicationDirectory() . $appPath;
+                    if(!file_exists($destinationDir))
+                    {
+                        $this->prepareDir($destinationDir);
+                    }
+                    $dirname = "__DIR__";
+                    for($i = 0; $i < $depth; $i++)
+                    {
+                        $dirname = "dirname($dirname)";
+                        $contentFix = str_replace('__DIR__', $dirname, $content);
+                        $destination = $appConf->getBaseApplicationDirectory() . $appPath . "/index.php";
+                        file_put_contents($destination, $contentFix);
+                    }
+                }
+            }
         }
 
         $this->updateApplicationStatus($entityApplication, "finish");
