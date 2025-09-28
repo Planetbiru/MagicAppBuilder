@@ -9,6 +9,7 @@ use AppBuilder\AppFeatures;
 use AppBuilder\AppField;
 use AppBuilder\AppSecretObject;
 use AppBuilder\EntityInfo;
+use AppBuilder\Util\FileDirUtil;
 use Exception;
 use MagicObject\Database\PicoDatabase;
 use MagicObject\Generator\PicoEntityGenerator;
@@ -537,8 +538,6 @@ class ScriptGenerator //NOSONAR
             }
             
             $yaml = PicoYamlUtil::dump(array('menu'=>$menuArray), 0, 2, 0);
-            error_log($menuPath);
-            error_log($yaml);
             file_put_contents($menuPath, $yaml);
         }
     }
@@ -605,8 +604,6 @@ class ScriptGenerator //NOSONAR
         }
 
         $yaml = PicoYamlUtil::dump(['menu' => $menuArray], 0, 2, 0);
-        error_log($menuPath);
-        error_log($yaml);
         file_put_contents($menuPath, $yaml);
     }
 
@@ -830,6 +827,17 @@ class ScriptGenerator //NOSONAR
     }
 
     /**
+     * Get the file extension in lowercase
+     *
+     * @param string $filename
+     * @return string
+     */
+    function getFileExtension($filename)
+    {
+        return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    }
+
+    /**
      * Prepare the application directory structure and configuration.
      *
      * This function ensures that necessary directories exist, sets up Composer dependencies, and copies template files.
@@ -911,6 +919,7 @@ class ScriptGenerator //NOSONAR
         // Not recursive, only copy the files in the directory
         $sourceDir = dirname(dirname(dirname(__DIR__)))."/inc.resources";
         $destinationDir = $appConf->getBaseApplicationDirectory();
+        $originalDestionationDir = $destinationDir;
         $depth = 0;
         $dirname = '__DIR__';
         if(isset($path))
@@ -929,8 +938,9 @@ class ScriptGenerator //NOSONAR
                 $dirname = "dirname($dirname)";
             }
         }
+
         
-        $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf, $depth, $dirname) {
+        $this->copyDirectory($sourceDir, $destinationDir, false, array('php'), function($source, $destination) use ($appConf, $depth, $dirname, $originalDestionationDir) {
             $content = file_get_contents($source);
             $baseApplicationNamespace = $appConf->getBaseApplicationNamespace();
             $content = str_replace('MagicAppTemplate', $baseApplicationNamespace, $content);
@@ -956,7 +966,29 @@ class ScriptGenerator //NOSONAR
 
             }
             file_put_contents($destination, $content);
-        });
+
+        }, true);
+
+        // Copy non-PHP files
+        // Iterate through each file and subdirectory
+        $directory = opendir($sourceDir);
+        if (!$directory) {
+            return false;
+        }
+        while (($file = readdir($directory)) !== false) {
+            if ($this->dottedDirectory($file)) {
+                continue; // Skip special directory entries
+            }
+
+            $fileExtension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if ($fileExtension == 'php') {
+                continue; // Skip non-PHP files
+            }
+
+            $sourcePath = $sourceDir . DIRECTORY_SEPARATOR . $file;
+            $destinationPath = $originalDestionationDir . DIRECTORY_SEPARATOR . $file;
+            copy($sourcePath, $destinationPath);
+        }
 
         if($depth > 0)
         {
@@ -1196,9 +1228,10 @@ require_once __DIR__ . "/inc.app/indexing.php";';
      * @param bool $recursive Whether to copy subdirectories recursively.
      * @param array|null $extensions An optional array of file extensions to process with the callback.
      * @param callable|null $callback An optional callback function to process files with the specified extensions.
+     * @param bool $skipNotMatch Whether to skip files that do not match the specified extensions.
      * @return bool Returns true if the operation is successful, false otherwise.
      */
-    public function copyDirectory($source, $destination, $recursive = false, $extensions = null, $callback = null) // NOSONAR
+    public function copyDirectory($source, $destination, $recursive = false, $extensions = null, $callback = null, $skipNotMatch = false) // NOSONAR
     {
         // Ensure the source directory exists
         if (!is_dir($source)) {
@@ -1224,14 +1257,21 @@ require_once __DIR__ . "/inc.app/indexing.php";';
 
             $sourcePath = $source . DIRECTORY_SEPARATOR . $file;
             $destinationPath = $destination . DIRECTORY_SEPARATOR . $file;
+
+            // Get the file extension
+            $fileExtension = pathinfo($file, PATHINFO_EXTENSION);
+            if($skipNotMatch && isset($extensions) && is_array($extensions) && !empty($fileExtension) && !in_array($fileExtension, $extensions))
+            {
+                continue;
+            }
+
             if (is_dir($sourcePath)) {
                 // Recursively copy subdirectories
                 if($recursive) {
                     $this->copyDirectory($sourcePath, $destinationPath, true, $extensions, $callback);
                 }
             } else {
-                // Get the file extension
-                $fileExtension = pathinfo($file, PATHINFO_EXTENSION);
+                
 
                 // Check if the file extension matches the specified extensions and a callback is provided
                 if ($this->needCallUserFfunction($extensions, $fileExtension, $callback)) {
