@@ -351,7 +351,7 @@ function setCheckingStatus(id, startTime)
         loadAllResource();
       }
     },
-    error: function(err)
+    error: function (err)
     {
       console.error(err);
     }
@@ -379,7 +379,7 @@ function updateApplicationInfo(id)
     {
       decreaseAjaxPending();
     },
-    error: function(err)
+    error: function (err)
     {
       decreaseAjaxPending();
     }
@@ -431,7 +431,7 @@ function saveFeatureForm()
     {
       decreaseAjaxPending();
     },
-    error: function(err)
+    error: function (err)
     {
       decreaseAjaxPending();
     }
@@ -569,7 +569,7 @@ function createValidator(elem)
         $('.validator-container-file .validator-li [data-validator-name="'+currentValidator+'"]').closest('li').addClass("selected-file");
       }, lineNumber);
     },
-    error: function(e)
+    error: function (e)
     {
       decreaseAjaxPending();
     }
@@ -603,7 +603,7 @@ function addValidatorForm()
       }
       decreaseAjaxPending();
     },
-    error: function()
+    error: function ()
     {
       decreaseAjaxPending();
     }
@@ -636,7 +636,7 @@ function selectTableForNewValidator(elem)
       });
       decreaseAjaxPending();
     },
-    error: function()
+    error: function ()
     {
       decreaseAjaxPending();
     }
@@ -691,7 +691,7 @@ function testValidator(elem) {
 
       decreaseAjaxPending(); // Assumption: this function exists
     },
-    error: function(jqXHR, textStatus, errorThrown) {
+    error: function (jqXHR, textStatus, errorThrown) {
       $('#validationMasterModal .modal-body .validator-test-message').empty().append(
         '<div class="alert alert-danger">AJAX Error: ' + textStatus + ' - ' + errorThrown + '</div>'
       );
@@ -722,7 +722,7 @@ function updateValidatorForm()
       valBuilder.setValidation(json.properties);
       valBuilder.renderValidationsMerged();
     },
-    error: function(jqXHR, textStatus, errorThrown) {
+    error: function (jqXHR, textStatus, errorThrown) {
 
       decreaseAjaxPending(); 
     }
@@ -808,7 +808,7 @@ function showTestValidatorForm()
       $('#genericModal').modal('show');
       decreaseAjaxPending();
     },
-    error: function()
+    error: function ()
     {
       decreaseAjaxPending();
     }
@@ -846,7 +846,7 @@ function deleteValidatorFile()
                 $('#button_update_validator_file').attr('disabled', 'disabled');
               }
             }, 
-            error: function(e){
+            error: function (e){
               decreaseAjaxPending();
             },
           });
@@ -1076,7 +1076,7 @@ let initAll = function () {
         $('#input-control-string-format').val(data.stringFormat);
         decreaseAjaxPending();
       },
-      error: function()
+      error: function ()
       {
         decreaseAjaxPending();
       }
@@ -1093,7 +1093,7 @@ let initAll = function () {
       {
         decreaseAjaxPending();
       },
-      error: function()
+      error: function ()
       {
         decreaseAjaxPending();
       }
@@ -1111,7 +1111,7 @@ let initAll = function () {
         $('#input-control-date-format').val(data.dateFormat);
         decreaseAjaxPending();
       },
-      error: function()
+      error: function ()
       {
         decreaseAjaxPending();
       }
@@ -1128,7 +1128,7 @@ let initAll = function () {
       {
         decreaseAjaxPending();
       },
-      error: function()
+      error: function ()
       {
         decreaseAjaxPending();
       }
@@ -1148,7 +1148,7 @@ let initAll = function () {
         $('#input-control-thousands-separator').val(data.thousandsSeparator);
         decreaseAjaxPending();
       },
-      error: function()
+      error: function ()
       {
         decreaseAjaxPending();
       }
@@ -1169,7 +1169,7 @@ let initAll = function () {
       {
         decreaseAjaxPending();
       },
-      error: function()
+      error: function ()
       {
         decreaseAjaxPending();
       }
@@ -1322,7 +1322,7 @@ let initAll = function () {
                   }, 1);
                 }
               }, 
-              error: function(e){
+              error: function (e){
                 decreaseAjaxPending();
               },
             });
@@ -1369,7 +1369,7 @@ let initAll = function () {
                   $('#button_delete_entity_file').attr('disabled', 'disabled');
                 }
               }, 
-              error: function(e){
+              error: function (e){
                 decreaseAjaxPending();
               },
             });
@@ -3894,7 +3894,7 @@ function validateReference() {
       }
       
     },
-    error: function(e1, e2)
+    error: function (e1, e2)
     {
       console.error(e1);
     }
@@ -4169,7 +4169,7 @@ function checkWriretableDirectory(input)
             showToast('Error', data.message);
           }
         },
-        error: function(err) {
+        error: function (err) {
           container.attr('data-loading', 'false');
           showToast('Error', err.getMessage());
         }
@@ -4290,7 +4290,7 @@ function loadReferenceResource()
       referenceResource = data;
       decreaseAjaxPending();
     },
-    error: function(e)
+    error: function (e)
     {
       decreaseAjaxPending();
     }
@@ -5806,7 +5806,7 @@ function saveValidator() {
           setTimeout(function () { closeAlertUI() }, 5000);
         }
       },
-      error: function(err)
+      error: function (err)
       {
         $("#button_save_validator_file").removeAttr("disabled");
         decreaseAjaxPending();
@@ -5861,7 +5861,7 @@ function saveValidatorAs() {
                 setTimeout(function () { closeAlertUI() }, 5000);
               }
             },
-            error: function(err)
+            error: function (err)
             {
               decreaseAjaxPending();
             }
@@ -7178,7 +7178,7 @@ function loadMenu() {
         });
       }
     },
-    error: function() {
+    error: function () {
       decreaseAjaxPending();
     }
   });
