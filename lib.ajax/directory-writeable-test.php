@@ -28,7 +28,7 @@ function hasSubdirectory($directory) {
     return count($arr) > 2; // Return true if the path has more than two segments
 }
 
-$writeable = false; // Default: directory is not writable
+$writeable = false; // Default: Directory $directory is not writable
 $permissions = 0; // Default permissions
 $message = null; // Default message
 
@@ -58,9 +58,9 @@ else {
             // Check if the directory is writable
             $writeable = is_writable($directory);
             if ($writeable) {
-                $message = "Directory is writable"; // NOSONAR
+                $message = "Directory $directory is writable"; // NOSONAR
             } else {
-                $message = "Directory is not writable"; // NOSONAR
+                $message = "Directory $directory is not writable"; // NOSONAR
             }
             $permissions = fileperms($directory); // Get directory permissions
         }
@@ -77,17 +77,29 @@ else {
             $permissions = fileperms($directoryToCheck); // Get parent directory permissions
             $writeable = is_writable($directoryToCheck); // Check if it is writable
             if ($writeable) {
-                $message = "Directory is writable"; // NOSONAR
+                $message = "Directory $directory is writable"; // NOSONAR
             } else {
-                $message = "Directory is not writable"; // NOSONAR
+                $message = "Directory $directory is not writable"; // NOSONAR
             }
         } 
         else {
             $writeable = is_writable(dirname($directoryToCheck));
             if ($writeable) {
-                $message = "Directory is writable"; // NOSONAR
+                $message = "Directory $directory is writable"; // NOSONAR
             } else {
-                $message = "Directory is not writable"; // NOSONAR
+                // try to create directory
+                if(@mkdir($directoryToCheck, $permissions, true))
+                {
+                    $writeable = true;
+                    $message = "Directory $directory is writable"; // NOSONAR
+                    // Delete directory
+                    @rmdir($directoryToCheck);
+                }
+                else
+                {
+                    $writeable = false;
+                    $message = "Directory $directory is not writable"; // NOSONAR
+                }
             }
         }
     }

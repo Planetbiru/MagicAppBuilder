@@ -4161,14 +4161,17 @@ function checkWriretableDirectory(input)
           if(data.writeable)
           {
             container.attr('data-valid', 'true');
+            showToast('Success', data.message);
           }
           else
           {
             container.attr('data-valid', 'false');
+            showToast('Error', data.message);
           }
         },
         error: function(err) {
           container.attr('data-loading', 'false');
+          showToast('Error', err.getMessage());
         }
       });
     }
@@ -7007,7 +7010,7 @@ function showToast(header, body) {
 
   // Construct the HTML structure for the toast dynamically
   let toastHTML = `
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000" id="${toastId}">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000" id="${toastId}" style="z-index:10000000">
       <div class="toast-header">
         <strong class="mr-auto">${header}&nbsp;&nbsp;</strong>
         <small>just now</small>
