@@ -112,8 +112,8 @@ if($databaseConfigured)
                 {
                     foreach($queries as $query)
                     {
-                        $query = $query['query'];
-                        $databaseBuilder->execute($query);
+                        $sql = $query['query'];
+                        $databaseBuilder->execute($sql);
                     }
                 }
                 catch(Exception $e)
@@ -131,8 +131,8 @@ if($databaseConfigured)
                         $queries = PicoDatabaseUtil::splitSql($licenseSql);
                         foreach($queries as $query)
                         {
-                            $query = $query['query'];
-                            $databaseBuilder->execute($query);
+                            $sql = $query['query'];
+                            $databaseBuilder->execute($sql);
                         }
                     }
                     catch(Exception $e)
