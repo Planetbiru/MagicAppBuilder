@@ -32,12 +32,12 @@ $writeable = false; // Default: Directory $directory is not writable
 $permissions = 0; // Default permissions
 $message = null; // Default message
 
-// Check if the Directory $directory is null
+// Check if the directory is null
 if ($directory == null) {
     $writeable = false;
     $message = "Directory cannot be null";
 } 
-// Check if the Directory $directory is empty
+// Check if the directory is empty
 else if (empty($directory)) {
     $writeable = false;
     $message = "Directory cannot be empty";
@@ -55,7 +55,7 @@ else {
             $message = "Path is not a directory";
         } 
         else {
-            // Check if the Directory $directory is writable
+            // Check if the directory is writable
             $writeable = is_writable($directory);
             if ($writeable) {
                 $message = "Directory $directory is writable"; // NOSONAR
