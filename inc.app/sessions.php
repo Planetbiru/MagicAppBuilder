@@ -1,40 +1,41 @@
 <?php
 
+use MagicObject\SecretObject;
 use MagicObject\Session\PicoSession;
 
 require_once dirname(__DIR__) . "/inc.lib/vendor/autoload.php";
-if($builderConfig != null && $builderConfig->getSessions() != null)
+
+
+$appSessionsConfig = $builderConfig->getSessions();
+if(!isset($appSessionsConfig))
 {
-    $sessionConfig = $builderConfig->getSessions();
-    $sessions = new PicoSession($sessionConfig);
-
-    $appCookieMaxLifeTime = $sessionConfig->getMaxLifetime();
-    $appCookiePath = $sessionConfig->getCookiePath();
-    $appCookieDomain = $sessionConfig->getCookieDomain();
-    $appCookieSecure = $sessionConfig->isCookieSecure();
-    $appCookieHttpOnly = $sessionConfig->isCookieHttpOnly();
-    $appCookieSameSite = $sessionConfig->getCookieSameSite();
-
-    if(!isset($appCookiePath))
-    {
-        $appCookiePath = "/";
-    }
-    if(!isset($appCookieMaxLifeTime))
-    {
-        $appCookieMaxLifeTime = 1440;
-    }
-
-    $sessions->setSessionCookieParams(
-        $appCookieMaxLifeTime,
-        $appCookiePath,
-        $appCookieDomain,
-        $appCookieSecure,
-        $appCookieHttpOnly,
-        $appCookieSameSite
-    );
+    $appSessionsConfig = new SecretObject();
 }
-else
+$sessions = new PicoSession($appSessionsConfig);
+
+$appCookieMaxLifetime = $appSessionsConfig->getMaxLifetime();
+$appCookiePath = $appSessionsConfig->getCookiePath();
+$appCookieDomain = $appSessionsConfig->getCookieDomain();
+$appCookieSecure = $appSessionsConfig->isCookieSecure();
+$appCookieHttpOnly = $appSessionsConfig->isCookieHttpOnly();
+$appCookieSameSite = $appSessionsConfig->getCookieSameSite();
+
+if(!isset($appCookiePath))
 {
-    $sessions = new PicoSession();
+    $appCookiePath = "/";
 }
+if(!isset($appCookieMaxLifetime))
+{
+    $appCookieMaxLifetime = 1440;
+}
+
+$sessions->setSessionCookieParams(
+    $appCookieMaxLifetime,
+    $appCookiePath,
+    $appCookieDomain,
+    $appCookieSecure,
+    $appCookieHttpOnly,
+    $appCookieSameSite
+);
+
 $sessions->startSession();
