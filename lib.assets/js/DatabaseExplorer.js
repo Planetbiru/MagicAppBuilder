@@ -548,6 +548,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
                 });
+                } else if (/[\"']__magic_signature__[\"']\s*:\s*[\"']MAGICAPPBUILDER-DB-DESIGN-V1[\"']/.test(text)) {
+                    // JSON
+                    try {
+                        editor.importJSONData(text, function(entities, diagrams){
+                        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+                        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                        sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);  
+                    }); // Import the file if it's selected
+                    } catch (jsonErr) {
+                        console.error("Invalid JSON format despite having signature:", jsonErr);
+                    }
                 } else {
                     parsed = editor.parseTextToJSON(text);
                     editor.importFromData(parsed);

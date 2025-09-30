@@ -3278,3 +3278,15 @@ The **Update Classes** function will update classes from the `MagicAppTemplate` 
 
 * Fixed common bugs related to join entity names.  
 * Improved wording in several parts of the application for better clarity and consistency.
+
+## Enhancement: Signature on Entity File
+
+Entity design files exported to JSON now include a special signature (`__magic_signature__`) that uniquely identifies them as MagicAppBuilder database design files.  
+This allows the system to reliably detect JSON entity files even when copied from the clipboard, distinguishing them from other supported formats such as CSV, SQL, or HTML tables.
+
+## Enhancement: Import JSON from Clipboard
+
+Users can now copy a MagicAppBuilder entity JSON file directly to the clipboard and import it into the application.  
+The system will automatically recognize the JSON entity format (using the unique signature) and import the entities and diagrams seamlessly.  
+This streamlines the workflow for sharing and reusing database designs between projects.
+

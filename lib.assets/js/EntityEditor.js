@@ -2788,23 +2788,43 @@ class EntityEditor {
         reader.onload = function (e) {
             const contents = e.target.result; // Get the content of the file
             try {
-                let raw = JSON.parse(contents);  // Parse the JSON content
-                let data = editor.createEntitiesFromJSON(raw); // Create entities from the parsed JSON
-                _this.clearEntities(); // Clear the existing entities
-                _this.clearDiagrams(); // Clear the existing diagrams
-                _this.entities = data.entities; // Insert the received data into editor.entities
-                _this.diagrams = data.diagrams || []; // Insert the received data into editor.diagrams
-                _this.prepareDiagram(); // Prepare the diagram by loading saved entities and diagrams
-                _this.updateDiagram(); // Update the diagram with the imported entities
-                _this.renderEntities(); // Update the view with the fetched entities
-                if (typeof callback === 'function') {
-                    callback(_this.entities, _this.diagrams); // Execute callback with the updated entities
-                }
+                _this.importJSONData(contents, callback);
             } catch (err) {
                 console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
             }
         };
         reader.readAsText(file); // Read the file as text
+    }
+
+    /**
+     * Mengimpor dan memproses data JSON untuk memperbarui status editor.
+     * 
+     * Fungsi ini mengambil string JSON, mem-parsing-nya, dan menggunakan data tersebut untuk
+     * membuat dan memuat entitas dan diagram ke dalam editor. Fungsi ini akan membersihkan
+     * semua entitas dan diagram yang ada sebelum memuat data baru. Setelah memuat,
+     * fungsi ini akan menyegarkan antarmuka pengguna dengan mempersiapkan diagram, memperbaruinya,
+     * dan me-render entitas.
+     *
+     * @param {string} contents - String JSON yang berisi data entitas dan diagram.
+     * @param {function(Array<Entity>, Array<Object>): void} [callback] - Fungsi callback opsional
+     * yang dieksekusi setelah impor selesai. Fungsi ini menerima entitas dan diagram
+     * yang baru dibuat sebagai argumen.
+     */
+    importJSONData(contents, callback)
+    {
+        let _this = this;
+        let raw = JSON.parse(contents);  // Parse the JSON content
+        let data = editor.createEntitiesFromJSON(raw); // Create entities from the parsed JSON
+        _this.clearEntities(); // Clear the existing entities
+        _this.clearDiagrams(); // Clear the existing diagrams
+        _this.entities = data.entities; // Insert the received data into editor.entities
+        _this.diagrams = data.diagrams || []; // Insert the received data into editor.diagrams
+        _this.prepareDiagram(); // Prepare the diagram by loading saved entities and diagrams
+        _this.updateDiagram(); // Update the diagram with the imported entities
+        _this.renderEntities(); // Update the view with the fetched entities
+        if (typeof callback === 'function') {
+            callback(_this.entities, _this.diagrams); // Execute callback with the updated entities
+        }
     }
 
     /**
@@ -3487,15 +3507,28 @@ class EntityEditor {
                 }
             }
 
-            const text = await navigator.clipboard.readText();            
+            const text = await navigator.clipboard.readText();    
 
             if (/create\s+table/i.test(text.trim()) || /insert\s+into/i.test(text.trim())) {
+                // SQL
                 this.parseCreateTable(text, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
                 });
                 
+            } else if (/[\"']__magic_signature__[\"']\s*:\s*[\"']MAGICAPPBUILDER-DB-DESIGN-V1[\"']/.test(text)) {
+                // JSON
+                try {
+                    editor.importJSONData(text, function(entities, diagrams){
+                    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                    sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);  
+                }); // Import the file if it's selected
+                } catch (jsonErr) {
+                    console.error("Invalid JSON format despite having signature:", jsonErr);
+                }
             } else {
+                // Text or HTML
                 parsed = this.parseTextToJSON(text);
                 this.importFromData(parsed);
             }
