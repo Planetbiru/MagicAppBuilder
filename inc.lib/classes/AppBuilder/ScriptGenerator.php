@@ -965,6 +965,10 @@ class ScriptGenerator //NOSONAR
                 $replace = 'require_once ' . $dirname . ' . "/inc.app/login-form.php";';
                 $content = preg_replace($pattern, $replace, $content);
 
+                $pattern = '/require_once\s+__DIR__\s*\.\s*[\'"]\/inc\.app\/reset\-password\.php[\'"]\s*;/';
+                $replace = 'require_once ' . $dirname . ' . "/inc.app/reset-password.php";';
+                $content = preg_replace($pattern, $replace, $content);
+
             }
             file_put_contents($destination, $content);
 
