@@ -58,6 +58,7 @@ function fixValue($original)
         'Button Update' => 'Update',
         'Button Login' => 'Login',
         'Button Restore' => 'Restore',
+        'Button Reset Password' => 'Reset Password',
         'Label Option Select One Or Leave It Blank' => 'Select One or Leave It Blank',
         'Label Option Select One' => 'Select One', // NOSONAR
         'Label Option Show All' => 'Show All',
@@ -226,6 +227,8 @@ if($inputPost->getUserAction() == 'get')
         'button_reply',
         'button_unread',
         'button_login',
+        'button_reset_password',
+        'button_restore',
         'column_name',
         'message_no_data_require_approval',
         'message_noneditable_data_waiting_approval',
