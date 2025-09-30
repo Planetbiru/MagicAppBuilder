@@ -81,6 +81,11 @@ if ($inputPost->getDatabaseName() !== null) {
         $path = $basePath . "/$filename";
         if (file_exists($path)) {
             $json = file_get_contents($path);
+            $data = json_decode($json, true);
+            $data['__magic_signature__'] = 'MAGICAPPBUILDER-DB-DESIGN-V1';
+            $json = json_encode($data);
+        } else {
+            $json = '{}';
         }
     }
     catch(Exception $e)
