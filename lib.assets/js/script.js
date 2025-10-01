@@ -274,6 +274,64 @@ function updateDependency(option, button) {
 }
 
     
+/**
+ * Retrieves the session refresh interval from a meta tag.
+ *
+ * @returns {number} The interval in milliseconds to refresh the session.
+ *                   Defaults to 300,000 ms (5 minutes) if not found or invalid.
+ */
+function getSessionRefreshInterval() {
+  // Look for the meta tag <meta name="session-refresh-interval" content="...">
+  const meta = document.querySelector('meta[name="session-refresh-interval"]');
+  
+  // Extract the 'content' attribute from the meta tag
+  const value = meta?.getAttribute('content');
+  
+  // Convert the attribute value into a number (milliseconds)
+  const interval = parseInt(value, 10);
+  
+  // Return parsed value or fallback (5 minutes)
+  return isNaN(interval) ? 300000 : interval;
+}
+
+/**
+ * Sends a request to refresh the session on the server.
+ * 
+ * This prevents the session from expiring while the user is active.
+ */
+function refreshSession() {
+  fetch('lib.ajax/session-refresh.php', {
+    method: 'GET'
+  })
+  .then(res => {
+    // If server response is not OK, throw an error
+    if (!res.ok) throw new Error('Session refresh failed');
+    
+    console.log('Session updated');
+  })
+  .catch(err => {
+    // Log any errors (e.g., network failure, server down)
+    console.error('Failed to update session:', err);
+  });
+}
+
+/**
+ * Starts a loop that periodically refreshes the session.
+ *
+ * The loop runs at the interval retrieved by getSessionRefreshInterval().
+ * Session is only refreshed when the page is visible (not in background).
+ */
+function startSessionRefreshLoop() {
+  const interval = getSessionRefreshInterval();
+  
+  setInterval(() => {
+    // Only refresh if the tab is currently visible
+    if (document.visibilityState === 'visible') {
+      refreshSession();
+    }
+  }, interval);
+}
+
 
 /**
  * Load main resource
@@ -283,6 +341,7 @@ jQuery(function () {
     initAll();
     initEditor();
     initFileManager();
+    startSessionRefreshLoop();
   });
 });
 

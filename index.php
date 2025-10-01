@@ -13,6 +13,13 @@ $adminName = isset($entityAdmin) ? $entityAdmin->getName() : "";
 
 $pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? $activeApplication->getName() . " | " . $builderName : $builderName;
 
+$refreshSession =  $appCookieMaxLifetime - 20;
+if($refreshSession < 300)
+{
+    // min 5 minutes
+    $refreshSession = 300;
+}
+
 ?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
@@ -26,6 +33,7 @@ $pageTitle = isset($activeApplication) && $activeApplication->getName() != "" ? 
   <meta name="admin-name" content="<?php echo $adminName; ?>" />
   <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>" />
   <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']); ?>" />
+  <meta name="session-refresh-interval" content="<?php echo $refreshSession;?>">
   <title><?php echo htmlspecialchars($pageTitle); ?></title>
   <link type="image/x-icon" rel="icon" href="favicon.ico" />
   <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
