@@ -45,7 +45,7 @@ database:
     connectionTimeout: 10
 sessions:
     name: MAGICAPP
-    maxLifeTime: 86400
+    maxLifetime: 86400
     saveHandler: files
     savePath: ''
     cookiePath: /

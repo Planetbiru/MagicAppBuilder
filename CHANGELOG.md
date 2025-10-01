@@ -1838,7 +1838,7 @@ MagicAppBuilder now support **customizable session and cookie settings** through
 You can define:
 
 * `name`: Custom session name.
-* `maxLifeTime`: Session maximum lifetime (in seconds).
+* `maxLifetime`: Session maximum lifetime (in seconds).
 * `saveHandler`: Session storage method (e.g., `files`, `redis`).
 * `savePath`: Path or location for storing session data.
 * `cookiePath`: The path scope for the session cookie.
