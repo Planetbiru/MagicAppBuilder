@@ -274,6 +274,35 @@ function updateDependency(option, button) {
 }
 
     
+function getSessionRefreshInterval() {
+  const meta = document.querySelector('meta[name="session-refresh-interval"]');
+  const value = meta?.getAttribute('content');
+  const interval = parseInt(value, 10);
+  return isNaN(interval) ? 300000 : interval; // fallback ke 5 menit
+}
+
+function refreshSession() {
+  fetch('lib.ajax/session-refresh.php', {
+    method: 'GET'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Session refresh failed');
+    console.log('Session updated');
+  })
+  .catch(err => {
+    console.error('Failed to update session:', err);
+  });
+}
+
+function startSessionRefreshLoop() {
+  const interval = getSessionRefreshInterval();
+  setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      refreshSession();
+    }
+  }, interval);
+}
+
 
 /**
  * Load main resource
@@ -283,6 +312,7 @@ jQuery(function () {
     initAll();
     initEditor();
     initFileManager();
+    startSessionRefreshLoop();
   });
 });
 
