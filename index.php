@@ -26,6 +26,8 @@ if($iddleDuration < 10)
     // min 5 minutes
     $iddleDuration = 300;
 }
+$uri = $_SERVER['REQUEST_URI'];
+$finalUri = (substr($uri, -1) === "/") ? $uri : str_replace("\\", "/", dirname($uri));
 
 ?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -39,7 +41,7 @@ if($iddleDuration < 10)
   <meta name="builder-name" content="<?php echo $builderName; ?>" />
   <meta name="admin-name" content="<?php echo $adminName; ?>" />
   <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>" />
-  <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']); ?>" />
+  <meta name="base-asset-url" content="<?php echo $finalUri; ?>" />
   <meta name="session-refresh-interval" content="<?php echo $refreshSession;?>">
   <meta name="iddle-duration" content="<?php echo $iddleDuration;?>">
 
