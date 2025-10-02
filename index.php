@@ -21,7 +21,7 @@ if($refreshSession < 300)
 }
 
 $iddleDuration = $builderConfig->getIddleDuration();
-if($iddleDuration < 300)
+if($iddleDuration < 10)
 {
     // min 5 minutes
     $iddleDuration = 300;
