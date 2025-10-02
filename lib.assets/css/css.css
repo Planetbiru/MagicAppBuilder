@@ -1522,6 +1522,14 @@ table.table.table-enum tr > td:last-child {
   border: 1px solid #dddddd;
 }
 
+.session-expired-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1041;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;

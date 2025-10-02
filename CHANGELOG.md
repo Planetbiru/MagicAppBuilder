@@ -3290,3 +3290,39 @@ Users can now copy a MagicAppBuilder entity JSON file directly to the clipboard 
 The system will automatically recognize the JSON entity format (using the unique signature) and import the entities and diagrams seamlessly.  
 This streamlines the workflow for sharing and reusing database designs between projects.
 
+
+
+# MagicAppBuilder Version 1.25.0
+
+## Enhancement: Smarter Session Management
+
+The session handling mechanism has been significantly improved to provide a smoother user experience and better security.
+
+* **Active Tab Refresh** – The application will automatically refresh the session when the current tab is active.
+* **Idle/Inactive Tabs** – If the tab is inactive, session refresh will not occur, reducing unnecessary background requests.
+* **Idle to Active Transition** – When a user becomes active again after being idle, MagicAppBuilder will immediately check the session status.
+* **Session Expiration Alert** – If the session has expired, a clear alert is displayed to notify the user.
+
+## New Feature: Login Modal Integration
+
+To improve session recovery, a new login workflow has been introduced:
+
+* **Session Expiration Alert** – Users can click a button on the alert to open the **Login Modal**.
+* **Re-login Without Leaving the Page** – Users can re-authenticate directly from the modal.
+* **Seamless Recovery** – Once login is successful, both the alert and login modal will disappear automatically, restoring the session.
+* **Error Handling** – If login fails, a notification is displayed inside the modal, guiding the user to retry.
+
+## Configuration
+
+### Configuration Changes
+
+`sessions.maxLifetime` → `sessions.maxLifeTime`
+
+This defines the lifetime of sessions and cookies. The value is an integer in seconds.
+
+### New Configuration
+
+`iddleDuration`
+
+This defines how long a user can remain idle before the system decides to check the session. The value is an integer in seconds.
+
