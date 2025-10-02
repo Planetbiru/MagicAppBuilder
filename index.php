@@ -20,6 +20,13 @@ if($refreshSession < 300)
     $refreshSession = 300;
 }
 
+$iddleDuration = $builderConfig->getIddleDuration();
+if($iddleDuration < 10)
+{
+    // min 5 minutes
+    $iddleDuration = 300;
+}
+
 ?><!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
@@ -34,6 +41,8 @@ if($refreshSession < 300)
   <meta name="admin-level-id" content="<?php echo $adminLevelId; ?>" />
   <meta name="base-asset-url" content="<?php echo basenameRequestUri($_SERVER['REQUEST_URI']); ?>" />
   <meta name="session-refresh-interval" content="<?php echo $refreshSession;?>">
+  <meta name="iddle-duration" content="<?php echo $iddleDuration;?>">
+
   <title><?php echo htmlspecialchars($pageTitle); ?></title>
   <link type="image/x-icon" rel="icon" href="favicon.ico" />
   <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
@@ -52,6 +61,7 @@ if($refreshSession < 300)
   <script type="text/javascript" src="lib.assets/js/Validator.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/SVGtoPNG.min.js"></script>
   <script type="text/javascript" src="lib.assets/js/Star.min.js"></script>
+  <script type="text/javascript" src="lib.assets/js/UserActivity.min.js"></script>
 
   <!-- SQLite Viewer -->
   <script type="text/javascript" data-src="lib.assets/js/SQliteViewer.min.js" class="script-for-sqlite-viewer"></script>

@@ -88,6 +88,8 @@ notification:
     http_port: 8080
     http_url: http://localhost:8080/notify
     http_request_timeout: 10
+
+iddleDuration: 3000
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();

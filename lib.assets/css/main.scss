@@ -1771,3 +1771,11 @@ table.table.table-enum
 		}
 	}
 }
+
+.session-expired-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1041;
+}

@@ -1520,4 +1520,12 @@ table.table.table-enum tr > td:last-child {
 #document-viewer #sheet-viewer table th, #document-viewer #sheet-viewer table td {
   padding: 5px 8px;
   border: 1px solid #dddddd;
+}
+
+.session-expired-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1041;
 }/*# sourceMappingURL=main.css.map */
