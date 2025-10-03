@@ -109,25 +109,29 @@ if($appConfig->getLanguages() == null)
 $appLanguage = new AppLanguageImpl(
     $appConfig->getApplication(),
     $currentUser->getLanguageId(),
-    function($var, $value)
+    function($var, $value) use ($appConfig)
     {
-        $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
-        $inputSource = FileUtil::fixFilePath($inputSource);
-        if(!file_exists(dirname($inputSource)))
+        if($appConfig->isDevelopmentMode())
         {
-            mkdir(dirname($inputSource), 0755, true);
+            // Only for development mode
+            $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
+            $inputSource = FileUtil::fixFilePath($inputSource);
+            if(!file_exists(dirname($inputSource)))
+            {
+                mkdir(dirname($inputSource), 0755, true);
+            }
+            $sourceData = null;
+            if(file_exists($inputSource) && filesize($inputSource) > 3)
+            {
+                $sourceData = PicoIniUtil::parseIniFile($inputSource);
+            }
+            if($sourceData == null || $sourceData === false)
+            {
+                $sourceData = array();
+            }   
+            $output = array_merge($sourceData, array(PicoStringUtil::snakeize($var) => $value));
+            PicoIniUtil::writeIniFile($output, $inputSource);
         }
-        $sourceData = null;
-        if(file_exists($inputSource) && filesize($inputSource) > 3)
-        {
-            $sourceData = PicoIniUtil::parseIniFile($inputSource);
-        }
-        if($sourceData == null || $sourceData === false)
-        {
-            $sourceData = array();
-        }   
-        $output = array_merge($sourceData, array(PicoStringUtil::snakeize($var) => $value));
-        PicoIniUtil::writeIniFile($output, $inputSource);
     }
 );
 

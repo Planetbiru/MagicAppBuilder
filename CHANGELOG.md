@@ -3326,3 +3326,8 @@ This defines the lifetime of sessions and cookies. The value is an integer in se
 
 This defines how long a user can remain idle before the system decides to check the session. The value is an integer in seconds.
 
+# MagicAppBuilder Version 1.25.1
+
+## Enhancement: Dump Undefined Localization
+
+MagicAppBuilder version 1.25.1 now only dumps undefined localizations in `Development Mode`. This prevents the application from creating localization files in a production environment. This enhancement ensures that the application will not make any changes to files within the localization directory in a production environment.
