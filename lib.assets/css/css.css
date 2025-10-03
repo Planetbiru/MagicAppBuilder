@@ -1190,8 +1190,8 @@ h3 {
   width: -moz-fit-content;
   width: fit-content;
 }
-#dir-tree li:hover {
-  color: #0055b1;
+#dir-tree li.hovered > span {
+  color: #0167d5;
 }
 #dir-tree span {
   white-space: nowrap;

@@ -3331,3 +3331,10 @@ This defines how long a user can remain idle before the system decides to check 
 ## Enhancement: Dump Undefined Localization
 
 MagicAppBuilder version 1.25.1 now only dumps undefined localizations in `Development Mode`. This prevents the application from creating localization files in a production environment. This enhancement ensures that the application will not make any changes to files within the localization directory in a production environment.
+
+## Enhancement: Improved File Manager Styling
+
+The File Manager interface has been improved with better hover effects.  
+When hovering over a file or directory item, only the specific list item (`<li>`) is highlighted, without affecting its parent directories.  
+This provides a clearer and more intuitive navigation experience when browsing and expanding directories.
+

@@ -979,6 +979,24 @@ function hideLoginError() {
  * Initialize all event handlers and elements
  */
 let initAll = function () {
+
+  const tree = document.getElementById("dir-tree");
+
+  // delegasi event hover
+  tree.addEventListener("mouseover", e => {
+    const li = e.target.closest("li");
+    if (li && tree.contains(li)) {
+      li.classList.add("hovered");
+    }
+  });
+
+  tree.addEventListener("mouseout", e => {
+    const li = e.target.closest("li");
+    if (li && tree.contains(li)) {
+      li.classList.remove("hovered");
+    }
+  });
+
   $('#loginForm').on('submit', function (e) {
     e.preventDefault();
 
