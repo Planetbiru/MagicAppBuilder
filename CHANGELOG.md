@@ -3316,7 +3316,7 @@ To improve session recovery, a new login workflow has been introduced:
 
 ### Configuration Changes
 
-`sessions.maxLifetime` → `sessions.maxLifeTime`
+`sessions.maxLifeTime` → `sessions.maxLifetime` 
 
 This defines the lifetime of sessions and cookies. The value is an integer in seconds.
 
