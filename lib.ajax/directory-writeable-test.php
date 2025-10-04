@@ -28,6 +28,23 @@ function hasSubdirectory($directory) {
     return count($arr) > 2; // Return true if the path has more than two segments
 }
 
+/**
+ * Check if the given path is a root directory
+ *
+ * @param string $path
+ * @return bool
+ */
+function isRootDirectory($path) {
+    $path = str_replace("\\", "/", $path);       // Normalisasi separator
+    $path = rtrim($path, "/");                   // Hilangkan trailing slash
+
+    // Hitung jumlah segmen path
+    $segments = explode("/", $path);
+
+    // Root biasanya hanya punya 1 segmen (misal: "C:", atau "")
+    return count($segments) === 1;
+}
+
 $writeable = false; // Default: Directory $directory is not writable
 $permissions = 0; // Default permissions
 $message = null; // Default message
@@ -88,17 +105,16 @@ else {
                 $message = "Directory $directory is writable"; // NOSONAR
             } else {
                 // try to create directory
-                if(@mkdir($directoryToCheck, $permissions, true))
-                {
-                    $writeable = true;
-                    $message = "Directory $directory is writable"; // NOSONAR
-                    // Delete directory
-                    @rmdir($directoryToCheck);
-                }
-                else
-                {
-                    $writeable = false;
-                    $message = "Directory $directory is not writable"; // NOSONAR
+                $parentDir = dirname($directoryToCheck);
+                if (isRootDirectory($parentDir)) {
+                    if (@mkdir($directoryToCheck, $permissions, true)) {
+                        $writeable = true;
+                        $message = "Directory $directory is writable"; // NOSONAR
+                        @rmdir($directoryToCheck);
+                    } else {
+                        $writeable = false;
+                        $message = "Directory $directory is not writable"; // NOSONAR
+                    }
                 }
             }
         }

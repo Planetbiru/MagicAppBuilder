@@ -3338,3 +3338,10 @@ The File Manager interface has been improved with better hover effects.
 When hovering over a file or directory item, only the specific list item (`<li>`) is highlighted, without affecting its parent directories.  
 This provides a clearer and more intuitive navigation experience when browsing and expanding directories.
 
+## Enhancement: Writable Directory Check at Root Level
+
+The writable directory check logic has been refined to handle edge cases where root directories (e.g., `C:\`, `D:\`, or `/`) appear non-writable due to system-level restrictions.  
+Now, the system will only attempt to create a temporary directory using `mkdir()` if the target location resides directly under a root path.  
+This is determined by counting the number of segments in the normalized path—only paths with a single segment (after trimming and normalization) are considered root.  
+This enhancement improves reliability when validating writable paths across different operating systems.
+
