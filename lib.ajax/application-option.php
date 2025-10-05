@@ -67,7 +67,11 @@ try
         }
     }
 
+    if($application->isApplicationValid())
+    {
 ?>
+<div class="application-valid" data-application-valid="true" style="display: none;"></div>
+
 <form name="formdatabase" id="formdatabase" method="post" action="" class="">
    <!-- BEGIN Accordion Wrapper -->
    <div id="accordion-option" class="accordion">
@@ -224,6 +228,16 @@ try
 </form>
 
 <?php
+    }
+    else
+    {
+      ?>
+      <div class="application-valid" data-application-valid="false" style="display: none;"></div>
+      <div class="alert alert-warning" role="alert">
+         This application is not valid.
+      </div>
+      <?php
+    }
 }
 catch (Exception $e)
 {

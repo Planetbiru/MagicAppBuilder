@@ -108,7 +108,9 @@ try
         data-application-id="<?php echo $app->getId();?>" 
         data-application-name="<?php echo htmlspecialchars($app->getName());?>"
         data-path="<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"
-        data-show-hidden="<?php $showHidden ? 'true' : 'false'; ?>"
+        data-show-hidden="<?php echo $showHidden ? 'true' : 'false'; ?>"
+        data-application-valid="<?php echo $application->isApplicationValid() ? 'true' : 'false'; ?>"
+        data-directory-exists="<?php echo $application->isDirectoryExists() ? 'true' : 'false'; ?>"
     >
         <div class="card-body">
             <h5 class="card-title">
@@ -197,7 +199,9 @@ try
         data-application-id="<?php echo $app->getId();?>" 
         data-application-name="<?php echo htmlspecialchars($app->getName());?>"
         data-path="<?php echo str_replace("\\", "/", $application->getBaseApplicationDirectory());?>"
-        data-show-hidden="<?php $showHidden ? 'true' : 'false'; ?>"
+        data-show-hidden="<?php echo $showHidden ? 'true' : 'false'; ?>"
+        data-application-valid="<?php echo $application->isApplicationValid() ? 'true' : 'false'; ?>"
+        data-directory-exists="<?php echo $application->isDirectoryExists() ? 'true' : 'false'; ?>"
     >
         <div class="card-body">
             <h5 class="card-title">
