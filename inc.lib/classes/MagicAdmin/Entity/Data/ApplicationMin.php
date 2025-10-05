@@ -124,6 +124,26 @@ class ApplicationMin extends MagicObject
 	protected $author;
 
 	/**
+	 * Application Valid
+	 * 
+	 * @Column(name="application_valid", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
+	 * @Label(content="Application Valid")
+	 * @var bool
+	 */
+	protected $applicationValid;
+
+	/**
+	 * Directory Exists
+	 * 
+	 * @Column(name="directory_exists", type="tinyint(1)", length=1, defaultValue="true", nullable=true)
+	 * @DefaultColumn(value="true")
+	 * @Label(content="Directory Exists")
+	 * @var bool
+	 */
+	protected $directoryExists;
+
+	/**
 	 * Sort Order
 	 * 
 	 * @Column(name="sort_order", type="int(11)", length=11, defaultValue="NULL", nullable=true)

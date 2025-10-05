@@ -2872,6 +2872,7 @@ let initAll = function () {
     e.preventDefault();
     let updateBtn = $('#modal-application-option .button-save-application-option');
     updateBtn[0].disabled = true;
+    updateBtn[0].style.display = 'none';
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-application-option .application-option').empty();
     $('#modal-application-option').modal('show');
@@ -2886,7 +2887,18 @@ let initAll = function () {
         decreaseAjaxPending();
         $('#modal-application-option').attr('data-application-id', applicationId);
         $('#modal-application-option .application-option').empty().append(data);
-        updateBtn[0].disabled = false;
+        let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
+        $('#modal-application-option').attr('data-application-valid', applicationValid);
+        if(applicationValid == 'false')
+        {
+          updateBtn[0].style.display = 'none';
+        }
+        else
+        {
+          updateBtn[0].disabled = false;
+          updateBtn[0].style.display = '';
+        }
+      
       },
       error: function (xhr, status, error) {
         decreaseAjaxPending();
