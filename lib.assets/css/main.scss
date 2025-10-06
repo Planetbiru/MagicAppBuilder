@@ -1411,10 +1411,11 @@ h3 {
 				width: fit-content;
 			}
 		}
+		&.hovered > span{
+			color: #0167d5;
+		}
 	}
-    li:hover{
-		color: #0055b1;
-	}
+
     span
     {
         white-space: nowrap;
