@@ -493,7 +493,7 @@ li.file-syntax-error a {
   align-items: center;
 }
 
-.table td,
+#modal-application-option .table td,
 .table th {
   padding: 0.4rem 0.5rem;
 }
