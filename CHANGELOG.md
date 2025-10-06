@@ -3365,3 +3365,28 @@ Fixed an issue with the `currentAction` object. Before the fix, the user ID in t
 
 Fixed an issue with the database export query.
 
+
+# MagicAppBuilder Version 1.26.0
+
+## New Feature: Inspect Application
+
+An application is considered valid if it meets all the following conditions:
+
+1. It is registered in the database.
+2. It has a configuration file within a workspace.
+3. It has source code files in the application directory following the defined structure.
+4. It has an application configuration file in the application directory.
+
+Previously, even if conditions 3 and 4 were not met, the application was still considered valid. Version 1.26.0 enforces a new rule that all four conditions above must be fulfilled for an application to be considered valid.
+
+Version 1.26.0 adds two new columns, `application_valid` and `directory_exists`, to the application table. These columns store inspection results about the application’s validity. Invalid applications will now be handled differently from valid ones.
+
+## New Feature: Rebuild Application
+
+Users can rebuild invalid applications. MagicAppBuilder will recreate the application according to the configuration stored in the workspace. Users can also choose to rebuild application modules and localizations.
+
+## New Feature: Import from Existing Application
+
+Users can now import existing applications. Instead of importing only from a configuration, users can regenerate an application configuration from an existing MagicAppBuilder-created application.
+This method is **strongly discouraged**, as it should only be used if the original application configuration files have been completely lost. MagicAppBuilder will only recreate the directory structure and generate a `default.yml` file — it cannot restore the lost configuration.
+ 
