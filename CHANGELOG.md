@@ -3395,3 +3395,4 @@ This method is **strongly discouraged**, as it should only be used if the origin
 
 An entity filter has been added to the Entity Editor to display only the desired entities on the left side of the editor. This makes it easier for users to select, modify, or delete the desired entities instead of scrolling to find the intended one. This feature is very useful when working on large databases with many entities.
 
+ 
