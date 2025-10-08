@@ -148,8 +148,8 @@ if(!isset($databaseName))
                     <div class="container">
                         <div class="left-panel">
                             <div class="object-container">
-                                <div class="panel-title">
-                                    <h3>Entity List</h3>
+                                <div class="entity-filter">
+                                    <input type="text" id="tableFilter" placeholder="Type entity name">
                                 </div>
                                 <ul class="table-list"></ul>
                             </div>

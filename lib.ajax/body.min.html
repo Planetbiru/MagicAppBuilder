@@ -1291,38 +1291,111 @@
 <span aria-hidden="true">&times;</span>
 </button>
 </div>
+
 <div class="modal-body">
+<!-- Tabs -->
+<ul class="nav nav-tabs" id="importApplicationTab" role="tablist">
+<li class="nav-item">
+<a class="nav-link active" id="tab-from-config" data-toggle="tab" href="#tab-pane-from-config" role="tab" aria-controls="tab-pane-from-config" aria-selected="true">
+From Configuration
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" id="tab-from-existing" data-toggle="tab" href="#tab-pane-from-existing" role="tab" aria-controls="tab-pane-from-existing" aria-selected="false">
+From Existing Application
+</a>
+</li>
+</ul>
+
+<div class="tab-content" id="importApplicationTabContent">
+<!-- TAB 1: From Configuration -->
+<div class="tab-pane fade show active" id="tab-pane-from-config" role="tabpanel" aria-labelledby="tab-from-config">
 <div class="import-message"></div>
 
 <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
 <tbody>
 <tr>
+<td>Base Application Directory</td>
+<td><input class="form-control" type="text" name="base_application_directory" value="" autocomplete="off"></td>
+</tr>
+<tr>
 <td>Application Name</td>
-<td><input class="form-control" type="text" name="application_name" value=""></td>
+<td><input class="form-control" type="text" name="application_name" value="" autocomplete="off"></td>
 </tr>
 <tr>
 <td>Application ID</td>
-<td><input class="form-control" type="text" name="application_id" value=""></td>
-</tr>
-<tr>
-<td>Base Application Directory</td>
-<td><input class="form-control" type="text" name="base_application_directory" value=""></td>
+<td><input class="form-control" type="text" name="application_id" value="" autocomplete="off"></td>
 </tr>
 <tr>
 <td>File</td>
 <td>
-<input class="form-control" type="text" name="file_name" value="">
+<input class="form-control" type="text" name="file_name" value="" autocomplete="off">
 <input type="file" id="import-application-file" accept=".zip" style="display: none;">
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<button class="btn btn-primary button-select-file-import">
+<i class="fa fa-folder-open"></i> Select File
+</button>
+<button class="btn btn-primary button-check-application-id">
+<i class="fa fa-check"></i> Check ID
+</button>
+<button class="btn btn-warning button-clear-file-import">
+<i class="fa fa-trash"></i> Clear
+</button>
 </td>
 </tr>
 </tbody>
 </table>
 </div>
 
+<!-- TAB 2: From Existing App -->
+<div class="tab-pane fade" id="tab-pane-from-existing" role="tabpanel" aria-labelledby="tab-from-existing">
+<!-- Kamu bisa isi form ini nanti -->
+<div class="import-message"></div>
+<div class="alert alert-info">
+Type existing application directory to import the application.
+</div>
+<table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>Base Application Directory</td>
+<td><input class="form-control" type="text" name="base_application_directory" value="" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Application Name</td>
+<td><input class="form-control" type="text" name="application_name" value="" autocomplete="off"></td>
+</tr>
+<tr>
+<td>Application ID</td>
+<td><input class="form-control" type="text" name="application_id" value="" autocomplete="off"></td>
+</tr>
+<tr>
+<td></td>
+<td>
+<button class="btn btn-primary button-check-application">
+<i class="fa fa-check"></i> Check Application
+</button>
+<button class="btn btn-warning button-clear-import">
+<i class="fa fa-trash"></i> Clear
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
 <div class="modal-footer">
-<button class="btn btn-primary button-select-file-import"><i class="fa fa-folder-open"></i> Select File</button>
-<button type="button" class="btn btn-success button-save-application-import" name="button-save-application-import"><i class="fa-solid fa-file-import"></i> Import</button>
-<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> Close</button>
+<button type="button" class="btn btn-success button-save-application-import" name="button-save-application-import">
+<i class="fa-solid fa-file-import"></i> Import
+</button>
+<button type="button" class="btn btn-secondary" data-dismiss="modal">
+<i class="fa-solid fa-times"></i> Close
+</button>
 </div>
 </div>
 </div>

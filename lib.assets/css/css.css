@@ -1631,6 +1631,7 @@ ul {
   padding: 0;
   cursor: pointer;
   transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
 .context-menu ul li a {

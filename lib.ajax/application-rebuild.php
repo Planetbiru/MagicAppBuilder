@@ -16,14 +16,12 @@ $inputPost = new InputPost();
 $appId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $appId = trim($appId);
 
-$appId = 'app-2';
-
 if (empty($appId)) {
     ResponseUtil::sendResponse(
-        json_encode(['error' => 'Application ID is required']),
+        json_encode(['success' => false, 'message' => 'Application ID is required']),
         PicoMime::APPLICATION_JSON,
         null,
-        PicoHttpStatus::HTTP_BAD_REQUEST
+        PicoHttpStatus::HTTP_OK
     );
     exit;
 }
@@ -38,10 +36,10 @@ try
     {
         // Do not rebuild valid application
         ResponseUtil::sendResponse(
-            json_encode(['error' => 'Application still valid']),
+            json_encode(['success' => false, 'message' => 'Application still valid']),
             PicoMime::APPLICATION_JSON,
             null,
-            PicoHttpStatus::HTTP_BAD_REQUEST
+            PicoHttpStatus::HTTP_OK
         );
         exit;
     }
@@ -49,10 +47,10 @@ try
 catch(Exception $e)
 {
     ResponseUtil::sendResponse(
-        json_encode(['error' => 'Application not found']),
+        json_encode(['success' => false, 'message' => 'Application not found']),
         PicoMime::APPLICATION_JSON,
         null,
-        PicoHttpStatus::HTTP_BAD_REQUEST
+        PicoHttpStatus::HTTP_OK
     );
     exit;
 }
@@ -63,7 +61,7 @@ $configPath = "$appDir/default.yml";
 
 if (!file_exists($configPath)) {
     ResponseUtil::sendResponse(
-        json_encode(['error' => 'Configuration file not found: '.$configPath]),
+        json_encode(['success' => false, 'message' => 'Configuration file not found: '.$configPath]),
         PicoMime::APPLICATION_JSON,
         null,
         PicoHttpStatus::HTTP_NOT_FOUND
