@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\AppImporter;
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputFiles;
@@ -82,17 +83,41 @@ if ($inputPost->getUserAction() == 'preview' && $inputFile->file) {
                 $applicationConfig->loadYamlString($yamlContent, false, true, true);
 
                 if ($applicationConfig->issetApplication()) {
-                    echo json_encode([
-                        "status" => "success",
-                        "message" => "Application configuration loaded successfully.",
-                        "data" => [
-                            "application_name" => $applicationConfig->getApplication()->getName(),
-                            "application_id" => $applicationConfig->getApplication()->getId(),
-                            "base_application_directory" => $applicationConfig->getApplication()->getBaseApplicationDirectory()
-                        ]
-                    ]);
+                    $application = $applicationConfig->getApplication();
+
+                    $applicationToUpdate = new EntityApplication(null, $databaseBuilder);
+
+                    try
+                    {
+                        $applicationToUpdate->find($application->getId());
+                        // If find() succeeds, it means the application ID already exists.
+                        echo json_encode([
+                            "success" => false,
+                            "status" => "warning",
+                            "message" => "Application configuration loaded, but the application ID already exists.",
+                            "data" => [
+                                "application_name" => $application->getName(),
+                                "application_id" => $application->getId(),
+                                "base_application_directory" => $application->getBaseApplicationDirectory()
+                            ]
+                        ]);
+                    }
+                    catch(Exception $e)
+                    {
+                        echo json_encode([
+                            "success" => true,
+                            "status" => "success",
+                            "message" => "Application configuration loaded successfully.",
+                            "data" => [
+                                "application_name" => $application->getName(),
+                                "application_id" => $application->getId(),
+                                "base_application_directory" => $application->getBaseApplicationDirectory()
+                            ]
+                        ]);
+                    }
                 } else {
                     echo json_encode([
+                        "success" => false,
                         "status" => "warning",
                         "message" => "The file 'default.yml' does not contain application information."
                     ]);
@@ -107,10 +132,12 @@ if ($inputPost->getUserAction() == 'preview' && $inputFile->file) {
             $zip->close();
         } else {
             echo json_encode([
+                "success" => false,
                 "status" => "error",
                 "message" => "Failed to open the ZIP file."
             ]);
         }
+        exit;
     }
 }
 else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
@@ -165,6 +192,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                         }
 
                         echo json_encode([
+                            "success" => true,
                             "status" => "success",
                             "message" => "Application '$applicationName' has been imported successfully.",
                             "data" => [
@@ -175,6 +203,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                         ]);
                     } else {
                         echo json_encode([
+                            "success" => false,
                             "status" => "warning",
                             "message" => "The file 'default.yml' does not contain application information.",
                             "data" => [
@@ -186,6 +215,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                     }
                 } else {
                     echo json_encode([
+                        "success" => false,
                         "status" => "warning",
                         "message" => "The file 'default.yml' was not found in the ZIP archive.",
                         "data" => [
@@ -199,6 +229,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                 $zip->close();
             } else {
                 echo json_encode([
+                    "success" => false,
                     "status" => "error",
                     "message" => "Failed to open the ZIP file.",
                     "data" => [
@@ -211,8 +242,9 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
         }
     } catch (Exception $e) {
         echo json_encode([
+            "success" => false,
             "status" => "error",
-            "message" => "Invalid workspace.",
+            "message" => "An error occurred during import: " . $e->getMessage(),
             "data" => [
                 "application_name" => $applicationName,
                 "application_id" => $applicationId,
@@ -221,5 +253,3 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
         ]);
     }
 }
-
-

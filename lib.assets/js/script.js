@@ -873,7 +873,7 @@ function deleteValidatorFile()
  * @param {string} [base_application_directory] - The base directory path for the application (if applicable).
  */
 function handleApplicationFileUpload(file, action, application_id, application_name, base_application_directory) {
-    const importInfoDiv = $('#modal-application-import .import-message');
+    const importInfoDiv = $('#tab-pane-from-config .import-message');
     const updateBtn = $('#modal-application-import .button-save-application-import');
 
     const formData = new FormData();
@@ -892,7 +892,7 @@ function handleApplicationFileUpload(file, action, application_id, application_n
     }
     formData.append('file[]', file);
 
-    $('#modal-application-import [name="file_name"]').val(file.name);
+    $('#tab-pane-from-config [name="file_name"]').val(file.name);
     importInfoDiv.html('<div class="alert alert-info">Uploading and parsing file...</div>');
 
     $.ajax({
@@ -903,10 +903,10 @@ function handleApplicationFileUpload(file, action, application_id, application_n
         contentType: false,
         dataType: 'json',
         success: function (data) {
-            if (data.status === 'success') {
-              $('#modal-application-import [name="application_name"]').val(data.data.application_name);
-              $('#modal-application-import [name="application_id"]').val(data.data.application_id);
-              $('#modal-application-import [name="base_application_directory"]').val(data.data.base_application_directory);
+            if (data.success) {
+              $('#tab-pane-from-config [name="base_application_directory"]').val(data.data.base_application_directory);
+              $('#tab-pane-from-config [name="application_name"]').val(data.data.application_name);
+              $('#tab-pane-from-config [name="application_id"]').val(data.data.application_id);
               updateBtn[0].disabled = false;
               if(action == 'import')
               {
@@ -914,7 +914,10 @@ function handleApplicationFileUpload(file, action, application_id, application_n
                 $('#modal-application-import').modal('hide');
               }
             } else {
-              updateBtn[0].disabled = true;
+              $('#tab-pane-from-config [name="base_application_directory"]').val(data.data.base_application_directory || '');
+              $('#tab-pane-from-config [name="application_name"]').val(data.data.application_name || '');
+              $('#tab-pane-from-config [name="application_id"]').val(data.data.application_id || '');
+              updateBtn[0].disabled = false;
             }
             importInfoDiv.html(`<div class="alert alert-${data.status}">${data.message}</div>`);
         },
@@ -995,6 +998,40 @@ let initAll = function () {
     if (li && tree.contains(li)) {
       li.classList.remove("hovered");
     }
+  });
+
+
+  $(document).on('click', '.button-check-application-id', function(e){
+    e.preventDefault();
+    let parent = $('#tab-pane-from-config');
+    let applicationId = parent.find('[name="application_id"]').val();
+    let baseApplicationDirectory = parent.find('[name="base_application_directory"]').val();
+    let applicationName = parent.find('[name="application_name"]').val();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-check-id.php',
+      data: {'application_id': applicationId, 'base_application_directory': baseApplicationDirectory, 'application_name': applicationName},
+      dataType: 'json',
+      success: function(data)
+      {
+        
+        if(data.success)
+        {
+          parent.find('.import-message').html(`<div class="alert alert-success">${data.message}</div>`);
+          $('.button-save-application-import')[0].disabled = false;
+        }
+        else
+        {
+          parent.find('.import-message').html(`<div class="alert alert-warning">${data.message}</div>`);
+          $('.button-save-application-import')[0].disabled = true;
+        }
+      },
+      error: function (err)
+      {
+        parent.find('.import-message').html(`<div class="alert alert-warning">${err}</div>`);
+      }
+    })
+
   });
 
   $('#loginForm').on('submit', function (e) {
@@ -2911,11 +2948,11 @@ let initAll = function () {
       e.preventDefault();
       
       // Display initial info message in modal
-      $('#modal-application-import .import-message').html('<div class="alert alert-info">Select file to import the application.</div>')
-      $('#modal-application-import [name="application_id"]').val('');
-      $('#modal-application-import [name="application_name"]').val('');
-      $('#modal-application-import [name="base_application_directory"]').val('');
-      $('#modal-application-import [name="file_name"]').val('');
+      $('#tab-pane-from-config .import-message').html('<div class="alert alert-info">Select file to import the application.</div>')
+      $('#tab-pane-from-config [name="base_application_directory"]').val('');
+      $('#tab-pane-from-config [name="application_name"]').val('');
+      $('#tab-pane-from-config [name="application_id"]').val('');
+      $('#tab-pane-from-config [name="file_name"]').val('');
       // Disable the "Import" button until a valid file is selected
       let updateBtn = $('#modal-application-import .button-save-application-import');
       updateBtn[0].disabled = true;
@@ -2927,6 +2964,14 @@ let initAll = function () {
   // When the "Select File" button is clicked, trigger the hidden file input
   $(document).on('click', '.button-select-file-import', function (e) {
       $('#import-application-file').click(); // Simulate click on hidden file input
+  });
+  $(document).on('click', '.button-clear-file-import', function (e) {
+      $('#import-application-file').val('');
+      $('#tab-pane-from-config .import-message').html('<div class="alert alert-info">Select file to import the application.</div>')
+      $('#tab-pane-from-config [name="base_application_directory"]').val('');
+      $('#tab-pane-from-config [name="application_name"]').val('');
+      $('#tab-pane-from-config [name="application_id"]').val('');
+      $('#tab-pane-from-config [name="file_name"]').val('');
   });
   
   // Preview file (called first when user selects file)
