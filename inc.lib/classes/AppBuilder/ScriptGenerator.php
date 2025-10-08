@@ -543,22 +543,22 @@ class ScriptGenerator //NOSONAR
     }
 
     /**
-     * Updates the menu configuration by adding a new module to the appropriate section.
+     * Updates the menu configuration file (menu.yml) by adding a new module as a submenu item.
      *
-     * This method checks if the menu configuration file exists. If it does not, it creates
-     * the file and loads the current menu structure from a YAML file. The provided module
-     * information is then added as a submenu item under the specified menu title if it
-     * does not already exist.
+     * This method reads the existing `menu.yml`, checks if the new module (based on its title and href) 
+     * already exists in any menu to prevent duplicates. If it doesn't exist, it adds the new module 
+     * as a submenu item under the specified parent menu. The `useBasename` parameter controls 
+     * whether the full path or just the filename is used for the `href`.
      *
      * @param SecretObject $appConf Configuration object containing application settings.
      * @param InputPost $request Request object containing the target, module menu, 
      *        module name, and module file information.
+     * @param bool $useBasename If true, uses only the basename of the module file for the href. 
+     *        Otherwise, it uses the full path. Defaults to false.
      *
      * @return void
-     *
-     * @throws Exception If there is an error reading or writing the menu configuration file.
      */
-    public function updateMenu($appConf, $request) // NOSONAR
+    public function updateMenu($appConf, $request, $useBasename = false) // NOSONAR
     {
         $menuPath = $appConf->getBaseApplicationDirectory() . "/inc.cfg/menu.yml";
         $this->prepareFile($menuPath);
@@ -569,7 +569,17 @@ class ScriptGenerator //NOSONAR
         $target = trim($request->getTarget(), "/\\");
         $moduleMenu = trim($request->getModuleMenu());
         $title = trim($request->getModuleName());
-        $href = ltrim(trim($target . "/" . $request->getModuleFile()), "/");
+
+        if($useBasename)
+        {
+            $href = $request->getModuleFile();
+        }
+        else
+        {
+            $href = $target . "/" . $request->getModuleFile();
+        }
+
+        $href = ltrim(trim($href), "/");
         $menuArray = json_decode((string) $menus, true)['menu'] ?? [];
 
         $submenuKey = $title . $href;
