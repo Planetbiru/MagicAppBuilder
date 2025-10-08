@@ -3345,3 +3345,9 @@ Now, the system will only attempt to create a temporary directory using `mkdir()
 This is determined by counting the number of segments in the normalized path—only paths with a single segment (after trimming and normalization) are considered root.  
 This enhancement improves reliability when validating writable paths across different operating systems.
 
+# MagicAppBuilder Version 1.25.2
+
+## Bug fix: Menu URL
+
+Fixed menu URL when the system module is not in the root.
+
