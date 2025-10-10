@@ -83,7 +83,10 @@ if (!empty($acceptLanguage)) {
     }
 }
 
-$entityAdmin->setLanguageId($chosenLanguage);
+if($entityAdmin->getLanguageId() == null || $entityAdmin->getLanguageId() == "")
+{
+    $entityAdmin->setLanguageId($chosenLanguage);
+}
 
 $appLanguage = new AppLanguageImpl(
     $appConfig->getApplication(),

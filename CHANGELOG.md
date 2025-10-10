@@ -3347,7 +3347,16 @@ This enhancement improves reliability when validating writable paths across diff
 
 # MagicAppBuilder Version 1.25.2
 
-## Bug fix: Menu URL
+## Bug Fix: Menu URL
 
 Fixed menu URL when the system module is not in the root.
 
+# MagicAppBuilder Version 1.25.3
+
+## Bug Fix: User Language
+
+Fixed a user language issue. Before the fix, MagicAppBuilder would always use the language based on the browser's selection, overwriting the user's preference even if they had already selected a language.
+
+## Bug Fix: currentAction 
+
+Fixed an issue with the `currentAction` object. Before the fix, the user ID in the `currentAction` object was always `superuser`, even when the logged-in user was not a superuser.
