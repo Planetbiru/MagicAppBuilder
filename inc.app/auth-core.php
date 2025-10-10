@@ -18,6 +18,13 @@ $userLoggedIn = false;
 $appBaseConfigPath = "";
 $configTemplatePath = "";
 $entityAdmin = new EntityAdmin(null, $databaseBuilder);
+
+// Initialize action context with user ID, IP address, and timestamp.
+// This context will be used when updating the application database.
+$currentAction = new SetterGetter();
+
+$currentAction->setIp($_SERVER['REMOTE_ADDR']);
+$currentAction->setTime(date('Y-m-d H:i:s'));
 if(isset($databaseBuilder) && isset($sessions->magicUsername) && isset($sessions->magicUserPassword))
 {
     try
@@ -32,6 +39,7 @@ if(isset($databaseBuilder) && isset($sessions->magicUsername) && isset($sessions
             $activeApplication = $entityAdmin->getApplication();
         }
         $userLoggedIn = true;
+        $currentAction->setUserId($entityAdmin->getAdminId());
 
         $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
         $configTemplatePath = dirname(__DIR__)."/inc.cfg/application-template.yml";
@@ -62,9 +70,3 @@ if(!isset($databaseConfig))
     $databaseConfig = new SecretObject();
 }
 
-// Initialize action context with user ID, IP address, and timestamp.
-// This context will be used when updating the application database.
-$currentAction = new SetterGetter();
-$currentAction->setUserId("superuser");
-$currentAction->setIp($_SERVER['REMOTE_ADDR']);
-$currentAction->setTime(date('Y-m-d H:i:s'));
