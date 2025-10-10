@@ -55,8 +55,8 @@
 
       <div id="define-workspace" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
         <div class="form-control-container main-menu">
-          <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace"><i class="fa fa-plus"></i>{{lang['create_new']}}</button>
-          <button type="button" class="btn btn-primary refresh-workspace-list"><i class="fa fa-refresh"></i>{{lang['refresh']}}</button>
+          <button type="button" class="btn btn-primary create-new-workspace" data-toggle="modal" data-target="#modal-workspace"><i class="fa fa-plus"></i> {{lang['create_new']}}</button>
+          <button type="button" class="btn btn-primary refresh-workspace-list"><i class="fa fa-refresh"></i> {{lang['refresh']}}</button>
           <input type="text" class="form-control" id="search-workspace" placeholder="{{lang['type_to_search']}}">
         </div>
         
@@ -69,10 +69,11 @@
       <div id="define-application" class="tab-pane fade" role="tabpanel" aria-labelledby="define-application-tab">
 
         <div class="form-control-container main-menu">
-          <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application"><i class="fa fa-plus"></i>{{lang['create_new']}}</button>
-          <button type="button" class="btn btn-primary refresh-application-list"><i class="fa fa-refresh"></i>{{lang['refresh']}}</button>
+          <button type="button" class="btn btn-primary create-new-application" data-toggle="modal" data-target="#modal-create-application"><i class="fa fa-plus"></i> {{lang['create_new']}}</button>
+          <button type="button" class="btn btn-primary refresh-application-list"><i class="fa fa-refresh"></i> {{lang['refresh']}}</button>
+          <button type="button" class="btn btn-primary show-hidden-application"><i class="fa-solid fa-eye"></i> {{lang['show_hidden']}}</button>
           <input type="text" class="form-control" id="search-application" placeholder="{{lang['type_to_search']}}">
-          <button type="button" class="btn btn-primary button-import-application"><i class="fa fa-file-import"></i>{{lang['import_application']}}</button>
+          <button type="button" class="btn btn-primary button-import-application"><i class="fa fa-file-import"></i> {{lang['import_application']}}</button>
         </div>
 
         <div class="container-fluid application-container">
@@ -98,7 +99,7 @@
                   <tr>
                     <td>&nbsp;</td>
                     <td>
-                      <button type="button" class="btn btn-primary" name="load_table" id="load_table"><i class="fa fa-refresh"></i>{{lang['reload_table']}}</button>
+                      <button type="button" class="btn btn-primary" name="load_table" id="load_table"><i class="fa fa-refresh"></i> {{lang['reload_table']}}</button>
                     </td>
                   </tr>
                   <tr>
@@ -135,7 +136,7 @@
                   </tr>
                   <tr>
                     <td>{{lang['update_entity']}}</td>
-                    <td><label for="update_entity"><input type="checkbox" name="update_entity" id="update_entity">{{lang['yes']}}</label></td>
+                    <td><label for="update_entity"><input type="checkbox" name="update_entity" id="update_entity"> {{lang['yes']}}</label></td>
                   </tr>
                 </tbody>
               </table>
@@ -157,7 +158,7 @@
                   </tr>
                   <tr>
                     <td>{{lang['update_validation_definition']}}</td>
-                    <td><label for="update_validation_definition"><input type="checkbox" name="update_validation_definition" id="update_validation_definition">{{lang['yes']}}</label></td>
+                    <td><label for="update_validation_definition"><input type="checkbox" name="update_validation_definition" id="update_validation_definition"> {{lang['yes']}}</label></td>
                   </tr>
                 </tbody>
               </table>
@@ -188,8 +189,8 @@
                   <tr>
                     <td>&nbsp;</td>
                     <td>
-                      <button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i>{{lang['update_current_location']}}</button>
-                      <button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i>{{lang['manage']}}</button>
+                      <button type="button" class="btn btn-primary" name="update_current_location" id="update_current_location"><i class="fa-solid fa-floppy-disk"></i> {{lang['update_current_location']}}</button>
+                      <button type="button" class="btn btn-primary" name="update_module_location" id="update_module_location" data-toggle="modal" data-target="#modal-update-path"><i class="fa-solid fa-cog"></i> {{lang['manage']}}</button>
                     </td>
                   </tr>
                   <tr>
@@ -198,19 +199,19 @@
                   </tr>
                   <tr>
                     <td>{{lang['load_saved_module']}}</td>
-                    <td><label for="module_load_previous"><input type="checkbox" name="module_load_previous" id="module_load_previous" value="1" checked="">{{lang['yes']}}</label></td>
+                    <td><label for="module_load_previous"><input type="checkbox" name="module_load_previous" id="module_load_previous" value="1" checked=""> {{lang['yes']}}</label></td>
                   </tr>
                   <tr>
                     <td>{{lang['add_to_module_list']}}</td>
-                    <td><label for="module_add_to_list"><input type="checkbox" name="module_add_to_list" id="module_add_to_list" value="1">{{lang['yes']}}</label></td>
+                    <td><label for="module_add_to_list"><input type="checkbox" name="module_add_to_list" id="module_add_to_list" value="1"> {{lang['yes']}}</label></td>
                   </tr>
                   <tr>
                     <td>{{lang['special_access']}}</td>
-                    <td><label for="module_special_access"><input type="checkbox" name="module_special_access" id="module_special_access" value="1">{{lang['yes']}}</label></td>
+                    <td><label for="module_special_access"><input type="checkbox" name="module_special_access" id="module_special_access" value="1"> {{lang['yes']}}</label></td>
                   </tr>
                   <tr>
                     <td>{{lang['add_menu']}}</td>
-                    <td><label for="module_as_menu"><input type="checkbox" name="module_as_menu" id="module_as_menu" value="1" checkdate="">{{lang['yes']}}</label></td>
+                    <td><label for="module_as_menu"><input type="checkbox" name="module_as_menu" id="module_as_menu" value="1" checkdate=""> {{lang['yes']}}</label></td>
                   </tr>
                   <tr>
                     <td>{{lang['append_to']}}</td>
@@ -219,8 +220,8 @@
                   <tr>
                     <td></td>
                     <td>
-                      <button type="button" class="btn btn-primary button-reload-application-menu"><i class="fas fa-refresh"></i>{{lang['reload_menu']}}</button>
-                      <button type="button" class="btn btn-primary button-manage-application-menu"><i class="fas fa-cog"></i>{{lang['manage']}}</button>
+                      <button type="button" class="btn btn-primary button-reload-application-menu"><i class="fas fa-refresh"></i> {{lang['reload_menu']}}</button>
+                      <button type="button" class="btn btn-primary button-manage-application-menu"><i class="fas fa-cog"></i> {{lang['manage']}}</button>
                     </td>
                   </tr>
                 </tbody>
@@ -230,7 +231,7 @@
                 <tbody>
                   <tr>
                     <td></td>
-                    <td><button type="button" class="btn btn-success" name="load_column" id="load_column"><i class="fa-solid fa-table"></i>{{lang['load_column']}}</button></td>
+                    <td><button type="button" class="btn btn-success" name="load_column" id="load_column"><i class="fa-solid fa-table"></i> {{lang['load_column']}}</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -257,7 +258,7 @@
                       <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="{{lang['primary_key_div_class_horizontal_line_div_is_column_a_br_primary_key']}}">{{lang['k']}}</td>
                       <td rowspan="2" align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="{{lang['required_div_class_horizontal_line_div_must_user_fill_this_br_field_on_forms']}}">{{lang['r']}}</td>
                       <td colspan="6" align="center" data-toggle="tooltip" data-placement="top" data-title="{{lang['html_element_for_user_input_on_insert_and_update_forms']}}">{{lang['input_element']}}</td>
-                      <td colspan="4" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="{{lang['html_element_for_filtering_list_data']}}">{{lang['filter_element']}}</td>
+                      <td colspan="5" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="{{lang['html_element_for_filtering_list_data']}}">{{lang['filter_element']}}</td>
                       <td rowspan="2" align="center" width="100" data-toggle="tooltip" data-placement="top" data-title="{{lang['data_type_for_single_line_input']}}">{{lang['data_type']}}</td>
                       <td rowspan="2" align="center" width="60" data-toggle="tooltip" data-placement="top" data-title="{{lang['output_format_for_list_and_detail']}}">{{lang['format']}}</td>
                       <td rowspan="2" align="center" width="180" data-toggle="tooltip" data-placement="top" data-title="{{lang['backend_input_filter_br_before_data_is_saved']}}">{{lang['filter_type']}}</td>
@@ -274,6 +275,7 @@
                       <td align="center" width="32" data-toggle="tooltip" data-placement="top" data-title="{{lang['select_div_class_horizontal_line_div_a_dropdown_filter']}}">{{lang['sl']}}</td>
                       <td align="center" width="74" data-toggle="tooltip" data-placement="top" data-title="{{lang['source_div_class_horizontal_line_div_data_source_for_select_filter']}}">{{lang['source']}}</td>
                       <td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="{{lang['multiple_div_class_horizontal_line_div_allows_multiple_filter_values']}}">{{lang['mi']}}</td>
+                      <td align="center" width="30" data-toggle="tooltip" data-placement="top" data-title="{{lang['exact_div_class_horizontal_line_div_use_exact_match_when_filtering_data_br_e_g_instead_of_like']}}">{{lang['ex']}}</td>
                   </tr>
               </thead>
 
@@ -283,14 +285,22 @@
             
             <div class="form-control-container button-area">
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-filter-data">
-                  <i class="fa-solid fa-filter"></i>{{lang['data_filter']}}</button>
+                  <i class="fa-solid fa-filter"></i> {{lang['data_filter']}}
+              </button>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-order-data">
-                  <i class="fa-solid fa-arrow-up-a-z"></i>{{lang['data_order']}}</button>
+                  <i class="fa-solid fa-arrow-up-a-z"></i> {{lang['data_order']}}
+              </button>
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-module-features">
-                  <i class="fa-solid fa-list-check"></i>{{lang['module_features']}}</button>
+                  <i class="fa-solid fa-list-check"></i> {{lang['module_features']}}
+              </button>
               <button type="button" class="btn btn-success" name="generate_script" id="generate_script" value="Generate Module">
-                  <i class="fa-solid fa-code"></i>{{lang['generate_module']}}</button> &nbsp;
+                  <i class="fa-solid fa-code"></i> {{lang['generate_module']}}
+              </button> &nbsp;
             </div>
+
+            <datalist id="data-list-column"></datalist>
+            <datalist id="data-list-reference"></datalist>
+            <datalist id="data-list-date-format"></datalist>
 
             <!-- Reference Begin -->
             <div class="modal fade" id="modal-create-reference-data" tabindex="-1" aria-labelledby="reference_data_modal_label" aria-hidden="true">
@@ -306,10 +316,10 @@
               
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-primary" id="load_from_cache"><i class="fa fa-refresh"></i>{{lang['load']}}</button>
-                      <button type="button" class="btn btn-primary" id="save_to_cache"><i class="fa-solid fa-floppy-disk"></i>{{lang['save']}}</button>
-                      <button type="button" class="btn btn-success" id="apply_reference"><i class="fa-solid fa-check"></i>{{lang['ok']}}</button>
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['cancel']}}</button>
+                      <button type="button" class="btn btn-primary" id="load_from_cache"><i class="fa fa-refresh"></i> {{lang['load']}}</button>
+                      <button type="button" class="btn btn-primary" id="save_to_cache"><i class="fa-solid fa-floppy-disk"></i> {{lang['save']}}</button>
+                      <button type="button" class="btn btn-success" id="apply_reference"><i class="fa-solid fa-check"></i> {{lang['ok']}}</button>
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['cancel']}}</button>
                   </div>
                   </div>
               </div>
@@ -341,21 +351,21 @@
                         </ul>
                         <div id="data-format-tab" class="tab-content">
                             <div id="string-format-tab" class="tab-pane fade active show" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-                                <input type="text" id="input-control-string-format" class="form-control">
+                                <input type="text" id="input-control-string-format" class="form-control" autocomplete="off">
                                 <div class="button-area">
-                                  <button type="button" class="btn btn-primary button-load-string-format"><i class="fas fa-refresh"></i>{{lang['load']}}</button>
-                                  <button type="button" class="btn btn-primary button-save-string-format"><i class="fas fa-save"></i>{{lang['save']}}</button>
+                                  <button type="button" class="btn btn-primary button-load-string-format"><i class="fas fa-refresh"></i> {{lang['load']}}</button>
+                                  <button type="button" class="btn btn-primary button-save-string-format"><i class="fas fa-save"></i> {{lang['save']}}</button>
                                 </div>
                                 <div class="input-description">
-                                <p>{{lang['the_format_string_is_composed_of_zero_or_more_directives_ordinary_characters_excluding_that_are_copied_directly_to_the_result_and_conversion_specifications_each_of_which_results_in_fetching_its_own_parameter']}}</p>
+                                <p>{{lang['the_format_string_is_composed_of_zero_or_more_directives_ordinary_characters_excluding_that_are_copied_directly_to_the_result_and_conversion_specifications_each_of_which_results_in_fetching_its_own_parameter']}} </p>
                                 <p><a href="https://www.php.net/manual/en/function.sprintf.php" target="_blank">{{lang['https_www_php_net_manual_en_function_sprintf_php']}}</a></p>
                                 </div>
                             </div>
                             <div id="date-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">                 
-                                <input type="text" id="input-control-date-format" class="form-control">
+                                <input type="text" id="input-control-date-format" class="form-control" list="data-list-date-format" autocomplete="off">
                                 <div class="button-area">
-                                  <button type="button" class="btn btn-primary button-load-date-format"><i class="fas fa-refresh"></i>{{lang['load']}}</button>
-                                  <button type="button" class="btn btn-primary button-save-date-format"><i class="fas fa-save"></i>{{lang['save']}}</button>
+                                  <button type="button" class="btn btn-primary button-load-date-format"><i class="fas fa-refresh"></i> {{lang['load']}}</button>
+                                  <button type="button" class="btn btn-primary button-save-date-format"><i class="fas fa-save"></i> {{lang['save']}}</button>
                                 </div>
                                 <div class="input-description">
                                 <p>{{lang['the_format_of_the_outputted_date_string']}}</p>
@@ -364,14 +374,14 @@
                             </div>
                             <div id="number-format-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="define-workspace-tab">
                                 <div class="input-label">{{lang['decimal']}}</div>                 
-                                <input type="text" id="input-control-decimal" class="form-control">
+                                <input type="text" id="input-control-decimal" class="form-control" autocomplete="off">
                                 <div class="input-label">{{lang['decimal_separator']}}</div>                
-                                <input type="text" id="input-control-decimal-separator" class="form-control">
+                                <input type="text" id="input-control-decimal-separator" class="form-control" autocomplete="off">
                                 <div class="input-label">{{lang['thousands_separator']}}</div>                
-                                <input type="text" id="input-control-thousands-separator" class="form-control">
+                                <input type="text" id="input-control-thousands-separator" class="form-control" autocomplete="off">
                                 <div class="button-area">
-                                  <button type="button" class="btn btn-primary button-load-number-format"><i class="fas fa-refresh"></i>{{lang['load']}}</button>
-                                  <button type="button" class="btn btn-primary button-save-number-format"><i class="fas fa-save"></i>{{lang['save']}}</button>
+                                  <button type="button" class="btn btn-primary button-load-number-format"><i class="fas fa-refresh"></i> {{lang['load']}}</button>
+                                  <button type="button" class="btn btn-primary button-save-number-format"><i class="fas fa-save"></i> {{lang['save']}}</button>
                                 </div>
                                 <div class="input-description">
                                   <p><a href="https://www.php.net/manual/en/function.number-format.php" target="_blank">{{lang['https_www_php_net_manual_en_function_number_format_php']}}</a></p>
@@ -381,8 +391,8 @@
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i>{{lang['ok']}}</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i>{{lang['cancel']}}</button>
+                    <button type="button" class="btn btn-primary" id="button-save-data-format"><i class="fas fa-check"></i> {{lang['ok']}}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> {{lang['cancel']}}</button>
                   </div>
                 </div>
               </div>
@@ -413,7 +423,7 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <td><input type="text" class="form-control data-filter-column-name" value="" autocomplete="off"></td>
+                          <td><input type="text" class="form-control data-filter-column-name" value="" autocomplete="off" list="data-list-column"></td>
                           <td>
                             <select class="form-control data-filter-column-comparison">
                               <option value="equals">=</option>
@@ -432,14 +442,14 @@
                       </tbody>
                       <tfoot>
                         <tr>
-                          <td colspan="6"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i>{{lang['add_row']}}</button></td>
+                          <td colspan="6"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i> {{lang['add_row']}}</button></td>
                         </tr>
                       </tfoot>
                     </table>
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
                   </div>
                 </div>
               </div>
@@ -469,7 +479,7 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <td><input type="text" class="form-control data-order-column-name" value="" autocomplete="off"></td>
+                          <td><input type="text" class="form-control data-order-column-name" value="" autocomplete="off" list="data-list-column"></td>
                           <td><select class="form-control data-order-order-type">
                               <option value="PicoSort::ORDER_TYPE_ASC">{{lang['asc']}}</option>
                               <option value="PicoSort::ORDER_TYPE_DESC">{{lang['desc']}}</option>
@@ -481,14 +491,14 @@
                       </tbody>
                       <tfoot>
                         <tr>
-                          <td colspan="5"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i>{{lang['add_row']}}</button></td>
+                          <td colspan="5"><button type="button" class="btn btn-primary btn-add-row"><i class="fa-solid fa-plus"></i> {{lang['add_row']}}</button></td>
                         </tr>
                       </tfoot>
                     </table>
                   </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
                   </div>
                 </div>
               </div>
@@ -510,86 +520,86 @@
                       <tbody>
                         <tr>
                           <td>{{lang['activate_deactivate']}}</td>
-                          <td><label for="activate_deactivate"><input type="checkbox" name="activate_deactivate" id="activate_deactivate" value="1">{{lang['activate_deactivate']}}</label> &nbsp;</td>
+                          <td><label for="activate_deactivate"><input type="checkbox" name="activate_deactivate" id="activate_deactivate" value="1"> {{lang['activate_deactivate']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['manual_sort_order']}}</td>
-                          <td><label for="manual_sort_order"><input type="checkbox" name="manual_sort_order" id="manual_sort_order" value="1">{{lang['manual_sort_order']}}</label> &nbsp;</td>
+                          <td><label for="manual_sort_order"><input type="checkbox" name="manual_sort_order" id="manual_sort_order" value="1"> {{lang['manual_sort_order']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['export_to_excel']}}</td>
-                          <td><label for="export_to_excel"><input type="checkbox" name="export_to_excel" id="export_to_excel" value="1">{{lang['export_to_excel']}}</label> &nbsp;</td>
+                          <td><label for="export_to_excel"><input type="checkbox" name="export_to_excel" id="export_to_excel" value="1"> {{lang['export_to_excel']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['export_to_csv']}}</td>
-                          <td><label for="export_to_csv"><input type="checkbox" name="export_to_csv" id="export_to_csv" value="1">{{lang['export_to_csv']}}</label> &nbsp;</td>
+                          <td><label for="export_to_csv"><input type="checkbox" name="export_to_csv" id="export_to_csv" value="1"> {{lang['export_to_csv']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['use_temporary_file']}}</td>
-                          <td><label for="export_use_temporary"><input type="checkbox" name="export_use_temporary" id="export_use_temporary" value="1" disabled="">{{lang['use_temporary_file']}}</label> &nbsp;</td>
+                          <td><label for="export_use_temporary"><input type="checkbox" name="export_use_temporary" id="export_use_temporary" value="1" disabled=""> {{lang['use_temporary_file']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['user_activity_log']}}</td>
-                          <td><label for="user_activity_logger"><input type="checkbox" name="user_activity_logger" id="user_activity_logger" value="1">{{lang['user_activity_logger']}}</label> &nbsp;</td>
+                          <td><label for="user_activity_logger"><input type="checkbox" name="user_activity_logger" id="user_activity_logger" value="1"> {{lang['user_activity_logger']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['approval']}}</td>
-                          <td><label for="with_approval"><input type="checkbox" name="with_approval" id="with_approval" value="1">{{lang['approval']}}</label> &nbsp;</td>
+                          <td><label for="with_approval"><input type="checkbox" name="with_approval" id="with_approval" value="1"> {{lang['approval']}}</label> &nbsp;</td>
                         </tr>
                         <tr style="display: none;">
                           <td>{{lang['approval_note']}}</td>
-                          <td><label for="with_approval_note"><input type="checkbox" name="with_approval_note" id="with_approval_note" value="1">{{lang['approval_note']}}</label> &nbsp;</td>
+                          <td><label for="with_approval_note"><input type="checkbox" name="with_approval_note" id="with_approval_note" value="1"> {{lang['approval_note']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['approval_type']}}</td>
                           <td>
-                            <label for="approval_type1"><input type="radio" name="approval_type" id="approval_type1" value="1" disabled="">{{lang['separated']}}</label> &nbsp; 
-                            <label for="approval_type2"><input type="radio" name="approval_type" id="approval_type2" value="2" checked="" disabled="">{{lang['combined']}}</label> &nbsp;
+                            <label for="approval_type1"><input type="radio" name="approval_type" id="approval_type1" value="1" disabled=""> {{lang['separated']}}</label> &nbsp; 
+                            <label for="approval_type2"><input type="radio" name="approval_type" id="approval_type2" value="2" checked="" disabled=""> {{lang['combined']}}</label> &nbsp;
                           </td>
                         </tr>
                         <tr>
                           <td>{{lang['approval_position']}}</td>
                           <td>
-                            <label for="approval_position1"><input type="radio" name="approval_position" id="approval_position1" value="before-data" disabled="">{{lang['before_data']}}</label> &nbsp; 
-                            <label for="approval_position2"><input type="radio" name="approval_position" id="approval_position2" value="after-data" checked="" disabled="">{{lang['after_data']}}</label> &nbsp;
+                            <label for="approval_position1"><input type="radio" name="approval_position" id="approval_position1" value="before-data" disabled=""> {{lang['before_data']}}</label> &nbsp; 
+                            <label for="approval_position2"><input type="radio" name="approval_position" id="approval_position2" value="after-data" checked="" disabled=""> {{lang['after_data']}}</label> &nbsp;
                           </td>
                         </tr>
                         <tr>
                           <td>{{lang['approval_by_another_user']}}</td>
-                          <td><label for="approval_by_other_user"><input type="checkbox" name="approval_by_other_user" id="approval_by_other_user" value="1" disabled="">{{lang['approval_by_another_user']}}</label> &nbsp;</td>
+                          <td><label for="approval_by_other_user"><input type="checkbox" name="approval_by_other_user" id="approval_by_other_user" value="1" disabled=""> {{lang['approval_by_another_user']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['bulk_approval']}}</td>
-                          <td><label for="approval_bulk"><input type="checkbox" name="approval_bulk" id="approval_bulk" value="1" disabled="">{{lang['bulk_approval']}}</label> &nbsp;</td>
+                          <td><label for="approval_bulk"><input type="checkbox" name="approval_bulk" id="approval_bulk" value="1" disabled=""> {{lang['bulk_approval']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['trash']}}</td>
-                          <td><label for="with_trash"><input type="checkbox" name="with_trash" id="with_trash" value="1">{{lang['trash']}}</label> &nbsp;</td>
+                          <td><label for="with_trash"><input type="checkbox" name="with_trash" id="with_trash" value="1"> {{lang['trash']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['validation']}}</td>
-                          <td><label for="with_validation"><input type="checkbox" name="with_validation" id="with_validation" value="1">{{lang['validation']}}</label> &nbsp;</td>
+                          <td><label for="with_validation"><input type="checkbox" name="with_validation" id="with_validation" value="1"> {{lang['validation']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['backend_only']}}</td>
-                          <td><label for="backend_only"><input type="checkbox" name="backend_only" id="backend_only" value="1">{{lang['backend_only']}}</label> &nbsp;</td>
+                          <td><label for="backend_only"><input type="checkbox" name="backend_only" id="backend_only" value="1"> {{lang['backend_only']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['ajax_support']}}</td>
-                          <td><label for="ajax_support"><input type="checkbox" name="ajax_support" id="ajax_support" value="1">{{lang['ajax_support']}}</label> &nbsp;</td>
+                          <td><label for="ajax_support"><input type="checkbox" name="ajax_support" id="ajax_support" value="1"> {{lang['ajax_support']}}</label> &nbsp;</td>
                         </tr>
                         <tr>
                           <td>{{lang['subquery']}}</td>
-                          <td><label for="subquery"><input type="checkbox" name="subquery" id="subquery" value="1">{{lang['subquery']}}</label> &nbsp;</td>
+                          <td><label for="subquery"><input type="checkbox" name="subquery" id="subquery" value="1"> {{lang['subquery']}}</label> &nbsp;</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="button-load-module-features"><i class="fa fa-refresh"></i>{{lang['load']}}</button>
-                    <button type="button" class="btn btn-primary" id="button-save-module-features"><i class="fa-solid fa-floppy-disk"></i>{{lang['save']}}</button>
-                    <button type="button" class="btn btn-danger" id="button-clear-module-features"><i class="fa-solid fa-trash-can"></i>{{lang['clear']}}</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+                    <button type="button" class="btn btn-primary" id="button-load-module-features"><i class="fa fa-refresh"></i> {{lang['load']}}</button>
+                    <button type="button" class="btn btn-primary" id="button-save-module-features"><i class="fa-solid fa-floppy-disk"></i> {{lang['save']}}</button>
+                    <button type="button" class="btn btn-danger" id="button-clear-module-features"><i class="fa-solid fa-trash-can"></i> {{lang['clear']}}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
                   </div>
                 </div>
               </div>
@@ -618,8 +628,8 @@
               <div class="column-body">
                 <textarea class="module-file app-code" spellcheck="false" contenteditable="true"></textarea>
                 <div class="form-control-container button-area">
-                  <button type="button" class="btn btn-success" id="button_save_module_file" disabled=""><i class="fa-solid fa-floppy-disk"></i>{{lang['save_module']}}</button>
-                  <button type="button" class="btn btn-danger" id="button_delete_module_file" disabled=""><i class="fa-solid fa-trash-can"></i>{{lang['delete_module']}}</button>
+                  <button type="button" class="btn btn-success" id="button_save_module_file" disabled=""><i class="fa-solid fa-floppy-disk"></i> {{lang['save_module']}}</button>
+                  <button type="button" class="btn btn-danger" id="button_delete_module_file" disabled=""><i class="fa-solid fa-trash-can"></i> {{lang['delete_module']}}</button>
                 </div>
               </div>
             </div>
@@ -645,10 +655,10 @@
               <div class="column-body">
                 <textarea class="entity-file app-code" spellcheck="false" contenteditable="true"></textarea>
                 <div class="form-control-container button-area">
-                  <button type="button" class="btn btn-success" id="button_save_entity_file" disabled=""><i class="fa-solid fa-floppy-disk"></i>{{lang['save_entity']}}</button>
-                  <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i>{{lang['save_entity_as']}}</button>
-                  <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled=""><i class="fa-solid fa-trash-can"></i>{{lang['delete_entity']}}</button>
-                  <button type="button" class="btn btn-primary" id="button_create_entity_file"><i class="fa-solid fa-file"></i>{{lang['create_entity']}}</button>
+                  <button type="button" class="btn btn-success" id="button_save_entity_file" disabled=""><i class="fa-solid fa-floppy-disk"></i> {{lang['save_entity']}}</button>
+                  <button type="button" class="btn btn-success" id="button_save_entity_file_as"><i class="fa-solid fa-floppy-disk"></i> {{lang['save_entity_as']}}</button>
+                  <button type="button" class="btn btn-danger" id="button_delete_entity_file" disabled=""><i class="fa-solid fa-trash-can"></i> {{lang['delete_entity']}}</button>
+                  <button type="button" class="btn btn-primary" id="button_create_entity_file"><i class="fa-solid fa-file"></i> {{lang['create_entity']}}</button>
                 </div>
               </div>
             </div>
@@ -674,12 +684,12 @@
               <div class="column-body">
                 <textarea class="validator-file app-code" spellcheck="false" contenteditable="true"></textarea>
                 <div class="form-control-container button-area">
-                  <button type="button" class="btn btn-success" id="button_save_validator_file" disabled=""><i class="fa-solid fa-floppy-disk"></i>{{lang['save_validator']}}</button>
-                  <button type="button" class="btn btn-success" id="button_save_validator_file_as" disabled=""><i class="fa-solid fa-floppy-disk"></i>{{lang['save_validator_as']}}</button>
-                  <button type="button" class="btn btn-success" id="button_test_validator" disabled=""><i class="fa-solid fa-check"></i>{{lang['test_validator']}}</button>
-                  <button type="button" class="btn btn-danger" id="button_delete_validator_file" disabled=""><i class="fa-solid fa-trash-can"></i>{{lang['delete_validator']}}</button>
-                  <button type="button" class="btn btn-primary" id="button_update_validator_file" disabled=""><i class="fa-solid fa-file"></i>{{lang['update_validator']}}</button>
-                  <button type="button" class="btn btn-primary" id="button_create_validator_file"><i class="fa-solid fa-file"></i>{{lang['create_validator']}}</button>
+                  <button type="button" class="btn btn-success" id="button_save_validator_file" disabled=""><i class="fa-solid fa-floppy-disk"></i> {{lang['save_validator']}}</button>
+                  <button type="button" class="btn btn-success" id="button_save_validator_file_as" disabled=""><i class="fa-solid fa-floppy-disk"></i> {{lang['save_validator_as']}}</button>
+                  <button type="button" class="btn btn-success" id="button_test_validator" disabled=""><i class="fa-solid fa-check"></i> {{lang['test_validator']}}</button>
+                  <button type="button" class="btn btn-danger" id="button_delete_validator_file" disabled=""><i class="fa-solid fa-trash-can"></i> {{lang['delete_validator']}}</button>
+                  <button type="button" class="btn btn-primary" id="button_update_validator_file" disabled=""><i class="fa-solid fa-file"></i> {{lang['update_validator']}}</button>
+                  <button type="button" class="btn btn-primary" id="button_create_validator_file"><i class="fa-solid fa-file"></i> {{lang['create_validator']}}</button>
                 </div>
               </div>
             </div>
@@ -705,16 +715,16 @@
               <div class="column-body">
                 <div class="form-control-container diagram-option">
                   <span>{{lang['max_level']}}</span> <input type="number" class="form-control" step="1" name="maximum_level" value="0" min="0" max="20">
-                  <span>{{lang['max_column']}}</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="4">
+                  <span>{{lang['max_column']}}</span> <input type="number" class="form-control" step="1" name="maximum_column" value="8" min="2">
                   <span>{{lang['margin_x']}}</span> <input type="number" class="form-control" name="margin_x" value="0" min="0">
                   <span>{{lang['margin_y']}}</span> <input type="number" class="form-control" name="margin_y" value="0" min="0">
                   <span>{{lang['gap_x']}}</span> <input type="number" class="form-control" name="entity_margin_x" value="40" min="0">
                   <span>{{lang['gap_y']}}</span> <input type="number" class="form-control" name="entity_margin_y" value="20" min="0">
                   <span>{{lang['zoom']}}</span> <input type="number" class="form-control" step="0.05" name="zoom" value="1" min="0.5">
-                  <button type="button" class="btn btn-primary reload-diagram"><i class="fa-solid fa-refresh"></i>{{lang['reload']}}</button>
-                  <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()"><i class="fa-solid fa-diagram-project"></i>{{lang['svg']}}</button>
-                  <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()"><i class="fa-solid fa-diagram-project"></i>{{lang['png']}}</button>
-                  <button type="button" class="btn btn-primary download-file" onclick="downloadMarkdown()"><i class="fa-solid fa-file"></i>{{lang['markdown']}}</button>
+                  <button type="button" class="btn btn-primary reload-diagram"><i class="fa-solid fa-refresh"></i> {{lang['reload']}}</button>
+                  <button type="button" class="btn btn-primary download-svg" onclick="downloadSVG()"><i class="fa-solid fa-diagram-project"></i> {{lang['svg']}}</button>
+                  <button type="button" class="btn btn-primary download-png" onclick="downloadPNG()"><i class="fa-solid fa-diagram-project"></i> {{lang['png']}}</button>
+                  <button type="button" class="btn btn-primary download-file" onclick="downloadMarkdown()"><i class="fa-solid fa-file"></i> {{lang['markdown']}}</button>
                 </div>
                 <div class="erd-image"></div>
                 <map name="erd-map"></map>
@@ -742,9 +752,9 @@
               <div class="column-body">
                 <textarea class="entity-query app-code" spellcheck="false" contenteditable="true"></textarea>
                 <div class="form-control-container button-area">
-                  <button type="button" class="btn btn-success" id="button_save_entity_query" disabled=""><i class="fa-solid fa-floppy-disk"></i>{{lang['save_query']}}</button>
-                  <button type="button" class="btn btn-primary" id="button_execute_entity_query"><i class="fa-solid fa-play"></i>{{lang['execute_query']}}</button>
-                  <button type="button" class="btn btn-primary" id="button_explore_database"><i class="fa-solid fa-database"></i>{{lang['explore_database']}}</button>
+                  <button type="button" class="btn btn-success" id="button_save_entity_query" disabled=""><i class="fa-solid fa-floppy-disk"></i> {{lang['save_query']}}</button>
+                  <button type="button" class="btn btn-primary" id="button_execute_entity_query"><i class="fa-solid fa-play"></i>  {{lang['execute_query']}}</button>
+                  <button type="button" class="btn btn-primary" id="button_explore_database"><i class="fa-solid fa-database"></i> {{lang['explore_database']}}</button>
                 </div>
               </div>
             </div>
@@ -773,9 +783,9 @@
                   <option value="untranslated">{{lang['untranslated']}}</option>
                   <option value="all">{{lang['all']}}</option>
                 </select>
-                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i>{{lang['reload']}}</button>
-                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i>{{lang['default_language']}}</button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i>{{lang['manage']}}</button>
+                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i> {{lang['reload']}}</button>
+                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> {{lang['default_language']}}</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> {{lang['manage']}}</button>
               </div>
               <div class="column-body">
                 <div class="row">
@@ -785,7 +795,7 @@
                 <div class="form-control-container button-area">
                   <input type="hidden" class="entity-property-name" value="">
                   <input type="hidden" class="entity-name" value="">
-                  <button type="button" class="btn btn-success" id="button-save-entity-translation"><i class="fa-solid fa-floppy-disk"></i>{{lang['save_translation']}}</button>
+                  <button type="button" class="btn btn-success" id="button-save-entity-translation"><i class="fa-solid fa-floppy-disk"></i> {{lang['save_translation']}}</button>
                   <span class="entity-translation-status"></span>
                 </div>
               </div>
@@ -815,9 +825,9 @@
                   <option value="untranslated">{{lang['untranslated']}}</option>
                   <option value="all">{{lang['all']}}</option>
                 </select>
-                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i>{{lang['reload']}}</button>
-                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i>{{lang['default_language']}}</button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i>{{lang['manage']}}</button>
+                <button type="button" class="btn btn-primary reload-translation"><i class="fa-solid fa-refresh"></i> {{lang['reload']}}</button>
+                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> {{lang['default_language']}}</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> {{lang['manage']}}</button>
               </div>
               <div class="column-body">
                 <div class="row">
@@ -826,7 +836,7 @@
                 </div>
                 <div class="form-control-container button-area">
                   <input type="hidden" class="module-property-name" value="">
-                  <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i>{{lang['save_translation']}}</button>
+                  <button type="button" class="btn btn-success" id="button-save-module-translation"><i class="fa-solid fa-floppy-disk"></i> {{lang['save_translation']}}</button>
                   <span class="module-translation-status"></span>
                 </div>
               </div>
@@ -853,9 +863,9 @@
                 <span>{{lang['target_language']}}</span>
                 <select class="form-control target-language target-language-app" data-translate-for="app">
                 </select>
-                <button type="button" class="btn btn-primary reload-app-translation"><i class="fa-solid fa-refresh"></i>{{lang['reload']}}</button>
-                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i>{{lang['default_language']}}</button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i>{{lang['manage']}}</button>
+                <button type="button" class="btn btn-primary reload-app-translation"><i class="fa-solid fa-refresh"></i> {{lang['reload']}}</button>
+                <button type="button" class="btn btn-primary default-language"><i class="fa-solid fa-check"></i> {{lang['default_language']}}</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-update-language"><i class="fa-solid fa-cog"></i> {{lang['manage']}}</button>
               </div>
               <div class="column-body">
                 <div class="row">
@@ -865,7 +875,7 @@
                 </div>
                 <div class="form-control-container button-area">
                   <input type="hidden" class="app-property-name" value="">
-                  <button type="button" class="btn btn-success" id="button-save-app-translation"><i class="fa-solid fa-floppy-disk"></i>{{lang['save_translation']}}</button>
+                  <button type="button" class="btn btn-success" id="button-save-app-translation"><i class="fa-solid fa-floppy-disk"></i> {{lang['save_translation']}}</button>
                   <span class="app-translation-status"></span>
                 </div>
               </div>
@@ -885,10 +895,14 @@
               </div>
           
               <div class="file-manager-right-panel col col-10">
-                  <div>{{lang['file_contents']}}</div>
+                  
                   <div id="file-content">
-                      <div class="media-display image-mode"></div>
-                      <div class="code text-mode">
+                      <div class="content-preview image-mode">
+                        <div>{{lang['image_preview']}}</div>
+                        <div class="media-display"></div>
+                      </div>
+                      <div class="content-preview code text-mode">
+                          <div>{{lang['file_contents']}}</div>
                           <div class="path-bar d-flex">
                               <input type="text" class="file-path form-control me-2" placeholder="{{lang['file_path']}}">
                               <button type="button" class="btn btn-primary btn-open-file">{{lang['open']}}</button>
@@ -897,6 +911,13 @@
                           <div class="file-editor">
                               <textarea id="code" name="code"></textarea>
                           </div>
+                      </div>
+                      <div class="content-preview database-display database-mode"></div>
+                      <div class="content-preview document-display document-mode">
+                        <div id="document-viewer"></div>
+                      </div>
+                      <div class="content-preview frame-display frame-mode">
+                        <div id="frame-viewer"></div>
                       </div>
                   </div>
               </div>
@@ -908,6 +929,40 @@
         </div>
       </div>  
 
+    </div>
+  </div>
+</div>
+
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <!-- Login Form -->
+      <form id="loginForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">{{lang['login']}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="{{lang['close']}}">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger login-error d-none" role="alert">
+          </div>
+          <div class="form-group">
+            <label for="username">{{lang['username']}}</label>
+            <input type="text" class="form-control" name="username" required="">
+          </div>
+          <div class="form-group">
+            <label for="password">{{lang['password']}}</label>
+            <input type="password" class="form-control" name="password" required="">
+          </div>
+          
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">{{lang['login']}}</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -938,7 +993,7 @@
                 <td>
                     <select class="form-control" name="application_architecture">
                         <option value="monolith">{{lang['monolith_application']}}</option>
-                        <option value="microservices">{{lang['microservices_aplication']}}</option>
+                        <option value="microservices" disabled="">{{lang['microservices_aplication']}}</option>
                     </select>
                 </td>
               </tr>
@@ -998,14 +1053,14 @@
                       <tr>
                         <td><input type="text" class="form-control" name="name[0]" value="root" autocomplete="off"></td>
                         <td><input type="text" class="form-control" name="path[0]" value="/" autocomplete="off"></td>
-                        <td><input type="checkbox" name="checked[0]" checked=""></td>
+                        <td><input type="checkbox" class="application-path-selector" name="checked[0]" checked=""></td>
                         <td><button type="button" class="btn btn-danger path-remover"><i class="fa-regular fa-trash-can"></i></button></td>
                       </tr>
                     </tbody>
                     <tfoot>
                       <tr>
                         <td colspan="4">
-                        <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i>{{lang['add']}}</button>
+                        <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> {{lang['add']}}</button>
                         </td>
                       </tr>
                     </tfoot>
@@ -1017,8 +1072,8 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="create_new_app"><i class="fa-solid fa-plus"></i>{{lang['create']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-primary" id="create_new_app"><i class="fa-solid fa-plus"></i> {{lang['create']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1048,8 +1103,8 @@
           </table>      
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success add-new-language"><i class="fa-solid fa-plus"></i>{{lang['add']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-success add-new-language"><i class="fa-solid fa-plus"></i> {{lang['add']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1091,7 +1146,7 @@
                     <tfoot>
                       <tr>
                         <td colspan="4">
-                        <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i>{{lang['add']}}</button>
+                        <button type="button" class="btn btn-primary add-path"><i class="fa-solid fa-plus"></i> {{lang['add']}}</button>
                         </td>
                       </tr>
                     </tfoot>
@@ -1103,8 +1158,8 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="update_module_path"><i class="fa-solid fa-floppy-disk"></i>{{lang['update']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-primary" id="update_module_path"><i class="fa-solid fa-floppy-disk"></i> {{lang['update']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1121,7 +1176,7 @@
       </div>
       <div class="modal-body">
         <form action="">
-          <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+          <table class="config-table config-language-table" width="100%" border="0" cellspacing="0" cellpadding="0">
             <tbody>
               <tr>
                 <td>{{lang['language']}}</td>
@@ -1130,7 +1185,7 @@
                     <thead>
                       <tr>
                         <td>{{lang['name']}}</td>
-                        <td width="35">{{lang['code']}}</td>
+                        <td width="55">{{lang['code']}}</td>
                         <td width="20"></td>
                         <td width="90"></td>
                       </tr>
@@ -1150,7 +1205,7 @@
                     <tfoot>
                       <tr>
                         <td colspan="4">
-                        <button type="button" class="btn btn-primary add-language"><i class="fa-solid fa-plus"></i>{{lang['add']}}</button>
+                        <button type="button" class="btn btn-primary add-language"><i class="fa-solid fa-plus"></i> {{lang['add']}}</button>
                         </td>
                       </tr>
                     </tfoot>
@@ -1162,8 +1217,8 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="update-application-language"><i class="fa-solid fa-floppy-disk"></i>{{lang['update']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-primary" id="update-application-language"><i class="fa-solid fa-floppy-disk"></i> {{lang['update']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1182,7 +1237,7 @@
         <div class="entity-detail"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1201,8 +1256,8 @@
         <div class="application-setting"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config"><i class="fa-solid fa-floppy-disk"></i>{{lang['save']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-success button-save-application-config" name="button-save-application-config"><i class="fa-solid fa-floppy-disk"></i> {{lang['save']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1221,8 +1276,8 @@
         <div class="application-option"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success button-save-application-option" name="button-save-application-option"><i class="fa-solid fa-floppy-disk"></i>{{lang['save']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-success button-save-application-option" name="button-save-application-option"><i class="fa-solid fa-floppy-disk"></i> {{lang['save']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1266,9 +1321,9 @@
       </div>
     
       <div class="modal-footer">
-        <button class="btn btn-primary button-select-file-import"><i class="fa fa-folder-open"></i>{{lang['select_file']}}</button>
-        <button type="button" class="btn btn-success button-save-application-import" name="button-save-application-import"><i class="fa-solid fa-file-import"></i>{{lang['import']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button class="btn btn-primary button-select-file-import"><i class="fa fa-folder-open"></i> {{lang['select_file']}}</button>
+        <button type="button" class="btn btn-success button-save-application-import" name="button-save-application-import"><i class="fa-solid fa-file-import"></i> {{lang['import']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1308,8 +1363,8 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace"><i class="fa-solid fa-floppy-disk"></i>{{lang['save']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-success button-save-workspace" name="button-save-workspace"><i class="fa-solid fa-floppy-disk"></i> {{lang['save']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1328,9 +1383,9 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary button-add-menu"><i class="fa-solid fa-plus"></i>{{lang['add']}}</button>
-        <button type="button" class="btn btn-success button-save-menu"><i class="fa-solid fa-floppy-disk"></i>{{lang['save']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-primary button-add-menu"><i class="fa-solid fa-plus"></i> {{lang['add']}}</button>
+        <button type="button" class="btn btn-success button-save-menu"><i class="fa-solid fa-floppy-disk"></i> {{lang['save']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1349,8 +1404,8 @@
         <input type="text" name="new_menu" id="new_menu" class="form-control" autocomplete="off">       
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success button-apply-new-menu"><i class="fa-solid fa-floppy-disk"></i>{{lang['ok']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-success button-apply-new-menu"><i class="fa-solid fa-floppy-disk"></i> {{lang['ok']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1390,13 +1445,16 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-success button-execute-query">
-            <i class="fas fa-play"></i>{{lang['execute']}}</button>
+            <i class="fas fa-play"></i> {{lang['execute']}}
+        </button>
         
         <button type="button" class="btn btn-primary button-open-file">
-            <i class="fas fa-folder-open"></i>{{lang['open_file']}}</button>
+            <i class="fas fa-folder-open"></i> {{lang['open_file']}}
+        </button>
         
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            <i class="fas fa-times"></i>{{lang['close']}}</button>        
+            <i class="fas fa-times"></i> {{lang['close']}}
+        </button>        
       </div>
     </div>
   </div>
@@ -1417,9 +1475,9 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary button-add-entity-suffix"><i class="fa-solid fa-plus"></i>{{lang['add_entity_suffix']}}</button>
-        <button type="button" class="btn btn-success button-create-entity"><i class="fa-solid fa-floppy-disk"></i>{{lang['ok']}}</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-primary button-add-entity-suffix"><i class="fa-solid fa-plus"></i> {{lang['add_entity_suffix']}}</button>
+        <button type="button" class="btn btn-success button-create-entity"><i class="fa-solid fa-floppy-disk"></i> {{lang['ok']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1439,8 +1497,8 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary master-validation-modal-ok"><i class="fa-solid fa-check"></i>{{lang['ok']}}</button>
-          <button type="button" class="btn btn-secondary master-validation-modal-close" data-dismiss="modal"><i class="fas fa-times"></i>{{lang['close']}}</button>
+          <button type="button" class="btn btn-primary master-validation-modal-ok"><i class="fa-solid fa-check"></i> {{lang['ok']}}</button>
+          <button type="button" class="btn btn-secondary master-validation-modal-close" data-dismiss="modal"><i class="fas fa-times"></i> {{lang['close']}}</button>
         </div>
       </form>
     </div>
@@ -1461,8 +1519,8 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary generic-modal-ok"><i class="fa-solid fa-check"></i>{{lang['ok']}}</button>
-          <button type="button" class="btn btn-secondary generic-modal-close" data-dismiss="modal"><i class="fas fa-times"></i>{{lang['close']}}</button>
+          <button type="button" class="btn btn-primary generic-modal-ok"><i class="fa-solid fa-check"></i> {{lang['ok']}}</button>
+          <button type="button" class="btn btn-secondary generic-modal-close" data-dismiss="modal"><i class="fas fa-times"></i> {{lang['close']}}</button>
         </div>
       </form>
     </div>
@@ -1481,15 +1539,15 @@
           </div>
           <div class="modal-body">
 
-            <span class="form-label">{{lang['validation_for']}}<strong><span class="field-to-validate"></span></strong></span>
+            <span class="form-label">{{lang['validation_for']}} <strong><span class="field-to-validate"></span></strong></span>
             <div class="field-validations-list mt-2"></div>
-            <button type="button" class="btn btn-primary mt-2 add-validation"><i class="fa-solid fa-plus"></i>{{lang['add_validation']}}</button>
+            <button type="button" class="btn btn-primary mt-2 add-validation"><i class="fa-solid fa-plus"></i> {{lang['add_validation']}}</button>
 
             <h4>{{lang['json_output']}}</h4>
             <pre id="jsonOutput" class="json-output">{}</pre>
           </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i>{{lang['save']}}</button>
+          <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> {{lang['save']}}</button>
         </div>
       </form>
     </div>
@@ -1518,17 +1576,21 @@
           <div class="mt-3">
             <div class="form-check">
               <input class="form-check-input apply-insert" type="checkbox" value="" id="apply-insert">
-              <label class="form-check-label" for="apply-insert">{{lang['apply_to_insert']}}</label>
+              <label class="form-check-label" for="apply-insert">
+                {{lang['apply_to_insert']}}
+              </label>
             </div>
             <div class="form-check">
               <input class="form-check-input apply-update" type="checkbox" value="" id="apply-update">
-              <label class="form-check-label" for="apply-update">{{lang['apply_to_update']}}</label>
+              <label class="form-check-label" for="apply-update">
+                {{lang['apply_to_update']}}
+              </label>
             </div>
           </div>
 
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i>{{lang['add']}}</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> {{lang['add']}}</button>
         </div>
       </form>
     </div>
@@ -1556,7 +1618,7 @@
 
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i>{{lang['add']}}</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> {{lang['add']}}</button>
         </div>
       </form>
     </div>
@@ -1579,7 +1641,7 @@
   
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i>{{lang['close']}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> {{lang['close']}}</button>
       </div>
     </div>
   </div>
@@ -1630,4 +1692,5 @@
     </div>
   </div>
 </div>
+
 

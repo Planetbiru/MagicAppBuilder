@@ -17,6 +17,7 @@
     "logout": "Logout",
     "create_new": "Create New",
     "refresh": "Refresh",
+    "show_hidden": "Show Hidden",
     "import_application": "Import Application",
     "entity": "Entity",
     "table": "Table",
@@ -70,6 +71,7 @@
     "sl": "SL",
     "source": "Source",
     "mi": "MI",
+    "ex": "EX",
     "data_filter": "Data Filter",
     "data_order": "Data Order",
     "module_features": "Module Features",
@@ -153,8 +155,10 @@
     "menu_group": "Menu Group",
     "menu": "Menu",
     "directory": "Directory",
+    "image_preview": "Image Preview",
     "file_contents": "File Contents",
     "open": "Open",
+    "login": "Login",
     "create_new_application": "Create New Application",
     "application_name": "Application Name",
     "application_id": "Application ID",
@@ -205,6 +209,8 @@
     "combined": "Combined",
     "before_data": "Before Data",
     "after_data": "After Data",
+    "username": "Username",
+    "password": "Password",
     "apply_to_insert": "Apply to Insert",
     "apply_to_update": "Apply to Update",
     "asc": "ASC",
@@ -238,5 +244,6 @@
     "text_div_class_horizontal_line_div_single_line_text_filter": "Text<div class='horizontal-line'></div>Single-line text filter.",
     "select_div_class_horizontal_line_div_a_dropdown_filter": "Select<div class='horizontal-line'></div>A dropdown filter.",
     "source_div_class_horizontal_line_div_data_source_for_select_filter": "Source<div class='horizontal-line'></div>Data source for select filter.",
-    "multiple_div_class_horizontal_line_div_allows_multiple_filter_values": "Multiple<div class='horizontal-line'></div>Allows multiple filter values."
+    "multiple_div_class_horizontal_line_div_allows_multiple_filter_values": "Multiple<div class='horizontal-line'></div>Allows multiple filter values.",
+    "exact_div_class_horizontal_line_div_use_exact_match_when_filtering_data_br_e_g_instead_of_like": "Exact<div class='horizontal-line'></div>Use exact match when filtering data <br />(e.g., = instead of LIKE)."
 }
