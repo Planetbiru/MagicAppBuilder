@@ -49,13 +49,18 @@ class TemplateConverter {
 
     convertTextToTemplate(element) {
         element.contents().each((_, node) => {
-            if (node.nodeType === 3) {
-                const originalText = node.textContent.trim();
-                if (originalText) {
-                    let key = this.fixKey(originalText.toLowerCase().replace(/\s+/g, '_'));
+            if (node.nodeType === 3) { // Node.TEXT_NODE
+                const fullText = node.textContent;
+                const trimmedText = fullText.trim();
+
+                if (trimmedText) {
+                    const leadingSpace = fullText.match(/^\s*/)[0] || '';
+                    const trailingSpace = fullText.match(/\s*$/)[0] || '';
+                    let key = this.fixKey(trimmedText.toLowerCase().replace(/\s+/g, '_'));
                     if (key !== '_') {
-                        $(node).replaceWith(`{{lang['${key}']}}`);
-                        this.addKey(key, originalText);
+                        const replacement = `${leadingSpace}{{lang['${key}']}}${trailingSpace}`;
+                        $(node).replaceWith(replacement);
+                        this.addKey(key, trimmedText);
                     }
                 }
             }
@@ -73,12 +78,19 @@ class TemplateConverter {
         $('label').each((_, label) => {
             const $label = $(label);
             $label.contents().each((_, node) => {
-                if (node.nodeType === 3 && node.textContent.trim()) {
-                    const originalText = node.textContent.trim();
-                    let key = this.fixKey(originalText.toLowerCase().replace(/\s+/g, '_'));
-                    if (key !== '_') {
-                        $(node).replaceWith(`{{lang['${key}']}}`);
-                        this.addKey(key, originalText);
+                if (node.nodeType === 3) { // Node.TEXT_NODE
+                    const fullText = node.textContent;
+                    const trimmedText = fullText.trim();
+
+                    if (trimmedText) {
+                        const leadingSpace = fullText.match(/^\s*/)[0] || '';
+                        const trailingSpace = fullText.match(/\s*$/)[0] || '';
+                        let key = this.fixKey(trimmedText.toLowerCase().replace(/\s+/g, '_'));
+                        if (key !== '_') {
+                            const replacement = `${leadingSpace}{{lang['${key}']}}${trailingSpace}`;
+                            $(node).replaceWith(replacement);
+                            this.addKey(key, trimmedText);
+                        }
                     }
                 }
             });
@@ -94,12 +106,13 @@ class TemplateConverter {
     convertPlaceholders() {
         $('input[placeholder], textarea[placeholder]').each((_, el) => {
             const $el = $(el);
-            const placeholder = $el.attr('placeholder')?.trim();
+            const placeholder = $el.attr('placeholder');
             if (placeholder) {
-                let key = this.fixKey(placeholder.toLowerCase().replace(/\s+/g, '_'));
+                const trimmedPlaceholder = placeholder.trim();
+                let key = this.fixKey(trimmedPlaceholder.toLowerCase().replace(/\s+/g, '_'));
                 if (key !== '_') {
                     $el.attr('placeholder', `{{lang['${key}']}}`);
-                    this.addKey(key, placeholder);
+                    this.addKey(key, trimmedPlaceholder);
                 }
             }
         });
@@ -109,12 +122,13 @@ class TemplateConverter {
         attributes.forEach(attr => {
             $(`*[${attr}]`).each((_, el) => {
                 const $el = $(el);
-                const value = $el.attr(attr)?.trim();
+                const value = $el.attr(attr);
                 if (value) {
-                    let key = this.fixKey(value.toLowerCase().replace(/\s+/g, '_'));
+                    const trimmedValue = value.trim();
+                    let key = this.fixKey(trimmedValue.toLowerCase().replace(/\s+/g, '_'));
                     if (key !== '_') {
                         $el.attr(attr, `{{lang['${key}']}}`);
-                        this.addKey(key, value);
+                        this.addKey(key, trimmedValue);
                     }
                 }
             });
