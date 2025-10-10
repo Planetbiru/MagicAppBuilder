@@ -129,7 +129,7 @@ function fixValue($original)
         'Session Expired Message' => 'Your session has expired. Please log in again.',
         'Invalid Credentials' => 'Invalid username or password.',
         'Label Username' => 'Username',
-        'Label Password' => 'Password',
+        'Label Password' => 'Password',        
     );
 
 
@@ -280,6 +280,12 @@ if($inputPost->getUserAction() == 'get')
         'invalid_credentials',
         'label_username',
         'label_password',
+
+        'title_deactivate_confirmation',
+        'warning_deactivate_confirmation',
+        'title_delete_confirmation',
+        'title_sort_order_confirmation',
+        'warning_sort_order_confirmation'
     );
 
     $response = array();
