@@ -3360,3 +3360,8 @@ Fixed a user language issue. Before the fix, MagicAppBuilder would always use th
 ## Bug Fix: currentAction 
 
 Fixed an issue with the `currentAction` object. Before the fix, the user ID in the `currentAction` object was always `superuser`, even when the logged-in user was not a superuser.
+
+## Bug Fix: Export Database
+
+Fixed an issue with the database export query.
+
