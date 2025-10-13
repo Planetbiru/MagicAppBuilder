@@ -978,12 +978,56 @@ function hideLoginError() {
   }
 }
 
+function trim(input, toBeTrim)
+{
+  // trim charahter on left and right
+  return input.replace(new RegExp(`^${toBeTrim}`, 'g'), '').replace(new RegExp(`${toBeTrim}$`, 'g'), '');
+}
+
+function getBasename(path) {
+  // trim
+  path = trim(path, '/');
+  // split
+  return path.split('/').reverse()[0];
+}
+
 /**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
 
   const tree = document.getElementById("dir-tree");
+
+  $('#tab-pane-from-config [name="base_application_directory"]').on('change keyup', function(e){
+    let path = $(this).val();
+    let basename = getBasename(path);
+    basename = trim(basename, '/');
+    basename = trim(basename, '-');
+    basename = trim(basename, '_');
+    basename = basename.trim();
+    $('#tab-pane-from-config [name="application_id"]').val(basename);
+  });
+  $('#tab-pane-from-config [name="application_id"]').on('change keyup', function(e){
+    let id = $(this).val();
+    let path = $('#tab-pane-from-config [name="base_application_directory"]').val();
+    path = trim(path, '/');
+    path = trim(path, '/');
+    path = trim(path, '-');
+    path = trim(path, '_');
+    path = path.trim();
+
+    id = trim(id, '/');
+    id = trim(id, '/');
+    id = trim(id, '-');
+    id = trim(id, '_');
+    id = id.trim();
+    // replace basename with id
+    // split with `/`
+    let arr = path.split('/');
+    arr[arr.length - 1] = id;
+    path = arr.join('/');
+    $('#tab-pane-from-config [name="base_application_directory"]').val(path);
+  });
 
   // delegasi event hover
   tree.addEventListener("mouseover", e => {
