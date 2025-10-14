@@ -70,7 +70,7 @@ if($application != null && $application->getId() != null)
         ResponseUtil::sendResponse(
             json_encode([
                 'success' => false,
-                'error' => "Basename ($basename) does not match application ID ($appId). If you want to import it, please rename it first.",
+                'message' => "Basename ($basename) does not match application ID ($appId). If you want to import it, please rename it first.",
                 'data' => [
                     'path' => $baseApplicationDirectory,
                     'applicationName' => $application->getName(),
@@ -93,7 +93,7 @@ if($application != null && $application->getId() != null)
         ResponseUtil::sendResponse(
             json_encode([
                 'success' => false,
-                'error' => "Application ID already exists ($appId). If you want to import it, please rename it first.",
+                'message' => "Application ID already exists ($appId). If you want to import it, please rename it first.",
                 'data' => [
                     'path' => $baseApplicationDirectory,
                     'applicationName' => $application->getName(),

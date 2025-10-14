@@ -15,7 +15,10 @@ $appId = trim($appId);
 
 if (empty($appId)) {
     ResponseUtil::sendResponse(
-        json_encode(['error' => 'Application ID is required']),
+        json_encode([
+            'success' => false, 
+            'message' => 'Application ID is required'
+        ]),
         PicoMime::APPLICATION_JSON,
         null,
         PicoHttpStatus::HTTP_OK

@@ -999,6 +999,11 @@ let initAll = function () {
 
   const tree = document.getElementById("dir-tree");
   
+  $('.button-clear-import').on('click', function(e){
+    $(this).closest('table').find('input[type="text"], input[type="hidden"]').val('');
+    $(this).closest('table').find('.import-message').empty();
+  });
+  
   $('#tab-pane-from-existing .button-check-application').on('click', function(e){
     e.preventDefault();
     let parent = $('#tab-pane-from-existing');

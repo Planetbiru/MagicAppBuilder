@@ -80,13 +80,13 @@ try
             // Handle errors if there is an issue using ImageMagick
             ResponseUtil::sendJSON(array(
                 'success' => false,
-                'error' => 'Error creating .ico file: ' . $e->getMessage()
+                'message' => 'Error creating .ico file: ' . $e->getMessage()
             ));
         }
     } else {
         ResponseUtil::sendJSON(array(
             'success' => false,
-            'error' => 'No images were uploaded.'
+            'message' => 'No images were uploaded.'
         ));
     }
 }
