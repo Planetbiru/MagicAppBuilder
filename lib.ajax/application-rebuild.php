@@ -1,5 +1,7 @@
 <?php
 
+// Rebuild application structure based on existing configuration
+
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\ScriptGenerator;
 use AppBuilder\Util\FileDirUtil;

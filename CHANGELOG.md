@@ -3385,7 +3385,7 @@ Version 1.26.0 adds two new columns, `application_valid` and `directory_exists`,
 
 Users can rebuild invalid applications. MagicAppBuilder will recreate the application according to the configuration stored in the workspace. Users can also choose to rebuild application modules and localizations.
 
-## New Feature: Import from Existing Application
+## New Feature: Recreate Application
 
 Users can now import existing applications. Instead of importing only from a configuration, users can regenerate an application configuration from an existing MagicAppBuilder-created application.
 This method is **strongly discouraged**, as it should only be used if the original application configuration files have been completely lost. MagicAppBuilder will only recreate the directory structure and generate a `default.yml` file — it cannot restore the lost configuration.
