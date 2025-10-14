@@ -88,24 +88,21 @@ if($application != null && $application->getId() != null)
     {
         $inputPost = new InputPost();
         $existingApplication->find($appId);
-        if($existingApplication->getApplicationId() == $appId)
-        {
-            ResponseUtil::sendResponse(
-                json_encode([
-                    'success' => false,
-                    'error' => "Application ID already exists ($appId). If you want to import it, please rename it first.",
-                    'data' => [
-                        'path' => $baseApplicationDirectory,
-                        'applicationName' => $application->getName(),
-                        'applicationId' => $appId
-                    ]
-                ]),
-                PicoMime::APPLICATION_JSON,
-                null,
-                PicoHttpStatus::HTTP_OK
-            );
-            exit;
-        }
+        ResponseUtil::sendResponse(
+            json_encode([
+                'success' => false,
+                'error' => "Application ID already exists ($appId). If you want to import it, please rename it first.",
+                'data' => [
+                    'path' => $baseApplicationDirectory,
+                    'applicationName' => $application->getName(),
+                    'applicationId' => $appId
+                ]
+            ]),
+            PicoMime::APPLICATION_JSON,
+            null,
+            PicoHttpStatus::HTTP_OK
+        );
+        exit;
     }
     catch(Exception $e)
     {

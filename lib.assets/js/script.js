@@ -986,6 +986,7 @@ function trim(input, toBeTrim)
 
 function getBasename(path) {
   // trim
+  path = path.split('\\').join('/');
   path = trim(path, '/');
   // split
   return path.split('/').reverse()[0];
@@ -997,6 +998,33 @@ function getBasename(path) {
 let initAll = function () {
 
   const tree = document.getElementById("dir-tree");
+  
+  $('#tab-pane-from-existing .button-check-application').on('click', function(e){
+    e.preventDefault();
+    let parent = $('#tab-pane-from-existing');
+    let path = parent.find('[name="base_application_directory"]').val();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-check-files.php',
+      data: {'base_application_directory': path},
+      dataType: 'json',
+      success: function(data)
+      {
+        if(data.success)
+        {
+          parent.find('.import-message').html(`<div class="alert alert-success">${data.message}</div>`);
+          parent.find('[name="application_id"]').val(data.data.applicationId);
+          parent.find('[name="application_name"]').val(data.data.applicationName);
+          $('.button-save-application-import')[0].disabled = false;
+        }
+        else
+        {
+          parent.find('.import-message').html(`<div class="alert alert-warning">${data.message}</div>`);
+          $('.button-save-application-import')[0].disabled = true;
+        }
+      }
+    });
+  });
 
   $('#tab-pane-from-config [name="base_application_directory"]').on('change keyup', function(e){
     let path = $(this).val();
@@ -1012,17 +1040,20 @@ let initAll = function () {
     let path = $('#tab-pane-from-config [name="base_application_directory"]').val();
     path = trim(path, '/');
     path = trim(path, '/');
+    path = trim(path, '\\');
     path = trim(path, '-');
     path = trim(path, '_');
     path = path.trim();
 
     id = trim(id, '/');
     id = trim(id, '/');
+    id = trim(id, '\\');
     id = trim(id, '-');
     id = trim(id, '_');
     id = id.trim();
     // replace basename with id
     // split with `/`
+    path = path.split('\\').join('/');
     let arr = path.split('/');
     arr[arr.length - 1] = id;
     path = arr.join('/');
