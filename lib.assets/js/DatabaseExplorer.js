@@ -815,8 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
        document.querySelector('#importDataFileInput').click();
     });
     
-    document.querySelector('.add-data-entity').addEventListener('click', function(){
-       editor.addData(); 
+    document.querySelector('.add-data-entity').addEventListener('click', function(e){
+       editor.addData(true); 
     });
     
     document.querySelector('.clear-data-entity').addEventListener('click', function(){

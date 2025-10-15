@@ -3395,4 +3395,13 @@ This method is **strongly discouraged**, as it should only be used if the origin
 
 An entity filter has been added to the Entity Editor to display only the desired entities on the left side of the editor. This makes it easier for users to select, modify, or delete the desired entities instead of scrolling to find the intended one. This feature is very useful when working on large databases with many entities.
 
+## New Feature: Autocomplete Suggestions in Entity Data Editor
+
+To improve data entry accuracy and speed, the **Entity Data Editor** now includes an **autocomplete suggestion** feature.
+
+*   When adding new data in a column that is a **foreign key** (e.g., `artist_id`), the input field will now display a dropdown list of suggestions.
+*   The suggestions are populated from the related entity (e.g., the `artist` table).
+*   This helps users select valid IDs without needing to manually look them up, reducing errors and speeding up data entry.
+
+
  
