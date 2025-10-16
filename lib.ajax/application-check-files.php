@@ -51,7 +51,7 @@ foreach($dirs as $idx=>$p)
             ]),
             PicoMime::APPLICATION_JSON,
             null,
-            PicoHttpStatus::HTTP_NOT_FOUND
+            PicoHttpStatus::HTTP_OK
         );
         exit;
     }

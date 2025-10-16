@@ -984,6 +984,11 @@ function trim(input, toBeTrim)
   return input.replace(new RegExp(`^${toBeTrim}`, 'g'), '').replace(new RegExp(`${toBeTrim}$`, 'g'), '');
 }
 
+/**
+ * Retrieves the basename of a file path, handling both forward and backward slashes.
+ * @param {string} path - The file path.
+ * @returns {string} The basename of the path.
+ */
 function getBasename(path) {
   // trim
   path = path.split('\\').join('/');
@@ -993,13 +998,64 @@ function getBasename(path) {
 }
 
 /**
+ * Validates the currently active tab in the import application modal.
+ * It calls the appropriate validation function based on which tab is active
+ * and enables or disables the save button accordingly.
+ */
+function validateActiveTab() {
+  const activePane = $('#importApplicationTabContent .tab-pane.show.active');
+  let isValid = false;
+
+  if (activePane.attr('id') === 'tab-pane-from-config') {
+    isValid = validateFromConfig();
+  } else if (activePane.attr('id') === 'tab-pane-from-existing') {
+    isValid = validateFromExisting();
+  }
+
+  $('.button-save-application-import').prop('disabled', !isValid);
+}
+
+/**
+ * Validates the form fields in the "Import from Configuration" tab.
+ * Checks if the base directory, application name, application ID, and file name are all filled.
+ * @returns {boolean} `true` if the form is valid, otherwise `false`.
+ */
+function validateFromConfig() {
+  const dir = $('input[name="base_application_directory"]', '#tab-pane-from-config').val().trim();
+  const name = $('input[name="application_name"]', '#tab-pane-from-config').val().trim();
+  const id = $('input[name="application_id"]', '#tab-pane-from-config').val().trim();
+  const file = $('input[name="file_name"]', '#tab-pane-from-config').val().trim();
+
+  return dir && name && id && file;
+}
+
+/**
+ * Validates the form fields in the "Import from Existing Application" tab.
+ * Checks if the base directory, application name, and application ID are all filled.
+ * @returns {boolean} `true` if the form is valid, otherwise `false`.
+ */
+function validateFromExisting() {
+  const dir = $('input[name="base_application_directory"]', '#tab-pane-from-existing').val().trim();
+  const name = $('input[name="application_name"]', '#tab-pane-from-existing').val().trim();
+  const id = $('input[name="application_id"]', '#tab-pane-from-existing').val().trim();
+
+  return dir && name && id;
+}
+
+/**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
 
   const tree = document.getElementById("dir-tree");
+
+  $('#importApplicationTab').on("shown.bs.tab", function (e) {
+        let currId = $(e.target).attr("id");
+        validateActiveTab();
+  });
   
   $('.button-clear-import').on('click', function(e){
+    $('#tab-pane-from-existing .import-message').html('<div class="alert alert-info">Type existing application directory to import the application.</div>');
     $(this).closest('table').find('input[type="text"], input[type="hidden"]').val('');
     $(this).closest('table').find('.import-message').empty();
   });
@@ -3028,7 +3084,8 @@ let initAll = function () {
       e.preventDefault();
       
       // Display initial info message in modal
-      $('#tab-pane-from-config .import-message').html('<div class="alert alert-info">Select file to import the application.</div>')
+      $('#tab-pane-from-config .import-message').html('<div class="alert alert-info">Select file to import the application.</div>');
+      $('#tab-pane-from-existing .import-message').html('<div class="alert alert-info">Type existing application directory to import the application.</div>');
       $('#tab-pane-from-config [name="base_application_directory"]').val('');
       $('#tab-pane-from-config [name="application_name"]').val('');
       $('#tab-pane-from-config [name="application_id"]').val('');
