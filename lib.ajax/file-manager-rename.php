@@ -21,6 +21,9 @@ try {
     // Get the base directory of the active application
     $baseDirectory = $activeApplication->getBaseApplicationDirectory();
     // Remove trailing slash if exists
+    
+    $baseDirectory = FileDirUtil::normalizationPath($baseDirectory);
+    
     $baseDirectory = rtrim($baseDirectory, "/");
 
     $name = $baseDirectory . "/" . $inputPost->getName();

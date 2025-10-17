@@ -15,8 +15,9 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
 $baseApplicationDirectory = $inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
-$baseApplicationDirectory = trim($baseApplicationDirectory);
 $baseApplicationDirectory = FileDirUtil::normalizePath($baseApplicationDirectory);
+$baseApplicationDirectory = trim($baseApplicationDirectory);
+$baseApplicationDirectory = rtrim($baseApplicationDirectory, "/");
 $newAppId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
 if (empty($baseApplicationDirectory)) {
@@ -164,29 +165,43 @@ if($application != null && $application->getId() != null)
         {
             $entityApplication->setApplicationStatus("created");
             $entityApplication->insert();
+            
+            // Send response
+            ResponseUtil::sendResponse(
+                json_encode([
+                    'success' => true, 
+                    'message' => 'Application is recreated.',
+                    'data' => [
+                        'path' => $baseApplicationDirectory,
+                        'applicationName' => $application->getName(),
+                        'applicationId' => $appId
+                    ]
+                ]),
+                PicoMime::APPLICATION_JSON,
+                null,
+                PicoHttpStatus::HTTP_OK
+            );
+            exit;
         }
         catch(Exception $e)
         {
-            // Do nothing    
+            // Send response
+            ResponseUtil::sendResponse(
+                json_encode([
+                    'success' => false, 
+                    'message' => 'Failed to recreate application: '.$e->getMessage()
+                ]), 
+                PicoMime::APPLICATION_JSON,
+                null,
+                PicoHttpStatus::HTTP_OK
+            );
+            exit;
         }
-
+        finally
+        {   
+            // Clean up if needed    
+        }
         
-        // Send response
-        ResponseUtil::sendResponse(
-            json_encode([
-                'success' => true, 
-                'message' => 'Application is recreated.',
-                'data' => [
-                    'path' => $baseApplicationDirectory,
-                    'applicationName' => $application->getName(),
-                    'applicationId' => $appId
-                ]
-            ]),
-            PicoMime::APPLICATION_JSON,
-            null,
-            PicoHttpStatus::HTTP_OK
-        );
-        exit;
     }
 }
 else

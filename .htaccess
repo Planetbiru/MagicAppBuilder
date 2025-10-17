@@ -13,6 +13,18 @@ AddType application/wasm .wasm
     </IfModule>
 </FilesMatch>
 
+<FilesMatch "\.(css|js|jpg|jpeg|png|gif|svg|ico)$">
+    # Enable caching for static files (cache for 3 months)
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresDefault "access plus 3 months"
+    </IfModule>
+
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=7884000"
+    </IfModule>
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
 
     RewriteEngine On
