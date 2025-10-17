@@ -28,8 +28,31 @@ if(isset($entityAdmin) && $entityAdmin->issetAdminId())
                 $yml = FileDirUtil::normalizePath($dir."/default.yml");
                 if(file_exists($yml))
                 {
+                    $dirs = array();
+                    
+                    $applicationValid = true;
+
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory);
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.app");
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg");
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/classes");
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/vendor");
+                    $yamlPath = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg/application.yml");
+                    $dirs[] = $yamlPath;
+
+                    // Check directory
+
+                    foreach($dirs as $idx=>$p)
+                    {
+                        if(!file_exists($p))
+                        {
+                            $applicationValid = false;
+                            break;
+                        }
+                    }
+                    $directoryExists = file_exists($baseApplicationDirectory);
                     $applicationImporter = new AppImporter($databaseBuilder);
-                    $applicationImporter->importApplication($yml, $dir, $workspaceId, $author, $adminId);
+                    $applicationImporter->importApplication($yml, $dir, $workspaceId, $author, $adminId, $applicationValid, $directoryExists);
                 }
             }
         }

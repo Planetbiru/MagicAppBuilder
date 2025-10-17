@@ -16,7 +16,8 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 $inputPost = new InputPost();
 $baseApplicationDirectory = $inputPost->getBaseApplicationDirectory(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 $baseApplicationDirectory = trim($baseApplicationDirectory);
-
+$baseApplicationDirectory = FileDirUtil::normalizePath($baseApplicationDirectory);
+$newAppId = $inputPost->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 
 if (empty($baseApplicationDirectory)) {
     ResponseUtil::sendResponse(
@@ -110,7 +111,9 @@ if($application != null && $application->getId() != null)
     {
         
         $dir2 = FileDirUtil::normalizePath($activeWorkspace->getDirectory()."/applications/$newAppId");
-        $yml2 = FileDirUtil::normalizePath($dir2."/inc.cfg/default.yml");
+        $yml2 = FileDirUtil::normalizePath($dir2."/default.yml");
+        
+        $yamlPath = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg/application.yml");
         
         // Create directories
         
@@ -121,6 +124,52 @@ if($application != null && $application->getId() != null)
         
         // Copy file
         copy($yamlPath, $yml2);
+        
+        // Success
+        
+        // Now, create the application to database
+        $now = date("Y-m-d H:i:s");
+        
+        $applicationName = $application->getName();
+        $applicationDescription = $application->getDescription();
+        $projectDirectory = $dir2;
+        $applicationDirectory = $baseApplicationDirectory;
+        $baseApplicationUrl = $application->getUrl();
+        $applicationArchitecture = $application->getArchitecture();
+        $author = $entityAdmin->getName();
+        $adminId = $entityAdmin->getAdminId();
+        $workspaceId = $activeWorkspace->getWorkspaceId();
+        
+
+        $entityApplication = new EntityApplication(null, $databaseBuilder);
+        $entityApplication->setApplicationId($newAppId);
+        $entityApplication->setName($applicationName);
+        $entityApplication->setDescription($applicationDescription);
+        $entityApplication->setProjectDirectory($projectDirectory);
+        $entityApplication->setBaseApplicationDirectory($applicationDirectory);
+        $entityApplication->setUrl($baseApplicationUrl);
+        $entityApplication->setArchitecture($applicationArchitecture);
+        $entityApplication->setAuthor($author);
+        $entityApplication->setAdminId($adminId);
+        $entityApplication->setWorkspaceId($workspaceId);
+        $entityApplication->setAdminCreate($adminId);
+        $entityApplication->setAdminEdit($adminId);   
+        $entityApplication->setTimeCreate($now);
+        $entityApplication->setTimeEdit($now);
+        $entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
+        $entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
+        $entityApplication->setActive(true);
+
+        try
+        {
+            $entityApplication->setApplicationStatus("created");
+            $entityApplication->insert();
+        }
+        catch(Exception $e)
+        {
+            // Do nothing    
+        }
+
         
         // Send response
         ResponseUtil::sendResponse(

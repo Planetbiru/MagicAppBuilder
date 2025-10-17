@@ -3402,5 +3402,7 @@ To improve data entry accuracy and speed, the **Entity Data Editor** now include
 *   The suggestions are populated from the related entity (e.g., the `artist` table).
 *   This helps users select valid IDs without needing to manually look them up, reducing errors and speeding up data entry.
 
+## Enhancement: Applicatin Validation when Scan Workspace
 
- 
+When scanning a workspace, MagicAppBuilder validates applications before importing them. Invalid applications will still be imported but will be marked as invalid.
+

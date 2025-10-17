@@ -1043,6 +1043,83 @@ function validateFromExisting() {
 }
 
 /**
+ * Initiates the application import process based on the currently active tab.
+ * 
+ * This function checks which tab is active within the import modal ('From Configuration'
+ * or 'From Existing Application') and calls the corresponding import function.
+ */
+function importApplication()
+{
+  let activeTab = $('#importApplicationTabContent .tab-pane.active');
+  if(activeTab)
+  {
+    if(activeTab.attr('id') === 'tab-pane-from-config')
+    {
+      importApplicationFromConfig();
+    }
+    else if(activeTab.attr('id') === 'tab-pane-from-existing')
+    {
+      importApplicationFromExisting();
+    }
+  }
+}
+
+/**
+ * Imports an application from a configuration file.
+ * 
+ * It retrieves the selected file from the file input, along with the application ID,
+ * name, and base directory from the form fields. It then calls 
+ * `handleApplicationFileUpload` to process the import.
+ */
+function importApplicationFromConfig()
+{
+  const input = document.getElementById('import-application-file');
+  let application_id = $('#modal-application-import [name="application_id"]').val();
+  let application_name = $('#modal-application-import [name="application_name"]').val();
+  let base_application_directory = $('#modal-application-import [name="base_application_directory"]').val();
+  if (input.files.length > 0) {
+      handleApplicationFileUpload(input.files[0], 'import', application_id, application_name, base_application_directory);
+  }
+}
+
+/**
+ * Imports an application from an existing directory on the server.
+ * 
+ * This function sends an AJAX POST request to 'lib.ajax/application-recreate.php'
+ * with the application ID, name, and base directory. On success, it reloads all 
+ * resources and hides the import modal. On failure, it displays an error message.
+ */
+function importApplicationFromExisting()
+{
+  $.ajax({
+    type: 'POST',
+    url: 'lib.ajax/application-recreate.php',
+    dataType: 'json',
+    data: {
+      application_id: $('#tab-pane-from-existing [name="application_id"]').val(),
+      application_name: $('#tab-pane-from-existing [name="application_name"]').val(),
+      base_application_directory: $('#tab-pane-from-existing [name="base_application_directory"]').val()
+    },
+    success: function(data)
+    {
+      if(data.success)
+      {
+        loadAllResource();
+        $('#modal-application-import').modal('hide');
+      }
+      else
+      {
+        $('#tab-pane-from-existing .import-message').html(`<div class="alert alert-${data.status}">${data.message}</div>`);
+      }
+    },
+    error: function (err)
+    {
+      $('#tab-pane-from-existing .import-message').html(`<div class="alert alert-danger">Error: Failed to recreate application. ${err}</div>`);
+    }
+  });
+}
+
+/**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
@@ -3120,13 +3197,7 @@ let initAll = function () {
 
   // Import file (re-uses selected file and sends as 'import')
   $(document).on('click', '.button-save-application-import', function () {
-      const input = document.getElementById('import-application-file');
-      let application_id = $('#modal-application-import [name="application_id"]').val();
-      let application_name = $('#modal-application-import [name="application_name"]').val();
-      let base_application_directory = $('#modal-application-import [name="base_application_directory"]').val();
-      if (input.files.length > 0) {
-          handleApplicationFileUpload(input.files[0], 'import', application_id, application_name, base_application_directory);
-      }
+      importApplication();
   });
   
   

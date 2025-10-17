@@ -6,7 +6,6 @@ use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputFiles;
 use MagicObject\Request\InputPost;
-use MagicObject\MagicObject;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -79,7 +78,7 @@ if ($inputPost->getUserAction() == 'preview' && $inputFile->file) {
             $yamlContent = $zip->getFromName('default.yml');
 
             if ($yamlContent !== false) {
-                $applicationConfig = new MagicObject();
+                $applicationConfig = new SecretObject();
                 $applicationConfig->loadYamlString($yamlContent, false, true, true);
 
                 if ($applicationConfig->issetApplication()) {
@@ -167,7 +166,7 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                 $yamlContent = $zip->getFromName('default.yml');
 
                 if ($yamlContent !== false) {
-                    $applicationConfig = new MagicObject();
+                    $applicationConfig = new SecretObject();
                     $applicationConfig->loadYamlString($yamlContent, false, true, true);
 
                     if ($applicationConfig->issetApplication()) {
@@ -182,25 +181,63 @@ else if ($inputPost->getUserAction() == 'import' && $inputFile->file) {
                         }
                         $zip->extractTo($projectDirectory);
                         $yml = $projectDirectory . '/default.yml';
-                        file_put_contents($yml, $yamlContent);
+                        file_put_contents($yml, $yamlContent);  
 
                         // Ensure that file is exists
                         if(file_exists($yml))
                         {
+                            $dirs = array();
+                    
+                            $applicationValid = true;
+
+                            $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory);
+                            $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.app");
+                            $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg");
+                            $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/classes");
+                            $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/vendor");
+                            $yamlPath = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg/application.yml");
+                            $dirs[] = $yamlPath;
+
+                            // Check directory
+
+                            foreach($dirs as $idx=>$p)
+                            {
+                                if(!file_exists($p))
+                                {
+                                    $applicationValid = false;
+                                    break;
+                                }
+                            }
+                            $directoryExists = file_exists($baseApplicationDirectory);
                             $applicationImporter = new AppImporter($databaseBuilder);
-                            $applicationImporter->importApplication($yml, $projectDirectory, $workspaceId, $author, $adminId);
+                            $applicationImporter->importApplication($yml, $dir, $workspaceId, $author, $adminId, $applicationValid, $directoryExists);
+                            
+                            echo json_encode([
+                                "success" => true,
+                                "status" => "success",
+                                "message" => "Application '$applicationName' has been imported successfully.",
+                                "data" => [
+                                    "application_name" => $applicationName,
+                                    "application_id" => $applicationId,
+                                    "base_application_directory" => $baseApplicationDirectory
+                                ]
+                            ]);
+                        }
+                        else
+                        {
+                            echo json_encode([
+                                "success" => false,
+                                "status" => "warning",
+                                "message" => "Failed to create 'default.yml' in the application directory after import.",
+                                "data" => [
+                                    "application_name" => $applicationName,
+                                    "application_id" => $applicationId,
+                                    "base_application_directory" => $baseApplicationDirectory
+                                ]
+                            ]);
                         }
 
-                        echo json_encode([
-                            "success" => true,
-                            "status" => "success",
-                            "message" => "Application '$applicationName' has been imported successfully.",
-                            "data" => [
-                                "application_name" => $applicationName,
-                                "application_id" => $applicationId,
-                                "base_application_directory" => $baseApplicationDirectory
-                            ]
-                        ]);
+                        
                     } else {
                         echo json_encode([
                             "success" => false,
