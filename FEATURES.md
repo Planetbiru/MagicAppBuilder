@@ -10,6 +10,7 @@
 - **Import entities** from various sources including SQL, Excel (.xlsx, .xls), CSV, DBF (dBase/Access), ODS, and by pasting tabular data from HTML, Word, or spreadsheets.
 - **Import entity structures** directly from Excel, CSV, and even GraphQL schemas, with automatic schema inference.
 - **Grouped table/entity lists** (Custom vs. System Tables).
+- **Duplicate entity prevention** in the Entity Editor.
 - **Hierarchical module management** with unlimited multi-level menu support.
 - **Automatic parent module creation** and role inheritance.
 - **Project-based entity editor data storage** for better portability and version control.
@@ -19,6 +20,7 @@
 - **Export entities as interactive HTML documents** for comprehensive documentation.
 - **Entity filter** to easily find entities in the editor.
 - **Paste SQL queries directly** into the editor to create or append entities and data.
+- **Automatic snake case naming** on SQL import.
 - **Context menu enhancements** for quick actions like duplicating entities or importing from clipboard.
 - **Autocomplete suggestions** for foreign key columns in the Data Editor.
 - **Entity export** uses the server-stored definition, ensuring consistency.
@@ -27,7 +29,7 @@
 - **Unlimited multi-level navigation menus** with Bootstrap-compatible styling.
 - Menu structure is based on hierarchical module definitions.
 - **Menu translation and localization** per user language.
-- **Optimized menu caching system** for improved performance.
+- **Menu caching system** for improved performance.
 - Efficient menu cache updates and theme filtering based on menu type.
 - Support for a **development mode preview** to check menu changes before deployment.
 
@@ -35,6 +37,7 @@
 - **Validator Builder** for generating validation classes with PHP attributes.
 - **Automatic validation** on insert/update operations with built-in exception handling and localized messages.
 - **Secure password management** including history tracking and secure password reset via email.
+- **Password column length increased** to 512 characters to support modern hashing algorithms.
 - **Configurable password hashing algorithm** and salt for enhanced security.
 - **Secure configuration management** with encryption/decryption support.
 - **Role-based menu caching** and special access mechanisms for admin levels.
@@ -42,6 +45,7 @@
 - **Superuser-only access enforcement** for critical builder features.
 - **IP forwarding support** for proxy access.
 - **Session variable updates** to prevent conflicts and allow simultaneous logins.
+- **Smarter session management** with active tab refresh and idle detection.
 
 #### **Database & Export**
 - **Supports MySQL, MariaDB, PostgreSQL, SQLite, and SQL Server.**
@@ -52,6 +56,7 @@
 - **Append entity data** from SQL `INSERT` queries.
 - **Database structure auto-update** after application upgrades.
 - **Database time zone conversion** for SQLServer and SQLite.
+- **Configurable database connection timeout**.
 - **Database Migration Tool** to automate data transfer from legacy schemas.
 - **Table filtering and grouping** in export and editor views.
 
@@ -66,13 +71,14 @@
 - Enhanced captions, tooltips, and error messages.
 - Synchronized translation editors.
 - **Theme system** with dynamic color support for mobile browsers (dark/light mode).
-- Improved UI for sortable handlers and drag-and-drop operations.
+- **Improved UI** for sortable handlers and drag-and-drop operations.
 - **Project exporter/importer** for easy backup and migration.
 - Scroll position memory in the database manager.
 - **Dashboard charts** for monitoring user and development activity.
 - **Sidebar menu search** in generated applications for quick navigation.
 - **Improved responsiveness** and theme style refinements.
-- Better error handling pages (403, 404) for a smoother user experience.
+- **Improved data list appearance** with better spacing and styling.
+- **Better error handling pages (403, 404)** for a smoother user experience.
 
 #### **Localization & Internationalization**
 - **Default language support** with customizable language priority.
@@ -82,9 +88,8 @@
 - **Enhanced language localization** for entities and modules.
 
 #### **Performance & Reliability**
-- Optimized caching, database queries, and internal workflows.
-- Refined error handling and stability improvements.
-- Numerous bug fixes and code quality improvements.
+- **Built for speed**: Multi-layered caching, optimized database queries, and a lightweight architecture ensure fast response times even under high load.
+- **Seamless data exploration**: Highly optimized AJAX handling for filtering and pagination delivers near-instantaneous results, ensuring a smooth user experience even with large datasets.
 
 #### **Developer Tools & Extensibility**
 - **Built-in application updater** for seamless upgrades.
@@ -108,7 +113,8 @@
 - **Flexible system module path** for better project organization.
 - **YAML to XML** configuration file conversion.
 - **HTTP request fallback** from cURL to PHP streams for better reliability.
-- Enhanced code documentation and maintainability.
+- Code documentation and maintainability.
+- **Login modal integration** for seamless session recovery.
 - Backend-only support with subquery functionality.
 
 ---
