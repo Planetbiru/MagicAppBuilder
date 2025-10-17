@@ -36,8 +36,8 @@ $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.app");
 $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg");
 $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/classes");
 $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/vendor");
-$yamlPath = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg/application.yml");
-$dirs[] = $yamlPath;
+$originalYamlPath = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg/application.yml");
+$dirs[] = $originalYamlPath;
 
 // Check directory
 
@@ -61,7 +61,7 @@ foreach($dirs as $idx=>$p)
 $basename = trim(basename($baseApplicationDirectory));
 
 $configToCheck = new SecretObject();
-$configToCheck->loadYamlFile($yamlPath, false, true, true);
+$configToCheck->loadYamlFile($originalYamlPath, false, true, true);
 $application = $configToCheck->getApplication();
 if($application != null && $application->getId() != null)
 {
@@ -111,20 +111,27 @@ if($application != null && $application->getId() != null)
     catch(Exception $e)
     {
         
-        $dir2 = FileDirUtil::normalizePath($activeWorkspace->getDirectory()."/applications/$newAppId");
-        $yml2 = FileDirUtil::normalizePath($dir2."/default.yml");
+        $newProjectDir = FileDirUtil::normalizePath($activeWorkspace->getDirectory()."/applications/$newAppId");
+        $newYamlPath = FileDirUtil::normalizePath($newProjectDir."/default.yml");
         
-        $yamlPath = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg/application.yml");
+        // Update Application ID in YAML file
+        
+        $configToCheck->getApplication()->setId($newAppId);
+        
+        $configContent = $configToCheck->dumpYaml();
+        
+        // Update application YAML in application directory
+        file_put_contents($originalYamlPath, $configContent);
         
         // Create directories
         
-        if(!file_exists($dir2))
+        if(!file_exists($newProjectDir))
         {
-            mkdir($dir2, 0755, true);
+            mkdir($newProjectDir, 0755, true);
         }
         
-        // Copy file
-        copy($yamlPath, $yml2);
+        // Copy application directory to workspace
+        file_put_contents($newYamlPath, $configContent);
         
         // Success
         
@@ -133,7 +140,7 @@ if($application != null && $application->getId() != null)
         
         $applicationName = $application->getName();
         $applicationDescription = $application->getDescription();
-        $projectDirectory = $dir2;
+        $projectDirectory = $newProjectDir;
         $applicationDirectory = $baseApplicationDirectory;
         $baseApplicationUrl = $application->getUrl();
         $applicationArchitecture = $application->getArchitecture();

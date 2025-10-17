@@ -16,6 +16,7 @@ try
 
     $applicationToUpdate = new EntityApplication(null, $databaseBuilder);
 
+    // Find one by primary key
     $applicationToUpdate->find($appId);
 
 	$workspaceDirectory = $activeWorkspace->getDirectory();
