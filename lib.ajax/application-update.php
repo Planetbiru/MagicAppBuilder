@@ -165,35 +165,63 @@ try
     }
 
     // Update application config in application directory
-    $yml2 = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory()."/inc.cfg/application.yml");
+    $rootDir = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory());
 
-    $appConfig2 = new SecretObject();
-    $appConfig2->loadYamlFile($yml2, true, true, true);
-    $appConfig2->setDatabase($existingDatabase);
-	$appConfig2->setSessions($existingSessions);
-    $appConfig2->setAccountSecurity($appConfig->getAccountSecurity());
-    $appConfig2->setEntityInfo($appConfig->getEntityInfo());
-
-    if($appConfig2->getApplication() == null)
+    if(file_exists($rootDir))
     {
-        $appConfig2->setApplication(new SecretObject());
-    }
-    $appConfig2->getApplication()->setName($appConfig->getApplication()->getName());
-    $appConfig2->getApplication()->setDescription($appConfig->getApplication()->getDescription());
-    $appConfig2->getApplication()->setArchitecture($appConfig->getApplication()->getArchitecture());
-    $appConfig2->getApplication()->setBaseModuleDirectory($appConfig->getApplication()->getBaseModuleDirectory());
-    $appConfig2->getApplication()->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
-    $appConfig2->getApplication()->setActiveTheme($inputPost->getActiveTheme());
-    $yamlData2 = $appConfig2->dumpYaml();
-    file_put_contents($yml2, $yamlData2);
+        $appDir = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory()."/inc.app");
+        $classesDir = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory()."/inc.lib/classes");
+        $vendorDir = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory()."/inc.lib/vendor");
+        $rootDirExists = true;
+        $appDirExists = file_exists($appDir);
+        $classesDirExists = file_exists($classesDir);
+        $vendorDirExists = file_exists($vendorDir);
 
+        if(!$rootDirExists || !$appDirExists || !$classesDirExists || !$vendorDirExists)
+        {
+            $applicationValid = false;
+        }
+        else
+        {
+            $applicationValid = true;
+        }
+        $yml2 = FileDirUtil::normalizePath($rootDir."/inc.cfg/application.yml");
+
+        $appConfig2 = new SecretObject();
+        $appConfig2->loadYamlFile($yml2, true, true, true);
+        $appConfig2->setDatabase($existingDatabase);
+        $appConfig2->setSessions($existingSessions);
+        $appConfig2->setAccountSecurity($appConfig->getAccountSecurity());
+        $appConfig2->setEntityInfo($appConfig->getEntityInfo());
+
+        if($appConfig2->getApplication() == null)
+        {
+            $appConfig2->setApplication(new SecretObject());
+        }
+        $appConfig2->getApplication()->setName($appConfig->getApplication()->getName());
+        $appConfig2->getApplication()->setDescription($appConfig->getApplication()->getDescription());
+        $appConfig2->getApplication()->setArchitecture($appConfig->getApplication()->getArchitecture());
+        $appConfig2->getApplication()->setBaseModuleDirectory($appConfig->getApplication()->getBaseModuleDirectory());
+        $appConfig2->getApplication()->setMultiLevelMenu($inputPost->getMultiLevelMenu() == 1 || $inputPost->getMultiLevelMenu() == 'true');
+        $appConfig2->getApplication()->setActiveTheme($inputPost->getActiveTheme());
+        $yamlData2 = $appConfig2->dumpYaml();
+        file_put_contents($yml2, $yamlData2);
+    }
+    else
+    {
+        $rootDirExists = false;
+        $applicationValid = false;
+    }
+
+    // Update the application
     $applicationToUpdate
         ->setName($applicationName)
         ->setDescription($description)
         ->setArchitecture($architecture)
         ->setBaseApplicationDirectory($baseApplicationDirectory)
+        ->setDirectoryExists($rootDirExists)
+        ->setApplicationValid($applicationValid)
         ->update();
-    
 }
 catch(Exception $e)
 {
