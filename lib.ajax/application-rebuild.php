@@ -32,19 +32,8 @@ $applicationToUpdate = new EntityApplication(null, $databaseBuilder);
 
 try
 {
-	$inputPost = new InputPost();
+	  $inputPost = new InputPost();
     $applicationToUpdate->find($appId);
-    if(!$applicationToUpdate->isApplicationValid())
-    {
-        // Do not rebuild valid application
-        ResponseUtil::sendResponse(
-            json_encode(['success' => false, 'message' => 'Application still valid']),
-            PicoMime::APPLICATION_JSON,
-            null,
-            PicoHttpStatus::HTTP_OK
-        );
-        exit;
-    }
 }
 catch(Exception $e)
 {
@@ -56,6 +45,7 @@ catch(Exception $e)
     );
     exit;
 }
+
 
 // Read the existing application configuration YAML
 $appDir = FileDirUtil::normalizePath($activeWorkspace->getDirectory()."/applications/$appId");
@@ -118,6 +108,28 @@ else
 
 $entityApplication = new EntityApplication(null, $databaseBuilder);
 $systemModulePath = '/';
+
+if(file_exists($yml))
+{
+    $appConfig = new SecretObject();
+    $appConfig->loadYamlFile($yml, false, true, true);
+    if($application->issetBaseModuleDirectory())
+    {
+        if($application->getBaseModuleDirectory())
+        {
+            $baseModuleDirs = $application->getBaseModuleDirectory();
+            foreach($baseModuleDirs as $dir)
+            {
+                if($dir->isActive() && $dir->issetPath())
+                {
+                    // get the first active module path
+                    $systemModulePath = $dir->getPath();
+                    break;
+                }
+            }
+        }
+    }
+}
 
 // Run the generator
 $scriptGenerator = new ScriptGenerator();
@@ -244,6 +256,10 @@ if(!file_exists($rootDir."/lib.upload"))
 {
     mkdir($rootDir."/lib.upload", 0755, true);
 }
+
+$applicationToUpdate->setApplicationValid(true)
+  ->setDirectoryExists(true)
+  ->update();
 
 // Send response
 ResponseUtil::sendResponse(

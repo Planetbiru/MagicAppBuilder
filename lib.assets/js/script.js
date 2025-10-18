@@ -3118,6 +3118,54 @@ let initAll = function () {
     });
   });
 
+  $(document).on("click", ".button-rebuild-application", function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-option .button-save-application-option');
+    updateBtn[0].disabled = true;
+    updateBtn[0].style.display = 'none';
+    let applicationId = $(this).attr('data-application-id');
+    increaseAjaxPending();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-rebuild.php',
+      data: { applicationId: applicationId },
+      dataType: 'json',
+      success: function (data) {
+
+        $.ajax({
+          type: 'GET',
+          url: 'lib.ajax/application-option.php',
+          data: { applicationId: applicationId},
+          dataType: 'html',
+          success: function (data) {
+            decreaseAjaxPending();
+            $('#modal-application-option').attr('data-application-id', applicationId);
+            $('#modal-application-option .application-option').empty().append(data);
+            let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
+            $('#modal-application-option').attr('data-application-valid', applicationValid);
+            if(applicationValid == 'false')
+            {
+              updateBtn[0].style.display = 'none';
+            }
+            else
+            {
+              updateBtn[0].disabled = false;
+              updateBtn[0].style.display = '';
+            }
+            loadAllResource();
+          },
+          error: function (xhr, status, error) {
+            decreaseAjaxPending();
+          }
+        });
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+    
+  });
+
   $(document).on("click", ".button-check-application-valid", function (e) {
     e.preventDefault();
     let updateBtn = $('#modal-application-option .button-save-application-option');
@@ -3132,7 +3180,6 @@ let initAll = function () {
       data: { applicationId: applicationId, validate: 'true' },
       dataType: 'html',
       success: function (data) {
-        console.log(data);
         decreaseAjaxPending();
         $('#modal-application-option').attr('data-application-id', applicationId);
         $('#modal-application-option .application-option').empty().append(data);
@@ -3147,7 +3194,7 @@ let initAll = function () {
           updateBtn[0].disabled = false;
           updateBtn[0].style.display = '';
         }
-      
+        loadAllResource();
       },
       error: function (xhr, status, error) {
         decreaseAjaxPending();
