@@ -5,13 +5,14 @@ use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
+use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 if(isset($entityAdmin) && $entityAdmin->issetAdminId())
 {
     $inputGet = new InputGet();
-    $workspaceId = $inputGet->getWorkspaceId();
+    $workspaceId = $inputGet->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
     $workspace = new EntityWorkspace(null, $databaseBuilder);
     try
     {

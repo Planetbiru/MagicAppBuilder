@@ -634,7 +634,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->workspaceId, Field::of()->name, $inputGet->getWorkspaceId())
+								Field::of()->workspaceId, Field::of()->name, $inputGet->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS))
 								; ?>
 							</select>
 					</span>

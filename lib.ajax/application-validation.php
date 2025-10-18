@@ -49,11 +49,17 @@ try
     }
     if(!$rootDirExists || !$appDirExists || !$classesDirExists || !$vendorDirExists || !$ymlExists)
     {
-        $applicationToUpdate
-            ->setApplicationValid(false)
-            ->setDirectoryExists($rootDirExists)
-            ->update();
+        $applicationValid = false;
     }
+    else
+    {
+        $applicationValid = true;
+    }
+
+    $applicationToUpdate
+        ->setApplicationValid($applicationValid)
+        ->setDirectoryExists($rootDirExists)
+        ->update();
 }
 catch(Exception $e)
 {

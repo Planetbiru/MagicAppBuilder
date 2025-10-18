@@ -3461,6 +3461,22 @@ let initAll = function () {
     });
   });
 
+  $(document).on('click', '.button-workspace-validate', function (e) {
+    e.preventDefault();
+    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    resetWorkspaceSearch();
+    increaseAjaxPending();
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/workspace-validation.php',
+      data: { workspaceId: workspaceId },
+      success: function (data) {
+        decreaseAjaxPending();
+        loadAllResource();
+      }
+    });
+  });
+
   $(document).on('click', '.button-workspace-default', function (e) {
     e.preventDefault();
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id') || '';
