@@ -3117,6 +3117,43 @@ let initAll = function () {
       }
     });
   });
+
+  $(document).on("click", ".button-check-application-valid", function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-option .button-save-application-option');
+    updateBtn[0].disabled = true;
+    updateBtn[0].style.display = 'none';
+    let applicationId = $(this).attr('data-application-id');
+    increaseAjaxPending();
+
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/application-option.php',
+      data: { applicationId: applicationId, validate: 'true' },
+      dataType: 'html',
+      success: function (data) {
+        console.log(data);
+        decreaseAjaxPending();
+        $('#modal-application-option').attr('data-application-id', applicationId);
+        $('#modal-application-option .application-option').empty().append(data);
+        let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
+        $('#modal-application-option').attr('data-application-valid', applicationValid);
+        if(applicationValid == 'false')
+        {
+          updateBtn[0].style.display = 'none';
+        }
+        else
+        {
+          updateBtn[0].disabled = false;
+          updateBtn[0].style.display = '';
+        }
+      
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+  });
   
   $(document).on('click', '.button-application-option', function (e) {
     e.preventDefault();

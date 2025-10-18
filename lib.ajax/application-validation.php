@@ -27,7 +27,7 @@ try
 
     // Check if application is valid
     $rootDir = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory());
-    if(!file_exists($rootDir))
+    if(file_exists($rootDir))
     {
         $appDir = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory()."/inc.app");
         $classesDir = FileDirUtil::normalizePath($applicationToUpdate->getBaseApplicationDirectory()."/inc.lib/classes");
