@@ -49,6 +49,26 @@ if($application->getApplicationId() != null)
     <table class="config-table" width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
             <td>
+                Application ID
+            </td>
+            <td>
+                <?php
+                echo $application->getApplicationId();
+                ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Application Name
+            </td>
+            <td>
+                <?php
+                echo $application->getName();
+                ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 Application Directory
             </td>
             <td>
@@ -91,7 +111,14 @@ if($application->getApplicationId() != null)
             <td></td>
             <td>
                 <button type="button" class="btn btn-primary button-check-application-valid" data-application-id="<?php echo $application->getApplicationId(); ?>"><i class="fa-regular fa-circle-check"></i> Validate</button>
-                <button type="button" class="btn btn-primary button-rebuild-application" data-application-id="<?php echo $application->getApplicationId(); ?>"><i class="fas fa-sync"></i> Rebuild</button>
+                <?php
+                if($inputGet->getValidate() === 'true')
+                {
+                    ?>
+                    <button type="button" class="btn btn-primary button-rebuild-application" data-application-id="<?php echo $application->getApplicationId(); ?>"><i class="fas fa-sync"></i> Rebuild</button>
+                    <?php
+                }
+                ?>
             </td>
         </tr>
     </table>

@@ -3124,45 +3124,72 @@ let initAll = function () {
     updateBtn[0].disabled = true;
     updateBtn[0].style.display = 'none';
     let applicationId = $(this).attr('data-application-id');
-    increaseAjaxPending();
-    $.ajax({
-      type: 'POST',
-      url: 'lib.ajax/application-rebuild.php',
-      data: { applicationId: applicationId },
-      dataType: 'json',
-      success: function (data) {
+    let rebuildButton = $(this);
 
-        $.ajax({
-          type: 'GET',
-          url: 'lib.ajax/application-option.php',
-          data: { applicationId: applicationId},
-          dataType: 'html',
-          success: function (data) {
-            decreaseAjaxPending();
-            $('#modal-application-option').attr('data-application-id', applicationId);
-            $('#modal-application-option .application-option').empty().append(data);
-            let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
-            $('#modal-application-option').attr('data-application-valid', applicationValid);
-            if(applicationValid == 'false')
-            {
-              updateBtn[0].style.display = 'none';
-            }
-            else
-            {
-              updateBtn[0].disabled = false;
-              updateBtn[0].style.display = '';
-            }
-            loadAllResource();
-          },
-          error: function (xhr, status, error) {
-            decreaseAjaxPending();
-          }
-        });
-      },
-      error: function (xhr, status, error) {
-        decreaseAjaxPending();
-      }
-    });
+    asyncAlert(
+      'Are yo sure you want to rebuild the application?',  // Message to display in the modal
+      'Rebuild Application Confirmation',  
+      [
+        {
+          'caption': 'Yes', 
+          'fn': () => {
+            
+            rebuildButton.html('<i class="fas fa-spinner fa-spin"></i> Rebuilding...').prop('disabled', true);
+
+            increaseAjaxPending();
+            $.ajax({
+              type: 'POST',
+              url: 'lib.ajax/application-rebuild.php',
+              data: { applicationId: applicationId },
+              dataType: 'json',
+              success: function (data) {
+                decreaseAjaxPending();
+                rebuildButton.html('Rebuild').prop('disabled', false);
+                $.ajax({
+                  type: 'GET',
+                  url: 'lib.ajax/application-option.php',
+                  data: { applicationId: applicationId},
+                  dataType: 'html',
+                  success: function (data) {
+                    
+                    decreaseAjaxPending();
+                    $('#modal-application-option').attr('data-application-id', applicationId);
+                    $('#modal-application-option .application-option').empty().append(data);
+                    let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
+                    $('#modal-application-option').attr('data-application-valid', applicationValid);
+                    if(applicationValid == 'false')
+                    {
+                      updateBtn[0].style.display = 'none';
+                    }
+                    else
+                    {
+                      updateBtn[0].disabled = false;
+                      updateBtn[0].style.display = '';
+                    }
+                    loadAllResource();
+                  },
+                  error: function (xhr, status, error) {
+                    decreaseAjaxPending();
+                  }
+                });
+              },
+              error: function (xhr, status, error) {
+                decreaseAjaxPending();
+              }
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
+
+    
+    
     
   });
 
@@ -3172,6 +3199,8 @@ let initAll = function () {
     updateBtn[0].disabled = true;
     updateBtn[0].style.display = 'none';
     let applicationId = $(this).attr('data-application-id');
+    let validateButton = $(this);
+    validateButton.html('<i class="fas fa-spinner fa-spin"></i> Validating...').prop('disabled', true);
     increaseAjaxPending();
 
     $.ajax({
@@ -3180,6 +3209,7 @@ let initAll = function () {
       data: { applicationId: applicationId, validate: 'true' },
       dataType: 'html',
       success: function (data) {
+        validateButton.html('Validate').prop('disabled', false);
         decreaseAjaxPending();
         $('#modal-application-option').attr('data-application-id', applicationId);
         $('#modal-application-option .application-option').empty().append(data);
