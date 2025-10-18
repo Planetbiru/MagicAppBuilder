@@ -72,6 +72,7 @@ $setting->setPrettify(true);
 
 echo PicoResponseBody::getInstance()
 	->setModule($picoModule)
+	->setCurrentAction("list")
 	->setPageable($pageable)
     ->setData($data)
     ->setEntity($entity)

@@ -42,6 +42,7 @@ try
 
     $body = PicoResponseBody::getInstance()
         ->setModule($picoModule)
+        ->setCurrentAction("detail")
         ->setData($data)
         ->setEntity($entity, true)
         ->setResponseCode("000")
