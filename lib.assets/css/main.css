@@ -484,13 +484,16 @@ li.file-syntax-error a {
   border-color: rgba(0, 0, 0, 0.15);
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
 }
+.workspace-item[data-directory-exists=false] .button-application-open, .application-item[data-directory-exists=false] .button-application-open {
+  display: none;
+}
 .workspace-item .card-body .card-title, .application-item .card-body .card-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.table td,
+#modal-application-option .table td,
 .table th {
   padding: 0.4rem 0.5rem;
 }

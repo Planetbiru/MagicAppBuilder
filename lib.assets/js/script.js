@@ -873,7 +873,7 @@ function deleteValidatorFile()
  * @param {string} [base_application_directory] - The base directory path for the application (if applicable).
  */
 function handleApplicationFileUpload(file, action, application_id, application_name, base_application_directory) {
-    const importInfoDiv = $('#modal-application-import .import-message');
+    const importInfoDiv = $('#tab-pane-from-config .import-message');
     const updateBtn = $('#modal-application-import .button-save-application-import');
 
     const formData = new FormData();
@@ -892,7 +892,7 @@ function handleApplicationFileUpload(file, action, application_id, application_n
     }
     formData.append('file[]', file);
 
-    $('#modal-application-import [name="file_name"]').val(file.name);
+    $('#tab-pane-from-config [name="file_name"]').val(file.name);
     importInfoDiv.html('<div class="alert alert-info">Uploading and parsing file...</div>');
 
     $.ajax({
@@ -903,10 +903,10 @@ function handleApplicationFileUpload(file, action, application_id, application_n
         contentType: false,
         dataType: 'json',
         success: function (data) {
-            if (data.status === 'success') {
-              $('#modal-application-import [name="application_name"]').val(data.data.application_name);
-              $('#modal-application-import [name="application_id"]').val(data.data.application_id);
-              $('#modal-application-import [name="base_application_directory"]').val(data.data.base_application_directory);
+            if (data.success) {
+              $('#tab-pane-from-config [name="base_application_directory"]').val(data.data.base_application_directory);
+              $('#tab-pane-from-config [name="application_name"]').val(data.data.application_name);
+              $('#tab-pane-from-config [name="application_id"]').val(data.data.application_id);
               updateBtn[0].disabled = false;
               if(action == 'import')
               {
@@ -914,7 +914,10 @@ function handleApplicationFileUpload(file, action, application_id, application_n
                 $('#modal-application-import').modal('hide');
               }
             } else {
-              updateBtn[0].disabled = true;
+              $('#tab-pane-from-config [name="base_application_directory"]').val(data.data.base_application_directory || '');
+              $('#tab-pane-from-config [name="application_name"]').val(data.data.application_name || '');
+              $('#tab-pane-from-config [name="application_id"]').val(data.data.application_id || '');
+              updateBtn[0].disabled = false;
             }
             importInfoDiv.html(`<div class="alert alert-${data.status}">${data.message}</div>`);
         },
@@ -975,12 +978,225 @@ function hideLoginError() {
   }
 }
 
+function trim(input, toBeTrim)
+{
+  // trim charahter on left and right
+  return input.replace(new RegExp(`^${toBeTrim}`, 'g'), '').replace(new RegExp(`${toBeTrim}$`, 'g'), '');
+}
+
+/**
+ * Retrieves the basename of a file path, handling both forward and backward slashes.
+ * @param {string} path - The file path.
+ * @returns {string} The basename of the path.
+ */
+function getBasename(path) {
+  // trim
+  path = path.split('\\').join('/');
+  path = trim(path, '/');
+  // split
+  return path.split('/').reverse()[0];
+}
+
+/**
+ * Validates the currently active tab in the import application modal.
+ * It calls the appropriate validation function based on which tab is active
+ * and enables or disables the save button accordingly.
+ */
+function validateActiveTab() {
+  const activePane = $('#importApplicationTabContent .tab-pane.show.active');
+  let isValid = false;
+
+  if (activePane.attr('id') === 'tab-pane-from-config') {
+    isValid = validateFromConfig();
+  } else if (activePane.attr('id') === 'tab-pane-from-existing') {
+    isValid = validateFromExisting();
+  }
+
+  $('.button-save-application-import').prop('disabled', !isValid);
+}
+
+/**
+ * Validates the form fields in the "Import from Configuration" tab.
+ * Checks if the base directory, application name, application ID, and file name are all filled.
+ * @returns {boolean} `true` if the form is valid, otherwise `false`.
+ */
+function validateFromConfig() {
+  const dir = $('input[name="base_application_directory"]', '#tab-pane-from-config').val().trim();
+  const name = $('input[name="application_name"]', '#tab-pane-from-config').val().trim();
+  const id = $('input[name="application_id"]', '#tab-pane-from-config').val().trim();
+  const file = $('input[name="file_name"]', '#tab-pane-from-config').val().trim();
+
+  return dir && name && id && file;
+}
+
+/**
+ * Validates the form fields in the "Import from Existing Application" tab.
+ * Checks if the base directory, application name, and application ID are all filled.
+ * @returns {boolean} `true` if the form is valid, otherwise `false`.
+ */
+function validateFromExisting() {
+  const dir = $('input[name="base_application_directory"]', '#tab-pane-from-existing').val().trim();
+  const name = $('input[name="application_name"]', '#tab-pane-from-existing').val().trim();
+  const id = $('input[name="application_id"]', '#tab-pane-from-existing').val().trim();
+
+  return dir && name && id;
+}
+
+/**
+ * Initiates the application import process based on the currently active tab.
+ * 
+ * This function checks which tab is active within the import modal ('From Configuration'
+ * or 'From Existing Application') and calls the corresponding import function.
+ */
+function importApplication()
+{
+  let activeTab = $('#importApplicationTabContent .tab-pane.active');
+  if(activeTab)
+  {
+    if(activeTab.attr('id') === 'tab-pane-from-config')
+    {
+      importApplicationFromConfig();
+    }
+    else if(activeTab.attr('id') === 'tab-pane-from-existing')
+    {
+      importApplicationFromExisting();
+    }
+  }
+}
+
+/**
+ * Imports an application from a configuration file.
+ * 
+ * It retrieves the selected file from the file input, along with the application ID,
+ * name, and base directory from the form fields. It then calls 
+ * `handleApplicationFileUpload` to process the import.
+ */
+function importApplicationFromConfig()
+{
+  const input = document.getElementById('import-application-file');
+  let application_id = $('#modal-application-import [name="application_id"]').val();
+  let application_name = $('#modal-application-import [name="application_name"]').val();
+  let base_application_directory = $('#modal-application-import [name="base_application_directory"]').val();
+  if (input.files.length > 0) {
+      handleApplicationFileUpload(input.files[0], 'import', application_id, application_name, base_application_directory);
+  }
+}
+
+/**
+ * Imports an application from an existing directory on the server.
+ * 
+ * This function sends an AJAX POST request to 'lib.ajax/application-recreate.php'
+ * with the application ID, name, and base directory. On success, it reloads all 
+ * resources and hides the import modal. On failure, it displays an error message.
+ */
+function importApplicationFromExisting()
+{
+  $.ajax({
+    type: 'POST',
+    url: 'lib.ajax/application-recreate.php',
+    dataType: 'json',
+    data: {
+      application_id: $('#tab-pane-from-existing [name="application_id"]').val(),
+      application_name: $('#tab-pane-from-existing [name="application_name"]').val(),
+      base_application_directory: $('#tab-pane-from-existing [name="base_application_directory"]').val()
+    },
+    success: function(data)
+    {
+      if(data.success)
+      {
+        loadAllResource();
+        $('#modal-application-import').modal('hide');
+      }
+      else
+      {
+        $('#tab-pane-from-existing .import-message').html(`<div class="alert alert-${data.status}">${data.message}</div>`);
+      }
+    },
+    error: function (err)
+    {
+      $('#tab-pane-from-existing .import-message').html(`<div class="alert alert-danger">Error: Failed to recreate application. ${err}</div>`);
+    }
+  });
+}
+
 /**
  * Initialize all event handlers and elements
  */
 let initAll = function () {
 
   const tree = document.getElementById("dir-tree");
+
+  $('#importApplicationTab').on("shown.bs.tab", function (e) {
+        let currId = $(e.target).attr("id");
+        validateActiveTab();
+  });
+  
+  $('.button-clear-import').on('click', function(e){
+    $('#tab-pane-from-existing .import-message').html('<div class="alert alert-info">Type existing application directory to import the application.</div>');
+    $(this).closest('table').find('input[type="text"], input[type="hidden"]').val('');
+    $(this).closest('table').find('.import-message').empty();
+  });
+  
+  $('#tab-pane-from-existing .button-check-application').on('click', function(e){
+    e.preventDefault();
+    let parent = $('#tab-pane-from-existing');
+    let path = parent.find('[name="base_application_directory"]').val();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-check-files.php',
+      data: {'base_application_directory': path},
+      dataType: 'json',
+      success: function(data)
+      {
+        if(data.success)
+        {
+          parent.find('.import-message').html(`<div class="alert alert-success">${data.message}</div>`);
+          parent.find('[name="application_id"]').val(data.data.applicationId);
+          parent.find('[name="application_name"]').val(data.data.applicationName);
+          $('.button-save-application-import')[0].disabled = false;
+        }
+        else
+        {
+          parent.find('.import-message').html(`<div class="alert alert-warning">${data.message}</div>`);
+          $('.button-save-application-import')[0].disabled = true;
+        }
+      }
+    });
+  });
+
+  $('#tab-pane-from-config [name="base_application_directory"]').on('change keyup', function(e){
+    let path = $(this).val();
+    let basename = getBasename(path);
+    basename = trim(basename, '/');
+    basename = trim(basename, '-');
+    basename = trim(basename, '_');
+    basename = basename.trim();
+    $('#tab-pane-from-config [name="application_id"]').val(basename);
+  });
+  $('#tab-pane-from-config [name="application_id"]').on('change keyup', function(e){
+    let id = $(this).val();
+    let path = $('#tab-pane-from-config [name="base_application_directory"]').val();
+    path = trim(path, '/');
+    path = trim(path, '/');
+    path = trim(path, '\\');
+    path = trim(path, '-');
+    path = trim(path, '_');
+    path = path.trim();
+
+    id = trim(id, '/');
+    id = trim(id, '/');
+    id = trim(id, '\\');
+    id = trim(id, '-');
+    id = trim(id, '_');
+    id = id.trim();
+    // replace basename with id
+    // split with `/`
+    path = path.split('\\').join('/');
+    let arr = path.split('/');
+    arr[arr.length - 1] = id;
+    path = arr.join('/');
+    $('#tab-pane-from-config [name="base_application_directory"]').val(path);
+  });
 
   // delegasi event hover
   tree.addEventListener("mouseover", e => {
@@ -995,6 +1211,40 @@ let initAll = function () {
     if (li && tree.contains(li)) {
       li.classList.remove("hovered");
     }
+  });
+
+
+  $(document).on('click', '.button-check-application-id', function(e){
+    e.preventDefault();
+    let parent = $('#tab-pane-from-config');
+    let applicationId = parent.find('[name="application_id"]').val();
+    let baseApplicationDirectory = parent.find('[name="base_application_directory"]').val();
+    let applicationName = parent.find('[name="application_name"]').val();
+    $.ajax({
+      type: 'POST',
+      url: 'lib.ajax/application-check-id.php',
+      data: {'application_id': applicationId, 'base_application_directory': baseApplicationDirectory, 'application_name': applicationName},
+      dataType: 'json',
+      success: function(data)
+      {
+        
+        if(data.success)
+        {
+          parent.find('.import-message').html(`<div class="alert alert-success">${data.message}</div>`);
+          $('.button-save-application-import')[0].disabled = false;
+        }
+        else
+        {
+          parent.find('.import-message').html(`<div class="alert alert-warning">${data.message}</div>`);
+          $('.button-save-application-import')[0].disabled = true;
+        }
+      },
+      error: function (err)
+      {
+        parent.find('.import-message').html(`<div class="alert alert-warning">${err}</div>`);
+      }
+    })
+
   });
 
   $('#loginForm').on('submit', function (e) {
@@ -2867,11 +3117,126 @@ let initAll = function () {
       }
     });
   });
+
+  $(document).on("click", ".button-rebuild-application", function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-option .button-save-application-option');
+    updateBtn[0].disabled = true;
+    updateBtn[0].style.display = 'none';
+    let applicationId = $(this).attr('data-application-id');
+    let rebuildButton = $(this);
+
+    asyncAlert(
+      'Are yo sure you want to rebuild the application?',  // Message to display in the modal
+      'Rebuild Application Confirmation',  
+      [
+        {
+          'caption': 'Yes', 
+          'fn': () => {
+            
+            rebuildButton.html('<i class="fas fa-spinner fa-spin"></i> Rebuilding...').prop('disabled', true);
+
+            increaseAjaxPending();
+            $.ajax({
+              type: 'POST',
+              url: 'lib.ajax/application-rebuild.php',
+              data: { applicationId: applicationId },
+              dataType: 'json',
+              success: function (data) {
+                decreaseAjaxPending();
+                rebuildButton.html('Rebuild').prop('disabled', false);
+                $.ajax({
+                  type: 'GET',
+                  url: 'lib.ajax/application-option.php',
+                  data: { applicationId: applicationId},
+                  dataType: 'html',
+                  success: function (data) {
+                    
+                    decreaseAjaxPending();
+                    $('#modal-application-option').attr('data-application-id', applicationId);
+                    $('#modal-application-option .application-option').empty().append(data);
+                    let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
+                    $('#modal-application-option').attr('data-application-valid', applicationValid);
+                    if(applicationValid == 'false')
+                    {
+                      updateBtn[0].style.display = 'none';
+                    }
+                    else
+                    {
+                      updateBtn[0].disabled = false;
+                      updateBtn[0].style.display = '';
+                    }
+                    loadAllResource();
+                  },
+                  error: function (xhr, status, error) {
+                    decreaseAjaxPending();
+                  }
+                });
+              },
+              error: function (xhr, status, error) {
+                decreaseAjaxPending();
+              }
+            });
+          },  
+          'class': 'btn-primary'  
+        },
+        {
+          'caption': 'No',  
+          'fn': () => { },  
+          'class': 'btn-secondary'  
+        }
+      ]
+    );
+
+    
+    
+    
+  });
+
+  $(document).on("click", ".button-check-application-valid", function (e) {
+    e.preventDefault();
+    let updateBtn = $('#modal-application-option .button-save-application-option');
+    updateBtn[0].disabled = true;
+    updateBtn[0].style.display = 'none';
+    let applicationId = $(this).attr('data-application-id');
+    let validateButton = $(this);
+    validateButton.html('<i class="fas fa-spinner fa-spin"></i> Validating...').prop('disabled', true);
+    increaseAjaxPending();
+
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/application-option.php',
+      data: { applicationId: applicationId, validate: 'true' },
+      dataType: 'html',
+      success: function (data) {
+        validateButton.html('Validate').prop('disabled', false);
+        decreaseAjaxPending();
+        $('#modal-application-option').attr('data-application-id', applicationId);
+        $('#modal-application-option .application-option').empty().append(data);
+        let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
+        $('#modal-application-option').attr('data-application-valid', applicationValid);
+        if(applicationValid == 'false')
+        {
+          updateBtn[0].style.display = 'none';
+        }
+        else
+        {
+          updateBtn[0].disabled = false;
+          updateBtn[0].style.display = '';
+        }
+        loadAllResource();
+      },
+      error: function (xhr, status, error) {
+        decreaseAjaxPending();
+      }
+    });
+  });
   
   $(document).on('click', '.button-application-option', function (e) {
     e.preventDefault();
     let updateBtn = $('#modal-application-option .button-save-application-option');
     updateBtn[0].disabled = true;
+    updateBtn[0].style.display = 'none';
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
     $('#modal-application-option .application-option').empty();
     $('#modal-application-option').modal('show');
@@ -2886,7 +3251,18 @@ let initAll = function () {
         decreaseAjaxPending();
         $('#modal-application-option').attr('data-application-id', applicationId);
         $('#modal-application-option .application-option').empty().append(data);
-        updateBtn[0].disabled = false;
+        let applicationValid = $('#modal-application-option .application-option').find('.application-valid').attr('data-application-valid');
+        $('#modal-application-option').attr('data-application-valid', applicationValid);
+        if(applicationValid == 'false')
+        {
+          updateBtn[0].style.display = 'none';
+        }
+        else
+        {
+          updateBtn[0].disabled = false;
+          updateBtn[0].style.display = '';
+        }
+      
       },
       error: function (xhr, status, error) {
         decreaseAjaxPending();
@@ -2899,11 +3275,12 @@ let initAll = function () {
       e.preventDefault();
       
       // Display initial info message in modal
-      $('#modal-application-import .import-message').html('<div class="alert alert-info">Select file to import the application.</div>')
-      $('#modal-application-import [name="application_id"]').val('');
-      $('#modal-application-import [name="application_name"]').val('');
-      $('#modal-application-import [name="base_application_directory"]').val('');
-      $('#modal-application-import [name="file_name"]').val('');
+      $('#tab-pane-from-config .import-message').html('<div class="alert alert-info">Select file to import the application.</div>');
+      $('#tab-pane-from-existing .import-message').html('<div class="alert alert-info">Type existing application directory to import the application.</div>');
+      $('#tab-pane-from-config [name="base_application_directory"]').val('');
+      $('#tab-pane-from-config [name="application_name"]').val('');
+      $('#tab-pane-from-config [name="application_id"]').val('');
+      $('#tab-pane-from-config [name="file_name"]').val('');
       // Disable the "Import" button until a valid file is selected
       let updateBtn = $('#modal-application-import .button-save-application-import');
       updateBtn[0].disabled = true;
@@ -2916,6 +3293,14 @@ let initAll = function () {
   $(document).on('click', '.button-select-file-import', function (e) {
       $('#import-application-file').click(); // Simulate click on hidden file input
   });
+  $(document).on('click', '.button-clear-file-import', function (e) {
+      $('#import-application-file').val('');
+      $('#tab-pane-from-config .import-message').html('<div class="alert alert-info">Select file to import the application.</div>')
+      $('#tab-pane-from-config [name="base_application_directory"]').val('');
+      $('#tab-pane-from-config [name="application_name"]').val('');
+      $('#tab-pane-from-config [name="application_id"]').val('');
+      $('#tab-pane-from-config [name="file_name"]').val('');
+  });
   
   // Preview file (called first when user selects file)
   $(document).on('change', '#import-application-file', function () {
@@ -2926,13 +3311,7 @@ let initAll = function () {
 
   // Import file (re-uses selected file and sends as 'import')
   $(document).on('click', '.button-save-application-import', function () {
-      const input = document.getElementById('import-application-file');
-      let application_id = $('#modal-application-import [name="application_id"]').val();
-      let application_name = $('#modal-application-import [name="application_name"]').val();
-      let base_application_directory = $('#modal-application-import [name="base_application_directory"]').val();
-      if (input.files.length > 0) {
-          handleApplicationFileUpload(input.files[0], 'import', application_id, application_name, base_application_directory);
-      }
+      importApplication();
   });
   
   
@@ -3188,6 +3567,22 @@ let initAll = function () {
     $.ajax({
       type: 'GET',
       url: 'lib.ajax/workspace-scan.php',
+      data: { workspaceId: workspaceId },
+      success: function (data) {
+        decreaseAjaxPending();
+        loadAllResource();
+      }
+    });
+  });
+
+  $(document).on('click', '.button-workspace-validate', function (e) {
+    e.preventDefault();
+    let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id');
+    resetWorkspaceSearch();
+    increaseAjaxPending();
+    $.ajax({
+      type: 'GET',
+      url: 'lib.ajax/workspace-validation.php',
       data: { workspaceId: workspaceId },
       success: function (data) {
         decreaseAjaxPending();

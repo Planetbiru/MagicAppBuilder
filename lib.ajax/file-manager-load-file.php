@@ -15,6 +15,9 @@ $inputGet = new InputGet();
 try {
     // Get the base directory of the active application
     $baseDirectory = rtrim($activeApplication->getBaseApplicationDirectory(), "/");
+    // Normalize the base directory path
+    $baseDirectory = FileDirUtil::normalizationPath($baseDirectory);
+
 
     // Construct the full path
     $file = FileDirUtil::normalizationPath($baseDirectory . "/" . $inputGet->getFile());

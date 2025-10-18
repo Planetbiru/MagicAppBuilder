@@ -1,6 +1,7 @@
 <?php
 
 use AppBuilder\EntityInstaller\EntityApplication;
+use AppBuilder\Util\FileDirUtil;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\PicoFilterConstant;
@@ -52,8 +53,47 @@ if($inputPost->getUserAction() == 'save')
 $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 try
 {
-    $application = new EntityApplication(null, $databaseBuilder);
-    $application->findOneWithPrimaryKeyValue($applicationId);
+   $application = new EntityApplication(null, $databaseBuilder);
+   $application->find($applicationId);
+   if($inputGet->getValidate() == 'true')
+   {
+      // Validate application
+      // Check if application is valid
+      $rootDir = FileDirUtil::normalizePath($application->getBaseApplicationDirectory());
+      if(file_exists($rootDir))
+      {
+         $appDir = FileDirUtil::normalizePath($application->getBaseApplicationDirectory()."/inc.app");
+         $classesDir = FileDirUtil::normalizePath($application->getBaseApplicationDirectory()."/inc.lib/classes");
+         $vendorDir = FileDirUtil::normalizePath($application->getBaseApplicationDirectory()."/inc.lib/vendor");
+         $yml = FileDirUtil::normalizePath($application->getBaseApplicationDirectory()."/inc.cfg/application.yml");
+         $rootDirExists = true;
+         $appDirExists = file_exists($appDir);
+         $classesDirExists = file_exists($classesDir);
+         $vendorDirExists = file_exists($vendorDir);
+         $ymlExists = file_exists($yml);
+      }
+      else
+      {
+         $rootDirExists = false;
+         $appDirExists = false;
+         $classesDirExists = false;
+         $vendorDirExists = false;
+         $ymlExists = false;
+      }
+      if(!$rootDirExists || !$appDirExists || !$classesDirExists || !$vendorDirExists || !$ymlExists)
+      {
+         $applicationValid = false;
+      }
+      else
+      {
+         $applicationValid = true;
+      }
+
+      $application
+         ->setApplicationValid($applicationValid)
+         ->setDirectoryExists($rootDirExists)
+         ->update();
+   }
 
     $appBaseConfigPath = $activeWorkspace->getDirectory()."/applications";
     $appConfig = new SecretObject();
@@ -67,7 +107,11 @@ try
         }
     }
 
+    if($application->isApplicationValid())
+    {
 ?>
+<div class="application-valid" data-application-valid="true" style="display: none;"></div>
+
 <form name="formdatabase" id="formdatabase" method="post" action="" class="">
    <!-- BEGIN Accordion Wrapper -->
    <div id="accordion-option" class="accordion">
@@ -224,6 +268,12 @@ try
 </form>
 
 <?php
+    }
+    else
+    {
+      require_once __DIR__ . "/application-invalid.php";
+      exit();
+    }
 }
 catch (Exception $e)
 {

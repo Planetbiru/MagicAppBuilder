@@ -5,7 +5,6 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\FileDirUtil;
-use MagicAdmin\AppEntityLanguageImpl;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicApp\PicoModule;
@@ -46,7 +45,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                 <span class="filter-group">
                 <span class="filter-label"><?php echo $appLanguage->getWorkspace();?></span>
                 <span class="filter-control">
-                    <select class="form-control" name="workspace_id" data-value="<?php echo $inputGet->getWorkspaceId();?>" onchange="this.form.submit()">
+                    <select class="form-control" name="workspace_id" data-value="<?php echo $inputGet->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);?>" onchange="this.form.submit()">
                         <option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
                         <?php echo AppFormBuilder::getInstance()->createSelectOption(new Workspace(null, $database), 
                         PicoSpecification::getInstance()
@@ -55,7 +54,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                         PicoSortable::getInstance()
                             ->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
                             ->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-                        Field::of()->workspaceId, Field::of()->name, $inputGet->getWorkspaceId())
+                        Field::of()->workspaceId, Field::of()->name, $inputGet->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS))
                         ; ?>
                     </select>
                 </span>
@@ -68,7 +67,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                         PicoSpecification::getInstance()
                             ->addAnd(new PicoPredicate(Field::of()->active, true))
                             ->addAnd(new PicoPredicate(Field::of()->draft, false))
-                            ->addAnd(new PicoPredicate(Field::of()->workspaceId, $inputGet->getWorkspaceId())), 
+                            ->addAnd(new PicoPredicate(Field::of()->workspaceId, $inputGet->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS))), 
                         PicoSortable::getInstance()
                             ->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
                             ->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 

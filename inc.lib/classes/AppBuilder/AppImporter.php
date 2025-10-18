@@ -45,9 +45,11 @@ class AppImporter
      * @param string $workspaceId The ID of the workspace to associate with this application.
      * @param string $author The author name to be saved with the application.
      * @param string $adminId The ID of the admin performing the import.
+     * @param bool $applicationValid Flag that indicates if the application is valid.
+     * @param bool $directoryExists Flag that indicates if the application directory exists.
      * @return EntityApplication The imported or existing application entity.
      */
-    public function importApplication($yml, $dir, $workspaceId, $author, $adminId)
+    public function importApplication($yml, $dir, $workspaceId, $author, $adminId, $applicationValid = true, $directoryExists = true)
     {
         $config = new SecretObject(null);
         $config->loadYamlFile($yml, false, true, true);
@@ -93,6 +95,10 @@ class AppImporter
             $application->setIpCreate($ip);
             $application->setIpEdit($ip);
             $application->setActive(true);
+            
+            $application->setApplicationValid($applicationValid);
+            $application->setDirectoryExists($directoryExists);
+            
             $application->insert();
         } catch (Exception $e) {
             // Silently fail on any unexpected exception (not recommended in production).

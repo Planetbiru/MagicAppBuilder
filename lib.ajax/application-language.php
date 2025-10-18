@@ -29,7 +29,7 @@ if($inputPost->getUserAction() == "update")
             }
             foreach($currentLanguages as $idx=>$p)
             {
-                if($p->getActive() == 'true' || $p->getActive() == 1)
+                if($p->getActive() == 'true' || $p->getActive() === 1 || $p->getActive() === true)
                 {
                     $selected = $p->getCode();
                 }

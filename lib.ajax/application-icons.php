@@ -46,14 +46,14 @@ try
             // Respond with error
             ResponseUtil::sendJSON(array(
                 'success' => false,
-                'error' => 'Failed to save the icon'
+                'message' => 'Failed to save the icon'
             ));
         }
     } else {
         // Invalid request, missing data
         ResponseUtil::sendJSON(array(
             'success' => false,
-            'error' => 'Missing image or icon name'
+            'message' => 'Missing image or icon name'
         ));
     }
 }

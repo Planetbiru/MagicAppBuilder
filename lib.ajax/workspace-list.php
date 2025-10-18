@@ -79,6 +79,7 @@ try
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $workspace->getDirectory(); ?></h6>
             <p class="card-text"><?php echo $workspace->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-scan"><i class="fa-solid fa-folder-tree"></i> Scan</a>
+            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-validate"><i class="fa-solid fa-check"></i> Validate</a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-open"><i class="fas fa-code"></i> Code</a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-export">
                 <i class="fas fa-file-export"></i> Export
@@ -121,6 +122,7 @@ try
             <h6 class="card-subtitle mb-2 text-muted"><?php echo $workspace->getDirectory(); ?></h6>
             <p class="card-text"><?php echo $workspace->getDescription(); ?></p>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-scan"><i class="fa-solid fa-folder-tree"></i> Scan</a>
+            <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-validate"><i class="fa-solid fa-check"></i> Validate</a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-open"><i class="fas fa-code"></i> Code</a>
             <a href="javascript:;" class="btn btn-tn btn-primary button-workspace-export">
                 <i class="fas fa-file-export"></i> Export

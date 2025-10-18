@@ -5,13 +5,14 @@ use AppBuilder\EntityInstaller\EntityWorkspace;
 use AppBuilder\Util\FileDirUtil;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputGet;
+use MagicObject\Request\PicoFilterConstant;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 if(isset($entityAdmin) && $entityAdmin->issetAdminId())
 {
     $inputGet = new InputGet();
-    $workspaceId = $inputGet->getWorkspaceId();
+    $workspaceId = $inputGet->getWorkspaceId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
     $workspace = new EntityWorkspace(null, $databaseBuilder);
     try
     {
@@ -28,8 +29,31 @@ if(isset($entityAdmin) && $entityAdmin->issetAdminId())
                 $yml = FileDirUtil::normalizePath($dir."/default.yml");
                 if(file_exists($yml))
                 {
+                    $dirs = array();
+                    
+                    $applicationValid = true;
+
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory);
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.app");
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg");
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/classes");
+                    $dirs[] = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.lib/vendor");
+                    $yamlPath = FileDirUtil::normalizePath($baseApplicationDirectory."/inc.cfg/application.yml");
+                    $dirs[] = $yamlPath;
+
+                    // Check directory
+
+                    foreach($dirs as $idx=>$p)
+                    {
+                        if(!file_exists($p))
+                        {
+                            $applicationValid = false;
+                            break;
+                        }
+                    }
+                    $directoryExists = file_exists($baseApplicationDirectory);
                     $applicationImporter = new AppImporter($databaseBuilder);
-                    $applicationImporter->importApplication($yml, $dir, $workspaceId, $author, $adminId);
+                    $applicationImporter->importApplication($yml, $dir, $workspaceId, $author, $adminId, $applicationValid, $directoryExists);
                 }
             }
         }

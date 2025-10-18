@@ -23,6 +23,9 @@ header('Access-Control-Allow-Origin: *');
 try {
     // Get the base directory of the active application
     $baseDirectory = $activeApplication->getBaseApplicationDirectory();
+    // Normalize the base directory path
+    $baseDirectory = FileDirUtil::normalizationPath($baseDirectory);
+
     // Remove trailing slash if exists
     $baseDirectory = rtrim($baseDirectory, "/");
 

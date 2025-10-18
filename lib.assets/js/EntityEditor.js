@@ -4432,6 +4432,7 @@ class EntityEditor {
         let fixDateTimeWrapper = document.createElement('div');
         
         fixDateTimeWrapper.innerHTML = `
+        <div class="suggestions-container"><span class="suggestions"></span> &nbsp;</div>
         Fix Date Time 
         <select id="selector-fix-date-time" class="form-control">
         </select>
@@ -4448,6 +4449,7 @@ class EntityEditor {
             <option value="time">time</option>
         </select>
         <button ="button-fix-date-time" class="btn btn-primary" onclick="editor.fixDateTime(this.closest('div').querySelector('#selector-fix-date-time').value, this.closest('div').querySelector('#format-preference').value, this.closest('div').querySelector('#date-time-mode').value)">Fix Data</button>
+        <span class="autocomplete-list-container" data-empty="true"></span>
         `;
         let selectOne = document.createElement('option');
         selectOne.value = '';
@@ -4512,7 +4514,7 @@ class EntityEditor {
      * @param {string} [value=""] - Optional value to prefill the input field.
      * @returns {HTMLTableCellElement} The created <td> element.
      */
-    createEntityDataCell(rowIndex, colIndex, col, value = "") {
+    createEntityDataCell(rowIndex, colIndex, col, value = "", withList = false, listId = null) {
         const td = document.createElement('td');
         td.classList.add('entity-column');
         const input = document.createElement('input');
@@ -4524,8 +4526,30 @@ class EntityEditor {
         input.dataset.col = col.name;
         input.dataset.type = col.type;
         input.value = value ?? '';
+        input.setAttribute('autocomplete', 'off');
         input.style.width = '100%';
         input.style.boxSizing = 'border-box';
+        if(withList)
+        {
+            let info = document.querySelector('.suggestions');
+            input.setAttribute('list', listId);
+            input.addEventListener('input', () => { // Use 'input' for better handling of value changes
+                const val = input.value;
+                const options = document.querySelectorAll('#' + listId + ' option');
+                let found = false;
+                for (let option of options) {
+                    if (option.value === val) {
+                        info.textContent = option.dataset.info || '';
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    info.textContent = ''; // Clear info if no match
+                }
+            });
+
+        }
 
         td.appendChild(input);
         return td;
@@ -4632,18 +4656,82 @@ class EntityEditor {
     }
 
     /**
-     * Adds a new empty row to the editable entity data table within the modal.
-     * Each cell in the new row will contain an input field, allowing users to enter new data.
-     * A delete button is also included in the first column of the new row, enabling
-     * the user to remove this newly added row from the table.
+     * Checks if the autocomplete list container is marked as empty.
+     * This is used to prevent re-populating the datalists.
      *
-     * @returns {HTMLTableRowElement|null} The newly created HTML table row element (<tr>),
-     * or null if the table body is not found.
+     * @returns {boolean} True if the `data-empty` attribute is 'true', false otherwise.
      */
-    addData() {
+    isAutocompleteListEmpty() {
+        return document.querySelector('.autocomplete-list-container').dataset.empty == 'true';
+    }
+
+    /**
+     * Populates the autocomplete list container with <datalist> elements for foreign key columns.
+     * This function is executed only once to avoid duplicating datalists. It identifies columns
+     * ending in `_id`, finds the corresponding reference entity, and creates a datalist
+     * with options from the reference entity's data.
+     * @param {Entity} entity - The entity object to scan for foreign key columns.
+     */
+    addAutocompleteList(entity) {
+        if (this.isAutocompleteListEmpty())
+        {
+            let container = document.querySelector('.autocomplete-list-container');
+            container.dataset.empty = 'false';
+            container.innerHTML = '';
+            
+            entity.columns.forEach(col => {
+                if(col.name.length > 3 && col.name.endsWith('_id'))
+                {
+                    let referenceName = col.name.substring(0, col.name.length - 3);
+                    let reference = this.getEntityByName(referenceName);
+                    if(reference)
+                    {
+                        if(reference.data.length > 0)
+                        {
+                            let autocomplete = document.createElement('datalist');
+                            autocomplete.setAttribute('id', `list${referenceName}`);
+                            reference.data.forEach(row => {
+                                let option = document.createElement('option');
+                                let value = row[col.name];
+                                let label = row['name'] || row['nama'] || row['description'] || ''; // Also support Indonesian
+                                if(typeof value != 'undefined')
+                                {
+                                    option.value = row[col.name];
+                                    option.dataset.info = label;
+                                    autocomplete.appendChild(option);
+                                }
+                            });
+                            container.appendChild(autocomplete);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Adds a new row to the entity data editor table.
+     *
+     * This function creates and appends a new `<tr>` element to the data table,
+     * with input cells for each column of the entity. It also includes a delete
+     * button for the row. If `withList` is true, it will also ensure that
+     * autocomplete datalists for foreign keys are created and attached.
+     *
+     * @param {boolean} [withList=false] - If true, enables and creates autocomplete lists
+     * for foreign key columns.
+     * @returns {HTMLTableRowElement|null} The newly created `<tr>` element, or `null` if the
+     * table body could not be found.
+     */
+    addData(withList = false) {
         const modal = document.querySelector('#entityDataEditorModal');
         let index = parseInt(modal.dataset.index);
         const entity = this.entities[index];
+
+        if(withList)
+        {
+            this.addAutocompleteList(entity);
+        }
+
         const tableBody = modal.querySelector('.data-preview-table tbody');
 
         // If the table body is not found, exit the function.
@@ -4670,7 +4758,13 @@ class EntityEditor {
             // 'this.createEntityDataCell' is assumed to be a method that creates
             // and returns a <td> element with an input field inside it.
             // The last argument '' indicates an empty initial value for the new row.
-            const td = this.createEntityDataCell(rowIndex, colIndex, col, '');
+            let listId = null;
+            if(withList && col.name.length > 3 && col.name.endsWith('_id'))
+            {
+                let referenceName = col.name.substring(0, col.name.length - 3);
+                listId = `list${referenceName}`;
+            }
+            const td = this.createEntityDataCell(rowIndex, colIndex, col, '', withList, listId);
             row.appendChild(td);
         });
 

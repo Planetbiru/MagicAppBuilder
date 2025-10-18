@@ -113,9 +113,9 @@ try
             {
                 $workspace = $row->getWorkspace();
                 $workspaceList[] = array(
-                    "label"=>$workspace->getName(),
-                    "value"=>$workspace->getWorkspaceId(),
-                    "selected"=>$currentWorkspaceId == $workspace->getWorkspaceId()
+                    "label" => $workspace->getName(),
+                    "value" => $workspace->getWorkspaceId(),
+                    "selected" => $currentWorkspaceId == $workspace->getWorkspaceId()
                 );
             }
         }
@@ -131,16 +131,16 @@ if($composerOnline)
 {
     $installationMethod = array(
         array(
-            'value'=>'Online', 
-            'label'=>'Online',
-            'selected'=>true,
-            'disabled'=>false
+            'value' => 'Online', 
+            'label' => 'Online',
+            'selected' => true,
+            'disabled' => false
         ),
         array(
-            'value'=>'Offline', 
-            'label'=>'Offline',
-            'selected'=>false,
-            'disabled'=>false
+            'value' => 'Offline', 
+            'label' => 'Offline',
+            'selected' => false,
+            'disabled' => false
         )
     )
     ;
@@ -149,16 +149,16 @@ else
 {
     $installationMethod = array(
         array(
-            'value'=>'Online', 
-            'label'=>'Online',
-            'selected'=>false,
-            'disabled'=>true
+            'value' => 'Online', 
+            'label' => 'Online',
+            'selected' => false,
+            'disabled' => true
         ),
         array(
-            'value'=>'Offline', 
-            'label'=>'Offline',
-            'selected'=>true,
-            'disabled'=>false
+            'value' => 'Offline', 
+            'label' => 'Offline',
+            'selected' => true,
+            'disabled' => false
         )
     )
     ;

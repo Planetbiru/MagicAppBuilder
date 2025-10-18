@@ -226,6 +226,28 @@ function init() {
         openStructure(this.files[0]);
     });
 
+    document.getElementById("tableFilter").addEventListener("input", function(event) {
+        // Use event.target instead of 'this' for clarity in delegation context, 
+        // though 'this' works here as well.
+        const filter = event.target.value.toLowerCase().trim();
+        
+        // Get the parent container of the list items
+        const tableList = document.querySelector(".object-container .table-list");
+
+        // Get all the list items inside the container
+        const items = tableList.querySelectorAll("li");
+
+        items.forEach(li => {
+            // Check if the <li> has a title attribute
+            const title = li.getAttribute("title");
+            
+            // Check for null/undefined before calling .toLowerCase()
+            const text = title ? title.toLowerCase() : "";
+            
+            li.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+
     document.querySelector('.draw-relationship').addEventListener('change', function(e){
         editor.refreshEntities();
         editor.updateDiagram();
@@ -793,8 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
        document.querySelector('#importDataFileInput').click();
     });
     
-    document.querySelector('.add-data-entity').addEventListener('click', function(){
-       editor.addData(); 
+    document.querySelector('.add-data-entity').addEventListener('click', function(e){
+       editor.addData(true); 
     });
     
     document.querySelector('.clear-data-entity').addEventListener('click', function(){

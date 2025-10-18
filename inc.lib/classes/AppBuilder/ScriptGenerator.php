@@ -1007,7 +1007,6 @@ class ScriptGenerator //NOSONAR
                 copy($sourcePath, $destinationPath);
             }
         }
-
         if($depth > 0)
         {
             // Create index.php in root directory
@@ -1021,10 +1020,8 @@ require_once __DIR__ . "/inc.app/indexing.php";';
             file_put_contents($destination, $content);
 
             $htaccess = $appConf->getBaseApplicationDirectory() . "/.htaccess";
-            error_log("PATH = $htaccess");
             if(file_exists($htaccess))
             {
-                error_log("Fix HTACCESS");
                 $htaccessContent = file_get_contents($htaccess);
                 $filesToComment = [
                     'login\.php',
@@ -1040,16 +1037,15 @@ require_once __DIR__ . "/inc.app/indexing.php";';
                     $pattern = '/^(\s*)(?!#)(RewriteRule\s+.+\b' . $file . '\b.*)$/mi';
                     $htaccessContent = preg_replace($pattern, '$1# $2', $htaccessContent);
                 }
-
-
-                error_log($htaccessContent);
-                
-
                 file_put_contents($htaccess, $htaccessContent);
             }
         }
         foreach($appConf->getBaseModuleDirectory() as $dir)
         {
+            $content = '<'.'?'.'php
+
+require_once __DIR__ . "/inc.app/indexing.php";';
+
             $appPath = $dir->getPath();
             if(isset($appPath) && !empty($appPath) && trim($appPath, "\\/") != "")
             {
