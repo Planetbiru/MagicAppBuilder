@@ -1,5 +1,7 @@
 # MagicAppBuilder Version 0.34
 
+Date: April 1st, 2025
+
 ## What's New
 
 When users create reference entities and filter entities, MagicAppBuilder now includes validation for the following data:
@@ -19,6 +21,8 @@ Once all values are correct, MagicAppBuilder will mark the reference or filter e
 
 # MagicAppBuilder Version 0.35
 
+Date: April 3rd, 2025
+
 ## What's New
 
 New Features:
@@ -32,6 +36,8 @@ Improvements:
 
 
 # MagicAppBuilder Version 0.36
+
+Date: April 5th, 2025
 
 ## What's New
 
@@ -128,6 +134,8 @@ With its modular structure, theme integration, and improved development workflow
 
 # MagicAppBuilder Version 0.37
 
+Date: April 23, 2025
+
 ## What's New
 
 ### Removed Absolute Paths in Configuration for Production Environment
@@ -173,6 +181,8 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
 
 
 # MagicObject Version 0.38
+
+Date: April 27th, 2025
 
 ## What's New
 
@@ -255,6 +265,8 @@ Improved code quality by cleaning up **redundant or inefficient code**, leading 
 
 
 # MagicAppBuilder Version 1.0
+
+Date: May 11th, 2025
 
 ## Overview
 
@@ -371,6 +383,8 @@ Version 1.0 delivers the stability, features, and performance enhancements requi
 
 # MagicAppBuilder Version 1.1
 
+Date: May 19th, 2025
+
 ## What's New
 
 ### Database Time Zone Conversion
@@ -464,6 +478,8 @@ When creating an ERD, users can now choose which related tables to display by ri
 
 # MagicAppBuilder Version 1.2
 
+Date: May 24th, 2025
+
 ## What's New
 
 ### Advanced Asynchronous Per-Table Database Export
@@ -503,6 +519,8 @@ This is especially useful for large databases where selective export is essentia
 
 
 # MagicAppBuilder Version 1.3
+
+Date: June 3rd, 2025
 
 ## What's New
 
@@ -551,6 +569,8 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 
 # MagicAppBuilder Version 1.4.0
+
+Date: June 19th, 2025
 
 ## What's New
 
@@ -608,6 +628,8 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 # MagicAppBuilder Version 1.4.1
 
+Date: June 23rd, 2025
+
 ## Improvements
 
 -   **Database Explorer Enhancements:** We've made the database explorer more stable and reliable. This includes adding the `autocomplete="off"` attribute to the SQL editor element, which helps prevent annoying browser autocomplete suggestions.
@@ -621,6 +643,8 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 
 # MagicAppBuilder Version 1.5.0
+
+Date: June 23rd, 2025
 
 ## What's New
 
@@ -669,6 +693,8 @@ A new `application_id` column has been added to the Error Cache entity. This enh
 
 
 # MagicAppBuilder Version 1.5.1
+
+Date: June 26th, 2025
 
 ## What's Changed
 
@@ -792,6 +818,8 @@ A safeguard has been implemented to **prevent users from deleting their own user
 
 # MagicAppBuilder Version 1.5.2
 
+Date: June 27th, 2025
+
 ## What's Changed
 
 ### Project-Based Entity Editor Data Storage
@@ -844,6 +872,8 @@ This change ensures that the visual and structural designs built using the Entit
 
 # MagicAppBuilder Version 1.6
 
+Date: June 27th, 2025
+
 ## What's New
 
 ###  Built-in Application Updater
@@ -886,6 +916,8 @@ Stay up-to-date effortlessly and enjoy the newest features and improvements with
 
 
 # MagicAppBuilder Version 1.7.0
+
+Date: June 28th, 2025
 
 ## What's New
 
@@ -990,6 +1022,8 @@ Let me know if you'd like to generate a version checker or migration assistant f
 
 # MagicAppBuilder Version 1.7.1
 
+Date: June 29th, 2025
+
 ## What's New
 
 -   **Improved UI During New Application Creation** The user interface now **disables scrolling** while the "waiting screen" is active during new application creation. This enhancement provides a smoother, more perfect visual experience by preventing unwanted content movement.
@@ -997,6 +1031,8 @@ Let me know if you'd like to generate a version checker or migration assistant f
 
 
 # MagicAppBuilder Version 1.8.0
+
+Date: June 30th, 2025
 
 ## What's New
 
@@ -1097,6 +1133,8 @@ Let me know if you'd like to generate a version checker or migration assistant f
 
 # MagicAppBuilder Version 1.9.0
 
+Date: July 3rd, 2025
+
 ## What's New
 
 -   **Automatic Database Structure Update After File Extraction**
@@ -1135,6 +1173,8 @@ Let me know if you'd like to generate a version checker or migration assistant f
 
 # MagicAppBuilder Version 1.9.1
 
+Date: July 5th, 2025
+
 ## What's Changed
 
 ### Library Update: MagicObject 3.14.4
@@ -1159,6 +1199,8 @@ This version contains no UI or functional changes beyond the library update but 
 
 
 # MagicAppBuilder Version 1.9.2
+
+Date: July 5th, 2025
 
 ## What's Changed
 
@@ -1277,6 +1319,8 @@ MagicAppBuilder now uses **MagicObject version 3.14.5**.
 
 # MagicAppBuilder Version 1.9.3
 
+Date: July 6th, 2025
+
 ## What's Changed
 
 ### Enhancement: Improved Sortable Handler UI
@@ -1305,6 +1349,8 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 
 # MagicAppBuilder Version 1.10.0
+
+Date: July 7th, 2025
 
 ## What's New
 
@@ -1396,6 +1442,8 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 # MagicAppBuilder Version 1.10.1
 
+Date: July 8th, 2025
+
 ## What's Fixed
 
 ### Bug Fix: Database Download Issue
@@ -1417,6 +1465,8 @@ The sortable handler in data tables has been updated for a cleaner and more cons
 
 
 # MagicAppBuilder Version 1.11.0
+
+Date: July 9th, 2025
 
 ## What's New
 
@@ -1500,6 +1550,8 @@ Berikut adalah versi final dari changelog **MagicAppBuilder Version 1.11.1** yan
 
 # MagicAppBuilder Version 1.11.1
 
+Date: July 10th, 2025
+
 ## What's New
 
 ### Entity Metadata Support
@@ -1566,6 +1618,8 @@ This enables easier reporting, data sharing, and external data review workflows.
 
 
 # MagicAppBuilder Version 1.12.0
+
+Date: July 14th, 2025
 
 MagicAppBuilder has just rolled out version 1.12.0, packed with features and improvements designed to give you more control, better performance, and enhanced data safety.
 
@@ -1661,6 +1715,8 @@ Lastly, we've resolved a bug causing **NaN (Not a Number) width values** in the 
 
 # MagicAppBuilder Version 1.13.0
 
+Date: July 16th, 2025
+
 Version 1.13.0 brings an exciting productivity enhancement that makes defining new entities faster and more intuitive — especially when working with existing table data from other sources.
 
 ## What's New
@@ -1732,6 +1788,8 @@ MagicAppBuilder now includes MagicObject **version 3.16.0**, which brings severa
 
 
 # MagicAppBuilder Version 1.14.0
+
+Date: July 18th, 2025
 
 Version 1.14.0 introduces powerful enhancements to your data modeling workflow — with a focus on interoperability and documentation. This update builds upon the clipboard and import/export improvements from the previous release.
 
@@ -1859,6 +1917,8 @@ MagicAppBuilder 1.14.0 completes the shift to a more open, editable, and shareab
 
 # MagicAppBuilder Version 1.15.0
 
+Date: July 21st, 2025
+
 Version 1.15.0 introduces additional flexibility in how application icons are managed, making it easier to work with scalable vector formats. This update also brings a significant enhancement to the clipboard import functionality, improved data validation in the Entity Editor, and a new feature for managing your projects. Overall, this release focuses on **enhancing visual customization, compatibility**, and **data consistency** in your generated applications.
 
 
@@ -1910,6 +1970,8 @@ To ensure **data model integrity**, the **Entity Editor** now includes built-in 
 * Fixed rendering glitch in the entity preview panel on certain browsers.
 
 # MagicAppBuilder Version 1.15.1
+
+Date: July 24th, 2025
 
 MagicAppBuilder 1.15.1 introduces a critical improvement to data type handling and enhanced account security configuration support. These updates ensure more reliable cross-database compatibility and provide developers with fine-grained control over password hashing behavior.
 
@@ -2049,6 +2111,8 @@ This ensures compatibility with a wide range of algorithms and encoding formats 
 
 # MagicAppBuilder Version 1.15.2
 
+Date: July 26th, 2025
+
 MagicAppBuilder 1.15.2 introduces two developer-focused features that improve both **user account management** and **data import flexibility** during the application development phase. These updates give developers better control over test data and streamline the development process.
 
 
@@ -2135,6 +2199,8 @@ The **Entity Editor** now supports **importing data from Excel files (`.xlsx`)**
 
 # MagicAppBuilder Version 1.15.3
 
+Date: July 27th, 2025
+
 MagicAppBuilder 1.15.3 introduces a small but helpful enhancement to improve visibility into application updates for developers, along with an important update to module access control.
 
 
@@ -2184,6 +2250,8 @@ In this release, the **Data Restoration module is no longer treated as a "specia
 
 
 # MagicAppBuilder Version 1.15.4
+
+Date: July 28th, 2025
 
 MagicAppBuilder 1.15.4 delivers several important improvements to the **Entity Editor**, making entity management more intelligent and schema generation more reliable. This version introduces enhanced handling of default values, full support for composite primary keys, a new system for determining entity creation order based on dependencies, and user-friendly autocomplete features in the module generator.
 
@@ -2294,6 +2362,8 @@ To improve usability and reduce input errors, the **main module creation form** 
 
 # MagicAppBuilder Version 1.16.0
 
+Date: July 29th, 2025
+
 ## Upgrade: MagicObject Updated to Version 3.16.4
 
 This release includes an upgrade to **MagicObject 3.16.4**, bringing with it support for the new `textequals` filter type—allowing developers to define **exact string match** conditions instead of the usual `LIKE`-based search.
@@ -2348,6 +2418,8 @@ WHERE LOWER(genre_id) LIKE '%jazz%'
 
 # MagicAppBuilder Version 1.16.1
 
+Date: July 30th, 2025
+
 ## Cleanup: Removal of Unused Files
 
 This version focuses on internal housekeeping to improve maintainability and reduce project bloat.
@@ -2401,6 +2473,8 @@ This fix ensures more reliable data exports across all supported database dialec
 
 
 # MagicAppBuilder Version 1.17.0
+
+Date: August 4th, 2025
 
 ## Enhancement: Context Menu for Entity Editor
 
@@ -2631,6 +2705,8 @@ payment_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
 
 # MagicAppBuilder Version 1.18.0
 
+Date: August 12th, 2025
+
 ## Enhancement: Confirmation Dialog for Viewing Large Entity Data
 
 Before opening the Entity Data Viewer, the system will now display a confirmation dialog if the number of data rows exceeds 1,000.
@@ -2716,6 +2792,8 @@ Upgraded the MagicObject library to **version 3.16.8**, which includes a bug fix
 
 # MagicAppBuilder Version 1.18.1
 
+Date: August 17th, 2025
+
 ## Bug Fix: Drag-and-Drop Column Ordering in Entity Editor
 
 Fixed a JavaScript error that occurred when reordering table columns or template columns in the **Entity Editor**:
@@ -2798,6 +2876,8 @@ Entities without dependencies on other entities will have a dependency depth of 
 
 # MagicAppBuilder Version 1.18.2
 
+Date: August 25rd, 2025
+
 ## Enhancement: Management of `sqlite_internal` Tables
 
 Added explicit handling for **`sqlite_internal` tables** during entity import from SQLite databases.
@@ -2851,6 +2931,8 @@ Upgraded **MagicObject** dependency to **version 3.17.1**, bringing the latest s
 Generated applications benefit from the latest improvements in MagicObject, ensuring smoother runtime behavior and broader database support.
 
 # MagicAppBuilder Version 1.19.0
+
+Date: August 31th, 2025
 
 ## New Feature: Paste SQL Query
 
@@ -2920,6 +3002,8 @@ This is a significant boost to efficiency, especially for workflows involving da
 
 
 # MagicAppBuilder Version 1.20.0
+
+Date: September 8th, 2025
 
 ## New Feature: Starter Package
 
@@ -3030,6 +3114,8 @@ With this feature, you can:
 
 # MagicAppBuilder Version 1.21.0
 
+Date: September 13rd, 2025
+
 ## Enhancement: Improved Local Storage Keys
 
 This update fixes a bug where changes made to the color mode or sidebar status in MagicAdmin would also affect the generated app, and vice versa. Now, MagicAdmin uses separate local storage keys, so your settings in one won't interfere with the other.
@@ -3091,6 +3177,8 @@ Now, boolean columns are correctly converted and included in the generated SQL.
 
 
 # MagicAppBuilder Version 1.22.0
+
+Date: September 18th, 2025
 
 ## Enhancement: Scrollable Menu in MagicAdmin
 
@@ -3204,6 +3292,8 @@ This change ensures that data lookups, especially those involving references bet
 
 # MagicAppBuilder Version 1.23.0
 
+Date: September 20th, 2025
+
 ## New Feature: Redis Explorer
 
 MagicAppBuilder now includes a built-in **Redis Explorer**, an interface for exploring and managing data stored in **Redis**.
@@ -3254,6 +3344,8 @@ The Redis Explorer provides powerful capabilities to view and modify data. For s
 
 # MagicAppBuilder Version 1.24.0
 
+Date: October 1st, 2025
+
 ## Enhancement: More Flexible System Module Path
 
 Users can now freely define the system module path in the application instead of being restricted to the application root.  
@@ -3294,6 +3386,8 @@ This streamlines the workflow for sharing and reusing database designs between p
 
 # MagicAppBuilder Version 1.25.0
 
+Date: October 3rd, 2025
+
 ## Enhancement: Smarter Session Management
 
 The session handling mechanism has been significantly improved to provide a smoother user experience and better security.
@@ -3328,6 +3422,8 @@ This defines how long a user can remain idle before the system decides to check 
 
 # MagicAppBuilder Version 1.25.1
 
+Date: October 6th, 2025
+
 ## Enhancement: Dump Undefined Localization
 
 MagicAppBuilder version 1.25.1 now only dumps undefined localizations in `Development Mode`. This prevents the application from creating localization files in a production environment. This enhancement ensures that the application will not make any changes to files within the localization directory in a production environment.
@@ -3347,11 +3443,15 @@ This enhancement improves reliability when validating writable paths across diff
 
 # MagicAppBuilder Version 1.25.2
 
+Date: October 8th, 2025
+
 ## Bug Fix: Menu URL
 
 Fixed menu URL when the system module is not in the root.
 
 # MagicAppBuilder Version 1.25.3
+
+Date: October 10th, 2025
 
 ## Bug Fix: User Language
 
@@ -3367,6 +3467,8 @@ Fixed an issue with the database export query.
 
 
 # MagicAppBuilder Version 1.26.0
+
+Date: October 19th, 2025
 
 ## New Feature: Inspect Application
 
