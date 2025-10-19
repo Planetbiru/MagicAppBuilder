@@ -42,6 +42,13 @@ class PicoResponseBody extends PicoObjectToString // NOSONAR
     protected $module;
 
     /**
+     * Current action
+     *
+     * @var string
+     */
+    protected $currentAction;
+
+    /**
      * PicoListPage
      *
      * @var PicoListPage
@@ -111,6 +118,28 @@ class PicoResponseBody extends PicoObjectToString // NOSONAR
         $responseText = "Success"
     ) {
         return new self($responseCode, $responseText, $data);
+    }
+
+    /**
+     * Get the current action.
+     *
+     * @return string Returns the current action.
+     */
+    public function getCurrentAction()
+    {
+        return $this->currentAction;
+    }
+
+    /**
+     * Set the current action.
+     *
+     * @param string $currentAction
+     * @return self Returns the current instance for method chaining.
+     */
+    public function setCurrentAction($currentAction)
+    {
+        $this->currentAction = $currentAction;
+        return $this;
     }
 
     /**
