@@ -22,7 +22,10 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 }
 
 require_once $appInclude->mainAppHeader(__DIR__);
+
+$timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
 ?>
+
     <link rel="stylesheet" href="css/database-migration.min.css">
     <script src="js/js-yaml.min.js"></script>
     <script src="js/database-migration.min.js"></script>
@@ -75,7 +78,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                     </div>
                     <div class="form-group">
                         <label><?php echo $appLanguage->getTimeZone();?></label>
-                        <input type="text" class="form-control" data-path="databaseTarget.timeZone" />
+                        <input type="text" class="form-control" data-path="databaseTarget.timeZone" list="timezone-list" />
                     </div>
 
                     <h6 class="h6"><?php echo $appLanguage->getDatabaseSource();?></h6>
@@ -121,7 +124,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
                     </div>
                     <div class="form-group">
                         <label><?php echo $appLanguage->getTimeZone();?></label>
-                        <input type="text" class="form-control" data-path="databaseSource.timeZone" />
+                        <input type="text" class="form-control" data-path="databaseSource.timeZone" list="timezone-list" />
                     </div>
 
                     <div class="form-group">
@@ -194,6 +197,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
             </main>
         </div>
     </div>
+
+    <datalist id="timezone-list">
+        <?php
+        foreach ($timezones as $timezone) {
+            echo '<option value="' . htmlspecialchars($timezone) . '">';
+        }
+        ?>
+    </datalist>
+
 
     <!-- Template tetap -->
     <template id="tplTableItem">
