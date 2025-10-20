@@ -126,7 +126,6 @@ $jsLang = [
                 <td>           
                     <button type="button" class="btn btn-success" onclick="startUpdate()" id="update-btn" disabled><?php echo $appLanguage->getButtonUpdateNow();?></button>
                     <button type="button" class="btn btn-success" onclick="updateDatabase()"><?php echo $appLanguage->getButtonUpdateDatabase();?></button>
-                    <button type="button" class="btn btn-info" onclick="window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DMHFJ6LR7FGQS')"><?php echo $appLanguage->getDonate();?></button>
                 </td>
             </tr>
             <tr>
