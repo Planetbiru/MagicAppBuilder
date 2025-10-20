@@ -328,6 +328,8 @@ $entityApplication->setTimeCreate($now);
 $entityApplication->setTimeEdit($now);
 $entityApplication->setIpCreate($_SERVER['REMOTE_ADDR']);
 $entityApplication->setIpEdit($_SERVER['REMOTE_ADDR']);
+$entityApplication->setApplicationValid(true);
+$entityApplication->setDirectoryExists(true);
 $entityApplication->setActive(true);
 
 try
