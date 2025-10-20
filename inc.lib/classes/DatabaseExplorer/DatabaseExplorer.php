@@ -1654,7 +1654,7 @@ class DatabaseExplorer // NOSONAR
             }
         }
 
-        if(!empty($applicationId))
+        //if(!empty($applicationId))
         {
             // Add space between buttons
             $space = $dom->createTextNode(' ');
