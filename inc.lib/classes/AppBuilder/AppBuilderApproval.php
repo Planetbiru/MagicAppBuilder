@@ -59,7 +59,7 @@ class AppBuilderApproval extends AppBuilderBase
             }
             else
             {
-                $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
+                $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter(), null, false, $field->getMultipleData()).";";
                 if($line != null)
                 {
                     $lines[] = $line;
@@ -206,7 +206,7 @@ class AppBuilderApproval extends AppBuilderBase
                 {
                     $includePrimaryKey = true;
                 }
-                $line = parent::TAB1.$this->createSetter($objectApprovalName, $field->getFieldName(), $field->getInputFilter(), $primaryKeyName, true).";";
+                $line = parent::TAB1.$this->createSetter($objectApprovalName, $field->getFieldName(), $field->getInputFilter(), $primaryKeyName, true, $field->getMultipleData()).";";
                 if($line != null)
                 {
                     $lines[] = $line;

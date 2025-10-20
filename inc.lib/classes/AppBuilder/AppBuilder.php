@@ -53,7 +53,7 @@ class AppBuilder extends AppBuilderBase
             }
             else
             {
-                $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter()).";";
+                $line = $this->createSetter($objectName, $field->getFieldName(), $field->getInputFilter(), null, false, $field->getMultipleData()).";";
                 if($line != null)
                 {
                     $lines[] = $line;
@@ -177,7 +177,7 @@ class AppBuilder extends AppBuilderBase
                 {
                     $updatePk = true;
                 }
-                $line = parent::TAB1.$this->createSetter(null, $field->getFieldName(), $field->getInputFilter());
+                $line = parent::TAB1.$this->createSetter(null, $field->getFieldName(), $field->getInputFilter(), null, false, $field->getMultipleData()).";";
                 if($line != null)
                 {
                     $lines[] = $line;
