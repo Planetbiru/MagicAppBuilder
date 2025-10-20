@@ -3528,5 +3528,47 @@ Previously, even when a user intended to submit multiple values (e.g., from a mu
 
 Previously, when loading an update form, the application would incorrectly read a JSON-encoded array from the database as a single scalar value. This prevented multi-select fields from being correctly pre-populated with all their stored values. After this fix, the application now properly decodes the JSON string from the database before rendering the form. As a result, the update form now accurately reflects the actual stored data, with all previously selected options correctly displayed.
 
+# MagicAppBuilder Version 1.27.0
 
+Date: October 28th, 2025
+
+## New Feature: Automatic GraphQL API Generation
+
+MagicAppBuilder 1.27.0 introduces the **GraphQL Generator**, a powerful tool that automatically creates a complete, production-ready GraphQL API layer directly from your database entity schema. This feature is designed to drastically reduce development time by automating repetitive API creation tasks.
+
+### Key Features of GraphQL Generator
+
+* **Schema-Based Generation**
+  With just your existing JSON entity schema, the generator builds the entire API layer, ensuring that your API always stays in sync with your database structure.
+
+* **Full CRUD Operations**
+  Automatically generates:
+
+  * **Queries**: To retrieve single records by ID and lists of data with pagination.
+  * **Mutations**: For `create`, `update`, and `delete` operations.
+
+* **Advanced Query Capabilities**
+  Generated list queries come with powerful features:
+
+  * **Filtering**: Supports operators such as `EQUALS`, `CONTAINS`, `GREATER_THAN`, and `LESS_THAN`.
+  * **Sorting**: Allows sorting by multiple columns in either `ASC` or `DESC` order.
+  * **Pagination**: Full support for `limit` and `offset` for efficient data loading.
+
+* **Automatic Relationship Handling**
+  Intelligently detects foreign key relationships (based on `_id` naming convention) and generates resolvers to fetch nested related data.
+
+* **Soft-Delete Support**
+  If an entity includes an `active` column, the `delete` mutation will automatically perform a soft-delete (setting `active` to `0`). Otherwise, a hard-delete will be executed.
+
+* **Automatic API Documentation**
+  Generates a comprehensive `MANUAL.md` file that includes ready-to-use examples for every *query* and *mutation*, making integration with frontend teams effortless.
+
+* **Ready-to-Use Endpoint**
+  The generator produces a single `graphql.php` file that serves as a fully functional GraphQL endpoint, complete with database connection and request-handling logic.
+
+### Benefits
+
+* **Faster Development**: Saves hundreds of development hours by eliminating the need to manually write boilerplate API code.
+* **Guaranteed Consistency**: Keeps your database schema and API perfectly aligned, reducing the risk of human error.
+* **Comprehensive Documentation**: Simplifies API adoption across teams with clear, always-updated documentation.
 
