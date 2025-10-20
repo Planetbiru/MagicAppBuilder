@@ -383,9 +383,10 @@ class AppBuilderBase //NOSONAR
      * @param string $fieldFilter Field filter type.
      * @param string|null $primaryKeyName Optional primary key name.
      * @param boolean $updatePk Indicates if the primary key should be updated.
+     * @param boolean $multipleValue Indicates if the field accepts multiple values.
      * @return string|null Generated setter code as a string or null if skipped.
      */
-    protected function createSetter($objectName, $fieldName, $fieldFilter, $primaryKeyName = null, $updatePk = false)
+    protected function createSetter($objectName, $fieldName, $fieldFilter, $primaryKeyName = null, $updatePk = false, $multipleValue = false)
     {
         if(!isset($objectName) || empty($objectName))
         {
@@ -408,7 +409,8 @@ class AppBuilderBase //NOSONAR
                 $methodSource = PicoStringUtil::upperCamelize($fieldName);
             }
             $methodTarget = PicoStringUtil::upperCamelize($fieldName);
-            return self::TAB1 . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, true))"; // NOSONAR
+            $forceScalar = $multipleValue ? 'false' : 'true';
+            return self::TAB1 . $objectName . self::CALL_SET . $methodTarget . "(" . self::VAR . "inputPost".self::CALL_GET.$methodSource . "(PicoFilterConstant::" . $fieldFilter . ", false, false, $forceScalar))"; // NOSONAR
         } else {
             return self::TAB1 . $objectName . self::CALL_SET."('" . $fieldName . "', " . self::VAR . "inputPost".self::CALL_GET."('" . $fieldName . "', PicoFilterConstant::" . $fieldFilter . "))";
         }
@@ -4001,7 +4003,14 @@ $subqueryMap = '.$referece.';
             $value->appendChild($textLabel);
             $input->appendChild($value);
             $referenceData = $field->getReferenceData();
-            $input = $this->appendOption($dom, $input, $referenceData, self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS);
+
+            $selectedValue = self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS;
+            if($multipleData)
+            {
+                $selectedValue = 'json_decode('.self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS.', true)';
+            }
+
+            $input = $this->appendOption($dom, $input, $referenceData, $selectedValue);
             if($field->getRequired())
             {
                 $input->setAttribute('required', 'required');

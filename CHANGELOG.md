@@ -3520,3 +3520,13 @@ To improve user experience and prevent typos, a datalist with time zone suggesti
 
 Project dependencies have been updated to their latest compatible versions. This ensures the application benefits from the latest bug fixes, security patches, and performance improvements from its underlying libraries.
 
+## Bug Fixes: Save Multiple Values on Insert/Update
+
+Previously, even when a user intended to submit multiple values (e.g., from a multi-select dropdown or tag input), the application would incorrectly force the input into a single scalar value, causing data loss. After this fix, array inputs are handled correctly. The array of values is now properly JSON-encoded before being saved to the database, ensuring all selected data is preserved.
+
+## Bug Fixes: Show Multiple Values on Update Form
+
+Previously, when loading an update form, the application would incorrectly read a JSON-encoded array from the database as a single scalar value. This prevented multi-select fields from being correctly pre-populated with all their stored values. After this fix, the application now properly decodes the JSON string from the database before rendering the form. As a result, the update form now accurately reflects the actual stored data, with all previously selected options correctly displayed.
+
+
+
