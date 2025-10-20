@@ -3508,3 +3508,15 @@ To improve data entry accuracy and speed, the **Entity Data Editor** now include
 
 When scanning a workspace, MagicAppBuilder validates applications before importing them. Invalid applications will still be imported but will be marked as invalid.
 
+# MagicAppBuilder Version 1.26.1
+
+Date: October 21, 2025
+
+## Enhancement: Time Zone Datalist
+
+To improve user experience and prevent typos, a datalist with time zone suggestions has been added to time zone input fields. This makes it easier for users to select the correct time zone without manual entry.
+
+## Dependency Updates
+
+Project dependencies have been updated to their latest compatible versions. This ensures the application benefits from the latest bug fixes, security patches, and performance improvements from its underlying libraries.
+

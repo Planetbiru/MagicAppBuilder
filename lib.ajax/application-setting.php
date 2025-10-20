@@ -15,6 +15,9 @@ $constSelected = ' selected';
 $constChecked = ' checked';
 $inputGet = new InputGet();
 $applicationId = $inputGet->getApplicationId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
+
+$timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
+
 $applicationEntity = new EntityApplication(null, $databaseBuilder);
 try
 {
@@ -366,11 +369,11 @@ $nameInIndonesian = array(
                             </tr>
                             <tr>
                                 <td>Time Zone</td>
-                                <td><input class="form-control" type="text" name="database_time_zone" id="database_time_zone" value="<?php echo $cfgDatabase->getTimeZone(); ?>"></td>
+                                <td><input class="form-control" type="text" name="database_time_zone" id="database_time_zone" value="<?php echo $cfgDatabase->getTimeZone(); ?>" list="timezone-list"></td>
                             </tr>
                             <tr>
                                 <td>Time Zone System</td>
-                                <td><input class="form-control" type="text" name="database_time_zone_system" id="database_time_zone_system" value="<?php echo $cfgDatabase->getTimeZoneSystem(); ?>"></td>
+                                <td><input class="form-control" type="text" name="database_time_zone_system" id="database_time_zone_system" value="<?php echo $cfgDatabase->getTimeZoneSystem(); ?>" list="timezone-list"></td>
                             </tr>
                             <tr>
                                 <td>Connection Timeout</td>
@@ -543,6 +546,13 @@ $nameInIndonesian = array(
             </div>
         </div>
     </div>
+    <datalist id="timezone-list">
+        <?php
+        foreach ($timezones as $timezone) {
+            echo '<option value="' . htmlspecialchars($timezone) . '">';
+        }
+        ?>
+    </datalist>
 </form>
 <?php
 }
