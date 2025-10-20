@@ -177,7 +177,7 @@ class AppBuilder extends AppBuilderBase
                 {
                     $updatePk = true;
                 }
-                $line = parent::TAB1.$this->createSetter(null, $field->getFieldName(), $field->getInputFilter(), null, false, $field->getMultipleData()).";";
+                $line = parent::TAB1.$this->createSetter(null, $field->getFieldName(), $field->getInputFilter(), null, false, $field->getMultipleData());
                 if($line != null)
                 {
                     $lines[] = $line;
