@@ -64,6 +64,10 @@ $lastQueries = "";
 if(isset($_POST['___export_excel___']))
 {
     $exporter = new DatabaseXLSXExporter($pdo);
+    if($applicationId == null || trim($applicationId) == "")
+    {
+        $applicationId = "database-export";
+    }
     $exporter->export($applicationId."-".date("Y-m-d-H-i-s").".xlsx");
     exit();
 }
