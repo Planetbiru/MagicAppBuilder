@@ -701,3 +701,11 @@ label {
     max-height: calc(100vh - 210px);
     overflow: auto;
 }
+.entity-selector-table{
+    margin-bottom: 2px;
+    border-color: transparent;
+    td{
+        padding: 4px 8px;
+        border-color: transparent;
+    }
+}

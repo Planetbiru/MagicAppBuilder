@@ -570,4 +570,13 @@ label {
 .entity-selector-container {
   max-height: calc(100vh - 210px);
   overflow: auto;
+}
+
+.entity-selector-table {
+  margin-bottom: 2px;
+  border-color: transparent;
+}
+.entity-selector-table td {
+  padding: 4px 8px;
+  border-color: transparent;
 }/*# sourceMappingURL=entity-editor.css.map */

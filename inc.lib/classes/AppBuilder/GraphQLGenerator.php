@@ -145,7 +145,7 @@ class GraphQLGenerator
         // Enum for Filter Operators
         $code .= "\$filterOperatorEnum = new EnumType(array(\r\n";
         $code .= "    'name' => 'FilterOperator',\r\n";
-        $code .= "    'values' => array('EQUALS', 'NOT_EQUALS', 'CONTAINS', 'GREATER_THAN', 'GREATER_THAN_OR_EQUALS', 'LESS_THAN', 'LESS_THAN_OR_EQUALS', 'IN')\r\n";
+        $code .= "    'values' => array('EQUALS', 'NOT_EQUALS', 'CONTAINS', 'GREATER_THAN', 'GREATER_THAN_OR_EQUALS', 'LESS_THAN', 'LESS_THAN_OR_EQUALS', 'IN', 'NOT_IN')\r\n";
         $code .= "));\r\n\r\n";
 
         // Input for Filtering
@@ -236,19 +236,21 @@ class GraphQLGenerator
             $pageTypeName = $this->camelCase($tableName) . 'PageType';
             $pageObjectName = $objectName . 'Page';
 
-            $code .= "\$" . $pageTypeName . " = new ObjectType([\r\n";
+            $code .= "\$" . $pageTypeName . " = new ObjectType(array(\r\n";
             $code .= "    'name' => '" . $pageObjectName . "',\r\n";
             $code .= "    'description' => 'Paginated list of " . $this->pluralize($objectName) . "',\r\n";
-            $code .= "    'fields' => fn() => [\r\n";
-            $code .= "        'items' => Type::listOf(\$" . $typeName . "),\r\n";
-            $code .= "        'total' => Type::int(),\r\n";
-            $code .= "        'limit' => Type::int(),\r\n";
-            $code .= "        'page' => Type::int(),\r\n";
-            $code .= "        'totalPages' => Type::int(),\r\n";
-            $code .= "        'hasNext' => Type::boolean(),\r\n";
-            $code .= "        'hasPrevious' => Type::boolean(),\r\n";
-            $code .= "    ]\r\n";
-            $code .= "]);\r\n\r\n";
+            $code .= "    'fields' => function() use(&\$" . $typeName . ") {\r\n";
+            $code .= "        return array(\r\n";
+            $code .= "            'items' => Type::listOf(\$" . $typeName . "),\r\n";
+            $code .= "            'total' => Type::int(),\r\n";
+            $code .= "            'limit' => Type::int(),\r\n";
+            $code .= "            'page' => Type::int(),\r\n";
+            $code .= "            'totalPages' => Type::int(),\r\n";
+            $code .= "            'hasNext' => Type::boolean(),\r\n";
+            $code .= "            'hasPrevious' => Type::boolean(),\r\n";
+            $code .= "        );\r\n";
+            $code .= "    }\r\n";
+            $code .= "));\r\n\r\n";
         }
         return $code;
     }
@@ -328,8 +330,10 @@ class GraphQLGenerator
             $code .= "                'filter' => Type::listOf(\$filterInputType)\r\n";
             $code .= "            ),\r\n";
             $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
-            $code .= "                // Whitelist valid columns for filtering and sorting to prevent SQL injection\r\n";
-            $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n\r\n";
+            $code .= "                // Whitelist valid columns for filtering and sorting to prevent SQL injection.\r\n";
+            $code .= "                // You can customize these arrays to allow/disallow columns for filtering and sorting.\r\n";
+            $code .= "                \$allowedFilterColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
+            $code .= "                \$allowedSortColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n\r\n";
             $code .= "                \$baseSql = 'FROM " . $tableName . "';\r\n";
             $code .= "                \$countSql = 'SELECT COUNT(*) as total ' . \$baseSql;\r\n";
             $code .= "                \$dataSql = 'SELECT * ' . \$baseSql;\r\n";
@@ -339,7 +343,7 @@ class GraphQLGenerator
             // Filter logic
             $code .= "                if (!empty(\$args['filter'])) {\r\n";
             $code .= "                    foreach (\$args['filter'] as \$filter) {\r\n";
-            $code .= "                        if (!in_array(\$filter['field'], \$allowedColumns)) continue;\r\n";
+            $code .= "                        if (!in_array(\$filter['field'], \$allowedFilterColumns)) continue;\r\n";
             $code .= "                        \$operator = isset(\$filter['operator']) ? \$filter['operator'] : 'EQUALS';\r\n";
             $code .= "                        \$paramName = ':' . \$filter['field'] . \$paramIndex++;\r\n";
             $code .= "                        switch (\$operator) {\r\n";
@@ -363,6 +367,20 @@ class GraphQLGenerator
             $code .= "                                \$where[] = \$filter['field'] . ' < ' . \$paramName;\r\n";
             $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
             $code .= "                                break;\r\n";
+            $code .= "                            case 'IN':\r\n";
+            $code .= "                            case 'NOT_IN':\r\n";
+            $code .= "                                \$values = array_map('trim', explode(',', \$filter['value']));\r\n";
+            $code .= "                                if (!empty(\$values)) {\r\n";
+            $code .= "                                    \$inPlaceholders = array();\r\n";
+            $code .= "                                    foreach (\$values as \$idx => \$val) {\r\n";
+            $code .= "                                        \$inParamName = \$paramName . '_' . \$idx;\r\n";
+            $code .= "                                        \$inPlaceholders[] = \$inParamName;\r\n";
+            $code .= "                                        \$params[\$inParamName] = \$val;\r\n";
+            $code .= "                                    }\r\n";
+            $code .= "                                    \$operatorStr = (\$operator === 'NOT_IN') ? 'NOT IN' : 'IN';\r\n";
+            $code .= "                                    \$where[] = \$filter['field'] . ' ' . \$operatorStr . ' (' . implode(', ', \$inPlaceholders) . ')';\r\n";
+            $code .= "                                }\r\n";
+            $code .= "                                break;\r\n";
             $code .= "                            case 'NOT_EQUALS':\r\n";
             $code .= "                                \$where[] = \$filter['field'] . ' != ' . \$paramName;\r\n";
             $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
@@ -384,7 +402,7 @@ class GraphQLGenerator
             $code .= "                if (!empty(\$args['orderBy'])) {\r\n";
             $code .= "                    \$orderParts = array();\r\n";
             $code .= "                    foreach (\$args['orderBy'] as \$order) {\r\n";
-            $code .= "                        if (in_array(\$order['field'], \$allowedColumns)) {\r\n";
+            $code .= "                        if (in_array(\$order['field'], \$allowedSortColumns)) {\r\n";
             $code .= "                            \$direction = (isset(\$order['direction']) && strtoupper(\$order['direction']) === 'DESC') ? 'DESC' : 'ASC';\r\n";
             $code .= "                            \$orderParts[] = \$order['field'] . ' ' . \$direction;\r\n";
             $code .= "                        }\r\n";
@@ -410,7 +428,7 @@ class GraphQLGenerator
             $code .= "                \$stmt = \$db->prepare(\$dataSql);\r\n";
             $code .= "                \$stmt->execute(\$params);\r\n";
             $code .= "                \$items = \$stmt->fetchAll(PDO::FETCH_ASSOC);\r\n\r\n";
-            $code .= "                return [\r\n";
+            $code .= "                return array(\r\n";
             $code .= "                    'total' => \$total,\r\n";
             $code .= "                    'limit' => \$limit,\r\n";
             $code .= "                    'page' => \$page,\r\n";
@@ -418,7 +436,7 @@ class GraphQLGenerator
             $code .= "                    'hasNext' => \$hasNext,\r\n";
             $code .= "                    'hasPrevious' => \$hasPrevious,\r\n";
             $code .= "                    'items' => \$items,\r\n";
-            $code .= "                ];\r\n";
+            $code .= "                );\r\n";
             $code .= "            },\r\n";
             $code .= "        ],\r\n\r\n";
         }
@@ -532,6 +550,37 @@ class GraphQLGenerator
     {
         $manualContent = "# GraphQL API Manual\r\n\r\n";
         $manualContent .= "This document provides examples for all available queries and mutations.\r\n\r\n";
+        
+        $manualContent .= "## Dependency Installation\r\n\r\n";
+        $manualContent .= "Before you can run the API, you need to install the required dependencies using Composer. Navigate to the directory where this `graphql.php` file is located and run the following command in your terminal:\r\n\r\n";
+        $manualContent .= "```bash\r\n";
+        $manualContent .= "composer install\r\n";
+        $manualContent .= "composer require webonyx/graphql-php:^14.11\r\n";
+        $manualContent .= "```\r\n\r\n";
+        $manualContent .= "This will download and install all the necessary libraries listed in the `composer.json` file.\r\n\r\n";
+
+        $manualContent .= "## Database Connection\r\n\r\n";
+        $manualContent .= "This API requires a database connection. You must configure the `database.php` file to create a PDO instance. Here is an example for connecting to a MySQL database:\r\n\r\n";
+        $manualContent .= "```php\r\n";
+        $manualContent .= "// file: database.php\r\n";
+        $manualContent .= "\$host         = '127.0.0.1';\r\n";
+        $manualContent .= "\$db           = 'your_database_name';\r\n";
+        $manualContent .= "\$user         = 'your_username';\r\n";
+        $manualContent .= "\$pass         = 'your_password';\r\n";
+        $manualContent .= "\$charset      = 'utf8mb4';\r\n\r\n";
+        $manualContent .= "\$dsn          = \"mysql:host=\$host;dbname=\$databaseName;charset=\$charset\";\r\n";
+        $manualContent .= "\$options = [\r\n";
+        $manualContent .= "    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,\r\n";
+        $manualContent .= "    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,\r\n";
+        $manualContent .= "    PDO::ATTR_EMULATE_PREPARES   => false,\r\n";
+        $manualContent .= "];\r\n\r\n";
+        $manualContent .= "try {\r\n";
+        $manualContent .= "     \$db = new PDO(\$dsn, \$user, \$pass, \$options);\r\n";
+        $manualContent .= "} catch (\\PDOException \$e) {\r\n";
+        $manualContent .= "     throw new \\PDOException(\$e->getMessage(), (int)\$e->getCode());\r\n";
+        $manualContent .= "}\r\n";
+        $manualContent .= "```\r\n\r\n";
+        $manualContent .= "Make sure to replace `your_database_name`, `your_username`, and `your_password` with your actual database credentials.\r\n\r\n";
 
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
@@ -644,7 +693,7 @@ class GraphQLGenerator
         $manualContent .= "| `GREATER_THAN` | Finds records where the numeric/date field is greater than the value. | `{field: \"price\", value: \"100\", operator: GREATER_THAN}` |\r\n";
         $manualContent .= "| `LESS_THAN_OR_EQUALS`    | Finds records where the numeric/date field is less than or equal to the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN_OR_EQUALS}`   |\r\n";
         $manualContent .= "| `LESS_THAN`    | Finds records where the numeric/date field is less than the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN}`   |\r\n";
-        $manualContent .= "| `IN`           | Finds records where the field value is in a list of values. | _(Note: The resolver logic for `IN` is not implemented by default)_ |\r\n\r\n";
+        $manualContent .= "| `IN` / `NOT_IN` | Finds records where the field value is in (or not in) a comma-separated list of values. | `{field: \"category_id\", value: \"1,2,3\", operator: IN}` |\r\n\r\n";
 
         // Sorting
         $manualContent .= "### Sorting (`orderBy`)\r\n\r\n";
@@ -707,6 +756,24 @@ class GraphQLGenerator
     }
 
     /**
+     * Generates the content for the composer.json file.
+     * This includes the necessary dependencies for running the GraphQL API,
+     * specifically the `webonyx/graphql-php` library.
+     *
+     * @return string The JSON formatted content for composer.json.
+     */
+    public function generateComposerJson()
+    {
+        $composerConfig = array(
+            'require' => [
+                'webonyx/graphql-php' => '^14.11',
+                'monolog/monolog' => '^3.5'
+            ]
+        );
+        return json_encode($composerConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
      * Main function to generate the complete graphql.php file content.
      *
      * @return string The complete PHP code for the GraphQL server.
@@ -714,9 +781,6 @@ class GraphQLGenerator
     public function generate()
     {
         $header = "<?php\r\n\r\n";
-        $header .= "require_once __DIR__ . '/vendor/autoload.php';\r\n";
-        $header .= "require_once __DIR__ . '/database.php';\r\n";
-
         $header .= "use GraphQL\\GraphQL;\r\n";
         $header .= "use GraphQL\\Error\\DebugFlag;\r\n";
         $header .= "use GraphQL\\Type\\Definition\\EnumType;\r\n";
@@ -724,6 +788,9 @@ class GraphQLGenerator
         $header .= "use GraphQL\\Type\\Definition\\ObjectType;\r\n";
         $header .= "use GraphQL\\Type\\Definition\\Type;\r\n";
         $header .= "use GraphQL\\Type\\Schema;\r\n\r\n";
+        $header .= "require_once __DIR__ . '/vendor/autoload.php';\r\n";
+        $header .= "require_once __DIR__ . '/database.php';\r\n\r\n";
+
         $dbConnection = "/**\r\n * ----------------------------------------------------------------------------\r\n * DATABASE CONNECTION\r\n * ----------------------------------------------------------------------------\r\n */\r\n\r\n";
 
         $utilityTypesCode = $this->generateUtilityTypes();
@@ -739,9 +806,12 @@ class GraphQLGenerator
         $schemaAndExecution .= "));\r\n\r\n";
         $schemaAndExecution .= "try {\r\n";
         $schemaAndExecution .= "    \$rawInput = file_get_contents('php://input');\r\n";
-        $schemaAndExecution .= "    \$input = json_decode(\$rawInput, true) ?: [];\r\n";
-        $schemaAndExecution .= "    \$query = \$input['query'] ?? null;\r\n";
-        $schemaAndExecution .= "    \$variableValues = \$input['variables'] ?? null;\r\n\r\n";
+        $schemaAndExecution .= "    \$input = json_decode(\$rawInput, true);\r\n";
+        $schemaAndExecution .= "    if (!isset(\$input) || !is_array(\$input)) {\r\n";
+        $schemaAndExecution .= "        \$input = array();\r\n";
+        $schemaAndExecution .= "    }\r\n";
+        $schemaAndExecution .= "    \$query = isset(\$input['query']) ? \$input['query'] : null;\r\n";
+        $schemaAndExecution .= "    \$variableValues = isset(\$input['variables']) ? \$input['variables'] : null;\r\n\r\n";
         $schemaAndExecution .= "    if (empty(\$query)) {\r\n";
         $schemaAndExecution .= "        throw new Exception('GraphQL query is missing.');\r\n";
         $schemaAndExecution .= "    }\r\n";
@@ -754,13 +824,11 @@ class GraphQLGenerator
         $schemaAndExecution .= "    // For development, use DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE;\r\n";
         $schemaAndExecution .= "    \$output = \$result->toArray(DebugFlag::INCLUDE_DEBUG_MESSAGE);\r\n";
         $schemaAndExecution .= "} catch (Exception \$e) {\r\n";
-        $schemaAndExecution .= "    \$output = [\r\n";
-        $schemaAndExecution .= "        'errors' => [\r\n";
-        $schemaAndExecution .= "            [\r\n";
-        $schemaAndExecution .= "                'message' => \$e->getMessage()\r\n";
-        $schemaAndExecution .= "            ]\r\n";
-        $schemaAndExecution .= "        ],\r\n";
-        $schemaAndExecution .= "    ];\r\n";
+        $schemaAndExecution .= "    \$output = array(\r\n";
+        $schemaAndExecution .= "        'errors' => array(\r\n";
+        $schemaAndExecution .= "            array('message' => \$e->getMessage())\r\n";
+        $schemaAndExecution .= "        )\r\n";
+        $schemaAndExecution .= "    );\r\n";
         $schemaAndExecution .= "}\r\n\r\n";
         $schemaAndExecution .= "header('Content-Type: application/json; charset=UTF-8');\r\n";
         $schemaAndExecution .= "echo json_encode(\$output);\r\n";

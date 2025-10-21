@@ -2472,7 +2472,6 @@ class EntityEditor {
      * @param {Object} selectedModel An object containing the entities to be included in the GraphQL schema.
      */
     exportGraphQLSchema(selectedModel) {
-        console.log(selectedModel);
         // send to server for processing
         fetch('../lib.ajax/generate-graphql.php', {
             method: 'POST',
@@ -2496,6 +2495,28 @@ class EntityEditor {
         .catch(error => {
             console.error('Error generating GraphQL schema:', error);
         });
+    }
+
+    /**
+     * Handles the confirmation action in the GraphQL generator modal.
+     * This method is triggered when the user clicks the "OK" button. It gathers the
+     * entities and columns selected by the user from the UI, and then initiates the
+     * GraphQL schema export process by calling `exportGraphQLSchema`.
+     * @returns {void}
+     */
+    handleOkGenerate() {
+        const selectedModel = this.getSelectedEntities();
+        this.exportGraphQLSchema(selectedModel);
+    }
+
+    /**
+     * Handles the cancellation action in the GraphQL generator modal.
+     * This method is triggered when the user clicks the "Cancel" button. It hides
+     * the modal dialog without performing any generation or export operations.
+     * @returns {void}
+     */
+    handleCancelGenerate() {
+        document.querySelector('#graphqlGeneratorModal').style.display = 'none';
     }
 
     /**
@@ -2526,28 +2547,7 @@ class EntityEditor {
         // Show the modal
         modal.style.display = 'block';
 
-        // Define the event listener for OK button
-        function handleOkGenerate() {
-            
-            let selectedModel = _this.getSelectedEntities();
-            _this.exportGraphQLSchema(selectedModel);
-        
-            
-        }
 
-        // Define the event listener for Cancel button
-        function handleCancelGenerate() {
-            modal.style.display = 'none';
-            //callback(false);  // Execute callback with 'false' if Cancel is clicked
-        }
-
-        // Remove existing event listeners to prevent duplicates
-        okBtn.removeEventListener('click', handleOkGenerate);
-        cancelBtn.removeEventListener('click', handleCancelGenerate);
-
-        // Add event listeners for OK and Cancel buttons
-        okBtn.addEventListener('click', handleOkGenerate);
-        cancelBtn.addEventListener('click', handleCancelGenerate);
     }
 
     /**
@@ -2556,9 +2556,41 @@ class EntityEditor {
      */
     createEntitySelectorTables(wrapper) {
         
+        // Custom entities
         this.entities.forEach(entity => {
-            this.createEntitySelectorTable(entity, wrapper);
+            if(!this.systemEntities.includes(entity.name))
+            {
+                this.createEntitySelectorTable(entity, wrapper);
+            }
         });
+
+        // System entities
+        this.entities.forEach(entity => {
+            if(this.systemEntities.includes(entity.name))
+            {
+                this.createEntitySelectorTable(entity, wrapper);
+            }
+        });
+    }
+
+    /**
+     * Checks or unchecks all column checkboxes within the same table.
+     * This function is triggered by a "check all" checkbox and synchronizes the state
+     * of all checkboxes with the class `.check-column` within the same `<table>`.
+     *
+     * @param {HTMLElement} element - The "check all" checkbox element that was clicked.
+     * @returns {void}
+     */
+    checkAllColumns(element)
+    {
+        let table = element.closest('table');
+        if(table)
+        {
+            let checkboxes = table.querySelectorAll('input.check-column');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = element.checked;
+            });
+        }
     }
 
     /**
@@ -2570,6 +2602,16 @@ class EntityEditor {
     createEntitySelectorTable(entity, wrapper) {
         let container = document.createElement("div");
         container.classList.add("mb-4");
+        container.classList.add("entity-selector-table-container");
+        
+        if(this.systemEntities.includes(entity.name))
+        {
+            container.classList.add("system-entity");
+        }
+        else
+        {
+            container.classList.add("custom-entity");
+        }
         
         let entitySelector = document.createElement("input");
         entitySelector.type = "checkbox";
@@ -2577,11 +2619,17 @@ class EntityEditor {
         entitySelector.value = entity.name;
         entitySelector.checked = true;
 
-        let title = document.createElement("h5");
-        title.appendChild(entitySelector);
-        title.appendChild(document.createTextNode(" "));
-        title.appendChild(document.createTextNode(entity.name));
-        container.appendChild(title);
+        let tdTitle = document.createElement("td");
+        tdTitle.appendChild(entitySelector);
+        tdTitle.appendChild(document.createTextNode(" "));
+        tdTitle.appendChild(document.createTextNode(entity.name));
+        
+        let tb = document.createElement("table");
+        tb.classList.add('entity-selector-table');
+        let tr = document.createElement("tr");
+        tr.appendChild(tdTitle);
+        tb.appendChild(tr);
+        container.appendChild(tb);
 
         let table = document.createElement("table");
         table.className = "table table-bordered table-striped table-sm";
@@ -2594,13 +2642,13 @@ class EntityEditor {
         let thead = document.createElement("thead");
         thead.innerHTML = `
             <tr>
-                <th style="width: 23px;"><input type="checkbox" class="check-all" onchange="checkAllColumns(this)" checked></th>
+                <th style="width: 30px;"><input type="checkbox" class="check-all" onchange="editor.checkAllColumns(this)" checked></th>
                 <th style="width: 24%;">Column</th>
                 <th style="width: 20%;">Type</th>
                 <th style="width: 10%;">PK</th>
                 <th style="width: 10%;">Serial</th>
                 <th style="width: 14%;">Nullable</th>
-                <th style="width: 20%;">Default</th>
+                <th style="">Default</th>
             </tr>
         `;
 
