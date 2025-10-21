@@ -366,6 +366,10 @@ if(!isset($databaseName))
                 <span class="close-btn cancel-button">×</span>
             </div>       
             <div class="modal-body">
+                <div class="entity-type-selector">
+                    <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entity</label>
+                    <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entity</label>
+                </div>
                 <div class="entity-selector-container"></div>
             </div>
             <div class="modal-footer">            

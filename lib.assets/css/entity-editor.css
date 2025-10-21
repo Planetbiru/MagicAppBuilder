@@ -568,7 +568,7 @@ label {
 }
 
 .entity-selector-container {
-  max-height: calc(100vh - 210px);
+  max-height: calc(100vh - 238px);
   overflow: auto;
 }
 
@@ -579,4 +579,12 @@ label {
 .entity-selector-table td {
   padding: 4px 8px;
   border-color: transparent;
+}
+
+.entity-type-selector {
+  border-bottom: 1px solid #cccccc;
+  padding: 0px 9px 4px 9px;
+  margin-bottom: 4px;
+  height: 24px;
+  box-sizing: border-box;
 }/*# sourceMappingURL=entity-editor.css.map */

@@ -2403,6 +2403,47 @@ class EntityEditor {
         return sql;
     }
 
+    /**
+     * Checks or unchecks all entity selectors of a specific type (custom or system).
+     * This function is typically triggered by a "check all" checkbox for a group of entities.
+     * It reads the `data-entity-type` attribute from the triggering element to determine
+     * whether to affect 'custom' or 'system' entities.
+     *
+     * @param {HTMLElement} element The checkbox element that triggered the event.
+     * It should have a `data-entity-type` attribute set to either 'custom' or 'system'.
+     */
+    checkEntityTypes(element)
+    {
+        if(element.dataset.entityType == 'custom')
+        {
+            document.querySelectorAll('.entity-selector-table-container.custom-entity .entity-selector').forEach(checkbox => {
+                checkbox.checked = element.checked;
+            });
+        } else if(element.dataset.entityType == 'system')
+        {
+            document.querySelectorAll('.entity-selector-table-container.system-entity .entity-selector').forEach(checkbox => {
+                checkbox.checked = element.checked;
+            });
+        }
+    }
+
+    /**
+     * Gathers all entities and their selected columns from the UI, typically from a modal
+     * for schema generation. It clones the selected entities and filters their columns
+     * based on user selection.
+     *
+     * This method performs the following steps:
+     * 1. Finds all entity selector checkboxes (`.entity-selector`) that are checked.
+     * 2. For each selected entity, it clones the original entity object.
+     * 3. It then filters the columns of the cloned entity based on which column checkboxes
+     *    are selected within that entity's specific table in the UI.
+     * 4. The `data` property of the cloned entity is cleared to reduce payload size.
+     * 5. Returns a structured object `{ entities: [...] }` containing the selected and
+     *    filtered entities, ready to be sent to the server.
+     *
+     * @returns {Object} An object containing an array of the selected and cloned entities.
+     *                   For example: `{ entities: [Entity, Entity, ...] }`.
+     */
     getSelectedEntities() {
         let _this = this;
         let selectedModel = {entities: []};
@@ -2560,7 +2601,7 @@ class EntityEditor {
         this.entities.forEach(entity => {
             if(!this.systemEntities.includes(entity.name))
             {
-                this.createEntitySelectorTable(entity, wrapper);
+                this.createEntitySelectorTable(entity, wrapper, true);
             }
         });
 
@@ -2568,7 +2609,7 @@ class EntityEditor {
         this.entities.forEach(entity => {
             if(this.systemEntities.includes(entity.name))
             {
-                this.createEntitySelectorTable(entity, wrapper);
+                this.createEntitySelectorTable(entity, wrapper, false);
             }
         });
     }
@@ -2595,11 +2636,15 @@ class EntityEditor {
 
     /**
      * Creates and appends a single table for an entity to the provided wrapper element.
-     * This table lists all columns of the entity with checkboxes for selection.
+     * This table lists all columns of the entity, each with a checkbox, allowing for
+     * fine-grained selection of columns to be included in an operation (e.g., GraphQL schema generation).
+     * It also distinguishes between system and custom entities by adding appropriate CSS classes.
+     *
      * @param {Object} entity The entity object for which to create the selection table.
      * @param {HTMLElement} wrapper The container element where the table will be appended.
+     * @param {boolean} checked The default checked state for the entity's main checkbox.
      */
-    createEntitySelectorTable(entity, wrapper) {
+    createEntitySelectorTable(entity, wrapper, checked) {
         let container = document.createElement("div");
         container.classList.add("mb-4");
         container.classList.add("entity-selector-table-container");
@@ -2617,7 +2662,7 @@ class EntityEditor {
         entitySelector.type = "checkbox";
         entitySelector.className = "entity-selector";
         entitySelector.value = entity.name;
-        entitySelector.checked = true;
+        entitySelector.checked = checked;
 
         let tdTitle = document.createElement("td");
         tdTitle.appendChild(entitySelector);
