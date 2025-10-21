@@ -3572,3 +3572,6 @@ MagicAppBuilder 1.27.0 introduces the **GraphQL Generator**, a powerful tool tha
 * **Guaranteed Consistency**: Keeps your database schema and API perfectly aligned, reducing the risk of human error.
 * **Comprehensive Documentation**: Simplifies API adoption across teams with clear, always-updated documentation.
 
+## What's Changed?
+
+To make space for the new **GraphQL** button in the export section, the checkbox caption for **Draw Relationship** has been changed to just **Relationship**. This reduces the high-resolution screen requirement for users. Additionally, the caption on the **Sort Entity** button has been changed to **Sort**, and the caption on the **Sort Entity by Type** button has been changed to **Sort by Type**. With these changes, users with a 1366x768 screen resolution can still use MagicAppBuilder without overflow issues.

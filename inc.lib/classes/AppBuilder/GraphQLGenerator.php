@@ -1,5 +1,7 @@
 <?php
 
+namespace AppBuilder;
+
 /**
  * The `GraphQLGenerator` class is a powerful tool designed to automatically generate a complete GraphQL API layer from a JSON file that defines database entities.
  * It inspects the schema to understand tables, columns, primary keys, and foreign key relationships.

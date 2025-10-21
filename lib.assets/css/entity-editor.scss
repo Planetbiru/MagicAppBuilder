@@ -696,3 +696,8 @@ label {
         text-align: center;
     }
 }
+
+.entity-selector-container{
+    max-height: calc(100vh - 210px);
+    overflow: auto;
+}

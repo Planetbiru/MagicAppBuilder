@@ -217,6 +217,10 @@ if(!isset($databaseName))
                                 <button class="btn" onclick="editor.importSheet()">Spreadsheet</button>
                                 <button class="btn" onclick="editor.triggerImportFromClipboard()">Clipboard</button>
                                 <button class="btn" onclick="editor.importGraphQLSchema()">GraphQL</button>
+                                <input class="import-file-json" type="file" accept=".json" style="display: none;" />
+                                <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
+                                <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
+                                <input class="import-file-graphql" type="file" accept=".graphqls" style="display: none;" />
                             </span>
 
                             <!-- Export group -->
@@ -228,16 +232,13 @@ if(!isset($databaseName))
                                 <button class="btn" onclick="downloadMD()">MD</button>
                                 <button class="btn" onclick="downloadHTML()">HTML</button>
                                 <button class="btn" onclick="editor.downloadSQL()">SQL</button>
+                                <button class="btn" onclick="editor.showEntitySelector()">GraphQL</button>
                             </span>
                             
                             <span class="btn-group">
-                                <button class="btn" onclick="editor.sortEntities()">Sort Entity</button>    
-                                <button class="btn" onclick="editor.sortAndGroupEntities()">Sort Entity by Type</button>              
-                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Draw Relationship</label>
-                                <input class="import-file-json" type="file" accept=".json" style="display: none;" />
-                                <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
-                                <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
-                                <input class="import-file-graphql" type="file" accept=".graphqls" style="display: none;" />
+                                <button class="btn" onclick="editor.sortEntities()">Sort</button>    
+                                <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>              
+                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Relationship</label>  
                             </span>
                         </div>
 
@@ -313,7 +314,7 @@ if(!isset($databaseName))
         </div>
     </div>
 
-    <div class="modal modal-lg" id="exportModal">
+    <div class="modal modal-lg modal-top-80" id="exportModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
@@ -353,6 +354,24 @@ if(!isset($databaseName))
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
                 <input type="file" id="importDataFileInput" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-lg modal-top-40" id="graphqlGeneratorModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>GraphQL Generator</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+                <div class="entity-selector-container"></div>
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary generate-graphql-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary generate-graphql-cancel">Cancel</button>
             </div>
         </div>
     </div>

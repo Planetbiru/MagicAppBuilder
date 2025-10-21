@@ -565,4 +565,9 @@ label {
 .data-preview-table .td-remover {
   width: 20px;
   text-align: center;
+}
+
+.entity-selector-container {
+  max-height: calc(100vh - 210px);
+  overflow: auto;
 }/*# sourceMappingURL=entity-editor.css.map */
