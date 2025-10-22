@@ -582,6 +582,16 @@ class GraphQLGenerator
         $manualContent .= "```\r\n\r\n";
         $manualContent .= "Make sure to replace `your_database_name`, `your_username`, and `your_password` with your actual database credentials.\r\n\r\n";
 
+
+        $manualContent .= "### Integration with MagicAppBuilder\r\n\r\n";
+        $manualContent .= "If you are integrating with MagicAppBuilder, you can use the database connection from an existing connection:\r\n\r\n";
+        $manualContent .= "```php\r\n";
+        $manualContent .= "\$db = \$database->getDatabaseConnection();\r\n";
+        $manualContent .= "```\r\n\r\n";
+        $manualContent .= "where `\$db` is an instance of PDO.\r\n\r\n";
+
+        $manualContent .= "---\r\n\r\n";
+
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
             $pluralCamelName = $this->pluralize($camelName);
