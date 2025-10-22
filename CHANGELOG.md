@@ -3575,3 +3575,7 @@ MagicAppBuilder 1.27.0 introduces the **GraphQL Generator**, a powerful tool tha
 ## What's Changed?
 
 To make space for the new **GraphQL** button in the export section, the checkbox caption for **Draw Relationship** has been changed to just **Relationship**. This reduces the high-resolution screen requirement for users. Additionally, the caption on the **Sort Entity** button has been changed to **Sort**, and the caption on the **Sort Entity by Type** button has been changed to **Sort by Type**. With these changes, users with a 1366x768 screen resolution can still use MagicAppBuilder without overflow issues.
+
+### Object Name Suffix for Reserved Keywords
+
+When generating code, if an entity name conflicts with a reserved system variable (e.g., `appConfig`, `database`), MagicAppBuilder will now automatically append the suffix `Obj` to the object name (e.g., `appConfigObj`). This prevents naming collisions and ensures the generated code is valid and error-free.

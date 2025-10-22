@@ -38,7 +38,7 @@ class AppBuilderApproval extends AppBuilderBase
     public function createInsertApprovalSection($mainEntity, $appFields, $approvalRequired, $approvalEntity, $callbackSuccess = null, $callbackFailed = null)
     {
         $entityName = $mainEntity->getEntityName();
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($mainEntity->getPrimaryKey());
         $upperWaitingFor = PicoStringUtil::upperCamelize($this->entityInfo->getWaitingFor());
@@ -165,7 +165,7 @@ class AppBuilderApproval extends AppBuilderBase
     {
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName = $mainEntity->getPrimaryKey();
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $entityApprovalName = $approvalEntity->getEntityName();
         $pkeyApprovalName = $approvalEntity->getPrimaryKey();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
@@ -302,7 +302,7 @@ class AppBuilderApproval extends AppBuilderBase
      */
     public function createDeleteApprovalSectionBase($entityName, $primaryKeyName, $userAction, $waitingForKey, $waitingForFalue)
     {
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $lines = array();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
         $upperWaitingFor = PicoStringUtil::upperCamelize($waitingForKey);
@@ -362,7 +362,7 @@ class AppBuilderApproval extends AppBuilderBase
      */
     public function createWaitingForSectionBase($entityName, $primaryKeyName, $userAction, $waitingForValue, $callbackFinish = null, $callbackException = null)
     {
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $lines = array();
         $camelPrimaryKeyName = PicoStringUtil::camelize($primaryKeyName);
         $upperWaitingFor = PicoStringUtil::upperCamelize($this->getentityInfo()->getWaitingFor());
@@ -524,7 +524,7 @@ class AppBuilderApproval extends AppBuilderBase
         $entityInfoName = "entityInfo";
         $entityApvInfoName = "entityApvInfo";
         $userAction = 'UserAction::APPROVE';
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $lines = array();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
         
@@ -697,7 +697,7 @@ class AppBuilderApproval extends AppBuilderBase
         $entityInfoName = "entityInfo";
         $entityApvInfoName = "entityApvInfo";
         $userAction = 'UserAction::REJECT';
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $lines = array();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
 

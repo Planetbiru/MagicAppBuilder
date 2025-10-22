@@ -677,7 +677,7 @@ class AppBuilderBase //NOSONAR
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName =  $mainEntity->getPrimaryKey();
 
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
@@ -756,7 +756,7 @@ class AppBuilderBase //NOSONAR
         $primaryKeyName =  $mainEntity->getPrimaryKey();
         $upperPkName = PicoStringUtil::upperCamelize($primaryKeyName);
 
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $dom = new DOMDocument();
 
         $phpCode = '
@@ -1048,7 +1048,7 @@ class AppBuilderBase //NOSONAR
         $primaryKeyName =  $mainEntity->getPrimaryKey();
         $upperPkName = PicoStringUtil::upperCamelize($primaryKeyName);
 
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         
         $htmlDetail = $this->createTableDetail($objectName, $appFields, $primaryKeyName);
 
@@ -1157,7 +1157,7 @@ class AppBuilderBase //NOSONAR
         $primaryKeyName =  $mainEntity->getPrimaryKey();
         $upperPkName = PicoStringUtil::upperCamelize($primaryKeyName);
 
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         
         $htmlDetail = $this->createTableDetail($objectName, $appFields, $primaryKeyName);
 
@@ -1426,7 +1426,7 @@ echo UserAction::getWaitingForMessage($appLanguage, $'.$objectName.'->getWaiting
     private function createExportScript($entityMain, $exportFields)
     {
         $entityName = $entityMain->getentityName();
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $headers = array();
         $data = array();
         $globals = array();
@@ -1540,7 +1540,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
             $getData[] = $beforeScript;
             
             $entityName = $entityMain->getentityName();
-            $objectName = lcfirst($entityName);
+            $objectName = $this->createObjectName($entityName);
             $headers = array();
             $data = array();
             $globals = array();
@@ -1644,7 +1644,7 @@ return 'if($inputGet->getUserAction() == UserAction::EXPORT)
     {
         $entityName = $entityMain->getentityName();
         $primaryKey = $entityMain->getPrimaryKey();
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $dom = new DOMDocument();
         $filterSection = $dom->createElement('div');
         $filterSection->setAttribute('class', 'filter-section');
@@ -6122,5 +6122,53 @@ $subqueryMap = '.$referece.';
     public function getValidatiorInfo()
     {
         return $this->validatorInfo;
+    }
+    
+    /**
+     * Gets the reserved object names.
+     * 
+     * This method returns a list of variable names that are reserved within the scope
+     * of the generated script. These names should not be used for entity objects to avoid
+     * naming conflicts with predefined variables such as configuration objects, user data,
+     * or core application components.
+     *
+     * @return string[] An array of reserved variable names.
+     */
+    public function getReservedObjectName()
+    {
+        return [
+          'appUserRole',
+          'appConfig',
+          'appLanguage',
+          'appEntityLanguage',
+          'appMenuData',
+          'appMenu',
+          'currentUser',
+          'database',
+          'appModule',
+          'currentAction',
+          'userActivityLogger'  
+        ];
+    }
+    
+    /**
+     * Creates a safe object name from an entity name.
+     *
+     * This method converts an entity name (typically in PascalCase) into a safe
+     * variable name (lowerCamelCase). If the resulting name conflicts with the list
+     * of reserved names (obtained from `getReservedObjectName`), this method appends
+     * the suffix "Obj" to ensure uniqueness within the generated script's scope.
+     *
+     * @param string $entityName The entity name.
+     * @return string A safe and non-conflicting variable name for the entity object.
+     */
+    public function createObjectName($entityName)
+    {
+        $objectName = lcfirst($entityName);
+        if(in_array($objectName, $this->getReservedObjectName()))
+        {
+            $objectName .= "Obj";
+        }
+        return $objectName;
     }
 }
