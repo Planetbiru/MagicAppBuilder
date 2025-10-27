@@ -2540,13 +2540,26 @@ class EntityEditor {
 
     /**
      * Handles the confirmation action in the GraphQL generator modal.
-     * This method is triggered when the user clicks the "OK" button. It gathers the
-     * entities and columns selected by the user from the UI, and then initiates the
-     * GraphQL schema export process by calling `exportGraphQLSchema`.
+     * This method is triggered when the user clicks the "Generate GraphQL" button.
+     * It gathers the selected entities and columns from the UI and initiates the
+     * GraphQL schema export process for the backend API only.
      * @returns {void}
      */
     handleOkGenerate() {
         const selectedModel = this.getSelectedEntities();
+        this.exportGraphQLSchema(selectedModel);
+    }
+
+    /**
+     * Handles the confirmation action in the GraphQL generator modal.
+     * This method is triggered when the user clicks the "Generate GraphQL with Frontend" button.
+     * It gathers the selected entities and columns, sets a flag to include the frontend,
+     * and then initiates the GraphQL schema and frontend application export process.
+     * @returns {void}
+     */
+    handleOkGenerateWithFrontend() {
+        const selectedModel = this.getSelectedEntities();
+        selectedModel.withFrontend = true;
         this.exportGraphQLSchema(selectedModel);
     }
 
@@ -2567,8 +2580,6 @@ class EntityEditor {
     showEntitySelector()
     {
         let title = 'GraphQL Generator';
-        let captionOk = 'Generate';
-        let captionCancel = 'Close';
         let _this = this;
 
         let wrapper = document.querySelector('.entity-selector-container');
@@ -2576,12 +2587,8 @@ class EntityEditor {
 
         // Get modal and buttons
         const modal = document.querySelector('#graphqlGeneratorModal');
-        const okBtn = modal.querySelector('.generate-graphql-ok');
-        const cancelBtn = modal.querySelector('.generate-graphql-cancel');
 
         modal.querySelector('.modal-header h3').innerHTML = title;
-        okBtn.innerHTML = captionOk;
-        cancelBtn.innerHTML = captionCancel;
 
         this.createEntitySelectorTables(wrapper);
 

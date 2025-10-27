@@ -374,7 +374,9 @@ if(!isset($databaseName))
                 <div class="entity-selector-container"></div>
             </div>
             <div class="modal-footer">            
-                <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerate()">OK</button>
+                <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerate()">Generate GraphQL</button>
+                &nbsp;
+                <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerateWithFrontend()">Generate GraphQL with Frontend</button>
                 &nbsp;
                 <button class="btn btn-secondary generate-graphql-cancel" onclick="editor.handleCancelGenerate()">Cancel</button>
             </div>
