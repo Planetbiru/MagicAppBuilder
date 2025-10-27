@@ -515,6 +515,26 @@ class GraphQLGenerator
             $code .= "            }\r\n";
             $code .= "        ),\r\n\r\n";
 
+            // Activate/Deactivate Mutation (if applicable)
+            if ($tableInfo['hasActiveColumn']) {
+                $code .= "        'toggle" . ucfirst($camelName) . "Active' => array(\r\n";
+                $code .= "            'type' => \$" . $typeName . ",\r\n";
+                $code .= "            'args' => array(\r\n";
+                $code .= "                'id' => Type::nonNull(Type::string()),\r\n";
+                $code .= "                'active' => Type::nonNull(Type::boolean())\r\n";
+                $code .= "            ),\r\n";
+                $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
+                $code .= "                \$sql = 'UPDATE " . $tableName . " SET active = :active WHERE " . $primaryKey . " = :id';\r\n";
+                $code .= "                \$stmt = \$db->prepare(\$sql);\r\n";
+                $code .= "                \$stmt->execute(array(':id' => \$args['id'], ':active' => \$args['active'] ? 1 : 0));\r\n";
+                $code .= "                \$stmt = \$db->prepare('SELECT * FROM " . $tableName . " WHERE " . $primaryKey . " = :id');\r\n";
+                $code .= "                \$stmt->execute(array(':id' => \$args['id']));\r\n";
+                $code .= "                return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
+                $code .= "            }\r\n";
+                $code .= "        ),\r\n\r\n";
+            }
+
+
             // Delete Mutation
             $code .= "        'delete" . ucfirst($camelName) . "' => array(\r\n";
             $code .= "            'type' => Type::boolean(),\r\n";
@@ -784,6 +804,729 @@ class GraphQLGenerator
     }
 
     /**
+     * Generates a JSON config file for the frontend.
+     * This file contains metadata about entities, fields, and relationships.
+     *
+     * @return string The JSON formatted content for frontend-config.json.
+     */
+    public function generateFrontendConfigJson($displayField = "name")
+    {
+        $frontendConfig = array();
+        foreach ($this->analyzedSchema as $tableName => $tableInfo) {
+            $camelName = $this->camelCase($tableName);
+            $pluralCamelName = $this->pluralize($camelName);
+
+            $columns = array();
+            foreach($tableInfo['columns'] as $colName => $colInfo) {
+                $columns[$colName] = array(
+                    'type' => $this->mapDbTypeToGqlType($colInfo['type']),
+                    'isForeignKey' => $colInfo['isForeignKey'],
+                    'references' => $colInfo['references'] ? $colInfo['references'] : null,
+                );
+            }
+
+            $frontendConfig[$camelName] = array(
+                'name' => $camelName,
+                'pluralName' => $pluralCamelName,
+                'displayName' => ucfirst(str_replace('_', ' ', $tableName)),
+                'displayField' => $displayField,
+                'primaryKey' => $tableInfo['primaryKey'],
+                'hasActiveColumn' => $tableInfo['hasActiveColumn'],
+                'columns' => $columns,
+            );
+        }
+        return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Generates the HTML file for the frontend application.
+     *
+     * @return string The HTML content.
+     */
+    public function generateFrontendHtml()
+    {
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL Frontend</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar" id="sidebar-nav">
+            <h2>Menu</h2>
+            <ul id="entity-menu"></ul>
+        </nav>
+        <main class="main-content" id="main-content">
+            <h1 id="content-title">Welcome</h1>
+            <div id="content-body">
+                <p>Please select an entity from the menu to get started.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Forms -->
+    <div id="form-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modal-title">Form</h2>
+            <form id="entity-form"></form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+HTML;
+    }
+
+    /**
+     * Generates the CSS file for the frontend application.
+     *
+     * @return string The CSS content.
+     */
+    public function generateFrontendCss()
+    {
+        return <<<CSS
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f7f9;
+    color: #333;
+}
+.container { display: flex; }
+.sidebar { width: 220px; background-color: #fff; border-right: 1px solid #e0e0e0; height: 100vh; padding: 20px; }
+.sidebar h2 { font-size: 1.2em; color: #555; }
+.sidebar ul { list-style: none; padding: 0; }
+.sidebar li { margin: 10px 0; }
+.sidebar a { text-decoration: none; color: #007bff; font-weight: 500; display: block; padding: 8px; border-radius: 4px; }
+.sidebar a:hover, .sidebar a.active { background-color: #e9f5ff; color: #0056b3; }
+.main-content { flex-grow: 1; padding: 20px; overflow-x: auto;
+width: calc(100% - 240px);;
+box-sizing: border-box;
+}
+
+/* Table Styles */
+table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+th, td { padding: 5px 8px; border: 1px solid #ddd; text-align: left; }
+th { background-color: #f8f9fa; }
+tr:nth-child(even) { background-color: #fdfdfd; }
+
+/* Button Styles */
+.btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-right: 5px;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-primary { background-color: #007bff; color: white; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-success { background-color: #28a745; color: white; }
+.btn-danger { background-color: #dc3545; color: white; }
+.btn-warning { background-color: #ffc107; color: black; }
+.btn-info { background-color: #17a2b8; color: white; }
+
+/* Form & Modal */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; }
+.close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+
+/* Detail View */
+.detail-view { background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.detail-view h3 { border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.detail-item { margin-bottom: 10px; }
+.detail-item strong { display: inline-block; width: 150px; color: #555; }
+
+/* Controls */
+.list-controls { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+
+/* Pagination */
+.pagination { margin-top: 20px; }
+.pagination button { margin: 0 5px; }
+
+
+#content-body{
+    overflow-y: auto;
+
+}
+
+.table-container{
+    overflow-x: auto;
+}
+td.actions{
+    white-space: nowrap;
+}
+CSS;
+    }
+
+    /**
+     * Generates the JavaScript file for the frontend application.
+     *
+     * @return string The JavaScript content.
+     */
+    public function generateFrontendJs()
+    {
+        // This now returns the full JavaScript application code.
+        return <<<'JS'
+class GraphQLClientApp {
+    constructor(configUrl, apiUrl) {
+        this.configUrl = configUrl;
+        this.apiUrl = apiUrl;
+        this.config = null;
+        this.currentEntity = null;
+        this.state = {
+            page: 1,
+            limit: 10,
+            filters: [],
+            orderBy: [],
+        };
+        this.dom = {
+            menu: document.getElementById('entity-menu'),
+            title: document.getElementById('content-title'),
+            body: document.getElementById('content-body'),
+            modal: document.getElementById('form-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            form: document.getElementById('entity-form'),
+            closeModalBtn: document.querySelector('.close-button'),
+        };
+        this.init();
+    }
+
+    async init() {
+        try {
+            await this.loadConfig();
+            this.buildMenu();
+            this.dom.closeModalBtn.onclick = () => this.closeModal();
+            window.onclick = (event) => {
+                if (event.target == this.dom.modal) this.closeModal();
+            };
+            // Handle initial page load and back/forward button clicks
+            window.addEventListener('popstate', () => this.handleRouteChange());
+            this.handleRouteChange(); // Handle initial route
+        } catch (error) {
+            console.error('Initialization Error:', error);
+            this.dom.body.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+    }
+
+    async loadConfig() { // Simplified loadConfig
+        const response = await fetch(this.configUrl);
+        if (!response.ok) throw new Error(`Failed to load config from ${this.configUrl}`);
+        this.config = await response.json();
+    }
+
+    buildMenu() {
+        if (!this.config || !this.config.entities) return;
+        this.dom.menu.innerHTML = '';
+        Object.values(this.config.entities).forEach((entity, index) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `#${entity.name}`;
+            a.textContent = entity.displayName;
+            a.onclick = (e) => {
+                e.preventDefault();
+                this.navigateTo(entity.name);
+            };
+            li.appendChild(a);
+            this.dom.menu.appendChild(li);
+        });
+    }
+
+    async gqlQuery(query, variables = {}) {
+        const response = await fetch(this.apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, variables }),
+        });
+        const result = await response.json();
+        if (result.errors) {
+            console.error('GraphQL Errors:', result.errors);
+            console.error(`Error: ${result.errors[0].message}`);
+            throw new Error(result.errors[0].message);
+        }
+        return result.data;
+    }
+
+    // =================================================================
+    // RENDER METHODS
+    // =================================================================
+
+    navigateTo(entityName, params = {}) {
+        const newParams = new URLSearchParams();
+        newParams.set('page', params.page || 1);
+        newParams.set('limit', params.limit || 10);
+        // TODO: Add filters and orderBy to params
+
+        const newUrl = `${window.location.pathname}#${entityName}?${newParams.toString()}`;
+        history.pushState({ entityName, params }, '', newUrl);
+        this.handleRouteChange();
+    }
+
+    navigateToDetail(entityName, id) {
+        const newUrl = `${window.location.pathname}#${entityName}/detail/${id}`;
+        history.pushState({ entityName, id }, '', newUrl);
+        this.handleRouteChange();
+    }
+
+    async handleRouteChange() {
+        const hash = window.location.hash.substring(1);
+        if (!hash) {
+            // If no hash, navigate to the first entity
+            const firstEntityName = Object.keys(this.config.entities)[0];
+            if (firstEntityName) {
+                this.navigateTo(firstEntityName);
+            } else {
+                this.dom.body.innerHTML = '<p>No entities configured.</p>';
+            }
+            return;
+        }
+
+        const [path, queryString] = hash.split('?');
+        const pathParts = path.split('/');
+
+        const entityName = pathParts[0];
+        const viewType = pathParts.length > 1 ? pathParts[1] : 'list';
+        const itemId = pathParts.length > 2 ? pathParts[2] : null;
+
+        const params = new URLSearchParams(queryString);
+
+        const entity = this.config.entities[entityName];
+        if (!entity) {
+            this.dom.body.innerHTML = `<p>Entity "${entityName}" not found.</p>`;
+            return;
+        }
+
+        this.currentEntity = entity;
+        this.state = {
+            page: parseInt(params.get('page')) || 1,
+            limit: parseInt(params.get('limit')) || 10,
+            filters: [], // TODO: Parse from URL
+            orderBy: [],   // TODO: Parse from URL
+        };
+
+        document.querySelectorAll('#entity-menu a').forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${entityName}`));
+
+        if (viewType === 'detail' && itemId) {
+            await this.renderDetailView(itemId);
+        } else {
+            await this.renderListView();
+        }
+    }
+
+    async renderListView() {
+        this.dom.title.textContent = `List of ${this.currentEntity.displayName}`;
+        this.dom.body.innerHTML = 'Loading...';
+
+        const fields = this.getFieldsForQuery(this.currentEntity, 1); // depth 1
+        const offset = (this.state.page - 1) * this.state.limit;
+
+        const query = `
+            query Get${this.currentEntity.pluralName}($limit: Int, $offset: Int, $orderBy: [SortInput], $filter: [FilterInput]) {
+                ${this.currentEntity.pluralName}(limit: $limit, offset: $offset, orderBy: $orderBy, filter: $filter) {
+                    items { ${fields} }
+                    total
+                    limit
+                    page
+                    totalPages
+                    hasNext
+                    hasPrevious
+                }
+            }
+        `;
+
+        try {
+            const data = await this.gqlQuery(query, {
+                limit: this.state.limit,
+                offset: offset,
+                orderBy: this.state.orderBy,
+                filter: this.state.filters,
+            });
+            const result = data[this.currentEntity.pluralName];
+            this.renderTable(result.items);
+            this.renderPagination(result);
+        } catch (error) {
+            this.dom.body.innerHTML = `<p style="color: red;">Failed to fetch data.</p>`;
+        }
+    }
+
+    renderTable(items) {
+        const headers = Object.keys(this.currentEntity.columns);
+        let tableHtml = `
+            <div class="list-controls">
+                <button id="add-new-btn" class="btn btn-primary">Add New ${this.currentEntity.displayName}</button>
+                <div><!-- Placeholder for filter/sort controls --></div>
+            </div>
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            ${headers.map(h => `<th>${h}</th>`).join('')}
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        if (items.length === 0) {
+            tableHtml += `<tr><td colspan="${headers.length + 1}">No items found.</td></tr>`;
+        } else {
+            items.forEach(item => {
+                tableHtml += `<tr>`;
+                headers.forEach(header => {
+                    const col = this.currentEntity.columns[header];
+                    let value = item[header];
+                    const relationName = col.references; // Now this is camelCase, e.g., "statusKeanggotaan"
+                    
+
+                    if (col.isForeignKey && item[relationName]) {
+                        // Display a representative field from the related object, e.g., 'name' or the second field.
+                        let relatedEntity = this.config.entities[this.camelCase(relationName)];
+                        let displayField = relatedEntity ? relatedEntity.displayField : 'name';
+                        value = item[relationName][displayField];
+                    }
+                    tableHtml += `<td>${value !== null ? value : 'N/A'}</td>`;
+                });
+                tableHtml += this.renderActionButtons(item);
+                tableHtml += `</tr>`;
+            });
+        }
+
+        tableHtml += `</tbody></table></div>`;
+        this.dom.body.innerHTML = tableHtml;
+
+        document.getElementById('add-new-btn').onclick = () => this.renderForm();
+        document.querySelectorAll('.btn-detail').forEach(btn => btn.onclick = (e) => this.navigateToDetail(this.currentEntity.name, e.currentTarget.dataset.id));
+        document.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = (e) => this.renderForm(e.currentTarget.dataset.id));
+        document.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = (e) => this.handleDelete(e.currentTarget.dataset.id));
+        document.querySelectorAll('.btn-toggle-active').forEach(btn => btn.onclick = (e) => this.handleToggleActive(e.currentTarget.dataset.id, e.currentTarget.dataset.active === 'true'));
+    }
+    
+    renderActionButtons(item) {
+        const id = item[this.currentEntity.primaryKey];
+        let buttons = `
+            <td class="actions">
+                <button class="btn btn-info btn-detail" data-id="${id}">View</button>
+                <button class="btn btn-warning btn-edit" data-id="${id}">Edit</button>
+        `;
+        if (this.currentEntity.hasActiveColumn) {
+            const isActive = item['active'];
+            buttons += `<button class="btn ${isActive ? 'btn-secondary' : 'btn-success'} btn-toggle-active" data-id="${id}" data-active="${isActive}">${isActive ? 'Deactivate' : 'Activate'}</button>`;
+        }
+        buttons += `<button class="btn btn-danger btn-delete" data-id="${id}">Delete</button></td>`;
+        return buttons;
+    }
+
+    renderPagination(result) {
+        const paginationDiv = document.createElement('div');
+        paginationDiv.className = 'pagination';
+        paginationDiv.innerHTML = `
+            <span>Page ${result.page} of ${result.totalPages} (Total: ${result.total})</span>
+            <button id="prev-page" ${!result.hasPrevious ? 'disabled' : ''}>Previous</button>
+            <button id="next-page" ${!result.hasNext ? 'disabled' : ''}>Next</button>
+        `;
+        this.dom.body.appendChild(paginationDiv);
+        
+        document.getElementById('prev-page').onclick = () => {
+            this.navigateTo(this.currentEntity.name, { page: this.state.page - 1 });
+        };
+        document.getElementById('next-page').onclick = () => {
+            this.navigateTo(this.currentEntity.name, { page: this.state.page + 1 });
+        };
+    }
+
+    async renderDetailView(id) {
+        this.dom.title.textContent = `Detail of ${this.currentEntity.displayName}`;
+        this.dom.body.innerHTML = 'Loading...';
+
+        const fields = this.getFieldsForQuery(this.currentEntity, 2); // Deeper nesting for details
+        const query = `
+            query Get${this.currentEntity.name}($id: String!) {
+                ${this.currentEntity.name}(id: $id) {
+                    ${fields}
+                }
+            }
+        `;
+
+        try {
+            const data = await this.gqlQuery(query, { id });
+            const item = data[this.currentEntity.name];
+            let detailHtml = `<button id="back-to-list" class="btn btn-secondary">Back to List</button><div class="detail-view">`;
+            for (const key in this.currentEntity.columns) {
+                const col = this.currentEntity.columns[key];
+                const relationName = col.references; // e.g., "statusKeanggotaan"
+                detailHtml += `<div class="detail-item"><strong>${key}:</strong> `;
+                if (col.isForeignKey && item[relationName]) {
+                    detailHtml += `<span>${JSON.stringify(item[relationName])}</span>`;
+                } else {
+                    detailHtml += `<span>${item[key] !== null ? item[key] : 'N/A'}</span>`;
+                }
+                detailHtml += `</div>`;
+            }
+            detailHtml += `</div>`;
+            this.dom.body.innerHTML = detailHtml;
+            document.getElementById('back-to-list').onclick = () => history.back();
+        } catch (error) {
+            this.dom.body.innerHTML = `<p style="color: red;">Failed to fetch item details.</p>`;
+        }
+    }
+
+    async renderForm(id = null) {
+        this.dom.modalTitle.textContent = id ? `Edit ${this.currentEntity.displayName}` : `Add New ${this.currentEntity.displayName}`;
+        this.dom.form.innerHTML = 'Loading form...';
+        this.openModal();
+
+        let item = {};
+        if (id) {
+            const fields = this.getFieldsForQuery(this.currentEntity, 1, true); // No relations for edit form
+            const query = `query GetForEdit($id: String!) { ${this.currentEntity.name}(id: $id) { ${fields} } }`;
+            const data = await this.gqlQuery(query, { id });
+            item = data[this.currentEntity.name];
+        }
+
+        let formHtml = '';
+        for (const colName in this.currentEntity.columns) {
+            if (colName === this.currentEntity.primaryKey) continue;
+            const col = this.currentEntity.columns[colName];
+            const value = item[colName] !== undefined ? item[colName] : '';
+
+            formHtml += `<div class="form-group">`;
+            formHtml += `<label for="${colName}">${colName}</label>`;
+            if (col.isForeignKey) {
+                let relationName = col.references; // This is now camelCase, e.g., "subKlasifikasi"
+
+                relationName = this.camelCase(relationName);
+
+                let relatedEntity = this.config.entities[relationName]; // Direct access
+                
+                const relatedData = relatedEntity ? (await this.fetchAll(relatedEntity)) : [];
+                let displayField = relatedEntity ? relatedEntity.displayField : 'name';
+
+                formHtml += `<select id="${colName}" name="${colName}">`;
+                formHtml += `<option value="">-- Select --</option>`;
+                relatedData.forEach(relItem => {
+                    const relId = relItem[relatedEntity.primaryKey];
+                    const relDisplay = relItem[displayField];
+                    formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay} (ID: ${relId})</option>`;
+                });
+                formHtml += `</select>`;
+            } else {
+                let inputType = 'text';
+                if (col.type.includes('int')) inputType = 'number';
+                if (col.type.includes('boolean')) inputType = 'checkbox';
+                
+                if (inputType === 'checkbox') {
+                     formHtml += `<input type="checkbox" id="${colName}" name="${colName}" ${value ? 'checked' : ''}>`;
+                } else {
+                     formHtml += `<input type="${inputType}" id="${colName}" name="${colName}" value="${value}">`;
+                }
+            }
+            formHtml += `</div>`;
+        }
+        formHtml += `<button type="submit" class="btn btn-primary">Save</button>`;
+        this.dom.form.innerHTML = formHtml;
+        this.dom.form.onsubmit = (e) => {
+            e.preventDefault();
+            this.handleSave(id);
+        };
+    }
+
+    // =================================================================
+    // HANDLER METHODS
+    // =================================================================
+
+    async handleSave(id) {
+        const formData = new FormData(this.dom.form);
+        const input = {};
+        for (const colName in this.currentEntity.columns) {
+             if (colName === this.currentEntity.primaryKey) continue;
+             const col = this.currentEntity.columns[colName];
+             if (col.type.includes('boolean')) {
+                 input[colName] = this.dom.form.querySelector(`[name="${colName}"]`).checked;
+             } else if (formData.has(colName)) {
+                 let value = formData.get(colName);
+                 if (col.type.includes('int') || col.type.includes('float')) {
+                     value = value ? Number(value) : null;
+                 }
+                 input[colName] = value;
+             }
+        }
+
+        const mutationName = id ? `update${this.currentEntity.name}` : `create${this.currentEntity.name}`;
+        const fields = this.getFieldsForQuery(this.currentEntity, 1, true);
+        const mutation = `
+            mutation Save${this.currentEntity.name}($id: String, $input: ${this.currentEntity.name}Input!) {
+                ${mutationName}(${id ? 'id: $id, ' : ''}input: $input) {
+                    ${fields}
+                }
+            }
+        `;
+        const variables = { input };
+        if (id) variables.id = id;
+
+        try {
+            await this.gqlQuery(mutation, variables);
+            this.closeModal();
+            this.renderListView(); // Refresh list
+        } catch (error) {
+            console.error(`Failed to save: ${error.message}`);
+        }
+    }
+
+    async handleDelete(id) {
+        if (!confirm('Are you sure you want to delete this item?')) return;
+
+        const mutation = `
+            mutation Delete${this.currentEntity.name}($id: String!) {
+                delete${this.currentEntity.name}(id: $id)
+            }
+        `;
+        try {
+            await this.gqlQuery(mutation, { id });
+            this.renderListView();
+        } catch (error) {
+            console.error(`Failed to delete: ${error.message}`);
+        }
+    }
+
+    async handleToggleActive(id, currentStatus) {
+        const newStatus = !currentStatus;
+        const action = newStatus ? 'activate' : 'deactivate';
+        if (!confirm(`Are you sure you want to ${action} this item?`)) return;
+
+        const mutation = `
+            mutation ToggleActive($id: String!, $active: Boolean!) {
+                toggle${this.currentEntity.name}Active(id: $id, active: $active) {
+                    ${this.currentEntity.primaryKey}
+                    active
+                }
+            }
+        `;
+        try {
+            await this.gqlQuery(mutation, { id, active: newStatus });
+            this.renderListView();
+        } catch (error) {
+            console.error(`Failed to ${action}: ${error.message}`);
+        }
+    }
+
+    // =================================================================
+    // UTILITY METHODS
+    // =================================================================
+
+    camelCase(str) {
+        return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+    }
+    // This function is no longer needed if frontend-config.json is correct,
+    // but we keep it for robustness just in case.
+    // camelCase(str) { return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase()); }
+
+    getFieldsForQuery(entity, depth = 1, noRelations = false) {
+        if (depth < 0) return entity.primaryKey;
+        let fields = [];
+        for (const colName in entity.columns) {
+            const col = entity.columns[colName];
+            if (col.isForeignKey && !noRelations) {
+                
+                let relationName = col.references; // This is now camelCase, e.g., "statusKeanggotaan"
+
+                let relationNameCamelCase = this.camelCase(relationName);
+
+
+                let relatedEntity = this.config.entities[relationName];
+
+                if(!relatedEntity)
+                {
+                    relatedEntity = this.config.entities[relationNameCamelCase];
+                }
+
+                if (relatedEntity) {
+                    let query = `${relationName} { ${this.getFieldsForQuery(relatedEntity, depth - 1)} }`;
+                    // Use the correct relation name from the entity config for the query
+                    fields.push(query);
+                }
+            } else if (!col.isForeignKey) {
+                fields.push(colName);
+            }
+        }
+        return fields.join(' ');
+    }
+    
+    async fetchAll(entity) {
+        const fields = this.getFieldsForQuery(entity, 0); // Only simple fields
+        const query = `query FetchAll { ${entity.pluralName}(limit: 0) { items { ${fields} } } }`;
+        try {
+            const data = await this.gqlQuery(query);
+            return data[entity.pluralName].items;
+        } catch (error) {
+            console.error(`Failed to pre-fetch ${entity.pluralName}:`, error);
+            return [];
+        }
+    }
+
+    openModal() { this.dom.modal.style.display = 'block'; }
+    closeModal() { this.dom.modal.style.display = 'none'; this.dom.form.innerHTML = ''; }
+}
+
+document.addEventListener('DOMContentLoaded', () => new GraphQLClientApp('frontend-config.json', 'graphql.php'));
+JS;
+    }
+
+    /**
+     * Generates a zip package containing the graphql.php, manual.md, and a nested frontend.zip.
+     *
+     * @param string $zipFilePath The full path where the final zip file will be saved.
+     * @return bool True on success, false on failure.
+     * @throws Exception If ZipArchive is not available or fails.
+     */
+    public function generatePackage($zipFilePath)
+    {
+        if (!class_exists('ZipArchive')) {
+            throw new \Exception('ZipArchive class is not found. Please enable the PHP zip extension.');
+        }
+
+        // 1. Create frontend.zip in memory
+        $frontendZip = new \ZipArchive();
+        $tempFrontendZipFile = tempnam(sys_get_temp_dir(), 'frontend') . '.zip';
+        if ($frontendZip->open($tempFrontendZipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== TRUE) {
+            throw new \Exception("Cannot create temporary frontend zip file: $tempFrontendZipFile");
+        }
+        $frontendZip->addFromString('index.html', $this->generateFrontendHtml());
+        $frontendZip->addFromString('style.css', $this->generateFrontendCss());
+        $frontendZip->addFromString('app.js', $this->generateFrontendJs());
+        $frontendZip->addFromString('frontend-config.json', $this->generateFrontendConfigJson());
+        $frontendZip->close();
+
+        // 2. Create the main package zip
+        $mainZip = new \ZipArchive();
+        if ($mainZip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== TRUE) {
+            unlink($tempFrontendZipFile); // Clean up temp file
+            throw new \Exception("Cannot create main package zip file: $zipFilePath");
+        }
+
+        // 3. Add all files to the main package
+        $mainZip->addFromString('graphql.php', $this->generate());
+        $mainZip->addFromString('manual.md', $this->generateManual());
+        $mainZip->addFile($tempFrontendZipFile, 'frontend.zip');
+
+        // 4. Close and clean up
+        $mainZip->close();
+        unlink($tempFrontendZipFile);
+
+        return file_exists($zipFilePath);
+    }
+
+
+    /**
      * Main function to generate the complete graphql.php file content.
      *
      * @return string The complete PHP code for the GraphQL server.
@@ -845,6 +1588,7 @@ class GraphQLGenerator
 
         return $header . $dbConnection . $utilityTypesCode . $typesCode . $inputTypesCode . $queriesCode . $mutationsCode . $schemaAndExecution;
     }
+
 
     /**
      * Converts snake_case to camelCase.

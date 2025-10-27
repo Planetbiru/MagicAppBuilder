@@ -9,7 +9,6 @@ require_once dirname(__DIR__) . "/inc.app/sessions.php";
 
 $inputPost = new InputPost();
 
-error_log($inputPost);
 $entityAdmin = new EntityAdmin();
 if(isset($databaseBuilder) && $databaseBuilder->isConnected())
 {
