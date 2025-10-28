@@ -846,9 +846,9 @@ class GraphQLGenerator
             foreach($tableInfo['columns'] as $colName => $colInfo) {
                 $columns[$colName] = $this->snakeCaseToTitleCase($colName); 
             }
-            $frontendConfig[$camelName]['name'] = trim($tableName);
-            $frontendConfig[$camelName]['displayName'] = $this->snakeCaseToTitleCase($tableName);
-            $frontendConfig[$camelName]['columns'] = $columns;
+            $frontendConfig[$tableName]['name'] = trim($tableName);
+            $frontendConfig[$tableName]['displayName'] = $this->snakeCaseToTitleCase($tableName);
+            $frontendConfig[$tableName]['columns'] = $columns;
         }
         return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
