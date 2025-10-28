@@ -4,7 +4,7 @@ $themeAssetsPath = "lib.themes/$appCurrentTheme/assets/";
 
 require_once __DIR__ . "/default-language.php";
 
-if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
+if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'xmlhttprequest')
 {
     // Show show login form for ajax requests
     header('HTTP/1.1 401 Unauthorized', true, 401);

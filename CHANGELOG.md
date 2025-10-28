@@ -3579,3 +3579,7 @@ To make space for the new **GraphQL** button in the export section, the checkbox
 ### Object Name Suffix for Reserved Keywords
 
 When generating code, if an entity name conflicts with a reserved system variable (e.g., `appConfig`, `database`), MagicAppBuilder will now automatically append the suffix `Obj` to the object name (e.g., `appConfigObj`). This prevents naming collisions and ensures the generated code is valid and error-free.
+
+## Bug Fixes: Replace `XMLHttpRequest` with `xmlhttprequest`
+
+To mark that a request is made via AJAX, the `X-Requested-With: xmlhttprequest` header is used. Previously, the casing of `xmlhttprequest` was inconsistent, which caused invalid detection. This version standardizes the casing.

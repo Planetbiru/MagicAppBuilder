@@ -809,7 +809,7 @@ class GraphQLGenerator
      *
      * @return string The JSON formatted content for frontend-config.json.
      */
-    public function generateFrontendConfigJson()
+    public function generateFrontendConfigJson($displayField = "name")
     {
         $frontendConfig = array();
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
@@ -829,6 +829,7 @@ class GraphQLGenerator
                 'name' => $camelName,
                 'pluralName' => $pluralCamelName,
                 'displayName' => ucfirst(str_replace('_', ' ', $tableName)),
+                'displayField' => $displayField,
                 'primaryKey' => $tableInfo['primaryKey'],
                 'hasActiveColumn' => $tableInfo['hasActiveColumn'],
                 'columns' => $columns,
@@ -857,7 +858,10 @@ class GraphQLGenerator
     <div class="container">
         <nav class="sidebar" id="sidebar-nav">
             <h2>Menu</h2>
-            <ul id="entity-menu"></ul>
+            <ul id="entity-menu">
+                <!-- Menu items will be inserted here by JavaScript -->
+            </ul>
+            <a href="#" id="logout-btn" class="logout-link">Logout</a>
         </nav>
         <main class="main-content" id="main-content">
             <h1 id="content-title">Welcome</h1>
@@ -873,6 +877,26 @@ class GraphQLGenerator
             <span class="close-button">&times;</span>
             <h2 id="modal-title">Form</h2>
             <form id="entity-form"></form>
+        </div>
+    </div>
+
+    <!-- Modal for Login -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="login-close-button">&times;</span>
+            <h2 id="login-modal-title">Login Required</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <div id="login-error" style="color: red; margin-top: 10px;"></div>
+            </form>
         </div>
     </div>
 
@@ -965,6 +989,24 @@ tr:nth-child(even) { background-color: #fdfdfd; }
 td.actions{
     white-space: nowrap;
 }
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+#sidebar-nav{
+    box-sizing: border-box;
+}
+
+#entity-menu{
+    max-height: calc(100vh - 140px);
+    overflow: auto;
+}
+
+h1, h2, h3{
+    margin: 0;
+    padding: 0;
+}
 CSS;
     }
 
@@ -997,6 +1039,10 @@ class GraphQLClientApp {
             modalTitle: document.getElementById('modal-title'),
             form: document.getElementById('entity-form'),
             closeModalBtn: document.querySelector('.close-button'),
+            loginModal: document.getElementById('login-modal'),
+            loginForm: document.getElementById('login-form'),
+            loginCloseBtn: document.getElementById('login-close-button'),
+            logoutBtn: document.getElementById('logout-btn'),
         };
         this.init();
     }
@@ -1009,6 +1055,9 @@ class GraphQLClientApp {
             window.onclick = (event) => {
                 if (event.target == this.dom.modal) this.closeModal();
             };
+            this.dom.loginCloseBtn.onclick = () => this.closeLoginModal();
+            this.dom.loginForm.onsubmit = (e) => this.handleLogin(e);
+            this.dom.logoutBtn.onclick = (e) => this.handleLogout(e);
             // Handle initial page load and back/forward button clicks
             window.addEventListener('popstate', () => this.handleRouteChange());
             this.handleRouteChange(); // Handle initial route
@@ -1018,24 +1067,10 @@ class GraphQLClientApp {
         }
     }
 
-    async loadConfig() {
+    async loadConfig() { // Simplified loadConfig
         const response = await fetch(this.configUrl);
         if (!response.ok) throw new Error(`Failed to load config from ${this.configUrl}`);
         this.config = await response.json();
-        // Pre-fetch related data for dropdowns
-        for (const entityName in this.config.entities) {
-            const entity = this.config.entities[entityName];
-            entity.relatedData = {};
-            for (const colName in entity.columns) {
-                const col = entity.columns[colName];
-                if (col.isForeignKey) {
-                    const relatedEntity = this.config.entities[col.references];
-                    if (relatedEntity) {
-                        entity.relatedData[colName] = await this.fetchAll(relatedEntity);
-                    }
-                }
-            }
-        }
     }
 
     buildMenu() {
@@ -1058,10 +1093,21 @@ class GraphQLClientApp {
     async gqlQuery(query, variables = {}) {
         const response = await fetch(this.apiUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'xmlhttprequest',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({ query, variables }),
         });
+
+        if (response.status === 401) {
+            this.openLoginModal();
+            throw new Error("Authentication required.");
+        }
+
         const result = await response.json();
+        
         if (result.errors) {
             console.error('GraphQL Errors:', result.errors);
             console.error(`Error: ${result.errors[0].message}`);
@@ -1157,7 +1203,6 @@ class GraphQLClientApp {
             }
         `;
 
-        await this.loadConfig();
         try {
             const data = await this.gqlQuery(query, {
                 limit: this.state.limit,
@@ -1169,7 +1214,7 @@ class GraphQLClientApp {
             this.renderTable(result.items);
             this.renderPagination(result);
         } catch (error) {
-            this.dom.body.innerHTML = `<p style="color: red;">Failed to fetch data.</p>`;
+            this.dom.body.innerHTML = `<p style="color: red;">${error.message}</p>`;
         }
     }
 
@@ -1181,7 +1226,7 @@ class GraphQLClientApp {
                 <div><!-- Placeholder for filter/sort controls --></div>
             </div>
             <div class="table-container">
-                <table>
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             ${headers.map(h => `<th>${h}</th>`).join('')}
@@ -1199,11 +1244,15 @@ class GraphQLClientApp {
                 headers.forEach(header => {
                     const col = this.currentEntity.columns[header];
                     let value = item[header];
-                    if (col.isForeignKey && item[col.references]) {
+                    const relationName = col.references; // Now this is camelCase, e.g., "statusKeanggotaan"
+                    
+
+                    if (col.isForeignKey && item[relationName]) {
                         // Display a representative field from the related object, e.g., 'name' or the second field.
-                        const relatedEntity = this.config.entities[col.references];
-                        const displayField = Object.keys(relatedEntity.columns)[1] || relatedEntity.primaryKey;
-                        value = item[col.references][displayField] || item[header];
+                        let relatedEntity = this.config.entities[this.camelCase(relationName)];
+                        // const displayField = relatedEntity ? (Object.keys(relatedEntity.columns)[1] || relatedEntity.displayField) : 'name';
+                        let displayField = relatedEntity ? relatedEntity.displayField : 'name';
+                        value = item[relationName][displayField];
                     }
                     tableHtml += `<td>${value !== null ? value : 'N/A'}</td>`;
                 });
@@ -1274,9 +1323,10 @@ class GraphQLClientApp {
             let detailHtml = `<button id="back-to-list" class="btn btn-secondary">Back to List</button><div class="detail-view">`;
             for (const key in this.currentEntity.columns) {
                 const col = this.currentEntity.columns[key];
+                const relationName = col.references; // e.g., "statusKeanggotaan"
                 detailHtml += `<div class="detail-item"><strong>${key}:</strong> `;
-                if (col.isForeignKey && item[col.references]) {
-                    detailHtml += `<span>${JSON.stringify(item[col.references])}</span>`;
+                if (col.isForeignKey && item[relationName]) {
+                    detailHtml += `<span>${JSON.stringify(item[relationName])}</span>`;
                 } else {
                     detailHtml += `<span>${item[key] !== null ? item[key] : 'N/A'}</span>`;
                 }
@@ -1297,7 +1347,7 @@ class GraphQLClientApp {
 
         let item = {};
         if (id) {
-            const fields = this.getFieldsForQuery(this.currentEntity, 1, true); // No relations for edit form
+            const fields = this.getFieldsForQuery(this.currentEntity, 2); // Fetch with relations for edit form
             const query = `query GetForEdit($id: String!) { ${this.currentEntity.name}(id: $id) { ${fields} } }`;
             const data = await this.gqlQuery(query, { id });
             item = data[this.currentEntity.name];
@@ -1307,29 +1357,28 @@ class GraphQLClientApp {
         for (const colName in this.currentEntity.columns) {
             if (colName === this.currentEntity.primaryKey) continue;
             const col = this.currentEntity.columns[colName];
-            const value = item[colName] !== undefined ? item[colName] : '';
+            let value = '';
+            if (col.isForeignKey && item[col.references]) {
+                value = item[col.references][this.config.entities[this.camelCase(col.references)].primaryKey];
+            } else if (item[colName] !== undefined) {
+                value = item[colName];
+            }
 
             formHtml += `<div class="form-group">`;
             formHtml += `<label for="${colName}">${colName}</label>`;
             if (col.isForeignKey) {
-                let relatedData = this.currentEntity.relatedData[colName] || [];
-                let relatedEntity = this.config.entities[col.references];
-                let displayField;
-                if(relatedEntity && relatedEntity.columns)
-                {
-                    displayField = Object.keys(relatedEntity.columns)[0];
-                }
-                if(!displayField && relatedEntity && relatedEntity.primaryKey)
-                {
-                    displayField = relatedEntity.primaryKey;
-                }
-                                
+                const relationName = col.references;
+                const relatedEntity = this.config.entities[this.camelCase(relationName)];
+                
+                const relatedData = relatedEntity ? (await this.fetchAll(relatedEntity)) : [];
+                const displayField = relatedEntity.displayField || 'name';
+
                 formHtml += `<select id="${colName}" name="${colName}">`;
                 formHtml += `<option value="">-- Select --</option>`;
                 relatedData.forEach(relItem => {
                     const relId = relItem[relatedEntity.primaryKey];
                     const relDisplay = relItem[displayField];
-                    formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay} (ID: ${relId})</option>`;
+                    formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay}</option>`;
                 });
                 formHtml += `</select>`;
             } else {
@@ -1432,9 +1481,71 @@ class GraphQLClientApp {
         }
     }
 
+    async handleLogin(event) {
+        event.preventDefault();
+        const formData = new FormData(this.dom.loginForm);
+        const loginErrorDiv = document.getElementById('login-error');
+        loginErrorDiv.textContent = '';
+
+        try {
+            const response = await fetch('login.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            // Jika login berhasil, server akan me-redirect atau memberikan respons sukses.
+            // Di sini kita asumsikan jika tidak ada URL redirect, login gagal.
+            if (response.ok && response.redirected === false) {
+                 // Cek jika respons berisi pesan error spesifik
+                const text = await response.text();
+                if(text.includes("Invalid username or password")) {
+                    loginErrorDiv.textContent = 'Invalid username or password.';
+                } else {
+                    // Jika login berhasil, muat ulang halaman untuk mendapatkan sesi baru
+                    this.closeLoginModal();
+                    this.handleRouteChange(); // Muat ulang data view saat ini
+                }
+            } else {
+                // Jika login berhasil dan ada redirect, browser akan menanganinya.
+                // Jika tidak, muat ulang untuk mengambil state baru.
+                window.location.reload();
+            }
+        } catch (error) {
+            loginErrorDiv.textContent = 'An error occurred during login.';
+            console.error('Login failed:', error);
+        }
+    }
+
+    async handleLogout(event) {
+        event.preventDefault();
+        try {
+            const response = await fetch('logout.php');
+            if (response.ok) {
+                // Clear the main content and title
+                this.dom.title.textContent = 'Logged Out';
+                this.dom.body.innerHTML = '<p>You have been successfully logged out.</p>';
+
+                // Hide the menu and show the login modal
+                this.dom.menu.style.display = 'none';
+                this.dom.logoutBtn.style.display = 'none';
+                this.openLoginModal();
+            }
+        } catch (error) {
+            console.error('Logout failed:', error);
+            alert('Logout failed. Please try again.');
+        }
+    }
+
     // =================================================================
     // UTILITY METHODS
     // =================================================================
+
+    camelCase(str) {
+        return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+    }
+    // This function is no longer needed if frontend-config.json is correct,
+    // but we keep it for robustness just in case.
+    // camelCase(str) { return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase()); }
 
     getFieldsForQuery(entity, depth = 1, noRelations = false) {
         if (depth < 0) return entity.primaryKey;
@@ -1442,9 +1553,24 @@ class GraphQLClientApp {
         for (const colName in entity.columns) {
             const col = entity.columns[colName];
             if (col.isForeignKey && !noRelations) {
-                const relatedEntity = this.config.entities[col.references];
+                
+                // sampai di sini `sub_klasifikasi` dan `jenis_media` masih diprint
+                let relationName = col.references; // This is now camelCase, e.g., "statusKeanggotaan"
+
+                let relationNameCamelCase = this.camelCase(relationName);
+
+                // masalahnya mungkin di
+                let relatedEntity = this.config.entities[relationName];
+
+                if(!relatedEntity)
+                {
+                    relatedEntity = this.config.entities[relationNameCamelCase];
+                }
+
                 if (relatedEntity) {
-                    fields.push(`${col.references} { ${this.getFieldsForQuery(relatedEntity, depth - 1)} }`);
+                    let query = `${relationName} { ${this.getFieldsForQuery(relatedEntity, depth - 1)} }`;
+                    // Use the correct relation name from the entity config for the query
+                    fields.push(query);
                 }
             } else if (!col.isForeignKey) {
                 fields.push(colName);
@@ -1467,6 +1593,8 @@ class GraphQLClientApp {
 
     openModal() { this.dom.modal.style.display = 'block'; }
     closeModal() { this.dom.modal.style.display = 'none'; this.dom.form.innerHTML = ''; }
+    openLoginModal() { this.dom.loginModal.style.display = 'block'; }
+    closeLoginModal() { this.dom.loginModal.style.display = 'none'; this.dom.loginForm.reset(); document.getElementById('login-error').textContent = ''; }
 }
 
 document.addEventListener('DOMContentLoaded', () => new GraphQLClientApp('frontend-config.json', 'graphql.php'));
@@ -1577,13 +1705,6 @@ JS;
         $schemaAndExecution .= "}\r\n\r\n";
         $schemaAndExecution .= "header('Content-Type: application/json; charset=UTF-8');\r\n";
         $schemaAndExecution .= "echo json_encode(\$output);\r\n";
-
-        // Note: The following lines are for demonstration on how to generate frontend files.
-        // You would typically call these methods from a separate script.
-        // file_put_contents('frontend-config.json', $this->generateFrontendConfigJson());
-        // file_put_contents('index.html', $this->generateFrontendHtml());
-        // file_put_contents('style.css', $this->generateFrontendCss());
-        // file_put_contents('app.js', $this->generateFrontendJs());
 
         return $header . $dbConnection . $utilityTypesCode . $typesCode . $inputTypesCode . $queriesCode . $mutationsCode . $schemaAndExecution;
     }
