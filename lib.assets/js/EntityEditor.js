@@ -2514,7 +2514,7 @@ class EntityEditor {
      */
     exportGraphQLSchema(selectedModel) {
         // send to server for processing
-        fetch('../lib.ajax/generate-graphql.php', {
+        fetch('../lib.ajax/graphql-generator.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

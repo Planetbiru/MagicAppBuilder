@@ -828,7 +828,7 @@ class GraphQLGenerator
             $frontendConfig[$camelName] = array(
                 'name' => $camelName,
                 'pluralName' => $pluralCamelName,
-                'displayName' => ucfirst(str_replace('_', ' ', $tableName)),
+                'displayName' => $this->camelCaseToTitleCase($camelName),
                 'displayField' => $displayField,
                 'primaryKey' => $tableInfo['primaryKey'],
                 'hasActiveColumn' => $tableInfo['hasActiveColumn'],
@@ -837,6 +837,51 @@ class GraphQLGenerator
         }
         return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
+    public function generateFrontendLanguageJson()
+    {
+        $frontendConfig = array();
+        foreach ($this->analyzedSchema as $tableName => $tableInfo) {
+            $camelName = $this->camelCase($tableName);
+            $columns = array();
+            foreach($tableInfo['columns'] as $colName => $colInfo) {
+                $columns[$colName] = $this->snakeCaseToTitleCase($colName); 
+            }
+            $frontendConfig[$tableName]['name'] = trim($tableName);
+            $frontendConfig[$tableName]['displayName'] = $this->snakeCaseToTitleCase($tableName);
+            $frontendConfig[$tableName]['columns'] = $columns;
+        }
+        return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+    public function camelCaseToSnakeCase($str) {
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $str));
+    }
+
+    public function snakeCaseToCamelCase($str) {
+        $words = explode('_', strtolower($str));
+        $camel = array_shift($words);
+        foreach ($words as $word) {
+            $camel .= ucfirst($word);
+        }
+        return $camel;
+    }
+
+    public function snakeCaseToTitleCase($str) {
+        $str = str_replace('_', ' ', strtolower($str));
+        return $this->titleCase($str);
+    }
+
+    public function camelCaseToTitleCase($str) {
+        return $this->snakeCaseToTitleCase($this->camelCaseToSnakeCase($str));
+    }
+
+    public function titleCase($str) {
+        $words = explode(' ', strtolower(trim($str)));
+        foreach ($words as &$word) {
+            $word = ucfirst($word);
+        }
+        return implode(' ', $words);
+    }
+
 
     /**
      * Generates the HTML file for the frontend application.
@@ -848,61 +893,121 @@ class GraphQLGenerator
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GraphQL Frontend</title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <nav class="sidebar" id="sidebar-nav">
-            <h2>Menu</h2>
-            <ul id="entity-menu">
-                <!-- Menu items will be inserted here by JavaScript -->
+    <script src="app.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <header class="header">
+        <div class="header-left">
+          <span class="sidebar-toggle" id="sidebar-toggle">&#9776;</span>
+        </div>
+        <div class="header-right">
+          <div class="header-item">
+            <i
+              class="fa-solid fa-bell icon"
+              data-dropdown="notification-menu"></i>
+            <ul id="notification-menu" class="dropdown-menu">
+              <li><a href="#">Notification 1</a></li>
+              <li><a href="#">Notification 2</a></li>
             </ul>
-            <a href="#" id="logout-btn" class="logout-link">Logout</a>
+          </div>
+          <div class="header-item">
+            <i
+              class="fa-solid fa-envelope icon"
+              data-dropdown="message-menu"></i>
+            <ul id="message-menu" class="dropdown-menu">
+              <li><a href="#">Message from John</a></li>
+              <li><a href="#">Message from Jane</a></li>
+            </ul>
+          </div>
+          <div class="header-item">
+            <i class="fa-solid fa-globe icon" data-dropdown="lang-menu"></i>
+            <ul id="lang-menu" class="dropdown-menu">
+              <li><a href="#">English</a></li>
+              <li><a href="#">Indonesia</a></li>
+            </ul>
+          </div>
+          <div class="header-item">
+            <i
+              class="fa-solid fa-user-circle icon"
+              data-dropdown="profile-menu"></i>
+            <ul id="profile-menu" class="dropdown-menu">
+              <li><a href="#">Profile</a></li>
+              <li><a href="#">Settings</a></li>
+              <li><hr style="margin: 5px 0; border-color: #eee" /></li>
+              <li><a href="#" id="logout-btn-dropdown" class="logout-link">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container">
+        <nav class="sidebar" id="sidebar-nav">
+          <ul id="entity-menu">
+            <!-- Menu items will be inserted here by JavaScript -->
+          </ul>
         </nav>
         <main class="main-content" id="main-content">
-            <h1 id="content-title">Welcome</h1>
-            <div id="content-body">
-                <p>Please select an entity from the menu to get started.</p>
-            </div>
+          <h1 id="content-title">Welcome</h1>
+          <div id="content-body">
+            <p>Please select an entity from the menu to get started.</p>
+          </div>
         </main>
+      </div>
     </div>
 
     <!-- Modal for Forms -->
     <div id="form-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="modal-title">Form</h2>
-            <form id="entity-form"></form>
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="close-button" id="form-close-button">&times;</span>
+          <h2 id="modal-title">Form</h2>
         </div>
+        <div class="modal-body"><form id="entity-form"></form></div>
+        <div class="modal-footer"></div>
+          </div>
+      </div>
     </div>
 
     <!-- Modal for Login -->
     <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="login-close-button">&times;</span>
-            <h2 id="login-modal-title">Login Required</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-                <div id="login-error" style="color: red; margin-top: 10px;"></div>
-            </form>
+      <div class="modal-content">
+        <form id="login-form"></form>
+        <div class="modal-header">
+          <span class="close-button" id="login-close-button">&times;</span> 
+          <h2 id="login-title">Login</h2>
         </div>
+        <div class="modal-body">
+        
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          
+          <div id="login-error" style="color: red; margin-top: 10px"></div>
+        
+        </div>
+        <div class="modal-footer"><button type="submit" class="btn btn-primary">Login</button></div>
+        </form>
+      </div>
     </div>
 
-    <script src="app.js"></script>
-</body>
+    
+  </body>
 </html>
+
 HTML;
     }
 
@@ -914,99 +1019,366 @@ HTML;
     public function generateFrontendCss()
     {
         return <<<CSS
+:root {
+  --sidebar-width: 250px;
+  --header-height: 60px;
+  --primary-color: #3b82f6; /* A brighter, more modern blue */
+  --primary-color-hover: #2563eb;
+  --background-color: #f9fafb; /* Lighter grey for background */
+  --sidebar-bg: #ffffff;
+  --header-bg: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    margin: 0;
-    background-color: #f4f7f9;
-    color: #333;
-}
-.container { display: flex; }
-.sidebar { width: 220px; background-color: #fff; border-right: 1px solid #e0e0e0; height: 100vh; padding: 20px; }
-.sidebar h2 { font-size: 1.2em; color: #555; }
-.sidebar ul { list-style: none; padding: 0; }
-.sidebar li { margin: 10px 0; }
-.sidebar a { text-decoration: none; color: #007bff; font-weight: 500; display: block; padding: 8px; border-radius: 4px; }
-.sidebar a:hover, .sidebar a.active { background-color: #e9f5ff; color: #0056b3; }
-.main-content { flex-grow: 1; padding: 20px; overflow-x: auto;
-width: calc(100% - 240px);;
-box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  background-color: var(--background-color);
+  color: var(--text-primary);
 }
 
-/* Table Styles */
-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-th, td { padding: 5px 8px; border: 1px solid #ddd; text-align: left; }
-th { background-color: #f8f9fa; }
-tr:nth-child(even) { background-color: #fdfdfd; }
+.page-wrapper {
+  flex-direction: column;
+  height: 100vh;
+}
 
-/* Button Styles */
+.header {
+  height: var(--header-height);
+  background-color: var(--header-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-color);
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-toggle {
+  font-size: 24px;
+  cursor: pointer;
+  margin-right: 20px;
+  color: var(--text-secondary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-item {
+  position: relative;
+  cursor: pointer;
+}
+
+.header-item .icon {
+  font-size: 22px;
+  color: var(--text-secondary);
+}
+h2,
+h3 {
+  margin: 0;
+}
+h2 {
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: var(--header-bg);
+  border-radius: 5px;
+  box-shadow: var(--shadow-md);
+  min-width: 180px;
+  z-index: 101;
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.dropdown-menu a:hover {
+  background-color: var(--background-color);
+}
+
+.container {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
+  padding: 20px;
+  border-right: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.sidebar-animated {
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.collapsed {
+  margin-left: calc((-1 * var(--sidebar-width)) - 43px);
+}
+
+.sidebar h2 {
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+#entity-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0px 0 0 0;
+}
+
+#entity-menu li a {
+  display: block;
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#entity-menu li a:hover,
+#entity-menu li a.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content h1 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: normal;
+}
+
+/* Styles from original file, slightly adapted */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 550px;
+  border-radius: 8px;
+  position: relative;
+}
+.close-button {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.modal-header {
+  padding: 1rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-body {
+  padding: 1rem;
+}
+.modal-footer {
+  padding: 1rem 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.form-group {
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
 .btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    margin-right: 5px;
-    text-decoration: none;
-    display: inline-block;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
-.btn-primary { background-color: #007bff; color: white; }
-.btn-secondary { background-color: #6c757d; color: white; }
-.btn-success { background-color: #28a745; color: white; }
-.btn-danger { background-color: #dc3545; color: white; }
-.btn-warning { background-color: #ffc107; color: black; }
-.btn-info { background-color: #17a2b8; color: white; }
-
-/* Form & Modal */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-.modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; }
-.close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-
-/* Detail View */
-.detail-view { background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.detail-view h3 { border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.detail-item { margin-bottom: 10px; }
-.detail-item strong { display: inline-block; width: 150px; color: #555; }
-
-/* Controls */
-.list-controls { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-
-/* Pagination */
-.pagination { margin-top: 20px; }
-.pagination button { margin: 0 5px; }
-
-
-#content-body{
-    overflow-y: auto;
-
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.btn-sm:hover {
+}
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--primary-color-hover);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-warning {
+  background-color: #f59e0b;
+  color: white;
+}
+.btn-warning:hover {
+  background-color: #d97706;
+}
+.btn-danger {
+  background-color: #ef4444;
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+.btn-info {
+  background-color: #3b82f6;
+  color: white;
+}
+.btn-info:hover {
+  background-color: #2563eb;
+}
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: var(--text-primary);
+}
+.btn-secondary:hover {
+  background-color: #d1d5db;
+}
+.logout-link {
+  display: block;
+  margin-top: 20px;
+}
+.table-container {
+  overflow: auto;
+}
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+.table-container table td,
+.table-container table th {
+  border: 1px solid #ddd;
+  padding: 5px 8px;
+  text-align: left;
+}
+.table-container table th {
+  background-color: #f2f2f2;
+  padding: 8px 8px;
 }
 
-.table-container{
-    overflow-x: auto;
-}
-td.actions{
-    white-space: nowrap;
+td.actions {
+  white-space: nowrap;
 }
 
-*, *:before, *:after {
-    box-sizing: inherit;
+.detail-view table tr > td:nth-child(1) {
+  width: 35%;
 }
 
-#sidebar-nav{
-    box-sizing: border-box;
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  margin-top: 10px;
+  border-top: 1px solid var(--border-color);
 }
 
-#entity-menu{
-    max-height: calc(100vh - 140px);
-    overflow: auto;
+.pagination-container span {
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 
-h1, h2, h3{
-    margin: 0;
-    padding: 0;
+.pagination-container button:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
+
+.list-controls,
+.back-controls {
+  padding: 0px 0px 8px 0px;
+}
+
 CSS;
     }
 
@@ -1042,19 +1414,83 @@ class GraphQLClientApp {
             loginModal: document.getElementById('login-modal'),
             loginForm: document.getElementById('login-form'),
             loginCloseBtn: document.getElementById('login-close-button'),
-            logoutBtn: document.getElementById('logout-btn'),
+            logoutBtn: document.querySelector('.logout-link'),
         };
         this.init();
+    }
+    
+    initPage() {
+        
+
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const sidebar = document.getElementById("sidebar-nav");
+
+        // Check for saved sidebar state in localStorage on page load
+        if (localStorage.getItem("sidebarCollapsed") === "true") {
+          sidebar.classList.add("collapsed");
+        }
+
+        // Add the transition class after a short delay to avoid animation on load
+        setTimeout(() => {
+          sidebar.classList.add("sidebar-animated");
+        }, 100);
+
+        sidebarToggle.addEventListener("click", () => {
+          sidebar.classList.toggle("collapsed");
+          // Save the new state to localStorage
+          localStorage.setItem( "sidebarCollapsed", sidebar.classList.contains("collapsed") );
+        });
+
+        // Dropdown logic
+        document.querySelectorAll(".header-item .icon").forEach((icon) => {
+          icon.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const dropdownId = icon.getAttribute("data-dropdown");
+            const targetDropdown = document.getElementById(dropdownId);
+
+            // Close other dropdowns
+            document
+              .querySelectorAll(".dropdown-menu.show")
+              .forEach((openDropdown) => {
+                if (openDropdown !== targetDropdown) {
+                  openDropdown.classList.remove("show");
+                }
+              });
+            targetDropdown.classList.toggle("show");
+          });
+        });
+
+        // Close dropdowns when clicking outside
+        window.addEventListener("click", () => {
+          document
+            .querySelectorAll(".dropdown-menu.show")
+            .forEach((openDropdown) => {
+              openDropdown.classList.remove("show");
+            });
+        });
+        
     }
 
     async init() {
         try {
             await this.loadConfig();
+            this.initPage();
             this.buildMenu();
             this.dom.closeModalBtn.onclick = () => this.closeModal();
             window.onclick = (event) => {
                 if (event.target == this.dom.modal) this.closeModal();
             };
+            // Add event listener for data-dismiss="modal"
+            document.addEventListener('click', (event) => {
+                const dismissButton = event.target.closest('[data-dismiss="modal"]');
+                if (dismissButton) {
+                    const modal = dismissButton.closest('.modal');
+                    if (modal) {
+                        if (modal.id === this.dom.modal.id) this.closeModal();
+                        else if (modal.id === this.dom.loginModal.id) this.closeLoginModal();
+                    }
+                }
+            });
             this.dom.loginCloseBtn.onclick = () => this.closeLoginModal();
             this.dom.loginForm.onsubmit = (e) => this.handleLogin(e);
             this.dom.logoutBtn.onclick = (e) => this.handleLogout(e);
@@ -1071,6 +1507,9 @@ class GraphQLClientApp {
         const response = await fetch(this.configUrl);
         if (!response.ok) throw new Error(`Failed to load config from ${this.configUrl}`);
         this.config = await response.json();
+        if (this.config.pagination && this.config.pagination.pageSize) {
+            this.state.limit = this.config.pagination.pageSize;
+        }
     }
 
     buildMenu() {
@@ -1083,7 +1522,7 @@ class GraphQLClientApp {
             a.textContent = entity.displayName;
             a.onclick = (e) => {
                 e.preventDefault();
-                this.navigateTo(entity.name);
+                this.navigateTo(entity.name, { limit: this.state.limit });
             };
             li.appendChild(a);
             this.dom.menu.appendChild(li);
@@ -1143,7 +1582,7 @@ class GraphQLClientApp {
             // If no hash, navigate to the first entity
             const firstEntityName = Object.keys(this.config.entities)[0];
             if (firstEntityName) {
-                this.navigateTo(firstEntityName);
+                this.navigateTo(firstEntityName, { limit: this.state.limit });
             } else {
                 this.dom.body.innerHTML = '<p>No entities configured.</p>';
             }
@@ -1275,32 +1714,32 @@ class GraphQLClientApp {
         const id = item[this.currentEntity.primaryKey];
         let buttons = `
             <td class="actions">
-                <button class="btn btn-info btn-detail" data-id="${id}">View</button>
-                <button class="btn btn-warning btn-edit" data-id="${id}">Edit</button>
+                <button class="btn btn-sm btn-info btn-detail" data-id="${id}">View</button>
+                <button class="btn btn-sm btn-warning btn-edit" data-id="${id}">Edit</button>
         `;
         if (this.currentEntity.hasActiveColumn) {
             const isActive = item['active'];
-            buttons += `<button class="btn ${isActive ? 'btn-secondary' : 'btn-success'} btn-toggle-active" data-id="${id}" data-active="${isActive}">${isActive ? 'Deactivate' : 'Activate'}</button>`;
+            buttons += `<button class="btn btn-sm ${isActive ? 'btn-secondary' : 'btn-success'} btn-toggle-active" data-id="${id}" data-active="${isActive}">${isActive ? 'Deactivate' : 'Activate'}</button>`;
         }
-        buttons += `<button class="btn btn-danger btn-delete" data-id="${id}">Delete</button></td>`;
+        buttons += `<button class="btn btn-sm btn-danger btn-delete" data-id="${id}">Delete</button></td>`;
         return buttons;
     }
 
     renderPagination(result) {
         const paginationDiv = document.createElement('div');
-        paginationDiv.className = 'pagination';
+        paginationDiv.className = 'pagination pagination-container';
         paginationDiv.innerHTML = `
             <span>Page ${result.page} of ${result.totalPages} (Total: ${result.total})</span>
-            <button id="prev-page" ${!result.hasPrevious ? 'disabled' : ''}>Previous</button>
-            <button id="next-page" ${!result.hasNext ? 'disabled' : ''}>Next</button>
+            <button id="prev-page" class="btn btn-secondary" ${!result.hasPrevious ? 'disabled' : ''}>Previous</button>
+            <button id="next-page" class="btn btn-secondary" ${!result.hasNext ? 'disabled' : ''}>Next</button>
         `;
         this.dom.body.appendChild(paginationDiv);
         
         document.getElementById('prev-page').onclick = () => {
-            this.navigateTo(this.currentEntity.name, { page: this.state.page - 1 });
+            this.navigateTo(this.currentEntity.name, { page: this.state.page - 1, limit: this.state.limit});
         };
         document.getElementById('next-page').onclick = () => {
-            this.navigateTo(this.currentEntity.name, { page: this.state.page + 1 });
+            this.navigateTo(this.currentEntity.name, { page: this.state.page + 1, limit: this.state.limit});
         };
     }
 
@@ -1320,19 +1759,26 @@ class GraphQLClientApp {
         try {
             const data = await this.gqlQuery(query, { id });
             const item = data[this.currentEntity.name];
-            let detailHtml = `<button id="back-to-list" class="btn btn-secondary">Back to List</button><div class="detail-view">`;
+            let detailHtml = `<div class="back-controls">
+                                <button id="back-to-list" class="btn btn-secondary">Back to List</button>
+                              </div>
+                <div class="table-container detail-view">
+                    <table class="table">
+                        <tbody>`;
             for (const key in this.currentEntity.columns) {
                 const col = this.currentEntity.columns[key];
-                const relationName = col.references; // e.g., "statusKeanggotaan"
-                detailHtml += `<div class="detail-item"><strong>${key}:</strong> `;
+                const relationName = col.references;
+                detailHtml += `<tr>
+                                    <td>${key}</td>
+                                    <td>`;
                 if (col.isForeignKey && item[relationName]) {
-                    detailHtml += `<span>${JSON.stringify(item[relationName])}</span>`;
+                    detailHtml += `<span>${JSON.stringify(item[relationName], null, 2)}</span>`;
                 } else {
                     detailHtml += `<span>${item[key] !== null ? item[key] : 'N/A'}</span>`;
                 }
-                detailHtml += `</div>`;
+                detailHtml += `</td></tr>`;
             }
-            detailHtml += `</div>`;
+            detailHtml += `</tbody></table></div>`;
             this.dom.body.innerHTML = detailHtml;
             document.getElementById('back-to-list').onclick = () => history.back();
         } catch (error) {
@@ -1394,8 +1840,15 @@ class GraphQLClientApp {
             }
             formHtml += `</div>`;
         }
-        formHtml += `<button type="submit" class="btn btn-primary">Save</button>`;
+        
         this.dom.form.innerHTML = formHtml;
+        
+        this.dom.form.closest('.modal').querySelector('.modal-footer').innerHTML = `
+        <button type="submit" class="btn btn-primary">Save</button> 
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> `;
+        
+        this.dom.form.closest('.modal').querySelector('.modal-footer').querySelector('[type="submit"]').addEventListener('click', () => this.handleSave(id));
+        
         this.dom.form.onsubmit = (e) => {
             e.preventDefault();
             this.handleSave(id);
@@ -1581,9 +2034,9 @@ class GraphQLClientApp {
     
     async fetchAll(entity) {
         const fields = this.getFieldsForQuery(entity, 0); // Only simple fields
-        const query = `query FetchAll { ${entity.pluralName}(limit: 0) { items { ${fields} } } }`;
+        const query = `query FetchAll($limit: Int) { ${entity.pluralName}(limit: $limit) { items { ${fields} } } }`;
         try {
-            const data = await this.gqlQuery(query);
+            const data = await this.gqlQuery(query, { limit: this.state.limit });
             return data[entity.pluralName].items;
         } catch (error) {
             console.error(`Failed to pre-fetch ${entity.pluralName}:`, error);
@@ -1663,6 +2116,8 @@ JS;
         $header .= "use GraphQL\\Type\\Schema;\r\n\r\n";
         $header .= "require_once __DIR__ . '/vendor/autoload.php';\r\n";
         $header .= "require_once __DIR__ . '/database.php';\r\n\r\n";
+        
+        $header .= "\$developmentMode = true;\r\n\r\n";
 
         $dbConnection = "/**\r\n * ----------------------------------------------------------------------------\r\n * DATABASE CONNECTION\r\n * ----------------------------------------------------------------------------\r\n */\r\n\r\n";
 
@@ -1672,7 +2127,7 @@ JS;
         $queriesCode = $this->generateQueries();
         $mutationsCode = $this->generateMutations();
 
-        $schemaAndExecution = "/**\r\n * ----------------------------------------------------------------------------\r\n * SCHEMA & EXECUTION\r\n * ----------------------------------------------------------------------------\r\n */\r\n";
+        $schemaAndExecution = "/**\r\n * ----------------------------------------------------------------------------\r\n * SCHEMA & EXECUTION\r\n * ----------------------------------------------------------------------------\r\n */\r\n";        
         $schemaAndExecution .= "\$schema = new Schema(array(\r\n";
         $schemaAndExecution .= "    'query' => \$queryType,\r\n";
         $schemaAndExecution .= "    'mutation' => \$mutationType,\r\n";
@@ -1695,7 +2150,14 @@ JS;
         $schemaAndExecution .= "    \$result = GraphQL::executeQuery(\$schema, \$query, \$rootValue, \$context, \$variableValues);\r\n";
         $schemaAndExecution .= "    // In production, use DebugFlag::NONE;\r\n";
         $schemaAndExecution .= "    // For development, use DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE;\r\n";
-        $schemaAndExecution .= "    \$output = \$result->toArray(DebugFlag::INCLUDE_DEBUG_MESSAGE);\r\n";
+                
+        $schemaAndExecution .= "    if(\$developmentMode == true) {\r\n";
+        $schemaAndExecution .= "        \$output = \$result->toArray(DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE);\r\n";
+        $schemaAndExecution .= "    } else {\r\n";
+        $schemaAndExecution .= "        \$output = \$result->toArray(DebugFlag::NONE);\r\n";
+        $schemaAndExecution .= "    }\r\n";
+        
+        
         $schemaAndExecution .= "} catch (Exception \$e) {\r\n";
         $schemaAndExecution .= "    \$output = array(\r\n";
         $schemaAndExecution .= "        'errors' => array(\r\n";
@@ -1704,6 +2166,7 @@ JS;
         $schemaAndExecution .= "    );\r\n";
         $schemaAndExecution .= "}\r\n\r\n";
         $schemaAndExecution .= "header('Content-Type: application/json; charset=UTF-8');\r\n";
+        $schemaAndExecution .= "header('Access-Control-Allow-Origin: *');\r\n";
         $schemaAndExecution .= "echo json_encode(\$output);\r\n";
 
         return $header . $dbConnection . $utilityTypesCode . $typesCode . $inputTypesCode . $queriesCode . $mutationsCode . $schemaAndExecution;

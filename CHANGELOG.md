@@ -3580,6 +3580,10 @@ To make space for the new **GraphQL** button in the export section, the checkbox
 
 When generating code, if an entity name conflicts with a reserved system variable (e.g., `appConfig`, `database`), MagicAppBuilder will now automatically append the suffix `Obj` to the object name (e.g., `appConfigObj`). This prevents naming collisions and ensures the generated code is valid and error-free.
 
+## Enhancement: Update Z-Index Element
+
+When the session in MagicAppBuilder expires, MagicAppBuilder displays an alert at the top of the page. When the Login button is selected, MagicAppBuilder displays the login form. Previously, this element was located beneath other elements, making it unusable in some conditions. In this version, the element has been moved so that it appears above other elements and is easy to use.
+
 ## Bug Fixes: Replace `XMLHttpRequest` with `xmlhttprequest`
 
 To mark that a request is made via AJAX, the `X-Requested-With: xmlhttprequest` header is used. Previously, the casing of `xmlhttprequest` was inconsistent, which caused invalid detection. This version standardizes the casing.
