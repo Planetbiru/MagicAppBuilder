@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fetch("update.php", {
                 method: "POST",
                 headers: {
-                    "X-Requested-With": "XMLHttpRequest"
+                    "X-Requested-With": "xmlhttprequest"
                 }
             })
             .then(response => response.json())

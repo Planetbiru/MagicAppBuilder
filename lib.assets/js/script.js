@@ -1260,7 +1260,7 @@ let initAll = function () {
       processData: false,
       contentType: false,
       headers: {
-        'X-Requested-With': 'XMLHttpRequest'
+        'X-Requested-With': 'xmlhttprequest'
       },
       dataType: 'json', // pastikan respons diparsing sebagai JSON
       success: function (response) {
