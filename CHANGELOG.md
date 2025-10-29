@@ -3532,58 +3532,64 @@ Previously, when loading an update form, the application would incorrectly read 
 
 Date: October 28th, 2025
 
-## New Feature: Automatic GraphQL API Generation
+## New Feature: Automatic GraphQL API and App Generation
 
-MagicAppBuilder 1.27.0 introduces the **GraphQL Generator**, a powerful tool that automatically creates a complete, production-ready GraphQL API layer directly from your database entity schema. This feature is designed to drastically reduce development time by automating repetitive API creation tasks.
+MagicAppBuilder 1.27.0 introduces the **GraphQL Generator**, a powerful feature that not only creates a complete GraphQL API but also generates both **frontend** and **backend** applications that communicate through GraphQL. With this new system, users can instantly obtain a fully functional web application just by providing their database configuration.
 
 ### Key Features of GraphQL Generator
 
 * **Schema-Based Generation**
-  With just your existing JSON entity schema, the generator builds the entire API layer, ensuring that your API always stays in sync with your database structure.
+  Using your existing JSON entity schema, MagicAppBuilder automatically builds a complete GraphQL backend and frontend application that stays perfectly synchronized with your database structure.
 
 * **Full CRUD Operations**
   Automatically generates:
 
-  * **Queries**: To retrieve single records by ID and lists of data with pagination.
-  * **Mutations**: For `create`, `update`, and `delete` operations.
+  * **Queries** – Retrieve single records by ID or lists with pagination.
+  * **Mutations** – Perform `create`, `update`, and `delete` operations.
 
 * **Advanced Query Capabilities**
-  Generated list queries come with powerful features:
+  Generated list queries include:
 
-  * **Filtering**: Supports operators such as `EQUALS`, `CONTAINS`, `GREATER_THAN`, and `LESS_THAN`.
-  * **Sorting**: Allows sorting by multiple columns in either `ASC` or `DESC` order.
-  * **Pagination**: Full support for `limit` and `offset` for efficient data loading.
+  * **Filtering** – Supports operators like `EQUALS`, `CONTAINS`, `GREATER_THAN`, and `LESS_THAN`.
+  * **Sorting** – Allows sorting by multiple columns in `ASC` or `DESC` order.
+  * **Pagination** – Full support for `limit` and `offset` for efficient data loading.
 
 * **Automatic Relationship Handling**
-  Intelligently detects foreign key relationships (based on `_id` naming convention) and generates resolvers to fetch nested related data.
+  Automatically detects foreign key relationships (based on the `_id` naming convention) and generates resolvers to fetch nested related data.
 
 * **Soft-Delete Support**
-  If an entity includes an `active` column, the `delete` mutation will automatically perform a soft-delete (setting `active` to `0`). Otherwise, a hard-delete will be executed.
+  If an entity includes an `active` column, the `delete` mutation will automatically perform a soft-delete (sets `active` to `0`). Otherwise, a hard-delete is executed.
 
 * **Automatic API Documentation**
-  Generates a comprehensive `MANUAL.md` file that includes ready-to-use examples for every *query* and *mutation*, making integration with frontend teams effortless.
+  Generates a detailed `MANUAL.md` file with ready-to-use query and mutation examples to simplify integration with frontend teams.
 
 * **Ready-to-Use Endpoint**
-  The generator produces a single `graphql.php` file that serves as a fully functional GraphQL endpoint, complete with database connection and request-handling logic.
+  The generator produces a fully functional `graphql.php` endpoint that includes database connectivity and request handling logic.
+
+* **Instant Frontend Generation**
+  The frontend is automatically generated to interact with the GraphQL backend. It dynamically reads the GraphQL schema to render data tables, forms, and filters. Mutations such as insert, update, and delete are automatically executed through GraphQL queries.
+
+  This means you can **immediately use the generated app** after configuring your database—no additional coding required.
 
 ### Benefits
 
-* **Faster Development**: Saves hundreds of development hours by eliminating the need to manually write boilerplate API code.
-* **Guaranteed Consistency**: Keeps your database schema and API perfectly aligned, reducing the risk of human error.
-* **Comprehensive Documentation**: Simplifies API adoption across teams with clear, always-updated documentation.
+* **Rapid Development** – Instantly generate complete backend and frontend applications in minutes.
+* **Guaranteed Consistency** – Keeps the database schema, backend, and frontend perfectly synchronized.
+* **Production-Ready Code** – Generates optimized and clean GraphQL-based source code for immediate deployment.
+* **Comprehensive Documentation** – Simplifies API integration with automatically generated documentation.
 
-## What's Changed?
+## What’s Changed?
 
-To make space for the new **GraphQL** button in the export section, the checkbox caption for **Draw Relationship** has been changed to just **Relationship**. This reduces the high-resolution screen requirement for users. Additionally, the caption on the **Sort Entity** button has been changed to **Sort**, and the caption on the **Sort Entity by Type** button has been changed to **Sort by Type**. With these changes, users with a 1366x768 screen resolution can still use MagicAppBuilder without overflow issues.
+To make room for the new **GraphQL** button in the export section, the checkbox caption for **Draw Relationship** has been shortened to **Relationship**. The **Sort Entity** button caption has been changed to **Sort**, and **Sort Entity by Type** has been changed to **Sort by Type**. These adjustments ensure that users with a 1366×768 screen resolution can still access all features without overflow issues.
 
 ### Object Name Suffix for Reserved Keywords
 
-When generating code, if an entity name conflicts with a reserved system variable (e.g., `appConfig`, `database`), MagicAppBuilder will now automatically append the suffix `Obj` to the object name (e.g., `appConfigObj`). This prevents naming collisions and ensures the generated code is valid and error-free.
+When generating code, if an entity name conflicts with a reserved system variable (e.g., `appConfig`, `database`), MagicAppBuilder now automatically appends the suffix `Obj` (e.g., `appConfigObj`). This ensures valid and collision-free generated code.
 
-## Enhancement: Update Z-Index Element
+## Enhancement: Updated Z-Index Layer
 
-When the session in MagicAppBuilder expires, MagicAppBuilder displays an alert at the top of the page. When the Login button is selected, MagicAppBuilder displays the login form. Previously, this element was located beneath other elements, making it unusable in some conditions. In this version, the element has been moved so that it appears above other elements and is easy to use.
+When a session expires, MagicAppBuilder displays a login prompt. Previously, this element could appear beneath other components, making it inaccessible. In this version, the element’s z-index has been updated so it always appears on top and remains usable.
 
-## Bug Fixes: Replace `XMLHttpRequest` with `xmlhttprequest`
+## Bug Fix: Standardized `X-Requested-With` Header
 
-To mark that a request is made via AJAX, the `X-Requested-With: xmlhttprequest` header is used. Previously, the casing of `xmlhttprequest` was inconsistent, which caused invalid detection. This version standardizes the casing.
+The `X-Requested-With: xmlhttprequest` header is used to indicate AJAX requests. Previously, inconsistent casing caused detection issues. This version standardizes the casing for better compatibility.

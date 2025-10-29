@@ -113,7 +113,8 @@ else
                     "length" => "50",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "name"
                 );
 
                 $columns[] = array(
@@ -122,7 +123,8 @@ else
                     "length" => "11",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key"=> "sort_order"
                 );
 
                 $columns[] = array(
@@ -131,7 +133,8 @@ else
                     "length" => "40",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "admin_create"
                 );
 
                 $columns[] = array(
@@ -140,7 +143,8 @@ else
                     "length" => "40",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "admin_edit"
                 );
 
                 $columns[] = array(
@@ -149,7 +153,8 @@ else
                     "length" => "",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "time_create"
                 );
 
                 $columns[] = array(
@@ -158,7 +163,8 @@ else
                     "length" => "",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "time_edit"
                 );
 
                 $columns[] = array(
@@ -167,7 +173,8 @@ else
                     "length" => "50",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "ip_create"
                 );
 
                 $columns[] = array(
@@ -176,7 +183,8 @@ else
                     "length" => "50",
                     "nullable" => true,
                     "default" => null,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "ip_edit"
                 );
 
                 $columns[] = array(
@@ -185,7 +193,8 @@ else
                     "length" => "1",
                     "nullable" => false,
                     "default" => 1,
-                    "values" => ""
+                    "values" => "",
+                    "key" => "active"
                 );
 
             }

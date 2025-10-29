@@ -2448,6 +2448,7 @@ class EntityEditor {
         let _this = this;
         let selectedModel = {entities: []};
         let entities = this.entities;
+        
         const checkboxesBody = document.querySelectorAll('input[type="checkbox"].entity-selector');
         if(checkboxesBody.length)
         {
@@ -2464,8 +2465,31 @@ class EntityEditor {
                 entities.forEach(entity => {
                     if(selected.includes(entity.name))
                     {
-                        let newEntity = this.cloneEntity(entity, document.querySelector(`table[data-entity="${entity.name}"]`));
+                        let entitySelector = document.querySelector(`table[data-entity="${entity.name}"]`);
+                        let newEntity = this.cloneEntity(entity, entitySelector);
                         newEntity.data = []; // clear data to reduce payload
+
+                        // Add filters
+                        let filters = [];
+                        newEntity.columns.forEach(col => {
+                            let filterVal = entitySelector.querySelector(`select.filter-graphql[data-col="${col.name}"]`).value;
+                            if(filterVal != '')
+                            {
+                                // { "name": "nama", "type": "string", "operator": "CONTAINS", "element": "text" }
+                                filters.push({
+                                    "name": col.name,
+                                    "type": 'string',
+                                    "operator": filterVal.indexOf('CONTAINS') !== -1 ? 'CONTAINS' : 'EQUALS',
+                                    "element": filterVal.indexOf('select') !== -1 ? 'select' : 'text'
+                                })
+                            }
+                        });
+
+                        if(filters.length > 0)
+                        {
+                            newEntity.filters = filters;
+                        }
+
                         selectedModel.entities.push(newEntity); 
                     }
                 });
@@ -2510,16 +2534,16 @@ class EntityEditor {
     /**
      * Sends the selected entity model to a server-side script to generate a GraphQL schema.
      * It then initiates a download of the server's response, which is expected to be a file (e.g., a zip archive).
-     * @param {Object} selectedModel An object containing the entities to be included in the GraphQL schema.
+     * @param {Object} request An object containing the entities to be included in the GraphQL schema.
      */
-    exportGraphQLSchema(selectedModel) {
+    exportGraphQLSchema(request) {
         // send to server for processing
         fetch('../lib.ajax/graphql-generator.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(selectedModel)
+            body: JSON.stringify(request)
         })
         .then(response => response.blob())
         .then(blob => {
@@ -2546,8 +2570,13 @@ class EntityEditor {
      * @returns {void}
      */
     handleOkGenerate() {
-        const selectedModel = this.getSelectedEntities();
-        this.exportGraphQLSchema(selectedModel);
+        let data = {
+            "schema": this.getSelectedEntities(),
+            "reservedColumns": reservedColumns,
+            "withFrontend": false,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+        };
+        this.exportGraphQLSchema(data);
     }
 
     /**
@@ -2558,9 +2587,13 @@ class EntityEditor {
      * @returns {void}
      */
     handleOkGenerateWithFrontend() {
-        const selectedModel = this.getSelectedEntities();
-        selectedModel.withFrontend = true;
-        this.exportGraphQLSchema(selectedModel);
+        let data = {
+            "schema": this.getSelectedEntities(),
+            "reservedColumns": reservedColumns,
+            "withFrontend": true,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+        };
+        this.exportGraphQLSchema(data);
     }
 
     /**
@@ -2603,12 +2636,21 @@ class EntityEditor {
      * @param {HTMLElement} wrapper The container element to which the entity selector tables will be appended.
      */
     createEntitySelectorTables(wrapper) {
-        
+        let displayField = 'name';
+        if(reservedColumns && reservedColumns.columns)
+        {
+            reservedColumns.columns.forEach(col => {
+                if(col.key == 'name')
+                {
+                    displayField = col.name;
+                }
+            });
+        }
         // Custom entities
         this.entities.forEach(entity => {
             if(!this.systemEntities.includes(entity.name))
             {
-                this.createEntitySelectorTable(entity, wrapper, true);
+                this.createEntitySelectorTable(entity, wrapper, true, displayField);
             }
         });
 
@@ -2616,7 +2658,7 @@ class EntityEditor {
         this.entities.forEach(entity => {
             if(this.systemEntities.includes(entity.name))
             {
-                this.createEntitySelectorTable(entity, wrapper, false);
+                this.createEntitySelectorTable(entity, wrapper, false, displayField);
             }
         });
     }
@@ -2651,7 +2693,7 @@ class EntityEditor {
      * @param {HTMLElement} wrapper The container element where the table will be appended.
      * @param {boolean} checked The default checked state for the entity's main checkbox.
      */
-    createEntitySelectorTable(entity, wrapper, checked) {
+    createEntitySelectorTable(entity, wrapper, checked, displayField) {
         let container = document.createElement("div");
         container.classList.add("mb-4");
         container.classList.add("entity-selector-table-container");
@@ -2700,7 +2742,7 @@ class EntityEditor {
                 <th style="width: 10%;">PK</th>
                 <th style="width: 10%;">Serial</th>
                 <th style="width: 14%;">Nullable</th>
-                <th style="">Default</th>
+                <th style="">Filter</th>
             </tr>
         `;
 
@@ -2723,7 +2765,7 @@ class EntityEditor {
                 <td style="text-align: center;">${col.primaryKey ? "YES" : "NO"}</td>
                 <td style="text-align: center;">${col.autoIncrement ? "YES" : "NO"}</td>
                 <td style="text-align: center;">${col.nullable ? "YES" : "NO"}</td>
-                <td>${col.defaultValue != null ? col.defaultValue : ""}</td>
+                <td>${this.getFilterType(col, displayField)}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -2732,6 +2774,30 @@ class EntityEditor {
 
         container.appendChild(table);
         wrapper.appendChild(container);
+    }
+
+    getFilterType(col, displayField)
+    {
+        let value = "";
+        if(col.primaryKey)
+        {
+            // Do not add filter for primaty key
+        }
+        else if(col.name == displayField)
+        {
+            value = "text-CONTAINS";
+        }
+        else if(col.name.endsWith('_id'))
+        {
+            value = "select-EQUALS";
+        }
+        let filter = `<select class="form-control filter-graphql" data-col="${col.name}">
+        <option value="">Not Applicable</option>
+        <option value="text-CONTAINS"${value == "text-CONTAINS" ? " selected" : ""}>Text Contains</option>
+        <option value="text-EQUALS"${value == "text-EQUALS" ? " selected" : ""}>Text Equals</option>
+        <option value="select-EQUALS"${value == "select-EQUALS" ? " selected" : ""}>Select Equals</option>
+        </select>`;
+        return filter;
     }
 
     /**

@@ -12,6 +12,10 @@ namespace AppBuilder;
  */
 class GraphQLGenerator
 {
+    private $reservedColumns = []; 
+    private $activeField = 'active';
+    private $displayField = 'name';
+
     /**
      * @var array Decoded JSON schema.
      */
@@ -26,11 +30,36 @@ class GraphQLGenerator
      * Constructor.
      *
      * @param array $schema Decoded JSON schema.
+     * @param array $reservedColumns
      * @throws Exception If the file is not found or invalid.
      */
-    public function __construct($schema)
+    public function __construct($schema, $reservedColumns = null)
     {
         $this->schema = $schema;
+
+        if(isset($reservedColumns) && isset($reservedColumns['columns']))
+        {
+          $arr = array();
+          foreach($reservedColumns['columns'] as $value)
+          {
+            $arr[$value['key']] = $value;
+            if($value['key'] == 'active')
+            {
+              $this->activeField = $value['name'];
+            }
+            if($value['key'] == 'name')
+            {
+              $this->displayField = $value['name'];
+            }
+          }
+          $this->reservedColumns = $arr;
+        }
+        else
+        {
+          $this->reservedColumns = array();
+          
+        }
+
         $this->analyzeSchema();
     }
 
@@ -53,6 +82,7 @@ class GraphQLGenerator
                 'primaryKey' => $primaryKey,
                 'columns' => array(),
                 'hasActiveColumn' => false,
+                'filters' => $entity['filters'] ? $entity['filters'] : array(),
             );
 
             foreach ($entity['columns'] as $column) {
@@ -62,8 +92,7 @@ class GraphQLGenerator
                     'isForeignKey' => false,
                     'references' => null
                 );
-
-                if ($columnName === 'active') {
+                if ($columnName === $this->activeField) {
                     $this->analyzedSchema[$tableName]['hasActiveColumn'] = true;
                 }
 
@@ -198,10 +227,8 @@ class GraphQLGenerator
             $code .= "        return array(\r\n";
 
             foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
-                if (!$columnInfo['isForeignKey']) {
-                    $gqlType = $this->mapDbTypeToGqlType($columnInfo['type']);
-                    $code .= "            '" . $columnName . "' => " . $gqlType . ",\r\n";
-                }
+                $gqlType = $this->mapDbTypeToGqlType($columnInfo['type']);
+                $code .= "            '" . $columnName . "' => " . $gqlType . ",\r\n";
             }
 
             // Add relationships
@@ -521,12 +548,12 @@ class GraphQLGenerator
                 $code .= "            'type' => \$" . $typeName . ",\r\n";
                 $code .= "            'args' => array(\r\n";
                 $code .= "                'id' => Type::nonNull(Type::string()),\r\n";
-                $code .= "                'active' => Type::nonNull(Type::boolean())\r\n";
+                $code .= "                '".$this->activeField."' => Type::nonNull(Type::boolean())\r\n";
                 $code .= "            ),\r\n";
                 $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
-                $code .= "                \$sql = 'UPDATE " . $tableName . " SET active = :active WHERE " . $primaryKey . " = :id';\r\n";
+                $code .= "                \$sql = 'UPDATE " . $tableName . " SET ".$this->activeField." = :active WHERE " . $primaryKey . " = :id';\r\n";
                 $code .= "                \$stmt = \$db->prepare(\$sql);\r\n";
-                $code .= "                \$stmt->execute(array(':id' => \$args['id'], ':active' => \$args['active'] ? 1 : 0));\r\n";
+                $code .= "                \$stmt->execute(array(':id' => \$args['id'], ':active' => \$args['".$this->activeField."'] ? 1 : 0));\r\n";
                 $code .= "                \$stmt = \$db->prepare('SELECT * FROM " . $tableName . " WHERE " . $primaryKey . " = :id');\r\n";
                 $code .= "                \$stmt->execute(array(':id' => \$args['id']));\r\n";
                 $code .= "                return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
@@ -542,7 +569,7 @@ class GraphQLGenerator
             $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
             if ($tableInfo['hasActiveColumn']) {
                 // Soft delete
-                $code .= "                \$sql = 'UPDATE " . $tableName . " SET active = 0 WHERE " . $primaryKey . " = :id';\r\n";
+                $code .= "                \$sql = 'DELETE FROM " . $tableName . " WHERE " . $primaryKey . " = :id';\r\n";
             } else {
                 // Hard delete
                 $code .= "                \$sql = 'DELETE FROM " . $tableName . " WHERE " . $primaryKey . " = :id';\r\n";
@@ -610,6 +637,13 @@ class GraphQLGenerator
         $manualContent .= "```\r\n\r\n";
         $manualContent .= "where `\$db` is an instance of PDO.\r\n\r\n";
 
+        $manualContent .= "---\r\n\r\n";
+        
+        $manualContent .= "## Security Considerations\r\n\r\n";
+        $manualContent .= "For production or any publicly exposed environments, it is strongly recommended to remove files that are not essential for the API's runtime operations. This helps to minimize the attack surface and prevent potential information disclosure.\r\n\r\n";
+        $manualContent .= "Please delete the following files from your production server:\r\n\r\n";
+        $manualContent .= "- **`manual.md`**: This file contains detailed API documentation that should not be publicly accessible.\r\n";
+        $manualContent .= "- **`composer.phar`**: This is the Composer executable and is not needed for the application to run after dependencies are installed. Leaving it on the server can pose a security risk.\r\n\r\n";
         $manualContent .= "---\r\n\r\n";
 
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
@@ -809,8 +843,9 @@ class GraphQLGenerator
      *
      * @return string The JSON formatted content for frontend-config.json.
      */
-    public function generateFrontendConfigJson($displayField = "name")
+    public function generateFrontendConfigJson()
     {
+      
         $frontendConfig = array();
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
@@ -829,10 +864,12 @@ class GraphQLGenerator
                 'name' => $camelName,
                 'pluralName' => $pluralCamelName,
                 'displayName' => $this->camelCaseToTitleCase($camelName),
-                'displayField' => $displayField,
+                'displayField' => $this->displayField,
+                'activeField' => $this->activeField,
                 'primaryKey' => $tableInfo['primaryKey'],
                 'hasActiveColumn' => $tableInfo['hasActiveColumn'],
                 'columns' => $columns,
+                'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : []
             );
         }
         return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -880,1222 +917,6 @@ class GraphQLGenerator
             $word = ucfirst($word);
         }
         return implode(' ', $words);
-    }
-
-
-    /**
-     * Generates the HTML file for the frontend application.
-     *
-     * @return string The HTML content.
-     */
-    public function generateFrontendHtml()
-    {
-        return <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GraphQL Frontend</title>
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js"></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-      rel="stylesheet" />
-  </head>
-  <body>
-    <div class="page-wrapper">
-      <header class="header">
-        <div class="header-left">
-          <span class="sidebar-toggle" id="sidebar-toggle">&#9776;</span>
-        </div>
-        <div class="header-right">
-          <div class="header-item">
-            <i
-              class="fa-solid fa-bell icon"
-              data-dropdown="notification-menu"></i>
-            <ul id="notification-menu" class="dropdown-menu">
-              <li><a href="#">Notification 1</a></li>
-              <li><a href="#">Notification 2</a></li>
-            </ul>
-          </div>
-          <div class="header-item">
-            <i
-              class="fa-solid fa-envelope icon"
-              data-dropdown="message-menu"></i>
-            <ul id="message-menu" class="dropdown-menu">
-              <li><a href="#">Message from John</a></li>
-              <li><a href="#">Message from Jane</a></li>
-            </ul>
-          </div>
-          <div class="header-item">
-            <i class="fa-solid fa-globe icon" data-dropdown="lang-menu"></i>
-            <ul id="lang-menu" class="dropdown-menu">
-              <li><a href="#">English</a></li>
-              <li><a href="#">Indonesia</a></li>
-            </ul>
-          </div>
-          <div class="header-item">
-            <i
-              class="fa-solid fa-user-circle icon"
-              data-dropdown="profile-menu"></i>
-            <ul id="profile-menu" class="dropdown-menu">
-              <li><a href="#">Profile</a></li>
-              <li><a href="#">Settings</a></li>
-              <li><hr style="margin: 5px 0; border-color: #eee" /></li>
-              <li><a href="#" id="logout-btn-dropdown" class="logout-link">Logout</a></li>
-            </ul>
-          </div>
-        </div>
-      </header>
-      <div class="container">
-        <nav class="sidebar" id="sidebar-nav">
-          <ul id="entity-menu">
-            <!-- Menu items will be inserted here by JavaScript -->
-          </ul>
-        </nav>
-        <main class="main-content" id="main-content">
-          <h1 id="content-title">Welcome</h1>
-          <div id="content-body">
-            <p>Please select an entity from the menu to get started.</p>
-          </div>
-        </main>
-      </div>
-    </div>
-
-    <!-- Modal for Forms -->
-    <div id="form-modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <span class="close-button" id="form-close-button">&times;</span>
-          <h2 id="modal-title">Form</h2>
-        </div>
-        <div class="modal-body"><form id="entity-form"></form></div>
-        <div class="modal-footer"></div>
-          </div>
-      </div>
-    </div>
-
-    <!-- Modal for Login -->
-    <div id="login-modal" class="modal">
-      <div class="modal-content">
-        <form id="login-form"></form>
-        <div class="modal-header">
-          <span class="close-button" id="login-close-button">&times;</span> 
-          <h2 id="login-title">Login</h2>
-        </div>
-        <div class="modal-body">
-        
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required />
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required />
-          </div>
-          
-          <div id="login-error" style="color: red; margin-top: 10px"></div>
-        
-        </div>
-        <div class="modal-footer"><button type="submit" class="btn btn-primary">Login</button></div>
-        </form>
-      </div>
-    </div>
-
-    
-  </body>
-</html>
-
-HTML;
-    }
-
-    /**
-     * Generates the CSS file for the frontend application.
-     *
-     * @return string The CSS content.
-     */
-    public function generateFrontendCss()
-    {
-        return <<<CSS
-:root {
-  --sidebar-width: 250px;
-  --header-height: 60px;
-  --primary-color: #3b82f6; /* A brighter, more modern blue */
-  --primary-color-hover: #2563eb;
-  --background-color: #f9fafb; /* Lighter grey for background */
-  --sidebar-bg: #ffffff;
-  --header-bg: #ffffff;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -2px rgba(0, 0, 0, 0.1);
-}
-
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  margin: 0;
-  background-color: var(--background-color);
-  color: var(--text-primary);
-}
-
-.page-wrapper {
-  flex-direction: column;
-  height: 100vh;
-}
-
-.header {
-  height: var(--header-height);
-  background-color: var(--header-bg);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  border-bottom: 1px solid var(--border-color);
-  z-index: 100;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
-.sidebar-toggle {
-  font-size: 24px;
-  cursor: pointer;
-  margin-right: 20px;
-  color: var(--text-secondary);
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.header-item {
-  position: relative;
-  cursor: pointer;
-}
-
-.header-item .icon {
-  font-size: 22px;
-  color: var(--text-secondary);
-}
-h2,
-h3 {
-  margin: 0;
-}
-h2 {
-  font-size: 18px;
-  font-weight: normal;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 40px;
-  right: 0;
-  background-color: var(--header-bg);
-  border-radius: 5px;
-  box-shadow: var(--shadow-md);
-  min-width: 180px;
-  z-index: 101;
-  list-style: none;
-  padding: 5px 0;
-  margin: 0;
-}
-
-.dropdown-menu.show {
-  display: block;
-}
-
-.dropdown-menu a {
-  display: block;
-  padding: 10px 15px;
-  color: var(--text-primary);
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.dropdown-menu a:hover {
-  background-color: var(--background-color);
-}
-
-.container {
-  display: flex;
-  flex-grow: 1;
-  overflow: hidden;
-}
-
-.sidebar {
-  width: var(--sidebar-width);
-  background-color: var(--sidebar-bg);
-  padding: 20px;
-  border-right: 1px solid var(--border-color);
-  flex-shrink: 0;
-}
-.sidebar-animated {
-  transition: margin-left 0.3s ease;
-}
-
-.sidebar.collapsed {
-  margin-left: calc((-1 * var(--sidebar-width)) - 43px);
-}
-
-.sidebar h2 {
-  color: var(--primary-color);
-  margin-top: 0;
-}
-
-#entity-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0px 0 0 0;
-}
-
-#entity-menu li a {
-  display: block;
-  padding: 8px 12px;
-  color: var(--text-secondary);
-  text-decoration: none;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-#entity-menu li a:hover,
-#entity-menu li a.active {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.main-content {
-  flex-grow: 1;
-  padding: 20px;
-  overflow-y: auto;
-  transition: margin-left 0.3s ease;
-}
-
-.main-content h1 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 28px;
-  font-weight: normal;
-}
-
-/* Styles from original file, slightly adapted */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-.modal-content {
-  background-color: #fefefe;
-  margin: 10% auto;
-  border: 1px solid #888;
-  width: 80%;
-  max-width: 550px;
-  border-radius: 8px;
-  position: relative;
-}
-.close-button {
-  color: #aaa;
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.modal-header {
-  padding: 1rem 1rem;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.modal-body {
-  padding: 1rem;
-}
-.modal-footer {
-  padding: 1rem 1rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-.close-button {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.form-group {
-  margin-bottom: 15px;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-.form-group input[type="text"],
-.form-group input[type="password"],
-.form-group input[type="email"],
-.form-group input[type="number"],
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  box-sizing: border-box;
-  background-color: #fff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-.btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-.btn-sm {
-  padding: 5px 10px;
-  font-size: 12px;
-}
-.btn-sm:hover {
-}
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-.btn-primary:hover {
-  background-color: var(--primary-color-hover);
-}
-.btn:active {
-  transform: translateY(1px);
-}
-.btn-warning {
-  background-color: #f59e0b;
-  color: white;
-}
-.btn-warning:hover {
-  background-color: #d97706;
-}
-.btn-danger {
-  background-color: #ef4444;
-  color: white;
-}
-.btn-danger:hover {
-  background-color: #dc2626;
-}
-.btn-info {
-  background-color: #3b82f6;
-  color: white;
-}
-.btn-info:hover {
-  background-color: #2563eb;
-}
-.btn-secondary {
-  background-color: #e5e7eb;
-  color: var(--text-primary);
-}
-.btn-secondary:hover {
-  background-color: #d1d5db;
-}
-.logout-link {
-  display: block;
-  margin-top: 20px;
-}
-.table-container {
-  overflow: auto;
-}
-.table-container table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 10px;
-}
-.table-container table td,
-.table-container table th {
-  border: 1px solid #ddd;
-  padding: 5px 8px;
-  text-align: left;
-}
-.table-container table th {
-  background-color: #f2f2f2;
-  padding: 8px 8px;
-}
-
-td.actions {
-  white-space: nowrap;
-}
-
-.detail-view table tr > td:nth-child(1) {
-  width: 35%;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 0;
-  margin-top: 10px;
-  border-top: 1px solid var(--border-color);
-}
-
-.pagination-container span {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.pagination-container button:disabled {
-  background-color: #f3f4f6;
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.list-controls,
-.back-controls {
-  padding: 0px 0px 8px 0px;
-}
-
-CSS;
-    }
-
-    /**
-     * Generates the JavaScript file for the frontend application.
-     *
-     * @return string The JavaScript content.
-     */
-    public function generateFrontendJs()
-    {
-        // This now returns the full JavaScript application code.
-        return <<<'JS'
-class GraphQLClientApp {
-    constructor(configUrl, apiUrl) {
-        this.configUrl = configUrl;
-        this.apiUrl = apiUrl;
-        this.config = null;
-        this.currentEntity = null;
-        this.state = {
-            page: 1,
-            limit: 10,
-            filters: [],
-            orderBy: [],
-        };
-        this.dom = {
-            menu: document.getElementById('entity-menu'),
-            title: document.getElementById('content-title'),
-            body: document.getElementById('content-body'),
-            modal: document.getElementById('form-modal'),
-            modalTitle: document.getElementById('modal-title'),
-            form: document.getElementById('entity-form'),
-            closeModalBtn: document.querySelector('.close-button'),
-            loginModal: document.getElementById('login-modal'),
-            loginForm: document.getElementById('login-form'),
-            loginCloseBtn: document.getElementById('login-close-button'),
-            logoutBtn: document.querySelector('.logout-link'),
-        };
-        this.init();
-    }
-    
-    initPage() {
-        
-
-        const sidebarToggle = document.getElementById("sidebar-toggle");
-        const sidebar = document.getElementById("sidebar-nav");
-
-        // Check for saved sidebar state in localStorage on page load
-        if (localStorage.getItem("sidebarCollapsed") === "true") {
-          sidebar.classList.add("collapsed");
-        }
-
-        // Add the transition class after a short delay to avoid animation on load
-        setTimeout(() => {
-          sidebar.classList.add("sidebar-animated");
-        }, 100);
-
-        sidebarToggle.addEventListener("click", () => {
-          sidebar.classList.toggle("collapsed");
-          // Save the new state to localStorage
-          localStorage.setItem( "sidebarCollapsed", sidebar.classList.contains("collapsed") );
-        });
-
-        // Dropdown logic
-        document.querySelectorAll(".header-item .icon").forEach((icon) => {
-          icon.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const dropdownId = icon.getAttribute("data-dropdown");
-            const targetDropdown = document.getElementById(dropdownId);
-
-            // Close other dropdowns
-            document
-              .querySelectorAll(".dropdown-menu.show")
-              .forEach((openDropdown) => {
-                if (openDropdown !== targetDropdown) {
-                  openDropdown.classList.remove("show");
-                }
-              });
-            targetDropdown.classList.toggle("show");
-          });
-        });
-
-        // Close dropdowns when clicking outside
-        window.addEventListener("click", () => {
-          document
-            .querySelectorAll(".dropdown-menu.show")
-            .forEach((openDropdown) => {
-              openDropdown.classList.remove("show");
-            });
-        });
-        
-    }
-
-    async init() {
-        try {
-            await this.loadConfig();
-            this.initPage();
-            this.buildMenu();
-            this.dom.closeModalBtn.onclick = () => this.closeModal();
-            window.onclick = (event) => {
-                if (event.target == this.dom.modal) this.closeModal();
-            };
-            // Add event listener for data-dismiss="modal"
-            document.addEventListener('click', (event) => {
-                const dismissButton = event.target.closest('[data-dismiss="modal"]');
-                if (dismissButton) {
-                    const modal = dismissButton.closest('.modal');
-                    if (modal) {
-                        if (modal.id === this.dom.modal.id) this.closeModal();
-                        else if (modal.id === this.dom.loginModal.id) this.closeLoginModal();
-                    }
-                }
-            });
-            this.dom.loginCloseBtn.onclick = () => this.closeLoginModal();
-            this.dom.loginForm.onsubmit = (e) => this.handleLogin(e);
-            this.dom.logoutBtn.onclick = (e) => this.handleLogout(e);
-            // Handle initial page load and back/forward button clicks
-            window.addEventListener('popstate', () => this.handleRouteChange());
-            this.handleRouteChange(); // Handle initial route
-        } catch (error) {
-            console.error('Initialization Error:', error);
-            this.dom.body.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-        }
-    }
-
-    async loadConfig() { // Simplified loadConfig
-        const response = await fetch(this.configUrl);
-        if (!response.ok) throw new Error(`Failed to load config from ${this.configUrl}`);
-        this.config = await response.json();
-        if (this.config.pagination && this.config.pagination.pageSize) {
-            this.state.limit = this.config.pagination.pageSize;
-        }
-    }
-
-    buildMenu() {
-        if (!this.config || !this.config.entities) return;
-        this.dom.menu.innerHTML = '';
-        Object.values(this.config.entities).forEach((entity, index) => {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = `#${entity.name}`;
-            a.textContent = entity.displayName;
-            a.onclick = (e) => {
-                e.preventDefault();
-                this.navigateTo(entity.name, { limit: this.state.limit });
-            };
-            li.appendChild(a);
-            this.dom.menu.appendChild(li);
-        });
-    }
-
-    async gqlQuery(query, variables = {}) {
-        const response = await fetch(this.apiUrl, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'xmlhttprequest',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ query, variables }),
-        });
-
-        if (response.status === 401) {
-            this.openLoginModal();
-            throw new Error("Authentication required.");
-        }
-
-        const result = await response.json();
-        
-        if (result.errors) {
-            console.error('GraphQL Errors:', result.errors);
-            console.error(`Error: ${result.errors[0].message}`);
-            throw new Error(result.errors[0].message);
-        }
-        return result.data;
-    }
-
-    // =================================================================
-    // RENDER METHODS
-    // =================================================================
-
-    navigateTo(entityName, params = {}) {
-        const newParams = new URLSearchParams();
-        newParams.set('page', params.page || 1);
-        newParams.set('limit', params.limit || 10);
-        // TODO: Add filters and orderBy to params
-
-        const newUrl = `${window.location.pathname}#${entityName}?${newParams.toString()}`;
-        history.pushState({ entityName, params }, '', newUrl);
-        this.handleRouteChange();
-    }
-
-    navigateToDetail(entityName, id) {
-        const newUrl = `${window.location.pathname}#${entityName}/detail/${id}`;
-        history.pushState({ entityName, id }, '', newUrl);
-        this.handleRouteChange();
-    }
-
-    async handleRouteChange() {
-        const hash = window.location.hash.substring(1);
-        if (!hash) {
-            // If no hash, navigate to the first entity
-            const firstEntityName = Object.keys(this.config.entities)[0];
-            if (firstEntityName) {
-                this.navigateTo(firstEntityName, { limit: this.state.limit });
-            } else {
-                this.dom.body.innerHTML = '<p>No entities configured.</p>';
-            }
-            return;
-        }
-
-        const [path, queryString] = hash.split('?');
-        const pathParts = path.split('/');
-
-        const entityName = pathParts[0];
-        const viewType = pathParts.length > 1 ? pathParts[1] : 'list';
-        const itemId = pathParts.length > 2 ? pathParts[2] : null;
-
-        const params = new URLSearchParams(queryString);
-
-        const entity = this.config.entities[entityName];
-        if (!entity) {
-            this.dom.body.innerHTML = `<p>Entity "${entityName}" not found.</p>`;
-            return;
-        }
-
-        this.currentEntity = entity;
-        this.state = {
-            page: parseInt(params.get('page')) || 1,
-            limit: parseInt(params.get('limit')) || 10,
-            filters: [], // TODO: Parse from URL
-            orderBy: [],   // TODO: Parse from URL
-        };
-
-        document.querySelectorAll('#entity-menu a').forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${entityName}`));
-
-        if (viewType === 'detail' && itemId) {
-            await this.renderDetailView(itemId);
-        } else {
-            await this.renderListView();
-        }
-    }
-
-    async renderListView() {
-        this.dom.title.textContent = `List of ${this.currentEntity.displayName}`;
-        this.dom.body.innerHTML = 'Loading...';
-
-        const fields = this.getFieldsForQuery(this.currentEntity, 1); // depth 1
-        const offset = (this.state.page - 1) * this.state.limit;
-
-        const query = `
-            query Get${this.currentEntity.pluralName}($limit: Int, $offset: Int, $orderBy: [SortInput], $filter: [FilterInput]) {
-                ${this.currentEntity.pluralName}(limit: $limit, offset: $offset, orderBy: $orderBy, filter: $filter) {
-                    items { ${fields} }
-                    total
-                    limit
-                    page
-                    totalPages
-                    hasNext
-                    hasPrevious
-                }
-            }
-        `;
-
-        try {
-            const data = await this.gqlQuery(query, {
-                limit: this.state.limit,
-                offset: offset,
-                orderBy: this.state.orderBy,
-                filter: this.state.filters,
-            });
-            const result = data[this.currentEntity.pluralName];
-            this.renderTable(result.items);
-            this.renderPagination(result);
-        } catch (error) {
-            this.dom.body.innerHTML = `<p style="color: red;">${error.message}</p>`;
-        }
-    }
-
-    renderTable(items) {
-        const headers = Object.keys(this.currentEntity.columns);
-        let tableHtml = `
-            <div class="list-controls">
-                <button id="add-new-btn" class="btn btn-primary">Add New ${this.currentEntity.displayName}</button>
-                <div><!-- Placeholder for filter/sort controls --></div>
-            </div>
-            <div class="table-container">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            ${headers.map(h => `<th>${h}</th>`).join('')}
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        if (items.length === 0) {
-            tableHtml += `<tr><td colspan="${headers.length + 1}">No items found.</td></tr>`;
-        } else {
-            items.forEach(item => {
-                tableHtml += `<tr>`;
-                headers.forEach(header => {
-                    const col = this.currentEntity.columns[header];
-                    let value = item[header];
-                    const relationName = col.references; // Now this is camelCase, e.g., "statusKeanggotaan"
-                    
-
-                    if (col.isForeignKey && item[relationName]) {
-                        // Display a representative field from the related object, e.g., 'name' or the second field.
-                        let relatedEntity = this.config.entities[this.camelCase(relationName)];
-                        // const displayField = relatedEntity ? (Object.keys(relatedEntity.columns)[1] || relatedEntity.displayField) : 'name';
-                        let displayField = relatedEntity ? relatedEntity.displayField : 'name';
-                        value = item[relationName][displayField];
-                    }
-                    tableHtml += `<td>${value !== null ? value : 'N/A'}</td>`;
-                });
-                tableHtml += this.renderActionButtons(item);
-                tableHtml += `</tr>`;
-            });
-        }
-
-        tableHtml += `</tbody></table></div>`;
-        this.dom.body.innerHTML = tableHtml;
-
-        document.getElementById('add-new-btn').onclick = () => this.renderForm();
-        document.querySelectorAll('.btn-detail').forEach(btn => btn.onclick = (e) => this.navigateToDetail(this.currentEntity.name, e.currentTarget.dataset.id));
-        document.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = (e) => this.renderForm(e.currentTarget.dataset.id));
-        document.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = (e) => this.handleDelete(e.currentTarget.dataset.id));
-        document.querySelectorAll('.btn-toggle-active').forEach(btn => btn.onclick = (e) => this.handleToggleActive(e.currentTarget.dataset.id, e.currentTarget.dataset.active === 'true'));
-    }
-    
-    renderActionButtons(item) {
-        const id = item[this.currentEntity.primaryKey];
-        let buttons = `
-            <td class="actions">
-                <button class="btn btn-sm btn-info btn-detail" data-id="${id}">View</button>
-                <button class="btn btn-sm btn-warning btn-edit" data-id="${id}">Edit</button>
-        `;
-        if (this.currentEntity.hasActiveColumn) {
-            const isActive = item['active'];
-            buttons += `<button class="btn btn-sm ${isActive ? 'btn-secondary' : 'btn-success'} btn-toggle-active" data-id="${id}" data-active="${isActive}">${isActive ? 'Deactivate' : 'Activate'}</button>`;
-        }
-        buttons += `<button class="btn btn-sm btn-danger btn-delete" data-id="${id}">Delete</button></td>`;
-        return buttons;
-    }
-
-    renderPagination(result) {
-        const paginationDiv = document.createElement('div');
-        paginationDiv.className = 'pagination pagination-container';
-        paginationDiv.innerHTML = `
-            <span>Page ${result.page} of ${result.totalPages} (Total: ${result.total})</span>
-            <button id="prev-page" class="btn btn-secondary" ${!result.hasPrevious ? 'disabled' : ''}>Previous</button>
-            <button id="next-page" class="btn btn-secondary" ${!result.hasNext ? 'disabled' : ''}>Next</button>
-        `;
-        this.dom.body.appendChild(paginationDiv);
-        
-        document.getElementById('prev-page').onclick = () => {
-            this.navigateTo(this.currentEntity.name, { page: this.state.page - 1, limit: this.state.limit});
-        };
-        document.getElementById('next-page').onclick = () => {
-            this.navigateTo(this.currentEntity.name, { page: this.state.page + 1, limit: this.state.limit});
-        };
-    }
-
-    async renderDetailView(id) {
-        this.dom.title.textContent = `Detail of ${this.currentEntity.displayName}`;
-        this.dom.body.innerHTML = 'Loading...';
-
-        const fields = this.getFieldsForQuery(this.currentEntity, 2); // Deeper nesting for details
-        const query = `
-            query Get${this.currentEntity.name}($id: String!) {
-                ${this.currentEntity.name}(id: $id) {
-                    ${fields}
-                }
-            }
-        `;
-
-        try {
-            const data = await this.gqlQuery(query, { id });
-            const item = data[this.currentEntity.name];
-            let detailHtml = `<div class="back-controls">
-                                <button id="back-to-list" class="btn btn-secondary">Back to List</button>
-                              </div>
-                <div class="table-container detail-view">
-                    <table class="table">
-                        <tbody>`;
-            for (const key in this.currentEntity.columns) {
-                const col = this.currentEntity.columns[key];
-                const relationName = col.references;
-                detailHtml += `<tr>
-                                    <td>${key}</td>
-                                    <td>`;
-                if (col.isForeignKey && item[relationName]) {
-                    detailHtml += `<span>${JSON.stringify(item[relationName], null, 2)}</span>`;
-                } else {
-                    detailHtml += `<span>${item[key] !== null ? item[key] : 'N/A'}</span>`;
-                }
-                detailHtml += `</td></tr>`;
-            }
-            detailHtml += `</tbody></table></div>`;
-            this.dom.body.innerHTML = detailHtml;
-            document.getElementById('back-to-list').onclick = () => history.back();
-        } catch (error) {
-            this.dom.body.innerHTML = `<p style="color: red;">Failed to fetch item details.</p>`;
-        }
-    }
-
-    async renderForm(id = null) {
-        this.dom.modalTitle.textContent = id ? `Edit ${this.currentEntity.displayName}` : `Add New ${this.currentEntity.displayName}`;
-        this.dom.form.innerHTML = 'Loading form...';
-        this.openModal();
-
-        let item = {};
-        if (id) {
-            const fields = this.getFieldsForQuery(this.currentEntity, 2); // Fetch with relations for edit form
-            const query = `query GetForEdit($id: String!) { ${this.currentEntity.name}(id: $id) { ${fields} } }`;
-            const data = await this.gqlQuery(query, { id });
-            item = data[this.currentEntity.name];
-        }
-
-        let formHtml = '';
-        for (const colName in this.currentEntity.columns) {
-            if (colName === this.currentEntity.primaryKey) continue;
-            const col = this.currentEntity.columns[colName];
-            let value = '';
-            if (col.isForeignKey && item[col.references]) {
-                value = item[col.references][this.config.entities[this.camelCase(col.references)].primaryKey];
-            } else if (item[colName] !== undefined) {
-                value = item[colName];
-            }
-
-            formHtml += `<div class="form-group">`;
-            formHtml += `<label for="${colName}">${colName}</label>`;
-            if (col.isForeignKey) {
-                const relationName = col.references;
-                const relatedEntity = this.config.entities[this.camelCase(relationName)];
-                
-                const relatedData = relatedEntity ? (await this.fetchAll(relatedEntity)) : [];
-                const displayField = relatedEntity.displayField || 'name';
-
-                formHtml += `<select id="${colName}" name="${colName}">`;
-                formHtml += `<option value="">-- Select --</option>`;
-                relatedData.forEach(relItem => {
-                    const relId = relItem[relatedEntity.primaryKey];
-                    const relDisplay = relItem[displayField];
-                    formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay}</option>`;
-                });
-                formHtml += `</select>`;
-            } else {
-                let inputType = 'text';
-                if (col.type.includes('int')) inputType = 'number';
-                if (col.type.includes('boolean')) inputType = 'checkbox';
-                
-                if (inputType === 'checkbox') {
-                     formHtml += `<input type="checkbox" id="${colName}" name="${colName}" ${value ? 'checked' : ''}>`;
-                } else {
-                     formHtml += `<input type="${inputType}" id="${colName}" name="${colName}" value="${value}">`;
-                }
-            }
-            formHtml += `</div>`;
-        }
-        
-        this.dom.form.innerHTML = formHtml;
-        
-        this.dom.form.closest('.modal').querySelector('.modal-footer').innerHTML = `
-        <button type="submit" class="btn btn-primary">Save</button> 
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> `;
-        
-        this.dom.form.closest('.modal').querySelector('.modal-footer').querySelector('[type="submit"]').addEventListener('click', () => this.handleSave(id));
-        
-        this.dom.form.onsubmit = (e) => {
-            e.preventDefault();
-            this.handleSave(id);
-        };
-    }
-
-    // =================================================================
-    // HANDLER METHODS
-    // =================================================================
-
-    async handleSave(id) {
-        const formData = new FormData(this.dom.form);
-        const input = {};
-        for (const colName in this.currentEntity.columns) {
-             if (colName === this.currentEntity.primaryKey) continue;
-             const col = this.currentEntity.columns[colName];
-             if (col.type.includes('boolean')) {
-                 input[colName] = this.dom.form.querySelector(`[name="${colName}"]`).checked;
-             } else if (formData.has(colName)) {
-                 let value = formData.get(colName);
-                 if (col.type.includes('int') || col.type.includes('float')) {
-                     value = value ? Number(value) : null;
-                 }
-                 input[colName] = value;
-             }
-        }
-
-        const mutationName = id ? `update${this.currentEntity.name}` : `create${this.currentEntity.name}`;
-        const fields = this.getFieldsForQuery(this.currentEntity, 1, true);
-        const mutation = `
-            mutation Save${this.currentEntity.name}($id: String, $input: ${this.currentEntity.name}Input!) {
-                ${mutationName}(${id ? 'id: $id, ' : ''}input: $input) {
-                    ${fields}
-                }
-            }
-        `;
-        const variables = { input };
-        if (id) variables.id = id;
-
-        try {
-            await this.gqlQuery(mutation, variables);
-            this.closeModal();
-            this.renderListView(); // Refresh list
-        } catch (error) {
-            console.error(`Failed to save: ${error.message}`);
-        }
-    }
-
-    async handleDelete(id) {
-        if (!confirm('Are you sure you want to delete this item?')) return;
-
-        const mutation = `
-            mutation Delete${this.currentEntity.name}($id: String!) {
-                delete${this.currentEntity.name}(id: $id)
-            }
-        `;
-        try {
-            await this.gqlQuery(mutation, { id });
-            this.renderListView();
-        } catch (error) {
-            console.error(`Failed to delete: ${error.message}`);
-        }
-    }
-
-    async handleToggleActive(id, currentStatus) {
-        const newStatus = !currentStatus;
-        const action = newStatus ? 'activate' : 'deactivate';
-        if (!confirm(`Are you sure you want to ${action} this item?`)) return;
-
-        const mutation = `
-            mutation ToggleActive($id: String!, $active: Boolean!) {
-                toggle${this.currentEntity.name}Active(id: $id, active: $active) {
-                    ${this.currentEntity.primaryKey}
-                    active
-                }
-            }
-        `;
-        try {
-            await this.gqlQuery(mutation, { id, active: newStatus });
-            this.renderListView();
-        } catch (error) {
-            console.error(`Failed to ${action}: ${error.message}`);
-        }
-    }
-
-    async handleLogin(event) {
-        event.preventDefault();
-        const formData = new FormData(this.dom.loginForm);
-        const loginErrorDiv = document.getElementById('login-error');
-        loginErrorDiv.textContent = '';
-
-        try {
-            const response = await fetch('login.php', {
-                method: 'POST',
-                body: formData
-            });
-
-            // Jika login berhasil, server akan me-redirect atau memberikan respons sukses.
-            // Di sini kita asumsikan jika tidak ada URL redirect, login gagal.
-            if (response.ok && response.redirected === false) {
-                 // Cek jika respons berisi pesan error spesifik
-                const text = await response.text();
-                if(text.includes("Invalid username or password")) {
-                    loginErrorDiv.textContent = 'Invalid username or password.';
-                } else {
-                    // Jika login berhasil, muat ulang halaman untuk mendapatkan sesi baru
-                    this.closeLoginModal();
-                    this.handleRouteChange(); // Muat ulang data view saat ini
-                }
-            } else {
-                // Jika login berhasil dan ada redirect, browser akan menanganinya.
-                // Jika tidak, muat ulang untuk mengambil state baru.
-                window.location.reload();
-            }
-        } catch (error) {
-            loginErrorDiv.textContent = 'An error occurred during login.';
-            console.error('Login failed:', error);
-        }
-    }
-
-    async handleLogout(event) {
-        event.preventDefault();
-        try {
-            const response = await fetch('logout.php');
-            if (response.ok) {
-                // Clear the main content and title
-                this.dom.title.textContent = 'Logged Out';
-                this.dom.body.innerHTML = '<p>You have been successfully logged out.</p>';
-
-                // Hide the menu and show the login modal
-                this.dom.menu.style.display = 'none';
-                this.dom.logoutBtn.style.display = 'none';
-                this.openLoginModal();
-            }
-        } catch (error) {
-            console.error('Logout failed:', error);
-            alert('Logout failed. Please try again.');
-        }
-    }
-
-    // =================================================================
-    // UTILITY METHODS
-    // =================================================================
-
-    camelCase(str) {
-        return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-    }
-    // This function is no longer needed if frontend-config.json is correct,
-    // but we keep it for robustness just in case.
-    // camelCase(str) { return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase()); }
-
-    getFieldsForQuery(entity, depth = 1, noRelations = false) {
-        if (depth < 0) return entity.primaryKey;
-        let fields = [];
-        for (const colName in entity.columns) {
-            const col = entity.columns[colName];
-            if (col.isForeignKey && !noRelations) {
-                
-                // sampai di sini `sub_klasifikasi` dan `jenis_media` masih diprint
-                let relationName = col.references; // This is now camelCase, e.g., "statusKeanggotaan"
-
-                let relationNameCamelCase = this.camelCase(relationName);
-
-                // masalahnya mungkin di
-                let relatedEntity = this.config.entities[relationName];
-
-                if(!relatedEntity)
-                {
-                    relatedEntity = this.config.entities[relationNameCamelCase];
-                }
-
-                if (relatedEntity) {
-                    let query = `${relationName} { ${this.getFieldsForQuery(relatedEntity, depth - 1)} }`;
-                    // Use the correct relation name from the entity config for the query
-                    fields.push(query);
-                }
-            } else if (!col.isForeignKey) {
-                fields.push(colName);
-            }
-        }
-        return fields.join(' ');
-    }
-    
-    async fetchAll(entity) {
-        const fields = this.getFieldsForQuery(entity, 0); // Only simple fields
-        const query = `query FetchAll($limit: Int) { ${entity.pluralName}(limit: $limit) { items { ${fields} } } }`;
-        try {
-            const data = await this.gqlQuery(query, { limit: this.state.limit });
-            return data[entity.pluralName].items;
-        } catch (error) {
-            console.error(`Failed to pre-fetch ${entity.pluralName}:`, error);
-            return [];
-        }
-    }
-
-    openModal() { this.dom.modal.style.display = 'block'; }
-    closeModal() { this.dom.modal.style.display = 'none'; this.dom.form.innerHTML = ''; }
-    openLoginModal() { this.dom.loginModal.style.display = 'block'; }
-    closeLoginModal() { this.dom.loginModal.style.display = 'none'; this.dom.loginForm.reset(); document.getElementById('login-error').textContent = ''; }
-}
-
-document.addEventListener('DOMContentLoaded', () => new GraphQLClientApp('frontend-config.json', 'graphql.php'));
-JS;
-    }
-
-    /**
-     * Generates a zip package containing the graphql.php, manual.md, and a nested frontend.zip.
-     *
-     * @param string $zipFilePath The full path where the final zip file will be saved.
-     * @return bool True on success, false on failure.
-     * @throws Exception If ZipArchive is not available or fails.
-     */
-    public function generatePackage($zipFilePath)
-    {
-        if (!class_exists('ZipArchive')) {
-            throw new \Exception('ZipArchive class is not found. Please enable the PHP zip extension.');
-        }
-
-        // 1. Create frontend.zip in memory
-        $frontendZip = new \ZipArchive();
-        $tempFrontendZipFile = tempnam(sys_get_temp_dir(), 'frontend') . '.zip';
-        if ($frontendZip->open($tempFrontendZipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== TRUE) {
-            throw new \Exception("Cannot create temporary frontend zip file: $tempFrontendZipFile");
-        }
-        $frontendZip->addFromString('index.html', $this->generateFrontendHtml());
-        $frontendZip->addFromString('style.css', $this->generateFrontendCss());
-        $frontendZip->addFromString('app.js', $this->generateFrontendJs());
-        $frontendZip->addFromString('frontend-config.json', $this->generateFrontendConfigJson());
-        $frontendZip->close();
-
-        // 2. Create the main package zip
-        $mainZip = new \ZipArchive();
-        if ($mainZip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== TRUE) {
-            unlink($tempFrontendZipFile); // Clean up temp file
-            throw new \Exception("Cannot create main package zip file: $zipFilePath");
-        }
-
-        // 3. Add all files to the main package
-        $mainZip->addFromString('graphql.php', $this->generate());
-        $mainZip->addFromString('manual.md', $this->generateManual());
-        $mainZip->addFile($tempFrontendZipFile, 'frontend.zip');
-
-        // 4. Close and clean up
-        $mainZip->close();
-        unlink($tempFrontendZipFile);
-
-        return file_exists($zipFilePath);
     }
 
 
