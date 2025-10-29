@@ -88,7 +88,8 @@ $reservedColumns = isset($data['reservedColumns']) ? $data['reservedColumns'] : 
 $applicationId = isset($data['applicationId']) ? $data['applicationId'] : null;
 
 try {
-    
+    $application = getApplication($databaseBuilder, $applicationId);
+
     if($withFrontend)
     {
         $generator = new GraphQLGenerator($schema, $reservedColumns);
@@ -135,7 +136,7 @@ try {
 
         $zip->addFromString('favicon.svg', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg"));
 
-        $application = getApplication($databaseBuilder, $applicationId);
+        
 
         // Replace application name
         // <title>{APP_NAME}</title>
@@ -184,6 +185,14 @@ try {
         if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
             throw new Exception("Could not create ZIP file.");
         }
+
+        $databaseConfiguration = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/database.php");
+
+        // Replace database configuration placeholders with actual values
+        $databaseConfiguration = setDatabaseConfiguration($application, $databaseConfiguration);
+
+        $zip->addFromString('database.php', $databaseConfiguration);
+        $zip->addFromString('auth.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/auth.php"));
 
         // Add generated code file
         $zip->addFromString('graphql.php', $generatedCode);
