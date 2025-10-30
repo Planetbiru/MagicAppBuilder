@@ -1248,9 +1248,12 @@ class GraphQLClientApp {
             } else {
                 let activeField = this.currentEntity.activeField || this.defaultActiveField;
                 let inputType = 'text';
+
+                // From GraphQL type
                 if (col.type.includes('int')) inputType = 'number';
                 if (col.type.includes('boolean') || colName === activeField) inputType = 'checkbox';
 
+                // From dataType
                 if(col.dataType.includes('datetime') || col.dataType.includes('timestamp')) {
                     inputType = 'datetime-local';
                 } else if(col.dataType.includes('date')) {
@@ -1258,6 +1261,10 @@ class GraphQLClientApp {
                 }
                 else if(col.dataType.includes('time')) {
                     inputType = 'time';
+                }
+                else if(col.dataType.includes('float')) {
+                    // Two attributes
+                    inputType = 'number" step="any';
                 }
 
                 if (inputType === 'checkbox') {
