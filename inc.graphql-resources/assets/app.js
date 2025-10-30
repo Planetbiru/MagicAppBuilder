@@ -826,14 +826,13 @@ class GraphQLClientApp {
                 headers.forEach(header => {
                     const col = this.currentEntity.columns[header];
                     let value = item[header];
-                    const relationName = col.references; // Now this is camelCase, e.g., "statusKeanggotaan"
+                    const relationName = col.references;
 
                     if (col.isForeignKey && item[relationName]) {
                         const relatedEntity = this.config.entities[relationName];
                         const displayField = relatedEntity ? relatedEntity.displayField : 'name';
                         value = item[relationName] ? item[relationName][displayField] : 'N/A';
-                    } else if (header === this.currentEntity.activeField && this.config.booleanDisplay) {
-                        // Handle boolean display for the activeField
+                    } else if ((col.type.includes('boolean') || header === this.currentEntity.activeField) && this.config.booleanDisplay) {
                         const isTrue = value === 1 || value === '1' || value === true;
                         if (isTrue) {
                             value = this.t(this.config.booleanDisplay.trueLabelKey);
@@ -1139,17 +1138,13 @@ class GraphQLClientApp {
                 detailHtml += `<tr>
                                     <td>${this.getEntityLabel(this.currentEntity, key)}</td>
                                     <td>`;
-                if (col.isForeignKey && item[relationName]) {
+                if (col.isForeignKey && item[relationName]) { // NOSONAR
                     let referenceValue = item[relationName][this.currentEntity.displayField];
                     if (referenceValue === null) referenceValue = 'N/A';
                     detailHtml += `<span>${referenceValue}</span>`;
-                } else if (key === this.currentEntity.activeField && this.config.booleanDisplay) {
+                } else if ((col.type.includes('boolean') || key === this.currentEntity.activeField) && this.config.booleanDisplay) {
                     const isTrue = item[key] === 1 || item[key] === '1' || item[key] === true;
-                    if (isTrue) {
-                        detailHtml += `<span>${this.t(this.config.booleanDisplay.trueLabelKey)}</span>`;
-                    } else {
-                        detailHtml += `<span>${this.t(this.config.booleanDisplay.falseLabelKey)}</span>`;
-                    }
+                    detailHtml += `<span>${isTrue ? this.t(this.config.booleanDisplay.trueLabelKey) : this.t(this.config.booleanDisplay.falseLabelKey)}</span>`;
                 } else {
                     detailHtml += `<span>${item[key] !== null ? item[key] : 'N/A'}</span>`;
                 }
