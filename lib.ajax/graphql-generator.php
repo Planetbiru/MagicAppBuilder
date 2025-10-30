@@ -132,7 +132,9 @@ try {
         $zip->addFromString('langs/i18n/id.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/id.json"));
         
         $zip->addFromString('assets/style.css', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css"));
+        $zip->addFromString('assets/style.min.css', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.min.css"));
         $zip->addFromString('assets/app.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/app.js"));
+        $zip->addFromString('assets/app.min.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/app.min.js"));
 
         $zip->addFromString('favicon.svg', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg"));
 

@@ -1,3 +1,7 @@
+/**
+ * Manages the frontend application for interacting with the GraphQL API.
+ * Handles entity navigation, data rendering (lists, details, forms), and user interactions.
+ */
 class GraphQLClientApp {
     /**
      * Initializes the GraphQL client application.
@@ -7,27 +11,51 @@ class GraphQLClientApp {
      */
     constructor(options = {}) {
         this.configUrl = 'frontend-config.php';
+        /** @type {string} The URL for the GraphQL API endpoint. */
         this.apiUrl = 'graphql.php';
+        /** @type {string} The URL for the login endpoint. */
         this.loginUrl = 'login.php';
+        /** @type {string} The URL for the logout endpoint. */
         this.logoutUrl = 'logout.php';
+        /** @type {string} The URL to fetch entity-specific language translations. */
         this.entityLanguageUrl = 'entity-language.php';
+        /** @type {string} The URL to fetch general UI translations. */
         this.i18nUrl = 'language.php';
+        /** @type {string} The URL to fetch available language configurations. */
         this.languageConfigUrl = 'available-language.php';
 
         // Initialize custom renderers from options
+        /** @type {object} Custom renderer hooks for different views (list, detail, form). */
         this.customRenderers = options.customRenderers || {};
+        /** @type {string} The default field name for the 'active' status column. */
         this.defaultActiveField = options.defaultActiveField || 'active';
 
+        /** @type {?string} The current language ID (e.g., 'en', 'id'). */
         this.languageId = null; // Will be determined in init
+        /** @type {object<string, string>} A map of supported language codes to their names. */
         this.supportedLanguages = {};
+        /** @type {string} The default language of the application. */
         this.defaultLanguage = 'en';
 
         // i18n for UI elements outside the class
+        /** @type {object<string, string>} Translations for UI elements. */
         this.uiTranslations = {};
 
+        /** @type {object} Stores language packs for entities, keyed by language ID. */
         this.entityLanguagePack = {};
+        /** @type {?object} The main application configuration loaded from the server. */
         this.config = null;
+        /** @type {?object} The currently active entity's configuration. */
         this.currentEntity = null;
+        /**
+         * The current state of the list view.
+         * @type {{
+         *   page: number,
+         *   limit: number,
+         *   filters: object<string, string>,
+         *   orderBy: {field?: string, direction?: 'ASC'|'DESC'}
+         * }}
+         */
         this.state = {
             page: 1,
             limit: 10,
@@ -35,7 +63,8 @@ class GraphQLClientApp {
             orderBy: {}, // Changed to an object {field, direction}
         };
         this.i18n = {};
-
+        
+        /** @type {object<string, HTMLElement>} A map of cached DOM elements. */
         this.dom = {
             menu: document.getElementById('entity-menu'),
             title: document.getElementById('content-title'),
@@ -137,6 +166,7 @@ class GraphQLClientApp {
 
     /**
      * Handles 401 Unauthorized responses by clearing the UI and showing the login modal.
+     * This is typically triggered when the user's session has expired.
      * @returns {void}
      */
     handleUnauthorized() {
@@ -153,6 +183,7 @@ class GraphQLClientApp {
 
     /**
      * Asynchronously initializes the application by loading configuration, language packs, and setting up event listeners.
+     * This is the main entry point for the application logic.
      * @returns {Promise<void>} Resolves when initialization completes.
      */
     async init() {
@@ -218,6 +249,7 @@ class GraphQLClientApp {
      * @param {string|number} [context.id] - The ID of the item.
      * @returns {boolean} - True if the custom hook was executed, false otherwise.
      */
+    // Method remains unchanged
     _invokeRenderHook(action, context) {
         const entityName = context.entity.name;
         if (this.customRenderers[entityName] && typeof this.customRenderers[entityName][action] === 'function') {
@@ -229,6 +261,7 @@ class GraphQLClientApp {
 
     /**
      * Determines the language to use, fetches language configuration, and populates the language menu.
+     * It checks local storage, then browser preferences, before falling back to the default.
      * @returns {Promise<void>} Resolves when language configuration and menu are initialized.
      */
     async initializeLanguage() {
@@ -275,6 +308,7 @@ class GraphQLClientApp {
 
     /**
      * Populates the language dropdown menu based on the supported languages.
+     * This is called after the language configuration is loaded.
      * @returns {void}
      */
     populateLangMenu() {
@@ -292,6 +326,7 @@ class GraphQLClientApp {
 
     /**
      * Fetches and loads the main application configuration from the specified URL.
+     * This configuration defines entities, columns, filters, etc.
      * @returns {Promise<void>} Resolves when configuration is loaded and applied.
      */
     async loadConfig() {
@@ -342,6 +377,7 @@ class GraphQLClientApp {
 
     /**
      * Fetches the general language pack for the UI.
+     * This is used for translating static UI elements like buttons and labels.
      * @returns {Promise<void>} Resolves when the i18n pack has been loaded (or fallen back to an empty pack).
      */
     async loadI18n() {
@@ -366,6 +402,7 @@ class GraphQLClientApp {
 
     /**
      * Applies translations to all elements with a `data-i18n` attribute.
+     * This should be called after `loadI18n` and whenever the DOM is updated with new translatable elements.
      * @returns {void}
      */
     applyI18n() {
@@ -388,6 +425,7 @@ class GraphQLClientApp {
      * If a translation is not found, it generates a label from the key.
      * Supports simple placeholders like {0}, {1}.
      * @param {string} key - The key to translate.
+     * @param {...(string|number)} args - Values to replace placeholders.
      * @param  {...any} args - Values to replace placeholders.
      * @returns {string} The translated string or a generated label.
      */
@@ -412,6 +450,7 @@ class GraphQLClientApp {
     /**
      * Changes the application language and reloads the page.
      * This ensures all components, including Summernote, re-initialize with the correct language.
+     * The new language is saved to local storage.
      * @param {string} lang - The new language ID (e.g., 'en', 'id').
      * @returns {void}
      */
@@ -423,6 +462,7 @@ class GraphQLClientApp {
 
     /**
      * Toggles the color theme between 'light' and 'dark'.
+     * The selected theme is saved to local storage.
      * @returns {void}
      */
     toggleTheme() {
@@ -434,6 +474,7 @@ class GraphQLClientApp {
 
     /**
      * Applies a specific theme to the application.
+     * It sets a `data-theme` attribute on the `<html>` element.
      * @param {string} theme - The theme to apply ('light' or 'dark').
      * @returns {void}
      */
@@ -444,6 +485,7 @@ class GraphQLClientApp {
 
     /**
      * Gets the translated label for a given entity and property key.
+     * It looks for translations in the loaded entity language pack.
      * Falls back to a title-cased version of the key if no translation is found.
      * @param {object} entity - The entity configuration object.
      * @param {string} key - The property key (column name) to get the label for.
@@ -466,6 +508,7 @@ class GraphQLClientApp {
     }
     /**
      * Gets the user's preferred languages from the browser's navigator settings.
+     * @private
      * @returns {string[]} An array of language codes, sorted by preference.
      */
     getPreferredLanguages() {
@@ -480,6 +523,7 @@ class GraphQLClientApp {
 
     /**
      * Builds the main navigation menu based on the entities defined in the configuration.
+     * Each menu item links to the list view of an entity.
      * @returns {void}
      */
     buildMenu() {
@@ -502,6 +546,7 @@ class GraphQLClientApp {
 
     /**
      * Sends a GraphQL query to the API endpoint.
+     * It handles loading indicators, authorization errors, and GraphQL-specific errors.
      * @param {string} query - The GraphQL query string.
      * @param {object} [variables={}] - The variables for the query.
      * @returns {Promise<object>} The data from the GraphQL response.
@@ -547,6 +592,7 @@ class GraphQLClientApp {
 
     /**
      * Navigates to the list view of a specific entity and updates the URL.
+     * This method updates the browser history.
      * @param {string} entityName - The name of the entity to navigate to.
      * @param {object} [params={}] - URL parameters like page and limit.
      * @returns {void}
@@ -572,6 +618,7 @@ class GraphQLClientApp {
 
     /**
      * Navigates to the detail view of a specific item and updates the URL.
+     * This method updates the browser history.
      * @param {string} entityName - The name of the entity.
      * @param {string|number} id - The ID of the item to display.
      * @returns {void}
@@ -585,6 +632,7 @@ class GraphQLClientApp {
     /**
      * Handles routing based on the URL hash. It parses the entity, view type, and parameters
      * from the hash and calls the appropriate render method.
+     * This is the central point for client-side routing.
      * @returns {Promise<void>} Resolves when the view rendering completes.
      */
     async handleRouteChange() {
@@ -645,6 +693,7 @@ class GraphQLClientApp {
 
     /**
      * Renders the default dashboard/welcome view.
+     * This is shown when no entity is selected.
      * @returns {void}
      */
     renderDashboardView() {
@@ -662,6 +711,7 @@ class GraphQLClientApp {
 
     /**
      * Renders the static parts of the list view, such as the title and filter controls.
+     * The dynamic table data is rendered separately by `updateTableView`.
      * @returns {Promise<void>} Resolves when the filters have been rendered.
      */
     async renderListView() {
@@ -673,7 +723,7 @@ class GraphQLClientApp {
     /**
      * Fetches data based on the current state (filters, pagination) and updates
      * the table and pagination sections of the view.
-     * @returns {Promise<void>}
+     * @returns {Promise<void>} Resolves when the view is updated.
      */
     async updateTableView() {
         const fields = this.getFieldsForQuery(this.currentEntity, 1); // depth 1
@@ -731,6 +781,7 @@ class GraphQLClientApp {
 
     /**
      * Renders the HTML table with data for the current entity.
+     * It also attaches event listeners for action buttons and sortable headers.
      * @param {Array<object>} items - The array of items to display in the table.
      * @returns {void}
      */
@@ -812,6 +863,7 @@ class GraphQLClientApp {
     /**
      * Renders filter controls and the "Add New" button based on the current entity's configuration.
      * Attaches event listeners for the search button and for the 'Enter' key on filter inputs.
+     * For select filters, it pre-fetches data for the dropdown options.
      * @returns {Promise<void>}
      */
     async renderFilters() {
@@ -880,6 +932,7 @@ class GraphQLClientApp {
 
     /**
      * Clears the content of the main view containers (filter, table, pagination).
+     * This is used before rendering a new view.
      * @returns {void}
      */
     clearListView() {
@@ -890,6 +943,7 @@ class GraphQLClientApp {
 
     /**
      * Handles the search action. It collects filter values, updates the application state, and refreshes the data view.
+     * It resets the page to 1 for the new search.
      * @returns {void}
      */
     handleSearch() {
@@ -907,6 +961,7 @@ class GraphQLClientApp {
 
     /**
      * Handles the filter reset action. It clears all filters and sorting, then navigates to the clean list view.
+     * It resets the page to 1.
      * @returns {void}
      */
     handleResetFilters() {
@@ -924,6 +979,7 @@ class GraphQLClientApp {
 
     /**
      * Handles the sort action when a table header is clicked.
+     * It toggles the sort direction or sets a new sort field.
      * @param {string} field - The field name to sort by.
      */
     handleSort(field) {
@@ -946,6 +1002,7 @@ class GraphQLClientApp {
 
     /**
      * Renders the action buttons (e.g., View, Edit, Delete) for a table row.
+     * It includes a toggle active button if the entity supports it.
      * @param {object} item - The data item for the row.
      * @returns {string} The HTML string for the action buttons cell.
      */
@@ -968,6 +1025,7 @@ class GraphQLClientApp {
 
     /**
      * Renders the pagination controls based on the query result.
+     * It includes page information and previous/next buttons.
      * @param {object} result - The pagination data from the GraphQL response.
      * @returns {void}
      */
@@ -1020,6 +1078,7 @@ class GraphQLClientApp {
 
     /**
      * Updates the URL in the browser's address bar to reflect the current application state (page, filters).
+     * This method updates the browser history.
      * @returns {void}
      */
     updateUrlForState() {
@@ -1037,6 +1096,7 @@ class GraphQLClientApp {
 
     /**
      * Fetches and renders the detail view for a single item.
+     * It can be overridden by a custom renderer hook.
      * @param {string|number} id - The ID of the item to display.
      * @returns {Promise<void>} Resolves when the detail view has been rendered.
      */
@@ -1101,6 +1161,7 @@ class GraphQLClientApp {
 
     /**
      * Renders the add/edit form inside a modal. If an ID is provided, it fetches the item's data to pre-fill the form.
+     * It can be overridden by a custom renderer hook.
      * @param {string|number|null} [id=null] - The ID of the item to edit. If null, an "add new" form is rendered.
      * @returns {Promise<void>} Resolves when the form is rendered and event handlers attached.
      */
@@ -1189,6 +1250,7 @@ class GraphQLClientApp {
 
     /**
      * Handles the save (create or update) operation when the form is submitted.
+     * It constructs and sends the appropriate GraphQL mutation.
      * @param {string|number|null} id - The ID of the item being edited, or null if creating a new item.
      * @returns {Promise<void>} Resolves when the save operation completes (or throws on error).
      */
@@ -1244,7 +1306,6 @@ class GraphQLClientApp {
                     }
                 }
             }
-
         }
 
         const methodName = this.ucFirst(this.currentEntity.name);
@@ -1295,6 +1356,7 @@ class GraphQLClientApp {
 
     /**
      * Handles the deletion of an item after user confirmation.
+     * It shows a confirmation dialog before proceeding.
      * @param {string|number} id - The ID of the item to delete.
      * @returns {Promise<void>} Resolves when deletion completes.
      */
@@ -1359,6 +1421,7 @@ class GraphQLClientApp {
 
     /**
      * Displays a custom confirmation modal and returns a promise that resolves with the user's choice.
+     * This provides a consistent confirmation experience across the app.
      * @param {object} options - The options for the confirmation modal.
      * @param {string} [options.title] - The title of the modal.
      * @param {string} [options.message='Are you sure?'] - The message to display.
@@ -1404,10 +1467,16 @@ class GraphQLClientApp {
         });
     }
 
+    /**
+     * Opens the confirmation modal.
+     */
     openConfirmModal() {
         const confirmModal = document.getElementById('customConfirmModal');
         confirmModal.classList.add('show');
     }
+    /**
+     * Closes the confirmation modal.
+     */
     closeConfirmModal() {
         const confirmModal = document.getElementById('customConfirmModal');
         confirmModal.classList.remove('show');
@@ -1415,6 +1484,7 @@ class GraphQLClientApp {
 
     /**
      * Displays a custom alert/info modal.
+     * This is a simple way to show information to the user.
      * @param {object} options - The options for the alert modal.
      * @param {string} [options.title='Info'] - The translation key for the modal title.
      * @param {string} [options.message] - The message to display.
@@ -1444,12 +1514,16 @@ class GraphQLClientApp {
         });
     }
 
+    /**
+     * Opens the info modal.
+     */
     openInfoModal() {
         this.dom.infoModal.classList.add('show');
     }
 
     /**
      * Handles the login form submission.
+     * On success, it reloads the page to establish a new session.
      * @param {Event} event - The form submission event.
      * @returns {Promise<void>} Resolves after handling the login response.
      */
@@ -1490,6 +1564,7 @@ class GraphQLClientApp {
 
     /**
      * Handles the logout process.
+     * On success, it hides the main application and shows the login modal.
      * @param {Event} event - The click event from the logout button.
      * @returns {Promise<void>} Resolves after logout processing completes.
      */
@@ -1523,6 +1598,7 @@ class GraphQLClientApp {
 
     /**
      * Converts a snake_case string to camelCase.
+     * @private
      * @param {string} str - The string to convert.
      * @returns {string} The camelCased string.
      */
@@ -1531,6 +1607,7 @@ class GraphQLClientApp {
     }
     /**
      * Converts a camelCase string to snake_case.
+     * @private
      * @param {string} str - The string to convert.
      * @returns {string} The snake_cased string.
      */
@@ -1539,6 +1616,7 @@ class GraphQLClientApp {
     }
     /**
      * Converts a string to Title Case.
+     * @private
      * @param {string} str - The string to convert.
      * @returns {string} The Title Cased string.
      */
@@ -1547,6 +1625,7 @@ class GraphQLClientApp {
     }
     /**
      * Converts a snake_case string to Title Case.
+     * @private
      * @param {string} str - The string to convert.
      * @returns {string} The Title Cased string.
      */
@@ -1555,6 +1634,7 @@ class GraphQLClientApp {
     }
     /**
      * Converts a camelCase string to Title Case.
+     * @private
      * @param {string} str - The string to convert.
      * @returns {string} The Title Cased string.
      */
@@ -1564,6 +1644,7 @@ class GraphQLClientApp {
 
     /**
      * Capitalizes the first letter of a string.
+     * @private
      * @param {string} str - The string to process.
      * @returns {string} The string with the first letter capitalized.
      */
@@ -1573,6 +1654,7 @@ class GraphQLClientApp {
 
     /**
      * Recursively builds the fields string for a GraphQL query based on entity relationships.
+     * @private
      * @param {object} entity - The entity configuration object.
      * @param {number} [depth=1] - The maximum depth for traversing relationships.
      * @param {boolean} [noRelations=false] - If true, only includes scalar fields.
@@ -1605,6 +1687,7 @@ class GraphQLClientApp {
 
     /**
      * Fetches all items for a given entity, typically for populating select dropdowns.
+     * @private
      * @param {object} entity - The entity configuration object.
      * @param {object} [options={}] - Options for fetching data.
      * @param {boolean} [options.activeOnly=true] - If true, fetches only active items.
@@ -1638,30 +1721,34 @@ class GraphQLClientApp {
 
     /**
      * Opens the main form modal.
+     * @private
      * @returns {void}
      */
     openModal() { this.dom.modal.style.display = 'block'; }
     /**
      * Closes the main form modal and clears its content.
+     * @private
      * @returns {void}
      */
     closeModal() { this.dom.modal.style.display = 'none'; this.dom.form.innerHTML = ''; }
 
     /**
      * Opens the login modal.
+     * @private
      * @returns {void}
      */
     openLoginModal() { this.dom.loginModal.style.display = 'block'; }
     /**
      * Closes the login modal and resets the form.
+     * @private
      * @returns {void}
      */
     closeLoginModal() { this.dom.loginModal.style.display = 'none'; this.dom.loginForm.reset(); document.getElementById('login-error').textContent = ''; }
 }
 
 /**
- * Generates a human-readable label from a snake_case key.
- * e.g., 'confirm_delete' becomes 'Confirm Delete'.
+ * Generates a human-readable label from a snake_case or camelCase key.
+ * This is a fallback for when a translation is not available.
  * @param {string} key - The key to convert.
  * @returns {string} The generated label.
  */
