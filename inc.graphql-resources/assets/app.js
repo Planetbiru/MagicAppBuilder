@@ -675,12 +675,28 @@ class GraphQLClientApp {
             orderBy.field = params.get('orderBy');
             orderBy.direction = params.get('orderDir') || 'ASC';
         }
+
+        // Handle limit parameter correctly, allowing for a value of 0 to be processed.
+        const limitParam = params.get('limit');
+        const newLimit = limitParam !== null ? parseInt(limitParam, 10) : (this.state.limit || 10);
+
         this.state = {
             page: parseInt(params.get('page')) || 1,
-            limit: parseInt(params.get('limit')) || 10,
+            limit: newLimit,
             filters: filters,
             orderBy: orderBy,
         };
+
+        // Enforce min/max page size from config
+        if (this.config && this.config.pagination) {
+            const { minPageSize, maxPageSize } = this.config.pagination;
+            if (minPageSize && this.state.limit < minPageSize) {
+                this.state.limit = minPageSize;
+            }
+            if (maxPageSize && this.state.limit > maxPageSize) {
+                this.state.limit = maxPageSize;
+            }
+        }
 
         document.querySelectorAll('#entity-menu a').forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${entityName}`));
 

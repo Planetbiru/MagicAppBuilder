@@ -872,15 +872,16 @@ class GraphQLGenerator
                 'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : []
             );
         }
-        /*
-        "booleanDisplay": {
-        "trueLabelKey": "yes",
-        "falseLabelKey": "no"
-        },*/
+        
         return json_encode([
             'booleanDisplay' => array(
                 'trueLabelKey' => 'yes',
                 'falseLabelKey' => 'no'
+            ),
+            'pagination' => array (
+                'pageSize' => 20,
+                'maxPageSize' => 100,
+                'minPageSize' => 1
             ),
             'entities' => $frontendConfig
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
