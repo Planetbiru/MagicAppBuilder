@@ -872,7 +872,19 @@ class GraphQLGenerator
                 'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : []
             );
         }
-        return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        
+        return json_encode([
+            'booleanDisplay' => array(
+                'trueLabelKey' => 'yes',
+                'falseLabelKey' => 'no'
+            ),
+            'pagination' => array (
+                'pageSize' => 20,
+                'maxPageSize' => 100,
+                'minPageSize' => 1
+            ),
+            'entities' => $frontendConfig
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
     public function generateFrontendLanguageJson()
     {
