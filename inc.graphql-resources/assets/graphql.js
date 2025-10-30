@@ -5,9 +5,22 @@
 class GraphQLClientApp {
     /**
      * Initializes the GraphQL client application.
-     * @param {object} [options={}] - Configuration options for the application.
+     * Sets up default configuration, merges with user-provided options,
+     * initializes state, caches DOM elements, and starts the application initialization process.
+     *
+     * @param {object} [options={}] - Configuration options to override the defaults.
+     * @param {string} [options.configUrl='frontend-config.php'] - URL to fetch the main application configuration.
+     * @param {string} [options.apiUrl='graphql.php'] - URL of the GraphQL API endpoint.
+     * @param {string} [options.loginUrl='login.php'] - URL for handling user login.
+     * @param {string} [options.logoutUrl='logout.php'] - URL for handling user logout.
+     * @param {string} [options.entityLanguageUrl='entity-language.php'] - URL to fetch entity-specific language packs.
+     * @param {string} [options.i18nUrl='language.php'] - URL to fetch UI language packs.
+     * @param {string} [options.languageConfigUrl='available-language.php'] - URL to fetch available languages configuration.
      * @param {object} [options.customRenderers] - Custom renderer hooks for entities (e.g., for list, detail, form views).
      * @param {string} [options.defaultActiveField='active'] - Default field name for the 'active' status column.
+     * @param {string} [options.defaultDisplayField='name'] - Default field name to use for display in relationships if not specified.
+     * @param {?string} [options.languageId=null] - The initial language ID. If null, it will be auto-detected.
+     * @param {string} [options.defaultLanguage='en'] - The fallback language if auto-detection fails.
      */
     constructor(options = {}) {
         const defaults = {
@@ -1785,4 +1798,3 @@ class GraphQLClientApp {
 GraphQLClientApp.prototype._generateLabelFromKey = function (key) {
     return key.replace(/_/g, ' ').replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase());
 };
-
