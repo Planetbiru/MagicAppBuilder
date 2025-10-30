@@ -1237,7 +1237,9 @@ class GraphQLClientApp {
             if (this.dom.form.querySelector(`[name="${colName}"]`).type === 'checkbox') {
                 let value = this.dom.form.querySelector(`[name="${colName}"]`).checked;
                 if (!value) {
-                    if (!col.type.includes('boolean')) {
+                    if (col.type.includes('boolean')) {
+                        input[colName] = false;
+                    } else {
                         input[colName] = 0;
                     }
                 }
