@@ -446,20 +446,28 @@ textarea {
     display: block;
     width: 480px;
     max-width: calc(100vh - 40px);
-    margin: 80px auto 0 auto;
+    margin: 20px auto 0 auto;
 }
 
 .modal-md .modal-content {
     display: block;
     width: 500px;
     max-width: calc(100vw - 40px);
-    margin: 80px auto 0 auto;
+    margin: 20px auto 0 auto;
 }
 
 .modal-lg .modal-content {
     display: block;
     width: 800px;
     max-width: calc(100vw - 40px);
+    margin: 20px auto 0 auto;
+}
+
+.modal-top-40 .modal-content {
+    margin: 40px auto 0 auto;
+}
+
+.modal-top-80 .modal-content {
     margin: 80px auto 0 auto;
 }
 
@@ -737,6 +745,7 @@ a.all-table {
     color: #495057;
     background-clip: padding-box;
     border: 1px solid #ced4da;
+    background-color: #FFFFFF;
     border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }

@@ -24,8 +24,23 @@ require_once __DIR__ . "/session.php";
 $appModule = new AppModuleImpl(null, $database);
 $appUserRole = new AppAdminRoleImpl(null, $database);
 $currentUser = new AppAdminImpl(null, $database);
+$currentAction = new SetterGetter();
 
 $languageId = 'en';
+if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    $currentAction->setRequestViaAjax(true);
+} 
+else
+{
+    $currentAction->setRequestViaAjax(false);
+}
+if (!empty($_SERVER['HTTP_ACCEPT'])) {
+    $currentAction->setAccept($_SERVER['HTTP_ACCEPT']);
+} 
+else
+{
+    $currentAction->setAccept('*');
+}
 
 AppIncludeImpl::updateAssetsPath($appConfig, dirname(realpath($_SERVER['DOCUMENT_ROOT'] . $_SERVER['PHP_SELF'])));
 
@@ -53,8 +68,17 @@ else
         $appSessionPassword = $sessions->userPassword;
         if(empty($appSessionUsername) || empty($appSessionPassword))
         {
-            require_once __DIR__ . "/login-form.php";
-            exit();
+            if(stripos($currentAction->getAccept(), 'application/json') !== false)
+            {
+                header('HTTP/1.1 401 Unauthorized', true, 401);
+                echo json_encode(['errors' => [['message' => 'Authentication required.']]]);
+                exit();
+            }
+            else
+            {
+                require_once __DIR__ . "/login-form.php";
+                exit();
+            }
         }
         else
         {
@@ -73,11 +97,20 @@ else
     }
     catch(Exception $e)
     {
-        require_once __DIR__ . "/login-form.php";
-        exit();
+        if(stripos($currentAction->getAccept(), 'application/json') !== false)
+        {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            echo json_encode(['errors' => [['message' => 'Authentication required.']]]);
+            exit();
+        }
+        else
+        {
+            require_once __DIR__ . "/login-form.php";
+            exit();
+        }
     }
 }
-$currentAction = new SetterGetter();
+
 $currentAction->setTime(date('Y-m-d H:i:s'));
 $currentAction->setIp($_SERVER['REMOTE_ADDR']);
 $currentAction->setUserId($currentUser->getAdminId());

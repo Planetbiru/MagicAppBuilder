@@ -92,6 +92,11 @@
 - **Seamless data exploration**: Highly optimized AJAX handling for filtering and pagination delivers near-instantaneous results, ensuring a smooth user experience even with large datasets.
 
 #### **Developer Tools & Extensibility**
+- **Automatic GraphQL API Generation**: A powerful tool that automatically creates a complete, production-ready GraphQL API layer directly from your database entity schema.
+  - **Full CRUD Operations**: Automatically generates queries and mutations.
+  - **Advanced Querying**: Built-in support for filtering, sorting, and pagination.
+  - **Automatic Relationship Handling** and **Soft-Delete Support**.
+  - **Generates API documentation** (`MANUAL.md`) and a ready-to-use endpoint.
 - **Built-in application updater** for seamless upgrades.
 - **Dockerfile included** for containerized deployment.
 - **Open application and project directories** directly in Visual Studio Code.

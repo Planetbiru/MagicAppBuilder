@@ -2404,6 +2404,403 @@ class EntityEditor {
     }
 
     /**
+     * Checks or unchecks all entity selectors of a specific type (custom or system).
+     * This function is typically triggered by a "check all" checkbox for a group of entities.
+     * It reads the `data-entity-type` attribute from the triggering element to determine
+     * whether to affect 'custom' or 'system' entities.
+     *
+     * @param {HTMLElement} element The checkbox element that triggered the event.
+     * It should have a `data-entity-type` attribute set to either 'custom' or 'system'.
+     */
+    checkEntityTypes(element)
+    {
+        if(element.dataset.entityType == 'custom')
+        {
+            document.querySelectorAll('.entity-selector-table-container.custom-entity .entity-selector').forEach(checkbox => {
+                checkbox.checked = element.checked;
+            });
+        } else if(element.dataset.entityType == 'system')
+        {
+            document.querySelectorAll('.entity-selector-table-container.system-entity .entity-selector').forEach(checkbox => {
+                checkbox.checked = element.checked;
+            });
+        }
+    }
+
+    /**
+     * Gathers all entities and their selected columns from the UI, typically from a modal
+     * for schema generation. It clones the selected entities and filters their columns
+     * based on user selection.
+     *
+     * This method performs the following steps:
+     * 1. Finds all entity selector checkboxes (`.entity-selector`) that are checked.
+     * 2. For each selected entity, it clones the original entity object.
+     * 3. It then filters the columns of the cloned entity based on which column checkboxes
+     *    are selected within that entity's specific table in the UI.
+     * 4. The `data` property of the cloned entity is cleared to reduce payload size.
+     * 5. Returns a structured object `{ entities: [...] }` containing the selected and
+     *    filtered entities, ready to be sent to the server.
+     *
+     * @returns {Object} An object containing an array of the selected and cloned entities.
+     *                   For example: `{ entities: [Entity, Entity, ...] }`.
+     */
+    getSelectedEntities() {
+        let _this = this;
+        let selectedModel = {entities: []};
+        let entities = this.entities;
+        
+        const checkboxesBody = document.querySelectorAll('input[type="checkbox"].entity-selector');
+        if(checkboxesBody.length)
+        {
+            let selected = [];
+            checkboxesBody.forEach(input => {
+                if(input.checked)
+                {
+                    selected.push(input.value);
+                }
+            });
+            
+            if(entities)
+            {
+                entities.forEach(entity => {
+                    if(selected.includes(entity.name))
+                    {
+                        let entitySelector = document.querySelector(`table[data-entity="${entity.name}"]`);
+                        let newEntity = this.cloneEntity(entity, entitySelector);
+                        newEntity.data = []; // clear data to reduce payload
+
+                        // Add filters
+                        let filters = [];
+                        newEntity.columns.forEach(col => {
+                            let filterVal = entitySelector.querySelector(`select.filter-graphql[data-col="${col.name}"]`).value;
+                            if(filterVal != '')
+                            {
+                                // { "name": "nama", "type": "string", "operator": "CONTAINS", "element": "text" }
+                                filters.push({
+                                    "name": col.name,
+                                    "type": 'string',
+                                    "operator": filterVal.indexOf('CONTAINS') !== -1 ? 'CONTAINS' : 'EQUALS',
+                                    "element": filterVal.indexOf('select') !== -1 ? 'select' : 'text'
+                                })
+                            }
+                        });
+
+                        if(filters.length > 0)
+                        {
+                            newEntity.filters = filters;
+                        }
+
+                        selectedModel.entities.push(newEntity); 
+                    }
+                });
+            }
+        }
+        return selectedModel;
+    }
+
+    /**
+     * Creates a deep clone of an entity object and optionally filters its columns.
+     * If a tableElement is provided, it filters the columns of the cloned entity
+     * to include only those selected via checkboxes within that table.
+     *
+     * @param {Object} entity The entity object to clone.
+     * @param {HTMLElement} tableElement The HTML table element containing column selection checkboxes.
+     * @returns {Object} A new, cloned entity object, potentially with a subset of its original columns.
+     */
+    cloneEntity(entity, tableElement) {
+        let cloned = JSON.parse(JSON.stringify(entity));
+        if(tableElement)
+        {
+            let checkboxes = tableElement.querySelectorAll('input.check-column');
+            if(checkboxes?.length)
+            {
+                let selectedColumns = [];
+                checkboxes.forEach(checkbox => {
+                    if(checkbox.checked)
+                    {
+                        selectedColumns.push(checkbox.value);
+                    }
+                });
+
+                if(selectedColumns.length)
+                {
+                    cloned.columns = cloned.columns.filter(col => selectedColumns.includes(col.name));
+                }
+            }
+        }
+        return cloned;
+    }
+
+    /**
+     * Sends the selected entity model to a server-side script to generate a GraphQL schema.
+     * It then initiates a download of the server's response, which is expected to be a file (e.g., a zip archive).
+     * @param {Object} request An object containing the entities to be included in the GraphQL schema.
+     */
+    exportGraphQLSchema(request) {
+        // send to server for processing
+        fetch('../lib.ajax/graphql-generator.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            // Create a link to download the file
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'graphql.zip';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('Error generating GraphQL schema:', error);
+        });
+    }
+
+    /**
+     * Handles the confirmation action in the GraphQL generator modal.
+     * This method is triggered when the user clicks the "Generate GraphQL" button.
+     * It gathers the selected entities and columns from the UI and initiates the
+     * GraphQL schema export process for the backend API only.
+     * @returns {void}
+     */
+    handleOkGenerate() {
+        let data = {
+            "schema": this.getSelectedEntities(),
+            "reservedColumns": reservedColumns,
+            "withFrontend": false,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+        };
+        this.exportGraphQLSchema(data);
+    }
+
+    /**
+     * Handles the confirmation action in the GraphQL generator modal.
+     * This method is triggered when the user clicks the "Generate GraphQL with Frontend" button.
+     * It gathers the selected entities and columns, sets a flag to include the frontend,
+     * and then initiates the GraphQL schema and frontend application export process.
+     * @returns {void}
+     */
+    handleOkGenerateWithFrontend() {
+        let data = {
+            "schema": this.getSelectedEntities(),
+            "reservedColumns": reservedColumns,
+            "withFrontend": true,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+        };
+        this.exportGraphQLSchema(data);
+    }
+
+    /**
+     * Handles the cancellation action in the GraphQL generator modal.
+     * This method is triggered when the user clicks the "Cancel" button. It hides
+     * the modal dialog without performing any generation or export operations.
+     * @returns {void}
+     */
+    handleCancelGenerate() {
+        document.querySelector('#graphqlGeneratorModal').style.display = 'none';
+    }
+
+    /**
+     * Displays a modal dialog that allows the user to select entities and their specific columns
+     * for GraphQL schema generation. It sets up the UI and event handlers for the generation process.
+     */
+    showEntitySelector()
+    {
+        let title = 'GraphQL Generator';
+        let _this = this;
+
+        let wrapper = document.querySelector('.entity-selector-container');
+        wrapper.innerHTML = ''; // Clear existing content
+
+        // Get modal and buttons
+        const modal = document.querySelector('#graphqlGeneratorModal');
+
+        modal.querySelector('.modal-header h3').innerHTML = title;
+
+        this.createEntitySelectorTables(wrapper);
+
+        // Show the modal
+        modal.style.display = 'block';
+
+
+    }
+
+    /**
+     * Populates a container with tables for each entity, allowing column-level selection.
+     * @param {HTMLElement} wrapper The container element to which the entity selector tables will be appended.
+     */
+    createEntitySelectorTables(wrapper) {
+        let displayField = 'name';
+        if(reservedColumns && reservedColumns.columns)
+        {
+            reservedColumns.columns.forEach(col => {
+                if(col.key == 'name')
+                {
+                    displayField = col.name;
+                }
+            });
+        }
+        // Custom entities
+        this.entities.forEach(entity => {
+            if(!this.systemEntities.includes(entity.name))
+            {
+                this.createEntitySelectorTable(entity, wrapper, true, displayField);
+            }
+        });
+
+        // System entities
+        this.entities.forEach(entity => {
+            if(this.systemEntities.includes(entity.name))
+            {
+                this.createEntitySelectorTable(entity, wrapper, false, displayField);
+            }
+        });
+    }
+
+    /**
+     * Checks or unchecks all column checkboxes within the same table.
+     * This function is triggered by a "check all" checkbox and synchronizes the state
+     * of all checkboxes with the class `.check-column` within the same `<table>`.
+     *
+     * @param {HTMLElement} element - The "check all" checkbox element that was clicked.
+     * @returns {void}
+     */
+    checkAllColumns(element)
+    {
+        let table = element.closest('table');
+        if(table)
+        {
+            let checkboxes = table.querySelectorAll('input.check-column');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = element.checked;
+            });
+        }
+    }
+
+    /**
+     * Creates and appends a single table for an entity to the provided wrapper element.
+     * This table lists all columns of the entity, each with a checkbox, allowing for
+     * fine-grained selection of columns to be included in an operation (e.g., GraphQL schema generation).
+     * It also distinguishes between system and custom entities by adding appropriate CSS classes.
+     *
+     * @param {Object} entity The entity object for which to create the selection table.
+     * @param {HTMLElement} wrapper The container element where the table will be appended.
+     * @param {boolean} checked The default checked state for the entity's main checkbox.
+     */
+    createEntitySelectorTable(entity, wrapper, checked, displayField) {
+        let container = document.createElement("div");
+        container.classList.add("mb-4");
+        container.classList.add("entity-selector-table-container");
+        
+        if(this.systemEntities.includes(entity.name))
+        {
+            container.classList.add("system-entity");
+        }
+        else
+        {
+            container.classList.add("custom-entity");
+        }
+        
+        let entitySelector = document.createElement("input");
+        entitySelector.type = "checkbox";
+        entitySelector.className = "entity-selector";
+        entitySelector.value = entity.name;
+        entitySelector.checked = checked;
+
+        let tdTitle = document.createElement("td");
+        tdTitle.appendChild(entitySelector);
+        tdTitle.appendChild(document.createTextNode(" "));
+        tdTitle.appendChild(document.createTextNode(entity.name));
+        
+        let tb = document.createElement("table");
+        tb.classList.add('entity-selector-table');
+        let tr = document.createElement("tr");
+        tr.appendChild(tdTitle);
+        tb.appendChild(tr);
+        container.appendChild(tb);
+
+        let table = document.createElement("table");
+        table.className = "table table-bordered table-striped table-sm";
+        table.dataset.entity = entity.name;
+
+        // Tambahkan styling khusus
+        table.style.width = "100%";
+        table.style.tableLayout = "fixed"; // supaya persen terpakai rata
+
+        let thead = document.createElement("thead");
+        thead.innerHTML = `
+            <tr>
+                <th style="width: 30px;"><input type="checkbox" class="check-all" onchange="editor.checkAllColumns(this)" checked></th>
+                <th style="width: 24%;">Column</th>
+                <th style="width: 20%;">Type</th>
+                <th style="width: 10%;">PK</th>
+                <th style="width: 10%;">Serial</th>
+                <th style="width: 14%;">Nullable</th>
+                <th style="">Filter</th>
+            </tr>
+        `;
+
+        table.appendChild(thead);
+
+        let tbody = document.createElement("tbody");
+        entity.columns.forEach(col => {
+            let tr = document.createElement("tr");
+
+            // gabungkan type + length jika ada
+            let typeDisplay = col.type || "";
+            if (col.length != null && col.length !== "") {
+                typeDisplay += `(${col.length})`;
+            }
+
+            tr.innerHTML = `
+                <td><input type="checkbox" class="check-column" value="${col.name || ''}" checked></td>
+                <td>${col.name || ""}</td>
+                <td>${typeDisplay}</td>
+                <td style="text-align: center;">${col.primaryKey ? "YES" : "NO"}</td>
+                <td style="text-align: center;">${col.autoIncrement ? "YES" : "NO"}</td>
+                <td style="text-align: center;">${col.nullable ? "YES" : "NO"}</td>
+                <td>${this.getFilterType(col, displayField)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+
+        container.appendChild(table);
+        wrapper.appendChild(container);
+    }
+
+    getFilterType(col, displayField)
+    {
+        let value = "";
+        if(col.primaryKey)
+        {
+            // Do not add filter for primaty key
+        }
+        else if(col.name == displayField)
+        {
+            value = "text-CONTAINS";
+        }
+        else if(col.name.endsWith('_id'))
+        {
+            value = "select-EQUALS";
+        }
+        let filter = `<select class="form-control filter-graphql" data-col="${col.name}">
+        <option value="">Not Applicable</option>
+        <option value="text-CONTAINS"${value == "text-CONTAINS" ? " selected" : ""}>Text Contains</option>
+        <option value="text-EQUALS"${value == "text-EQUALS" ? " selected" : ""}>Text Equals</option>
+        <option value="select-EQUALS"${value == "select-EQUALS" ? " selected" : ""}>Select Equals</option>
+        </select>`;
+        return filter;
+    }
+
+    /**
      * Copy the SQL CREATE TABLE statement of the selected entity to clipboard.
      * @param {MouseEvent} e - The mouse event that triggered the copy action.
      */

@@ -6,6 +6,7 @@ let converter = null;
 let editor;
 let entityRenderer;
 let diagramRenderer = {};
+let reservedColumns = {};
 let resizablePanels;
 
 let scrollElement = null;
@@ -515,7 +516,9 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             callbackLoadTemplate: function(){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                fetchTemplateFromServer(applicationId, databaseType, databaseName, databaseSchema);         
+                fetchTemplateFromServer(applicationId, databaseType, databaseName, databaseSchema, null, function(data){
+                    reservedColumns = data;
+                });         
             }, 
             callbackSaveTemplate: function (template){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
@@ -1540,6 +1543,10 @@ function fetchTemplateFromServer(applicationId, databaseType, databaseName, data
                     try {
                         const parsedData = JSON.parse(response);  // Try to parse the JSON response
                         editor.template = editor.createTemplateFromJSON(parsedData); // Insert the received data into editor.entities
+                        if(typeof callback == 'function')
+                        {
+                            callback(parsedData);
+                        }
                     } catch (err) {
                         console.error(err)
                     }

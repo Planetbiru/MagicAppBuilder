@@ -35,7 +35,7 @@ class AppBuilder extends AppBuilderBase
     public function createInsertSection($mainEntity, $appFields, $callbackSuccess = null, $callbackFailed = null)
     {
         $entityName = $mainEntity->getEntityName();
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $primaryKeyName = $mainEntity->getPrimaryKey();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
         $lines = array();
@@ -150,7 +150,7 @@ class AppBuilder extends AppBuilderBase
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName = $mainEntity->getPrimaryKey();
         $upperPrimaryKeyName = PicoStringUtil::upperCamelize($primaryKeyName);
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         $updatePk = false;
         $lines = array();
         
@@ -289,7 +289,7 @@ class AppBuilder extends AppBuilderBase
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName =  $mainEntity->getPrimaryKey();
 
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         
         $upperAdminDelete = PicoStringUtil::upperCamelize($this->entityInfo->getAdminDelete());
         $upperTimeDelete = PicoStringUtil::upperCamelize($this->entityInfo->getTimeDelete());
@@ -396,7 +396,7 @@ class AppBuilder extends AppBuilderBase
         $entityName = $mainEntity->getEntityName();
         $primaryKeyName =  $mainEntity->getPrimaryKey();
 
-        $objectName = lcfirst($entityName);
+        $objectName = $this->createObjectName($entityName);
         
         $upperAdminEdit = PicoStringUtil::upperCamelize($this->entityInfo->getAdminEdit());
         $upperTimeEdit = PicoStringUtil::upperCamelize($this->entityInfo->getTimeEdit());

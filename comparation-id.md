@@ -29,26 +29,27 @@ Berikut adalah perbandingan MagicAppBuilder dengan _platform low-code_ terkemuka
 
 -   **Bekerja Offline & Tanpa Ketergantungan AI:** Berbeda dengan banyak platform modern yang bergantung pada layanan _cloud_ atau AI untuk pembuatan kode, MagicAppBuilder dirancang untuk bekerja **100% offline**. Aplikasi ini dapat dijalankan di satu PC tanpa koneksi internet sama sekali, memastikan privasi data dan kontrol penuh atas lingkungan pengembangan. Hal ini membuatnya ideal untuk mengembangkan aplikasi sensitif atau untuk digunakan di lingkungan dengan akses internet terbatas atau tanpa akses sama sekali.
 
+-   **Pembuatan API GraphQL Otomatis:** MagicAppBuilder menyertakan generator canggih yang secara otomatis membuat lapisan API GraphQL yang lengkap dan siap produksi langsung dari skema entitas database Anda. Ini termasuk pembuatan _types_, _queries_ (dengan pemfilteran, pengurutan, dan paginasi), _mutations_ (buat, perbarui, hapus), dan bahkan manual API yang komprehensif dalam format Markdown. Fitur ini secara drastis mengurangi waktu dan upaya yang diperlukan untuk membangun dan mendokumentasikan API modern.
+
 -   **Peralatan Pengembang dan Manajemen Data Tingkat Lanjut:** MagicAppBuilder menyediakan beberapa fitur yang bertujuan untuk meningkatkan produktivitas pengembang dan integritas data.
     -   **Peningkatan Editor Entitas:** Fitur seperti **filter entitas** untuk navigasi yang lebih mudah dan **saran pelengkapan otomatis** untuk _foreign key_ menyederhanakan proses pemodelan dan entri data.
     -   **Manajemen Siklus Hidup Aplikasi:** Alat untuk **memeriksa, membangun ulang, dan membuat ulang aplikasi** memberikan jaring pengaman bagi pengembang, memastikan integritas aplikasi dan menawarkan opsi pemulihan yang kuat jika konfigurasi hilang atau rusak.
 
 ----------
-
-**Perbandingan dengan _Platform Low-Code_ Terkemuka (misalnya, OutSystems, Mendix, Appian, Microsoft Power Apps):**
-
--   **Lingkup vs. Kedalaman:**
-    
-    -   _**Platform Terkemuka (OutSystems, Mendix, Appian, Power Apps):**_ Ini seringkali merupakan _platform_ kelas perusahaan yang menawarkan cakupan kemampuan yang sangat luas, termasuk integrasi AI canggih, otomatisasi proses kompleks, integrasi ekosistem yang luas, _pipeline DevOps_ yang canggih, dan dukungan untuk aplikasi khusus yang sangat kompleks. Mereka melayani berbagai kasus penggunaan di luar manajemen data (misalnya, keterlibatan pelanggan, modernisasi _legacy_, aplikasi seluler canggih, integrasi IoT). Model harga mereka biasanya pada tingkat perusahaan.
-    -   **MagicAppBuilder:** Meskipun juga berfokus pada perusahaan, deskripsinya menunjukkan kekuatan khusus dalam menghasilkan dan mengelola volume tinggi **modul yang konsisten dan kaya fitur** terutama yang berpusat pada operasi CRUD dan alur kerja persetujuan. Mungkin tidak terlalu fokus pada logika bisnis yang sangat _niche_, kompleks, atau berbasis AI dibandingkan dengan _platform_ yang lebih luas, tetapi unggul dalam domain spesifiknya yaitu pembuatan modul standar bervolume tinggi.
--   **Target Pengguna:**
-    
-    -   _Platform_ terkemuka sering menargetkan _developer_ profesional dan "developer warga" (_citizen developer_) dengan penekanan _no-code_ vs. _low-code_ yang bervariasi.
-    -   MagicAppBuilder, dengan menyebutkan "fleksibilitas dan kontrol untuk _developer_", tampaknya menargetkan _developer_ profesional yang ingin mempercepat pekerjaan mereka pada proyek modular besar.
--   **Penyebaran & Ekosistem:**
-    
-    -   _Platform_ yang lebih besar sering memiliki opsi penyebaran _cloud_ yang matang, _marketplace_ yang kuat untuk komponen, dan jaringan mitra yang luas.
-    -   MagicAppBuilder, sebagai alat yang lebih spesifik, kemungkinan akan berfokus pada penyebaran yang disederhanakan dalam model _database_ dan skalanya yang didukung.
+ 
+**Perbandingan dengan Platform _Low-Code_ Terkemuka (misalnya, OutSystems, Mendix, Appian):**
+ 
+*   **Target Audiens dan Filosofi:**
+    *   **Platform Terkemuka:** Sering menargetkan campuran "citizen developer" (pengguna non-teknis) dan developer profesional, dengan penekanan kuat pada antarmuka visual _no-code_/_low-code_. Mereka biasanya berbasis _cloud_, bersifat _proprietary_, dan disertai dengan harga tingkat perusahaan serta ketergantungan pada vendor (_vendor lock-in_).
+    *   **MagicAppBuilder:** Secara eksplisit **berpusat pada developer**. Ini bukan platform _no-code_, melainkan **akselerator pembuatan kode** untuk developer profesional. MagicAppBuilder memberikan akses penuh ke kode sumber, berjalan **100% offline**, dan memberi developer kontrol penuh atas lingkungan _deployment_ (_on-premises_ atau _private cloud_), menjadikannya ideal untuk proyek yang memerlukan kedaulatan data dan tanpa ketergantungan pada vendor.
+ 
+*   **Fungsionalitas Inti dan Spesialisasi:**
+    *   **Platform Terkemuka:** Menawarkan spektrum fitur yang luas, termasuk manajemen proses bisnis (BPM) yang kompleks, integrasi AI/ML, dan _marketplace_ layanan pihak ketiga yang ekstensif. Mereka adalah alat serbaguna untuk berbagai kebutuhan perusahaan.
+    *   **MagicAppBuilder:** Berspesialisasi dalam pembuatan cepat **aplikasi modular yang berpusat pada data**. Kekuatannya terletak pada kemampuannya untuk dengan cepat membuat modul yang konsisten dan kaya fitur (CRUD, persetujuan, pemfilteran, dll.) serta API modern (seperti **Generator GraphQL Otomatis**). Ini unggul dalam membangun alat internal, panel admin, dan aplikasi lini bisnis di mana manajemen data adalah kunci.
+ 
+*   **Teknologi dan Arsitektur:**
+    *   **Platform Terkemuka:** Sering menggunakan _runtime proprietary_ dan memerlukan _deployment_ ke _cloud_ spesifik mereka atau lingkungan yang terkelola. Kustomisasi bisa terbatas pada titik ekstensi yang telah mereka tentukan.
+    *   **MagicAppBuilder:** Menghasilkan **kode PHP** standar yang bersih dan memanfaatkan komponen _open-source_ terkenal (seperti Bootstrap dan Composer). Hasilnya adalah aplikasi monolitik standar yang dapat di-_deploy_ di server mana pun yang mendukung PHP dan database yang kompatibel (MySQL, PostgreSQL, dll.). Ini memberikan fleksibilitas, transparansi, dan kemudahan pemeliharaan jangka panjang yang maksimal.
 
 ----------
 
@@ -56,6 +57,6 @@ Berikut adalah perbandingan MagicAppBuilder dengan _platform low-code_ terkemuka
 
 MagicAppBuilder tampaknya merupakan _platform low-code_ yang sangat efektif untuk organisasi yang perlu **dengan cepat membangun dan memelihara aplikasi berskala besar yang terdiri dari banyak modul berbasis data yang konsisten.** Perbedaan utamanya terletak pada kecepatan luar biasa dalam pembuatan modul, fitur perusahaan bawaan yang kuat (seperti alur kerja persetujuan spesifik, _soft delete_ canggih, dan dukungan _multi-language/theme_ yang komprehensif), serta dukungan eksplisitnya untuk **MySQL, MariaDB, dan PostgreSQL dengan kemampuan _horizontal scaling_ yang mulus tanpa modifikasi aplikasi.**
 
-Meskipun _platform low-code_ tujuan umum terkemuka seperti OutSystems, Mendix, dan Appian menawarkan kemampuan yang lebih luas untuk skenario perusahaan yang kompleks dan integrasi yang mendalam, MagicAppBuilder unggul dalam ceruknya yang khusus, yaitu generasi modul aplikasi standar bervolume tinggi, menjadikannya sangat cocok untuk proyek dengan tenggat waktu yang ketat dan persyaratan kuat untuk fungsionalitas berbasis data yang konsisten di banyak bagian aplikasi.
+Meskipun platform _low-code_ tujuan umum terkemuka seperti OutSystems dan Mendix menawarkan kemampuan yang lebih luas dan berpusat pada _cloud_ untuk beragam kebutuhan perusahaan, MagicAppBuilder unggul dalam ceruknya sebagai **alat yang berfokus pada developer, _offline-first_, untuk membangun aplikasi PHP _self-hosted_ yang intensif data dengan cepat**. Ini adalah pilihan ideal bagi tim yang menghargai kecepatan, kontrol, privasi data, dan kebebasan dari _vendor lock-in_, menjadikannya sangat cocok untuk proyek dengan tenggat waktu yang ketat dan persyaratan kuat untuk fungsionalitas berbasis data yang konsisten.
 
 > This document was generated by Gemini

@@ -696,3 +696,24 @@ label {
         text-align: center;
     }
 }
+
+.entity-selector-container{
+    max-height: calc(100vh - 238px);
+    overflow: auto;
+}
+.entity-selector-table{
+    margin-bottom: 2px;
+    border-color: transparent;
+    td{
+        padding: 4px 8px;
+        border-color: transparent;
+    }
+}
+
+.entity-type-selector{
+    border-bottom: 1px solid #cccccc;
+    padding: 0px 9px 4px 9px;
+    margin-bottom: 4px;
+    height: 24px;
+    box-sizing: border-box;
+}

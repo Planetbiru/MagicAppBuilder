@@ -31,7 +31,7 @@ function fetchUrl(url, section) {
   fetch(url, {
     method: 'GET',
     headers: {
-      'X-Requested-With': 'XMLHttpRequest'
+      'X-Requested-With': 'xmlhttprequest'
     }
   })
     .then(response => {
@@ -116,7 +116,7 @@ function loginAjax() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'X-Requested-With': 'XMLHttpRequest'
+      'X-Requested-With': 'xmlhttprequest'
     },
     body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
   })
@@ -582,7 +582,7 @@ function initAjaxSupport() {
         fetch(window.location.href, {
           method: 'POST',
           headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'xmlhttprequest'
           },
           body: formData
         })
