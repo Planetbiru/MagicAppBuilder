@@ -15,6 +15,12 @@ $languageId = $arr[0];
 $filePath = __DIR__ . '/langs/i18n/' . $languageId . '.json';
 
 if (!file_exists($filePath)) {
+    $languageId = 'en'; // Fallback to default language
+}
+
+$filePath = __DIR__ . '/langs/i18n/' . $languageId . '.json';
+
+if (!file_exists($filePath)) {
     // Fallback ke bahasa Inggris jika file bahasa yang diminta tidak ada
     $filePath = __DIR__ . '/langs/i18n/en.json';
     if(!file_exists($filePath)) {

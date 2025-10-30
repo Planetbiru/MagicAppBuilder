@@ -10,6 +10,12 @@ $languageId = $arr[0];
 $filePath = __DIR__ . '/langs/entity/' . $languageId . '.json';
 
 if (!file_exists($filePath)) {
+    $languageId = 'en'; // Fallback to default language
+}
+
+$filePath = __DIR__ . '/langs/entity/' . $languageId . '.json';
+
+if (!file_exists($filePath)) {
     http_response_code(404);
     echo json_encode(['error' => 'Language file not found.']);
     exit;
