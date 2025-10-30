@@ -280,6 +280,10 @@ html.sidebar-collapsed .sidebar {
   input[type="password"],
   input[type="email"],
   input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime"],
+  input[type="datetime-local"],
   select,
   textarea {
     width: 100%;

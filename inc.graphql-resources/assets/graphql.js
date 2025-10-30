@@ -1238,6 +1238,15 @@ class GraphQLClientApp {
                 if (col.type.includes('int')) inputType = 'number';
                 if (col.type.includes('boolean') || colName === activeField) inputType = 'checkbox';
 
+                if(col.dataType.includes('datetime') || col.dataType.includes('timestamp')) {
+                    inputType = 'datetime-local';
+                } else if(col.dataType.includes('date')) {
+                    inputType = 'date';
+                }
+                else if(col.dataType.includes('time')) {
+                    inputType = 'time';
+                }
+
                 if (inputType === 'checkbox') {
                     formHtml += `<input type="checkbox" id="${colName}" name="${colName}" ${value ? 'checked' : ''}>`;
                 } else {

@@ -149,6 +149,112 @@ class GraphQLGenerator
     }
 
     /**
+     * Normalize a database-specific column type into a generic type.
+     *
+     * Supported DBMS: MySQL, MariaDB, PostgreSQL, SQLite, SQL Server
+     *
+     * Possible return values:
+     * - string
+     * - integer
+     * - float
+     * - boolean
+     * - date
+     * - time
+     * - datetime
+     * - binary
+     * - json
+     * - uuid
+     * - enum
+     * - geometry
+     * - unknown
+     *
+     * @param string $dbType The raw column type from the database (e.g., VARCHAR(255), INT, NUMERIC(10,2), TEXT, etc.)
+     * @return string One of the normalized type names listed above.
+     */
+    function normalizeDbType($dbType)
+    {
+        $type = strtolower(trim($dbType));
+
+        // Remove size and precision (e.g. varchar(255) → varchar)
+        $type = preg_replace('/\(.+\)/', '', $type);
+
+        // Common integer types
+        $integerTypes = [
+            'int', 'integer', 'smallint', 'mediumint', 'bigint', 'serial', 'bigserial', 'tinyint'
+        ];
+
+        // Common float/decimal types
+        $floatTypes = [
+            'float', 'double', 'decimal', 'numeric', 'real', 'money', 'smallmoney'
+        ];
+
+        // Common string/text types
+        $stringTypes = [
+            'char', 'varchar', 'text', 'tinytext', 'mediumtext', 'longtext', 'nchar', 'nvarchar', 'citext', 'uuid'
+        ];
+
+        // Common date/time types
+        $dateTypes = [
+            'date', 'datetime', 'timestamp', 'time', 'year'
+        ];
+
+        // Boolean types
+        $booleanTypes = [
+            'boolean', 'bool', 'bit'
+        ];
+
+        // Binary types
+        $binaryTypes = [
+            'blob', 'binary', 'varbinary', 'image', 'bytea'
+        ];
+
+        // JSON types
+        $jsonTypes = [
+            'json', 'jsonb'
+        ];
+
+        // Normalize by matching
+        if (in_array($type, $integerTypes, true)) {
+            // Detect MySQL TINYINT(1) as boolean
+            if (strpos($dbType, 'tinyint(1)') !== false) {
+                return 'boolean';
+            }
+            return 'integer';
+        }
+
+        if (in_array($type, $floatTypes, true)) {
+            return 'float';
+        }
+
+        if (in_array($type, $booleanTypes, true)) {
+            return 'boolean';
+        }
+
+        if (in_array($type, $stringTypes, true)) {
+            // UUID is string-like but semantically different
+            return $type === 'uuid' ? 'uuid' : 'string';
+        }
+
+        if (in_array($type, $jsonTypes, true)) {
+            return 'json';
+        }
+
+        if (in_array($type, $binaryTypes, true)) {
+            return 'binary';
+        }
+
+        if (in_array($type, $dateTypes, true)) {
+            if ($type === 'time') return 'time';
+            if ($type === 'date') return 'date';
+            return 'datetime'; // timestamp, datetime, etc.
+        }
+
+        // Default fallback
+        return 'string';
+    }
+
+
+    /**
      * Generates common Input types for filtering and sorting.
      * @return string
      */
@@ -855,6 +961,7 @@ class GraphQLGenerator
             foreach($tableInfo['columns'] as $colName => $colInfo) {
                 $columns[$colName] = array(
                     'type' => $this->mapDbTypeToGqlType($colInfo['type']),
+                    'dataType' => $this->normalizeDbType($colInfo['type']),
                     'isForeignKey' => $colInfo['isForeignKey'],
                     'references' => $colInfo['references'] ? $colInfo['references'] : null,
                 );
