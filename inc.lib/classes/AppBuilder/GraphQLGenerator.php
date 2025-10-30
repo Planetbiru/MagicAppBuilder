@@ -936,7 +936,8 @@ class GraphQLGenerator
         $header .= "use GraphQL\\Type\\Definition\\Type;\r\n";
         $header .= "use GraphQL\\Type\\Schema;\r\n\r\n";
         $header .= "require_once __DIR__ . '/vendor/autoload.php';\r\n";
-        $header .= "require_once __DIR__ . '/database.php';\r\n\r\n";
+        $header .= "require_once __DIR__ . '/database.php';\r\n";
+        $header .= "require_once __DIR__ . '/auth.php';\r\n\r\n";
         
         $header .= "\$developmentMode = true;\r\n\r\n";
 
