@@ -154,8 +154,8 @@ h2 {
   transition: margin-left 0.3s ease;
 }
 
-.sidebar.collapsed {
-  margin-left: calc((-1 * var(--sidebar-width)) - 43px);
+html.sidebar-collapsed .sidebar {
+  margin-left: calc(-1 * var(--sidebar-width) - 42px); /* Adjust to fully hide */
 }
 
 .sidebar h2 {

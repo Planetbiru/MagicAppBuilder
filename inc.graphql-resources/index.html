@@ -4,7 +4,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{APP_NAME}</title>
+  <title>GraphQL Application</title>
+  <script>
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+      document.documentElement.classList.add('sidebar-collapsed');
+    }
+  </script>
   <link rel="stylesheet" href="assets/style.min.css">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <script src="assets/app.min.js"></script>

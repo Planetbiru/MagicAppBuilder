@@ -103,9 +103,10 @@ class GraphQLClientApp {
     initPage() {
         // Sidebar toggle functionality
         if (this.dom.sidebarToggle && this.dom.sidebar && this.dom.mainContent) {
+            // When the toggle is clicked, update the class on the <html> element and save the state
             this.dom.sidebarToggle.addEventListener('click', () => {
-                this.dom.sidebar.classList.toggle('collapsed');
-                this.dom.mainContent.classList.toggle('expanded');
+                const isCollapsed = document.documentElement.classList.toggle('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', isCollapsed);
             });
         }
 
