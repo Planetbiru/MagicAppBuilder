@@ -276,8 +276,6 @@ class GraphQLClientApp {
             this.supportedLanguages = langConfig.supported;
             this.defaultLanguage = langConfig.default;
 
-            this.populateLangMenu();
-
             const savedLang = localStorage.getItem('userLanguage');
             let langToLoad = this.defaultLanguage;
 
@@ -294,19 +292,23 @@ class GraphQLClientApp {
             localStorage.setItem('languageId', this.languageId); // Sync for both systems
             document.documentElement.lang = this.languageId;
 
+            // Now populate the menu, so the active language can be marked correctly.
+            this.populateLangMenu();
+
         } catch (error) {
             console.error("Failed to initialize language configuration, falling back to default:", error);
             // Fallback to default language if config fails to load
             this.supportedLanguages = { 'en': 'English' };
             this.defaultLanguage = 'en';
-
-            this.populateLangMenu();
-
+            
             // Set language to default
             this.languageId = this.defaultLanguage;
             localStorage.setItem('userLanguage', this.languageId);
             localStorage.setItem('languageId', this.languageId); // Sync for both systems
             document.documentElement.lang = this.languageId;
+
+            // Populate menu even on fallback
+            this.populateLangMenu();
         }
     }
 
@@ -322,6 +324,9 @@ class GraphQLClientApp {
             const a = document.createElement('a');
             a.href = '#';
             a.dataset.lang = code;
+            if (code === this.languageId) {
+                a.classList.add('active');
+            }
             a.textContent = name;
             li.appendChild(a);
             this.dom.langMenu.appendChild(li);
@@ -806,6 +811,7 @@ class GraphQLClientApp {
      * @returns {void}
      */
     renderTable(items) {
+        let _this = this;
         const headers = Object.keys(this.currentEntity.columns);
         let tableHtml = `
             <div class="table-container">
@@ -831,7 +837,6 @@ class GraphQLClientApp {
             tableHtml += `<tr><td colspan="${headers.length + 1}">${this.t('no_items_found')}</td></tr>`;
         } else {
             items.forEach(item => {
-
                 let activeField = this.currentEntity.activeField || this.defaultActiveField;
                 let isActive = true;
                 if (this.currentEntity.hasActiveColumn) {
@@ -842,10 +847,11 @@ class GraphQLClientApp {
                 headers.forEach(header => {
                     const col = this.currentEntity.columns[header];
                     let value = item[header];
-                    const relationName = col.references;
+                    let relationName = col.references;
+
 
                     if (col.isForeignKey && item[relationName]) {
-                        const relatedEntity = this.config.entities[relationName];
+                        const relatedEntity = this.config.entities[this.camelCase(relationName)];
                         const displayField = relatedEntity ? relatedEntity.displayField : 'name';
                         value = item[relationName] ? item[relationName][displayField] : 'N/A';
                     } else if ((col.type.includes('boolean') || header === this.currentEntity.activeField) && this.config.booleanDisplay) {
@@ -1618,6 +1624,10 @@ class GraphQLClientApp {
      * @returns {string} The camelCased string.
      */
     camelCase(str) {
+        if(!str)
+        {
+            return '';
+        }
         return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
     }
     /**
@@ -1683,12 +1693,12 @@ class GraphQLClientApp {
             if (col.isForeignKey && !noRelations) {
                 // TODO:
                 fields.push(colName);
-                const relationNameCamelCase = col.references; // e.g., "jenisKeanggotaan"
-                const relatedEntity = this.config.entities[relationNameCamelCase];
+                const relationNameCamelCase = col.references; 
+                const relatedEntity = this.config.entities[this.camelCase(relationNameCamelCase)];
 
                 if (relatedEntity) {
                     // Convert relation name to snake_case for the GraphQL query to match the PHP backend schema
-                    const relationNameSnakeCase = this.snakeCase(relationNameCamelCase); // e.g., "jenis_keanggotaan"
+                    const relationNameSnakeCase = relationNameCamelCase; // this.snakeCase(relationNameCamelCase); // e.g., "jenis_keanggotaan"
                     let query = `${relationNameSnakeCase} { ${this.getFieldsForQuery(relatedEntity, depth - 1)} }`;
                     // Use the correct relation name from the entity config for the query
                     fields.push(query);

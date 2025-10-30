@@ -4,6 +4,7 @@
   --primary-color: #3b82f6;
   /* A brighter, more modern blue */
   --primary-color-hover: #2563eb;
+  --primary-color-bg-light: rgba(59, 130, 246, 0.1);
   --background-color: #f9fafb;
   /* Lighter grey for background */
   --sidebar-bg: #ffffff;
@@ -20,6 +21,7 @@
 [data-theme=dark] {
   --primary-color: #4f8ff7;
   --primary-color-hover: #69a1f8;
+  --primary-color-bg-light: rgba(79, 143, 247, 0.15);
   --background-color: #111827;
   --sidebar-bg: #1f2937;
   --header-bg: #1f2937;
@@ -119,6 +121,9 @@ h2 {
 }
 .dropdown-menu a:hover {
   background-color: var(--background-color);
+}
+.dropdown-menu a.active {
+  background-color: var(--primary-color-bg-light);
 }
 
 .container {
