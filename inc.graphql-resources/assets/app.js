@@ -1155,9 +1155,10 @@ class GraphQLClientApp {
                 });
                 formHtml += `</select>`;
             } else {
+                let activeField = this.currentEntity.activeField || this.defaultActiveField;
                 let inputType = 'text';
                 if (col.type.includes('int')) inputType = 'number';
-                if (col.type.includes('boolean')) inputType = 'checkbox';
+                if (col.type.includes('boolean') || colName === activeField) inputType = 'checkbox';
 
                 if (inputType === 'checkbox') {
                     formHtml += `<input type="checkbox" id="${colName}" name="${colName}" ${value ? 'checked' : ''}>`;
@@ -1202,6 +1203,7 @@ class GraphQLClientApp {
         });
         if (hookHandled) return;
 
+        let activeField = this.currentEntity.activeField || this.defaultActiveField;
         const formData = new FormData(this.dom.form);
         const input = {};
         for (const colName in this.currentEntity.columns) {
@@ -1226,6 +1228,21 @@ class GraphQLClientApp {
                 }
                 input[colName] = value;
             }
+        }
+        for (const colName in this.currentEntity.columns) {
+            if (colName === this.currentEntity.primaryKey) continue;
+            const col = this.currentEntity.columns[colName];
+
+            // Handle unchecked checkboxes
+            if (this.dom.form.querySelector(`[name="${colName}"]`).type === 'checkbox') {
+                let value = this.dom.form.querySelector(`[name="${colName}"]`).checked;
+                if (!value) {
+                    if (!col.type.includes('boolean')) {
+                        input[colName] = 0;
+                    }
+                }
+            }
+
         }
 
         const methodName = this.ucFirst(this.currentEntity.name);
