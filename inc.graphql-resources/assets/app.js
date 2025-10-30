@@ -101,7 +101,7 @@ class GraphQLClientApp {
      * @returns {void}
      */
     initPage() {
-        // Sidebar toggle functionality
+        // Sidebar toggle functionality with animation control
         if (this.dom.sidebarToggle && this.dom.sidebar && this.dom.mainContent) {
             // When the toggle is clicked, update the class on the <html> element and save the state
             this.dom.sidebarToggle.addEventListener('click', () => {
@@ -109,6 +109,9 @@ class GraphQLClientApp {
                 localStorage.setItem('sidebarCollapsed', isCollapsed);
             });
         }
+
+        // Add the animation class after the initial render to prevent animation on page load.
+        this.dom.sidebar.classList.add('sidebar-animated');
 
         // Dropdown menu functionality
         document.querySelectorAll('[data-dropdown]').forEach(button => {
