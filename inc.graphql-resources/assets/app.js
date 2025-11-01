@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['user-profile-update'] = {
-        url: 'user-profile.php?action=update',
+        url: 'user-profile-update.php',
         title: 'profile', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['settings-update'] = {
-        url: 'settings.php?action=update',
+        url: 'settings-update.php',
         title: 'settings', // The translation key for the page title.
         method: 'GET',
         headers: {

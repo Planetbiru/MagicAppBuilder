@@ -131,12 +131,17 @@ try {
 
         $zip->addFromString('langs/i18n/id.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/id.json"));
         
+        $zip->addFromString('assets/style.scss', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.scss"));
         $zip->addFromString('assets/style.css', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css"));
+        $zip->addFromString('assets/style.css.map', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css.map"));
         $zip->addFromString('assets/style.min.css', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.min.css"));
         $zip->addFromString('assets/app.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/app.js"));
         $zip->addFromString('assets/app.min.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/app.min.js"));
+        $zip->addFromString('assets/graphql.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.js"));
+        $zip->addFromString('assets/graphql.min.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.min.js"));
 
         $zip->addFromString('favicon.svg', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg"));
+        $zip->addFromString('inc/I18n.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php"));
 
         
 
@@ -160,6 +165,15 @@ try {
         $zip->addFromString('login.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/login.php"));
         $zip->addFromString('logout.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/logout.php"));
         $zip->addFromString('frontend-config.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend-config.php"));
+
+        $zip->addFromString("message.php", file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/message.php"));
+        $zip->addFromString("notification.php", file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/notification.php"));
+        $zip->addFromString("user-profile.php", file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/user-profile.php"));
+        $zip->addFromString("user-profile-update.php", file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/user-profile-update.php"));
+        $zip->addFromString("settings.php", file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/settings.php"));
+        $zip->addFromString("settings-update.php", file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/settings-update.php"));
+        $zip->addFromString("update-password.php", file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/update-password.php"));
+
         
         // Bonus
         $zip->addFile(dirname(__DIR__) . "/inc.lib/composer.phar", "composer.phar");
