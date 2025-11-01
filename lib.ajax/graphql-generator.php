@@ -123,20 +123,25 @@ try {
         $zip->addFromString('langs/entity/en.json', $entityLanguagePacks);
 
 
-        $languagePacks = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/en.json");
-        $zip->addFromString('langs/i18n/source.json', $languagePacks);
+        $languagePacksPath = dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/en.json";
+        $zip->addFile($languagePacksPath, 'langs/i18n/source.json');
 
         // Assumpt that default language is `en`
-        $zip->addFromString('langs/i18n/en.json', $languagePacks);
+        $zip->addFile($languagePacksPath, 'langs/i18n/en.json');
 
-        $zip->addFromString('langs/i18n/id.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/id.json"));
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/id.json", 'langs/i18n/id.json');
         
-        $zip->addFromString('assets/style.css', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css"));
-        $zip->addFromString('assets/style.min.css', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/style.min.css"));
-        $zip->addFromString('assets/app.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/app.js"));
-        $zip->addFromString('assets/app.min.js', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/assets/app.min.js"));
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.scss", 'assets/style.scss');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css", 'assets/style.css');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css.map", 'assets/style.css.map');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.min.css", 'assets-style.min.css');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/app.js", 'assets/app.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/app.min.js", 'assets/app.min.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.js", 'assets/graphql.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.min.js", 'assets/graphql.min.js');
 
-        $zip->addFromString('favicon.svg', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg"));
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg", 'favicon.svg');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
 
         
 
@@ -146,9 +151,9 @@ try {
         $indexFileContent = str_replace('{APP_NAME}', $application->getName(), $indexFileContent);
 
         $zip->addFromString('index.php', $indexFileContent);
-        $zip->addFromString('language.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/language.php"));
-        $zip->addFromString('entity-language.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/entity-language.php"));
-        $zip->addFromString('available-language.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/available-language.php"));
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/language.php", 'language.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/entity-language.php", 'entity-language.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/available-language.php", 'available-language.php');
 
         $databaseConfiguration = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/database.php");
 
@@ -156,10 +161,19 @@ try {
         $databaseConfiguration = setDatabaseConfiguration($application, $databaseConfiguration);
 
         $zip->addFromString('database.php', $databaseConfiguration);
-        $zip->addFromString('auth.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/auth.php"));
-        $zip->addFromString('login.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/login.php"));
-        $zip->addFromString('logout.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/logout.php"));
-        $zip->addFromString('frontend-config.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend-config.php"));
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/auth.php", 'auth.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/login.php", 'login.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/logout.php", 'logout.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend-config.php", 'frontend-config.php');
+
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/message.php", "message.php");
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/notification.php", "notification.php");
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/user-profile.php", "user-profile.php");
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/user-profile-update.php", "user-profile-update.php");
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/settings.php", "settings.php");
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/settings-update.php", "settings-update.php");
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/update-password.php", "update-password.php");
+
         
         // Bonus
         $zip->addFile(dirname(__DIR__) . "/inc.lib/composer.phar", "composer.phar");
