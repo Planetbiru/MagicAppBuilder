@@ -5,22 +5,24 @@
 class GraphQLClientApp {
     /**
      * Initializes the GraphQL client application.
-     * Sets up default configuration, merges with user-provided options,
-     * initializes state, caches DOM elements, and starts the application initialization process.
+     * This constructor sets up default configurations, merges them with user-provided options,
+     * initializes application state, caches essential DOM elements, and triggers the main
+     * initialization process for the single-page application.
      *
      * @param {object} [options={}] - Configuration options to override the defaults.
      * @param {string} [options.configUrl='frontend-config.php'] - URL to fetch the main application configuration.
      * @param {string} [options.apiUrl='graphql.php'] - URL of the GraphQL API endpoint.
      * @param {string} [options.loginUrl='login.php'] - URL for handling user login.
      * @param {string} [options.logoutUrl='logout.php'] - URL for handling user logout.
-     * @param {string} [options.entityLanguageUrl='entity-language.php'] - URL to fetch entity-specific language packs.
+     * @param {string} [options.entityLanguageUrl='entity-language.php'] - URL to fetch entity-specific language translations.
      * @param {string} [options.i18nUrl='language.php'] - URL to fetch UI language packs.
-     * @param {string} [options.languageConfigUrl='available-language.php'] - URL to fetch available languages configuration.
-     * @param {object} [options.customRenderers] - Custom renderer hooks for entities (e.g., for list, detail, form views).
+     * @param {string} [options.languageConfigUrl='available-language.php'] - URL to fetch the list of available languages.
+     * @param {object} [options.customRenderers] - Custom rendering functions for entities (e.g., for list, detail, form views).
      * @param {string} [options.defaultActiveField='active'] - Default field name for the 'active' status column.
-     * @param {string} [options.defaultDisplayField='name'] - Default field name to use for display in relationships if not specified.
+     * @param {string} [options.defaultDisplayField='name'] - Default field name to use for displaying relationships if not specified.
      * @param {?string} [options.languageId=null] - The initial language ID. If null, it will be auto-detected.
      * @param {string} [options.defaultLanguage='en'] - The fallback language if auto-detection fails.
+     * @param {object} [options.pages] - An object to define custom, non-entity pages for the application.
      */
     constructor(options = {}) {
         const defaults = {
@@ -39,6 +41,7 @@ class GraphQLClientApp {
             languageId: null,
             
             defaultLanguage: 'en',
+            pages: {},
         };
 
         Object.assign(this, defaults, options);
@@ -102,6 +105,7 @@ class GraphQLClientApp {
             infoModalMessage: document.getElementById('infoModalMessage'),
             infoModalOk: document.getElementById('infoModalOk'),
         };
+        this.applicationTitle = document.querySelector('meta[name="title"]').getAttribute('content');
         this.init();
     }
 
@@ -356,8 +360,11 @@ class GraphQLClientApp {
         if (!response.ok) throw new Error(`Failed to load config from ${this.configUrl}`); // NOSONAR
         this.config = await response.json();
 
-        if (this.config.pagination && this.config.pagination.pageSize) {
-            this.state.limit = this.config.pagination.pageSize;
+        if (this.config.pagination) {
+            if(this.config.pagination.pageSize)
+            {
+                this.state.limit = this.config.pagination.pageSize;
+            }
         }
     }
 
@@ -577,6 +584,8 @@ class GraphQLClientApp {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'xmlhttprequest',
+                    'X-Language-Id': this.languageId,
+                    'Accept-Language': this.languageId,
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({ query, variables }),
@@ -648,6 +657,118 @@ class GraphQLClientApp {
     }
 
     /**
+     * Handles the rendering of custom, non-entity pages (e.g., 'user-profile', 'settings').
+     * These pages are defined in the `this.pages` object.
+     * It can either fetch content from a URL or render predefined content.
+     * @param {string} pageName - The key of the page to render, as defined in `this.pages`.
+     * @returns {Promise<void>} A promise that resolves when the page has been handled.
+     */
+    async handlePage(pageName)
+    {
+        // Find the page configuration for the given name.
+        let page = this.pages[pageName];
+        if(!page) return;
+
+        try {
+            // Set the main content title and the browser document title.
+            let title = this.t(page.title);
+            this.dom.title.textContent = title;
+            document.title = `${title} - ${this.applicationTitle}`;
+
+            // If the page is defined by a URL, fetch its content.
+            if(page.url)
+            {
+                // Separate the base path from the query string in the configured URL.
+                const [path1, queryString1] = page.url.split('?');
+                let params1 = {};
+                let params2 = {};
+                
+
+                // Get the query string from the current window hash.
+                let hash2 = window.location.hash;
+                const [path2, queryString2] = hash2.split('?');
+                
+
+                // Merge query parameters from the page config URL and the current hash.
+                const combinedParams = new URLSearchParams();
+
+                if(queryString1)
+                {
+                    params1 = new URLSearchParams(queryString1);
+                    for (const [key, value] of params1.entries()) {
+                        // combinedParams.set(key, value);
+                    }
+                }
+
+                if(queryString2)
+                {
+                    params2 = new URLSearchParams(queryString2);
+                    for (const [key, value] of params2.entries()) {
+                        combinedParams.set(key, value);
+                    }
+                }
+
+                // Reconstruct the final URL with merged parameters.
+                page.url = `${path1}?${combinedParams.toString()}`;
+
+                this.dom.loadingBar.style.display = 'block';
+                // Prepare fetch parameters.
+                let params = {
+                    method: page.method,
+                    headers: {
+                        'X-Requested-With': 'xmlhttprequest',
+                        'X-Language-Id': this.languageId,
+                        'Accept-Language': this.languageId,
+                        'Accept': page.accept || '*'
+                    }
+                };
+                if(page.body)
+                {
+                    params.body = page.body;
+                }
+                // Make the request to the page's URL.
+                const response = await fetch(page.url, params);
+
+                if (response.status != 200) {
+                    if(typeof page.error == 'function')
+                    {
+                        page.error(response.status, response.statusText, this.dom.tableDataContainer, this.dom);
+                    }
+                    return;
+                }
+
+                let result;
+                // Parse the response based on the expected 'accept' type.
+                if(page?.accept && page.accept?.indexOf('json') != -1)
+                {
+                    result = await response.json();
+                }
+                else
+                {
+                    result = await response.text();
+                }
+
+                // Call the success callback with the fetched data.
+                if(typeof page.success == 'function')
+                {
+                    page.success(result, this.dom.tableDataContainer, this.dom);
+                }
+            }
+            // If the page is defined by static content, use its render function.
+            else if(page.content && typeof page.render == 'function')
+            {
+                page.render(page.content, this.dom.tableDataContainer, this.dom);
+            }
+            
+        } catch (error) {
+            throw error;
+        } finally {
+            // Always hide the loading bar after the operation is complete.
+            this.dom.loadingBar.style.display = 'none';
+        }
+    }
+
+    /**
      * Handles routing based on the URL hash. It parses the entity, view type, and parameters
      * from the hash and calls the appropriate render method.
      * This is the central point for client-side routing.
@@ -663,6 +784,12 @@ class GraphQLClientApp {
         const [path, queryString] = hash.split('?');
         const pathParts = path.split('/');
 
+        if(this.pages[pathParts[0]])
+        {
+            this.handlePage(pathParts[0]);
+            return;
+        }
+
         const entityName = pathParts[0];
         const viewType = pathParts.length > 1 ? pathParts[1] : 'list';
         const itemId = pathParts.length > 2 ? pathParts[2] : null;
@@ -671,11 +798,13 @@ class GraphQLClientApp {
 
         const entity = this.config.entities[entityName];
         if (!entity) {
-            this.dom.body.innerHTML = `<p>Entity "${entityName}" not found.</p>`;
+            this.dom.body.innerHTML = `<p>Page "${entityName}" not found.</p>`;
             return;
         }
 
         this.currentEntity = entity;
+        let title = this.applicationTitle;
+        document.title = `${entity.displayName} - ${title}`;
 
         const filters = {};
         for (const [key, value] of params.entries()) {
@@ -732,7 +861,9 @@ class GraphQLClientApp {
      */
     renderDashboardView() {
         // Set title and clear any active menu items
-        this.dom.title.textContent = this.t('dashboard');
+        const pageTitle = this.t('dashboard');
+        document.title = `${this.applicationTitle}`;
+        this.dom.title.textContent = pageTitle;
         document.querySelectorAll('#entity-menu a').forEach(link => link.classList.remove('active'));
 
         // Hide filter container and clear table/pagination
@@ -973,6 +1104,7 @@ class GraphQLClientApp {
         this.dom.filterContainer.innerHTML = '';
         this.dom.tableDataContainer.innerHTML = '';
         this.dom.paginationContainer.innerHTML = '';
+        this.dom.paginationContainer.style.display = 'none';
     }
 
     /**
@@ -1092,6 +1224,7 @@ class GraphQLClientApp {
             <a id="prev-page" href="${prevUrl}" class="btn btn-secondary ${!result.hasPrevious ? 'disabled' : ''}">${this.t('previous')}</a>
             <a id="next-page" href="${nextUrl}" class="btn btn-secondary ${!result.hasNext ? 'disabled' : ''}">${this.t('next')}</a>
         `;
+        this.dom.paginationContainer.style.display = 'flex';
 
         const handleNavClick = (e, newPage) => {
             // Allow middle-click, right-click, and ctrl/cmd-click to open in new tab
@@ -1583,8 +1716,11 @@ class GraphQLClientApp {
             method: 'POST',
             body: formData,
             headers: {
+                'X-Requested-With': 'xmlhttprequest',
+                'X-Language-Id': this.languageId,
+                'Accept-Language': this.languageId,
                 'Accept': 'application/json'
-            }
+            },
         });
 
         if (response.ok) {
