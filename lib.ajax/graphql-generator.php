@@ -101,6 +101,34 @@ function addDirectoryToZip($zip, $sourcePath, $zipPath) {
     }
 }
 
+/**
+ * Adds files with a specific prefix from a source directory to a ZIP archive.
+ *
+ * This function scans a directory for files that match a given prefix. If recursion is enabled,
+ * it will traverse all subdirectories. Matching files are added to the provided ZipArchive object
+ * under a specified path within the archive.
+ *
+ * @param ZipArchive $zip The ZipArchive instance to add files to.
+ * @param string $sourcePath The source directory to search for files.
+ * @param string $zipPath The path inside the ZIP archive where files will be placed.
+ * @param string $prefix The prefix of the files to be added.
+ */
+function addFilesWithPrefixToZip($zip, $sourcePath, $zipPath, $prefix) { //NOSONAR
+    if (!is_dir($sourcePath)) {
+        return;
+    }
+    $pattern = $sourcePath . '/' . $prefix . '*';
+    $files = glob($pattern);
+    if ($files !== false) {
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                $finalZipPath = empty($zipPath) ? basename($file) : $zipPath . '/' . basename($file);
+                $zip->addFile($file, $finalZipPath);
+            }
+        }
+    }
+}
+
 $request = file_get_contents('php://input');
 $data = json_decode($request, true);
 
@@ -109,38 +137,66 @@ $schema = isset($data['schema']) ? $data['schema'] : [];
 $reservedColumns = isset($data['reservedColumns']) ? $data['reservedColumns'] : [];
 $applicationId = isset($data['applicationId']) ? $data['applicationId'] : null;
 
-$backendHandledColumns = [
-    'timeCreate'=>
-    [
-        'columnName' => 'waktu_buat',
+function createReservedColumnMap($reservedColumns) {
+    $reservedColumnMap = array();
+    foreach ($reservedColumns as $reservedColumn) {
+        $key = $reservedColumn['key'];
+        $reservedColumnMap[$key] = $reservedColumn['name'];
+    }
+    return $reservedColumnMap;
+}
+
+$reservedColumnMap = createReservedColumnMap($reservedColumns['columns']);
+
+$backendHandledColumns = [];
+
+if(isset($reservedColumnMap['time_create']))
+{
+    $backendHandledColumns['timeCreate'] = [
+        'columnName' => $reservedColumnMap['time_create'],
         'type' => 'datetime'
-    ],
-    'timeEdit'=>
-    [
-        'columnName' => 'waktu_ubah',
+    ];
+}
+
+if(isset($reservedColumnMap['time_edit']))
+{
+    $backendHandledColumns['timeEdit'] = [
+        'columnName' => $reservedColumnMap['time_edit'],
         'type' => 'datetime'
-    ],
-    'adminCreate'=>
-    [
-        'columnName' => 'admin_buat',
+    ];
+}
+
+if(isset($reservedColumnMap['admin_create']))
+{
+    $backendHandledColumns['adminCreate'] = [
+        'columnName' => $reservedColumnMap['admin_create'],
         'type' => 'string'
-    ],
-    'adminEdit'=>
-    [
-        'columnName' => 'admin_ubah',
+    ];
+}
+
+if(isset($reservedColumnMap['admin_edit']))
+{
+    $backendHandledColumns['adminEdit'] = [
+        'columnName' => $reservedColumnMap['admin_edit'],
         'type' => 'string'
-    ],
-    'ipCreate'=>
-    [
-        'columnName' => 'ip_buat',
+    ];
+}
+
+if(isset($reservedColumnMap['ip_create']))
+{
+    $backendHandledColumns['ipCreate'] = [
+        'columnName' => $reservedColumnMap['ip_create'],
         'type' => 'string'
-    ],
-    'ipEdit'=>
-    [
-        'columnName' => 'ip_ubah',
+    ];
+}
+
+if(isset($reservedColumnMap['ip_edit']))
+{
+    $backendHandledColumns['ipEdit'] = [
+        'columnName' => $reservedColumnMap['ip_edit'],
         'type' => 'string'
-    ]
-];
+    ];
+}
 
 try {
     $application = getApplication($databaseBuilder, $applicationId);
@@ -195,7 +251,6 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.js", 'assets/graphql.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.min.js", 'assets/graphql.min.js');
 
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg", 'favicon.svg');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
@@ -233,6 +288,14 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/settings.php", "settings.php");
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/settings-update.php", "settings-update.php");
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/update-password.php", "update-password.php");
+
+        // Add all icon files
+        // Add file with prefix `icon-`
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'android-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'apple-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'favicon');
+        
 
         
         // Bonus
