@@ -166,11 +166,35 @@ html.sidebar-collapsed .sidebar {
   margin-left: calc(-1 * var(--sidebar-width) - 42px);
 }
 
+.sidebar-filter-container {
+  margin-bottom: 15px;
+  padding: 0;
+}
+
+.sidebar-filter-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+
+  [data-theme="dark"] & {
+    background-color: #374151;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+}
+
 #entity-menu {
   list-style: none;
   padding: 0;
   margin: 0px 0 0 0;
-  height: calc(100vh - 92px);
+  height: calc(100vh - 140px);
   box-sizing: border-box;
   overflow-y: auto;
 

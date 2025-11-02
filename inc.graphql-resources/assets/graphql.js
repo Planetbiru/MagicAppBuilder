@@ -79,6 +79,7 @@ class GraphQLClientApp {
         /** @type {object<string, HTMLElement>} A map of cached DOM elements. */
         this.dom = {
             menu: document.getElementById('entity-menu'),
+            menuFilterInput: document.getElementById('entity-menu-filter'),
             title: document.getElementById('content-title'),
             body: document.getElementById('content-body'),
             modal: document.getElementById('form-modal'),
@@ -178,6 +179,11 @@ class GraphQLClientApp {
         // Apply initial theme
         const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         this.applyTheme(savedTheme);
+
+        // Menu filter functionality
+        if (this.dom.menuFilterInput) {
+            this.dom.menuFilterInput.addEventListener('input', (e) => this.filterMenu(e.target.value));
+        }
 
     }
 
@@ -431,6 +437,11 @@ class GraphQLClientApp {
      */
     applyI18n() {
         document.querySelectorAll('[data-i18n]').forEach(el => {
+            // Special case for the menu filter placeholder
+            if (el.id === 'entity-menu-filter' && el.hasAttribute('placeholder')) {
+                el.placeholder = this.t('menu_filter');
+                return;
+            }
             const key = el.getAttribute('data-i18n');
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                 el.placeholder = this.t(key);
@@ -574,6 +585,24 @@ class GraphQLClientApp {
             };
             li.appendChild(a);
             this.dom.menu.appendChild(li);
+        });
+    }
+
+    /**
+     * Filters the navigation menu items based on the provided text.
+     * @param {string} filterText - The text to filter the menu by.
+     */
+    filterMenu(filterText) {
+        const filter = filterText.toLowerCase().trim();
+        const menuItems = this.dom.menu.querySelectorAll('li');
+
+        menuItems.forEach(item => {
+            const itemText = item.textContent.toLowerCase();
+            if (itemText.includes(filter)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
         });
     }
 

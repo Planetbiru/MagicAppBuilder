@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     try {
-
+        $currentAdminId = $appAdmin['admin_id'];
         $newStatus = '0';
         if(stripos($cfgDbDriver, 'posgre') !== false || stripos($cfgDbDriver, 'pgsql') !== false)
         {
