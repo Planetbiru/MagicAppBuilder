@@ -663,6 +663,7 @@ class GraphQLGenerator
             $code .= "            'args' => array('input' => Type::nonNull(\$" . $inputTypeName . ")),\r\n";
             $code .= "            'resolve' => function (\$root, \$args) use (\$db, \$appTimeCreate, \$appTimeEdit, \$appAdminCreate, \$appAdminEdit, \$appIpCreate, \$appIpEdit) {\r\n";
             $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
+            $code .= "                \$input = \$args['input'];\r\n";
             $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
             $code .= "                    return in_array(\$key, \$allowedColumns);\r\n";
             $code .= "                }, ARRAY_FILTER_USE_KEY);\r\n\r\n";
@@ -699,7 +700,6 @@ class GraphQLGenerator
                 }
                 $code .= "                // Handle backend handled columns end\r\n\r\n";
             }
-            $code .= "                \$input = \$args['input'];\r\n";
             $code .= "                \$id = uniqid(); // Simple unique ID\r\n";
             $code .= "                \$input['" . $primaryKey . "'] = \$id;\r\n";
             $code .= "                \$columns = array_keys(\$input);\r\n";
@@ -722,7 +722,7 @@ class GraphQLGenerator
             $code .= "                'id' => Type::nonNull(Type::string()),\r\n";
             $code .= "                'input' => Type::nonNull(\$" . $inputTypeName . ")\r\n";
             $code .= "            ),\r\n";
-            $code .= "            'resolve' => function (\$root, \$args) use (\$db, \$appTimeEdit, \$appAdminEdit, \$appIpEdit) {\r\n";
+            $code .= "            'resolve' => function (\$root, \$args) use (\$db, \$appTimeCreate, \$appTimeEdit, \$appAdminCreate, \$appAdminEdit, \$appIpCreate, \$appIpEdit) {\r\n";
             $code .= "                \$id = \$args['id'];\r\n";
             $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
             $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
