@@ -83,6 +83,7 @@ class GraphQLGenerator
                 'columns' => array(),
                 'hasActiveColumn' => false,
                 'filters' => $entity['filters'] ? $entity['filters'] : array(),
+                'description' => isset($entity['description']) ? $entity['description'] : null
             );
 
             foreach ($entity['columns'] as $column) {
@@ -321,6 +322,10 @@ class GraphQLGenerator
 
             $code .= "\$" . $typeName . " = new ObjectType(array(\r\n";
             $code .= "    'name' => '" . $objectName . "',\r\n";
+            if(!empty($tableInfo['description'])) {
+                $description = addslashes($tableInfo['description']);
+                $code .= "    'description' => '" . $description . "',\r\n";
+            }
             $code .= "    'fields' => function () use (&\$db";
             // Include other types for lazy loading relationships
             foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
@@ -341,12 +346,13 @@ class GraphQLGenerator
             foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
                 if ($columnInfo['isForeignKey']) {
                     $refTableName = $columnInfo['references'];
+                    $description = "Get the related " . $refTableName;
                     $refTypeName = $this->camelCase($refTableName) . 'Type';
                     $refPK = $this->analyzedSchema[$refTableName]['primaryKey'];
 
                     $code .= "            '" . $refTableName . "' => array(\r\n";
                     $code .= "                'type' => \$" . $refTypeName . ",\r\n";
-                    $code .= "                'description' => 'Get the related " . $refTableName . "',\r\n";
+                    $code .= "                'description' => '".$description."',\r\n";
                     $code .= "                'resolve' => function (\$root, \$args) use (\$db) {\r\n";
                     $code .= "                    if (empty(\$root['" . $columnName . "'])) return null;\r\n";
                     $code .= "                    \$stmt = \$db->prepare('SELECT * FROM " . $refTableName . " WHERE " . $refPK . " = :id');\r\n";
