@@ -12,7 +12,8 @@
     }
   </script>
   <link rel="stylesheet" href="assets/style.css">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link type="image/x-icon" rel="icon" href="favicon.ico" />
+  <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
   <script src="assets/graphql.js"></script>
   <script src="assets/app.js"></script>
 </head>
@@ -91,6 +92,9 @@
     </header>
     <div class="container">
       <nav class="sidebar" id="sidebar-nav">
+        <div class="sidebar-filter-container">
+          <input type="text" id="entity-menu-filter" class="sidebar-filter-input" placeholder="Filter menu..." data-i18n="menu_filter">
+        </div>
         <ul id="entity-menu">
           <!-- Menu items will be inserted here by JavaScript -->
         </ul>

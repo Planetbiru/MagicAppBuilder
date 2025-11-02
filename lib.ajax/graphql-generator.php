@@ -79,6 +79,56 @@ database:
     return $databaseConfiguration;
 }
 
+/**
+ * Adds a directory and all its contents to a ZIP archive.
+ *
+ * @param ZipArchive $zip The ZipArchive instance.
+ * @param string $sourcePath The path to the directory to add.
+ * @param string $zipPath The path inside the ZIP archive where the directory will be placed.
+ */
+function addDirectoryToZip($zip, $sourcePath, $zipPath) {
+    if (is_dir($sourcePath)) {
+        $zip->addEmptyDir($zipPath);
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourcePath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($files as $file) {
+            $filePath = $file->getRealPath();
+            $relativePath = $zipPath . '/' . substr($filePath, strlen($sourcePath) + 1);
+            $file->isDir() ? $zip->addEmptyDir($relativePath) : $zip->addFile($filePath, $relativePath);
+        }
+    }
+}
+
+/**
+ * Adds files with a specific prefix from a source directory to a ZIP archive.
+ *
+ * This function scans a directory for files that match a given prefix. If recursion is enabled,
+ * it will traverse all subdirectories. Matching files are added to the provided ZipArchive object
+ * under a specified path within the archive.
+ *
+ * @param ZipArchive $zip The ZipArchive instance to add files to.
+ * @param string $sourcePath The source directory to search for files.
+ * @param string $zipPath The path inside the ZIP archive where files will be placed.
+ * @param string $prefix The prefix of the files to be added.
+ */
+function addFilesWithPrefixToZip($zip, $sourcePath, $zipPath, $prefix) { //NOSONAR
+    if (!is_dir($sourcePath)) {
+        return;
+    }
+    $pattern = $sourcePath . '/' . $prefix . '*';
+    $files = glob($pattern);
+    if ($files !== false) {
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                $finalZipPath = empty($zipPath) ? basename($file) : $zipPath . '/' . basename($file);
+                $zip->addFile($file, $finalZipPath);
+            }
+        }
+    }
+}
+
 $request = file_get_contents('php://input');
 $data = json_decode($request, true);
 
@@ -87,12 +137,73 @@ $schema = isset($data['schema']) ? $data['schema'] : [];
 $reservedColumns = isset($data['reservedColumns']) ? $data['reservedColumns'] : [];
 $applicationId = isset($data['applicationId']) ? $data['applicationId'] : null;
 
+function createReservedColumnMap($reservedColumns) {
+    $reservedColumnMap = array();
+    foreach ($reservedColumns as $reservedColumn) {
+        $key = $reservedColumn['key'];
+        $reservedColumnMap[$key] = $reservedColumn['name'];
+    }
+    return $reservedColumnMap;
+}
+
+$reservedColumnMap = createReservedColumnMap($reservedColumns['columns']);
+
+$backendHandledColumns = [];
+
+if(isset($reservedColumnMap['time_create']))
+{
+    $backendHandledColumns['timeCreate'] = [
+        'columnName' => $reservedColumnMap['time_create'],
+        'type' => 'datetime'
+    ];
+}
+
+if(isset($reservedColumnMap['time_edit']))
+{
+    $backendHandledColumns['timeEdit'] = [
+        'columnName' => $reservedColumnMap['time_edit'],
+        'type' => 'datetime'
+    ];
+}
+
+if(isset($reservedColumnMap['admin_create']))
+{
+    $backendHandledColumns['adminCreate'] = [
+        'columnName' => $reservedColumnMap['admin_create'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['admin_edit']))
+{
+    $backendHandledColumns['adminEdit'] = [
+        'columnName' => $reservedColumnMap['admin_edit'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['ip_create']))
+{
+    $backendHandledColumns['ipCreate'] = [
+        'columnName' => $reservedColumnMap['ip_create'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['ip_edit']))
+{
+    $backendHandledColumns['ipEdit'] = [
+        'columnName' => $reservedColumnMap['ip_edit'],
+        'type' => 'string'
+    ];
+}
+
 try {
     $application = getApplication($databaseBuilder, $applicationId);
 
     if($withFrontend)
     {
-        $generator = new GraphQLGenerator($schema, $reservedColumns);
+        $generator = new GraphQLGenerator($schema, $reservedColumns, $backendHandledColumns);
 
         // Create ZIP file
         $zip = new ZipArchive();
@@ -140,10 +251,14 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.js", 'assets/graphql.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.min.js", 'assets/graphql.min.js');
 
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg", 'favicon.svg');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
 
-        
+        // Add all files under directory `vendor`
+
+        $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
+        addDirectoryToZip($zip, $vendorPath, 'vendor');
 
         // Replace application name
         // <title>{APP_NAME}</title>
@@ -173,6 +288,14 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/settings.php", "settings.php");
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/settings-update.php", "settings-update.php");
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/update-password.php", "update-password.php");
+
+        // Add all icon files
+        // Add file with prefix `icon-`
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'android-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'apple-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'favicon');
+        
 
         
         // Bonus

@@ -152,11 +152,33 @@ html.sidebar-collapsed .sidebar {
   margin-left: calc(-1 * var(--sidebar-width) - 42px);
 }
 
+.sidebar-filter-container {
+  margin-bottom: 15px;
+  padding: 0;
+}
+
+.sidebar-filter-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+}
+[data-theme=dark] .sidebar-filter-input {
+  background-color: #374151;
+}
+.sidebar-filter-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
 #entity-menu {
   list-style: none;
   padding: 0;
   margin: 0px 0 0 0;
-  height: calc(100vh - 92px);
+  height: calc(100vh - 140px);
   box-sizing: border-box;
   overflow-y: auto;
 }
@@ -582,41 +604,110 @@ hr {
   border-top: 1px solid #4F4F4F;
 }
 
-/* Message View Styles */
-.message-container, .notification-container {
+/* Message & Notification View Styles */
+.message-container,
+.notification-container {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   margin-bottom: 1rem;
+  padding: 0 1rem 1rem;
   background-color: var(--sidebar-bg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
-
-.message-header, .notification-header {
-  padding: 0.75rem 1rem;
-  background-color: var(--background-color);
-  border-bottom: 1px solid var(--border-color);
-  font-weight: bold;
+.message-container .message-body,
+.notification-container .message-body {
+  padding-top: 0.5rem;
 }
-
-.message-header a, .notification-header a {
-  text-decoration: none;
-  color: var(--primary-color);
-}
-
-.message-header a:hover, .notification-header a:hover {
-  text-decoration: underline;
-}
-
-.message-content, .notification-content {
-  padding: 1rem;
-  line-height: 1.6;
-}
-
-/* Add a subtle hover effect on the message list */
-.detail-view > .message-container:hover, .detail-view > .notification-container:hover {
+.message-container:hover,
+.notification-container:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--primary-color);
 }
 
-/*# sourceMappingURL=style.css.map */
+/* Message List Styles */
+.message-list-container .message-item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.message-list-container .message-item:hover {
+  background-color: var(--primary-color-bg-light);
+}
+.message-list-container .message-item.unread .message-sender,
+.message-list-container .message-item.unread .message-subject {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+.message-list-container .message-item.unread .message-content {
+  color: var(--text-primary);
+}
+.message-list-container .message-item.read .message-sender,
+.message-list-container .message-item.read .message-subject {
+  font-weight: normal;
+  color: var(--text-primary);
+}
+.message-list-container .message-item .message-link-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 15px;
+}
+.message-list-container .message-item .message-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: inherit;
+  flex-grow: 1;
+  min-width: 0;
+}
+.message-list-container .message-item .message-sender {
+  font-weight: normal;
+  flex-shrink: 0;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.message-list-container .message-item .message-subject {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.message-list-container .message-item .message-time {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.message-list-container .message-item .message-content {
+  padding: 4px 0 0;
+  font-size: 0.9em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Headers */
+.message-header,
+.notification-header {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.message-header a,
+.notification-header a {
+  text-decoration: none;
+  color: var(--primary-color);
+}
+
+/* Content sections */
+.message-content,
+.notification-content {
+  padding: 1rem;
+  line-height: 1.6;
+}/*# sourceMappingURL=style.css.map */

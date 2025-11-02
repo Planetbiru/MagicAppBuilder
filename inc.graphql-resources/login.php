@@ -19,7 +19,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         if ($user && sha1(sha1($password)) === $user['password']) {
             // Set session on successful login
             $_SESSION['username'] = $user['username'];
-            $_SESSION['password'] = $user['password']; // Storing the hash is more secure
+            $_SESSION['password'] = sha1($password); // Storing the hash is more secure
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode(array('success' => true));

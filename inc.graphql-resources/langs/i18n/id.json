@@ -63,11 +63,9 @@
     "profile_updated_successfully": "Profil berhasil diperbarui.",
     "failed_to_update_profile": "Gagal memperbarui profil: {0}",
     "unexpected_error_occurred": "Terjadi kesalahan tak terduga.",
-
     "active": "Aktif",
     "inactive": "Tidak Aktif",
     "blocked": "Diblokir",
-
     "male": "Pria",
     "female": "Wanita",
     "admin_id": "ID Admin",
@@ -88,24 +86,16 @@
     "failed_to_update_password": "Gagal memperbarui kata sandi.",
     "password_mismatch": "Kata sandi baru dan konfirmasi tidak cocok.",
     "incorrect_current_password": "Kata sandi saat ini salah.",
-
     "page_size": "Ukuran Halaman",
     "max_page_size": "Ukuran Halaman Maksimal",
     "min_page_size": "Ukuran Halaman Minimal",
-
     "settings_updated_successfully": "Pengaturan berhasil diperbarui.",
     "failed_to_update_settings": "Gagal memperbarui pengaturan.",
-
     "new_password_required": "Password baru harus diisi.",
     "current_password_required": "Password basaat ini harus diisi.",
-
     "message": "Pesan",
-
     "no_message": "Tidak ada pesan",
     "notification": "Notifikasi",
-    "no_notification": "Tidak ada notifikasi"
-    
-
-
-
+    "no_notification": "Tidak ada notifikasi",
+    "menu_filter": "Saring menu..."
 }
