@@ -353,3 +353,53 @@ async function handleSettingsUpdate(event) {
         await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: 'An unexpected error occurred.' });
     }
 }
+
+async function markMessageAsUnread(messageId) {
+    const formData = new FormData();
+    formData.append('action', 'mark_as_unread');
+    formData.append('messageId', messageId);
+
+    try {
+        const response = await fetch('message.php', {
+            method: 'POST',
+            headers:{
+                'X-Language-Id': graphqlApp.languageId,
+                'Accept-Language': graphqlApp.languageId
+            },
+            body: formData
+        });
+        const result = await response.json();
+        await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
+        if (response.ok) {
+            // Go back to the message list instead of refreshing the detail view
+            backToList('message');
+        }
+    } catch (error) {
+        console.error('Error marking message as unread:', error);
+    }
+}
+
+async function markNotificationAsUnread(notificationId) {
+    const formData = new FormData();
+    formData.append('action', 'mark_as_unread');
+    formData.append('notificationId', notificationId);
+
+    try {
+        const response = await fetch('notification.php', {
+            method: 'POST',
+            headers:{
+                'X-Language-Id': graphqlApp.languageId,
+                'Accept-Language': graphqlApp.languageId
+            },
+            body: formData
+        });
+        const result = await response.json();
+        await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
+        if (response.ok) {
+            // Go back to the message list instead of refreshing the detail view
+            backToList('notification');
+        }
+    } catch (error) {
+        console.error('Error marking notification as unread:', error);
+    }
+}
