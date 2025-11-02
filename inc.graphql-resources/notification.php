@@ -78,7 +78,7 @@ try {
             <div class="back-controls">
                 <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')"><?php echo $i18n->t('back_to_list'); ?></button>
                 <?php if ($notification['is_read']): ?>
-                    <button class="btn btn-warning" onclick="markNotificationAsUnread('<?php echo $notification['notification_id']; ?>')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                    <button class="btn btn-primary" onclick="markNotificationAsUnread('<?php echo $notification['notification_id']; ?>')"><?php echo $i18n->t('mark_as_unread'); ?></button>
                 <?php endif; ?>
             </div>
             <div class="notification-container">

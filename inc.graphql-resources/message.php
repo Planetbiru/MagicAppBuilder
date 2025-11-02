@@ -99,7 +99,7 @@ try
             <div class="back-controls">
                 <button id="back-to-list" class="btn btn-secondary" onclick="backToList('message')"><?php echo $i18n->t('back_to_list'); ?></button>
                 <?php if ($message['receiver_id'] == $currentAdminId && $message['is_read']): ?>
-                    <button class="btn btn-warning" onclick="markMessageAsUnread('<?php echo $message['message_id']; ?>')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                    <button class="btn btn-primary" onclick="markMessageAsUnread('<?php echo $message['message_id']; ?>')"><?php echo $i18n->t('mark_as_unread'); ?></button>
                 <?php endif; ?>
             </div>
             <div class="message-container">
