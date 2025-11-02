@@ -1070,7 +1070,7 @@ class GraphQLGenerator
      */
     public function generateFrontendConfigJson()
     {
-      
+        $sortOrder = 1;
         $frontendConfig = array();
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
@@ -1096,7 +1096,8 @@ class GraphQLGenerator
                 'hasActiveColumn' => $tableInfo['hasActiveColumn'],
                 'columns' => $columns,
                 'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : [],
-                'backendHandledColumns' => array_column($this->backendHandledColumns, 'columnName')
+                'backendHandledColumns' => array_column($this->backendHandledColumns, 'columnName'),
+                'sortOrder' => $sortOrder++
             );
         }
         

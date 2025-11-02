@@ -553,7 +553,16 @@ class GraphQLClientApp {
     buildMenu() {
         if (!this.config || !this.config.entities) return;
         this.dom.menu.innerHTML = '';
-        Object.values(this.config.entities).forEach((entity, index) => {
+
+        // Convert entities object to an array and sort it by the sortOrder property.
+        // Entities without a sortOrder will be placed at the end.
+        const sortedEntities = Object.values(this.config.entities).sort((a, b) => {
+            const orderA = a.sortOrder !== undefined ? a.sortOrder : Infinity;
+            const orderB = b.sortOrder !== undefined ? b.sortOrder : Infinity;
+            return orderA - orderB;
+        });
+
+        sortedEntities.forEach((entity) => {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = `#${entity.name}`;
