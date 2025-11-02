@@ -109,12 +109,45 @@ $schema = isset($data['schema']) ? $data['schema'] : [];
 $reservedColumns = isset($data['reservedColumns']) ? $data['reservedColumns'] : [];
 $applicationId = isset($data['applicationId']) ? $data['applicationId'] : null;
 
+$backendHandledColumns = [
+    'timeCreate'=>
+    [
+        'columnName' => 'waktu_buat',
+        'type' => 'datetime'
+    ],
+    'timeEdit'=>
+    [
+        'columnName' => 'waktu_ubah',
+        'type' => 'datetime'
+    ],
+    'adminCreate'=>
+    [
+        'columnName' => 'admin_buat',
+        'type' => 'string'
+    ],
+    'adminEdit'=>
+    [
+        'columnName' => 'admin_ubah',
+        'type' => 'string'
+    ],
+    'ipCreate'=>
+    [
+        'columnName' => 'ip_buat',
+        'type' => 'string'
+    ],
+    'ipEdit'=>
+    [
+        'columnName' => 'ip_ubah',
+        'type' => 'string'
+    ]
+];
+
 try {
     $application = getApplication($databaseBuilder, $applicationId);
 
     if($withFrontend)
     {
-        $generator = new GraphQLGenerator($schema, $reservedColumns);
+        $generator = new GraphQLGenerator($schema, $reservedColumns, $backendHandledColumns);
 
         // Create ZIP file
         $zip = new ZipArchive();

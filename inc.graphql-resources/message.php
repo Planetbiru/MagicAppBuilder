@@ -16,11 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     try {
-        $sql = "SELECT admin_id FROM admin WHERE username = :username";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':username' => $_SESSION['username']]);
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-        $currentAdminId = $admin['admin_id'];
 
         $newStatus = '0';
         if(stripos($cfgDbDriver, 'posgre') !== false || stripos($cfgDbDriver, 'pgsql') !== false)
@@ -64,12 +59,12 @@ try
     $sql = "SELECT * FROM admin WHERE username = :username";
     $stmt = $db->prepare($sql);
     $stmt->execute(array(':username' => $_SESSION['username']));
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    $appAdmin = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if(isset($_GET['messageId']))
     {
         $messageId = $_GET['messageId'];
-        $currentAdminId = $admin['admin_id'];
+        $currentAdminId = $appAdmin['admin_id'];
 
         // Mark as read if the current user is the receiver and the message is unread
         $checkReadSql = "SELECT is_read, receiver_id FROM message WHERE message_id = :message_id";
@@ -143,7 +138,7 @@ try
     // Count total messages for pagination
     $countSql = "SELECT COUNT(*) FROM message WHERE sender_id = :admin_id OR receiver_id = :admin_id";
     $countStmt = $db->prepare($countSql);
-    $countStmt->execute(array(':admin_id' => $admin['admin_id']));
+    $countStmt->execute(array(':admin_id' => $appAdmin['admin_id']));
     $totalMessages = $countStmt->fetchColumn();
     $totalPages = ceil($totalMessages / $dataLimit);
 
@@ -157,7 +152,7 @@ try
     LIMIT $dataLimit OFFSET $offset
     ";
     $stmt = $db->prepare($sql);
-    $stmt->execute(array(':admin_id' => $admin['admin_id']));
+    $stmt->execute(array(':admin_id' => $appAdmin['admin_id']));
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
     <div class="message-list-container">

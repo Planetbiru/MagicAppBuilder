@@ -14,6 +14,7 @@ class GraphQLGenerator
 {
     private $reservedColumns = []; 
     private $activeField = 'active';
+    private $backendHandledColumns = [];
     private $displayField = 'name';
 
     /**
@@ -31,11 +32,13 @@ class GraphQLGenerator
      *
      * @param array $schema Decoded JSON schema.
      * @param array $reservedColumns
+     * @param array $backendHandledColumns
      * @throws Exception If the file is not found or invalid.
      */
-    public function __construct($schema, $reservedColumns = null)
+    public function __construct($schema, $reservedColumns = null, $backendHandledColumns = array())
     {
         $this->schema = $schema;
+        $this->backendHandledColumns = $backendHandledColumns;
 
         if(isset($reservedColumns) && isset($reservedColumns['columns']))
         {
@@ -588,6 +591,49 @@ class GraphQLGenerator
     }
 
     /**
+     * Undocumented function
+     *
+     * @param [type] $tableInfo
+     * @return array
+     */
+    private function getColumnNames($tableInfo)
+    {
+        $columnNames = [];
+        foreach($tableInfo['columns'] as $columnName => $col) {
+            $columnNames[] = $columnName;
+        }
+        return $columnNames;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return array
+     */
+    private function backendHandledColumns()
+    {
+        $backendHandledColumns = [];
+        foreach ($this->backendHandledColumns as $backendHandledColumnKey => $col) {
+            $backendHandledColumns[] = $col['columnName'];
+        }
+        return $backendHandledColumns;
+    }
+
+    private function hasBackendHandledColumns($tableInfo)
+    {
+        $columnNames = $this->getColumnNames($tableInfo);
+        $backendHandledColumns = $this->backendHandledColumns();
+        foreach ($backendHandledColumns as $columnName) {
+            if (in_array($columnName, $columnNames)) {
+                return true;
+            }
+        }
+        return false;
+        
+    }
+
+
+    /**
      * Generates the PHP code for the root Mutation type.
      *
      * @return string The generated PHP code.
@@ -599,21 +645,60 @@ class GraphQLGenerator
         $code .= "    'name' => 'Mutation',\r\n";
         $code .= "    'fields' => array(\r\n";
 
+        
+
+
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
             $typeName = $camelName . 'Type';
             $inputTypeName = $camelName . 'InputType';
             $primaryKey = $tableInfo['primaryKey'];
+            $activeField = $this->activeField;
+
+            $hasBackendHandledColumns = $this->hasBackendHandledColumns($tableInfo);
 
             // Create Mutation
             $code .= "        'create" . ucfirst($camelName) . "' => array(\r\n";
             $code .= "            'type' => \$" . $typeName . ",\r\n";
             $code .= "            'args' => array('input' => Type::nonNull(\$" . $inputTypeName . ")),\r\n";
-            $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
+            $code .= "            'resolve' => function (\$root, \$args) use (\$db, \$appTimeCreate, \$appTimeEdit, \$appAdminCreate, \$appAdminEdit, \$appIpCreate, \$appIpEdit) {\r\n";
             $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
             $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
             $code .= "                    return in_array(\$key, \$allowedColumns);\r\n";
             $code .= "                }, ARRAY_FILTER_USE_KEY);\r\n\r\n";
+            if ($hasBackendHandledColumns)
+            {
+                $code .= "\r\n";
+                $code .= "                // Handle backend handled columns begin\r\n";
+                foreach ($this->backendHandledColumns as $backendHandledColumnKey => $col) {
+                    $colName = $col['columnName'];
+                    if($backendHandledColumnKey == 'timeCreate')
+                    {
+                        $code .= "                \$input['$colName'] = \$appTimeCreate;\r\n";
+                    }
+                    else if($backendHandledColumnKey == 'timeEdit')
+                    {
+                        $code .= "                \$input['$colName'] = \$appTimeEdit;\r\n";
+                    }
+                    else if($backendHandledColumnKey == 'adminCreate')
+                    {
+                        $code .= "                \$input['$colName'] = \$appAdminCreate;\r\n";
+                    }
+                    else if($backendHandledColumnKey == 'adminEdit')
+                    {
+                        $code .= "                \$input['$colName'] = \$appAdminEdit;\r\n";
+                    }
+                    else if($backendHandledColumnKey == 'ipCreate')
+                    {
+                        $code .= "                \$input['$colName'] = \$appIpCreate;\r\n";
+                    }
+                    else if($backendHandledColumnKey == 'ipEdit')
+                    {
+                        $code .= "                \$input['$colName'] = \$appIpEdit;\r\n";
+                    }
+                }
+                $code .= "                // Handle backend handled columns end\r\n\r\n";
+            }
             $code .= "                \$input = \$args['input'];\r\n";
             $code .= "                \$id = uniqid(); // Simple unique ID\r\n";
             $code .= "                \$input['" . $primaryKey . "'] = \$id;\r\n";
@@ -637,12 +722,33 @@ class GraphQLGenerator
             $code .= "                'id' => Type::nonNull(Type::string()),\r\n";
             $code .= "                'input' => Type::nonNull(\$" . $inputTypeName . ")\r\n";
             $code .= "            ),\r\n";
-            $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
+            $code .= "            'resolve' => function (\$root, \$args) use (\$db, \$appTimeEdit, \$appAdminEdit, \$appIpEdit) {\r\n";
             $code .= "                \$id = \$args['id'];\r\n";
             $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
             $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
             $code .= "                    return in_array(\$key, \$allowedColumns);\r\n";
             $code .= "                }, ARRAY_FILTER_USE_KEY);\r\n\r\n";
+            if ($hasBackendHandledColumns)
+            {
+                $code .= "\r\n";
+                $code .= "                // Handle backend handled columns begin\r\n";
+                foreach ($this->backendHandledColumns as $backendHandledColumnKey => $col) {
+                    $colName = $col['columnName'];
+                    if($backendHandledColumnKey == 'timeEdit')
+                    {
+                        $code .= "                \$input['$colName'] = \$appTimeEdit;\r\n";
+                    }
+                    else if($backendHandledColumnKey == 'adminEdit')
+                    {
+                        $code .= "                \$input['$colName'] = \$appAdminEdit;\r\n";
+                    }
+                    else if($backendHandledColumnKey == 'ipEdit')
+                    {
+                        $code .= "                \$input['$colName'] = \$appIpEdit;\r\n";
+                    }
+                }
+                $code .= "                // Handle backend handled columns end\r\n\r\n";
+            }
             $code .= "                \$setPart = array();\r\n";
             $code .= "                \$params = array(':id' => \$id);\r\n";
             $code .= "                foreach (\$input as \$field => \$value) {\r\n";
@@ -667,12 +773,12 @@ class GraphQLGenerator
                 $code .= "            'type' => \$" . $typeName . ",\r\n";
                 $code .= "            'args' => array(\r\n";
                 $code .= "                'id' => Type::nonNull(Type::string()),\r\n";
-                $code .= "                '".$this->activeField."' => Type::nonNull(Type::boolean())\r\n";
+                $code .= "                '".$activeField."' => Type::nonNull(Type::boolean())\r\n";
                 $code .= "            ),\r\n";
                 $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
-                $code .= "                \$sql = 'UPDATE " . $tableName . " SET ".$this->activeField." = :active WHERE " . $primaryKey . " = :id';\r\n";
+                $code .= "                \$sql = 'UPDATE " . $tableName . " SET ".$activeField." = :active WHERE " . $primaryKey . " = :id';\r\n";
                 $code .= "                \$stmt = \$db->prepare(\$sql);\r\n";
-                $code .= "                \$stmt->execute(array(':id' => \$args['id'], ':active' => \$args['".$this->activeField."'] ? 1 : 0));\r\n";
+                $code .= "                \$stmt->execute(array(':id' => \$args['id'], ':active' => \$args['".$activeField."'] ? 1 : 0));\r\n";
                 $code .= "                \$stmt = \$db->prepare('SELECT * FROM " . $tableName . " WHERE " . $primaryKey . " = :id');\r\n";
                 $code .= "                \$stmt->execute(array(':id' => \$args['id']));\r\n";
                 $code .= "                return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
@@ -989,7 +1095,8 @@ class GraphQLGenerator
                 'primaryKey' => $tableInfo['primaryKey'],
                 'hasActiveColumn' => $tableInfo['hasActiveColumn'],
                 'columns' => $columns,
-                'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : []
+                'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : [],
+                'backendHandledColumns' => array_column($this->backendHandledColumns, 'columnName')
             );
         }
         
@@ -1075,6 +1182,17 @@ class GraphQLGenerator
 
         $dbConnection = "/**\r\n * ----------------------------------------------------------------------------\r\n * DATABASE CONNECTION\r\n * ----------------------------------------------------------------------------\r\n */\r\n\r\n";
 
+        $variableDeclaration = "";
+
+        $variableDeclaration .= "\$appTimeCreate = date('Y-m-d H:i:s');\r\n";
+        $variableDeclaration .= "\$appTimeEdit = date('Y-m-d H:i:s');\r\n";
+        $variableDeclaration .= "\$appAdminCreate = \$appAdmin['admin_id'];\r\n";
+        $variableDeclaration .= "\$appAdminEdit = \$appAdmin['admin_id'];\r\n";
+        $variableDeclaration .= "\$appIpCreate = \$_SERVER['REMOTE_ADDR'];\r\n";
+        $variableDeclaration .= "\$appIpEdit = \$_SERVER['REMOTE_ADDR'];\r\n\r\n";
+
+
+
         $utilityTypesCode = $this->generateUtilityTypes();
         $typesCode = $this->generateTypes();
         $inputTypesCode = $this->generateInputTypes();
@@ -1123,7 +1241,7 @@ class GraphQLGenerator
         $schemaAndExecution .= "header('Access-Control-Allow-Origin: *');\r\n";
         $schemaAndExecution .= "echo json_encode(\$output);\r\n";
 
-        return $header . $dbConnection . $utilityTypesCode . $typesCode . $inputTypesCode . $queriesCode . $mutationsCode . $schemaAndExecution;
+        return $header . $dbConnection . $variableDeclaration . $utilityTypesCode . $typesCode . $inputTypesCode . $queriesCode . $mutationsCode . $schemaAndExecution;
     }
 
 

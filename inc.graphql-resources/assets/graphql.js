@@ -1339,7 +1339,13 @@ class GraphQLClientApp {
 
         let formHtml = '';
         for (const colName in this.currentEntity.columns) {
+            // Exclude primary key
             if (colName === this.currentEntity.primaryKey) continue;
+            // Exclude backend handled columns
+            if (this.currentEntity.backendHandledColumns && this.currentEntity.backendHandledColumns.includes(colName)) {
+                continue;
+            }
+
             const col = this.currentEntity.columns[colName];
             let value = '';
             if (col.isForeignKey && item[col.references]) {
@@ -1462,7 +1468,7 @@ class GraphQLClientApp {
             const col = this.currentEntity.columns[colName];
 
             // Handle unchecked checkboxes
-            if (this.dom.form.querySelector(`[name="${colName}"]`).type === 'checkbox') {
+            if (this.dom.form.querySelector(`[name="${colName}"]`) && this.dom.form.querySelector(`[name="${colName}"]`).type === 'checkbox') {
                 let value = this.dom.form.querySelector(`[name="${colName}"]`).checked;
                 if (!value) {
                     if (col.type.includes('boolean')) {

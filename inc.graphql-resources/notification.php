@@ -16,15 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     try {
-        $sql = "SELECT admin_id, admin_level_id FROM admin WHERE username = :username";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':username' => $_SESSION['username']]);
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        $currentAdminId = $appAdmin['admin_id'];
 
         if ($action === 'mark_as_unread') {
             $updateSql = "UPDATE notification SET is_read = 0, time_read = NULL WHERE notification_id = :notification_id AND (admin_id = :admin_id OR admin_group = :admin_level_id)";
             $updateStmt = $db->prepare($updateSql);
-            $updateStmt->execute([':notification_id' => $notificationId, ':admin_id' => $admin['admin_id'], ':admin_level_id' => $admin['admin_level_id']]);
+            $updateStmt->execute([':notification_id' => $notificationId, ':admin_id' => $currentAdminId, ':admin_level_id' => $appAdmin['admin_level_id']]);
             echo json_encode(['success' => true, 'message' => $i18n->t('notification_marked_as_unread')]);
         }
     } catch (Exception $e) {
@@ -52,12 +49,7 @@ $dataLimit = abs($pagination['pageSize']);
 $offset = ($page - 1) * $dataLimit;
 
 try {
-    $sql = "SELECT admin_id, admin_level_id FROM admin WHERE username = :username";
-    $stmt = $db->prepare($sql);
-    $stmt->execute(array(':username' => $_SESSION['username']));
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-    $currentAdminId = $admin['admin_id'];
-    $currentAdminLevelId = $admin['admin_level_id'];
+    $currentAdminLevelId = $appAdmin['admin_level_id'];
 
     if (isset($_GET['notificationId'])) {
         $notificationId = $_GET['notificationId'];
