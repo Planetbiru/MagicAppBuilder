@@ -79,6 +79,28 @@ database:
     return $databaseConfiguration;
 }
 
+/**
+ * Adds a directory and all its contents to a ZIP archive.
+ *
+ * @param ZipArchive $zip The ZipArchive instance.
+ * @param string $sourcePath The path to the directory to add.
+ * @param string $zipPath The path inside the ZIP archive where the directory will be placed.
+ */
+function addDirectoryToZip($zip, $sourcePath, $zipPath) {
+    if (is_dir($sourcePath)) {
+        $zip->addEmptyDir($zipPath);
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourcePath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($files as $file) {
+            $filePath = $file->getRealPath();
+            $relativePath = $zipPath . '/' . substr($filePath, strlen($sourcePath) + 1);
+            $file->isDir() ? $zip->addEmptyDir($relativePath) : $zip->addFile($filePath, $relativePath);
+        }
+    }
+}
+
 $request = file_get_contents('php://input');
 $data = json_decode($request, true);
 
@@ -142,8 +164,13 @@ try {
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/favicon.svg", 'favicon.svg');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
 
-        
+        // Add all files under directory `vendor`
+
+        $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
+        addDirectoryToZip($zip, $vendorPath, 'vendor');
 
         // Replace application name
         // <title>{APP_NAME}</title>
