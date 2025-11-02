@@ -472,7 +472,7 @@ class GraphQLGenerator
             $code .= "                // Whitelist valid columns for filtering and sorting to prevent SQL injection.\r\n";
             $code .= "                // You can customize these arrays to allow/disallow columns for filtering and sorting.\r\n";
             $code .= "                \$allowedFilterColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
-            $code .= "                \$allowedSortColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n\r\n";
+            $code .= "                \$allowedSortColumns   = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n\r\n";
             $code .= "                \$baseSql = 'FROM " . $tableName . "';\r\n";
             $code .= "                \$countSql = 'SELECT COUNT(*) as total ' . \$baseSql;\r\n";
             $code .= "                \$dataSql = 'SELECT * ' . \$baseSql;\r\n";
@@ -610,6 +610,10 @@ class GraphQLGenerator
             $code .= "            'type' => \$" . $typeName . ",\r\n";
             $code .= "            'args' => array('input' => Type::nonNull(\$" . $inputTypeName . ")),\r\n";
             $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
+            $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
+            $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
+            $code .= "                    return in_array(\$key, \$allowedColumns);\r\n";
+            $code .= "                }, ARRAY_FILTER_USE_KEY);\r\n\r\n";
             $code .= "                \$input = \$args['input'];\r\n";
             $code .= "                \$id = uniqid(); // Simple unique ID\r\n";
             $code .= "                \$input['" . $primaryKey . "'] = \$id;\r\n";
@@ -635,7 +639,10 @@ class GraphQLGenerator
             $code .= "            ),\r\n";
             $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
             $code .= "                \$id = \$args['id'];\r\n";
-            $code .= "                \$input = \$args['input'];\r\n";
+            $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
+            $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
+            $code .= "                    return in_array(\$key, \$allowedColumns);\r\n";
+            $code .= "                }, ARRAY_FILTER_USE_KEY);\r\n\r\n";
             $code .= "                \$setPart = array();\r\n";
             $code .= "                \$params = array(':id' => \$id);\r\n";
             $code .= "                foreach (\$input as \$field => \$value) {\r\n";
