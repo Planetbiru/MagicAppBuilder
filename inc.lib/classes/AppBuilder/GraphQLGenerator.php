@@ -1090,6 +1090,7 @@ class GraphQLGenerator
                 'name' => $camelName,
                 'pluralName' => $pluralCamelName,
                 'displayName' => $this->camelCaseToTitleCase($camelName),
+                'originalName' => $tableName,
                 'displayField' => $this->displayField,
                 'activeField' => $this->activeField,
                 'primaryKey' => $tableInfo['primaryKey'],
