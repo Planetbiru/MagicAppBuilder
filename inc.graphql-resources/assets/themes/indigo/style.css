@@ -21,9 +21,9 @@
   --primary-color: #818cf8; /* Indigo 400 */
   --primary-color-hover: #a5b4fc; /* Indigo 300 */
   --primary-color-bg-light: rgba(129, 140, 248, 0.15);
-  --background-color: #111827;
-  --sidebar-bg: #1f2937;
-  --header-bg: #1f2937;
+  --background-color: #1a182c;
+  --sidebar-bg: #21202f;
+  --header-bg: #21202f;
   --text-primary: #f9fafb;
   --text-secondary: #9ca3af;
   --border-color: #374151;
