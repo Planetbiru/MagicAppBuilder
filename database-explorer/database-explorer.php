@@ -331,7 +331,7 @@ if(!isset($databaseName))
         </div>
     </div>
     
-    <div class="modal modal-xl" id="entityDataEditorModal">
+    <div class="modal modal-xxl" id="entityDataEditorModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
@@ -358,7 +358,7 @@ if(!isset($databaseName))
         </div>
     </div>
 
-    <div class="modal modal-lg modal-top-40" id="graphqlGeneratorModal">
+    <div class="modal modal-xl modal-top-40" id="graphqlGeneratorModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
