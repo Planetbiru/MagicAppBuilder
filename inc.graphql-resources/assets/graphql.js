@@ -17,6 +17,8 @@ class GraphQLClientApp {
      * @param {string} [options.entityLanguageUrl='entity-language.php'] - URL to fetch entity-specific language translations.
      * @param {string} [options.i18nUrl='language.php'] - URL to fetch UI language packs.
      * @param {string} [options.languageConfigUrl='available-language.php'] - URL to fetch the list of available languages.
+     * @param {string} [options.themeConfigUrl='available-theme.php'] - URL to fetch the list of available themes.
+     * @param {string} [options.defaultThemeUrl='assets/style.min.css'] - Path to the default/fallback stylesheet.
      * @param {object} [options.customRenderers] - Custom rendering functions for entities (e.g., for list, detail, form views).
      * @param {string} [options.defaultActiveField='active'] - Default field name for the 'active' status column.
      * @param {string} [options.defaultDisplayField='name'] - Default field name to use for displaying relationships if not specified.
@@ -33,6 +35,8 @@ class GraphQLClientApp {
             entityLanguageUrl: 'entity-language.php',
             i18nUrl: 'language.php',
             languageConfigUrl: 'available-language.php',
+            themeConfigUrl: 'available-theme.php',
+            defaultThemeUrl: 'assets/style.min.css',
 
             customRenderers: {},
             defaultActiveField: 'active',
@@ -47,6 +51,8 @@ class GraphQLClientApp {
         Object.assign(this, defaults, options);
 
         this.supportedLanguages = {};
+        /** @type {Array<object>} A list of available theme objects, e.g., [{name: 'green', title: 'Green'}]. */
+        this.availableThemes = [];
 
 
         // i18n for UI elements outside the class
@@ -99,6 +105,7 @@ class GraphQLClientApp {
             sidebar: document.getElementById('sidebar-nav'),
             mainContent: document.getElementById('main-content'),
             langMenu: document.getElementById('lang-menu'),
+            themeMenu: document.getElementById('theme-menu'),
             filterContainer: document.getElementById('filter-container'),
             tableDataContainer: document.getElementById('table-data-container'),
             paginationContainer: document.getElementById('pagination-container'),
@@ -109,6 +116,7 @@ class GraphQLClientApp {
             infoModalTitle: document.getElementById('infoModalTitle'),
             infoModalMessage: document.getElementById('infoModalMessage'),
             infoModalOk: document.getElementById('infoModalOk'),
+            themeStylesheet: document.getElementById('theme-stylesheet'),
         };
         this.applicationTitle = document.querySelector('meta[name="title"]').getAttribute('content');
         this.init();
@@ -170,6 +178,17 @@ class GraphQLClientApp {
             }
         });
 
+        // Theme selection handler
+        this.dom.themeMenu.addEventListener('click', (e) => {
+            if (e.target.matches('a[data-theme-name]')) {
+                e.preventDefault();
+                const themeName = e.target.dataset.themeName;
+                this.changeTheme(themeName);
+                // Close dropdown after selection
+                this.dom.themeMenu.classList.remove('active');
+            }
+        });
+
         // Theme toggle handler
         this.dom.themeToggle.addEventListener('click', () => this.toggleTheme());
 
@@ -179,10 +198,6 @@ class GraphQLClientApp {
                 this.applyTheme(event.newValue);
             }
         });
-
-        // Apply initial theme
-        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        this.applyTheme(savedTheme);
 
         // Menu filter functionality
         if (this.dom.menuFilterInput) {
@@ -222,13 +237,13 @@ class GraphQLClientApp {
 
         try {
             await this.initializeLanguage();
+            await this.initializeTheme();
             await this.loadI18n();
             await this.loadConfig();
             await this.loadLanguage();
             this.applyI18n();
             this.initPage(); // Initialize UI event listeners
             window.onclick = (event) => {
-                if (event.target == this.dom.modal) this.closeModal();
             };
             // Add event listener for data-dismiss="modal"
             document.addEventListener('click', (event) => {
@@ -355,6 +370,39 @@ class GraphQLClientApp {
             this.dom.langMenu.appendChild(li);
         }
     }
+
+    /**
+     * Fetches available themes, validates the stored theme, and applies it.
+     * @returns {Promise<void>}
+     */
+    async initializeTheme() {
+        try {
+            const response = await fetch(this.themeConfigUrl);
+            if (!response.ok) throw new Error(`Could not fetch ${this.themeConfigUrl}`);
+            this.availableThemes = await response.json();
+
+            const savedThemeName = localStorage.getItem('colorTheme');
+            let themeToApply = null;
+
+            // Validate if the saved theme exists in the available themes
+            if (savedThemeName && this.availableThemes.some(t => t.name === savedThemeName)) {
+                themeToApply = savedThemeName;
+            }
+            this.applyTheme(themeToApply);
+            this.populateThemeMenu();
+
+        } catch (error) {
+            console.error("Failed to initialize theme configuration:", error);
+            // Fallback to default stylesheet if config fails
+            this.applyTheme(null);
+            this.populateThemeMenu(); // Populate with empty to avoid errors
+        } finally {
+            // Apply initial dark/light mode after theme is set
+            const savedThemeMode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            this.applyThemeMode(savedThemeMode);
+        }
+    }
+
 
     /**
      * Fetches and loads the main application configuration from the specified URL.
@@ -510,21 +558,102 @@ class GraphQLClientApp {
      * @returns {void}
      */
     toggleTheme() {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        this.applyTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
+        const currentMode = document.documentElement.getAttribute('data-theme') || 'light';
+        const newMode = currentMode === 'dark' ? 'light' : 'dark';
+        this.applyThemeMode(newMode);
+        localStorage.setItem('theme', newMode);
     }
 
     /**
-     * Applies a specific theme to the application.
-     * It sets a `data-theme` attribute on the `<html>` element.
-     * @param {string} theme - The theme to apply ('light' or 'dark').
-     * @returns {void}
+     * Populates the theme dropdown menu.
      */
-    applyTheme(theme) {
-        // Simply set the data-theme attribute. CSS will handle showing/hiding the correct icon path.
-        document.documentElement.setAttribute('data-theme', theme);
+    populateThemeMenu() {
+        this.dom.themeMenu.innerHTML = ''; // Clear existing items
+        const currentTheme = localStorage.getItem('colorTheme');
+
+        this.availableThemes.forEach(theme => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.dataset.themeName = theme.name;
+            if (theme.name === currentTheme) {
+                a.classList.add('active');
+            }
+            a.textContent = theme.title;
+            li.appendChild(a);
+            this.dom.themeMenu.appendChild(li);
+        });
+    }
+
+    /**
+     * Changes the application's color theme.
+     * @param {string} themeName - The name of the theme to apply.
+     */
+    changeTheme(themeName) {
+        localStorage.setItem('colorTheme', themeName);
+        this.applyTheme(themeName);
+
+        // Update active class in the dropdown
+        this.dom.themeMenu.querySelectorAll('a').forEach(a => {
+            a.classList.toggle('active', a.dataset.themeName === themeName);
+        });
+    }
+
+    /**
+     * Applies a specific color theme by changing the stylesheet link.
+     * This method ensures a smooth transition by preloading the new stylesheet
+     * before removing the old one, preventing a "flash of unstyled content".
+     * @param {?string} themeName - The name of the theme directory, or null to use the default.
+     * @returns {Promise<void>}
+     */
+    async applyTheme(themeName) {
+        const newUrl = themeName ? `assets/themes/${themeName}/style.min.css` : this.defaultThemeUrl;
+
+        // If the new URL is the same as the current one, do nothing.
+        if (this.dom.themeStylesheet && this.dom.themeStylesheet.href.endsWith(newUrl)) {
+            return;
+        }
+
+        // Create a new link element for the new theme
+        const newLink = document.createElement('link');
+        newLink.rel = 'stylesheet';
+        newLink.href = newUrl;
+
+        // Append the new link to the head. The browser will start loading it.
+        document.head.appendChild(newLink);
+
+        // When the new stylesheet has loaded successfully
+        newLink.onload = () => {
+            // Get the old stylesheet element
+            const oldLink = this.dom.themeStylesheet;
+
+            // Remove the old stylesheet from the DOM
+            if (oldLink && oldLink.parentNode) {
+                oldLink.parentNode.removeChild(oldLink);
+            }
+
+            // Update the DOM cache to point to the new stylesheet and give it the primary ID
+            this.dom.themeStylesheet = newLink;
+            newLink.id = 'theme-stylesheet';
+        };
+
+        // Handle cases where the new stylesheet fails to load
+        newLink.onerror = () => {
+            console.error(`Failed to load theme: ${newUrl}. Keeping the current theme.`);
+            // Remove the failed link element
+            if (newLink.parentNode) {
+                newLink.parentNode.removeChild(newLink);
+            }
+        };
+    }
+
+    /**
+     * Applies a specific theme mode to the application ('light' or 'dark').
+     * It sets a `data-theme` attribute on the `<html>` element.
+     * @param {string} mode - The theme mode to apply ('light' or 'dark').
+     */
+    applyThemeMode(mode) {
+        document.documentElement.setAttribute('data-theme', mode);
     }
 
     /**

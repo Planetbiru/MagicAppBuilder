@@ -11,9 +11,17 @@
       document.documentElement.classList.add('sidebar-collapsed');
     }
   </script>
-  <link rel="stylesheet" href="assets/style.css">
   <link type="image/x-icon" rel="icon" href="favicon.ico" />
   <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
+  <script id="theme-selector-script">
+    // Immediately set the theme stylesheet href based on localStorage for faster perceived load.
+    // Validation will happen later in graphql.js, which can correct this if the theme is invalid.
+    const storedColorTheme = localStorage.getItem('colorTheme');
+    const themeUrl = storedColorTheme ? `assets/themes/${storedColorTheme}/style.min.css` : 'assets/style.min.css';
+    document.write(`<link rel="stylesheet" id="theme-stylesheet" href="${themeUrl}">`);
+    let themeSelector = document.querySelector('#theme-selector-script');
+    themeSelector.parentNode.removeChild(themeSelector);
+  </script>
   <script src="assets/graphql.min.js"></script>
   <script src="assets/app.min.js"></script>
 </head>
@@ -59,6 +67,17 @@
               <path id="theme-icon-light" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
             </svg>
           </span>
+        </div>
+        <div class="header-item">
+          <span class="icon" data-dropdown="theme-menu">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM5.23 16.77c-.39-.39-.39-1.02 0-1.41l8.49-8.49c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41l-8.49 8.49c-.39.39-1.02.39-1.41 0zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+            </svg>
+          </span>
+          <ul id="theme-menu" class="dropdown-menu">
+            <!-- Theme items will be inserted here by JavaScript -->
+          </ul>
         </div>
         <div class="header-item">
           <span class="icon" data-dropdown="lang-menu">

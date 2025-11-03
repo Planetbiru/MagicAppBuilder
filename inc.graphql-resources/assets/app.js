@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         entityLanguageUrl: 'entity-language.php',
         // URL to fetch general UI translations (i18n).
         i18nUrl: 'language.php',
+        // URL to get the list of available themes.
+        themeConfigUrl: 'available-theme.php',
         // URL to get the list of available languages.
         languageConfigUrl: 'available-language.php',
 

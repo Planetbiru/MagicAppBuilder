@@ -259,6 +259,9 @@ try {
 
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
         addDirectoryToZip($zip, $vendorPath, 'vendor');
+        
+        $themePath = dirname(__DIR__) . "/inc.graphql-resources/assets/themes";
+        addDirectoryToZip($zip, $themePath, 'assets/themes');
 
         // Replace application name
         // <title>{APP_NAME}</title>

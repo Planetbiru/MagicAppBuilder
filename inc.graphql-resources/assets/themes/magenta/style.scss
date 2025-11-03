@@ -1,9 +1,9 @@
 :root {
   --sidebar-width: 250px;
   --header-height: 50px;
-  --primary-color: #78350f; /* Amber 800 */
-  --primary-color-hover: #522e12; /* Amber 900 */
-  --primary-color-bg-light: rgba(120, 53, 15, 0.1);
+  --primary-color: #c026d3; /* Fuchsia 600 */
+  --primary-color-hover: #a21caf; /* Fuchsia 700 */
+  --primary-color-bg-light: rgba(192, 38, 211, 0.1);
   --background-color: #f9fafb;
   /* Lighter grey for background */
   --sidebar-bg: #ffffff;
@@ -18,9 +18,9 @@
 
 /* Dark Mode Variables */
 [data-theme="dark"] {
-  --primary-color: #b45309; /* Amber 700 */
-  --primary-color-hover: #d97706; /* Amber 600 */
-  --primary-color-bg-light: rgba(180, 83, 9, 0.15);
+  --primary-color: #d946ef; /* Fuchsia 500 */
+  --primary-color-hover: #e879f9; /* Fuchsia 400 */
+  --primary-color-bg-light: rgba(217, 70, 239, 0.15);
   --background-color: #111827;
   --sidebar-bg: #1f2937;
   --header-bg: #1f2937;
@@ -327,7 +327,7 @@ html.sidebar-collapsed .sidebar {
     &:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(120, 53, 15, 0.3);
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.3);
     }
   }
 }
@@ -597,7 +597,7 @@ td.actions {
   left: 0;
   width: 100%;
   height: 3px;
-  background-color: rgba(120, 53, 15, 0.2);
+  background-color: rgba(192, 38, 211, 0.2);
   z-index: 9999;
   overflow: hidden;
   display: none;
