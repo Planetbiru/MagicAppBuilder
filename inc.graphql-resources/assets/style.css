@@ -101,7 +101,7 @@ h2 {
   top: 40px;
   right: 0;
   background-color: var(--header-bg);
-  border-radius: 5px;
+  border-radius: 4px;
   box-shadow: var(--shadow-md);
   min-width: 180px;
   z-index: 101;
@@ -187,7 +187,7 @@ html.sidebar-collapsed .sidebar {
   padding: 8px 12px;
   color: var(--text-secondary);
   text-decoration: none;
-  border-radius: 5px;
+  border-radius: 4px;
   margin-bottom: 5px;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -343,6 +343,7 @@ html.sidebar-collapsed .sidebar {
 .btn-sm {
   padding: 5px 10px;
   font-size: 12px;
+  border-radius: 2px;
 }
 
 .btn-primary {
