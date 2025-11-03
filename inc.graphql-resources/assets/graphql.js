@@ -1031,9 +1031,7 @@ class GraphQLClientApp {
 
                     if (col.isForeignKey && item[relationName]) {
                         const relatedEntity = this.config.entities[this.camelCase(relationName)];
-                        console.log(relatedEntity);
                         const displayField = relatedEntity && relatedEntity.displayField ? relatedEntity.displayField : relatedEntity.primaryKey;
-                        console.log(displayField);
                         if(item[relationName] && typeof item[relationName][displayField] != 'undefined')
                         {
                             value = item[relationName][displayField] || 'N/A';
