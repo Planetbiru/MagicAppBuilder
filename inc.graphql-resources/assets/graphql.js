@@ -1029,11 +1029,19 @@ class GraphQLClientApp {
                     let value = item[header];
                     let relationName = col.references;
 
-
                     if (col.isForeignKey && item[relationName]) {
                         const relatedEntity = this.config.entities[this.camelCase(relationName)];
+                        console.log(relatedEntity);
                         const displayField = relatedEntity && relatedEntity.displayField ? relatedEntity.displayField : relatedEntity.primaryKey;
-                        value = item[relationName] ? item[relationName][displayField] : 'N/A';
+                        console.log(displayField);
+                        if(item[relationName] && typeof item[relationName][displayField] != 'undefined')
+                        {
+                            value = item[relationName][displayField] || 'N/A';
+                        }
+                        else if(item[relationName] && typeof item[relationName][relatedEntity.primaryKey] != 'undefined')
+                        {
+                            value = item[relationName][relatedEntity.primaryKey];
+                        }
                     } else if ((col.type.includes('boolean') || header === this.currentEntity.activeField) && this.config.booleanDisplay) {
                         const isTrue = value === 1 || value === '1' || value === true;
                         if (isTrue) {
