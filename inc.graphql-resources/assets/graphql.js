@@ -60,6 +60,10 @@ class GraphQLClientApp {
         /** @type {?object} The currently active entity's configuration. */
         this.currentEntity = null;
         /**
+         * @type {string} The current entity display name
+         */
+        this.currentEntityDisplayName = '';
+        /**
          * The current state of the list view.
          * @type {{
          *   page: number,
@@ -396,7 +400,12 @@ class GraphQLClientApp {
                 let data = await response.json();
                 this.entityLanguagePack[this.languageId] = {};
                 for (let name in data.entities) {
-                    this.entityLanguagePack[this.languageId][name] = data.entities[name].columns;
+                    if(typeof this.entityLanguagePack[this.languageId][name] === 'undefined')
+                    {
+                        this.entityLanguagePack[this.languageId][name] = {};
+                    }
+                    this.entityLanguagePack[this.languageId][name].displayName = data.entities[name].displayName;
+                    this.entityLanguagePack[this.languageId][name].columns = data.entities[name].columns;
                 }
             }
         } catch (error) {
@@ -519,12 +528,13 @@ class GraphQLClientApp {
     }
 
     /**
-     * Gets the translated label for a given entity and property key.
-     * It looks for translations in the loaded entity language pack.
-     * Falls back to a title-cased version of the key if no translation is found.
+     * Gets the translated label for a specific column (property) of an entity.
+     * It searches for the translation in the loaded entity language pack using the current language.
+     * If a translation is not found, it falls back to converting the column's key (e.g., 'user_name')
+     * into a title-cased string (e.g., 'User Name').
      * @param {object} entity - The entity configuration object.
-     * @param {string} key - The property key (column name) to get the label for.
-     * @returns {string} The translated label or a formatted key.
+     * @param {string} key - The property key (column name) for which to find the label.
+     * @returns {string} The translated column label or a generated title-cased label as a fallback.
      */
     getEntityLabel(entity, key) { // NOSONAR
         let entityName = this.snakeCase(entity.name);
@@ -533,14 +543,35 @@ class GraphQLClientApp {
             if (!entityLanguage) {
                 entityLanguage = this.entityLanguagePack[this.languageId][entityName];
             }
-            if (entityLanguage && entityLanguage[key]) {
-                return entityLanguage[key];
+            if (entityLanguage && entityLanguage.columns && entityLanguage.columns[key]) {
+                return entityLanguage.columns[key];
             }
             return this.snakeCaseToTitleCase(key);
         } else {
             return this.snakeCaseToTitleCase(key);
         }
     }
+    
+    /**
+     * Gets the translated display name for an entire entity.
+     * It looks for the entity's `displayName` in the loaded language pack.
+     * If not found, it falls back to converting the entity's camelCase name to Title Case.
+     * @param {object} entity - The entity configuration object.
+     * @returns {string} The translated entity display name or a generated name as a fallback.
+     */
+    getTranslatedEntityName(entity)
+    {
+        if (this.entityLanguagePack && this.entityLanguagePack[this.languageId]) {
+            let entityLanguage = this.entityLanguagePack[this.languageId][entity.originalName];
+            if (entityLanguage && entityLanguage.displayName) {
+                return entityLanguage.displayName;
+            }
+            return this.camelCaseToTitleCase(entity.displayName);
+        } else {
+            return this.camelCaseToTitleCase(entity.displayName);
+        }
+    }
+    
     /**
      * Gets the user's preferred languages from the browser's navigator settings.
      * @private
@@ -562,6 +593,7 @@ class GraphQLClientApp {
      * @returns {void}
      */
     buildMenu() {
+        let _this = this;
         if (!this.config || !this.config.entities) return;
         this.dom.menu.innerHTML = '';
 
@@ -577,7 +609,7 @@ class GraphQLClientApp {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = `#${entity.name}`;
-            a.textContent = entity.displayName;
+            a.textContent = _this.getTranslatedEntityName(entity);
             // Reset filters and order when a menu item is clicked
             a.onclick = (e) => {
                 e.preventDefault();
@@ -809,7 +841,10 @@ class GraphQLClientApp {
 
         this.currentEntity = entity;
         let title = this.applicationTitle;
-        document.title = `${entity.displayName} - ${title}`;
+        
+        this.currentEntityDisplayName = this.getTranslatedEntityName(entity);
+        
+        document.title = `${this.currentEntityDisplayName} - ${title}`;
 
         const filters = {};
         for (const [key, value] of params.entries()) {
@@ -886,7 +921,7 @@ class GraphQLClientApp {
      */
     async renderListView() {
         this.clearListView();
-        this.dom.title.textContent = this.t('list_of', this.currentEntity.displayName);
+        this.dom.title.textContent = this.t('list_of', this.currentEntityDisplayName);
         await this.renderFilters(); // Render filters and controls once
     }
 
@@ -1293,7 +1328,7 @@ class GraphQLClientApp {
      * @returns {Promise<void>} Resolves when the detail view has been rendered.
      */
     async renderDetailView(id) {
-        this.dom.title.textContent = this.t('detail_of', this.currentEntity.displayName); // NOSONAR
+        this.dom.title.textContent = this.t('detail_of', this.currentEntityDisplayName); // NOSONAR
 
         // Panggil hook kustom untuk render detail
         const hookHandled = this._invokeRenderHook('detail', {
@@ -1684,6 +1719,7 @@ class GraphQLClientApp {
         const confirmModal = document.getElementById('customConfirmModal');
         confirmModal.classList.add('show');
     }
+    
     /**
      * Closes the confirmation modal.
      */
@@ -1821,6 +1857,7 @@ class GraphQLClientApp {
         }
         return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
     }
+    
     /**
      * Converts a camelCase string to snake_case.
      * @private
@@ -1830,6 +1867,7 @@ class GraphQLClientApp {
     snakeCase(str) {
         return str.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
     }
+    
     /**
      * Converts a string to Title Case.
      * @private
@@ -1839,6 +1877,7 @@ class GraphQLClientApp {
     titleCase(str) {
         return str.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase());
     }
+    
     /**
      * Converts a snake_case string to Title Case.
      * @private
@@ -1848,6 +1887,7 @@ class GraphQLClientApp {
     snakeCaseToTitleCase(str) {
         return this.titleCase(str.replace(/_/g, ' '));
     }
+    
     /**
      * Converts a camelCase string to Title Case.
      * @private
@@ -1941,6 +1981,7 @@ class GraphQLClientApp {
      * @returns {void}
      */
     openModal() { this.dom.modal.style.display = 'block'; }
+    
     /**
      * Closes the main form modal and clears its content.
      * @private
@@ -1954,6 +1995,7 @@ class GraphQLClientApp {
      * @returns {void}
      */
     openLoginModal() { this.dom.loginModal.style.display = 'block'; }
+    
     /**
      * Closes the login modal and resets the form.
      * @private
