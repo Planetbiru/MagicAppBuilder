@@ -1,10 +1,9 @@
 :root {
   --sidebar-width: 250px;
   --header-height: 50px;
-  --primary-color: #3b82f6;
-  /* A brighter, more modern blue */
-  --primary-color-hover: #2563eb;
-  --primary-color-bg-light: rgba(59, 130, 246, 0.1);
+  --primary-color: #c026d3; /* Fuchsia 600 */
+  --primary-color-hover: #a21caf; /* Fuchsia 700 */
+  --primary-color-bg-light: rgba(192, 38, 211, 0.1);
   --background-color: #f9fafb;
   /* Lighter grey for background */
   --sidebar-bg: #ffffff;
@@ -19,12 +18,12 @@
 
 /* Dark Mode Variables */
 [data-theme="dark"] {
-  --primary-color: #4f8ff7;
-  --primary-color-hover: #69a1f8;
-  --primary-color-bg-light: rgba(79, 143, 247, 0.15);
-  --background-color: #151c27;
-  --sidebar-bg: #1d232c;
-  --header-bg: #1d232c;
+  --primary-color: #d946ef; /* Fuchsia 500 */
+  --primary-color-hover: #e879f9; /* Fuchsia 400 */
+  --primary-color-bg-light: rgba(217, 70, 239, 0.15);
+  --background-color: #111827;
+  --sidebar-bg: #1f2937;
+  --header-bg: #1f2937;
   --text-primary: #f9fafb;
   --text-secondary: #9ca3af;
   --border-color: #374151;
@@ -328,7 +327,7 @@ html.sidebar-collapsed .sidebar {
     &:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.3);
     }
   }
 }
@@ -598,7 +597,7 @@ td.actions {
   left: 0;
   width: 100%;
   height: 3px;
-  background-color: rgba(59, 130, 246, 0.2);
+  background-color: rgba(192, 38, 211, 0.2);
   z-index: 9999;
   overflow: hidden;
   display: none;

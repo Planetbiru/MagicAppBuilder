@@ -1188,8 +1188,16 @@ class GraphQLGenerator
 
         $variableDeclaration .= "\$appTimeCreate = date('Y-m-d H:i:s');\r\n";
         $variableDeclaration .= "\$appTimeEdit = date('Y-m-d H:i:s');\r\n";
-        $variableDeclaration .= "\$appAdminCreate = \$appAdmin['admin_id'];\r\n";
-        $variableDeclaration .= "\$appAdminEdit = \$appAdmin['admin_id'];\r\n";
+        $variableDeclaration .= "if(isset(\$appAdmin) && isset(\$appAdmin['admin_id']))\r\n";
+        $variableDeclaration .= "{\r\n";
+        $variableDeclaration .= "\t\$appAdminCreate = \$appAdmin['admin_id'];\r\n";
+        $variableDeclaration .= "\t\$appAdminEdit = \$appAdmin['admin_id'];\r\n";
+        $variableDeclaration .= "}\r\n";
+        $variableDeclaration .= "else\r\n";
+        $variableDeclaration .= "{\r\n";
+        $variableDeclaration .= "\t\$appAdminCreate = null;\r\n";
+        $variableDeclaration .= "\t\$appAdminEdit = null;\r\n";
+        $variableDeclaration .= "}\r\n";
         $variableDeclaration .= "\$appIpCreate = \$_SERVER['REMOTE_ADDR'];\r\n";
         $variableDeclaration .= "\$appIpEdit = \$_SERVER['REMOTE_ADDR'];\r\n\r\n";
 
