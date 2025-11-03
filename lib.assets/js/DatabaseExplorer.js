@@ -342,10 +342,10 @@ function init() {
 
 function saveFormState(frm)
 {
-    let custom = document.querySelector('.entity-type-checker[data-entity-type="custom"]').checked;
-    let system = document.querySelector('.entity-type-checker[data-entity-type="system"]').checked;
-    let entitySelectorTables = document.querySelectorAll('.entity-selector-table');
-    let entityTables = document.querySelectorAll('.entity-table');
+    let custom = frm.querySelector('.entity-type-checker[data-entity-type="custom"]').checked;
+    let system = frm.querySelector('.entity-type-checker[data-entity-type="system"]').checked;
+    let entitySelectorTables = frm.querySelectorAll('.entity-selector-table');
+    let entityTables = frm.querySelectorAll('.entity-table');
     let entitySelector = {};
     let entities = {};
     
@@ -385,33 +385,121 @@ function saveFormState(frm)
     sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave); 
 }
 
-function sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave)
-{
-    const xhr = new XMLHttpRequest();
-    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
+/**
+ * Loads the state of the GraphQL entity selector form from a data object.
+ * It safely checks for the existence of each element before setting its value.
+ *
+ * @param {object} data - The data object containing the form state.
+ * @param {boolean} data.custom - The checked state for the 'custom' entity type checkbox.
+ * @param {boolean} data.system - The checked state for the 'system' entity type checkbox.
+ * @param {object} data.entitySelector - An object mapping entity names to their checked state.
+ * @param {object} data.entities - A nested object mapping entity and column names to their filter and primary key value settings.
+ */
+function loadFormState(frm, data) {
+    
+    if (!frm || !data) {
+        return;
+    }
 
-    xhr.open('POST', url, true);
+    // Restore the main entity type checkers (Custom/System)
+    if (typeof data.custom !== 'undefined') {
+        const customChecker = frm.querySelector('.entity-type-checker[data-entity-type="custom"]');
+        if (customChecker) {
+            customChecker.checked = data.custom;
+        }
+    }
+    if (typeof data.system !== 'undefined') {
+        const systemChecker = frm.querySelector('.entity-type-checker[data-entity-type="system"]');
+        if (systemChecker) {
+            systemChecker.checked = data.system;
+        }
+    }
 
-    // Set the header to send data as a JSON string
-    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-
-    // Handle the server response
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {  // Check if the request is complete
-            if (xhr.status === 200) {  // Check if the response is successful (status 200)
-                // Response received successfully
-                // console.log('GraphQL entity data saved successfully.');
-            } else {
-                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+    // Restore the checked state for each entity selector
+    if (data.entitySelector && typeof data.entitySelector === 'object') {
+        for (const entityName in data.entitySelector) {
+            if (Object.hasOwnProperty.call(data.entitySelector, entityName)) {
+                const entityCheckbox = frm.querySelector(`.entity-selector[value="${entityName}"]`);
+                if (entityCheckbox) {
+                    entityCheckbox.checked = data.entitySelector[entityName];
+                }
             }
         }
-    };
+    }
 
-    // Prepare data in URL-encoded format
+    // Restore values for filters and primary key settings within each entity table
+    if (data.entities && typeof data.entities === 'object') {
+        for (const entityName in data.entities) {
+            for (const colName in data.entities[entityName]) {
+                const colData = data.entities[entityName][colName];
+                const filterSelect = frm.querySelector(`table[data-entity="${entityName}"] select.filter-graphql[data-col="${colName}"]`);
+                if (filterSelect && typeof colData.filter !== 'undefined') {
+                    filterSelect.value = colData.filter;
+                }
+                const pkSelect = frm.querySelector(`table[data-entity="${entityName}"] select.pk-value-graphql[data-col="${colName}"]`);
+                if (pkSelect && typeof colData.primaryKeyValue !== 'undefined') {
+                    pkSelect.value = colData.primaryKeyValue;
+                }
+            }
+        }
+    }
+}
+
+async function sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave) {
+    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
     const jsonData = JSON.stringify(dataToSave);
 
-    // Send the data in URL-encoded format
-    xhr.send(jsonData);
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'X-Requested-With': 'xmlhttprequest'
+            },
+            body: jsonData
+        });
+
+        if (!response.ok) {
+            console.error('An error occurred while sending data to the server:', response.status, response.statusText);
+            return null;
+        }
+
+        // Optionally parse JSON response if needed
+        const result = await response.json();
+        // console.log('GraphQL entity data saved successfully.', result);
+        return result;
+
+    } catch (error) {
+        console.error('Network error while sending data to the server:', error);
+        return null;
+    }
+}
+
+
+function loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, callback) {
+    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'xmlhttprequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (typeof callback === 'function') {
+            callback(data);
+        }
+    })
+    .catch(error => {
+        console.error('An error occurred while fetching data from the server:', error);
+    });
 }
 
 

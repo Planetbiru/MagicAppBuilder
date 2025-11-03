@@ -2628,8 +2628,8 @@ class EntityEditor {
      */
     showEntitySelector()
     {
+        let _this = this;
         let title = 'GraphQL Generator';
-
         let wrapper = document.querySelector('.entity-selector-container');
         wrapper.innerHTML = ''; // Clear existing content
 
@@ -2639,10 +2639,16 @@ class EntityEditor {
         modal.querySelector('.modal-header h3').innerHTML = title;
 
         this.createEntitySelectorTables(wrapper);
+        
 
-        // Show the modal
+        let frm = wrapper.closest('form');
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+        
+        loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, function(data){
+            loadFormState(frm, data);
+            // Show modal
+        }); 
         modal.style.display = 'block';
-
 
     }
 
