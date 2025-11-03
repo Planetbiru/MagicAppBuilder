@@ -245,7 +245,7 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.scss", 'assets/style.scss');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css", 'assets/style.css');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.css.map", 'assets/style.css.map');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.min.css", 'assets-style.min.css');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.min.css", 'assets/style.min.css');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/app.js", 'assets/app.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/app.min.js", 'assets/app.min.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.js", 'assets/graphql.js');
