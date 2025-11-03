@@ -1032,7 +1032,7 @@ class GraphQLClientApp {
 
                     if (col.isForeignKey && item[relationName]) {
                         const relatedEntity = this.config.entities[this.camelCase(relationName)];
-                        const displayField = relatedEntity ? relatedEntity.displayField : this.defaultDisplayField;
+                        const displayField = relatedEntity && relatedEntity.displayField ? relatedEntity.displayField : relatedEntity.primaryKey;
                         value = item[relationName] ? item[relationName][displayField] : 'N/A';
                     } else if ((col.type.includes('boolean') || header === this.currentEntity.activeField) && this.config.booleanDisplay) {
                         const isTrue = value === 1 || value === '1' || value === true;
@@ -1090,13 +1090,13 @@ class GraphQLClientApp {
                     }
                     const relatedEntity = this.config.entities[this.camelCase(col.references)];
                     const relatedData = relatedEntity ? (await this.fetchAll(relatedEntity)) : [];
-                    const displayField = relatedEntity.displayField || 'name';
+                    const displayField = relatedEntity.displayField || relatedEntity.primaryKey;
 
                     filterHtml += `<select id="filter-${filter.name}" name="${filter.name}">`;
                     filterHtml += `<option value="">${this.t('select_option')}</option>`;
                     relatedData.forEach(relItem => {
                         const relId = relItem[relatedEntity.primaryKey];
-                        const relDisplay = relItem[displayField];
+                        const relDisplay = relItem[displayField] || relId;
                         filterHtml += `<option value="${relId}" ${String(relId) === String(currentValue) ? 'selected' : ''}>${relDisplay}</option>`;
                     });
                     filterHtml += `</select>`;
@@ -1434,13 +1434,13 @@ class GraphQLClientApp {
                 const relatedEntity = this.config.entities[this.camelCase(relationName)];
 
                 const relatedData = relatedEntity ? (await this.fetchAll(relatedEntity, { activeOnly: !id })) : [];
-                const displayField = relatedEntity.displayField || 'name';
+                const displayField = relatedEntity.displayField || relatedEntity.primaryKey;
 
                 formHtml += `<select id="${colName}" name="${colName}">`;
                 formHtml += `<option value="">${this.t('select_option')}</option>`;
                 relatedData.forEach(relItem => {
                     const relId = relItem[relatedEntity.primaryKey];
-                    const relDisplay = relItem[displayField];
+                    const relDisplay = relItem[displayField] || relId;
                     formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay}</option>`;
                 });
                 formHtml += `</select>`;
@@ -1719,7 +1719,6 @@ class GraphQLClientApp {
         const confirmModal = document.getElementById('customConfirmModal');
         confirmModal.classList.add('show');
     }
-    
     /**
      * Closes the confirmation modal.
      */
@@ -1857,7 +1856,6 @@ class GraphQLClientApp {
         }
         return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
     }
-    
     /**
      * Converts a camelCase string to snake_case.
      * @private
@@ -1867,7 +1865,6 @@ class GraphQLClientApp {
     snakeCase(str) {
         return str.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
     }
-    
     /**
      * Converts a string to Title Case.
      * @private
@@ -1877,7 +1874,6 @@ class GraphQLClientApp {
     titleCase(str) {
         return str.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase());
     }
-    
     /**
      * Converts a snake_case string to Title Case.
      * @private
@@ -1887,7 +1883,6 @@ class GraphQLClientApp {
     snakeCaseToTitleCase(str) {
         return this.titleCase(str.replace(/_/g, ' '));
     }
-    
     /**
      * Converts a camelCase string to Title Case.
      * @private
@@ -1981,7 +1976,6 @@ class GraphQLClientApp {
      * @returns {void}
      */
     openModal() { this.dom.modal.style.display = 'block'; }
-    
     /**
      * Closes the main form modal and clears its content.
      * @private
@@ -1995,7 +1989,6 @@ class GraphQLClientApp {
      * @returns {void}
      */
     openLoginModal() { this.dom.loginModal.style.display = 'block'; }
-    
     /**
      * Closes the login modal and resets the form.
      * @private
