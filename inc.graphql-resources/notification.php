@@ -195,26 +195,3 @@ try {
     exit;
 }
 ?>
-<script>
-    async function markNotificationAsUnread(notificationId) {
-        const formData = new FormData();
-        formData.append('action', 'mark_as_unread');
-        formData.append('notificationId', notificationId);
-
-        try {
-            const response = await fetch('notification.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
-            if (response.ok) {
-                // Go back to the notification list
-                backToList('notification');
-            }
-        } catch (error) {
-            console.error('Error marking notification as unread:', error);
-            await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: graphqlApp.t('unexpected_error_occurred') });
-        }
-    }
-</script>

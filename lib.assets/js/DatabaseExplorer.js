@@ -322,7 +322,188 @@ function init() {
             editor.exportToSQL();
         }
     });
+
+    document.querySelector('.entity-selector-container').addEventListener('change', function(e){
+        // Check if the changed element is a <select> inside the form
+        if(e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')
+        {
+            setTimeout(function(){
+                saveFormState(e.target.form);
+            }, 400);
+        }
+    });
+    document.querySelector('.entity-type-selector').addEventListener('change', function(e){
+        setTimeout(function(){
+            saveFormState(e.target.form);
+        }, 400);
+    });
 }
+
+
+function saveFormState(frm)
+{
+    let custom = frm.querySelector('.entity-type-checker[data-entity-type="custom"]').checked;
+    let system = frm.querySelector('.entity-type-checker[data-entity-type="system"]').checked;
+    let entitySelectorTables = frm.querySelectorAll('.entity-selector-table');
+    let entityTables = frm.querySelectorAll('.entity-table');
+    let entitySelector = {};
+    let entities = {};
+    
+    entitySelectorTables.forEach(table => {
+        let input = table.querySelector('.entity-selector');
+        entitySelector[input.value] = input.checked;
+    });
+
+    entityTables.forEach(table => {
+        let entityName = table.dataset.entity;
+        entities[entityName] = {};
+        
+        table.querySelector('tbody').querySelectorAll('tr').forEach(tr => {
+            let colName = tr.dataset.col;
+            let columnInfo = {};
+            if(tr.querySelector('.filter-graphql'))
+            {
+                let value = tr.querySelector('.filter-graphql').value;
+                columnInfo.filter = value;
+            }
+            if(tr.querySelector('.pk-value-graphql'))
+            {
+                let value = tr.querySelector('.pk-value-graphql').value;
+                columnInfo.primaryKeyValue = value;
+            }
+            entities[entityName][colName] = columnInfo;
+        });
+    });
+
+    let dataToSave = {
+        custom: custom,
+        system: system,
+        entitySelector: entitySelector,
+        entities: entities
+    };
+    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+    sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave); 
+}
+
+/**
+ * Loads the state of the GraphQL entity selector form from a data object.
+ * It safely checks for the existence of each element before setting its value.
+ *
+ * @param {object} data - The data object containing the form state.
+ * @param {boolean} data.custom - The checked state for the 'custom' entity type checkbox.
+ * @param {boolean} data.system - The checked state for the 'system' entity type checkbox.
+ * @param {object} data.entitySelector - An object mapping entity names to their checked state.
+ * @param {object} data.entities - A nested object mapping entity and column names to their filter and primary key value settings.
+ */
+function loadFormState(frm, data) {
+    
+    if (!frm || !data) {
+        return;
+    }
+
+    // Restore the main entity type checkers (Custom/System)
+    if (typeof data.custom !== 'undefined') {
+        const customChecker = frm.querySelector('.entity-type-checker[data-entity-type="custom"]');
+        if (customChecker) {
+            customChecker.checked = data.custom;
+        }
+    }
+    if (typeof data.system !== 'undefined') {
+        const systemChecker = frm.querySelector('.entity-type-checker[data-entity-type="system"]');
+        if (systemChecker) {
+            systemChecker.checked = data.system;
+        }
+    }
+
+    // Restore the checked state for each entity selector
+    if (data.entitySelector && typeof data.entitySelector === 'object') {
+        for (const entityName in data.entitySelector) {
+            if (Object.hasOwnProperty.call(data.entitySelector, entityName)) {
+                const entityCheckbox = frm.querySelector(`.entity-selector[value="${entityName}"]`);
+                if (entityCheckbox) {
+                    entityCheckbox.checked = data.entitySelector[entityName];
+                }
+            }
+        }
+    }
+
+    // Restore values for filters and primary key settings within each entity table
+    if (data.entities && typeof data.entities === 'object') {
+        for (const entityName in data.entities) {
+            for (const colName in data.entities[entityName]) {
+                const colData = data.entities[entityName][colName];
+                const filterSelect = frm.querySelector(`table[data-entity="${entityName}"] select.filter-graphql[data-col="${colName}"]`);
+                if (filterSelect && typeof colData.filter !== 'undefined') {
+                    filterSelect.value = colData.filter;
+                }
+                const pkSelect = frm.querySelector(`table[data-entity="${entityName}"] select.pk-value-graphql[data-col="${colName}"]`);
+                if (pkSelect && typeof colData.primaryKeyValue !== 'undefined') {
+                    pkSelect.value = colData.primaryKeyValue;
+                }
+            }
+        }
+    }
+}
+
+async function sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave) {
+    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
+    const jsonData = JSON.stringify(dataToSave);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'X-Requested-With': 'xmlhttprequest'
+            },
+            body: jsonData
+        });
+
+        if (!response.ok) {
+            console.error('An error occurred while sending data to the server:', response.status, response.statusText);
+            return null;
+        }
+
+        // Optionally parse JSON response if needed
+        const result = await response.json();
+        // console.log('GraphQL entity data saved successfully.', result);
+        return result;
+
+    } catch (error) {
+        console.error('Network error while sending data to the server:', error);
+        return null;
+    }
+}
+
+
+function loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, callback) {
+    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'xmlhttprequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (typeof callback === 'function') {
+            callback(data);
+        }
+    })
+    .catch(error => {
+        console.error('An error occurred while fetching data from the server:', error);
+    });
+}
+
+
+
 /**
  * Opens the structure of the provided file.
  * If the file is a SQLite database, it delegates to `openSQLiteStructure`.
@@ -1670,6 +1851,10 @@ function buildUrl(type, applicationId, databaseType, databaseName, databaseSchem
     {
         return `../lib.ajax/load-config-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
     } 
+    else if(type == 'graphql-entity')
+    {
+        return `../lib.ajax/load-graphql-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
+    }
     else
     {
         return `../lib.ajax/load-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;

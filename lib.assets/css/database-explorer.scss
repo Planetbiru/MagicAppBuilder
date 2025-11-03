@@ -463,6 +463,13 @@ textarea {
     margin: 20px auto 0 auto;
 }
 
+.modal-xl .modal-content {
+    display: block;
+    width: 920px;
+    max-width: calc(100vw - 40px);
+    margin: 20px auto 0 auto;
+}
+
 .modal-top-40 .modal-content {
     margin: 40px auto 0 auto;
 }

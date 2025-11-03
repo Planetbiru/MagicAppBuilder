@@ -272,6 +272,7 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/language.php", 'language.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/entity-language.php", 'entity-language.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/available-language.php", 'available-language.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/available-theme.php", 'available-theme.php');
 
         $databaseConfiguration = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/database.php");
 
