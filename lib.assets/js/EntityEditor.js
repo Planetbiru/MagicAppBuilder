@@ -2629,7 +2629,6 @@ class EntityEditor {
     showEntitySelector()
     {
         let title = 'GraphQL Generator';
-        let _this = this;
 
         let wrapper = document.querySelector('.entity-selector-container');
         wrapper.innerHTML = ''; // Clear existing content
@@ -2757,7 +2756,7 @@ class EntityEditor {
         container.appendChild(tb);
 
         let table = document.createElement("table");
-        table.className = "table table-bordered table-striped table-sm";
+        table.className = "table table-bordered table-striped table-sm entity-table";
         table.dataset.entity = entity.name;
 
         // Tambahkan styling khusus
@@ -2789,6 +2788,8 @@ class EntityEditor {
             if (col.length != null && col.length !== "") {
                 typeDisplay += `(${col.length})`;
             }
+
+            tr.dataset.col = col.name;
 
             tr.innerHTML = `
                 <td><input type="checkbox" class="check-column" value="${col.name || ''}" checked></td>

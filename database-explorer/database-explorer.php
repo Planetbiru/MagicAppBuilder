@@ -366,12 +366,14 @@ if(!isset($databaseName))
                 <span class="close-btn cancel-button">×</span>
             </div>       
             <div class="modal-body">
-                <div class="entity-type-selector">
-                    <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
-                    &nbsp;
-                    <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
-                </div>
-                <div class="entity-selector-container"></div>
+                <form>
+                    <div class="entity-type-selector">
+                        <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
+                        &nbsp;
+                        <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
+                    </div>
+                    <div class="entity-selector-container"></div>
+                </form>
             </div>
             <div class="modal-footer">            
                 <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerate()">Generate GraphQL</button>

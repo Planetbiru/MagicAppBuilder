@@ -322,7 +322,100 @@ function init() {
             editor.exportToSQL();
         }
     });
+
+    document.querySelector('.entity-selector-container').addEventListener('change', function(e){
+        // Check if the changed element is a <select> inside the form
+        if(e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')
+        {
+            setTimeout(function(){
+                saveFormState(e.target.form);
+            }, 400);
+        }
+    });
+    document.querySelector('.entity-type-selector').addEventListener('change', function(e){
+        setTimeout(function(){
+            saveFormState(e.target.form);
+        }, 400);
+    });
 }
+
+
+function saveFormState(frm)
+{
+    let custom = document.querySelector('.entity-type-checker[data-entity-type="custom"]').checked;
+    let system = document.querySelector('.entity-type-checker[data-entity-type="system"]').checked;
+    let entitySelectorTables = document.querySelectorAll('.entity-selector-table');
+    let entityTables = document.querySelectorAll('.entity-table');
+    let entitySelector = {};
+    let entities = {};
+    
+    entitySelectorTables.forEach(table => {
+        let input = table.querySelector('.entity-selector');
+        entitySelector[input.value] = input.checked;
+    });
+
+    entityTables.forEach(table => {
+        let entityName = table.dataset.entity;
+        entities[entityName] = {};
+        
+        table.querySelector('tbody').querySelectorAll('tr').forEach(tr => {
+            let colName = tr.dataset.col;
+            let columnInfo = {};
+            if(tr.querySelector('.filter-graphql'))
+            {
+                let value = tr.querySelector('.filter-graphql').value;
+                columnInfo.filter = value;
+            }
+            if(tr.querySelector('.pk-value-graphql'))
+            {
+                let value = tr.querySelector('.pk-value-graphql').value;
+                columnInfo.primaryKeyValue = value;
+            }
+            entities[entityName][colName] = columnInfo;
+        });
+    });
+
+    let dataToSave = {
+        custom: custom,
+        system: system,
+        entitySelector: entitySelector,
+        entities: entities
+    };
+    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+    sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave); 
+}
+
+function sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave)
+{
+    const xhr = new XMLHttpRequest();
+    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
+
+    xhr.open('POST', url, true);
+
+    // Set the header to send data as a JSON string
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+    // Handle the server response
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {  // Check if the request is complete
+            if (xhr.status === 200) {  // Check if the response is successful (status 200)
+                // Response received successfully
+                // console.log('GraphQL entity data saved successfully.');
+            } else {
+                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+            }
+        }
+    };
+
+    // Prepare data in URL-encoded format
+    const jsonData = JSON.stringify(dataToSave);
+
+    // Send the data in URL-encoded format
+    xhr.send(jsonData);
+}
+
+
+
 /**
  * Opens the structure of the provided file.
  * If the file is a SQLite database, it delegates to `openSQLiteStructure`.
@@ -1670,6 +1763,10 @@ function buildUrl(type, applicationId, databaseType, databaseName, databaseSchem
     {
         return `../lib.ajax/load-config-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
     } 
+    else if(type == 'graphql-entity')
+    {
+        return `../lib.ajax/load-graphql-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
+    }
     else
     {
         return `../lib.ajax/load-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
