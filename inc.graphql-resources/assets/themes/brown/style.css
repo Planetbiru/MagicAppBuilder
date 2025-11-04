@@ -535,6 +535,9 @@ td.actions {
   gap: 0.8rem;
   align-items: flex-end;
 }
+.filter-controls select {
+  max-width: 200px;
+}
 .filter-controls .form-group {
   margin-bottom: 0;
 }
