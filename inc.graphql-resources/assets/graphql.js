@@ -204,6 +204,43 @@ class GraphQLClientApp {
             this.dom.menuFilterInput.addEventListener('input', (e) => this.filterMenu(e.target.value));
         }
 
+        // Add a click listener to the window to close modals when clicking outside
+        window.addEventListener('click', (event) => {
+            // Check if the clicked element is a modal backdrop
+            if (event.target.classList.contains('modal')) {
+                // Determine which modal was clicked and call its specific close function
+                if (event.target.id === this.dom.modal.id) {
+                    this.closeModal();
+                } else if (event.target.id === this.dom.loginModal.id) {
+                    this.closeLoginModal();
+                } else if (event.target.id === 'customConfirmModal') {
+                    this.closeConfirmModal();
+                } else if (event.target.id === this.dom.infoModal.id) {
+                    this.dom.infoModal.classList.remove('show');
+                }
+            }
+        });
+
+        // Add a keydown listener to the document to close the top-most modal on 'Escape' key press
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                // Find all visible modals
+                const visibleModals = Array.from(document.querySelectorAll('.modal'))
+                    .filter(modal => modal.style.display === 'block' || modal.classList.contains('show'))
+                    .sort((a, b) => {
+                        // Sort by z-index to find the top-most modal
+                        const zIndexA = parseInt(window.getComputedStyle(a).zIndex, 10) || 0;
+                        const zIndexB = parseInt(window.getComputedStyle(b).zIndex, 10) || 0;
+                        return zIndexB - zIndexA;
+                    });
+
+                if (visibleModals.length > 0) {
+                    // Trigger a click on the first modal's backdrop to close it
+                    visibleModals[0].click();
+                }
+            }
+        });
+
     }
 
     /**
