@@ -147,6 +147,12 @@ class EntityEditor {
         this.db = null; // SQL.js database instance
         this.parsedTableData = {};
         this.maxLength = {};
+        this.graphqlAppData = {
+            custom: true,
+            system: false,
+            entities: [],
+            entitySelector: []
+        }
     }
 
     /**
@@ -2642,11 +2648,14 @@ class EntityEditor {
         
 
         let frm = wrapper.closest('form');
+
+        loadFormState(frm, this.graphqlAppData);
+
         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
         
         loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, function(data){
             loadFormState(frm, data);
-            // Show modal
+            _this.graphqlAppData = data;
         }); 
         modal.style.display = 'block';
 
