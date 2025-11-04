@@ -578,6 +578,10 @@ td.actions {
   gap: 0.8rem;
   align-items: flex-end;
 
+  select {
+    max-width: 200px;
+  }
+
   .form-group {
     margin-bottom: 0;
   }

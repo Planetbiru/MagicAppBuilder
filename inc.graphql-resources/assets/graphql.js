@@ -871,6 +871,7 @@ class GraphQLClientApp {
             const title = this.t(page.title);
             this.dom.title.textContent = title;
             document.title = `${title} - ${this.applicationTitle}`;
+            document.querySelectorAll('#entity-menu a').forEach(link => link.classList.remove('active'));
 
             // If the page is defined by a URL, fetch its content.
             if (page.url) {
