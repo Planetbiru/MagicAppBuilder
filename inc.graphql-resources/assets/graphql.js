@@ -1642,6 +1642,8 @@ class GraphQLClientApp {
                     formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay}</option>`;
                 });
                 formHtml += `</select>`;
+            } else if (col.element === 'textarea') {
+                formHtml += `<textarea id="${colName}" name="${colName}" spellcheck="false">${value}</textarea>`;
             } else {
                 let activeField = this.currentEntity.activeField || this.defaultActiveField;
                 let inputType = 'text';
