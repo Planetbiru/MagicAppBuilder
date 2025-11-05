@@ -86,6 +86,7 @@ class GraphQLGenerator
                 'columns' => array(),
                 'hasActiveColumn' => false,
                 'filters' => $entity['filters'] ? $entity['filters'] : array(),
+                'textareaColumns' => isset($entity['textareaColumns']) ? $entity['textareaColumns'] : array(),
                 'description' => isset($entity['description']) ? $entity['description'] : null,
                 
             );
@@ -1125,7 +1126,12 @@ class GraphQLGenerator
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
             $pluralCamelName = $this->pluralize($camelName);
-
+            
+            $textareaColumns = array();
+            if(isset($tableInfo['textareaColumns']) && is_array($tableInfo['textareaColumns']))
+            {
+                $textareaColumns = $tableInfo['textareaColumns'];
+            }
             $columns = array();
             foreach($tableInfo['columns'] as $colName => $colInfo) {
                 $columns[$colName] = array(
@@ -1134,6 +1140,7 @@ class GraphQLGenerator
                     'isPrimaryKey' => $colInfo['isPrimaryKey'],
                     'isForeignKey' => $colInfo['isForeignKey'],
                     'references' => $colInfo['references'] ? $colInfo['references'] : null,
+                    'element' => in_array($colName, $textareaColumns) ? 'textarea' : 'input',
                 );
                 if($colInfo['isPrimaryKey'])
                 {
@@ -1176,6 +1183,10 @@ class GraphQLGenerator
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
             $columns = array();
+            if(isset($tableInfo['textareaColumns']) && is_array($tableInfo['textareaColumns']))
+            {
+                $textareaColumns = $tableInfo['textareaColumns'];
+            }
             foreach($tableInfo['columns'] as $colName => $colInfo) {
                 $columns[$colName] = $this->snakeCaseToTitleCase($colName); 
             }

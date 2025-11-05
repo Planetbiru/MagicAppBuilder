@@ -374,6 +374,11 @@ function saveFormState(frm)
                 let value = tr.querySelector('.filter-graphql').value;
                 columnInfo.filter = value;
             }
+            if(tr.querySelector('.textarea-graphql'))
+            {
+                let value = tr.querySelector('.textarea-graphql').checked;
+                columnInfo.textareaColumns = value;
+            }
             if(tr.querySelector('.pk-value-graphql'))
             {
                 let value = tr.querySelector('.pk-value-graphql').value;
@@ -444,6 +449,10 @@ function loadFormState(frm, data) {
                 const filterSelect = frm.querySelector(`table[data-entity="${entityName}"] select.filter-graphql[data-col="${colName}"]`);
                 if (filterSelect && typeof colData.filter !== 'undefined') {
                     filterSelect.value = colData.filter;
+                }
+                const taCheckBox = frm.querySelector(`table[data-entity="${entityName}"] input.textarea-graphql[data-col="${colName}"]`);
+                if (taCheckBox && typeof colData.textareaColumns !== 'undefined') {
+                    taCheckBox.checked = colData.textareaColumns;
                 }
                 const pkSelect = frm.querySelector(`table[data-entity="${entityName}"] select.pk-value-graphql[data-col="${colName}"]`);
                 if (pkSelect && typeof colData.primaryKeyValue !== 'undefined') {
@@ -1562,7 +1571,7 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
             if (xhr.status === 200) {  // Check if the response is successful (status 200)
                 // Response received successfully
             } else {
-                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+                console.error('An error occurred while sending data to the server'); // Log error if status is not 200
             }
         }
     };
@@ -1606,7 +1615,7 @@ function sendDiagramToServer(applicationId, databaseType, databaseName, database
             if (xhr.status === 200) {  // Check if the response is successful (status 200)
                 // Response received successfully
             } else {
-                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+                console.error('An error occurred while sending data to the server'); // Log error if status is not 200
             }
         }
     };
@@ -1693,7 +1702,7 @@ function sendTemplateToServer(applicationId, databaseType, databaseName, databas
             if (xhr.status === 200) {  // Check if the response is successful (status 200)
                 // Response received successfully
             } else {
-                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+                console.error('An error occurred while sending data to the server'); // Log error if status is not 200
             }
         }
     };
@@ -1784,7 +1793,7 @@ function sendConfigToServer(applicationId, databaseType, databaseName, databaseS
             if (xhr.status === 200) {  // Check if the response is successful (status 200)
                 // Response received successfully
             } else {
-                console.log('An error occurred while sending data to the server'); // Log error if status is not 200
+                console.error('An error occurred while sending data to the server'); // Log error if status is not 200
             }
         }
     };

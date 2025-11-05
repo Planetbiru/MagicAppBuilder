@@ -310,7 +310,7 @@ class EntityEditor {
                     sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);  
                 }); // Import the file if it's selected
             } else {
-                console.log("Please select a JSON file first.");
+                console.error("Please select a JSON file first.");
             }
         });
 
@@ -322,7 +322,7 @@ class EntityEditor {
                     sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
                 }); // Import the file if it's selected
             } else {
-                console.log("Please select a JSON file first.");
+                console.error("Please select a JSON file first.");
             }
         });
 
@@ -346,7 +346,7 @@ class EntityEditor {
                     }
                 }); 
             } else {
-                console.log("Please select a JSON file first.");
+                console.error("Please select a JSON file first.");
             }
         });
 
@@ -359,7 +359,7 @@ class EntityEditor {
         
                 }); 
             } else {
-                console.log("Please select a GraphQL Schema file first.");
+                console.error("Please select a GraphQL Schema file first.");
             }
         });
         
@@ -2477,6 +2477,7 @@ class EntityEditor {
 
                         // Add filters
                         let filters = [];
+                        let textareas = [];
                         
                         
                         newEntity.columns.forEach(col => {
@@ -2505,11 +2506,20 @@ class EntityEditor {
                                     "element": filterVal.indexOf('select') !== -1 ? 'select' : 'text'
                                 })
                             }
+                            let textareaCheckbox = entitySelector.querySelector(`input.textarea-graphql[data-col="${col.name}"]`);
+                            if(textareaCheckbox && textareaCheckbox.checked)
+                            {
+                                textareas.push(col.name);
+                            }
                         });
 
                         if(filters.length > 0)
                         {
                             newEntity.filters = filters;
+                        }
+                        if(textareas.length > 0)
+                        {
+                            newEntity.textareaColumns = textareas;
                         }
 
                         selectedModel.entities.push(newEntity); 
@@ -2782,11 +2792,12 @@ class EntityEditor {
         thead.innerHTML = `
             <tr>
                 <th style="width: 30px;"><input type="checkbox" class="check-all" onchange="editor.checkAllColumns(this)" checked=""></th>
-                <th style="width: 24%;">Column</th>
-                <th style="width: 16%;">Type</th>
+                <th style="width: 22%;">Column</th>
+                <th style="width: 14%;">Type</th>
                 <th style="width: 8%;">PK</th>
                 <th style="width: 8%;">Serial</th>
                 <th style="width: 8%;">Null</th>
+                <th style="width: 35px;">TA</th>
                 <th style="width: 16%;">Filter</th>
                 <th>PK Value</th>
             </tr>
@@ -2806,6 +2817,12 @@ class EntityEditor {
 
             tr.dataset.col = col.name;
 
+            let ta = '';
+            if(!col.primaryKey && !col.name.endsWith('_id'))
+            {
+                ta = `<input type="checkbox" class="textarea-graphql" data-col="${col.name}">`;
+            }
+
             tr.innerHTML = `
                 <td><input type="checkbox" class="check-column" value="${col.name || ''}" checked></td>
                 <td>${col.name || ""}</td>
@@ -2813,6 +2830,7 @@ class EntityEditor {
                 <td style="text-align: center;">${col.primaryKey ? "YES" : "NO"}</td>
                 <td style="text-align: center;">${col.autoIncrement ? "YES" : "NO"}</td>
                 <td style="text-align: center;">${col.nullable ? "YES" : "NO"}</td>
+                <td style="text-align: center;">${ta}</td>
                 <td>${this.getFilterType(col, displayField)}</td>
                 <td>${this.getPrimaryKeyValue(col)}</td>
             `;
@@ -3236,7 +3254,7 @@ class EntityEditor {
             try {
                 _this.importJSONData(contents, callback);
             } catch (err) {
-                console.log("Error parsing JSON: " + err.message); // Handle JSON parsing errors
+                console.error("Error parsing JSON: " + err.message); // Handle JSON parsing errors
             }
         };
         reader.readAsText(file); // Read the file as text
@@ -3413,7 +3431,7 @@ class EntityEditor {
 
                 _this.restoreCheckedEntitiesFromCurrentDiagram(); // Reapply previous diagram selections
             } catch (err) {
-                console.log("Error parsing SQL: " + err.message); // Log error if parsing fails
+                console.error("Error parsing SQL: " + err.message); // Log error if parsing fails
             }
         };
 
@@ -4037,7 +4055,6 @@ class EntityEditor {
                         _this.entities.push(entity);
                     }
                     else if (tableParser.data?.[entity.name]) {
-                        console.log('append data');
                         _this.getEntityByName(entity.name).appendData(tableParser.data[entity.name]); // Assign row data if available
                     }
                 });

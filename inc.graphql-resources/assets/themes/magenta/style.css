@@ -287,6 +287,7 @@ html.sidebar-collapsed .sidebar {
 .form-group input[type=datetime-local],
 .form-group select,
 .form-group textarea {
+  resize: vertical;
   width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--border-color);

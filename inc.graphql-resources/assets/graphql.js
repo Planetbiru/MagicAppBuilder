@@ -1393,14 +1393,14 @@ class GraphQLClientApp {
         const id = item[this.currentEntity.primaryKey]; // NOSONAR
         let buttons = `<td class="actions">`;
         buttons += `<button class="btn btn-sm btn-info btn-detail" data-id="${id}">${this.t('view')}</button> `;
-        buttons += `<button class="btn btn-sm btn-warning btn-edit" data-id="${id}">${this.t('edit')}</button> `;
+        buttons += `<button class="btn btn-sm btn-primary btn-edit" data-id="${id}">${this.t('edit')}</button> `;
 
         if (this.currentEntity.hasActiveColumn) {
             const activeField = this.currentEntity.activeField || this.defaultActiveField;
 
             const isActive = item[activeField] === 1 || item[activeField] === '1' || item[activeField] === true;
 
-            buttons += `<button class="btn btn-sm ${isActive ? 'btn-secondary' : 'btn-success'} btn-toggle-active" data-id="${id}" data-active="${isActive}">${isActive ? this.t('deactivate') : this.t('activate')}</button> `;
+            buttons += `<button class="btn btn-sm ${isActive ? 'btn-warning' : 'btn-success'} btn-toggle-active" data-id="${id}" data-active="${isActive}">${isActive ? this.t('deactivate') : this.t('activate')}</button> `;
         }
         buttons += `<button class="btn btn-sm btn-danger btn-delete" data-id="${id}">${this.t('delete')}</button></td>`;
         return buttons;
@@ -1642,6 +1642,8 @@ class GraphQLClientApp {
                     formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay}</option>`;
                 });
                 formHtml += `</select>`;
+            } else if (col.element === 'textarea') {
+                formHtml += `<textarea id="${colName}" name="${colName}" spellcheck="false">${value}</textarea>`;
             } else {
                 let activeField = this.currentEntity.activeField || this.defaultActiveField;
                 let inputType = 'text';
