@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+<?php
+$cacheTime = 86400; // 24 jam
+header('Cache-Control: public, max-age=' . $cacheTime);
+header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
+?><!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>{APP_NAME}</title>
-  <meta name="title" content="{APP_NAME}">
+  <title>GraphQL Application</title>
+  <meta name="title" content="GraphQL Application">
   <script>
     if (localStorage.getItem('sidebarCollapsed') === 'true') {
       document.documentElement.classList.add('sidebar-collapsed');
@@ -14,8 +18,6 @@
   <link type="image/x-icon" rel="icon" href="favicon.ico" />
   <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
   <script id="theme-selector-script">
-    // Immediately set the theme stylesheet href based on localStorage for faster perceived load.
-    // Validation will happen later in graphql.js, which can correct this if the theme is invalid.
     const storedColorTheme = localStorage.getItem('colorTheme');
     const themeUrl = storedColorTheme ? `assets/themes/${storedColorTheme}/style.min.css` : 'assets/style.min.css';
     document.write(`<link rel="stylesheet" id="theme-stylesheet" href="${themeUrl}">`);
@@ -30,7 +32,7 @@
   <!-- Loading Bar -->
   <div id="loading-bar" class="loading-bar"></div>
 
-  <div class="page-wrapper" id="page-wrapper">
+  <div class="page-wrapper" id="page-wrapper" style="display: none;">
     <header class="header">
       <div class="header-left">
         <span class="sidebar-toggle" id="sidebar-toggle">&#9776;</span>

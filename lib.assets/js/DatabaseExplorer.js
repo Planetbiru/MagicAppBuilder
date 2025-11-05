@@ -337,6 +337,14 @@ function init() {
             saveFormState(e.target.form);
         }, 400);
     });
+
+    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+
+
+        
+    loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, function(data){
+        editor.graphqlAppData = data;
+    }); 
 }
 
 
@@ -381,6 +389,7 @@ function saveFormState(frm)
         entitySelector: entitySelector,
         entities: entities
     };
+    editor.graphqlAppData = dataToSave;
     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
     sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave); 
 }

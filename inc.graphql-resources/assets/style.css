@@ -1,3 +1,4 @@
+@charset "UTF-8";
 :root {
   --sidebar-width: 250px;
   --header-height: 50px;
@@ -256,6 +257,10 @@ html.sidebar-collapsed .sidebar {
   gap: 8px;
 }
 
+#login-modal.modal .modal-content {
+  max-width: 480px;
+}
+
 .close-button {
   color: #aaa;
   position: absolute;
@@ -446,6 +451,18 @@ html.sidebar-collapsed .sidebar {
 }
 [data-theme=dark] .table-container table th {
   background-color: #374151;
+}
+.table-container table th.sortable {
+  position: relative;
+}
+.table-container table th.sortable[data-sort-direction=asc]::after, .table-container table th.sortable[data-sort-direction=desc]::after {
+  font-size: 10px;
+}
+.table-container table th.sortable[data-sort-direction=asc]::after {
+  content: "▲";
+}
+.table-container table th.sortable[data-sort-direction=desc]::after {
+  content: "▼";
 }
 .table-container table th.sortable:hover {
   background-color: #e9e9e9;

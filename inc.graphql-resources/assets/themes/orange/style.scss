@@ -281,6 +281,12 @@ html.sidebar-collapsed .sidebar {
   }
 }
 
+#login-modal.modal {
+  .modal-content {
+    max-width: 480px;
+  }
+}
+
 .close-button {
   color: #aaa;
   position: absolute;
@@ -475,6 +481,23 @@ html.sidebar-collapsed .sidebar {
         background-color: #374151;
       }
 
+      &.sortable {
+        position: relative;
+        &[data-sort-direction="asc"],
+        &[data-sort-direction="desc"] {
+          &::after {
+            font-size: 10px;
+          }
+        }
+
+        &[data-sort-direction="asc"]::after {
+          content: "▲";
+        }
+
+        &[data-sort-direction="desc"]::after {
+          content: "▼";
+        }
+      }
       &.sortable:hover {
         background-color: #e9e9e9;
         cursor: pointer;
@@ -782,4 +805,25 @@ hr{
 .notification-content {
   padding: 1rem;
   line-height: 1.6;
+}
+
+/* For WebKit/Blink browsers (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* Important to remove default margin */
+}
+
+/* For Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 0.7; /* Make them slightly transparent */
+    width: 20px; /* Adjust width */
+    height: 100%; /* Make them fill the height */
+    background-color: #eee;
+    border-left: 1px solid #ccc;
+    /* Further styling like hover effects, background images for arrows, etc. */
 }

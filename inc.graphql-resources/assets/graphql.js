@@ -204,6 +204,43 @@ class GraphQLClientApp {
             this.dom.menuFilterInput.addEventListener('input', (e) => this.filterMenu(e.target.value));
         }
 
+        // Add a click listener to the window to close modals when clicking outside
+        window.addEventListener('click', (event) => {
+            // Check if the clicked element is a modal backdrop
+            if (event.target.classList.contains('modal')) {
+                // Determine which modal was clicked and call its specific close function
+                if (event.target.id === this.dom.modal.id) {
+                    this.closeModal();
+                } else if (event.target.id === this.dom.loginModal.id) {
+                    this.closeLoginModal();
+                } else if (event.target.id === 'customConfirmModal') {
+                    this.closeConfirmModal();
+                } else if (event.target.id === this.dom.infoModal.id) {
+                    this.dom.infoModal.classList.remove('show');
+                }
+            }
+        });
+
+        // Add a keydown listener to the document to close the top-most modal on 'Escape' key press
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                // Find all visible modals
+                const visibleModals = Array.from(document.querySelectorAll('.modal'))
+                    .filter(modal => modal.style.display === 'block' || modal.classList.contains('show'))
+                    .sort((a, b) => {
+                        // Sort by z-index to find the top-most modal
+                        const zIndexA = parseInt(window.getComputedStyle(a).zIndex, 10) || 0;
+                        const zIndexB = parseInt(window.getComputedStyle(b).zIndex, 10) || 0;
+                        return zIndexB - zIndexA;
+                    });
+
+                if (visibleModals.length > 0) {
+                    // Trigger a click on the first modal's backdrop to close it
+                    visibleModals[0].click();
+                }
+            }
+        });
+
     }
 
     /**
@@ -218,7 +255,7 @@ class GraphQLClientApp {
         }
 
         // Hide the entire page wrapper and show the login modal
-        this.dom.pageWrapper.style.display = 'none';
+        this.hidePageWrapper();
         document.getElementById('login-error').textContent = this.t('session_expired');
         this.openLoginModal();
     }
@@ -238,11 +275,14 @@ class GraphQLClientApp {
         try {
             await this.initializeLanguage();
             await this.initializeTheme();
-            await this.loadI18n();
             await this.loadConfig();
+            await this.loadI18n();
             await this.loadLanguage();
+            this.showPageWrapper();
             this.applyI18n();
+            this.buildMenu();
             this.initPage(); // Initialize UI event listeners
+            
             window.onclick = (event) => {
             };
             // Add event listener for data-dismiss="modal"
@@ -269,7 +309,7 @@ class GraphQLClientApp {
                 }
             });
 
-            this.buildMenu();
+            
 
 
             // Handle initial page load and back/forward button clicks
@@ -1052,6 +1092,7 @@ class GraphQLClientApp {
     async renderListView() {
         this.clearListView();
         this.dom.title.textContent = this.t('list_of', this.currentEntityDisplayName);
+        this.showPageWrapper();
         await this.renderFilters(); // Render filters and controls once
     }
 
@@ -1133,8 +1174,8 @@ class GraphQLClientApp {
             const isSortable = true; // Assume all are sortable for now
             const isCurrentSort = this.state.orderBy.field === h;
             const sortIcon = isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? ' &#9650;' : ' &#9660;') : '';
-            return `<th class="${isSortable ? 'sortable' : ''}" data-sort-key="${h}">
-                                            ${this.getEntityLabel(this.currentEntity, h)}${sortIcon}
+            return `<th class="${isSortable ? 'sortable' : ''}" data-sort-key="${h}" data-sort-direction="${isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? 'asc' : 'desc') : ''}">
+                                            ${this.getEntityLabel(this.currentEntity, h)}
                                         </th>`;
         }).join('')} 
                             <th>${this.t('actions')}</th>
@@ -1457,6 +1498,16 @@ class GraphQLClientApp {
         history.pushState({ entityName: this.currentEntity.name, params: this.state }, '', newUrl);
     }
 
+    showPageWrapper()
+    {
+        this.dom.pageWrapper.style.display = 'block';
+    }
+
+    hidePageWrapper()
+    {
+        this.dom.pageWrapper.style.display = 'none';
+    }
+
     /**
      * Fetches and renders the detail view for a single item.
      * It can be overridden by a custom renderer hook.
@@ -1485,6 +1536,7 @@ class GraphQLClientApp {
 
         try {
             const data = await this.gqlQuery(query, { id });
+            this.showPageWrapper();
             const item = data[this.currentEntity.name]; // NOSONAR
             let detailHtml = `<div class="back-controls">
                                 <button id="back-to-list" class="btn btn-secondary">${this.t('back_to_list')}</button>
@@ -1978,7 +2030,7 @@ class GraphQLClientApp {
             const response = await fetch(this.logoutUrl);
             if (response.ok) {
                 // Hide the main page content and show the login modal
-                this.dom.pageWrapper.style.display = 'none';
+                this.hidePageWrapper();
                 this.openLoginModal();
             }
             else {

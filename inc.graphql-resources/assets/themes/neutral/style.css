@@ -2,17 +2,15 @@
 :root {
   --sidebar-width: 250px;
   --header-height: 50px;
-  --primary-color: #3b82f6;
-  /* A brighter, more modern blue */
-  --primary-color-hover: #2563eb;
-  --primary-color-bg-light: rgba(59, 130, 246, 0.1);
-  --background-color: #f9fafb;
-  /* Lighter grey for background */
+  --primary-color: #475569; /* Slate 600 */
+  --primary-color-hover: #334155; /* Slate 700 */
+  --primary-color-bg-light: rgba(71, 85, 105, 0.1);
+  --background-color: #f8fafc; /* Slate 50 */
   --sidebar-bg: #ffffff;
   --header-bg: #ffffff;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
+  --text-primary: #1e293b; /* Slate 800 */
+  --text-secondary: #64748b; /* Slate 500 */
+  --border-color: #e2e8f0; /* Slate 200 */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -2px rgba(0, 0, 0, 0.1);
@@ -20,15 +18,15 @@
 
 /* Dark Mode Variables */
 [data-theme=dark] {
-  --primary-color: #4f8ff7;
-  --primary-color-hover: #69a1f8;
-  --primary-color-bg-light: rgba(79, 143, 247, 0.15);
-  --background-color: #151c27;
-  --sidebar-bg: #1d232c;
-  --header-bg: #1d232c;
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --border-color: #374151;
+  --primary-color: #94a3b8; /* Slate 400 */
+  --primary-color-hover: #cbd5e1; /* Slate 300 */
+  --primary-color-bg-light: rgba(148, 163, 184, 0.15);
+  --background-color: #0f172a; /* Slate 900 */
+  --sidebar-bg: #1e293b; /* Slate 800 */
+  --header-bg: #1e293b; /* Slate 800 */
+  --text-primary: #f1f5f9; /* Slate 100 */
+  --text-secondary: #94a3b8; /* Slate 400 */
+  --border-color: #334155; /* Slate 700 */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
     0 2px 4px -2px rgba(0, 0, 0, 0.2);

@@ -38,7 +38,15 @@ if ($inputGet->getDatabaseName() !== null) {
             }
             else
             {
-                ResponseUtil::sendJSON([]);
+                ResponseUtil::sendJSON([
+                    "custom" => true,
+                    "system" => false,
+                    "entities" => [
+
+                    ],
+                    "entitySelector" => [
+                    ]
+                ]);
             }
         }
     }
