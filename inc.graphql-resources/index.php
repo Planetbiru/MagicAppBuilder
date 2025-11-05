@@ -1,5 +1,5 @@
 <?php
-$cacheTime = 86400; // 24 jam
+$cacheTime = 86400; // 24 hours
 header('Cache-Control: public, max-age=' . $cacheTime);
 header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
 ?><!DOCTYPE html>

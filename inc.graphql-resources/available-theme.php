@@ -7,7 +7,7 @@
 
 // Set the content type to JSON
 header('Content-Type: application/json');
-$cacheTime = 86400; // 24 jam
+$cacheTime = 86400; // 24 hours
 header('Cache-Control: public, max-age=' . $cacheTime);
 header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
 
