@@ -30,34 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     exit;
 }
-
-
-
-/*
-CREATE TABLE IF NOT EXISTS admin (
-	 admin_id NVARCHAR(40) PRIMARY KEY NOT NULL,
-	 name NVARCHAR(100) NULL,
-	 username NVARCHAR(100) NULL,
-	 password NVARCHAR(512) NULL,
-	 password_version NVARCHAR(512) NULL,
-	 admin_level_id NVARCHAR(40) NULL,
-	 gender NVARCHAR(2) NULL,
-	 birth_day DATE NULL,
-	 email NVARCHAR(100) NULL,
-	 phone NVARCHAR(100) NULL,
-	 language_id NVARCHAR(40) NULL,
-	 validation_code TEXT NULL,
-	 last_reset_password TIMESTAMP NULL,
-	 blocked BOOLEAN NULL DEFAULT 0,
-	 time_create TIMESTAMP NULL,
-	 time_edit TIMESTAMP NULL,
-	 admin_create NVARCHAR(40) NULL,
-	 admin_edit NVARCHAR(40) NULL,
-	 ip_create NVARCHAR(50) NULL,
-	 ip_edit NVARCHAR(50) NULL,
-	 active BOOLEAN NULL DEFAULT 1
-);
-*/
 try
 {
 $sql = "SELECT admin.*, (SELECT admin_level.name FROM admin_level WHERE admin_level.admin_level_id = admin.admin_level_id) AS admin_level_name FROM admin WHERE admin.username = :username";
@@ -72,7 +44,7 @@ if (isset($_GET) && isset($_GET['action']) && $_GET['action'] == 'update') {
             <table class="table table-borderless">
                 <tr>
                     <td><?php echo $i18n->t('admin_id'); ?></td>
-                    <td><input type="text" name="admin_id" class="form-control" value="<?php echo htmlspecialchars($admin['admin_id']); ?>" readonly></td>
+                    <td><input type="text" name="admin_id" class="form-control" value="<?php echo htmlspecialchars($admin['admin_id']); ?>" autocomplete="off" readonly></td>
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('name'); ?></td>
@@ -80,7 +52,7 @@ if (isset($_GET) && isset($_GET['action']) && $_GET['action'] == 'update') {
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('username'); ?></td>
-                    <td><input type="text" name="username" class="form-control" value="<?php echo htmlspecialchars($admin['username']); ?>" readonly></td>
+                    <td><input type="text" name="username" class="form-control" value="<?php echo htmlspecialchars($admin['username']); ?>" autocomplete="off" readonly></td>
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('gender'); ?></td>
@@ -93,15 +65,15 @@ if (isset($_GET) && isset($_GET['action']) && $_GET['action'] == 'update') {
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('birthday'); ?></td>
-                    <td><input type="date" name="birth_day" class="form-control" value="<?php echo htmlspecialchars($admin['birth_day']); ?>"></td>
+                    <td><input type="date" name="birth_day" class="form-control" value="<?php echo htmlspecialchars($admin['birth_day']); ?>" autocomplete="off"></td>
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('phone'); ?></td>
-                    <td><input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($admin['phone']); ?>"></td>
+                    <td><input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($admin['phone']); ?>" autocomplete="off"></td>
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('email'); ?></td>
-                    <td><input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($admin['email']); ?>"></td>
+                    <td><input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($admin['email']); ?>" autocomplete="off"></td>
                 </tr>
                 <tr>
                     <td></td>

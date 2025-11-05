@@ -50,15 +50,15 @@ if (isset($_GET) && isset($_GET['action']) && $_GET['action'] == 'update') {
             <table class="table table-borderless">
                 <tr>
                     <td><?php echo $i18n->t('page_size');?></td>
-                    <td><input type="number" min=="1" name="pageSize" value="<?php echo $pagination['pageSize']; ?>"></td>
+                    <td><input type="number" min=="1" name="pageSize" value="<?php echo $pagination['pageSize']; ?>" required autocomplete="off"></td>
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('max_page_size');?></td>
-                    <td><input type="number" min=="1" name="maxPageSize" value="<?php echo $pagination['maxPageSize']; ?>"></td>
+                    <td><input type="number" min=="1" name="maxPageSize" value="<?php echo $pagination['maxPageSize']; ?>" required autocomplete="off"></td>
                 </tr>
                 <tr>
                     <td><?php echo $i18n->t('min_page_size');?></td>
-                    <td><input type="number" min=="1" name="minPageSize" value="<?php echo $pagination['minPageSize']; ?>"></td>
+                    <td><input type="number" min=="1" name="minPageSize" value="<?php echo $pagination['minPageSize']; ?>" required autocomplete="off"></td>
                 </tr>
                 <tr>
                     <td></td>

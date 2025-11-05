@@ -334,6 +334,7 @@ async function handlePasswordUpdate(event) {
 async function handleSettingsUpdate(event) {
     const form = document.getElementById('settings-update-form');
     const formData = new FormData(form);
+    let limit = parseInt(form.querySelector('[name="pageSize"]').value);
     try {
         const response = await fetch('settings.php', {
             method: 'POST',
@@ -346,6 +347,10 @@ async function handleSettingsUpdate(event) {
         const result = await response.json();
         if (result.success) {
             await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
+            if(!isNaN(limit))
+            {
+                graphqlApp.state.limit = limit;
+            }
             window.location.hash = '#settings';
         } else {
             await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: result.message });
