@@ -3650,6 +3650,20 @@ Overall, the addition of `manual.html` drastically improves the usability and ac
 
 A condition has been added to check if `$appAdmin['admin_id']` exists and has a value. This change prevents PHP warnings when a developer bypasses authentication (for instance, by not including the `auth.php` file) while testing the GraphQL API in a development environment. Consequently, developers no longer need to manually set values for `$appAdminCreate` and `$appAdminEdit` during testing, leading to a smoother and more efficient workflow.
 
+## Enhancement: Improved Input Form Attributes
+
+The forms in the generated GraphQL application have been enhanced with additional HTML attributes to improve data validation and user experience. These attributes are dynamically applied based on the entity's schema and validation rules.
+
+### Key Attributes Added:
+
+*   **`readonly`**: Applied to primary key fields in the update form to prevent modification.
+*   **`required`**: Added to fields that are marked as mandatory in the entity definition, ensuring users cannot submit the form without filling them.
+*   **`autocomplete="off"`**: Added to all input fields to prevent browsers from suggesting previously entered values, which is useful for sensitive data or to avoid incorrect auto-fills.
+*   **`min`** and **`max`**: Applied to numeric input fields to enforce range constraints, providing immediate feedback to the user.
+*   **`spellcheck="false"`**: Applied to `textarea` to disable spelliing check.
+
+These enhancements ensure that data entered by users is more likely to be valid before it is even sent to the server, reducing errors and improving the overall robustness of the application.
+
 ## Enhancement: Primary Key Generation Option in GraphQL Application
 
 There are three options for handling the generation of *primary key* values in applications generated through the GraphQL Generator:
