@@ -729,4 +729,26 @@ hr {
 .notification-content {
   padding: 1rem;
   line-height: 1.6;
+}
+
+/* For WebKit/Blink browsers (Chrome, Safari, Edge) */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0; /* Important to remove default margin */
+}
+
+/* For Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  opacity: 0.7; /* Make them slightly transparent */
+  width: 20px; /* Adjust width */
+  height: 100%; /* Make them fill the height */
+  background-color: #eee;
+  border-left: 1px solid #ccc;
+  /* Further styling like hover effects, background images for arrows, etc. */
 }/*# sourceMappingURL=style.css.map */
