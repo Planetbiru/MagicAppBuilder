@@ -3648,11 +3648,7 @@ Overall, the addition of `manual.html` drastically improves the usability and ac
 
 ## Enhancement: Improved Development Experience for GraphQL API
 
-A condition has been added to check whether `$appAdmin['admin_id']` exists and has a value. This change prevents PHP warnings when a developer bypasses authentication (for example, by not including the `auth.php` file) while testing the GraphQL API in a development environment. As a result, developers no longer need to manually assign values to `$appAdminCreate` and `$appAdminEdit` during testing, leading to a smoother and more efficient workflow.
-
-## Enhancement: Improved Development Experience for GraphQL API
-
-A condition has been added to check if `$appAdmin['admin_id']` exists and has a value. This change prevents PHP warnings when a developer bypasses authentication (for instance, by not including the `auth.php` file) while testing the GraphQL API in a development environment. Consequently, developers no longer need to manually set values for `$appAdminCreate` and `$appAdminEdit` during testing, leading to a smoother workflow.
+A condition has been added to check if `$appAdmin['admin_id']` exists and has a value. This change prevents PHP warnings when a developer bypasses authentication (for instance, by not including the `auth.php` file) while testing the GraphQL API in a development environment. Consequently, developers no longer need to manually set values for `$appAdminCreate` and `$appAdminEdit` during testing, leading to a smoother and more efficient workflow.
 
 ## Enhancement: Primary Key Generation Option in GraphQL Application
 
