@@ -255,7 +255,7 @@ class GraphQLClientApp {
         }
 
         // Hide the entire page wrapper and show the login modal
-        this.dom.pageWrapper.style.display = 'none';
+        this.hidePageWrapper();
         document.getElementById('login-error').textContent = this.t('session_expired');
         this.openLoginModal();
     }
@@ -275,9 +275,10 @@ class GraphQLClientApp {
         try {
             await this.initializeLanguage();
             await this.initializeTheme();
-            await this.loadI18n();
             await this.loadConfig();
+            await this.loadI18n();
             await this.loadLanguage();
+            this.showPageWrapper();
             this.applyI18n();
             this.initPage(); // Initialize UI event listeners
             window.onclick = (event) => {
@@ -1089,6 +1090,7 @@ class GraphQLClientApp {
     async renderListView() {
         this.clearListView();
         this.dom.title.textContent = this.t('list_of', this.currentEntityDisplayName);
+        this.showPageWrapper();
         await this.renderFilters(); // Render filters and controls once
     }
 
@@ -1494,6 +1496,16 @@ class GraphQLClientApp {
         history.pushState({ entityName: this.currentEntity.name, params: this.state }, '', newUrl);
     }
 
+    showPageWrapper()
+    {
+        this.dom.pageWrapper.style.display = 'block';
+    }
+
+    hidePageWrapper()
+    {
+        this.dom.pageWrapper.style.display = 'none';
+    }
+
     /**
      * Fetches and renders the detail view for a single item.
      * It can be overridden by a custom renderer hook.
@@ -1522,6 +1534,7 @@ class GraphQLClientApp {
 
         try {
             const data = await this.gqlQuery(query, { id });
+            this.showPageWrapper();
             const item = data[this.currentEntity.name]; // NOSONAR
             let detailHtml = `<div class="back-controls">
                                 <button id="back-to-list" class="btn btn-secondary">${this.t('back_to_list')}</button>
@@ -2015,7 +2028,7 @@ class GraphQLClientApp {
             const response = await fetch(this.logoutUrl);
             if (response.ok) {
                 // Hide the main page content and show the login modal
-                this.dom.pageWrapper.style.display = 'none';
+                this.hidePageWrapper();
                 this.openLoginModal();
             }
             else {

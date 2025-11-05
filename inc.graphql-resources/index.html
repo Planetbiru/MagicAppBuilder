@@ -14,15 +14,13 @@
   <link type="image/x-icon" rel="icon" href="favicon.ico" />
   <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
   <script id="theme-selector-script">
-    // Immediately set the theme stylesheet href based on localStorage for faster perceived load.
-    // Validation will happen later in graphql.js, which can correct this if the theme is invalid.
     const storedColorTheme = localStorage.getItem('colorTheme');
     const themeUrl = storedColorTheme ? `assets/themes/${storedColorTheme}/style.min.css` : 'assets/style.min.css';
     document.write(`<link rel="stylesheet" id="theme-stylesheet" href="${themeUrl}">`);
     let themeSelector = document.querySelector('#theme-selector-script');
     themeSelector.parentNode.removeChild(themeSelector);
   </script>
-  <script src="assets/graphql.min.js"></script>
+  <script src="assets/graphql.js"></script>
   <script src="assets/app.min.js"></script>
 </head>
 
@@ -30,7 +28,7 @@
   <!-- Loading Bar -->
   <div id="loading-bar" class="loading-bar"></div>
 
-  <div class="page-wrapper" id="page-wrapper">
+  <div class="page-wrapper" id="page-wrapper" style="display: none;">
     <header class="header">
       <div class="header-left">
         <span class="sidebar-toggle" id="sidebar-toggle">&#9776;</span>

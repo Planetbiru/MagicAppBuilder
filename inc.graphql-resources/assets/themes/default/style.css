@@ -256,6 +256,10 @@ html.sidebar-collapsed .sidebar {
   gap: 8px;
 }
 
+#login-modal.modal .modal-content {
+  max-width: 480px;
+}
+
 .close-button {
   color: #aaa;
   position: absolute;

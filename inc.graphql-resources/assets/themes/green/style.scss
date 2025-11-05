@@ -281,6 +281,12 @@ html.sidebar-collapsed .sidebar {
   }
 }
 
+#login-modal.modal {
+  .modal-content {
+    max-width: 480px;
+  }
+}
+
 .close-button {
   color: #aaa;
   position: absolute;
