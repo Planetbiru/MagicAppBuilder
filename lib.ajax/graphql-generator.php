@@ -19,7 +19,6 @@ function getApplication($databaseBuilder, $applicationId)
     }
     return $application;
 }
-    
 
 function setDatabaseConfiguration($application, $databaseConfiguration)
 {
@@ -36,34 +35,6 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
         $databaseConfig = $appConfig->getDatabase();
         if($databaseConfig != null)
         {
-            /*
-            Placeholder to replace
-            $cfgDbDriver         = '{DB_DRIVER}';
-            $cfgDbHost           = '{DB_HOST}';
-            $cfgDbDatabaseName   = '{DB_NAME}';
-            $cfgDbDatabaseSchema = '{DB_NAME}';
-            $cfgDbDatabaseFile   = '{DB_FILE}';
-            $cfgDbUser           = '{DB_USER}';
-            $cfgDbPass           = '{DB_PASS}';
-            $cfgDbCharset        = '{DB_CHARSET}';
-            $cfgDbPort           = '{DB_PORT}';
-            $cfgDbTimeZone       = '{DB_TIMEZONE}';
-            */
-            /*
-            Yaml file
-database:
-    driver: sqlite
-    databaseFilePath: D:/xampp/htdocs/graphql-application/inc.database/database.sqlite
-    host: ""
-    port: 0
-    username: ""
-    password: ""
-    databaseName: ""
-    databaseSchema: ""
-    timeZone: Asia/Jakarta
-    timeZoneSystem: Asia/Jakarta
-    connectionTimeout: 10
-            */
             $databaseConfiguration = str_replace('{DB_DRIVER}', str_replace("'", "\\'", $databaseConfig->getDriver()), $databaseConfiguration);
             $databaseConfiguration = str_replace('{DB_HOST}', str_replace("'", "\\'", $databaseConfig->getHost()), $databaseConfiguration);
             $databaseConfiguration = str_replace('{DB_NAME}', str_replace("'", "\\'", $databaseConfig->getDatabaseName()), $databaseConfiguration);
@@ -265,7 +236,7 @@ try {
 
         // Replace application name
         // <title>{APP_NAME}</title>
-        $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/index.html");
+        $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/index.php");
         $indexFileContent = str_replace('{APP_NAME}', $application->getName(), $indexFileContent);
 
         $zip->addFromString('index.php', $indexFileContent);
@@ -300,9 +271,9 @@ try {
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'apple-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'favicon');
         
-
-        
         // Bonus
+        // composer.phar to update dependencies
+
         $zip->addFile(dirname(__DIR__) . "/inc.lib/composer.phar", "composer.phar");
 
         $zip->close();

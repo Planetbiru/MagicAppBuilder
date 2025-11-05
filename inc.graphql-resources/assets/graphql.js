@@ -280,7 +280,9 @@ class GraphQLClientApp {
             await this.loadLanguage();
             this.showPageWrapper();
             this.applyI18n();
+            this.buildMenu();
             this.initPage(); // Initialize UI event listeners
+            
             window.onclick = (event) => {
             };
             // Add event listener for data-dismiss="modal"
@@ -307,7 +309,7 @@ class GraphQLClientApp {
                 }
             });
 
-            this.buildMenu();
+            
 
 
             // Handle initial page load and back/forward button clicks
@@ -1172,8 +1174,8 @@ class GraphQLClientApp {
             const isSortable = true; // Assume all are sortable for now
             const isCurrentSort = this.state.orderBy.field === h;
             const sortIcon = isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? ' &#9650;' : ' &#9660;') : '';
-            return `<th class="${isSortable ? 'sortable' : ''}" data-sort-key="${h}">
-                                            ${this.getEntityLabel(this.currentEntity, h)}${sortIcon}
+            return `<th class="${isSortable ? 'sortable' : ''}" data-sort-key="${h}" data-sort-direction="${isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? 'asc' : 'desc') : ''}">
+                                            ${this.getEntityLabel(this.currentEntity, h)}
                                         </th>`;
         }).join('')} 
                             <th>${this.t('actions')}</th>

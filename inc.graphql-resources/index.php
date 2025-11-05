@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+<?php
+$cacheTime = 86400; // 24 jam
+header('Cache-Control: public, max-age=' . $cacheTime);
+header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
+?><!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>{APP_NAME}</title>
-  <meta name="title" content="{APP_NAME}">
+  <title>GraphQL Application</title>
+  <meta name="title" content="GraphQL Application">
   <script>
     if (localStorage.getItem('sidebarCollapsed') === 'true') {
       document.documentElement.classList.add('sidebar-collapsed');
@@ -20,7 +24,7 @@
     let themeSelector = document.querySelector('#theme-selector-script');
     themeSelector.parentNode.removeChild(themeSelector);
   </script>
-  <script src="assets/graphql.js"></script>
+  <script src="assets/graphql.min.js"></script>
   <script src="assets/app.min.js"></script>
 </head>
 
