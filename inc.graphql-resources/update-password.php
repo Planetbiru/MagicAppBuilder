@@ -71,15 +71,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <table class="table table-borderless">
             <tr>
                 <td><?php echo $i18n->t('current_password'); ?></td>
-                <td><input type="password" name="current_password" class="form-control" required></td>
+                <td><input type="password" name="current_password" class="form-control" autocomplete="off" required></td>
             </tr>
             <tr>
                 <td><?php echo $i18n->t('new_password'); ?></td>
-                <td><input type="password" name="new_password" class="form-control" required></td>
+                <td><input type="password" name="new_password" class="form-control" autocomplete="off" required></td>
             </tr>
             <tr>
                 <td><?php echo $i18n->t('confirm_password'); ?></td>
-                <td><input type="password" name="confirm_password" class="form-control" required></td>
+                <td><input type="password" name="confirm_password" class="form-control" autocomplete="off" required></td>
             </tr>
             <tr>
                 <td></td>
