@@ -16,12 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     try {
-        $currentAdminId = $appAdmin['admin_id'];
+        // Fetch full admin data to get admin_level_id
+        $sql = "SELECT admin_id, admin_level_id FROM admin WHERE admin_id = :admin_id";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':admin_id' => $appAdmin['admin_id']]);
+        $currentAdminData = $stmt->fetch(PDO::FETCH_ASSOC);
+        $currentAdminId = $currentAdminData['admin_id'];
 
         if ($action === 'mark_as_unread') {
             $updateSql = "UPDATE notification SET is_read = 0, time_read = NULL WHERE notification_id = :notification_id AND (admin_id = :admin_id OR admin_group = :admin_level_id)";
             $updateStmt = $db->prepare($updateSql);
-            $updateStmt->execute([':notification_id' => $notificationId, ':admin_id' => $currentAdminId, ':admin_level_id' => $appAdmin['admin_level_id']]);
+            $updateStmt->execute([':notification_id' => $notificationId, ':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminData['admin_level_id']]);
             echo json_encode(['success' => true, 'message' => $i18n->t('notification_marked_as_unread')]);
         }
     } catch (Exception $e) {
@@ -50,6 +55,7 @@ $offset = ($page - 1) * $dataLimit;
 
 try {
     $currentAdminLevelId = $appAdmin['admin_level_id'];
+    $currentAdminId = $appAdmin['admin_id'];
 
     if (isset($_GET['notificationId'])) {
         $notificationId = $_GET['notificationId'];
@@ -78,7 +84,7 @@ try {
             <div class="back-controls">
                 <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')"><?php echo $i18n->t('back_to_list'); ?></button>
                 <?php if ($notification['is_read']): ?>
-                    <button class="btn btn-primary" onclick="markNotificationAsUnread('<?php echo $notification['notification_id']; ?>')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                    <button class="btn btn-primary" onclick="markNotificationAsUnread('<?php echo $notification['notification_id']; ?>', 'detail')"><?php echo $i18n->t('mark_as_unread'); ?></button>
                 <?php endif; ?>
             </div>
             <div class="notification-container">
@@ -140,6 +146,9 @@ try {
                                 <span class="message-subject"><?php echo htmlspecialchars($notification['subject']); ?></span>
                             </a>
                             <span class="message-time"><?php echo htmlspecialchars($notification['time_create']); ?></span>
+                            <?php if ($notification['is_read']): ?>
+                                <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('<?php echo $notification['notification_id']; ?>', 'list')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="message-content">

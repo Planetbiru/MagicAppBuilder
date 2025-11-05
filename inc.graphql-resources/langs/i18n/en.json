@@ -99,5 +99,18 @@
     "no_message": "No message",
     "notification": "Notification",
     "no_notification": "No notification",
-    "menu_filter": "Filter menu..."
+    "menu_filter": "Filter menu...",
+    "read_at": "Read at",
+    "unread": "Unread",
+    "system": "System",
+    "message_id_required": "Message ID is required.",
+    "mark_as_unread": "Mark as Unread",
+    "message_marked_as_unread": "Message marked as unread.",
+    "more_info": "More Info",
+    "notification_id_required": "Notification ID is required.",
+    "notification_marked_as_unread": "Notification marked as unread.",
+    "time": "Time",
+    "status": "Status",
+    "from": "From",
+    "to": "To"
 }
