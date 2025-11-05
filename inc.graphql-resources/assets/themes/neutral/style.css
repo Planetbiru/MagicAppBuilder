@@ -67,7 +67,7 @@ body {
 .header .header-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 .header .header-item {
   position: relative;
