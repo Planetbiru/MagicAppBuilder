@@ -4,7 +4,7 @@
 
 // Please relpace all codes bellow
 
-@session_start();
+require_once __DIR__ . '/sessions.php';
 
 unset($_SESSION['username']);
 unset($_SESSION['password']);

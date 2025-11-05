@@ -204,13 +204,10 @@ try {
         // Assumpt that default language is `en`
         $zip->addFromString('langs/entity/en.json', $entityLanguagePacks);
 
-
-        $languagePacksPath = dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/en.json";
-        $zip->addFile($languagePacksPath, 'langs/i18n/source.json');
-
         // Assumpt that default language is `en`
-        $zip->addFile($languagePacksPath, 'langs/i18n/en.json');
 
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/en.json", 'langs/i18n/source.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/en.json", 'langs/i18n/en.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/langs/i18n/id.json", 'langs/i18n/id.json');
         
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/style.scss", 'assets/style.scss');
@@ -225,6 +222,7 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/sessions.php", 'sessions.php');   
 
         // Add all files under directory `vendor`
 

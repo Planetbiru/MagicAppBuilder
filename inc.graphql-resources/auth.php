@@ -4,8 +4,7 @@
 
 // Please relpace all codes bellow
 
-@session_start();
-
+require_once __DIR__ . '/sessions.php';
 require_once __DIR__ . '/database.php';
 
 $appAdmin = [
