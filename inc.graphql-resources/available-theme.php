@@ -7,6 +7,9 @@
 
 // Set the content type to JSON
 header('Content-Type: application/json');
+$cacheTime = 86400; // 24 jam
+header('Cache-Control: public, max-age=' . $cacheTime);
+header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
 
 // Define the path to the themes directory
 $themesPath = __DIR__ . '/assets/themes';

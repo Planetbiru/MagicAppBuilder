@@ -13,7 +13,8 @@ $appAdmin = [
     'username' => null,
     'name' => null,
     'email' => null,
-    'phone' => null
+    'phone' => null,
+    'admin_level_id' => null
 ];
 
 if(isset($_SESSION['username']) && isset($_SESSION['password']))
@@ -34,6 +35,7 @@ if(isset($_SESSION['username']) && isset($_SESSION['password']))
             $appAdmin['name'] = $user['name'];
             $appAdmin['email'] = $user['email'];
             $appAdmin['phone'] = $user['phone'];
+            $appAdmin['admin_level_id'] = $user['admin_level_id'];
         }
         else
         {

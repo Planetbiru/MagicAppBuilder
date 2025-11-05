@@ -52,6 +52,8 @@
     "welcome_dashboard": "Selamat datang di dasbor. Silakan pilih entitas dari menu untuk memulai.",
     "cancel": "Batal",
     "toggle_theme": "Ubah tema",
+    "logout_failed_title": "Galat Keluar",
+    "ok": "OK",
     "logout_failed": "Gagal keluar. Silakan coba lagi.",
     "success": "Berhasil",
     "error": "Galat",
@@ -97,5 +99,18 @@
     "no_message": "Tidak ada pesan",
     "notification": "Notifikasi",
     "no_notification": "Tidak ada notifikasi",
-    "menu_filter": "Saring menu..."
+    "menu_filter": "Saring menu...",
+    "read_at": "Dibaca pada",
+    "unread": "Belum Dibaca",
+    "system": "Sistem",
+    "message_id_required": "ID Pesan diperlukan.",
+    "mark_as_unread": "Tandai Belum Dibaca",
+    "message_marked_as_unread": "Pesan ditandai sebagai belum dibaca.",
+    "more_info": "Info Lebih Lanjut",
+    "notification_id_required": "ID Notifikasi diperlukan.",
+    "notification_marked_as_unread": "Notifikasi ditandai sebagai belum dibaca.",
+    "time": "Waktu",
+    "status": "Status",
+    "from": "Dari",
+    "to": "Kepada"
 }

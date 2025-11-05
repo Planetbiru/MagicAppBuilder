@@ -356,7 +356,7 @@ async function handleSettingsUpdate(event) {
     }
 }
 
-async function markMessageAsUnread(messageId) {
+async function markMessageAsUnread(messageId, fromView = 'list') {
     const formData = new FormData();
     formData.append('action', 'mark_as_unread');
     formData.append('messageId', messageId);
@@ -373,15 +373,18 @@ async function markMessageAsUnread(messageId) {
         const result = await response.json();
         await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
         if (response.ok) {
-            // Go back to the message list instead of refreshing the detail view
-            backToList('message');
+            if (fromView === 'detail') {
+                backToList('message');
+            } else {
+                graphqlApp.handleRouteChange();
+            }
         }
     } catch (error) {
         console.error('Error marking message as unread:', error);
     }
 }
 
-async function markNotificationAsUnread(notificationId) {
+async function markNotificationAsUnread(notificationId, fromView = 'list') {
     const formData = new FormData();
     formData.append('action', 'mark_as_unread');
     formData.append('notificationId', notificationId);
@@ -398,8 +401,11 @@ async function markNotificationAsUnread(notificationId) {
         const result = await response.json();
         await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
         if (response.ok) {
-            // Go back to the message list instead of refreshing the detail view
-            backToList('notification');
+            if (fromView === 'detail') {
+                backToList('notification');
+            } else {
+                graphqlApp.handleRouteChange();
+            }
         }
     } catch (error) {
         console.error('Error marking notification as unread:', error);

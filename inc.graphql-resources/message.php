@@ -99,7 +99,7 @@ try
             <div class="back-controls">
                 <button id="back-to-list" class="btn btn-secondary" onclick="backToList('message')"><?php echo $i18n->t('back_to_list'); ?></button>
                 <?php if ($message['receiver_id'] == $currentAdminId && $message['is_read']): ?>
-                    <button class="btn btn-primary" onclick="markMessageAsUnread('<?php echo $message['message_id']; ?>')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                    <button class="btn btn-primary" onclick="markMessageAsUnread('<?php echo $message['message_id']; ?>', 'detail')"><?php echo $i18n->t('mark_as_unread'); ?></button>
                 <?php endif; ?>
             </div>
             <div class="message-container">
@@ -143,7 +143,7 @@ try
     $totalPages = ceil($totalMessages / $dataLimit);
 
     $sql = "SELECT 
-        m.message_id, m.subject, m.content, m.is_read, m.time_create,
+        m.message_id, m.subject, m.content, m.is_read, m.time_create, m.receiver_id,
         sender.name AS sender_name
     FROM message m
     LEFT JOIN admin sender ON m.sender_id = sender.admin_id
@@ -170,6 +170,9 @@ try
                             <span class="message-subject"><?php echo htmlspecialchars($message['subject']); ?></span>
                         </a>
                         <span class="message-time"><?php echo htmlspecialchars($message['time_create']); ?></span>
+                        <?php if ($message['receiver_id'] == $appAdmin['admin_id'] && $message['is_read']): ?>
+                            <button class="btn btn-sm btn-secondary" onclick="markMessageAsUnread('<?php echo $message['message_id']; ?>', 'list')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="message-content">

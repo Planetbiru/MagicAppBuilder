@@ -1,6 +1,9 @@
 <?php
 
 header('Content-Type: application/json');
+$cacheTime = 86400; // 24 jam
+header('Cache-Control: public, max-age=' . $cacheTime);
+header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
 
 // Default ke 'en' jika tidak ada bahasa yang ditentukan
 $languageId = isset($_GET['lang']) ? $_GET['lang'] : 'en';
