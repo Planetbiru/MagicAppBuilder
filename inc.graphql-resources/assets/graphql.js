@@ -1643,7 +1643,7 @@ class GraphQLClientApp {
                 });
                 formHtml += `</select>`;
             } else if (col.element === 'textarea') {
-                formHtml += `<textarea id="${colName}" name="${colName}" spellcheck="false">${value}</textarea>`;
+                formHtml += `<textarea id="${colName}" name="${colName}" spellcheck="false" autocomplete="off">${value}</textarea>`;
             } else {
                 let activeField = this.currentEntity.activeField || this.defaultActiveField;
                 let inputType = 'text';
@@ -1669,7 +1669,7 @@ class GraphQLClientApp {
                 if (inputType === 'checkbox') {
                     formHtml += `<input type="checkbox" id="${colName}" name="${colName}" ${value ? 'checked' : ''}>`;
                 } else {
-                    formHtml += `<input type="${inputType}" id="${colName}" name="${colName}" value="${value}">`;
+                    formHtml += `<input type="${inputType}" id="${colName}" name="${colName}" value="${value}" autocomplete="off">`;
                 }
             }
             formHtml += `</div>`;
