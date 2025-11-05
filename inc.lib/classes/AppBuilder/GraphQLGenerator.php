@@ -917,9 +917,10 @@ class GraphQLGenerator
         
         $manualContent .= "## Security Considerations\r\n\r\n";
         $manualContent .= "For production or any publicly exposed environments, it is strongly recommended to remove files that are not essential for the API's runtime operations. This helps to minimize the attack surface and prevent potential information disclosure.\r\n\r\n";
-        $manualContent .= "Please delete the following files from your production server:\r\n\r\n";
-        $manualContent .= "- **`manual.md`**: This file contains detailed API documentation that should not be publicly accessible.\r\n";
-        $manualContent .= "- **`composer.phar`**: This is the Composer executable and is not needed for the application to run after dependencies are installed. Leaving it on the server can pose a security risk.\r\n\r\n";
+        $manualContent .= "Please consider deleting the following files from your production server:\r\n\r\n";
+        $manualContent .= "- **`manual.md`**: This file contains API documentation and is not needed for runtime.\r\n";
+        $manualContent .= "- **`manual.html`**: An HTML version of the API documentation, not needed for runtime.\r\n";
+        $manualContent .= "- **`composer.phar`**: The Composer executable, which is not required after dependencies are installed and can pose a security risk.\r\n\r\n";
         $manualContent .= "---\r\n\r\n";
 
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {

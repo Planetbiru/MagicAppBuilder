@@ -3,6 +3,7 @@
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\GraphQLGenerator;
 use MagicObject\SecretObject;
+use MagicObject\Util\Parsedown;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -100,6 +101,129 @@ function addFilesWithPrefixToZip($zip, $sourcePath, $zipPath, $prefix) { //NOSON
     }
 }
 
+/**
+ * Generates an HTML manual from Markdown content.
+ *
+ * @param string $manualMd The Markdown content of the manual.
+ * @param string $appName The name of the application.
+ * @return string The generated HTML content.
+ */
+function generateManualHtml($manualMd, $appName)
+{
+    $parsedown = new Parsedown();
+    $manualBody = $parsedown->text($manualMd);
+
+    // Generate Table of Contents
+    $toc = '';
+    $headings = [];
+    $slugs = [];
+
+    // Add IDs to headings and extract them for the TOC
+    $manualBody = preg_replace_callback('/<h([2-4])>(.*?)<\/h\1>/i', function ($matches) use (&$headings, &$slugs) {
+        $level = (int) $matches[1];
+        $text = $matches[2];
+        $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', trim(strip_tags($text))));
+
+        // Ensure slug is unique
+        $originalSlug = $slug;
+        $counter = 1;
+        while (isset($slugs[$slug])) {
+            $slug = $originalSlug . '-' . $counter++;
+        }
+        $slugs[$slug] = true;
+
+        $headings[] = ['level' => $level, 'text' => $text, 'slug' => $slug];
+        return "<h$level id=\"$slug\">$text</h$level>";
+    }, $manualBody);
+
+    // Build the TOC HTML from the extracted headings
+    if (!empty($headings)) {
+        $toc .= "<div id=\"toc-container\"><h2>Table of Contents</h2>\n<ul class=\"toc\">\n";
+        $lastLevel = 1;
+        foreach ($headings as $heading) {
+            $level = $heading['level'];
+            if ($level > $lastLevel) {
+                $toc .= "<ul>\n";
+            } else if ($level < $lastLevel) {
+                $toc .= str_repeat("</ul></li>\n", $lastLevel - $level);
+            }
+            $toc .= "<li><a href=\"#{$heading['slug']}\">{$heading['text']}</a>";
+            if ($level >= $lastLevel) {
+                $toc .= "</li>\n";
+            }
+            $lastLevel = $level;
+        }
+        $toc .= str_repeat("</ul></li>\n", $lastLevel - 1);
+        $toc .= "</ul></div>\n";
+    }
+
+    // Inject the TOC after the first H1 tag
+    $manualBody = preg_replace('/(<\/h1>)/', '$1' . $toc, $manualBody, 1);
+
+    // Add copy button to code blocks
+    $manualBody = preg_replace('/<pre><code( class="language-(.*?)")?>/i', '<div class="code-container"><button class="copy-btn" title="Copy to clipboard">Copy</button><pre><code$1>', $manualBody);
+    $manualBody = preg_replace('/<\/code><\/pre>/i', '</code></pre></div>', $manualBody);
+
+    return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL API Manual for $appName</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2, h3, h4 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        h1 { font-size: 2em; } h2 { font-size: 1.5em; } h3 { font-size: 1.25em; }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 85%; padding: 0.2em 0.4em; margin: 0; background-color: rgba(27,31,35,0.05); border-radius: 3px; }
+        pre { padding: 16px; overflow: auto; font-size: 85%; line-height: 1.45; background-color: #f6f8fa; border-radius: 6px; margin-top:0; margin-bottom:0; }
+        pre code { display: inline; padding: 0; margin: 0; background-color: transparent; border: 0; }
+        .code-container { position: relative; margin-top: 16px; margin-bottom: 16px; }
+        .copy-btn { position: absolute; top: 8px; right: 8px; background-color: #e1e4e8; border: 1px solid #d1d5da; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+        .copy-btn:hover { opacity: 1; background-color: #d1d5da; }
+        .copy-btn:active { background-color: #c6cbd1; }
+        .copy-btn.copied { background-color: #28a745; color: white; border-color: #28a745; }
+        #toc-container { background-color: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 15px 20px; margin-bottom: 20px; }
+        .toc ul { padding-left: 20px; list-style-type: disc; }
+        .toc a { text-decoration: none; color: #0366d6; }
+        .toc a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        .back-to-toc { position: fixed; bottom: 20px; right: 20px; background-color: #0366d6; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; text-decoration: none; z-index: 1000; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        $manualBody
+    </div>
+    <a href="#toc-container" class="back-to-toc" title="Back to Table of Contents">&uarr;</a>
+    <script>
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const pre = button.nextElementSibling;
+                const code = pre.querySelector('code');
+                navigator.clipboard.writeText(code.innerText).then(() => {
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+HTML;
+}
+
 $request = file_get_contents('php://input');
 $data = json_decode($request, true);
 
@@ -187,7 +311,13 @@ try {
         // Add generated code file
         $zip->addFromString('graphql.php', $generator->generate());
         // Add manual content file
-        $zip->addFromString('manual.md', $generator->generateManual());
+        $manualMd = $generator->generateManual();
+        $zip->addFromString('manual.md', $manualMd);
+
+        $parsedown = new Parsedown();
+        $appName = $application->getName();
+        $manualHtml = generateManualHtml($manualMd, $appName);
+        $zip->addFromString('manual.html', $manualHtml);        
         
         // Add frontend config files
         $zip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
