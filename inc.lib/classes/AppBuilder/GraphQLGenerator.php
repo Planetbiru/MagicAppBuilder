@@ -2,6 +2,8 @@
 
 namespace AppBuilder;
 
+use MagicObject\Util\PicoStringUtil;
+
 /**
  * The `GraphQLGenerator` class is a powerful tool designed to automatically generate a complete GraphQL API layer from a JSON file that defines database entities.
  * It inspects the schema to understand tables, columns, primary keys, and foreign key relationships.
@@ -1182,14 +1184,16 @@ class GraphQLGenerator
     {
         $frontendConfig = array();
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
-            $camelName = $this->camelCase($tableName);
             $columns = array();
-            if(isset($tableInfo['textareaColumns']) && is_array($tableInfo['textareaColumns']))
-            {
-                $textareaColumns = $tableInfo['textareaColumns'];
-            }
             foreach($tableInfo['columns'] as $colName => $colInfo) {
-                $columns[$colName] = $this->snakeCaseToTitleCase($colName); 
+                if($colInfo['isForeignKey'] && PicoStringUtil::endsWith($colName, '_id'))
+                {
+                    $columns[$colName] = $this->snakeCaseToTitleCase(substr($colName, 0, strlen($colName) - 3)); 
+                }
+                else
+                {
+                    $columns[$colName] = $this->snakeCaseToTitleCase($colName); 
+                }
             }
             $frontendConfig[$tableName]['name'] = trim($tableName);
             $frontendConfig[$tableName]['displayName'] = $this->snakeCaseToTitleCase($tableName);
