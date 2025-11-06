@@ -1681,6 +1681,9 @@ class GraphQLClientApp {
             formHtml += `</div>`;
         }
 
+        // Add a placeholder for form-level error messages
+        formHtml += `<div id="form-error"></div>`;
+
         this.dom.form.innerHTML = formHtml;
 
         this.dom.form.closest('.modal').querySelector('.modal-footer').innerHTML = `
@@ -1715,6 +1718,13 @@ class GraphQLClientApp {
             app: this // Berikan akses ke instance aplikasi
         });
         if (hookHandled) return;
+
+        // Find and clear any previous error messages before attempting to save
+        const errorDiv = this.dom.form.querySelector('#form-error');
+        if (errorDiv) {
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+        }
 
         let activeField = this.currentEntity.activeField || this.defaultActiveField;
         const formData = new FormData(this.dom.form);
@@ -1812,6 +1822,8 @@ class GraphQLClientApp {
             this.updateTableView(); // Refresh list
         } catch (error) {
             console.error(`Failed to save: ${error.message}`);
+            this.dom.form.querySelector('#form-error').textContent = error.message;
+            this.dom.form.querySelector('#form-error').style.display = 'block';
         }
     }
 
