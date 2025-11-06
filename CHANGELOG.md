@@ -3652,6 +3652,9 @@ A condition has been added to check if `$appAdmin['admin_id']` exists and has a 
 
 ## Enhancement: Improved Input Form Attributes
 
+## Enhancement: Right-to-Left (RTL) Language Support
+The generated GraphQL application has been tested with right-to-left languages (such as Arabic) to ensure proper display and functionality.
+
 The forms in the generated GraphQL application have been enhanced with additional HTML attributes to improve data validation and user experience. These attributes are dynamically applied based on the entity's schema and validation rules.
 
 ### Key Attributes Added:
@@ -3703,3 +3706,4 @@ In version 1.28.0, users can now select `<textarea>` as a form element. This enh
 ## Enhancement: Improved Button Appearance
 
 The "Update" and "Deactivate" buttons in data lists have been visually enhanced to better represent their respective actions. The "Update" button now features a more intuitive color for editing, while the "Deactivate" button has been updated to more clearly signify its deactivation function, improving overall UI clarity.
+
