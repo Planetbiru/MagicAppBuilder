@@ -3664,6 +3664,15 @@ The forms in the generated GraphQL application have been enhanced with additiona
 
 These enhancements ensure that data entered by users is more likely to be valid before it is even sent to the server, reducing errors and improving the overall robustness of the application.
 
+## New Feature: Live Application Reload
+
+A "Refresh App" feature has been added to the user dropdown menu in the generated GraphQL application. This allows developers to reload application configurations without a full page refresh, which is especially useful during the development phase.
+
+### Key Benefits:
+*   **Instant Updates**: Reloads `frontend-config.json`, UI translations (`language.php`), and entity translations (`entity-language.php`) on the fly.
+*   **Seamless Workflow**: Allows developers to see changes to configurations, menus, and translations immediately without losing their current context or navigating away from the page.
+*   **User Feedback**: Displays a success or failure notification to confirm the outcome of the reload operation.
+
 ## Enhancement: Primary Key Generation Option in GraphQL Application
 
 There are three options for handling the generation of *primary key* values in applications generated through the GraphQL Generator:

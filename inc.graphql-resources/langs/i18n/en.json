@@ -112,5 +112,8 @@
     "time": "Time",
     "status": "Status",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "refresh_app": "Refresh Application",
+    "app_refreshed_successfully": "Application has been refreshed successfully.",
+    "app_refresh_failed": "Failed to refresh the application."
 }

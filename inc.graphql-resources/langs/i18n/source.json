@@ -65,12 +65,9 @@
     "profile_updated_successfully": "Profile updated successfully.",
     "failed_to_update_profile": "Failed to update profile: {0}",
     "unexpected_error_occurred": "An unexpected error occurred.",
-
     "active": "Active",
     "inactive": "Inactive",
-
     "blocked": "Blocked",
-
     "male": "Male",
     "female": "Female",
     "admin_id": "Admin ID",
@@ -91,24 +88,32 @@
     "failed_to_update_password": "Failed to update password.",
     "password_mismatch": "New password and confirmation do not match.",
     "incorrect_current_password": "Incorrect current password.",
-
     "page_size": "Page Size",
     "max_page_size": "Maximum Page Size",
     "min_page_size": "Minimum Page Size",
-
     "settings_updated_successfully": "Settings updated successfully.",
     "failed_to_update_settings": "Failed to update settings.",
-
     "new_password_required": "New password is required.",
     "current_password_required": "Current password is required.",
-
     "message": "Message",
-
     "no_message": "No message",
-
     "notification": "Notification",
-    "no_notification": "No notification"
-    
-
-
+    "no_notification": "No notification",
+    "menu_filter": "Filter menu...",
+    "read_at": "Read at",
+    "unread": "Unread",
+    "system": "System",
+    "message_id_required": "Message ID is required.",
+    "mark_as_unread": "Mark as Unread",
+    "message_marked_as_unread": "Message marked as unread.",
+    "more_info": "More Info",
+    "notification_id_required": "Notification ID is required.",
+    "notification_marked_as_unread": "Notification marked as unread.",
+    "time": "Time",
+    "status": "Status",
+    "from": "From",
+    "to": "To",
+    "refresh_app": "Refresh Application",
+    "app_refreshed_successfully": "Application has been refreshed successfully.",
+    "app_refresh_failed": "Failed to refresh the application."
 }

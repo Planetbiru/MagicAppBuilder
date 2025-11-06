@@ -112,5 +112,8 @@
     "time": "Waktu",
     "status": "Status",
     "from": "Dari",
-    "to": "Kepada"
+    "to": "Kepada",
+    "refresh_app": "Segarkan Aplikasi",
+    "app_refreshed_successfully": "Aplikasi berhasil disegarkan.",
+    "app_refresh_failed": "Gagal menyegarkan aplikasi."
 }
