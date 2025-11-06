@@ -333,6 +333,16 @@ textarea {
   resize: vertical;
 }
 
+/* Form Error Styling */
+#form-error {
+  color: #ef4444; /* red-500 */
+  margin-top: 10px;
+  display: none;
+}
+#form-error.show {
+  display: block;
+}
+
 .btn {
   padding: 8px 15px;
   border: none;
