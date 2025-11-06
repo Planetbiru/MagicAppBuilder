@@ -28,24 +28,29 @@ Berikut adalah perbandingan MagicAppBuilder dengan _platform low-code_ terkemuka
     -   **_Horizontal Scaling_ Tanpa Modifikasi:** Penyebutan eksplisit bahwa baik aplikasi maupun _database_ dapat diskalakan secara **horizontal tanpa memerlukan _upgrade_ atau modifikasi pada aplikasi** adalah keuntungan signifikan, menyiratkan arsitektur yang sangat elastis dan mudah beradaptasi.
 
 -   **Bekerja Offline & Tanpa Ketergantungan AI:** Berbeda dengan banyak platform modern yang bergantung pada layanan _cloud_ atau AI untuk pembuatan kode, MagicAppBuilder dirancang untuk bekerja **100% offline**. Aplikasi ini dapat dijalankan di satu PC tanpa koneksi internet sama sekali, memastikan privasi data dan kontrol penuh atas lingkungan pengembangan. Hal ini membuatnya ideal untuk mengembangkan aplikasi sensitif atau untuk digunakan di lingkungan dengan akses internet terbatas atau tanpa akses sama sekali.
-
--   **Pembuatan API GraphQL Otomatis:** MagicAppBuilder menyertakan generator canggih yang secara otomatis membuat lapisan API GraphQL yang lengkap dan siap produksi langsung dari skema entitas database Anda. Ini termasuk pembuatan _types_, _queries_ (dengan pemfilteran, pengurutan, dan paginasi), _mutations_ (buat, perbarui, hapus), dan bahkan manual API yang komprehensif dalam format Markdown. Fitur ini secara drastis mengurangi waktu dan upaya yang diperlukan untuk membangun dan mendokumentasikan API modern.
-
--   **Peralatan Pengembang dan Manajemen Data Tingkat Lanjut:** MagicAppBuilder menyediakan beberapa fitur yang bertujuan untuk meningkatkan produktivitas pengembang dan integritas data.
-    -   **Peningkatan Editor Entitas:** Fitur seperti **filter entitas** untuk navigasi yang lebih mudah dan **saran pelengkapan otomatis** untuk _foreign key_ menyederhanakan proses pemodelan dan entri data.
-    -   **Manajemen Siklus Hidup Aplikasi:** Alat untuk **memeriksa, membangun ulang, dan membuat ulang aplikasi** memberikan jaring pengaman bagi pengembang, memastikan integritas aplikasi dan menawarkan opsi pemulihan yang kuat jika konfigurasi hilang atau rusak.
+ 
+-   **Pembuatan Aplikasi & API GraphQL Otomatis (Full-Stack):** MagicAppBuilder melampaui pembuatan API sederhana dengan secara otomatis menghasilkan:
+    -   **Backend GraphQL Lengkap:** Termasuk _types_, _queries_ (dengan pemfilteran, pengurutan, paginasi), dan _mutations_ (CRUD) yang siap produksi.
+    -   **Aplikasi Frontend Fungsional:** Aplikasi web yang langsung dapat digunakan, yang berinteraksi dengan backend GraphQL untuk menampilkan data, formulir, dan filter.
+    -   **Dokumentasi API Interaktif:** Menghasilkan `MANUAL.md` dan `manual.html` yang interaktif dengan daftar isi dan navigasi yang mudah, menyederhanakan proses integrasi.
+ 
+-   **Interoperabilitas dan Manajemen Data Tingkat Lanjut:**
+    -   **Impor Data Fleksibel:** Membuat entitas dari berbagai sumber, termasuk **Excel, CSV, SQL, DBF, ODS, skema GraphQL**, dan bahkan dengan **menempelkan data dari _clipboard_** (misalnya, dari tabel Word atau web).
+    -   **Ekspor Komprehensif:** Mengekspor definisi entitas dan diagram ERD ke dalam dokumen **HTML interaktif**, **Markdown**, dan format gambar (SVG/PNG) untuk dokumentasi dan kolaborasi.
+    -   **Manajemen Siklus Hidup Aplikasi:** Menyediakan alat untuk **memeriksa, membangun ulang, dan membuat ulang aplikasi**, memberikan jaring pengaman jika konfigurasi hilang atau rusak.
+    -   **Alat Bantu Bawaan:** Termasuk **Redis Explorer**, **Database Migration Tool**, dan **File Manager** dengan penampil untuk dokumen (PDF, DOCX), _font_, dan database SQLite.
 
 ----------
  
 **Perbandingan dengan Platform _Low-Code_ Terkemuka (misalnya, OutSystems, Mendix, Appian):**
  
 *   **Target Audiens dan Filosofi:**
-    *   **Platform Terkemuka:** Sering menargetkan campuran "citizen developer" (pengguna non-teknis) dan developer profesional, dengan penekanan kuat pada antarmuka visual _no-code_/_low-code_. Mereka biasanya berbasis _cloud_, bersifat _proprietary_, dan disertai dengan harga tingkat perusahaan serta ketergantungan pada vendor (_vendor lock-in_).
+    *   **Platform Terkemuka:** Sering menargetkan campuran "_citizen developer_" (pengguna non-teknis) dan developer profesional, dengan penekanan kuat pada antarmuka visual _no-code_/_low-code_. Mereka biasanya berbasis _cloud_, bersifat _proprietary_, dan disertai dengan harga tingkat perusahaan serta ketergantungan pada vendor (_vendor lock-in_).
     *   **MagicAppBuilder:** Secara eksplisit **berpusat pada developer**. Ini bukan platform _no-code_, melainkan **akselerator pembuatan kode** untuk developer profesional. MagicAppBuilder memberikan akses penuh ke kode sumber, berjalan **100% offline**, dan memberi developer kontrol penuh atas lingkungan _deployment_ (_on-premises_ atau _private cloud_), menjadikannya ideal untuk proyek yang memerlukan kedaulatan data dan tanpa ketergantungan pada vendor.
  
 *   **Fungsionalitas Inti dan Spesialisasi:**
     *   **Platform Terkemuka:** Menawarkan spektrum fitur yang luas, termasuk manajemen proses bisnis (BPM) yang kompleks, integrasi AI/ML, dan _marketplace_ layanan pihak ketiga yang ekstensif. Mereka adalah alat serbaguna untuk berbagai kebutuhan perusahaan.
-    *   **MagicAppBuilder:** Berspesialisasi dalam pembuatan cepat **aplikasi modular yang berpusat pada data**. Kekuatannya terletak pada kemampuannya untuk dengan cepat membuat modul yang konsisten dan kaya fitur (CRUD, persetujuan, pemfilteran, dll.) serta API modern (seperti **Generator GraphQL Otomatis**). Ini unggul dalam membangun alat internal, panel admin, dan aplikasi lini bisnis di mana manajemen data adalah kunci.
+    *   **MagicAppBuilder:** Berspesialisasi dalam pembuatan cepat **aplikasi modular yang berpusat pada data**. Kekuatannya terletak pada kemampuannya untuk dengan cepat membuat modul yang konsisten dan kaya fitur (CRUD, persetujuan, pemfilteran, dll.) serta menghasilkan **tumpukan aplikasi penuh (full-stack) dengan API GraphQL** secara otomatis. Ini unggul dalam membangun alat internal, panel admin, dan aplikasi lini bisnis di mana manajemen data adalah kunci.
  
 *   **Teknologi dan Arsitektur:**
     *   **Platform Terkemuka:** Sering menggunakan _runtime proprietary_ dan memerlukan _deployment_ ke _cloud_ spesifik mereka atau lingkungan yang terkelola. Kustomisasi bisa terbatas pada titik ekstensi yang telah mereka tentukan.

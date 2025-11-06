@@ -26,13 +26,18 @@ Here's a comparison of MagicAppBuilder with other prominent low-code platforms, 
     * **Horizontal Scaling without Modification:** The explicit mention that both application and database can be horizontally scaled *without requiring upgrades or modifications to the application* is a significant advantage, implying a highly elastic and adaptable architecture.
 
 -   **Offline First & No AI Dependency:** Unlike many modern platforms that rely on cloud services or AI for code generation, MagicAppBuilder is designed to work **100% offline**. It can be run on a single PC without any internet connection, ensuring data privacy and full control over the development environment. This makes it ideal for developing sensitive applications or for use in environments with limited or no internet access.
-
--   **Automatic GraphQL API Generation:** MagicAppBuilder includes a powerful generator that automatically creates a complete, production-ready GraphQL API layer directly from your database entity schema. This includes generating types, queries (with filtering, sorting, and pagination), mutations (create, update, delete), and even a comprehensive API manual in Markdown format. This feature drastically reduces the time and effort required to build and document a modern API.
-
--   **Advanced Developer Tooling and Data Management:** MagicAppBuilder provides several features aimed at improving developer productivity and data integrity.
-    -   **Entity Editor Enhancements:** Features like an **entity filter** for easier navigation and **autocomplete suggestions** for foreign key fields streamline the data modeling and entry process.
-    -   **Application Lifecycle Management:** Tools for **inspecting, rebuilding, and recreating applications** provide a safety net for developers, ensuring application integrity and offering powerful recovery options if configurations are lost or corrupted.
-
+ 
+-   **Automatic Full-Stack GraphQL App & API Generation:** MagicAppBuilder goes beyond simple API creation by automatically generating:
+    -   **A Complete GraphQL Backend:** Including production-ready types, queries (with filtering, sorting, pagination), and mutations (CRUD).
+    -   **A Functional Frontend Application:** A ready-to-use web app that interacts with the GraphQL backend to render data, forms, and filters.
+    -   **Interactive API Documentation:** Generates both `MANUAL.md` and an interactive `manual.html` with a table of contents and easy navigation, simplifying the integration process.
+ 
+-   **Advanced Interoperability and Data Management:**
+    -   **Flexible Data Import:** Creates entities from a wide range of sources, including **Excel, CSV, SQL, DBF, ODS, GraphQL schemas**, and even by **pasting data from the clipboard** (e.g., from Word or web tables).
+    -   **Comprehensive Export:** Exports entity definitions and ER diagrams into **interactive HTML documents**, **Markdown**, and image formats (SVG/PNG) for documentation and collaboration.
+    -   **Application Lifecycle Management:** Provides tools for **inspecting, rebuilding, and recreating applications**, offering a safety net if configurations are lost or corrupted.
+    -   **Built-in Tooling:** Includes a **Redis Explorer**, **Database Migration Tool**, and a **File Manager** with viewers for documents (PDF, DOCX), fonts, and SQLite databases.
+ 
 **Comparison with Leading Low-Code Platforms (e.g., OutSystems, Mendix, Appian, Microsoft Power Apps):**
  
 *   **Target Audience and Philosophy:**
@@ -41,7 +46,7 @@ Here's a comparison of MagicAppBuilder with other prominent low-code platforms, 
  
 *   **Core Functionality and Specialization:**
     *   **Leading Platforms:** Offer a broad spectrum of features, including complex business process management (BPM), AI/ML integrations, and extensive third-party service marketplaces. They are general-purpose tools for a wide range of enterprise needs.
-    *   **MagicAppBuilder:** Specializes in the rapid generation of **data-centric, modular applications**. Its strength lies in its ability to quickly scaffold consistent, feature-rich modules (CRUD, approvals, filtering, etc.) and modern APIs (like the **Automatic GraphQL Generator**). It excels in building internal tools, admin panels, and line-of-business applications where data management is key.
+    *   **MagicAppBuilder:** Specializes in the rapid generation of **data-centric, modular applications**. Its strength lies in its ability to quickly scaffold consistent, feature-rich modules (CRUD, approvals, filtering, etc.) and generate a **full-stack application with a GraphQL API** automatically. It excels in building internal tools, admin panels, and line-of-business applications where data management is key.
  
 *   **Technology and Architecture:**
     *   **Leading Platforms:** Often use proprietary runtimes and require deployment to their specific cloud or a managed environment. Customization can be limited to their defined extension points.
