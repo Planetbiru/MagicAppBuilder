@@ -200,8 +200,12 @@ class GraphQLClientApp {
 
         // Listen for theme changes in other tabs
         window.addEventListener('storage', (event) => {
-            if (event.key === 'theme') {
-                this.applyTheme(event.newValue);
+            if (event.key === 'themeName') {
+                this.applyTheme(event.newValue); // Apply color theme change
+            } else if (event.key === 'colorMode') {
+                this.applyThemeMode(event.newValue); // Apply dark/light mode change
+            } else if (event.key === 'userLanguage') {
+                this.changeLanguage(event.newValue); // Apply language change
             }
         });
 
@@ -426,25 +430,17 @@ class GraphQLClientApp {
             const response = await fetch(this.themeConfigUrl);
             if (!response.ok) throw new Error(`Could not fetch ${this.themeConfigUrl}`);
             this.availableThemes = await response.json();
-
-            const savedThemeName = localStorage.getItem('colorTheme');
-            let themeToApply = null;
-
-            // Validate if the saved theme exists in the available themes
-            if (savedThemeName && this.availableThemes.some(t => t.name === savedThemeName)) {
-                themeToApply = savedThemeName;
-            }
-            this.applyTheme(themeToApply);
+            // No need to apply here, it's handled by the script in index.php on initial load
             this.populateThemeMenu();
 
         } catch (error) {
             console.error("Failed to initialize theme configuration:", error);
             // Fallback to default stylesheet if config fails
-            this.applyTheme(null);
+            // No need to apply here
             this.populateThemeMenu(); // Populate with empty to avoid errors
         } finally {
             // Apply initial dark/light mode after theme is set
-            const savedThemeMode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const savedThemeMode = localStorage.getItem('colorMode') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             this.applyThemeMode(savedThemeMode);
         }
     }
@@ -607,7 +603,7 @@ class GraphQLClientApp {
         const currentMode = document.documentElement.getAttribute('data-theme') || 'light';
         const newMode = currentMode === 'dark' ? 'light' : 'dark';
         this.applyThemeMode(newMode);
-        localStorage.setItem('theme', newMode);
+        localStorage.setItem('colorMode', newMode);
     }
 
     /**
@@ -615,7 +611,7 @@ class GraphQLClientApp {
      */
     populateThemeMenu() {
         this.dom.themeMenu.innerHTML = ''; // Clear existing items
-        const currentTheme = localStorage.getItem('colorTheme');
+        const currentTheme = localStorage.getItem('themeName');
 
         this.availableThemes.forEach(theme => {
             const li = document.createElement('li');
@@ -636,7 +632,7 @@ class GraphQLClientApp {
      * @param {string} themeName - The name of the theme to apply.
      */
     changeTheme(themeName) {
-        localStorage.setItem('colorTheme', themeName);
+        localStorage.setItem('themeName', themeName);
         this.applyTheme(themeName);
 
         // Update active class in the dropdown
@@ -2087,7 +2083,10 @@ class GraphQLClientApp {
      * @returns {Promise<void>}
      */
     async reloadConfiguration(event) {
-        event.preventDefault();
+        if(event)
+        {
+            event.preventDefault();
+        }
         this.dom.loadingBar.style.display = 'block';
         try {
             await this.loadConfig();

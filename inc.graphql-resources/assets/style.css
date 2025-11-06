@@ -69,7 +69,7 @@ body {
 .header .header-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 .header .header-item {
   position: relative;
@@ -326,6 +326,12 @@ html.sidebar-collapsed .sidebar {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+textarea {
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
 }
 
 textarea {

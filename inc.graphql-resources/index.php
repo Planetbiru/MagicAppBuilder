@@ -2,7 +2,8 @@
 $cacheTime = 86400; // 24 hours
 header('Cache-Control: public, max-age=' . $cacheTime);
 header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -14,18 +15,32 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
     if (localStorage.getItem('sidebarCollapsed') === 'true') {
       document.documentElement.classList.add('sidebar-collapsed');
     }
+    if (localStorage.getItem('colorMode') == 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
   </script>
   <link type="image/x-icon" rel="icon" href="favicon.ico" />
   <link type="image/x-icon" rel="shortcut icon" href="favicon.ico" />
   <script id="theme-selector-script">
-    const storedColorTheme = localStorage.getItem('colorTheme');
-    const themeUrl = storedColorTheme ? `assets/themes/${storedColorTheme}/style.min.css` : 'assets/style.min.css';
-    document.write(`<link rel="stylesheet" id="theme-stylesheet" href="${themeUrl}">`);
-    let themeSelector = document.querySelector('#theme-selector-script');
-    themeSelector.parentNode.removeChild(themeSelector);
+    (function() {
+      const storedColorTheme = localStorage.getItem('themeName');
+      const defaultThemeUrl = 'assets/style.min.css';
+      const themeUrl = storedColorTheme ? `assets/themes/${storedColorTheme}/style.min.css` : defaultThemeUrl;
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.id = 'theme-stylesheet';
+      link.href = themeUrl;
+      link.onerror = function() {
+        this.href = defaultThemeUrl;
+        this.onerror = null; // Prevent infinite loop if default also fails
+      };
+      document.head.appendChild(link);
+    })();
   </script>
-  <script src="assets/graphql.min.js"></script>
-  <script src="assets/app.min.js"></script>
+  <script src="assets/graphql.js"></script>
+  <script src="assets/app.js"></script>
 </head>
 
 <body>
