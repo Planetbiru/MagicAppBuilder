@@ -117,6 +117,7 @@ try
 
 	$body = PicoResponseBody::getInstance()
 		->setModule($picoModule)
+		->setCurrentAction("insert")
 		->setData($data)
 		->setEntity($entity, true)
 		->setResponseStatus(new PicoResponseStatus("000"))
@@ -130,6 +131,7 @@ catch(Exception $e)
 {
 	$body = PicoResponseBody::getInstance()
   	->setModule($picoModule)
+	->setCurrentAction("insert")
     ->setEntity($entity, true)
     ->setResponseStatus(new PicoResponseStatus(PicoStatusCode::DATA_NOT_FOUND))
 	->switchCaseTo("camel")
