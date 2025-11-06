@@ -100,6 +100,7 @@ class GraphQLClientApp {
             loginForm: document.getElementById('login-form'),
             loginCloseBtn: document.getElementById('login-close-button'),
             logoutBtn: document.querySelector('.logout-link'),
+            reloadConfigBtn: document.getElementById('reload-config-btn'),
             logoutBtnDropdown: document.getElementById('logout-btn-dropdown'),
             sidebarToggle: document.getElementById('sidebar-toggle'),
             sidebar: document.getElementById('sidebar-nav'),
@@ -167,6 +168,11 @@ class GraphQLClientApp {
         // Ensure logout link in dropdown works
         if (this.dom.logoutBtnDropdown) {
             this.dom.logoutBtnDropdown.onclick = (e) => this.handleLogout(e);
+        }
+
+        // Reload config button handler
+        if (this.dom.reloadConfigBtn) {
+            this.dom.reloadConfigBtn.onclick = (e) => this.reloadConfiguration(e);
         }
 
         // Language selection handler
@@ -1943,9 +1949,10 @@ class GraphQLClientApp {
      * @param {object} options - The options for the alert modal.
      * @param {string} [options.title='Info'] - The translation key for the modal title.
      * @param {string} [options.message] - The message to display.
+     * @param {?number} [options.timeout=null] - Optional. Time in milliseconds to auto-close the alert.
      * @returns {Promise<void>} A promise that resolves when the modal is closed.
      */
-    customAlert({ title = 'Info', message = '' }) {
+    customAlert({ title = 'Info', message = '', timeout = null }) {
         return new Promise(resolve => {
             this.dom.infoModalTitle.innerText = this.t(title);
             this.dom.infoModalMessage.innerText = message;
@@ -1954,8 +1961,13 @@ class GraphQLClientApp {
             this.dom.infoModalOk.innerText = this.t('ok');
 
             const closeButton = this.dom.infoModal.querySelector('.close-button');
+            let timeoutId = null;
 
             const cleanupAndResolve = () => {
+                // If a timeout is set, clear it to prevent it from running after manual close.
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                }
                 this.dom.infoModal.classList.remove('show');
                 this.dom.infoModalOk.removeEventListener('click', cleanupAndResolve);
                 closeButton.removeEventListener('click', cleanupAndResolve);
@@ -1964,6 +1976,11 @@ class GraphQLClientApp {
 
             this.dom.infoModalOk.addEventListener('click', cleanupAndResolve, { once: true });
             closeButton.addEventListener('click', cleanupAndResolve, { once: true });
+
+            // If a timeout is provided and is a valid number, set it.
+            if (typeof timeout === 'number' && timeout > 0) {
+                timeoutId = setTimeout(cleanupAndResolve, timeout);
+            }
 
             this.openInfoModal();
         });
@@ -2047,6 +2064,32 @@ class GraphQLClientApp {
                 title: 'logout_failed_title',
                 message: this.t('logout_failed')
             });
+        }
+    }
+
+    /**
+     * Reloads the application's configuration files without a full page refresh.
+     * This re-fetches frontend config, UI translations, and entity translations,
+     * then rebuilds the UI to reflect any changes.
+     * @param {Event} event - The click event from the reload button.
+     * @returns {Promise<void>}
+     */
+    async reloadConfiguration(event) {
+        event.preventDefault();
+        this.dom.loadingBar.style.display = 'block';
+        try {
+            await this.loadConfig();
+            await this.loadI18n();
+            await this.loadLanguage();
+            this.buildMenu();
+            this.applyI18n();
+            await this.handleRouteChange(); // Re-render the current view
+            await this.customAlert({ title: 'success', message: this.t('app_refreshed_successfully'), timeout: 2000});
+        } catch (error) {
+            console.error('Failed to reload configuration:', error);
+            await this.customAlert({ title: 'error', message: this.t('app_refresh_failed')});
+        } finally {
+            this.dom.loadingBar.style.display = 'none';
         }
     }
 

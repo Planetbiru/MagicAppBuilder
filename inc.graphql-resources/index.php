@@ -8,8 +8,8 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GraphQL Application</title>
-  <meta name="title" content="GraphQL Application">
+  <title>{APP_NAME}</title>
+  <meta name="title" content="{APP_NAME}">
   <script>
     if (localStorage.getItem('sidebarCollapsed') === 'true') {
       document.documentElement.classList.add('sidebar-collapsed');
@@ -24,7 +24,7 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
     let themeSelector = document.querySelector('#theme-selector-script');
     themeSelector.parentNode.removeChild(themeSelector);
   </script>
-  <script src="assets/graphql.min.js"></script>
+  <script src="assets/graphql.js"></script>
   <script src="assets/app.min.js"></script>
 </head>
 
@@ -101,8 +101,9 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
           </span>
           <ul id="profile-menu" class="dropdown-menu"
             data-i18n-menu='{"profile":"Profile", "settings": "Settings", "logout": "Logout"}'>
-            <li><a href="#user-profile" data-i18n="profile">Profile</a></li>
-            <li><a href="#settings" data-i18n="settings">Settings</a></li>
+            <li><a href="#user-profile" data-i18n="profile">Profil</a></li>
+            <li><a href="#settings" data-i18n="settings">Pengaturan</a></li>
+            <li><a href="#" id="reload-config-btn" data-i18n="refresh_app">Segarkan Aplikasi</a></li>
             <li>
               <hr class="menu-separator" />
             </li>
