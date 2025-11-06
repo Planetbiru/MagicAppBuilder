@@ -470,6 +470,19 @@ function loadFormState(frm, data) {
     }
 }
 
+/**
+ * Sends GraphQL entity data to the server via a POST request.
+ *
+ * @async
+ * @function sendGraphQlEntityToServer
+ * @param {string} applicationId - The unique identifier of the application.
+ * @param {string} databaseType - The type of the database (e.g., mysql, postgresql, sqlite, sqlserver).
+ * @param {string} databaseName - The name of the database to which the entity belongs.
+ * @param {string} databaseSchema - The schema name of the database (if applicable).
+ * @param {Object} dataToSave - The entity data to be sent to the server as JSON.
+ * @returns {Promise<Object|null>} A promise that resolves to the JSON response from the server, or `null` if an error occurs.
+ *
+ */
 async function sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave) {
     const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
     const jsonData = JSON.stringify(dataToSave);
@@ -500,7 +513,17 @@ async function sendGraphQlEntityToServer(applicationId, databaseType, databaseNa
     }
 }
 
-
+/**
+ * Loads GraphQL entity data from the server via a GET request.
+ *
+ * @function loadGraphQlEntityToServer
+ * @param {string} applicationId - The unique identifier of the application.
+ * @param {string} databaseType - The type of the database (e.g., mysql, postgresql, sqlite, sqlserver).
+ * @param {string} databaseName - The name of the database to retrieve entities from.
+ * @param {string} databaseSchema - The schema name of the database (if applicable).
+ * @param {Function} callback - A callback function executed after data is successfully fetched.
+ *                              Receives the parsed JSON data as its single argument.
+ */
 function loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, callback) {
     const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
 
@@ -526,8 +549,6 @@ function loadGraphQlEntityToServer(applicationId, databaseType, databaseName, da
         console.error('An error occurred while fetching data from the server:', error);
     });
 }
-
-
 
 /**
  * Opens the structure of the provided file.
