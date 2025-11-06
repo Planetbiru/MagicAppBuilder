@@ -369,6 +369,7 @@ function saveFormState(frm)
         table.querySelector('tbody').querySelectorAll('tr').forEach(tr => {
             let colName = tr.dataset.col;
             let columnInfo = {};
+            columnInfo.checked = tr.querySelector('.check-column').checked;
             if(tr.querySelector('.filter-graphql'))
             {
                 let value = tr.querySelector('.filter-graphql').value;
@@ -446,15 +447,21 @@ function loadFormState(frm, data) {
         for (const entityName in data.entities) {
             for (const colName in data.entities[entityName]) {
                 const colData = data.entities[entityName][colName];
-                const filterSelect = frm.querySelector(`table[data-entity="${entityName}"] select.filter-graphql[data-col="${colName}"]`);
+
+                const tr = frm.querySelector(`table[data-entity="${entityName}"] tr[data-col="${colName}"]`);
+                if (!tr) continue;
+
+                tr.querySelector('.check-column').checked = colData.checked;
+
+                const filterSelect = tr.querySelector(`select.filter-graphql[data-col="${colName}"]`);
                 if (filterSelect && typeof colData.filter !== 'undefined') {
                     filterSelect.value = colData.filter;
                 }
-                const taCheckBox = frm.querySelector(`table[data-entity="${entityName}"] input.textarea-graphql[data-col="${colName}"]`);
+                const taCheckBox = tr.querySelector(`input.textarea-graphql[data-col="${colName}"]`);
                 if (taCheckBox && typeof colData.textareaColumns !== 'undefined') {
                     taCheckBox.checked = colData.textareaColumns;
                 }
-                const pkSelect = frm.querySelector(`table[data-entity="${entityName}"] select.pk-value-graphql[data-col="${colName}"]`);
+                const pkSelect = tr.querySelector(`select.pk-value-graphql[data-col="${colName}"]`);
                 if (pkSelect && typeof colData.primaryKeyValue !== 'undefined') {
                     pkSelect.value = colData.primaryKeyValue;
                 }
