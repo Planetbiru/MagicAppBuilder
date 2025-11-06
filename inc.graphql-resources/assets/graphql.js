@@ -632,6 +632,9 @@ class GraphQLClientApp {
      * @param {string} themeName - The name of the theme to apply.
      */
     changeTheme(themeName) {
+        let currentTheme = localStorage.getItem('themeName');
+        if (currentTheme === themeName) return;
+        
         localStorage.setItem('themeName', themeName);
         this.applyTheme(themeName);
 
