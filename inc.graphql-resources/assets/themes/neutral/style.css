@@ -286,7 +286,8 @@ html.sidebar-collapsed .sidebar {
 .form-group input[type=datetime-local],
 .form-group select,
 .form-group textarea {
-  resize: vertical;
+  font-family: inherit;
+  font-size: 13px;
   width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
@@ -327,7 +328,7 @@ html.sidebar-collapsed .sidebar {
 
 textarea {
   font-family: inherit;
-  font-size: 0.845rem;
+  font-size: 13px;
   resize: vertical;
 }
 
