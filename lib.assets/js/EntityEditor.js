@@ -2580,10 +2580,17 @@ class EntityEditor {
         .then(response => response.blob())
         .then(blob => {
             // Create a link to download the file
+            let { applicationId} = getMetaValues();
+
+            if(applicationId == '')
+            {
+                applicationId = 'app';
+            }
+
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'graphql.zip';
+            a.download = `${applicationId}-graphql.zip`;
             document.body.appendChild(a);
             a.click();
             a.remove();
