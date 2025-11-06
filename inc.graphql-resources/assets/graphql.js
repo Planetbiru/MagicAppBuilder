@@ -1293,7 +1293,7 @@ class GraphQLClientApp {
         }
 
         // Add the "Add New" button. Inside .filter-controls if filters exist, otherwise directly in .filter-container.
-        filterHtml += `<button id="add-new-btn" class="btn btn-primary">${this.t('add_new', this.currentEntity.displayName)}</button>`;
+        filterHtml += `<button id="add-new-btn" class="btn btn-primary">${this.t('add_new', this.currentEntityDisplayName)}</button>`;
 
         if (hasFilters) {
             filterHtml += '</div>'; // Close .filter-controls
@@ -1583,7 +1583,7 @@ class GraphQLClientApp {
      * @returns {Promise<void>} Resolves when the form is rendered and event handlers attached.
      */
     async renderForm(id = null) {
-        this.dom.modalTitle.textContent = id ? this.t('edit_entity', this.currentEntity.displayName) : this.t('add_new_entity', this.currentEntity.displayName);
+        this.dom.modalTitle.textContent = id ? this.t('edit_entity', this.currentEntityDisplayName) : this.t('add_new_entity', this.currentEntityDisplayName);
         this.dom.form.innerHTML = this.t('loading');
         this.openModal();
 

@@ -24,7 +24,7 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
     let themeSelector = document.querySelector('#theme-selector-script');
     themeSelector.parentNode.removeChild(themeSelector);
   </script>
-  <script src="assets/graphql.js"></script>
+  <script src="assets/graphql.min.js"></script>
   <script src="assets/app.min.js"></script>
 </head>
 
