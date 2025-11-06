@@ -326,6 +326,12 @@ html.sidebar-collapsed .sidebar {
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
 }
 
+textarea {
+  font-family: inherit;
+  font-size: 0.845rem;
+  resize: vertical;
+}
+
 .btn {
   padding: 8px 15px;
   border: none;
@@ -741,10 +747,10 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 /* For Firefox */
-input[type="number"] {
-     -moz-appearance: textfield;
+input[type=number] {
+  -moz-appearance: textfield;
   -webkit-appearance: textfield;
-          appearance: textfield;
+  appearance: textfield;
 }
 
 input[type=number]::-webkit-inner-spin-button,

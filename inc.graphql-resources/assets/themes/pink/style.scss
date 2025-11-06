@@ -308,7 +308,7 @@ html.sidebar-collapsed .sidebar {
   input[type="text"],
   input[type="password"],
   input[type="email"],
-  input[type="number"],
+  input[type=number],
   input[type="date"],
   input[type="time"],
   input[type="datetime"],
@@ -337,6 +337,13 @@ html.sidebar-collapsed .sidebar {
       box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.3);
     }
   }
+}
+
+textarea
+{
+  font-family: inherit;
+  font-size: 0.845rem;
+  resize: vertical;;
 }
 
 .btn {
@@ -810,21 +817,21 @@ hr{
 }
 
 /* For WebKit/Blink browsers (Chrome, Safari, Edge) */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0; /* Important to remove default margin */
 }
 
 /* For Firefox */
-input[type="number"] {
+input[type=number] {
      -moz-appearance: textfield;
   -webkit-appearance: textfield;
           appearance: textfield;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
     opacity: 0.7; /* Make them slightly transparent */
     width: 20px; /* Adjust width */
     height: 100%; /* Make them fill the height */
