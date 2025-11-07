@@ -100,7 +100,6 @@ class GraphQLClientApp {
             closeModalBtn: document.querySelector('.close-button'),
             loginModal: document.getElementById('login-modal'),
             loginForm: document.getElementById('login-form'),
-            loginCloseBtn: document.getElementById('login-close-button'),
             logoutBtn: document.querySelector('.logout-link'),
             reloadConfigBtn: document.getElementById('reload-config-btn'),
             logoutBtnDropdown: document.getElementById('logout-btn-dropdown'),
@@ -224,7 +223,7 @@ class GraphQLClientApp {
                 if (event.target.id === this.dom.modal.id) {
                     this.closeModal();
                 } else if (event.target.id === this.dom.loginModal.id) {
-                    this.closeLoginModal();
+                    // Do not close login moda
                 } else if (event.target.id === 'customConfirmModal') {
                     this.closeConfirmModal();
                 } else if (event.target.id === this.dom.infoModal.id) {
@@ -280,7 +279,6 @@ class GraphQLClientApp {
     async init() {
         let _this = this;
 
-        this.dom.loginCloseBtn.onclick = () => this.closeLoginModal();
         this.dom.loginForm.onsubmit = (e) => this.handleLogin(e);
         this.dom.logoutBtn.onclick = (e) => this.handleLogout(e);
 

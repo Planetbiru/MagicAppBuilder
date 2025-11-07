@@ -167,7 +167,6 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
     <div class="modal-content">
       <form id="login-form">
         <div class="modal-header">
-          <span class="close-button" id="login-close-button" data-dismiss="modal">&times;</span>
           <h2 id="login-title" data-i18n="login">Login</h2>
         </div>
         <div class="modal-body">
