@@ -357,7 +357,13 @@ class GraphQLClientApp {
      */
     async initializeLanguage() {
         try {
-            const response = await fetch(this.languageConfigUrl);
+            const response = await fetch(this.languageConfigUrl, {
+                headers: { 
+                    'X-Requested-With': 'xmlhttprequest',
+                    'X-Language-Id': this.languageId,
+                    'Accept-Language': this.languageId, 
+                }
+            });
             if (!response.ok) throw new Error(`Could not fetch ${this.languageConfigUrl}`);
             const langConfig = await response.json();
             this.supportedLanguages = langConfig.supported;
@@ -431,7 +437,13 @@ class GraphQLClientApp {
      */
     async initializeTheme() {
         try {
-            const response = await fetch(this.themeConfigUrl);
+            const response = await fetch(this.themeConfigUrl, {
+                headers: { 
+                    'X-Requested-With': 'xmlhttprequest',
+                    'X-Language-Id': this.languageId,
+                    'Accept-Language': this.languageId, 
+                }
+            });
             if (!response.ok) throw new Error(`Could not fetch ${this.themeConfigUrl}`);
             this.availableThemes = await response.json();
             // No need to apply here, it's handled by the script in index.php on initial load
@@ -456,7 +468,13 @@ class GraphQLClientApp {
      * @returns {Promise<void>} Resolves when configuration is loaded and applied.
      */
     async loadConfig() {
-        const response = await fetch(this.configUrl);
+        const response = await fetch(this.configUrl, {
+            headers: { 
+                'X-Requested-With': 'xmlhttprequest',
+                'X-Language-Id': this.languageId,
+                'Accept-Language': this.languageId, 
+            }
+        });
         if (response.status === 401) {
             this.handleUnauthorized();
             throw new Error("Authentication required.");
@@ -483,7 +501,14 @@ class GraphQLClientApp {
         try {
             if (this.entityLanguageUrl) {
                 let url = `${this.entityLanguageUrl}?lang=${this.languageId}`;
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'xmlhttprequest',
+                        'Accept': 'application/json',
+                        'X-Language-Id': this.languageId,
+                        'Accept-Language': this.languageId,
+                    }
+                });
                 if (response.status === 401) {
                     this.handleUnauthorized();
                     throw new Error("Authentication required.");
@@ -517,7 +542,14 @@ class GraphQLClientApp {
         try {
             if (this.i18nUrl) {
                 let url = `${this.i18nUrl}?lang=${this.languageId}`;
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'xmlhttprequest',
+                        'Accept': 'application/json',
+                        'X-Language-Id': this.languageId,
+                        'Accept-Language': this.languageId,
+                    }
+                });
                 if (!response.ok) {
                     throw new Error(`Failed to load i18n from ${this.i18nUrl}`); // NOSONAR
                 }
@@ -2057,7 +2089,9 @@ class GraphQLClientApp {
     async handleLogout(event) {
         event.preventDefault();
         try {
-            const response = await fetch(this.logoutUrl);
+            const response = await fetch(this.logoutUrl, {
+                headers: { 'X-Requested-With': 'xmlhttprequest' }
+            });
             if (response.ok) {
                 // Hide the main page content and show the login modal
                 this.hidePageWrapper();
