@@ -889,7 +889,7 @@ class GraphQLGenerator
         $manualContent .= "```php\r\n";
         $manualContent .= "// file: database.php\r\n";
         $manualContent .= "\$host         = '127.0.0.1';\r\n";
-        $manualContent .= "\$db           = 'your_database_name';\r\n";
+        $manualContent .= "\$databaseName = 'your_database_name';\r\n";
         $manualContent .= "\$user         = 'your_username';\r\n";
         $manualContent .= "\$pass         = 'your_password';\r\n";
         $manualContent .= "\$charset      = 'utf8mb4';\r\n\r\n";
