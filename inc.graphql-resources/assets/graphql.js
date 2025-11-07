@@ -223,7 +223,7 @@ class GraphQLClientApp {
                 if (event.target.id === this.dom.modal.id) {
                     this.closeModal();
                 } else if (event.target.id === this.dom.loginModal.id) {
-                    // Do not close login moda
+                    // Do not close login modal
                 } else if (event.target.id === 'customConfirmModal') {
                     this.closeConfirmModal();
                 } else if (event.target.id === this.dom.infoModal.id) {

@@ -352,7 +352,8 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/sessions.php", 'sessions.php');   
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/sessions.php", 'sessions.php');  
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/admin.php", 'admin.php');   
 
         // Add all files under directory `vendor`
 
