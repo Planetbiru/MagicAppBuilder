@@ -49,6 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo json_encode(['success' => true, 'message' => $i18n->t('admin_created_successfully')]);
             } else { // Update
                 if (!$adminId) throw new Exception($i18n->t('admin_id_required'));
+
+                if($adminId == $appAdmin['admin_id']) {
+                    $active = 1; // Must be active
+                    $admin_level_id = $appAdmin['admin_level_id']; // Can not be changed
+                }
+
                 $sql = "UPDATE admin SET name = :name, username = :username, email = :email, admin_level_id = :admin_level_id, active = :active, 
                         time_edit = :time_edit, admin_edit = :admin_edit, ip_edit = :ip_edit WHERE admin_id = :admin_id";
                 $stmt = $db->prepare($sql);
@@ -75,6 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $currentStatus = $stmt->fetchColumn();
             
             $newStatus = $currentStatus ? 0 : 1;
+
+            if($adminId == $appAdmin['admin_id']) {
+                $newStatus = 1; // Must be active
+            }
+
             $updateStmt = $db->prepare("UPDATE admin SET active = :active WHERE admin_id = :admin_id");
             $updateStmt->execute([':active' => $newStatus, ':admin_id' => $adminId]);
             echo json_encode(['success' => true, 'message' => $i18n->t('admin_status_updated')]);
