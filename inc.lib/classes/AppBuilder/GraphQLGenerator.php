@@ -922,7 +922,6 @@ class GraphQLGenerator
         $manualContent .= "Please consider deleting the following files from your production server:\r\n\r\n";
         $manualContent .= "- **`manual.md`**: This file contains API documentation and is not needed for runtime.\r\n";
         $manualContent .= "- **`manual.html`**: An HTML version of the API documentation, not needed for runtime.\r\n";
-        $manualContent .= "- **`composer.phar`**: The Composer executable, which is not required after dependencies are installed and can pose a security risk.\r\n\r\n";
         $manualContent .= "---\r\n\r\n";
 
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {

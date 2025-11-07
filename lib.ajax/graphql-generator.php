@@ -402,11 +402,6 @@ try {
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'android-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'apple-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'favicon');
-        
-        // Bonus
-        // composer.phar to update dependencies
-
-        $zip->addFile(dirname(__DIR__) . "/inc.lib/composer.phar", "composer.phar");
 
         $zip->close();
         // Send the ZIP file as a download
@@ -460,9 +455,6 @@ try {
 
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
         addDirectoryToZip($zip, $vendorPath, 'vendor');
-
-        // Bonus
-        $zip->addFile(dirname(__DIR__) . "/inc.lib/composer.phar", "composer.phar");
 
         $zip->close();
         // Send the ZIP file as a download
