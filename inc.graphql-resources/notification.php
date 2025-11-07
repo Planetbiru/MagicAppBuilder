@@ -1,5 +1,10 @@
 <?php
 
+if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+    header('Localtion: ./'.basename(__FILE__, '.php'));
+    exit();
+}
+
 require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/inc/I18n.php';

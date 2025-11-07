@@ -50,12 +50,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
+    graphqlApp.pages['dashboard'] = {
+        url: 'dashboard.php',
+        title: 'dashboard', // The translation key for the page title.
+        method: 'GET',
+        headers: {
+            'X-Requested-with': 'xmlhttprequest',
+            'X-Language-Id': graphqlApp.languageId,
+            'Accept-Language': graphqlApp.languageId
+        },
+        accept: 'text/html',
+        // Callback function executed on a successful fetch.
+        success: (data, container, dom) => {
+            // Hide standard entity view elements.
+            dom.filterContainer.style.display = 'none';
+            dom.paginationContainer.style.display = 'none';
+            dom.filterContainer.innerHTML = '';
+            dom.tableDataContainer.innerHTML = '';
+            // Inject the fetched HTML into the main content container.
+            container.innerHTML = data;
+        },
+        // Callback function for handling errors.
+        error: (errorCode, errorMessage, container, dom) => {
+            console.error(error);
+        },
+        // A general render function (can be used for static content).
+        render: (data, container, dom) => {
+            // Not used here as content is fetched via URL.
+        }
+    };
 
     graphqlApp.pages['user-profile'] = {
         url: 'user-profile.php',
         title: 'profile', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -84,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'profile', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -112,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'settings', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -140,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'settings', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -168,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'message', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -196,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'notification', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -224,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'admin', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -253,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: 'update_password', // The translation key for the page title.
         method: 'GET',
         headers: {
+            'X-Requested-with': 'xmlhttprequest',
             'X-Language-Id': graphqlApp.languageId,
             'Accept-Language': graphqlApp.languageId
         },
@@ -316,6 +353,8 @@ async function handleProfileUpdate(event) {
         const response = await fetch('user-profile.php', {
             method: 'POST',
             headers:{
+                'X-Requested-With': 'xmlhttprequest',
+                'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
                 'Accept-Language': graphqlApp.languageId
             },
@@ -341,6 +380,8 @@ async function handlePasswordUpdate(event) {
         const response = await fetch('update-password.php', {
             method: 'POST',
             headers:{
+                'X-Requested-With': 'xmlhttprequest',
+                'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
                 'Accept-Language': graphqlApp.languageId
             },
@@ -367,6 +408,8 @@ async function handleSettingsUpdate(event) {
         const response = await fetch('settings.php', {
             method: 'POST',
             headers:{
+                'X-Requested-With': 'xmlhttprequest',
+                'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
                 'Accept-Language': graphqlApp.languageId
             },
@@ -403,6 +446,8 @@ async function handleAdminSave(event, adminId = null) {
             method: 'POST',
             body: formData,
             headers: {
+                'X-Requested-With': 'xmlhttprequest',
+                'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
                 'Accept-Language': graphqlApp.languageId
             }
@@ -432,6 +477,8 @@ async function handleAdminChangePassword(event, adminId) {
             method: 'POST',
             body: formData,
             headers: {
+                'X-Requested-With': 'xmlhttprequest',
+                'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
                 'Accept-Language': graphqlApp.languageId
             }
@@ -465,7 +512,13 @@ async function handleAdminToggleActive(adminId, isActive) {
     formData.append('adminId', adminId);
 
     try {
-        const response = await fetch('admin.php', { method: 'POST', body: formData });
+        const response = await fetch('admin.php', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'xmlhttprequest'
+            }
+        });
         const result = await response.json();
         if (result.success) {
             graphqlApp.handleRouteChange(); // Refresh the list/detail view
@@ -490,7 +543,13 @@ async function handleAdminDelete(adminId) {
     formData.append('adminId', adminId);
 
     try {
-        await fetch('admin.php', { method: 'POST', body: formData });
+        await fetch('admin.php', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'xmlhttprequest'
+            }
+        });
         graphqlApp.handleRouteChange(); // Refresh list
     } catch (error) {
         console.error('Error deleting admin:', error);
@@ -516,6 +575,8 @@ async function markMessageAsUnread(messageId, fromView = 'list') {
         const response = await fetch('message.php', {
             method: 'POST',
             headers:{
+                'X-Requested-with': 'xmlhttprequest',
+                'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
                 'Accept-Language': graphqlApp.languageId
             },
@@ -544,6 +605,8 @@ async function markNotificationAsUnread(notificationId, fromView = 'list') {
         const response = await fetch('notification.php', {
             method: 'POST',
             headers:{
+                'X-Requested-with': 'xmlhttprequest',
+                'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
                 'Accept-Language': graphqlApp.languageId
             },
