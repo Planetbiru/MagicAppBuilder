@@ -39,8 +39,8 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
       document.head.appendChild(link);
     })();
   </script>
-  <script src="assets/graphql.js"></script>
-  <script src="assets/app.js"></script>
+  <script src="assets/graphql.min.js"></script>
+  <script src="assets/app.min.js"></script>
 </head>
 
 <body>
@@ -117,6 +117,7 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheTime) . ' GMT');
           <ul id="profile-menu" class="dropdown-menu"
             data-i18n-menu='{"profile":"Profile", "settings": "Settings", "logout": "Logout"}'>
             <li><a href="#user-profile" data-i18n="profile">Profil</a></li>
+            <li><a href="#admin" data-i18n="admin">Admin</a></li>
             <li><a href="#settings" data-i18n="settings">Pengaturan</a></li>
             <li><a href="#" id="reload-config-btn" data-i18n="refresh_app">Segarkan Aplikasi</a></li>
             <li>

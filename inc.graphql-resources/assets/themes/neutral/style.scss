@@ -365,6 +365,10 @@ textarea
   font-size: 14px;
   text-decoration: none;
   transition: background-color 0.2s ease, transform 0.1s ease;
+  vertical-align: middle;
+  display: inline-block;
+  margin-top: 1px;
+  margin-bottom: 1px;
 
   &:active {
     transform: translateY(1px);
@@ -381,6 +385,13 @@ textarea
   padding: 5px 10px;
   font-size: 12px;
   border-radius: 2px;
+}
+
+a.btn{
+  padding: 7px 10px;
+}
+a.btn-sm{
+  padding: 4px 10px;
 }
 
 .btn-primary {

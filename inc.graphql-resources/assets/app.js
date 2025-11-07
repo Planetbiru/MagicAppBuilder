@@ -218,6 +218,34 @@ document.addEventListener('DOMContentLoaded', () => {
         render: (data, container, dom) => {
             // Not used here as content is fetched via URL.
         }
+    };
+    graphqlApp.pages['admin'] = {
+        url: 'admin.php',
+        title: 'admin', // The translation key for the page title.
+        method: 'GET',
+        headers: {
+            'X-Language-Id': graphqlApp.languageId,
+            'Accept-Language': graphqlApp.languageId
+        },
+        accept: 'text/html',
+        // Callback function executed on a successful fetch.
+        success: (data, container, dom) => {
+            // Hide standard entity view elements.
+            dom.filterContainer.style.display = 'none';
+            dom.paginationContainer.style.display = 'none';
+            dom.filterContainer.innerHTML = '';
+            dom.tableDataContainer.innerHTML = '';
+            // Inject the fetched HTML into the main content container.
+            container.innerHTML = data;
+        },
+        // Callback function for handling errors.
+        error: (errorCode, errorMessage, container, dom) => {
+            console.error(error);
+        },
+        // A general render function (can be used for static content).
+        render: (data, container, dom) => {
+            // Not used here as content is fetched via URL.
+        }
     }
 
     graphqlApp.pages['update-password'] = {
@@ -359,6 +387,124 @@ async function handleSettingsUpdate(event) {
         console.error('Error updating settings:', error);
         await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: 'An unexpected error occurred.' });
     }
+}
+
+async function handleAdminSave(event, adminId = null) {
+    event.preventDefault();
+    const form = document.getElementById('admin-form');
+    const formData = new FormData(form);
+    formData.append('action', adminId ? 'update' : 'create');
+    if (adminId) {
+        formData.append('adminId', adminId);
+    }
+
+    try {
+        const response = await fetch('admin.php', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Language-Id': graphqlApp.languageId,
+                'Accept-Language': graphqlApp.languageId
+            }
+        });
+        const result = await response.json();
+        if (result.success) {
+            await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
+            window.location.hash = '#admin';
+        } else {
+            await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: result.message });
+        }
+    } catch (error) {
+        console.error('Error saving admin:', error);
+        await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: graphqlApp.t('unexpected_error_occurred') });
+    }
+}
+
+async function handleAdminChangePassword(event, adminId) {
+    event.preventDefault();
+    const form = document.getElementById('change-password-form');
+    const formData = new FormData(form);
+    formData.append('action', 'change_password');
+    formData.append('adminId', adminId);
+
+    try {
+        const response = await fetch('admin.php', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Language-Id': graphqlApp.languageId,
+                'Accept-Language': graphqlApp.languageId
+            }
+        });
+        const result = await response.json();
+        if (result.success) {
+            await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
+            window.location.hash = `#admin/detail/${adminId}`;
+        } else {
+            await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: result.message });
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: graphqlApp.t('unexpected_error_occurred') });
+    }
+}
+
+async function handleAdminToggleActive(adminId, isActive) {
+    const action = isActive ? 'deactivate' : 'activate';
+    const confirmed = await graphqlApp.customConfirm({
+        title: graphqlApp.t('confirmation_title'),
+        message: graphqlApp.t('confirm_toggle_active', graphqlApp.t(action)),
+        okText: graphqlApp.t('yes'),
+        cancelText: graphqlApp.t('no')
+    });
+    if (!confirmed) return;
+    graphqlApp.closeConfirmModal();
+
+    const formData = new FormData();
+    formData.append('action', 'toggle_active');
+    formData.append('adminId', adminId);
+
+    try {
+        const response = await fetch('admin.php', { method: 'POST', body: formData });
+        const result = await response.json();
+        if (result.success) {
+            graphqlApp.handleRouteChange(); // Refresh the list/detail view
+        } else {
+            await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: result.message });
+        }
+    } catch (error) {
+        console.error('Error toggling admin status:', error);
+    }
+}
+
+async function handleAdminDelete(adminId) {
+    const confirmed = await graphqlApp.customConfirm({
+        title: graphqlApp.t('confirmation_title'),
+        message: graphqlApp.t('confirm_delete')
+    });
+    if (!confirmed) return;
+    graphqlApp.closeConfirmModal();
+
+    const formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('adminId', adminId);
+
+    try {
+        await fetch('admin.php', { method: 'POST', body: formData });
+        graphqlApp.handleRouteChange(); // Refresh list
+    } catch (error) {
+        console.error('Error deleting admin:', error);
+    }
+}
+
+function handleAdminSearch(event) {
+    event.preventDefault();
+    const form = document.getElementById('admin-search-form');
+    const searchInput = form.querySelector('input[name="search"]');
+    const searchTerm = searchInput.value.trim();
+
+    const newHash = searchTerm ? `#admin?search=${encodeURIComponent(searchTerm)}` : '#admin';
+    window.location.hash = newHash;
 }
 
 async function markMessageAsUnread(messageId, fromView = 'list') {
