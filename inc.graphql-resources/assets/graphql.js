@@ -25,6 +25,7 @@ class GraphQLClientApp {
      * @param {?string} [options.languageId=null] - The initial language ID. If null, it will be auto-detected.
      * @param {string} [options.defaultLanguage='en'] - The fallback language if auto-detection fails.
      * @param {object} [options.pages] - An object to define custom, non-entity pages for the application.
+     * @param {boolean} [options.useBrowserLanguage=true] - If true, attempts to use the browser's language if none is set in local storage.
      */
     constructor(options = {}) {
         const defaults = {
@@ -45,6 +46,7 @@ class GraphQLClientApp {
             languageId: null,
 
             defaultLanguage: 'en',
+            useBrowserLanguage: true,
             pages: {},
         };
 
@@ -98,7 +100,6 @@ class GraphQLClientApp {
             closeModalBtn: document.querySelector('.close-button'),
             loginModal: document.getElementById('login-modal'),
             loginForm: document.getElementById('login-form'),
-            loginCloseBtn: document.getElementById('login-close-button'),
             logoutBtn: document.querySelector('.logout-link'),
             reloadConfigBtn: document.getElementById('reload-config-btn'),
             logoutBtnDropdown: document.getElementById('logout-btn-dropdown'),
@@ -222,7 +223,7 @@ class GraphQLClientApp {
                 if (event.target.id === this.dom.modal.id) {
                     this.closeModal();
                 } else if (event.target.id === this.dom.loginModal.id) {
-                    this.closeLoginModal();
+                    // Do not close login moda
                 } else if (event.target.id === 'customConfirmModal') {
                     this.closeConfirmModal();
                 } else if (event.target.id === this.dom.infoModal.id) {
@@ -278,18 +279,17 @@ class GraphQLClientApp {
     async init() {
         let _this = this;
 
-        this.dom.loginCloseBtn.onclick = () => this.closeLoginModal();
         this.dom.loginForm.onsubmit = (e) => this.handleLogin(e);
         this.dom.logoutBtn.onclick = (e) => this.handleLogout(e);
 
         try {
             await this.initializeLanguage();
             await this.initializeTheme();
-            await this.loadConfig();
             await this.loadI18n();
             await this.loadLanguage();
-            this.showPageWrapper();
             this.applyI18n();
+            await this.loadConfig();
+            this.showPageWrapper();
             this.buildMenu();
             this.initPage(); // Initialize UI event listeners
             
@@ -326,7 +326,6 @@ class GraphQLClientApp {
             window.addEventListener('popstate', () => this.handleRouteChange());
             this.handleRouteChange(); // Handle initial route
         } catch (error) {
-            console.error('Initialization Error:', error);
             this.dom.body.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`; // NOSONAR
         }
     }
@@ -367,14 +366,19 @@ class GraphQLClientApp {
             const savedLang = localStorage.getItem('userLanguage');
             let langToLoad = this.defaultLanguage;
 
+
             if (savedLang && this.supportedLanguages[savedLang]) {
+                // 1. Priority: Use language from local storage if it exists and is supported.
                 langToLoad = savedLang;
-            } else {
+            } else if (this.useBrowserLanguage) {
+                // 2. If not in storage and option is enabled, try to use browser's language.
                 const browserLang = navigator.language.split('-')[0];
                 if (this.supportedLanguages[browserLang]) {
                     langToLoad = browserLang;
                 }
             }
+
+            // 3. Otherwise, it will remain as this.defaultLanguage.
             this.languageId = langToLoad;
             localStorage.setItem('userLanguage', this.languageId);
             localStorage.setItem('languageId', this.languageId); // Sync for both systems
@@ -514,10 +518,6 @@ class GraphQLClientApp {
             if (this.i18nUrl) {
                 let url = `${this.i18nUrl}?lang=${this.languageId}`;
                 const response = await fetch(url);
-                if (response.status === 401) {
-                    this.handleUnauthorized();
-                    throw new Error("Authentication required.");
-                }
                 if (!response.ok) {
                     throw new Error(`Failed to load i18n from ${this.i18nUrl}`); // NOSONAR
                 }
