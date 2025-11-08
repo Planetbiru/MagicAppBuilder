@@ -143,17 +143,17 @@ class GraphQLGenerator
      */
     private function mapDbTypeToGqlType($dbType)
     {
-        $dbType = strtoupper($dbType);
-        if (strpos($dbType, 'VARCHAR') !== false || strpos($dbType, 'TEXT') !== false || strpos($dbType, 'DATE') !== false || strpos($dbType, 'TIMESTAMP') !== false) {
+        $dbType = strtolower($dbType);
+        if (strpos($dbType, 'varchar') !== false || strpos($dbType, 'text') !== false || strpos($dbType, 'date') !== false || strpos($dbType, 'timestamp') !== false) {
             return 'Type::string()';
         }
-        if (strpos($dbType, 'DECIMAL') !== false || strpos($dbType, 'FLOAT') !== false || strpos($dbType, 'DOUBLE') !== false) {
+        if (strpos($dbType, 'decimal') !== false || strpos($dbType, 'float') !== false || strpos($dbType, 'double') !== false) {
             return 'Type::float()';
         }
-        if (strpos($dbType, 'TINYINT(1)') !== false || strpos($dbType, 'BOOL') !== false || strpos($dbType, 'BIT') !== false) {
+        if (strpos($dbType, 'tinyint(1)') !== false || strpos($dbType, 'bool') !== false || strpos($dbType, 'bit') !== false) {
             return 'Type::boolean()';
         }
-        if (strpos($dbType, 'INT') !== false) {
+        if (strpos($dbType, 'int') !== false) {
             return 'Type::int()';
         }
         return 'Type::string()'; // Default fallback
