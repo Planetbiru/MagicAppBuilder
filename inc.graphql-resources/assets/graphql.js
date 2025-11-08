@@ -1139,7 +1139,7 @@ class GraphQLClientApp {
      * @returns {Promise<void>} Resolves when the view is updated.
      */
     async updateTableView() {
-        const fields = this.getFieldsForQuery(this.currentEntity, 1); // depth 1
+        const fields = this.getFieldsForQuery(this.currentEntity, 1, 1); // depth 1, maxDepth 1 (only fetch primary key and displaField if entity has displayField)
         const offset = (this.state.page - 1) * this.state.limit;
 
         // Construct filter array for GQL query from state object
@@ -1562,7 +1562,7 @@ class GraphQLClientApp {
         });
         if (hookHandled) return;
 
-        const fields = this.getFieldsForQuery(this.currentEntity, 2); // Deeper nesting for details
+        const fields = this.getFieldsForQuery(this.currentEntity, 2, 2); // Deeper nesting for details
         const query = `
             query Get${this.currentEntity.name}($id: String!) {
                 ${this.currentEntity.name}(id: $id) {
@@ -1629,7 +1629,7 @@ class GraphQLClientApp {
 
         let item = {};
         if (id) {
-            const fields = this.getFieldsForQuery(this.currentEntity, 2); // Fetch with relations for edit form
+            const fields = this.getFieldsForQuery(this.currentEntity, 2, 2); // Fetch with relations for edit form
             const query = `query GetForEdit($id: String!) { ${this.currentEntity.name}(id: $id) { ${fields} } }`;
             const data = await this.gqlQuery(query, { id }); // NOSONAR
             item = data[this.currentEntity.name];
@@ -1812,7 +1812,7 @@ class GraphQLClientApp {
 
         const methodName = this.ucFirst(this.currentEntity.name);
         const mutationName = id ? `update${methodName}` : `create${methodName}`;
-        const fields = this.getFieldsForQuery(this.currentEntity, 1, true);
+        const fields = this.getFieldsForQuery(this.currentEntity, 1, 1, true);
 
         // Helper to format values for inline GraphQL mutation
         const formatValue = (value) => {
@@ -2209,29 +2209,43 @@ class GraphQLClientApp {
      * @private
      * @param {object} entity - The entity configuration object.
      * @param {number} [depth=1] - The maximum depth for traversing relationships.
+     * @param {number} [maxDepth=1] - The maximum depth from initiator.
      * @param {boolean} [noRelations=false] - If true, only includes scalar fields.
      * @returns {string} A string of fields for the GraphQL query.
      */
-    getFieldsForQuery(entity, depth = 1, noRelations = false) { // NOSONAR
+    getFieldsForQuery(entity, depth = 1, maxDepth = 1, noRelations = false) { // NOSONAR
         if (depth < 0) return entity.primaryKey;
         let fields = [];
         for (const colName in entity.columns) {
             const col = entity.columns[colName];
-            if (col.isForeignKey && !noRelations) {
-                // TODO:
-                fields.push(colName);
-                const relationNameCamelCase = col.references;
-                const relatedEntity = this.config.entities[this.camelCase(relationNameCamelCase)];
 
-                if (relatedEntity) {
-                    // Convert relation name to snake_case for the GraphQL query to match the PHP backend schema
-                    const relationNameSnakeCase = relationNameCamelCase; // this.snakeCase(relationNameCamelCase); // e.g., "jenis_keanggotaan"
-                    let query = `${relationNameSnakeCase} { ${this.getFieldsForQuery(relatedEntity, depth - 1)} }`;
-                    // Use the correct relation name from the entity config for the query
-                    fields.push(query);
+            if(maxDepth == 1 && depth < 1)
+            {
+                if(col.isPrimaryKey || colName == entity.displayField)
+                {
+                    fields.push(colName);
                 }
-            } else if (!col.isForeignKey) {
-                fields.push(colName);
+            }
+            else
+            {
+
+
+                if (col.isForeignKey && !noRelations) {
+                    // TODO:
+                    fields.push(colName);
+                    const relationNameCamelCase = col.references;
+                    const relatedEntity = this.config.entities[this.camelCase(relationNameCamelCase)];
+
+                    if (relatedEntity) {
+                        // Convert relation name to snake_case for the GraphQL query to match the PHP backend schema
+                        const relationNameSnakeCase = relationNameCamelCase; // this.snakeCase(relationNameCamelCase); // e.g., "jenis_keanggotaan"
+                        let query = `${relationNameSnakeCase} { ${this.getFieldsForQuery(relatedEntity, depth - 1, maxDepth)} }`;
+                        // Use the correct relation name from the entity config for the query
+                        fields.push(query);
+                    }
+                } else if (!col.isForeignKey) {
+                    fields.push(colName);
+                }
             }
         }
         return fields.join(' ');
@@ -2247,7 +2261,7 @@ class GraphQLClientApp {
      */
     async fetchAll(entity, options = {}) {
         const { activeOnly = true } = options;
-        const fields = this.getFieldsForQuery(entity, 0); // Only simple fields
+        const fields = this.getFieldsForQuery(entity, 0, 0); // Only simple fields
 
         const filterForQuery = [];
         if (activeOnly && entity.hasActiveColumn && entity.activeField) {
