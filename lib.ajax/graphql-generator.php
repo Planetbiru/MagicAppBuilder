@@ -193,6 +193,7 @@ function generateManualHtml($manualMd, $appName)
         tr:nth-child(even) { background-color: #f9f9f9; }
         tr:hover { background-color: #f1f1f1; }
         .back-to-toc { position: fixed; bottom: 20px; right: 20px; background-color: #0366d6; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; text-decoration: none; z-index: 1000; }
+        hr { height: 0; border: dotted #8a8a8a; border-width: 0px 0px 1px 0px; }
     </style>
 </head>
 <body>
