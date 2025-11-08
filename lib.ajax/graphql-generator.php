@@ -139,20 +139,20 @@ function generateManualHtml($manualMd, $appName)
     if (!empty($headings)) {
         $toc .= "<div id=\"toc-container\"><h2>Table of Contents</h2>\n<ul class=\"toc\">\n";
         $lastLevel = 1;
+        $openLevels = 0;
         foreach ($headings as $heading) {
             $level = $heading['level'];
             if ($level > $lastLevel) {
                 $toc .= "<ul>\n";
+                $openLevels++;
             } else if ($level < $lastLevel) {
-                $toc .= str_repeat("</ul></li>\n", $lastLevel - $level);
+                $toc .= str_repeat("</li></ul>\n", $lastLevel - $level);
+                $openLevels -= ($lastLevel - $level);
             }
             $toc .= "<li><a href=\"#{$heading['slug']}\">{$heading['text']}</a>";
-            if ($level >= $lastLevel) {
-                $toc .= "</li>\n";
-            }
             $lastLevel = $level;
         }
-        $toc .= str_repeat("</ul></li>\n", $lastLevel - 1);
+        $toc .= str_repeat("</li></ul>\n", $openLevels);
         $toc .= "</ul></div>\n";
     }
 
@@ -184,6 +184,7 @@ function generateManualHtml($manualMd, $appName)
         .copy-btn:active { background-color: #c6cbd1; }
         .copy-btn.copied { background-color: #28a745; color: white; border-color: #28a745; }
         #toc-container { background-color: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 15px 20px; margin-bottom: 20px; }
+        ul.toc { margin-left: 0px; padding-left: 0px; }
         .toc ul { padding-left: 20px; list-style-type: disc; }
         .toc a { text-decoration: none; color: #0366d6; }
         .toc a:hover { text-decoration: underline; }
