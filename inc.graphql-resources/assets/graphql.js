@@ -1782,7 +1782,10 @@ class GraphQLClientApp {
                 }
 
                 // Flexible type conversion based on frontend-config.json
-                if (col.type.includes('boolean') || col.type.includes('int')) {
+                if(col.type.includes('boolean'))
+                {
+                    value = value === 'true' || value === '1' || value === 1 || value === true;
+                } else if (col.type.includes('int')) {
                     // Convert boolean to integer (1/0) for backend compatibility
                     value = value === true ? 1 : (value === false ? 0 : value);
                     // Convert string number to actual number
