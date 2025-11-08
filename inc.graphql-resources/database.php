@@ -26,7 +26,7 @@ if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone) && $cfgDbTimeZone != 'Asia/Ja
 
 if(stripos($cfgDbDriver, 'mysql') !== false || stripos($cfgDbDriver, 'mariadb') !== false) {
      $cfgDbDriver = 'mysql'; // Normalize to mysql
-     $cfgDbDsn = "mysql:host=$cfgDbHost;dbname=$cfgDbDatabaseName;charset=$cfgDbCharset";
+     $cfgDbDsn = "mysql:host=$cfgDbHost;dbname=$cfgDbDatabaseName";
 
      $options = [
           PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -41,6 +41,10 @@ if(stripos($cfgDbDriver, 'mysql') !== false || stripos($cfgDbDriver, 'mariadb') 
               $tz = new DateTimeZone($cfgDbTimeZone);
               $offset = (new DateTime('now', $tz))->format('P');
               $db->exec("SET time_zone = '" . $offset . "'");
+          }
+          if(isset($cfgDbCharset) && !empty($cfgDbCharset))
+          {
+              $db->exec("SET NAMES " . $cfgDbCharset);
           }
      } catch (\PDOException $e) {
           throw new \PDOException($e->getMessage(), (int)$e->getCode());
