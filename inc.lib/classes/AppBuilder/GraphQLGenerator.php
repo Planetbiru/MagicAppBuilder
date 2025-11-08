@@ -1420,4 +1420,22 @@ function generateNewId()
         }
         return $string . 's';
     }
+
+    /**
+     * Get the value of reservedColumns
+     */
+    public function getReservedColumns()
+    {
+        return $this->reservedColumns;
+    }
+
+    /**
+     * Set the value of reservedColumns
+     */
+    public function setReservedColumns($reservedColumns)
+    {
+        $this->reservedColumns = $reservedColumns;
+
+        return $this;
+    }
 }
