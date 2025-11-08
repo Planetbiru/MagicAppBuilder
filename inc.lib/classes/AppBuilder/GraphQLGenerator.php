@@ -144,17 +144,17 @@ class GraphQLGenerator
     private function mapDbTypeToGqlType($dbType)
     {
         $dbType = strtoupper($dbType);
-        if (strpos($dbType, 'INT') !== false) {
-            return 'Type::int()';
-        }
         if (strpos($dbType, 'VARCHAR') !== false || strpos($dbType, 'TEXT') !== false || strpos($dbType, 'DATE') !== false || strpos($dbType, 'TIMESTAMP') !== false) {
             return 'Type::string()';
         }
         if (strpos($dbType, 'DECIMAL') !== false || strpos($dbType, 'FLOAT') !== false || strpos($dbType, 'DOUBLE') !== false) {
             return 'Type::float()';
         }
-        if (strpos($dbType, 'TINYINT(1)') !== false) {
+        if (strpos($dbType, 'TINYINT(1)') !== false || strpos($dbType, 'BOOL') !== false || strpos($dbType, 'BIT') !== false) {
             return 'Type::boolean()';
+        }
+        if (strpos($dbType, 'INT') !== false) {
+            return 'Type::int()';
         }
         return 'Type::string()'; // Default fallback
     }
@@ -185,6 +185,10 @@ class GraphQLGenerator
     function normalizeDbType($dbType)
     {
         $type = strtolower(trim($dbType));
+
+        if($type == 'tinyint(1)') {
+            return 'boolean';
+        }
 
         // Remove size and precision (e.g. varchar(255) → varchar)
         $type = preg_replace('/\(.+\)/', '', $type);

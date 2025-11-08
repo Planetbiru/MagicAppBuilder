@@ -15,7 +15,11 @@ $cfgDbCharset        = '{DB_CHARSET}';
 $cfgDbPort           = '{DB_PORT}';
 $cfgDbTimeZone       = '{DB_TIMEZONE}';
 
-if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone) && $cfgDbTimeZone != '{DB_TIMEZONE}')
+if(empty($cfgDbCharset))
+{
+     $cfgDbCharset = 'utf8mb4'; // Set default charset
+}
+if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone) && $cfgDbTimeZone != 'Asia/Jakarta')
 {
      date_default_timezone_set($cfgDbTimeZone); // Set default timezone
 }
@@ -34,7 +38,9 @@ if(stripos($cfgDbDriver, 'mysql') !== false || stripos($cfgDbDriver, 'mariadb') 
           $db = new PDO($cfgDbDsn, $cfgDbUser, $cfgDbPass, $options);
           if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone))
           {
-               $db->exec("SET time_zone = '".$cfgDbTimeZone."'");
+              $tz = new DateTimeZone($cfgDbTimeZone);
+              $offset = (new DateTime('now', $tz))->format('P');
+              $db->exec("SET time_zone = '" . $offset . "'");
           }
      } catch (\PDOException $e) {
           throw new \PDOException($e->getMessage(), (int)$e->getCode());
@@ -73,9 +79,11 @@ else if(stripos($cfgDbDriver, 'pgsql') !== false)
           $db = new PDO($cfgDbDsn, $cfgDbUser, $cfgDbPass, $options);
           if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone))
           {
-               $db->exec("SET TIMEZONE = '".$cfgDbTimeZone."'");
+               $tz = new DateTimeZone($cfgDbTimeZone);
+               $offset = (new DateTime('now', $tz))->format('P');
+               $db->exec("SET TIMEZONE = '" . $offset . "'");
           }
-          if(isset($cfgDbDatabaseSchema) && !empty($cfgDbDatabaseSchema) && $cfgDbDatabaseSchema != '{DB_NAME}')
+          if(isset($cfgDbDatabaseSchema) && !empty($cfgDbDatabaseSchema) && $cfgDbDatabaseSchema != 'perpustakaan')
           {
                $db->exec("SET search_path TO ".$cfgDbDatabaseSchema);
           }
