@@ -139,20 +139,20 @@ function generateManualHtml($manualMd, $appName)
     if (!empty($headings)) {
         $toc .= "<div id=\"toc-container\"><h2>Table of Contents</h2>\n<ul class=\"toc\">\n";
         $lastLevel = 1;
+        $openLevels = 0;
         foreach ($headings as $heading) {
             $level = $heading['level'];
             if ($level > $lastLevel) {
                 $toc .= "<ul>\n";
+                $openLevels++;
             } else if ($level < $lastLevel) {
-                $toc .= str_repeat("</ul></li>\n", $lastLevel - $level);
+                $toc .= str_repeat("</li></ul>\n", $lastLevel - $level);
+                $openLevels -= ($lastLevel - $level);
             }
             $toc .= "<li><a href=\"#{$heading['slug']}\">{$heading['text']}</a>";
-            if ($level >= $lastLevel) {
-                $toc .= "</li>\n";
-            }
             $lastLevel = $level;
         }
-        $toc .= str_repeat("</ul></li>\n", $lastLevel - 1);
+        $toc .= str_repeat("</li></ul>\n", $openLevels);
         $toc .= "</ul></div>\n";
     }
 
@@ -184,6 +184,7 @@ function generateManualHtml($manualMd, $appName)
         .copy-btn:active { background-color: #c6cbd1; }
         .copy-btn.copied { background-color: #28a745; color: white; border-color: #28a745; }
         #toc-container { background-color: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 15px 20px; margin-bottom: 20px; }
+        ul.toc { margin-left: 0px; padding-left: 0px; }
         .toc ul { padding-left: 20px; list-style-type: disc; }
         .toc a { text-decoration: none; color: #0366d6; }
         .toc a:hover { text-decoration: underline; }
@@ -193,6 +194,7 @@ function generateManualHtml($manualMd, $appName)
         tr:nth-child(even) { background-color: #f9f9f9; }
         tr:hover { background-color: #f1f1f1; }
         .back-to-toc { position: fixed; bottom: 20px; right: 20px; background-color: #0366d6; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; text-decoration: none; z-index: 1000; }
+        hr { height: 0; border: dotted #8a8a8a; border-width: 0px 0px 1px 0px; }
     </style>
 </head>
 <body>
