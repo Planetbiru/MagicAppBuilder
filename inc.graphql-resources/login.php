@@ -2,8 +2,11 @@
 
 require_once __DIR__ . '/sessions.php';
 require_once __DIR__ . '/database.php';
-require_once __DIR__ . '/inc/I18n.php';
 
+if(file_exists(__DIR__ . '/inc/I18n.php'))
+{
+    require_once __DIR__ . '/inc/I18n.php';
+}
 
 if (isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
@@ -22,6 +25,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             $_SESSION['password'] = sha1($password); // Storing the hash is more secure
 
             header('Content-Type: application/json; charset=utf-8');
+            header('Access-Control-Allow-Origin: *', true);
             echo json_encode(array('success' => true));
             exit();
         }
@@ -34,5 +38,6 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 // If we reach here, it means login failed (user not found, password incorrect, or no credentials provided)
 header('HTTP/1.1 401 Unauthorized', true, 401);
 header('Content-Type: application/json; charset=utf-8');
-echo json_encode(array('success' => false, 'message' => $i18n->t('invalid_credentials')));
+header('Access-Control-Allow-Origin: *');
+echo json_encode(array('success' => false, 'message' => isset($i18n) ? $i18n->t('invalid_credentials') : 'Invalid credentials'));
 exit();

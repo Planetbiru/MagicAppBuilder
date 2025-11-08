@@ -39,14 +39,14 @@ if(isset($_SESSION['username']) && isset($_SESSION['password']))
         else
         {
             header('HTTP/1.1 401 Unauthorized', true, 401);
-            header('Content-Type', 'application/json; charset=utf-8');
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode(['errors' => [['message' => 'Authentication required.']]]);
             exit();
         }
     } catch (Exception $e) {
         // Log the database error, but return a generic auth error to the user
         header('HTTP/1.1 401 Unauthorized', true, 401);
-        header('Content-Type', 'application/json; charset=utf-8');
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['errors' => [['message' => 'Authentication required.']]]);
         exit();
     }
@@ -54,7 +54,7 @@ if(isset($_SESSION['username']) && isset($_SESSION['password']))
 else
 {
     header('HTTP/1.1 401 Unauthorized', true, 401);
-    header('Content-Type', 'application/json; charset=utf-8');
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['errors' => [['message' => 'Authentication required.']]]);
     exit();
 }

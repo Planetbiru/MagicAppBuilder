@@ -45,7 +45,6 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
             $databaseConfiguration = str_replace('{DB_CHARSET}', str_replace("'", "\\'", $databaseConfig->getCharset()), $databaseConfiguration);
             $databaseConfiguration = str_replace('{DB_PORT}', str_replace("'", "\\'", $databaseConfig->getPort()), $databaseConfiguration);
             $databaseConfiguration = str_replace('{DB_TIMEZONE}', str_replace("'", "\\'", $databaseConfig->getTimeZone()), $databaseConfiguration);
-
         }
     }
     return $databaseConfiguration;
@@ -175,7 +174,7 @@ function generateManualHtml($manualMd, $appName)
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f8f9fa; margin: 0; padding: 20px; }
         .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h1, h2, h3, h4 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
-        h1 { font-size: 2em; } h2 { font-size: 1.5em; } h3 { font-size: 1.25em; }
+        h1 { margin-top: 0px; font-size: 2em; } h2 { font-size: 1.5em; } h3 { font-size: 1.25em; }
         code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 85%; padding: 0.2em 0.4em; margin: 0; background-color: rgba(27,31,35,0.05); border-radius: 3px; }
         pre { padding: 16px; overflow: auto; font-size: 85%; line-height: 1.45; background-color: #f6f8fa; border-radius: 6px; margin-top:0; margin-bottom:0; }
         pre code { display: inline; padding: 0; margin: 0; background-color: transparent; border: 0; }
@@ -350,11 +349,13 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.min.js", 'assets/graphql.min.js');
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/sessions.php", 'sessions.php');  
+        
+        
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/admin.php", 'admin.php');   
 
+
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
         // Add all files under directory `vendor`
 
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
@@ -374,12 +375,14 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/available-language.php", 'available-language.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/available-theme.php", 'available-theme.php');
 
+        // Get template from file
         $databaseConfiguration = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/database.php");
 
         // Replace database configuration placeholders with actual values
         $databaseConfiguration = setDatabaseConfiguration($application, $databaseConfiguration);
 
         $zip->addFromString('database.php', $databaseConfiguration);
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/sessions.php", 'sessions.php');  
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/auth.php", 'auth.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/login.php", 'login.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/logout.php", 'logout.php');
@@ -399,11 +402,6 @@ try {
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'android-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'apple-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'favicon');
-        
-        // Bonus
-        // composer.phar to update dependencies
-
-        $zip->addFile(dirname(__DIR__) . "/inc.lib/composer.phar", "composer.phar");
 
         $zip->close();
         // Send the ZIP file as a download
@@ -419,7 +417,7 @@ try {
     {
         $generator = new GraphQLGenerator($schema, $reservedColumns);
         $generatedCode = $generator->generate();
-        $manualContent = $generator->generateManual();
+        $manualMd = $generator->generateManual();
 
         // Create ZIP file
         $zip = new ZipArchive();
@@ -429,21 +427,34 @@ try {
             throw new Exception("Could not create ZIP file.");
         }
 
+        // Get template from file
         $databaseConfiguration = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/database.php");
 
         // Replace database configuration placeholders with actual values
         $databaseConfiguration = setDatabaseConfiguration($application, $databaseConfiguration);
 
         $zip->addFromString('database.php', $databaseConfiguration);
-        $zip->addFromString('auth.php', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/auth.php"));
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/sessions.php", 'sessions.php');  
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/auth.php", 'auth.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/login.php", 'login.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/logout.php", 'logout.php');
 
         // Add generated code file
         $zip->addFromString('graphql.php', $generatedCode);
         // Add manual content file
-        $zip->addFromString('manual.md', $manualContent);
+        $zip->addFromString('manual.md', $manualMd);
 
-        // Bonus
-        $zip->addFile(dirname(__DIR__) . "/inc.lib/composer.phar", "composer.phar");
+        $parsedown = new Parsedown();
+        $appName = $application->getName();
+        $manualHtml = generateManualHtml($manualMd, $appName);
+        $zip->addFromString('manual.html', $manualHtml);
+
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
+        // Add all files under directory `vendor`
+
+        $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
+        addDirectoryToZip($zip, $vendorPath, 'vendor');
 
         $zip->close();
         // Send the ZIP file as a download
@@ -454,9 +465,7 @@ try {
         // Delete the temporary file
         unlink($zipFilePath);
         exit();
-    }
-    exit();
-    
+    }    
 } catch (Exception $e) {
     header("Content-Type: application/json");
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
