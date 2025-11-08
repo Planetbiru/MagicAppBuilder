@@ -34,6 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $updateStmt = $db->prepare($updateSql);
             $updateStmt->execute([':message_id' => $messageId, ':receiver_id' => $currentAdminId, ':is_read' => $newStatus]);
             echo json_encode(['success' => true, 'message' => $i18n->t('message_marked_as_unread')]);
+        } elseif ($action === 'delete') {
+            $deleteSql = "DELETE FROM message WHERE message_id = :message_id AND (sender_id = :admin_id OR receiver_id = :admin_id)";
+            $deleteStmt = $db->prepare($deleteSql);
+            $deleteStmt->execute([':message_id' => $messageId, ':admin_id' => $currentAdminId]);
+            echo json_encode(['success' => true, 'message' => $i18n->t('message_deleted_successfully')]);
         }
     } catch (Exception $e) {
         http_response_code(500);
@@ -106,6 +111,7 @@ try
                 <button id="back-to-list" class="btn btn-secondary" onclick="backToList('message')"><?php echo $i18n->t('back_to_list'); ?></button>
                 <?php if ($message['receiver_id'] == $currentAdminId && $message['is_read']): ?>
                     <button class="btn btn-primary" onclick="markMessageAsUnread('<?php echo $message['message_id']; ?>', 'detail')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                    <button class="btn btn-danger" onclick="handleMessageDelete('<?php echo $message['message_id']; ?>')"><?php echo $i18n->t('delete'); ?></button>
                 <?php endif; ?>
             </div>
             <div class="message-container">
@@ -141,28 +147,53 @@ try
     }
     else
     {
-    // Count total messages for pagination
-    $countSql = "SELECT COUNT(*) FROM message WHERE sender_id = :admin_id OR receiver_id = :admin_id";
-    $countStmt = $db->prepare($countSql);
-    $countStmt->execute(array(':admin_id' => $appAdmin['admin_id']));
-    $totalMessages = $countStmt->fetchColumn();
-    $totalPages = ceil($totalMessages / $dataLimit);
+        $search = $_GET['search'] ?? '';
+        $params = [':admin_id' => $appAdmin['admin_id']];
+        $whereClause = "WHERE (m.sender_id = :admin_id OR m.receiver_id = :admin_id)";
 
-    $sql = "SELECT 
-        m.message_id, m.subject, m.content, m.is_read, m.time_create, m.receiver_id,
-        sender.name AS sender_name
-    FROM message m
-    LEFT JOIN admin sender ON m.sender_id = sender.admin_id
-    WHERE m.sender_id = :admin_id OR m.receiver_id = :admin_id 
-    ORDER BY m.time_create DESC
-    LIMIT $dataLimit OFFSET $offset
-    ";
-    $stmt = $db->prepare($sql);
-    $stmt->execute(array(':admin_id' => $appAdmin['admin_id']));
-    $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    ?>
+        if (!empty($search)) {
+            $whereClause .= " AND (m.subject LIKE :search OR m.content LIKE :search OR sender.name LIKE :search)";
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        // Count total messages for pagination
+        $countSql = "SELECT COUNT(*) FROM message m LEFT JOIN admin sender ON m.sender_id = sender.admin_id " . $whereClause;
+        $countStmt = $db->prepare($countSql);
+        $countStmt->execute($params);
+        $totalMessages = $countStmt->fetchColumn();
+        $totalPages = ceil($totalMessages / $dataLimit);
+
+        $sql = "SELECT 
+            m.message_id, m.subject, m.content, m.is_read, m.time_create, m.receiver_id,
+            sender.name AS sender_name
+        FROM message m
+        LEFT JOIN admin sender ON m.sender_id = sender.admin_id
+        $whereClause
+        ORDER BY m.time_create DESC
+        LIMIT $dataLimit OFFSET $offset
+        ";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+        <div id="filter-container" class="filter-container" style="display: block;">
+            <form id="message-search-form" class="search-form" onsubmit="handleMessageSearch(event)">
+                <div class="filter-controls">
+                    <div class="form-group">
+                        <label for="search_message"><?php echo $i18n->t('search'); ?></label>
+                        <input type="text" name="search" id="search_message" placeholder="<?php echo $i18n->t('search'); ?>" value="<?php echo htmlspecialchars($search); ?>">
+                    </div>
+                    <button type="submit" class="btn btn-primary"><?php echo $i18n->t('search'); ?></button>
+                </div>
+            </form>
+        </div>
+
     <div class="message-list-container">
         <?php
+        if (empty($messages)) {
+            echo '<p>' . $i18n->t('no_message') . '</p>';
+        }
+
         foreach ($messages as $message) {
             $content = trim($message['content']);
             $isReadClass = $message['is_read'] ? 'read' : 'unread';
@@ -178,6 +209,7 @@ try
                         <span class="message-time"><?php echo htmlspecialchars($message['time_create']); ?></span>
                         <?php if ($message['receiver_id'] == $appAdmin['admin_id'] && $message['is_read']): ?>
                             <button class="btn btn-sm btn-secondary" onclick="markMessageAsUnread('<?php echo $message['message_id']; ?>', 'list')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                            <button class="btn btn-sm btn-danger" onclick="handleMessageDelete('<?php echo $message['message_id']; ?>')"><?php echo $i18n->t('delete'); ?></button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -193,9 +225,10 @@ try
     </div>
     <div class="pagination-container">
         <?php if ($totalPages > 1): ?>
+            <?php $searchQuery = !empty($search) ? '&search=' . urlencode($search) : ''; ?>
             <span><?php echo $i18n->t('page_of', $page, $totalPages, $totalMessages); ?></span>
             <?php if ($page > 1): ?>
-                <a href="#message?page=<?php echo $page - 1; ?>" class="btn btn-secondary"><?php echo $i18n->t('previous'); ?></a>
+                <a href="#message?page=<?php echo $page - 1; ?><?php echo $searchQuery; ?>" class="btn btn-secondary"><?php echo $i18n->t('previous'); ?></a>
             <?php endif; ?>
 
             <?php
@@ -204,26 +237,26 @@ try
             $endPage = min($totalPages, $page + $window);
 
             if ($startPage > 1) {
-                echo '<a href="#message?page=1" class="btn btn-secondary">1</a>';
+                echo '<a href="#message?page=1'.$searchQuery.'" class="btn btn-secondary">1</a>';
                 if ($startPage > 2) {
                     echo '<span class="pagination-ellipsis">...</span>';
                 }
             }
 
             for ($i = $startPage; $i <= $endPage; $i++): ?>
-                <a href="#message?page=<?php echo $i; ?>" class="btn <?php echo ($i == $page) ? 'btn-primary' : 'btn-secondary'; ?>"><?php echo $i; ?></a>
+                <a href="#message?page=<?php echo $i; ?><?php echo $searchQuery; ?>" class="btn <?php echo ($i == $page) ? 'btn-primary' : 'btn-secondary'; ?>"><?php echo $i; ?></a>
             <?php endfor;
 
             if ($endPage < $totalPages) {
                 if ($endPage < $totalPages - 1) {
                     echo '<span class="pagination-ellipsis">...</span>';
                 }
-                echo '<a href="#message?page='.$totalPages.'" class="btn btn-secondary">'.$totalPages.'</a>';
+                echo '<a href="#message?page='.$totalPages.$searchQuery.'" class="btn btn-secondary">'.$totalPages.'</a>';
             }
             ?>
 
             <?php if ($page < $totalPages): ?>
-                <a href="#message?page=<?php echo $page + 1; ?>" class="btn btn-secondary"><?php echo $i18n->t('next'); ?></a>
+                <a href="#message?page=<?php echo $page + 1; ?><?php echo $searchQuery; ?>" class="btn btn-secondary"><?php echo $i18n->t('next'); ?></a>
             <?php endif; ?>
         <?php endif; ?>
     </div>
@@ -235,5 +268,3 @@ catch(Exception $e)
     echo $e->getMessage();
     exit;
 }
-
-?>

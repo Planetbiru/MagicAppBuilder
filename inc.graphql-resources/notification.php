@@ -34,6 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $updateStmt = $db->prepare($updateSql);
             $updateStmt->execute([':notification_id' => $notificationId, ':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminData['admin_level_id']]);
             echo json_encode(['success' => true, 'message' => $i18n->t('notification_marked_as_unread')]);
+        } elseif ($action === 'delete') {
+            $deleteSql = "DELETE FROM notification WHERE notification_id = :notification_id AND (admin_id = :admin_id OR admin_group = :admin_level_id)";
+            $deleteStmt = $db->prepare($deleteSql);
+            $deleteStmt->execute([':notification_id' => $notificationId, ':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminData['admin_level_id']]);
+            echo json_encode(['success' => true, 'message' => $i18n->t('notification_deleted_successfully')]);
         }
     } catch (Exception $e) {
         http_response_code(500);
@@ -91,6 +96,7 @@ try {
                 <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')"><?php echo $i18n->t('back_to_list'); ?></button>
                 <?php if ($notification['is_read']): ?>
                     <button class="btn btn-primary" onclick="markNotificationAsUnread('<?php echo $notification['notification_id']; ?>', 'detail')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                    <button class="btn btn-danger" onclick="handleNotificationDelete('<?php echo $notification['notification_id']; ?>')"><?php echo $i18n->t('delete'); ?></button>
                 <?php endif; ?>
             </div>
             <div class="notification-container">
@@ -123,23 +129,47 @@ try {
             <?php
         }
     } else {
+        $search = $_GET['search'] ?? '';
+        $params = [':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminLevelId];
+        $whereClause = "WHERE (admin_id = :admin_id OR admin_group = :admin_level_id)";
+
+        if (!empty($search)) {
+            $whereClause .= " AND (subject LIKE :search OR content LIKE :search)";
+            $params[':search'] = '%' . $search . '%';
+        }
+
         // Count total notifications for pagination
-        $countSql = "SELECT COUNT(*) FROM notification WHERE admin_id = :admin_id OR admin_group = :admin_level_id";
+        $countSql = "SELECT COUNT(*) FROM notification " . $whereClause;
         $countStmt = $db->prepare($countSql);
-        $countStmt->execute([':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminLevelId]);
+        $countStmt->execute($params);
         $totalNotifications = $countStmt->fetchColumn();
         $totalPages = ceil($totalNotifications / $dataLimit);
 
         $sql = "SELECT notification_id, subject, content, is_read, time_create, link
                 FROM notification 
-                WHERE admin_id = :admin_id OR admin_group = :admin_level_id
+                $whereClause
                 ORDER BY time_create DESC
                 LIMIT $dataLimit OFFSET $offset";
         $stmt = $db->prepare($sql);
-        $stmt->execute([':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminLevelId]);
+        $stmt->execute($params);
         $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
+        <div id="filter-container" class="filter-container" style="display: block;">
+            <form id="notification-search-form" class="search-form" onsubmit="handleNotificationSearch(event)">
+                <div class="filter-controls">
+                    <div class="form-group">
+                        <label for="search_notification"><?php echo $i18n->t('search'); ?></label>
+                        <input type="text" name="search" id="search_notification" placeholder="<?php echo $i18n->t('search'); ?>" value="<?php echo htmlspecialchars($search); ?>">
+                    </div>
+                    <button type="submit" class="btn btn-primary"><?php echo $i18n->t('search'); ?></button>
+                </div>
+            </form>
+        </div>
+
         <div class="message-list-container">
+            <?php if (empty($notifications)): ?>
+                <p><?php echo $i18n->t('no_notification'); ?></p>
+            <?php endif; ?>
             <?php foreach ($notifications as $notification): 
                 $content = trim($notification['content']);
                 $isReadClass = $notification['is_read'] ? 'read' : 'unread';
@@ -154,6 +184,7 @@ try {
                             <span class="message-time"><?php echo htmlspecialchars($notification['time_create']); ?></span>
                             <?php if ($notification['is_read']): ?>
                                 <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('<?php echo $notification['notification_id']; ?>', 'list')"><?php echo $i18n->t('mark_as_unread'); ?></button>
+                                <button class="btn btn-sm btn-danger" onclick="handleNotificationDelete('<?php echo $notification['notification_id']; ?>')"><?php echo $i18n->t('delete'); ?></button>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -167,9 +198,10 @@ try {
         </div>
         <div class="pagination-container">
             <?php if ($totalPages > 1): ?>
+                <?php $searchQuery = !empty($search) ? '&search=' . urlencode($search) : ''; ?>
                 <span><?php echo $i18n->t('page_of', $page, $totalPages, $totalNotifications); ?></span>
                 <?php if ($page > 1): ?>
-                    <a href="#notification?page=<?php echo $page - 1; ?>" class="btn btn-secondary">
+                    <a href="#notification?page=<?php echo $page - 1; ?><?php echo $searchQuery; ?>" class="btn btn-secondary">
                         <?php echo $i18n->t('previous'); ?>
                     </a>
                 <?php endif; ?>
@@ -180,12 +212,12 @@ try {
                 $endPage = min($totalPages, $page + $window);
 
                 if ($startPage > 1) {
-                    echo '<a href="#notification?page=1" class="btn btn-secondary">1</a>';
+                    echo '<a href="#notification?page=1'.$searchQuery.'" class="btn btn-secondary">1</a>';
                     if ($startPage > 2) echo '<span class="pagination-ellipsis">...</span>';
                 }
 
                 for ($i = $startPage; $i <= $endPage; $i++): ?>
-                    <a href="#notification?page=<?php echo $i; ?>"
+                    <a href="#notification?page=<?php echo $i; ?><?php echo $searchQuery; ?>"
                        class="btn <?php echo ($i == $page) ? 'btn-primary' : 'btn-secondary'; ?>">
                         <?php echo $i; ?>
                     </a>
@@ -193,11 +225,11 @@ try {
 
                 if ($endPage < $totalPages) {
                     if ($endPage < $totalPages - 1) echo '<span class="pagination-ellipsis">...</span>';
-                    echo '<a href="#notification?page='.$totalPages.'" class="btn btn-secondary">'.$totalPages.'</a>';
+                    echo '<a href="#notification?page='.$totalPages.$searchQuery.'" class="btn btn-secondary">'.$totalPages.'</a>';
                 }
 
                 if ($page < $totalPages): ?>
-                    <a href="#notification?page=<?php echo $page + 1; ?>" class="btn btn-secondary">
+                    <a href="#notification?page=<?php echo $page + 1; ?><?php echo $searchQuery; ?>" class="btn btn-secondary">
                         <?php echo $i18n->t('next'); ?>
                     </a>
                 <?php endif; ?>
@@ -209,4 +241,3 @@ try {
     echo $e->getMessage();
     exit;
 }
-?>

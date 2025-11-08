@@ -566,6 +566,90 @@ function handleAdminSearch(event) {
     window.location.hash = newHash;
 }
 
+async function handleMessageDelete(messageId) {
+    const confirmed = await graphqlApp.customConfirm({
+        title: graphqlApp.t('confirmation_title'),
+        message: graphqlApp.t('confirm_delete')
+    });
+    if (!confirmed) return;
+    graphqlApp.closeConfirmModal();
+
+    const formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('messageId', messageId);
+
+    try {
+        const response = await fetch('message.php', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'xmlhttprequest' }
+        });
+        const result = await response.json();
+        if (result.success) {
+            await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
+            const hash = window.location.hash;
+            if (hash.includes('messageId=')) {
+                // If on detail page, go back to list
+                backToList('message');
+            } else {
+                graphqlApp.handleRouteChange(); // Refresh list
+            }
+        } else {
+            await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: result.message });
+        }
+    } catch (error) {
+        console.error('Error deleting message:', error);
+        await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: graphqlApp.t('unexpected_error_occurred') });
+    }
+}
+
+function handleMessageSearch(event) {
+    event.preventDefault();
+    const form = document.getElementById('message-search-form');
+    const searchInput = form.querySelector('input[name="search"]');
+    const searchTerm = searchInput.value.trim();
+    const newHash = searchTerm ? `#message?search=${encodeURIComponent(searchTerm)}` : '#message';
+    window.location.hash = newHash;
+}
+
+async function handleNotificationDelete(notificationId) {
+    const confirmed = await graphqlApp.customConfirm({
+        title: graphqlApp.t('confirmation_title'),
+        message: graphqlApp.t('confirm_delete')
+    });
+    if (!confirmed) return;
+    graphqlApp.closeConfirmModal();
+
+    const formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('notificationId', notificationId);
+
+    try {
+        const response = await fetch('notification.php', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'xmlhttprequest' } });
+        const result = await response.json();
+        if(result.success) {
+            const hash = window.location.hash;
+            if (hash.includes('notificationId=')) {
+                backToList('notification');
+            } else {
+                graphqlApp.handleRouteChange();
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+        await graphqlApp.customAlert({ title: graphqlApp.t('error'), message: graphqlApp.t('unexpected_error_occurred') });
+    }
+}
+
+function handleNotificationSearch(event) {
+    event.preventDefault();
+    const form = document.getElementById('notification-search-form');
+    const searchInput = form.querySelector('input[name="search"]');
+    const searchTerm = searchInput.value.trim();
+    const newHash = searchTerm ? `#notification?search=${encodeURIComponent(searchTerm)}` : '#notification';
+    window.location.hash = newHash;
+}
+
 async function markMessageAsUnread(messageId, fromView = 'list') {
     const formData = new FormData();
     formData.append('action', 'mark_as_unread');

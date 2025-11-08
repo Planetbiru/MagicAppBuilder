@@ -113,6 +113,8 @@
     "status": "Status",
     "from": "Dari",
     "to": "Kepada",
+    "message_deleted_successfully": "Pesan berhasil dihapus.",
+    "notification_deleted_successfully": "Notifikasi berhasil dihapus.",
     "refresh_app": "Segarkan Aplikasi",
     "app_refreshed_successfully": "Aplikasi berhasil disegarkan.",
     "app_refresh_failed": "Gagal menyegarkan aplikasi."
