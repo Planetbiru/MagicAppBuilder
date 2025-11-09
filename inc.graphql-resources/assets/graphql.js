@@ -920,9 +920,11 @@ class GraphQLClientApp {
 
     /**
      * Navigates to the detail view of a specific item and updates the URL.
-     * This method updates the browser history.
+     * This method updates the browser history. It includes an optional `fromUrl`
+     * parameter to facilitate a "back" navigation feature.
      * @param {string} entityName - The name of the entity.
      * @param {string|number} id - The ID of the item to display.
+     * @param {?string} [fromUrl=null] - The URL to return to when navigating back from the detail view.
      * @returns {void}
      */
     navigateToDetail(entityName, id, fromUrl = null) {
