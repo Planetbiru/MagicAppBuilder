@@ -925,8 +925,12 @@ class GraphQLClientApp {
      * @param {string|number} id - The ID of the item to display.
      * @returns {void}
      */
-    navigateToDetail(entityName, id) {
-        const newUrl = `${window.location.pathname}#${entityName}/detail/${id}`;
+    navigateToDetail(entityName, id, fromUrl = null) {
+        let fromParam = '';
+        if (fromUrl) {
+            fromParam = `?from=${encodeURIComponent(fromUrl)}`;
+        }
+        const newUrl = `${window.location.pathname}#${entityName}/detail/${id}${fromParam}`;
         history.pushState({ entityName, id }, '', newUrl);
         this.handleRouteChange();
     }
@@ -1267,7 +1271,7 @@ class GraphQLClientApp {
         tableHtml += `</tbody></table></div>`;
         this.dom.tableDataContainer.innerHTML = tableHtml;
 
-        document.querySelectorAll('.btn-detail').forEach(btn => btn.onclick = (e) => this.navigateToDetail(this.currentEntity.name, e.currentTarget.dataset.id));
+        document.querySelectorAll('.btn-detail').forEach(btn => btn.onclick = (e) => this.navigateToDetail(this.currentEntity.name, e.currentTarget.dataset.id, window.location.hash));
         document.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = (e) => this.renderForm(e.currentTarget.dataset.id));
         document.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = (e) => this.handleDelete(e.currentTarget.dataset.id));
         document.querySelectorAll('.btn-toggle-active').forEach(btn => btn.onclick = (e) => this.handleToggleActive(e.currentTarget.dataset.id, e.currentTarget.dataset.active === 'true'));
@@ -1429,10 +1433,13 @@ class GraphQLClientApp {
     renderActionButtons(item) {
         const entityName = this.currentEntity.name;
         const id = item[this.currentEntity.primaryKey]; // NOSONAR
-        let detailLink = `${window.location.pathname}#${entityName}/detail/${id}`;
+        
+        // Encode the current list view URL to be passed as a parameter
+        const fromUrl = encodeURIComponent(window.location.hash);
+        let detailLink = `${window.location.pathname}#${entityName}/detail/${id}?from=${fromUrl}`;
 
         let buttons = `<td class="actions">`;
-        buttons += `<a class="btn btn-sm btn-info btn-detail" data-id="${id}" href="${detailLink}">${this.t('view')}</a> `;
+        buttons += `<a class="btn btn-sm btn-info btn-detail" data-id="${id}" href="${detailLink}" data-from-url="${window.location.hash}">${this.t('view')}</a> `;
         buttons += `<button class="btn btn-sm btn-primary btn-edit" data-id="${id}">${this.t('edit')}</button> `;
 
         if (this.currentEntity.hasActiveColumn) {
@@ -1604,12 +1611,15 @@ class GraphQLClientApp {
             }
             detailHtml += `</tbody></table></div>`; // NOSONAR
             this.dom.tableDataContainer.innerHTML = detailHtml;
+
             document.getElementById('back-to-list').onclick = () => {
-                // Use history.back() only if there's a history stack in the current tab
-                // and the referrer is from the same origin.
-                if (history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin) {
-                    history.back();
+                const params = new URLSearchParams(window.location.hash.split('?')[1]);
+                const fromUrl = params.get('from');
+
+                if (fromUrl) {
+                    window.location.hash = decodeURIComponent(fromUrl);
                 } else {
+                    // Fallback for old links or if 'from' is not present
                     this.navigateTo(this.currentEntity.name);
                 }
             };
