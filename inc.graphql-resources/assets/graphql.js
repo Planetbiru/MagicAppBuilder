@@ -1272,7 +1272,15 @@ class GraphQLClientApp {
         tableHtml += `</tbody></table></div>`;
         this.dom.tableDataContainer.innerHTML = tableHtml;
 
-        document.querySelectorAll('.btn-detail').forEach(btn => btn.onclick = (e) => this.navigateToDetail(this.currentEntity.name, e.currentTarget.dataset.id, window.location.hash));
+        document.querySelectorAll('.btn-detail').forEach(btn => btn.onclick = (e) => {
+            // Allow default browser behavior for Ctrl+Click or Cmd+Click (open in new tab)
+            if (e.ctrlKey || e.metaKey) {
+                return;
+            }
+            // For normal clicks, prevent default and handle with SPA routing
+            e.preventDefault();
+            this.navigateToDetail(this.currentEntity.name, e.currentTarget.dataset.id, window.location.hash);
+        });
         document.querySelectorAll('.btn-edit').forEach(btn => btn.onclick = (e) => this.renderForm(e.currentTarget.dataset.id));
         document.querySelectorAll('.btn-delete').forEach(btn => btn.onclick = (e) => this.handleDelete(e.currentTarget.dataset.id));
         document.querySelectorAll('.btn-toggle-active').forEach(btn => btn.onclick = (e) => this.handleToggleActive(e.currentTarget.dataset.id, e.currentTarget.dataset.active === 'true'));
@@ -1614,13 +1622,21 @@ class GraphQLClientApp {
             this.dom.tableDataContainer.innerHTML = detailHtml;
 
             document.getElementById('back-to-list').onclick = () => {
+                // Priority 1: Use history.back() if it's a safe intra-app navigation.
+                // This is the most efficient way to return to the previous state.
+                if (history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin) {
+                    history.back();
+                    return;
+                }
+
+                // Priority 2: Use the 'from' parameter if available.
+                // This is useful when the detail page is opened in a new tab or from a shared link.
                 const params = new URLSearchParams(window.location.hash.split('?')[1]);
                 const fromUrl = params.get('from');
-
                 if (fromUrl) {
                     window.location.hash = decodeURIComponent(fromUrl);
                 } else {
-                    // Fallback for old links or if 'from' is not present
+                    // Priority 3 (Fallback): Navigate to the default list view for the entity.
                     this.navigateTo(this.currentEntity.name);
                 }
             };
