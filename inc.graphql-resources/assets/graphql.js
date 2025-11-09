@@ -1214,7 +1214,6 @@ class GraphQLClientApp {
                             ${headers.map(h => {
             const isSortable = true; // Assume all are sortable for now
             const isCurrentSort = this.state.orderBy.field === h;
-            const sortIcon = isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? ' &#9650;' : ' &#9660;') : '';
             return `<th class="${isSortable ? 'sortable' : ''}" data-sort-key="${h}" data-sort-direction="${isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? 'asc' : 'desc') : ''}">
                                             ${this.getEntityLabel(this.currentEntity, h)}
                                         </th>`;
