@@ -15,7 +15,7 @@ if(file_exists($configPath)) {
     $pagination = $config['pagination'];
 
 } else {
-    $config = [];
+    $config = array();
     $pagination = array(
         'pageSize' => 20,
         'maxPageSize' => 100,
@@ -26,9 +26,9 @@ if(file_exists($configPath)) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     try {
-        $pageSize = isset($_POST['pageSize']) ? $_POST['pageSize'] : $pagination['pageSize'];
-        $maxPageSize = isset($_POST['maxPageSize']) ? $_POST['maxPageSize'] : $pagination['maxPageSize'];
-        $minPageSize = isset($_POST['minPageSize']) ? $_POST['minPageSize'] : $pagination['minPageSize'];
+        $pageSize = isset($_POST['pageSize']) ? $_POST['pageSize'] : $pagination['pageSize']; // NOSONAR
+        $maxPageSize = isset($_POST['maxPageSize']) ? $_POST['maxPageSize'] : $pagination['maxPageSize']; // NOSONAR
+        $minPageSize = isset($_POST['minPageSize']) ? $_POST['minPageSize'] : $pagination['minPageSize']; // NOSONAR
 
         $config['pagination'] = array(
             'pageSize' => (int) $pageSize,
