@@ -1427,9 +1427,12 @@ class GraphQLClientApp {
      * @returns {string} The HTML string for the action buttons cell.
      */
     renderActionButtons(item) {
+        const entityName = this.currentEntity.name;
         const id = item[this.currentEntity.primaryKey]; // NOSONAR
+        let detailLink = `${window.location.pathname}#${entityName}/detail/${id}`;
+
         let buttons = `<td class="actions">`;
-        buttons += `<button class="btn btn-sm btn-info btn-detail" data-id="${id}">${this.t('view')}</button> `;
+        buttons += `<a class="btn btn-sm btn-info btn-detail" data-id="${id}" href="${detailLink}">${this.t('view')}</a> `;
         buttons += `<button class="btn btn-sm btn-primary btn-edit" data-id="${id}">${this.t('edit')}</button> `;
 
         if (this.currentEntity.hasActiveColumn) {
