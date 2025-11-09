@@ -920,9 +920,11 @@ class GraphQLClientApp {
 
     /**
      * Navigates to the detail view of a specific item and updates the URL.
-     * This method updates the browser history.
+     * This method updates the browser history. It includes an optional `fromUrl`
+     * parameter to facilitate a "back" navigation feature.
      * @param {string} entityName - The name of the entity.
      * @param {string|number} id - The ID of the item to display.
+     * @param {?string} [fromUrl=null] - The URL to return to when navigating back from the detail view.
      * @returns {void}
      */
     navigateToDetail(entityName, id, fromUrl = null) {
@@ -1214,7 +1216,6 @@ class GraphQLClientApp {
                             ${headers.map(h => {
             const isSortable = true; // Assume all are sortable for now
             const isCurrentSort = this.state.orderBy.field === h;
-            const sortIcon = isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? ' &#9650;' : ' &#9660;') : '';
             return `<th class="${isSortable ? 'sortable' : ''}" data-sort-key="${h}" data-sort-direction="${isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? 'asc' : 'desc') : ''}">
                                             ${this.getEntityLabel(this.currentEntity, h)}
                                         </th>`;
