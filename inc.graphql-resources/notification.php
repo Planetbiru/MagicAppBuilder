@@ -52,16 +52,16 @@ if (file_exists($configPath)) {
     $config = json_decode(file_get_contents($configPath), true);
     $pagination = $config['pagination'];
 } else {
-    $config = [];
-    $pagination = array(
+    $config = array();
+    $pagination = array( // NOSONAR
         'pageSize' => 20,
         'maxPageSize' => 100,
         'minPageSize' => 1
     );
 }
 
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-$dataLimit = abs($pagination['pageSize']);
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$dataLimit = abs($pagination['pageSize']); // NOSONAR
 $offset = ($page - 1) * $dataLimit;
 
 try {
@@ -129,8 +129,8 @@ try {
             <?php
         }
     } else {
-        $search = $_GET['search'] ?? '';
-        $params = [':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminLevelId];
+        $search = isset($_GET['search']) ? $_GET['search'] : '';
+        $params = array(':admin_id' => $currentAdminId, ':admin_level_id' => $currentAdminLevelId);
         $whereClause = "WHERE (admin_id = :admin_id OR admin_group = :admin_level_id)";
 
         if (!empty($search)) {

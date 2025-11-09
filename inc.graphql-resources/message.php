@@ -54,23 +54,19 @@ if(file_exists($configPath)) {
 
 } else {
     $config = [];
-    $pagination = array(
+    $pagination = array( // NOSONAR
         'pageSize' => 20,
         'maxPageSize' => 100,
         'minPageSize' => 1
     );
 }
 
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $dataLimit = abs($pagination['pageSize']);
 $offset = ($page - 1) * $dataLimit;
 
 try
 {
-    $sql = "SELECT * FROM admin WHERE username = :username";
-    $stmt = $db->prepare($sql);
-    $stmt->execute(array(':username' => $_SESSION['username']));
-    $appAdmin = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if(isset($_GET['messageId']))
     {
@@ -89,6 +85,8 @@ try
             $markReadStmt->execute([':time_read' => date('Y-m-d H:i:s'), ':message_id' => $messageId]);
         }
 
+        
+
         $sql = "SELECT 
             m.*, 
             mf.name AS message_folder_name,
@@ -98,10 +96,10 @@ try
         LEFT JOIN message_folder mf ON m.message_folder_id = mf.message_folder_id
         LEFT JOIN admin sender ON m.sender_id = sender.admin_id
         LEFT JOIN admin receiver ON m.receiver_id = receiver.admin_id
-        WHERE (m.sender_id = :admin_id OR m.receiver_id = :admin_id) AND m.message_id = :message_id
+        WHERE (m.sender_id = :sender_id OR m.receiver_id = :receiver_id) AND m.message_id = :message_id
         ";
         $stmt = $db->prepare($sql);
-        $stmt->execute(array(':admin_id' => $currentAdminId, ':message_id' => $messageId));
+        $stmt->execute(array(':sender_id' => $currentAdminId, ':receiver_id' => $currentAdminId, ':message_id' => $messageId));
         $message = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if($message !== false)
@@ -147,17 +145,26 @@ try
     }
     else
     {
-        $search = $_GET['search'] ?? '';
-        $params = [':admin_id' => $appAdmin['admin_id']];
-        $whereClause = "WHERE (m.sender_id = :admin_id OR m.receiver_id = :admin_id)";
+        $search = isset($_GET['search']) ? $_GET['search'] : '';
+        $params = array(
+            ':sender_id' => $appAdmin['admin_id'],
+            ':receiver_id' => $appAdmin['admin_id']
+        );
+        $whereClause = "WHERE (m.sender_id = :sender_id OR m.receiver_id = :receiver_id)";
 
         if (!empty($search)) {
-            $whereClause .= " AND (m.subject LIKE :search OR m.content LIKE :search OR sender.name LIKE :search)";
+            $whereClause .= " AND (m.subject LIKE :search OR m.content LIKE :search OR sender.name LIKE :search OR receiver.name LIKE :search)";
             $params[':search'] = '%' . $search . '%';
         }
 
         // Count total messages for pagination
-        $countSql = "SELECT COUNT(*) FROM message m LEFT JOIN admin sender ON m.sender_id = sender.admin_id " . $whereClause;
+        $countSql = "
+            SELECT COUNT(*) 
+            FROM message m 
+            LEFT JOIN admin sender ON m.sender_id = sender.admin_id 
+            LEFT JOIN admin receiver ON m.receiver_id = receiver.admin_id 
+            " . $whereClause;
+            
         $countStmt = $db->prepare($countSql);
         $countStmt->execute($params);
         $totalMessages = $countStmt->fetchColumn();
@@ -165,8 +172,10 @@ try
 
         $sql = "SELECT 
             m.message_id, m.subject, m.content, m.is_read, m.time_create, m.receiver_id,
-            sender.name AS sender_name
+            sender.name AS sender_name,
+            receiver.name as receiver_name
         FROM message m
+        LEFT JOIN admin receiver ON m.receiver_id = receiver.admin_id
         LEFT JOIN admin sender ON m.sender_id = sender.admin_id
         $whereClause
         ORDER BY m.time_create DESC

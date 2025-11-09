@@ -123,8 +123,8 @@ $config = file_exists($configPath) ? json_decode(file_get_contents($configPath),
 $pagination = $config['pagination'] ?? ['pageSize' => 20];
 
 
-$view = $_GET['view'] ?? 'list';
-$adminId = $_GET['adminId'] ?? null;
+$view = isset($_GET['view']) ? $_GET['view'] : 'list';
+$adminId = isset($_GET['adminId']) ? $_GET['adminId'] : null;
 
 function getAdminLevels($db) {
     return $db->query("SELECT admin_level_id, name FROM admin_level WHERE active = 1 ORDER BY sort_order")->fetchAll(PDO::FETCH_ASSOC);
@@ -132,7 +132,7 @@ function getAdminLevels($db) {
 
 function getLanguages() {
     $langData = json_decode(file_get_contents(__DIR__ . '/langs/available-language.json'), true);
-    $languages = [];
+    $languages = array();
     foreach($langData['supported'] as $code => $name) {
         $languages[] = ['code' => $code, 'name' => $name];
     }
@@ -268,12 +268,12 @@ if ($view === 'create' || ($view === 'edit' && $adminId)) {
         echo "<p>" . $i18n->t('admin_not_found') . "</p>";
     }
 } else { // List view
-    $search = $_GET['search'] ?? '';
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $dataLimit = abs($pagination['pageSize']);
     $offset = ($page - 1) * $dataLimit;
 
-    $params = [];
+    $params = array();
     $whereClause = '';
     if (!empty($search)) {
         $whereClause = " WHERE (a.name LIKE :search OR a.username LIKE :search)";

@@ -26,13 +26,13 @@ if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone) && $cfgDbTimeZone != 'Asia/Ja
 
 if(stripos($cfgDbDriver, 'mysql') !== false || stripos($cfgDbDriver, 'mariadb') !== false) {
      $cfgDbDriver = 'mysql'; // Normalize to mysql
-     $cfgDbDsn = "mysql:host=$cfgDbHost;dbname=$cfgDbDatabaseName";
+     $cfgDbDsn = "mysql:host=$cfgDbHost;dbname=$cfgDbDatabaseName;charset=$cfgDbCharset";
 
-     $options = [
+     $options = array(
           PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
           PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
           PDO::ATTR_EMULATE_PREPARES   => false,
-     ];
+     );
 
      try {
           $db = new PDO($cfgDbDsn, $cfgDbUser, $cfgDbPass, $options);
@@ -41,10 +41,6 @@ if(stripos($cfgDbDriver, 'mysql') !== false || stripos($cfgDbDriver, 'mariadb') 
               $tz = new DateTimeZone($cfgDbTimeZone);
               $offset = (new DateTime('now', $tz))->format('P');
               $db->exec("SET time_zone = '" . $offset . "'");
-          }
-          if(isset($cfgDbCharset) && !empty($cfgDbCharset))
-          {
-              $db->exec("SET NAMES " . $cfgDbCharset);
           }
      } catch (\PDOException $e) {
           throw new \PDOException($e->getMessage(), (int)$e->getCode());
@@ -62,10 +58,10 @@ else if(stripos($cfgDbDriver, 'sqlite') !== false)
 else if(stripos($cfgDbDriver, 'sqlsrv') !== false) 
 {
      $cfgDbDsn = "sqlsrv:Server=$cfgDbHost,$cfgDbPort;Database=$cfgDbDatabaseName";
-     $options = [
+     $options = array(
           PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
           PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-     ];
+     );
      try {
           $db = new PDO($cfgDbDsn, $cfgDbUser, $cfgDbPass, $options);
      } catch (\PDOException $e) {
@@ -75,10 +71,10 @@ else if(stripos($cfgDbDriver, 'sqlsrv') !== false)
 else if(stripos($cfgDbDriver, 'pgsql') !== false) 
 {
      $cfgDbDsn = "pgsql:host=$cfgDbHost;port=$cfgDbPort;dbname=$cfgDbDatabaseName";
-     $options = [
+     $options = array(
           PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
           PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-     ];
+     );
      try {
           $db = new PDO($cfgDbDsn, $cfgDbUser, $cfgDbPass, $options);
           if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone))

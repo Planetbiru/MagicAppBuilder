@@ -7,14 +7,14 @@
 require_once __DIR__ . '/sessions.php';
 require_once __DIR__ . '/database.php';
 
-$appAdmin = [
+$appAdmin = array(
     'admin_id' => null,
     'username' => null,
     'name' => null,
     'email' => null,
     'phone' => null,
     'admin_level_id' => null
-];
+);
 
 if(isset($_SESSION['username']) && isset($_SESSION['password']))
 {
@@ -58,4 +58,3 @@ else
     echo json_encode(['errors' => [['message' => 'Authentication required.']]]);
     exit();
 }
-
