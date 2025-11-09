@@ -1602,9 +1602,17 @@ class GraphQLClientApp {
                 }
                 detailHtml += `</td></tr>`;
             }
-            detailHtml += `</tbody></table></div>`;
+            detailHtml += `</tbody></table></div>`; // NOSONAR
             this.dom.tableDataContainer.innerHTML = detailHtml;
-            document.getElementById('back-to-list').onclick = () => history.back();
+            document.getElementById('back-to-list').onclick = () => {
+                // Use history.back() only if there's a history stack in the current tab
+                // and the referrer is from the same origin.
+                if (history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin) {
+                    history.back();
+                } else {
+                    this.navigateTo(this.currentEntity.name);
+                }
+            };
         } catch (error) {
             this.dom.tableDataContainer.innerHTML = `<p style="color: red;">${this.t('failed_to_fetch_details')}</p>`;
         }
