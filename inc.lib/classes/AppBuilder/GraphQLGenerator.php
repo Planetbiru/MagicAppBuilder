@@ -28,6 +28,11 @@ class GraphQLGenerator
      * @var array Analyzed schema with PK, FK, and column info.
      */
     private $analyzedSchema = array();
+    
+    /**
+     * @var bool Whether to use in-memory caching for queries.
+     */
+    private $useCache = false;
 
     /**
      * Constructor.
@@ -35,12 +40,14 @@ class GraphQLGenerator
      * @param array $schema Decoded JSON schema.
      * @param array $reservedColumns
      * @param array $backendHandledColumns
+     * @param bool $useCache Whether to use in-memory caching for queries.
      * @throws Exception If the file is not found or invalid.
      */
-    public function __construct($schema, $reservedColumns = null, $backendHandledColumns = array())
+    public function __construct($schema, $reservedColumns = null, $backendHandledColumns = array(), $useCache = false)
     {
         $this->schema = $schema;
         $this->backendHandledColumns = $backendHandledColumns;
+        $this->useCache = $useCache;
 
         if(isset($reservedColumns) && isset($reservedColumns['columns']))
         {
@@ -467,9 +474,29 @@ class GraphQLGenerator
             $code .= "                'id' => Type::nonNull(Type::string()),\r\n";
             $code .= "            ),\r\n";
             $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
-            $code .= "                \$stmt = \$db->prepare('SELECT * FROM " . $tableName . " WHERE " . $primaryKey . " = :id');\r\n";
-            $code .= "                \$stmt->execute(array(':id' => \$args['id']));\r\n";
-            $code .= "                return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
+            
+            if($this->useCache)
+            {        
+                $code .= "                \$cacheKey = \"$tableName:{\$args['id']}\";\r\n";
+                $code .= "                if (InMemoryCache::has(\$cacheKey)) {\r\n";
+                $code .= "                    return InMemoryCache::get(\$cacheKey);\r\n";
+                $code .= "                }\r\n";
+                $code .= "                \$stmt = \$db->prepare('SELECT * FROM " . $tableName . " WHERE " . $primaryKey . " = :id');\r\n";
+                $code .= "                \$stmt->execute(array(':id' => \$args['id']));\r\n";
+                $code .= "                \$tableNameData = \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
+                $code .= "                if (isset(\$tableNameData) && !empty(\$tableNameData)) {\r\n";
+                $code .= "                    InMemoryCache::set(\$cacheKey, \$tableNameData);\r\n";
+                $code .= "                }\r\n";
+                $code .= "                return \$tableNameData;\r\n";
+            
+            }
+            else
+            {
+                $code .= "                \$stmt = \$db->prepare('SELECT * FROM " . $tableName . " WHERE " . $primaryKey . " = :id');\r\n";
+                $code .= "                \$stmt->execute(array(':id' => \$args['id']));\r\n";
+                $code .= "                return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
+            }
+            
             $code .= "            },\r\n";
             $code .= "        ],\r\n\r\n";
 
@@ -921,6 +948,23 @@ class GraphQLGenerator
         $manualContent .= "where `\$db` is an instance of PDO.\r\n\r\n";
 
         $manualContent .= "---\r\n\r\n";
+
+        $manualContent .= "## In-Memory Cache\r\n\r\n";
+        $manualContent .= "The auto-generated API includes a simple in-memory caching mechanism to improve performance and reduce database load. This cache temporarily stores query results, so that subsequent identical requests can be served from memory instead of accessing the database again. This is particularly effective for queries that fetch a single item by its ID.\r\n\r\n";
+        $manualContent .= "### Benefits\r\n\r\n";
+        $manualContent .= "- **Reduced Database Load**: Fewer queries are executed on the database.\r\n";
+        $manualContent .= "- **Faster Response Times**: Retrieving data from memory is significantly faster than from the database.\r\n\r\n";
+        $manualContent .= "### How to Use\r\n\r\n";
+        $manualContent .= "You can enable or disable this cache in the generated `graphql.php` file:\r\n\r\n";
+        $manualContent .= "```php\r\n";
+        $manualContent .= "// Enable the cache\r\n";
+        $manualContent .= "InMemoryCache::setEnabled(true);\r\n\r\n";
+        $manualContent .= "// Disable the cache\r\n";
+        $manualContent .= "InMemoryCache::setEnabled(false);\r\n";
+        $manualContent .= "```\r\n\r\n";
+        $manualContent .= "By default, the cache is disabled (`false`). The caching logic is provided by the included `inc/InMemoryCache.php` file in the generated project.\r\n\r\n";
+
+        $manualContent .= "---\r\n\r\n";
         
         $manualContent .= "## Security Considerations\r\n\r\n";
         $manualContent .= "For production or any publicly exposed environments, it is strongly recommended to remove files that are not essential for the API's runtime operations. This helps to minimize the attack surface and prevent potential information disclosure.\r\n\r\n";
@@ -1316,12 +1360,27 @@ function generateNewId()
         $header .= "use GraphQL\\Type\\Schema;\r\n\r\n";
         $header .= "require_once __DIR__ . '/vendor/autoload.php';\r\n";
         $header .= "require_once __DIR__ . '/database.php';\r\n";
-        $header .= "require_once __DIR__ . '/auth.php';\r\n\r\n";
+        $header .= "require_once __DIR__ . '/auth.php';\r\n";
+        
+        if($this->useCache)
+        {
+            $header .= "require_once __DIR__ . '/inc/InMemoryCache.php';\r\n";
+        }
+        
+        $header .= "\r\n";
+
+        if($this->useCache)
+        {
+            $header .= "//Use your own configuration for caching and development mode\r\n\r\n";
+            $header .= "InMemoryCache::setEnabled(false);\r\n";
+        }
+        $header .= "\$developmentMode = true;\r\n";        
+        $header .= "\r\n";
 
         $header .= $this->generateLastInsertIdFunction() . "\r\n";
         $header .= $this->generateNewIdFunction() . "\r\n";
         
-        $header .= "\$developmentMode = true;\r\n\r\n";
+        $header .= "\r\n";
 
         $dbConnection = "/**\r\n * ----------------------------------------------------------------------------\r\n * DATABASE CONNECTION\r\n * ----------------------------------------------------------------------------\r\n */\r\n\r\n";
 

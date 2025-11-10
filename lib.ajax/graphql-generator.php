@@ -225,14 +225,6 @@ function generateManualHtml($manualMd, $appName)
 HTML;
 }
 
-$request = file_get_contents('php://input');
-$data = json_decode($request, true);
-
-$withFrontend = isset($data['withFrontend']) && ($data['withFrontend'] == 'true' || $data['withFrontend'] == '1' || $data['withFrontend'] === true) ? true : false;
-$schema = isset($data['schema']) ? $data['schema'] : [];
-$reservedColumns = isset($data['reservedColumns']) ? $data['reservedColumns'] : [];
-$applicationId = isset($data['applicationId']) ? $data['applicationId'] : null;
-
 function createReservedColumnMap($reservedColumns) {
     $reservedColumnMap = array();
     foreach ($reservedColumns as $reservedColumn) {
@@ -241,6 +233,16 @@ function createReservedColumnMap($reservedColumns) {
     }
     return $reservedColumnMap;
 }
+
+$request = file_get_contents('php://input');
+$data = json_decode($request, true);
+
+$withFrontend = isset($data['withFrontend']) && ($data['withFrontend'] == 'true' || $data['withFrontend'] == '1' || $data['withFrontend'] === true) ? true : false;
+$schema = isset($data['schema']) ? $data['schema'] : [];
+$reservedColumns = isset($data['reservedColumns']) ? $data['reservedColumns'] : [];
+$applicationId = isset($data['applicationId']) ? $data['applicationId'] : null;
+
+$useCache = false;
 
 $reservedColumnMap = createReservedColumnMap($reservedColumns['columns']);
 
@@ -299,7 +301,7 @@ try {
 
     if($withFrontend)
     {
-        $generator = new GraphQLGenerator($schema, $reservedColumns, $backendHandledColumns);
+        $generator = new GraphQLGenerator($schema, $reservedColumns, $backendHandledColumns, $useCache);
 
         // Create ZIP file
         $zip = new ZipArchive();
@@ -351,7 +353,10 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/assets/graphql.min.js", 'assets/graphql.min.js');
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/I18n.php", 'inc/I18n.php');
-        
+        if($useCache)
+        {
+            $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/InMemoryCache.php", 'inc/InMemoryCache.php');
+        }
         
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/admin.php", 'admin.php');   
 
@@ -454,7 +459,12 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.json", 'composer.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/composer.lock", 'composer.lock');
         // Add all files under directory `vendor`
-
+        
+        if($useCache)
+        {
+            $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/inc/InMemoryCache.php", 'inc/InMemoryCache.php');
+        }
+        
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
         addDirectoryToZip($zip, $vendorPath, 'vendor');
 
