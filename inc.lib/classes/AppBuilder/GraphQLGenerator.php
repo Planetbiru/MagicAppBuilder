@@ -1166,9 +1166,11 @@ class GraphQLGenerator
                 'primaryKey' => $tableInfo['primaryKey'],
                 'hasActiveColumn' => $tableInfo['hasActiveColumn'],
                 'columns' => $columns,
+                'sortOrder' => $sortOrder++,
+                'menu' => true,
                 'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : [],
                 'backendHandledColumns' => array_column($this->backendHandledColumns, 'columnName'),
-                'sortOrder' => $sortOrder++
+                
             );
         }
         

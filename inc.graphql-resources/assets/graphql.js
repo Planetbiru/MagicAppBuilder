@@ -812,17 +812,20 @@ class GraphQLClientApp {
         });
 
         sortedEntities.forEach((entity) => {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = `#${entity.name}`;
-            a.textContent = _this.getTranslatedEntityName(entity);
-            // Reset filters and order when a menu item is clicked
-            a.onclick = (e) => {
-                e.preventDefault();
-                this.navigateTo(entity.name, { limit: this.state.limit });
-            };
-            li.appendChild(a);
-            this.dom.menu.appendChild(li);
+            if(entity.menu)
+            {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${entity.name}`;
+                a.textContent = _this.getTranslatedEntityName(entity);
+                // Reset filters and order when a menu item is clicked
+                a.onclick = (e) => {
+                    e.preventDefault();
+                    this.navigateTo(entity.name, { limit: this.state.limit });
+                };
+                li.appendChild(a);
+                this.dom.menu.appendChild(li);
+            }
         });
     }
 
