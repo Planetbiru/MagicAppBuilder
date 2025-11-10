@@ -1343,6 +1343,41 @@ function generateNewId()
 ";
     }
 
+    private function generateNormalizeBooleanFunction()
+    {
+        return "/**
+ * Normalizes boolean values in input arguments for specific database drivers.
+ *
+ * This function converts boolean values (true/false) inside `\$args['input']`
+ * into integer values (1/0) when using databases that do not natively support
+ * boolean types — specifically SQLite and SQL Server.
+ *
+ * For other drivers (e.g., MySQL, PostgreSQL), the input arguments are returned
+ * unchanged.
+ *
+ * @param array \$args Input arguments, typically containing a key `input` with associative data.
+ * @param PDO \$db A valid PDO instance representing the current database connection.
+ *
+ * @return array The modified (or original) input arguments with normalized boolean values.
+ */
+function normalizeBooleanInput(\$args, \$db)
+{
+    \$driver = strtolower(\$db->getAttribute(PDO::ATTR_DRIVER_NAME));
+    if (\$driver !== 'sqlite' && \$driver !== 'sqlsrv') {
+        return \$args;
+    }
+    if(isset(\$args['input']) && is_array(\$args['input']))
+    {
+        foreach (\$args['input'] as \$key => \$value) {
+            if (is_bool(\$value)) {
+                \$args['input'][\$key] = \$value ? 1 : 0;
+            }
+        }
+    }
+    return \$args;
+}";
+    }
+
     /**
      * Main function to generate the complete graphql.php file content.
      *
@@ -1379,6 +1414,7 @@ function generateNewId()
 
         $header .= $this->generateLastInsertIdFunction() . "\r\n";
         $header .= $this->generateNewIdFunction() . "\r\n";
+        $header .= $this->generateNormalizeBooleanFunction() . "\r\n";
         
         $header .= "\r\n";
 
