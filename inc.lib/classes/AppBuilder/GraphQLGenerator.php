@@ -87,7 +87,7 @@ class GraphQLGenerator
                 'primaryKey' => $primaryKey,
                 'columns' => array(),
                 'hasActiveColumn' => false,
-                'filters' => $entity['filters'] ? $entity['filters'] : array(),
+                'filters' => isset($entity['filters']) ? $entity['filters'] : array(),
                 'textareaColumns' => isset($entity['textareaColumns']) ? $entity['textareaColumns'] : array(),
                 'description' => isset($entity['description']) ? $entity['description'] : null,
                 
