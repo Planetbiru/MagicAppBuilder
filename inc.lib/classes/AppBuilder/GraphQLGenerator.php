@@ -711,6 +711,7 @@ class GraphQLGenerator
             $code .= "            'args' => array('input' => Type::nonNull(\$" . $inputTypeName . ")),\r\n";
             $code .= "            'resolve' => function (\$root, \$args) use (\$db, \$appTimeCreate, \$appTimeEdit, \$appAdminCreate, \$appAdminEdit, \$appIpCreate, \$appIpEdit) {\r\n";
             $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
+            $code .= "                \$args = normalizeBooleanInputs(\$args, \$db);\r\n";
             $code .= "                \$input = \$args['input'];\r\n";
             $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
             $code .= "                    return in_array(\$key, \$allowedColumns);\r\n";
@@ -797,6 +798,7 @@ class GraphQLGenerator
             $code .= "                \$id = \$args['id'];\r\n";
 
             $code .= "                \$allowedColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
+            $code .= "                \$args = normalizeBooleanInputs(\$args, \$db);\r\n";
             $code .= "                \$input = array_filter(\$args['input'], function(\$key) use (\$allowedColumns) {\r\n";
             $code .= "                    return in_array(\$key, \$allowedColumns);\r\n";
             $code .= "                }, ARRAY_FILTER_USE_KEY);\r\n\r\n";
@@ -863,7 +865,8 @@ class GraphQLGenerator
                 $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
                 $code .= "                \$sql = 'UPDATE " . $tableName . " SET ".$activeField." = :active WHERE " . $primaryKey . " = :id';\r\n";
                 $code .= "                \$stmt = \$db->prepare(\$sql);\r\n";
-                $code .= "                \$stmt->execute(array(':id' => \$args['id'], ':active' => \$args['".$activeField."'] ? 1 : 0));\r\n";
+                $code .= "                \$args['".$activeField."'] = normalizeBoolean(\$args['".$activeField."'], \$db);\r\n";
+                $code .= "                \$stmt->execute(array(':id' => \$args['id'], ':active' => \$args['".$activeField."']));\r\n";
                 $code .= "                \$stmt = \$db->prepare('SELECT * FROM " . $tableName . " WHERE " . $primaryKey . " = :id');\r\n";
                 $code .= "                \$stmt->execute(array(':id' => \$args['id']));\r\n";
                 $code .= "                return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
@@ -1209,9 +1212,9 @@ class GraphQLGenerator
                 'activeField' => $this->activeField,
                 'primaryKey' => $tableInfo['primaryKey'],
                 'hasActiveColumn' => $tableInfo['hasActiveColumn'],
-                'columns' => $columns,
                 'sortOrder' => $sortOrder++,
                 'menu' => true,
+                'columns' => $columns,
                 'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : [],
                 'backendHandledColumns' => array_column($this->backendHandledColumns, 'columnName'),
                 
@@ -1343,7 +1346,7 @@ function generateNewId()
 ";
     }
 
-    private function generateNormalizeBooleanFunction()
+    private function generateNormalizeBooleanInputsFunction()
     {
         return "/**
  * Normalizes boolean values in input arguments for specific database drivers.
@@ -1360,7 +1363,7 @@ function generateNewId()
  *
  * @return array The modified (or original) input arguments with normalized boolean values.
  */
-function normalizeBooleanInput(\$args, \$db)
+function normalizeBooleanInputs(\$args, \$db)
 {
     \$driver = strtolower(\$db->getAttribute(PDO::ATTR_DRIVER_NAME));
     if (\$driver !== 'sqlite' && \$driver !== 'sqlsrv') {
@@ -1375,6 +1378,33 @@ function normalizeBooleanInput(\$args, \$db)
         }
     }
     return \$args;
+}";
+    }
+
+    private function generateNormalizeBooleanFunction()
+    {
+        return "/**
+ * Normalizes boolean value argument for specific database drivers.
+ *
+ * This function converts boolean value (true/false) into integer values (1/0) 
+ * when using databases that do not natively support
+ * boolean types — specifically SQLite and SQL Server.
+ *
+ * For other drivers (e.g., MySQL, PostgreSQL), the input arguments are returned
+ * unchanged.
+ *
+ * @param boolean \$value Input value, typically containing a key `input` with associative data.
+ * @param PDO \$db A valid PDO instance representing the current database connection.
+ *
+ * @return boolean The modified (or original) input argument with normalized boolean value.
+ */
+function normalizeBoolean(\$value, \$db)
+{
+    \$driver = strtolower(\$db->getAttribute(PDO::ATTR_DRIVER_NAME));
+    if (\$driver === 'sqlite' || \$driver === 'sqlsrv') {
+        return \$value ? 1 : 0;
+    }
+    return (bool) \$value;
 }";
     }
 
@@ -1414,7 +1444,8 @@ function normalizeBooleanInput(\$args, \$db)
 
         $header .= $this->generateLastInsertIdFunction() . "\r\n";
         $header .= $this->generateNewIdFunction() . "\r\n";
-        $header .= $this->generateNormalizeBooleanFunction() . "\r\n";
+        $header .= $this->generateNormalizeBooleanInputsFunction() . "\r\n\r\n";
+        $header .= $this->generateNormalizeBooleanFunction() . "\r\n\r\n";
         
         $header .= "\r\n";
 
