@@ -14,9 +14,24 @@ use MagicObject\Util\PicoStringUtil;
  */
 class GraphQLGenerator
 {
+    /**
+     * @var array List of reserved column definitions.
+     */
     private $reservedColumns = []; 
+
+    /**
+     * @var string Name of the 'active' field.
+     */
     private $activeField = 'active';
+
+    /**
+     * @var array List of backend-handled columns.
+     */
     private $backendHandledColumns = [];
+
+    /**
+     * @var string Name of the 'display' field.
+     */
     private $displayField = 'name';
 
     /**
@@ -279,7 +294,7 @@ class GraphQLGenerator
 
     /**
      * Generates common Input types for filtering and sorting.
-     * @return string
+     * @return string The generated PHP code.
      */
     private function generateUtilityTypes()
     {
@@ -649,34 +664,40 @@ class GraphQLGenerator
     }
 
     /**
-     * Undocumented function
+     * Gets a list of column names from table information.
      *
-     * @param [type] $tableInfo
-     * @return array
+     * @param array $tableInfo Table information which must contain a 'columns' key.
+     * @return string[] An array containing column names.
      */
     private function getColumnNames($tableInfo)
     {
         $columnNames = [];
-        foreach($tableInfo['columns'] as $columnName => $col) {
+        foreach ($tableInfo['columns'] as $columnName => $col) { //NOSONAR
             $columnNames[] = $columnName;
         }
         return $columnNames;
     }
 
     /**
-     * Undocumented function
+     * Retrieves a simple array containing the names of columns handled by the backend.
      *
-     * @return array
+     * @return string[] An array containing column names.
      */
     private function backendHandledColumns()
     {
         $backendHandledColumns = [];
-        foreach ($this->backendHandledColumns as $backendHandledColumnKey => $col) {
+        foreach ($this->backendHandledColumns as $col) { //NOSONAR
             $backendHandledColumns[] = $col['columnName'];
         }
         return $backendHandledColumns;
     }
 
+    /**
+     * Checks if a table has columns that are handled by the backend.
+     *
+     * @param array $tableInfo Table information to be checked.
+     * @return bool Returns `true` if there is a matching column, otherwise `false`.
+     */
     private function hasBackendHandledColumns($tableInfo)
     {
         $columnNames = $this->getColumnNames($tableInfo);
@@ -690,7 +711,6 @@ class GraphQLGenerator
         
     }
 
-
     /**
      * Generates the PHP code for the root Mutation type.
      *
@@ -702,9 +722,6 @@ class GraphQLGenerator
         $code .= "\$mutationType = new ObjectType(array(\r\n";
         $code .= "    'name' => 'Mutation',\r\n";
         $code .= "    'fields' => array(\r\n";
-
-        
-
 
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
@@ -720,7 +737,6 @@ class GraphQLGenerator
                     break;
                 }
             }
-
 
             $hasBackendHandledColumns = $this->hasBackendHandledColumns($tableInfo);
 
@@ -930,13 +946,8 @@ class GraphQLGenerator
         $manualContent = "# GraphQL API Manual\r\n\r\n";
         $manualContent .= "This document provides examples for all available queries and mutations.\r\n\r\n";
         
-        $manualContent .= "## Dependency Installation\r\n\r\n";
-        $manualContent .= "Before you can run the API, you need to install the required dependencies using Composer. Navigate to the directory where this `graphql.php` file is located and run the following command in your terminal:\r\n\r\n";
-        $manualContent .= "```bash\r\n";
-        $manualContent .= "composer install\r\n";
-        $manualContent .= "composer require webonyx/graphql-php:^14.11\r\n";
-        $manualContent .= "```\r\n\r\n";
-        $manualContent .= "This will download and install all the necessary libraries listed in the `composer.json` file.\r\n\r\n";
+        $manualContent .= "## Dependencies\r\n\r\n";
+        $manualContent .= "All required dependencies are already included in this package, so you no longer need to run any installation commands. This API relies on the `webonyx/graphql-php` library, which is already included in the `vendor` directory.\r\n\r\n";
 
         $manualContent .= "## Database Connection\r\n\r\n";
         $manualContent .= "This API requires a database connection. You must configure the `database.php` file to create a PDO instance. Here is an example for connecting to a MySQL database:\r\n\r\n";
@@ -1004,7 +1015,7 @@ class GraphQLGenerator
             $manualContent .= "## " . $ucCamelName . "\r\n\r\n";
 
             // --- Get Fields for examples ---
-            $fieldsString = $this->getFieldsForManual($tableInfo);
+            $fieldsString = $this->getFieldsForManual($tableInfo, false);
             $mutationFieldsString = $this->getFieldsForManual($tableInfo, true); // No relations for mutation return
 
             // --- Query Examples ---
@@ -1127,25 +1138,33 @@ class GraphQLGenerator
 
     /**
      * Helper to get a formatted string of fields for the manual.
+     * If $noRelations is true, foreign key relations are not expanded.
+     * 
+     * @param array $tableInfo The table information.
+     * @param bool $noRelations Whether to exclude foreign key relations.
+     * @return string The formatted fields string.
      */
     private function getFieldsForManual($tableInfo, $noRelations = false)
     {
         $fieldsString = "";
-        foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
-            if (!$columnInfo['isForeignKey']) {
-                $fieldsString .= "    " . $columnName . "\r\n";
-            } else if (!$noRelations) {
-                $refTableName = $columnInfo['references'];
-                $fieldsString .= "    " . $refTableName . " {\r\n";
-                $fieldsString .= "      " . $this->analyzedSchema[$refTableName]['primaryKey'] . "\r\n";
-                // Add one more field for context
-                foreach ($this->analyzedSchema[$refTableName]['columns'] as $refColName => $refColInfo) {
-                    if (!$refColInfo['isForeignKey'] && $refColName !== $this->analyzedSchema[$refTableName]['primaryKey']) {
-                        $fieldsString .= "      " . $refColName . "\r\n";
-                        break;
+        if(isset($tableInfo) && isset($tableInfo['columns']))
+        {
+            foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
+                if (!$columnInfo['isForeignKey']) {
+                    $fieldsString .= "    " . $columnName . "\r\n";
+                } else if (!$noRelations) {
+                    $refTableName = $columnInfo['references'];
+                    $fieldsString .= "    " . $refTableName . " {\r\n";
+                    $fieldsString .= "      " . $this->analyzedSchema[$refTableName]['primaryKey'] . "\r\n";
+                    // Add one more field for context
+                    foreach ($this->analyzedSchema[$refTableName]['columns'] as $refColName => $refColInfo) {
+                        if (!$refColInfo['isForeignKey'] && $refColName !== $this->analyzedSchema[$refTableName]['primaryKey']) {
+                            $fieldsString .= "      " . $refColName . "\r\n";
+                            break;
+                        }
                     }
+                    $fieldsString .= "    }\r\n";
                 }
-                $fieldsString .= "    }\r\n";
             }
         }
         return $fieldsString;
@@ -1153,10 +1172,13 @@ class GraphQLGenerator
 
     /**
      * Helper to get formatted input fields for the manual.
+     * @param array $tableInfo The table information.
+     * @return array An array with two strings: input fields and example values.
      */
     private function getInputFieldsForManual($tableInfo)
     {
         $inputExampleString = "";
+        
         foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
             if ($columnName === $tableInfo['primaryKey']) continue;
             $gqlType = $this->mapDbTypeToGqlType($columnInfo['type'], $columnInfo['length']);
@@ -1253,6 +1275,13 @@ class GraphQLGenerator
             'entities' => $frontendConfig
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
+
+    /**
+     * Generates a JSON file for frontend language translations.
+     * This file contains human-readable names for entities and their fields.
+     *
+     * @return string The JSON formatted content for frontend-language.json.
+     */
     public function generateFrontendLanguageJson()
     {
         $frontendConfig = array();
@@ -1274,10 +1303,23 @@ class GraphQLGenerator
         }
         return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
+
+    /**
+     * Converts a camelCase string to snake_case.
+     *
+     * @param string $str The camelCase string.
+     * @return string The converted snake_case string.
+     */
     public function camelCaseToSnakeCase($str) {
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $str));
     }
 
+    /**
+     * Converts a snake_case string to camelCase.
+     *
+     * @param string $str The snake_case string.
+     * @return string The converted camelCase string.
+     */
     public function snakeCaseToCamelCase($str) {
         $words = explode('_', strtolower($str));
         $camel = array_shift($words);
@@ -1287,15 +1329,33 @@ class GraphQLGenerator
         return $camel;
     }
 
+    /**
+     * Converts a snake_case string to Title Case.
+     *
+     * @param string $str The snake_case string.
+     * @return string The converted Title Case string.
+     */
     public function snakeCaseToTitleCase($str) {
         $str = str_replace('_', ' ', strtolower($str));
         return $this->titleCase($str);
     }
 
+    /**
+     * Converts a camelCase string to Title Case.
+     *
+     * @param string $str The camelCase string.
+     * @return string The converted Title Case string.
+     */
     public function camelCaseToTitleCase($str) {
         return $this->snakeCaseToTitleCase($this->camelCaseToSnakeCase($str));
     }
 
+    /**
+     * Converts a string to Title Case.
+     *
+     * @param string $str The input string.
+     * @return string The converted Title Case string.
+     */
     public function titleCase($str) {
         $words = explode(' ', strtolower(trim($str)));
         foreach ($words as &$word) {
@@ -1341,6 +1401,11 @@ function getLastInsertId(\$db, \$tableName, \$primaryKeyName)
 }";
     }
 
+    /**
+     * Generates the PHP code for a helper function that generates a unique 20-byte ID.
+     *
+     * @return string The PHP code for the `generateNewId` function.
+     */
     private function generateNewIdFunction()
     {
         return "
@@ -1365,6 +1430,12 @@ function generateNewId()
 ";
     }
 
+    /**
+     * Generates the PHP code for a helper function that normalizes boolean inputs
+     * for specific database drivers.
+     *
+     * @return string The PHP code for the `normalizeBooleanInputs` function.
+     */
     private function generateNormalizeBooleanInputsFunction()
     {
         return "/**
@@ -1400,6 +1471,12 @@ function normalizeBooleanInputs(\$args, \$db)
 }";
     }
 
+    /**
+     * Generates the PHP code for a helper function that normalizes a single boolean value
+     * for specific database drivers.
+     *
+     * @return string The PHP code for the `normalizeBoolean` function.
+     */
     private function generateNormalizeBooleanFunction()
     {
         return "/**
@@ -1567,5 +1644,13 @@ function normalizeBoolean(\$value, \$db)
             return $string . 'es';
         }
         return $string . 's';
+    }
+
+    /**
+     * Get list of reserved column definitions.
+     */
+    public function getReservedColumns()
+    {
+        return $this->reservedColumns;
     }
 }
