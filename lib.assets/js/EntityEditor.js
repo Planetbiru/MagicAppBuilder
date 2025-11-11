@@ -150,6 +150,7 @@ class EntityEditor {
         this.graphqlAppData = {
             custom: true,
             system: false,
+            inMemoryCache: false,
             entities: [],
             entitySelector: []
         }
@@ -2433,6 +2434,11 @@ class EntityEditor {
         }
     }
 
+    inMemoryCacheChange(element)
+    {
+
+    }
+
     /**
      * Gathers all entities and their selected columns from the UI, typically from a modal
      * for schema generation. It clones the selected entities and filters their columns
@@ -2613,6 +2619,7 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": false,
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
             "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
         };
         this.exportGraphQLSchema(data);
@@ -2630,6 +2637,7 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": true,
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
             "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
         };
         this.exportGraphQLSchema(data);

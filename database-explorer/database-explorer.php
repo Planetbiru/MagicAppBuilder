@@ -371,6 +371,8 @@ if(!isset($databaseName))
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
                         &nbsp;
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
+                        &nbsp;
+                        <label><input type="checkbox" class="in-memory-cache-checker" data-entity-type="in-memory-cache" onchange="editor.inMemoryCacheChange(this)"> In Memory Cache</label>
                     </div>
                     <div class="entity-selector-container"></div>
                 </form>

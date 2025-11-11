@@ -377,9 +377,28 @@ class GraphQLGenerator
                     $code .= "                'description' => '".$description."',\r\n";
                     $code .= "                'resolve' => function (\$root, \$args) use (\$db) {\r\n";
                     $code .= "                    if (empty(\$root['" . $columnName . "'])) return null;\r\n";
-                    $code .= "                    \$stmt = \$db->prepare('SELECT * FROM " . $refTableName . " WHERE " . $refPK . " = :id');\r\n";
-                    $code .= "                    \$stmt->execute(array(':id' => \$root['" . $columnName . "']));\r\n";
-                    $code .= "                    return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
+
+
+                    if($this->useCache)
+                    {        
+                        $code .= "                    \$refCacheKey = \"$refTableName:{\$root['$columnName']}\";\r\n";
+                        $code .= "                    if (InMemoryCache::has(\$refCacheKey)) {\r\n";
+                        $code .= "                        return InMemoryCache::get(\$refCacheKey);\r\n";
+                        $code .= "                    }\r\n";
+                        $code .= "                    \$stmt = \$db->prepare('SELECT * FROM " . $refTableName . " WHERE " . $refPK . " = :id');\r\n";
+                        $code .= "                    \$stmt->execute(array(':id' => \$root['$columnName']));\r\n";
+                        $code .= "                    \$refTableNameData = \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
+                        $code .= "                    if (isset(\$refTableNameData) && !empty(\$refTableNameData)) {\r\n";
+                        $code .= "                        InMemoryCache::set(\$refCacheKey, \$refTableNameData);\r\n";
+                        $code .= "                    }\r\n";
+                        $code .= "                    return \$refTableNameData;\r\n";                      
+                    }
+                    else
+                    {
+                        $code .= "                    \$stmt = \$db->prepare('SELECT * FROM " . $refTableName . " WHERE " . $refPK . " = :id');\r\n";
+                        $code .= "                    \$stmt->execute(array(':id' => \$root['" . $columnName . "']));\r\n";
+                        $code .= "                    return \$stmt->fetch(PDO::FETCH_ASSOC);\r\n";
+                    }
                     $code .= "                }\r\n";
                     $code .= "            ),\r\n";
                 }

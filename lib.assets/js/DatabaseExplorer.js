@@ -347,11 +347,23 @@ function init() {
     }); 
 }
 
-
+/**
+ * Saves the current state of the GraphQL entity selector form to the server.
+ *
+ * This function reads the values of various form controls within the provided form element,
+ * including checkboxes for entity types (custom/system), in-memory cache settings,
+ * and column-level configurations for each entity (e.g., filters, primary key handling).
+ * It constructs a data object with this state and sends it to the server for persistence
+ * via `sendGraphQlEntityToServer`. The state is also stored locally in `editor.graphqlAppData`.
+ *
+ * @param {HTMLFormElement} frm - The form element containing the GraphQL generator settings.
+ * @returns {void}
+ */
 function saveFormState(frm)
 {
     let custom = frm.querySelector('.entity-type-checker[data-entity-type="custom"]').checked;
     let system = frm.querySelector('.entity-type-checker[data-entity-type="system"]').checked;
+    let inMemoryCache = frm.querySelector('.in-memory-cache-checker').checked;
     let entitySelectorTables = frm.querySelectorAll('.entity-selector-table');
     let entityTables = frm.querySelectorAll('.entity-table');
     let entitySelector = {};
@@ -392,6 +404,7 @@ function saveFormState(frm)
     let dataToSave = {
         custom: custom,
         system: system,
+        inMemoryCache: inMemoryCache,
         entitySelector: entitySelector,
         entities: entities
     };
@@ -427,6 +440,12 @@ function loadFormState(frm, data) {
         const systemChecker = frm.querySelector('.entity-type-checker[data-entity-type="system"]');
         if (systemChecker) {
             systemChecker.checked = data.system;
+        }
+    }
+    if (typeof data.inMemoryCache !== 'undefined') {
+        const inMemoryCacheChecker = frm.querySelector('.in-memory-cache-checker');
+        if (inMemoryCacheChecker) {
+            inMemoryCacheChecker.checked = data.inMemoryCache;
         }
     }
 
