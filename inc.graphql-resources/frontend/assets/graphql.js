@@ -2310,8 +2310,8 @@ class GraphQLClientApp {
         const filterForQuery = [];
         if (activeOnly && entity.hasActiveColumn && entity.activeField) {
             const activeCol = entity.columns[entity.activeField];
-            // The backend filter expects a string. For boolean-like integers, this is "1".
-            const valueForFilter = (activeCol && activeCol.type.includes('boolean')) ? "1" : "1";
+            // The backend filter with ObjectScalar now correctly handles boolean types.
+            const valueForFilter = true;
 
             filterForQuery.push({
                 field: entity.activeField,

@@ -2620,7 +2620,8 @@ class EntityEditor {
             "reservedColumns": reservedColumns,
             "withFrontend": false,
             "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2638,7 +2639,8 @@ class EntityEditor {
             "reservedColumns": reservedColumns,
             "withFrontend": true,
             "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }

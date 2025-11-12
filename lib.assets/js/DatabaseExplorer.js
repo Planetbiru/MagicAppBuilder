@@ -364,6 +364,7 @@ function saveFormState(frm)
     let custom = frm.querySelector('.entity-type-checker[data-entity-type="custom"]').checked;
     let system = frm.querySelector('.entity-type-checker[data-entity-type="system"]').checked;
     let inMemoryCache = frm.querySelector('.in-memory-cache-checker').checked;
+    let programmingLanguage = frm.querySelector('.programming-language-selector').value;
     let entitySelectorTables = frm.querySelectorAll('.entity-selector-table');
     let entityTables = frm.querySelectorAll('.entity-table');
     let entitySelector = {};
@@ -406,7 +407,8 @@ function saveFormState(frm)
         system: system,
         inMemoryCache: inMemoryCache,
         entitySelector: entitySelector,
-        entities: entities
+        entities: entities,
+        programmingLanguage: programmingLanguage
     };
     editor.graphqlAppData = dataToSave;
     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
@@ -446,6 +448,13 @@ function loadFormState(frm, data) {
         const inMemoryCacheChecker = frm.querySelector('.in-memory-cache-checker');
         if (inMemoryCacheChecker) {
             inMemoryCacheChecker.checked = data.inMemoryCache;
+        }
+    }
+
+    if (typeof data.programmingLanguage !== 'undefined') {
+        const programmingLanguageSelector = frm.querySelector('.programming-language-selector');
+        if (programmingLanguageSelector) {
+            programmingLanguageSelector.value = data.programmingLanguage;
         }
     }
 

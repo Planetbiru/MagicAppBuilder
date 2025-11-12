@@ -368,6 +368,11 @@ if(!isset($databaseName))
             <div class="modal-body">
                 <form>
                     <div class="entity-type-selector">
+                        <label>Programming Language</label>
+                        <select class="form-control programming-language-selector">
+                            <option value="php">PHP</option>
+                            <option value="java">Java</option>
+                        </select>
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
                         &nbsp;
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>

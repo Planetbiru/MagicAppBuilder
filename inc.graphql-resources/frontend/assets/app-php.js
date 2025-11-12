@@ -1,8 +1,14 @@
 // Global variable to hold the application instance.
 let graphqlApp = null;
 
+let backendBaseUrl = ''; // Base URL for API endpoints, if needed.
+let frontendBaseUrl = ''; // Base URL for frontend pages, if needed.
+
 // Wait for the DOM to be fully loaded before initializing the application.
 document.addEventListener('DOMContentLoaded', () => {
+
+
+
     /**
      * Create a single instance of the GraphQLClientApp.
      * The constructor handles the entire initialization process, including fetching
@@ -13,21 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Configuration for backend communication ---
 
         // URL to fetch the main frontend configuration (entities, columns, etc.).
-        configUrl: 'frontend-config.php',
+        configUrl: backendBaseUrl + 'frontend-config.php',
         // The endpoint for all GraphQL queries and mutations.
-        apiUrl: 'graphql.php',
+        apiUrl: backendBaseUrl + 'graphql.php',
         // URL to handle user login requests.
-        loginUrl: 'login.php',
+        loginUrl: backendBaseUrl + 'login.php',
         // URL to handle user logout requests.
-        logoutUrl: 'logout.php',
+        logoutUrl: backendBaseUrl + 'logout.php',
         // URL to fetch language translations for entity and column names.
-        entityLanguageUrl: 'entity-language.php',
+        entityLanguageUrl: frontendBaseUrl + 'entity-language.php',
         // URL to fetch general UI translations (i18n).
-        i18nUrl: 'language.php',
+        i18nUrl: frontendBaseUrl + 'language.php',
         // URL to get the list of available themes.
-        themeConfigUrl: 'available-theme.php',
+        themeConfigUrl: frontendBaseUrl + 'available-theme.php',
         // URL to get the list of available languages.
-        languageConfigUrl: 'available-language.php',
+        languageConfigUrl: frontendBaseUrl + 'available-language.php',
 
         // --- Default field names ---
 
@@ -352,7 +358,7 @@ async function handleProfileUpdate(event) {
     try {
         const response = await fetch('user-profile.php', {
             method: 'POST',
-            headers:{
+            headers: {
                 'X-Requested-With': 'xmlhttprequest',
                 'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
@@ -379,7 +385,7 @@ async function handlePasswordUpdate(event) {
     try {
         const response = await fetch('update-password.php', {
             method: 'POST',
-            headers:{
+            headers: {
                 'X-Requested-With': 'xmlhttprequest',
                 'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
@@ -407,7 +413,7 @@ async function handleSettingsUpdate(event) {
     try {
         const response = await fetch('settings.php', {
             method: 'POST',
-            headers:{
+            headers: {
                 'X-Requested-With': 'xmlhttprequest',
                 'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
@@ -418,8 +424,7 @@ async function handleSettingsUpdate(event) {
         const result = await response.json();
         if (result.success) {
             await graphqlApp.customAlert({ title: graphqlApp.t('success'), message: result.message });
-            if(!isNaN(limit))
-            {
+            if (!isNaN(limit)) {
                 graphqlApp.state.limit = limit;
             }
             window.location.hash = '#settings';
@@ -627,7 +632,7 @@ async function handleNotificationDelete(notificationId) {
     try {
         const response = await fetch('notification.php', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'xmlhttprequest' } });
         const result = await response.json();
-        if(result.success) {
+        if (result.success) {
             const hash = window.location.hash;
             if (hash.includes('notificationId=')) {
                 backToList('notification');
@@ -658,7 +663,7 @@ async function markMessageAsUnread(messageId, fromView = 'list') {
     try {
         const response = await fetch('message.php', {
             method: 'POST',
-            headers:{
+            headers: {
                 'X-Requested-with': 'xmlhttprequest',
                 'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,
@@ -688,7 +693,7 @@ async function markNotificationAsUnread(notificationId, fromView = 'list') {
     try {
         const response = await fetch('notification.php', {
             method: 'POST',
-            headers:{
+            headers: {
                 'X-Requested-with': 'xmlhttprequest',
                 'Accept': 'application/json',
                 'X-Language-Id': graphqlApp.languageId,

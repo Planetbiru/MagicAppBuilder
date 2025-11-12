@@ -12,7 +12,7 @@ use MagicObject\Util\PicoStringUtil;
  * 
  * @package AppBuilder
  */
-class GraphQLGenerator
+class GraphQLGeneratorPHP extends GraphQLGeneratorBase
 {
     /**
      * @var array List of reserved column definitions.
@@ -299,7 +299,7 @@ class GraphQLGenerator
     private function generateUtilityTypes()
     {
         $code = "/**\r\n * ----------------------------------------------------------------------------\r\n * UTILITY TYPE DEFINITIONS (for Filtering & Sorting)\r\n * ----------------------------------------------------------------------------\r\n */\r\n\r\n";
-
+        $code .= "\$objectScalar = new ObjectScalar();\r\n\r\n";
         // Enum for Sort Direction
         $code .= "\$sortDirectionEnum = new EnumType(array(\r\n";
         $code .= "    'name' => 'SortDirection',\r\n";
@@ -326,7 +326,7 @@ class GraphQLGenerator
         $code .= "    'name' => 'FilterInput',\r\n";
         $code .= "    'fields' => array(\r\n";
         $code .= "        'field' => Type::nonNull(Type::string()),\r\n";
-        $code .= "        'value' => Type::nonNull(Type::string()),\r\n";
+        $code .= "        'value' => \$objectScalar,\r\n";
         $code .= "        'operator' => \$filterOperatorEnum\r\n";
         $code .= "    )\r\n";
         $code .= "));\r\n\r\n";
@@ -340,7 +340,7 @@ class GraphQLGenerator
      * @return string The generated PHP code.
      */
     private function generateTypes()
-    {
+    { //NOSONAR
         $code = "/**\r\n * ----------------------------------------------------------------------------\r\n * GRAPHQL TYPE DEFINITIONS\r\n * ----------------------------------------------------------------------------\r\n */\r\n\r\n";
         
         // Lazy loading requires forward declaration
@@ -1507,7 +1507,7 @@ function normalizeBoolean(\$value, \$db)
     /**
      * Main function to generate the complete graphql.php file content.
      *
-     * @return string The complete PHP code for the GraphQL server.
+     * @return array The complete PHP code for the GraphQL server.
      */
     public function generate()
     {
@@ -1522,6 +1522,7 @@ function normalizeBoolean(\$value, \$db)
         $header .= "require_once __DIR__ . '/vendor/autoload.php';\r\n";
         $header .= "require_once __DIR__ . '/database.php';\r\n";
         $header .= "require_once __DIR__ . '/auth.php';\r\n";
+        $header .= "require_once __DIR__ . '/inc/ObjectScalar.php';\r\n";
         
         if($this->useCache)
         {
@@ -1613,8 +1614,11 @@ function normalizeBoolean(\$value, \$db)
         $schemaAndExecution .= "header('Content-Type: application/json; charset=UTF-8');\r\n";
         $schemaAndExecution .= "header('Access-Control-Allow-Origin: *');\r\n";
         $schemaAndExecution .= "echo json_encode(\$output);\r\n";
-
-        return $header . $dbConnection . $variableDeclaration . $utilityTypesCode . $typesCode . $inputTypesCode . $queriesCode . $mutationsCode . $schemaAndExecution;
+        
+        $files = array();
+        $files[] = array('name'=>'graphql.php', 'content'=>$header . $dbConnection . $variableDeclaration . $utilityTypesCode . $typesCode . $inputTypesCode . $queriesCode . $mutationsCode . $schemaAndExecution);
+        $files[] = array('name'=>'inc/ObjectScalar.php', 'content'=>$this->generateObjectScalarPHP());
+        return $files;
     }
 
 
@@ -1652,5 +1656,63 @@ function normalizeBoolean(\$value, \$db)
     public function getReservedColumns()
     {
         return $this->reservedColumns;
+    }
+    
+    /**
+     * Generates the PHP code for the ObjectScalar class.
+     *
+     * @return string The PHP code for the custom scalar.
+     */
+    private function generateObjectScalarPHP()
+    {
+        return <<<PHP
+<?php
+
+use GraphQL\\Error\\Error;
+use GraphQL\\Language\\AST\\Node;
+use GraphQL\\Language\\AST\\BooleanValueNode;
+use GraphQL\\Language\\AST\\FloatValueNode;
+use GraphQL\\Language\\AST\\IntValueNode;
+use GraphQL\\Language\\AST\\StringValueNode;
+use GraphQL\\Type\\Definition\\ScalarType;
+
+class ObjectScalar extends ScalarType
+{
+    public \$name = 'Object';
+    public \$description = 'A custom scalar that can represent any JSON-like value: string, int, float, boolean, or null.';
+
+    public function serialize(\$value)
+    {
+        // Return the value as-is
+        return \$value;
+    }
+
+    public function parseValue(\$value)
+    {
+        // Return the value as-is from variables
+        return \$value;
+    }
+
+    public function parseLiteral(Node \$valueNode, \$variables = null)
+    {
+        if (\$valueNode instanceof StringValueNode) {
+            return \$valueNode->value;
+        }
+        if (\$valueNode instanceof IntValueNode) {
+            return (int) \$valueNode->value;
+        }
+        if (\$valueNode instanceof FloatValueNode) {
+            return (float) \$valueNode->value;
+        }
+        if (\$valueNode instanceof BooleanValueNode) {
+            return (bool) \$valueNode->value;
+        }
+        // For NullValueNode, it will implicitly return null, which is correct.
+        // For ListValueNode and ObjectValueNode, you would need more complex logic,
+        // but for simple filter values, this is sufficient.
+        return null;
+    }
+}
+PHP;
     }
 }

@@ -6,6 +6,5 @@
 
 # Block access to sensitive files
 <FilesMatch "^(composer\.json|composer\.lock)$">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
