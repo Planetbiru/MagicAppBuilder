@@ -396,17 +396,30 @@ class GraphQLGeneratorJava extends GraphQLGeneratorBase
         $manualContent .= "## Database Connection\r\n\r\n";
         $manualContent .= "This API requires a database connection. You must configure the `src/main/resources/application.properties` file. Here is an example for connecting to a MySQL database:\r\n\r\n";
         $manualContent .= "```properties\r\n";
-        $manualContent .= "# file: src/main/resources/application.properties\r\n";
+        $manualContent .= "spring.application.name=YourAppName\r\n\r\n";
+        $manualContent .= "# Database Configuration (Please update with your details)\r\n";
+        $manualContent .= "app.security.require-login=true\r\n\r\n";
+        $manualContent .= "# Session Management (optional, uncomment to use Redis)\r\n";
+        $manualContent .= "# spring.session.store-type=redis\r\n";
+        $manualContent .= "# spring.data.redis.host=localhost\r\n";
+        $manualContent .= "# spring.data.redis.port=6379\r\n";
+        $manualContent .= "# spring.session.timeout=30m\r\n\r\n";
+        $manualContent .= "# CORS Configuration (Cross-Origin Resource Sharing)\r\n";
+        $manualContent .= "app.security.cors.enabled=true\r\n";
+        $manualContent .= "app.security.cors.allowed-origins=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:8080\r\n\r\n";
         $manualContent .= "spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name\r\n";
         $manualContent .= "spring.datasource.username=your_username\r\n";
         $manualContent .= "spring.datasource.password=your_password\r\n";
         $manualContent .= "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver\r\n\r\n";
-        $manualContent .= "# JPA Properties\r\n";
+        $manualContent .= "# JPA/Hibernate Configuration\r\n";
         $manualContent .= "spring.jpa.hibernate.ddl-auto=update\r\n";
         $manualContent .= "spring.jpa.show-sql=true\r\n";
-        $manualContent .= "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect\r\n\r\n";
+        $manualContent .= "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect\r\n";
+        $manualContent .= "spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl\r\n\r\n";
         $manualContent .= "# GraphQL Properties\r\n";
         $manualContent .= "spring.graphql.graphiql.enabled=true\r\n";
+        $manualContent .= "spring.graphql.schema.locations=classpath:graphql/\r\n";
+        $manualContent .= "spring.graphql.schema.file-extensions=.graphqls\r\n";
         $manualContent .= "```\r\n\r\n";
         $manualContent .= "Make sure to replace `your_database_name`, `your_username`, and `your_password` with your actual database credentials.\r\n\r\n";
 
@@ -1044,7 +1057,7 @@ app.security.require-login=$requireLoginValue
 
 # CORS Configuration (Cross-Origin Resource Sharing)
 app.security.cors.enabled=true
-app.security.cors.allowed-origins=http://localhost,http://127.0.0.1,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080
+app.security.cors.allowed-origins=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:4000,http://127.0.0.1:4000,http://127.0.0.1:3000,http://localhost:8080
 
 spring.datasource.url={DB_URL}
 spring.datasource.username={DB_USER}

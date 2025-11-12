@@ -3755,6 +3755,27 @@ The new generator automatically scaffolds a complete, production-ready Spring Bo
 
 > **Note:** The GraphQL Application for Java feature is not available in the community version.
 
+## New Feature: GraphQL Application Generator for Node.js
+
+Continuing its expansion into diverse technology stacks, MagicAppBuilder 1.29.0 now also includes a **GraphQL application generator for Node.js**. This allows developers to harness the speed and scalability of Node.js for their backend services, providing another powerful alternative alongside PHP and Java.
+
+The generator creates a complete, modern Node.js application using industry-standard tools:
+
+*   **Project Setup**: A standard `package.json` with all necessary dependencies like Express, Apollo Server, and a database driver (e.g., `mysql2`).
+*   **GraphQL Schema and Resolvers**: Automatically generates the GraphQL schema (`typeDefs`) and the corresponding resolver functions to handle queries and mutations.
+*   **Database Integration**: Sets up a database connection and provides simple data access logic to interact with your database.
+*   **Express Server**: A lightweight Express.js server configured with Apollo Server to expose the GraphQL endpoint.
+*   **Ready-to-Use Frontend**: A simple yet functional HTML, CSS, and JavaScript frontend that communicates with the generated Node.js backend.
+
+### Why Node.js?
+
+*   **Asynchronous and Non-Blocking**: Built on an event-driven, non-blocking I/O model, Node.js is exceptionally efficient for building scalable, real-time applications that handle many concurrent connections.
+*   **JavaScript Everywhere**: Use a single language (JavaScript/TypeScript) across your entire stack, from frontend to backend, simplifying development and team collaboration.
+*   **Rich Ecosystem**: Tap into the vast npm registry, the largest ecosystem of open-source libraries in the world.
+*   **Fast Performance**: Powered by Google's V8 engine, Node.js compiles JavaScript into native machine code, delivering impressive performance for backend logic.
+
+> **Note:** The GraphQL Application for Node.js feature is not available in the community version.
+
 ## Enhancements
 
 ### Consistent Boolean Handling Across All Databases

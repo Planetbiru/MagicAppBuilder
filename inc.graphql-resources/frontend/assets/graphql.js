@@ -1170,7 +1170,7 @@ class GraphQLClientApp {
 
 
         const query = `
-            query Get${this.currentEntity.pluralName}($limit: Int, $offset: Int, $orderBy: [SortInput], $filter: [FilterInput]) {
+            query Get${this.ucFirst(this.currentEntity.pluralName)}($limit: Int, $offset: Int, $orderBy: [SortInput], $filter: [FilterInput]) {
                 ${this.currentEntity.pluralName}(limit: $limit, offset: $offset, orderBy: $orderBy, filter: $filter) {
                     items { ${fields} }
                     total
@@ -1586,7 +1586,7 @@ class GraphQLClientApp {
 
         const fields = this.getFieldsForQuery(this.currentEntity, 2, 2); // Deeper nesting for details
         const query = `
-            query Get${this.currentEntity.name}($id: String!) {
+            query Get${this.ucFirst(this.currentEntity.name)}($id: String!) {
                 ${this.currentEntity.name}(id: $id) {
                     ${fields}
                 }
@@ -2200,6 +2200,17 @@ class GraphQLClientApp {
             return '';
         }
         return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+    }
+    
+    /**
+     * Converts a string to UpperCamelCase.
+     * @private
+     * @param {string} str - The string to convert.
+     * @returns {string} The UpperCamelCased string.
+     */
+    upperCamelCase(str) {
+        const camel = this.camelCase(str);
+        return camel.charAt(0).toUpperCase() + camel.slice(1);
     }
     /**
      * Converts a camelCase string to snake_case.
