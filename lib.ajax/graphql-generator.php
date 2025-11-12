@@ -409,6 +409,8 @@ try {
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'apple-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources", '', 'favicon');
 
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/.htaccess", '.htaccess');
+
         $zip->close();
         // Send the ZIP file as a download
         header('Content-Type: application/zip');
@@ -466,6 +468,8 @@ try {
         
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/vendor";
         addDirectoryToZip($zip, $vendorPath, 'vendor');
+
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/.htaccess", '.htaccess');
 
         $zip->close();
         // Send the ZIP file as a download
