@@ -1533,6 +1533,13 @@ table.table.table-enum tr > td:last-child {
   z-index: 2041;
 }
 
+.card-reserved-columns .card-body {
+  max-height: calc(100vh - 360px);
+  display: block;
+  min-height: 200px;
+  overflow: auto;
+}
+
 .animation-wave, .animation-wave > span {
   position: relative;
   display: inline-block;

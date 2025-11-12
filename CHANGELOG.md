@@ -3758,3 +3758,7 @@ To improve performance and reduce database load, an optional in-memory caching l
 -   **Benefit**: This is particularly effective for frequently accessed data, resulting in significantly faster response times and a more efficient application.
 -   **Implementation**: The caching logic is provided by the `inc/InMemoryCache.php` file included in the generated project.
 
+### UI Fix for Reserved Columns Modal
+
+Fixed a display issue in Application Settings where the Reserved Columns modal would overflow, hiding the footer buttons. The modal's height is now limited to ensure all elements are visible and accessible.
+
