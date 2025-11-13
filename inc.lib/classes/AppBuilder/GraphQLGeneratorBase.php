@@ -618,4 +618,28 @@ class GraphQLGeneratorBase
         }
         return array($inputExampleString, $inputExampleString);
     }
+
+    /**
+     * Get list of reserved column definitions.
+     * @return array<string, array> List of backend-handled columns.
+     */
+    public function getBackendHandledColumns()
+    {
+        return $this->backendHandledColumns;
+    }
+
+    /**
+     * Retrieves a simple array containing the names of columns handled by the backend.
+     *
+     * @return string[] An array containing column names.
+     */
+    public function getBackendHandledColumnNames()
+    {
+        $names = [];
+        foreach($this->backendHandledColumns as $col)
+        {
+            $names[] = $col['columnName'];
+        }
+        return $names;
+    }
 }

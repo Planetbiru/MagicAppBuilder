@@ -561,24 +561,45 @@ PROPERTIES;
         $camelName = $this->camelCase($tableName);
         $className = ucfirst($camelName);
         $package = $this->projectConfig['packageName'];
-
+        
         $imports = "import jakarta.persistence.*;\nimport lombok.Data;\nimport java.io.Serializable;\n";
         $fields = "";
         $hasLdt = false;
         $hasLd = false;
-
+        $hasManyToOne = false;
+        
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
-            $fieldName = $colName; // Use original column name without camelCase conversion
-
+            $fieldName = $this->camelCase($colName);
+            
             if (strpos($javaType, 'LocalDateTime') !== false) $hasLdt = true;
             if (strpos($javaType, 'LocalDate') !== false) $hasLd = true;
-
+            
             if ($colInfo['isPrimaryKey']) {
                 $fields .= "    @Id\n";
                 if ($colInfo['isAutoIncrement']) {
                     $fields .= "    @GeneratedValue(strategy = GenerationType.IDENTITY)\n";
                 }
+                if ($fieldName !== $colName) {
+                    $fields .= "    @Column(name = \"$colName\")\n";
+                }
+            } else if ($colInfo['isForeignKey']) {
+                $hasManyToOne = true;
+                $refTableName = $colInfo['references'];
+                $refClassName = ucfirst($this->camelCase($refTableName));
+                $refFieldName = $this->camelCase($refTableName);
+
+                // Add the foreign key column field
+                $fields .= "    @Column(name = \"$colName\")\n";
+                $fields .= "    private " . basename(str_replace('\\', '/', $javaType)) . " $fieldName;\n\n";
+                
+                // Add the object relationship
+                $fields .= "    @ManyToOne(fetch = FetchType.LAZY)\n";
+                $fields .= "    @JoinColumn(name = \"$colName\", insertable = false, updatable = false)\n";
+                $fields .= "    private $refClassName $refFieldName;\n\n";
+                continue; // Skip the separate ID field generation for foreign keys
+            } else if ($fieldName !== $colName) {
+                $fields .= "    @Column(name = \"$colName\")\n";
             }
             // No need for @Column(name=...) if physical strategy is used and field name matches
             $fields .= "    private " . basename(str_replace('\\', '/', $javaType)) . " $fieldName;\n\n";
@@ -586,6 +607,7 @@ PROPERTIES;
 
         if ($hasLdt) $imports .= "import java.time.LocalDateTime;\n";
         if ($hasLd) $imports .= "import java.time.LocalDate;\n";
+        if ($hasManyToOne) $imports .= "import com.fasterxml.jackson.annotation.JsonIgnore;\n";
 
         return <<<JAVA
 package $package.model.entity;
@@ -622,15 +644,20 @@ JAVA;
         $imports = "import org.springframework.data.jpa.repository.JpaRepository;\n";
         $imports .= "import org.springframework.data.jpa.repository.JpaSpecificationExecutor;\n";
         $imports .= "import $package.model.entity.$className;\n";
+        $imports .= "import org.springframework.data.jpa.repository.EntityGraph;\n";
         if ($this->useCache) {
             $imports .= "import org.springframework.cache.annotation.Cacheable;\n";
         }
         $imports .= "import java.util.Optional;\n";
-
+        $entityGraphAnnotation = $this->buildEntityGraphAnnotation($tableName);
         $findByIdMethod = "Optional<$className> findById($pkJavaType id);";
         if ($this->useCache) {
             $findByIdMethod = "@Cacheable(value = \"$camelName\", key = \"#id\")\n    " . $findByIdMethod;
         }
+        if(!empty($entityGraphAnnotation)) {
+            $findByIdMethod = $entityGraphAnnotation . "    " . $findByIdMethod;
+        }
+
 
         return <<<JAVA
 package $package.model.repository;
@@ -640,9 +667,66 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface {$className}Repository extends JpaRepository<$className, $pkJavaType>, JpaSpecificationExecutor<$className> {
-    $findByIdMethod
+$findByIdMethod
 }
 JAVA;
+    }
+
+    /**
+     * Builds the @EntityGraph annotation string by recursively finding all nested relationships.
+     *
+     * @param string $tableName The starting table name.
+     * @return string The generated @EntityGraph annotation string.
+     */
+    private function buildEntityGraphAnnotation($tableName)
+    {
+        $allPaths = $this->getNestedAttributePaths($tableName);
+        if (empty($allPaths)) {
+            return "";
+        }
+
+        $quotedPaths = array_map(function($path) {
+            return '"' . $path . '"';
+        }, $allPaths);
+
+        return "    @EntityGraph(attributePaths = {" . implode(', ', $quotedPaths) . "})\n";
+    }
+
+    /**
+     * Recursively traverses entity relationships to build a list of nested attribute paths for @EntityGraph.
+     *
+     * @param string $tableName The current table to analyze.
+     * @param string $currentPath The path prefix built so far (e.g., "subKlasifikasi.").
+     * @param array $visited An array to prevent infinite loops in circular dependencies.
+     * @return array A flat list of all nested attribute paths.
+     */
+    private function getNestedAttributePaths($tableName, $currentPath = '', &$visited = [])
+    {
+        if (isset($visited[$tableName])) {
+            return []; // Avoid infinite recursion on circular dependencies
+        }
+        $visited[$tableName] = true;
+
+        $paths = [];
+        $tableInfo = $this->analyzedSchema[$tableName];
+
+        foreach ($tableInfo['columns'] as $colInfo) {
+            if ($colInfo['isForeignKey']) {
+                $refTableName = $colInfo['references'];
+                $attributeName = $this->camelCase($refTableName);
+                $fullPath = $currentPath . $attributeName;
+                $paths[] = $fullPath;
+
+                // Recursively find paths from the referenced table
+                $nestedPaths = $this->getNestedAttributePaths($refTableName, $fullPath . '.', $visited);
+                $paths = array_merge($paths, $nestedPaths);
+            }
+        }
+
+        // Backtrack for the current path
+        unset($visited[$tableName]);
+
+        return $paths;
     }
 
     /**
@@ -656,7 +740,7 @@ JAVA;
         $className = ucfirst($camelName) . "Input";
         $package = $this->projectConfig['packageName'];
 
-        $imports = "import lombok.Data;\n";
+        $imports = "import com.fasterxml.jackson.annotation.JsonProperty;\nimport lombok.Data;\n";
         $fields = "";
         $hasLdt = false;
         $hasLd = false;
@@ -665,10 +749,21 @@ JAVA;
             if ($colName === $tableInfo['primaryKey'] && ($colInfo['isAutoIncrement'] || $colInfo['primaryKeyValue'] == 'autogenerated')) {
                 continue;
             }
-            $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
-            $fieldName = $colName; // Use original column name
+            
+            if ($colInfo['isForeignKey']) {
+                $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
+            }
+            else {
+                $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
+            }
+            $fieldName = $this->camelCase($colName);
+
             if (strpos($javaType, 'LocalDateTime') !== false) $hasLdt = true;
             if (strpos($javaType, 'LocalDate') !== false) $hasLd = true;
+
+            if ($fieldName !== $colName) {
+                $fields .= "    @JsonProperty(\"$colName\")\n";
+            }
             $fields .= "    private " . basename(str_replace('\\', '/', $javaType)) . " $fieldName;\n\n";
         }
 
@@ -696,6 +791,7 @@ JAVA;
         $ucCamelName = ucfirst($camelName);
         $pluralCamelName = $this->pluralize($camelName);
         $package = $this->projectConfig['packageName'];
+        $schemaMappings = "";
         $pkJavaType = 'String';
         foreach ($tableInfo['columns'] as $col) {
             if ($col['isPrimaryKey']) {
@@ -704,12 +800,20 @@ JAVA;
             }
         }
 
-        return <<<JAVA
+        $relatedEntityImports = "";
+        foreach ($tableInfo['columns'] as $colInfo) {
+            if ($colInfo['isForeignKey']) {
+                $refClassName = ucfirst($this->camelCase($colInfo['references']));
+                $relatedEntityImports .= "import $package.model.entity.$refClassName;\n";
+            }
+        }
+
+        $code = <<<JAVA
 package $package.controller;
 
 import $package.model.dto.FilterInput;
 import $package.model.dto.SortInput;
-import $package.model.dto.{$ucCamelName}Input;
+import $package.model.dto.{$ucCamelName}Input;{$relatedEntityImports}
 import $package.model.entity.$ucCamelName;
 import $package.model.repository.{$ucCamelName}Repository;
 import $package.util.SearchOperation;
@@ -720,6 +824,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -792,18 +897,22 @@ public class {$ucCamelName}Controller {
     @MutationMapping
     public $ucCamelName create{$ucCamelName}(@Argument {$ucCamelName}Input input) {
         $ucCamelName {$camelName} = new $ucCamelName();
-        // Manual mapping from DTO to Entity
-        // You can use a library like MapStruct for this
+        // Manual mapping from DTO to Entity. Consider using a library like MapStruct.
+{$this->generateDtoToEntityMapping($tableName, $tableInfo, $camelName, 'input')}
         return {$camelName}Repository.save({$camelName});
     }
 
     @MutationMapping
     public $ucCamelName update{$ucCamelName}(@Argument $pkJavaType id, @Argument {$ucCamelName}Input input) {
         $ucCamelName {$camelName} = {$camelName}Repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("$ucCamelName not found with id " + id));
-        // Manual mapping from DTO to Entity
+            .orElseThrow(() -> new RuntimeException("{$ucCamelName} not found with id " + id));
+        // Manual mapping from DTO to Entity. Consider using a library like MapStruct.
+{$this->generateDtoToEntityMapping($tableName, $tableInfo, $camelName, 'input')}
         return {$camelName}Repository.save({$camelName});
     }
+
+    // Field resolvers for relationships and snake_case to camelCase mapping
+{$this->generateFieldResolvers($tableName, $tableInfo)}
 
     @MutationMapping
     public boolean delete{$ucCamelName}(@Argument $pkJavaType id) {
@@ -812,32 +921,63 @@ public class {$ucCamelName}Controller {
     }
 }
 JAVA;
-
-        // Add field resolvers for foreign key relationships
-        foreach ($tableInfo['columns'] as $colName => $colInfo) {
-            if ($colInfo['isForeignKey']) {
-                $refTableName = $colInfo['references'];
-                $refCamelName = $this->camelCase($refTableName);
-                $refUcCamelName = ucfirst($refCamelName);
-                $refRepositoryName = $refCamelName . "Repository";
-
-                $code .= "\n";
-                $code .= "    @Autowired\n";
-                $code .= "    private {$refUcCamelName}Repository {$refRepositoryName};\n\n";
-
-                $code .= "    @SchemaMapping(typeName = \"$ucCamelName\", field = \"$refTableName\")\n";
-                $code .= "    public $refUcCamelName resolve".ucfirst($refCamelName)."($ucCamelName {$camelName}) {\n";
-                $code .= "        if ({$camelName}.get".PicoStringUtil::upperCamelize($colName)."() == null) {\n";
-                $code .= "            return null;\n";
-                $code .= "        }\n";
-                $code .= "        return {$refRepositoryName}.findById({$camelName}.get".PicoStringUtil::upperCamelize($colName)."()).orElse(null);\n";
-                $code .= "    }\n";
-            }
+        
+        $code = str_replace("}\n}", "}", $code);
+        
+        // Inject field resolvers before the final closing brace
+        $fieldResolvers = $this->generateFieldResolvers($tableName, $tableInfo);
+        $lastBracePos = strrpos($code, '}');
+        if ($lastBracePos !== false) {
+            $code = substr_replace($code, $fieldResolvers . "\n}", $lastBracePos, 1);
         }
 
         $code .= <<<JAVA
 }
 JAVA;
+        return $code;
+    }
+
+    /**
+     * Generates field resolvers for foreign key relationships and camelCase to snake_case mapping.
+     *
+     * @param string $tableName The name of the table.
+     * @param array $tableInfo The table information.
+     * @return string The generated field resolver methods.
+     */
+    private function generateFieldResolvers($tableName, $tableInfo) {
+        $resolvers = "";
+        $ucCamelTableName = ucfirst($this->camelCase($tableName));
+        $camelTableName = $this->camelCase($tableName);
+    
+        foreach ($tableInfo['columns'] as $colName => $colInfo) {
+            $camelColName = $this->camelCase($colName);
+            $ucCamelColName = ucfirst($camelColName);
+    
+            // Resolver for snake_case field to camelCase getter
+            if ($colName !== $camelColName) {
+                $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
+                $baseJavaType = basename(str_replace('\\', '/', $javaType));
+                $resolvers .= "\n    @SchemaMapping(typeName = \"$ucCamelTableName\", field = \"$colName\")\n";
+                $resolvers .= "    public $baseJavaType get".PicoStringUtil::upperCamelize($colName)."($ucCamelTableName $camelTableName) {\n";
+                $resolvers .= "        return {$camelTableName}.get{$ucCamelColName}();\n";
+                $resolvers .= "    }\n";
+            }
+    
+            // Resolver for relationship objects
+            if ($colInfo['isForeignKey']) {
+                $refTableName = $colInfo['references'];
+                $refCamelName = $this->camelCase($refTableName);
+                $refUcCamelName = ucfirst($refCamelName);
+
+                // Resolver for the related object itself
+                $resolvers .= "\n    @SchemaMapping(typeName = \"$ucCamelTableName\", field = \"$refTableName\")\n";
+                $resolvers .= "    public $refUcCamelName get".ucfirst($refCamelName)."($ucCamelTableName $camelTableName) {\n";
+                $resolvers .= "        return {$camelTableName}.get".ucfirst($refCamelName)."();\n";
+                $resolvers .= "    }\n";
+            }
+        }
+    
+        return $resolvers;
     }
 
     /**
@@ -1642,11 +1782,11 @@ JAVA;
         $fields = "";
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             $gqlType = $this->mapJavaTypeToGqlType($this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']));
-            $fieldName = $colName; // Use original column name
+            $fieldName = $colName; // Use original snake_case name
             if ($colInfo['isForeignKey']) {
                 $refUcCamelName = ucfirst($this->camelCase($colInfo['references']));
                 $fields .= "    $fieldName: $gqlType\n"; // Keep the ID field
-                $fields .= "    {$colInfo['references']}: $refUcCamelName\n";
+                $fields .= "    {$colInfo['references']}: $refUcCamelName\n"; // Use original table name for relation
             } else {
                 $fields .= "    $fieldName: $gqlType\n";
             }
@@ -1659,7 +1799,7 @@ JAVA;
                 continue;
             }
             $gqlType = $this->mapJavaTypeToGqlType($this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']));
-            $fieldName = $colName; // Use original column name
+            $fieldName = $colName; // Use original snake_case name
             $inputFields .= "    $fieldName: $gqlType\n";
         }
 
@@ -1694,6 +1834,44 @@ GQL;
             'mutations' => $mutations
         ];
     }
+
+    /**
+     * Generates the mapping code from a DTO to an Entity.
+     *
+     * @param string $tableName The name of the table.
+     * @param array $tableInfo The table information.
+     * @param string $entityVar The variable name of the entity.
+     * @param string $dtoVar The variable name of the DTO.
+     * @return string The generated mapping code.
+     */
+    private function generateDtoToEntityMapping($tableName, $tableInfo, $entityVar, $dtoVar) {
+        $mappingCode = "";
+        foreach ($tableInfo['columns'] as $colName => $colInfo) {
+            if ($colName === $tableInfo['primaryKey'] && ($colInfo['isAutoIncrement'] || $colInfo['primaryKeyValue'] == 'autogenerated')) {
+                continue;
+            }
+            if ($colInfo['isForeignKey']) {
+                $refTableName = $colInfo['references'];
+                $refCamelName = $this->camelCase($refTableName);
+                $ucRefCamelName = ucfirst($refCamelName);
+                $camelColName = $this->camelCase($colName);
+                $ucCamelColName = ucfirst($camelColName);
+                $mappingCode .= "        if (input.get{$ucCamelColName}() != null) {\n";
+                $mappingCode .= "            {$this->projectConfig['packageName']}.model.entity.$ucRefCamelName {$refCamelName} = new {$this->projectConfig['packageName']}.model.entity.$ucRefCamelName();\n";
+                $refTableInfo = $this->analyzedSchema[$refTableName];
+                $refTablePrimaryKey = $refTableInfo['primaryKey'];
+                $mappingCode .= "            {$refCamelName}.set".ucfirst($this->camelCase($refTablePrimaryKey))."(input.get{$ucCamelColName}());\n";
+                $mappingCode .= "            {$entityVar}.set".ucfirst($refCamelName)."({$refCamelName});\n";
+                $mappingCode .= "        }\n";
+            } else {
+                $camelColName = $this->camelCase($colName);
+                $ucCamelColName = ucfirst($camelColName);
+                $mappingCode .= "        {$entityVar}.set{$ucCamelColName}({$dtoVar}.get{$ucCamelColName}());\n";
+            }
+        }
+        return $mappingCode;
+    }
+
 
     /**
      * Combines all schema parts into a single GraphQL schema string.
@@ -1783,7 +1961,7 @@ import lombok.Data;
 @Data
 public class SortInput {
     private String field;
-    private String direction;
+private String direction;
 
     public String getDirection() {
         return (direction == null || direction.isEmpty()) ? "ASC" : direction;
