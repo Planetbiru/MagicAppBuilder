@@ -2598,7 +2598,7 @@ class EntityEditor {
             if (!filename) {
                 let { applicationId } = getMetaValues();
                 if (!applicationId) applicationId = 'app';
-                filename = `${applicationId}-graphql${programmingLanguage}.zip`;
+                filename = `${applicationId}-graphql-${programmingLanguage}.zip`;
             }
 
             const blob = await response.blob();

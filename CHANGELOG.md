@@ -3735,72 +3735,79 @@ Date: November 17th, 2025
 
 ## New Feature: GraphQL Application Generator for Java (Spring Boot)
 
-MagicAppBuilder 1.29.0 marks a revolutionary breakthrough by introducing a new **GraphQL application generator for the Java ecosystem, built on the powerful Spring Boot framework**. This gives developers the freedom to choose between PHP and Java, leveraging the distinct advantages of each platform.
+MagicAppBuilder 1.29.0 marks a major milestone by introducing the **GraphQL Application Generator for Java**, built on the robust and battle-tested **Spring Boot** framework.
+This feature empowers developers to seamlessly generate fully functional, production-ready GraphQL backends — offering flexibility to choose between **PHP** and **Java**, depending on their preferred technology stack and deployment environment.
 
-The new generator automatically scaffolds a complete, production-ready Spring Boot application from your existing entity schema, including:
+The generator automatically scaffolds a **complete Spring Boot project** from your existing entity schema, including:
 
-*   **Full Project Structure**: A standard Maven project (`pom.xml`) with all necessary dependencies for Spring Boot, Spring for GraphQL, and Spring Data JPA.
-*   **JPA Entities**: Plain Old Java Objects (POJOs) annotated with `@Entity` for seamless object-relational mapping (ORM).
-*   **Spring Data Repositories**: `JpaRepository` interfaces for out-of-the-box CRUD operations.
-*   **GraphQL Controllers**: Controllers with `@QueryMapping` and `@MutationMapping` to expose your data via a GraphQL API.
-*   **Advanced Filtering**: A `SpecificationBuilder` that translates GraphQL filter arguments into JPA Specifications, enabling complex, type-safe database queries.
-*   **Ready-to-Use Frontend**: A simple yet functional HTML, CSS, and JavaScript frontend that communicates with the generated Spring Boot backend.
+* **Full Project Structure** — A ready-to-build Maven project (`pom.xml`) with all required dependencies for Spring Boot, Spring GraphQL, and Spring Data JPA.
+* **JPA Entities** — Plain Old Java Objects (POJOs) annotated with `@Entity` for clean, efficient object-relational mapping (ORM).
+* **Spring Data Repositories** — Auto-generated `JpaRepository` interfaces providing built-in CRUD operations.
+* **GraphQL Controllers** — Controllers using `@QueryMapping` and `@MutationMapping` annotations to expose data endpoints via GraphQL.
+* **Advanced Filtering** — A `SpecificationBuilder` class that converts GraphQL filter arguments into JPA Specifications, enabling dynamic and type-safe query construction.
+* **Ready-to-Use Frontend** — A minimal but functional HTML, CSS, and JavaScript frontend that connects seamlessly with the generated backend.
 
-### Why Spring Boot?
+### Why Choose Spring Boot?
 
-*   **Performance and Scalability**: Java's multi-threaded architecture, combined with Spring Boot's non-blocking capabilities, offers superior performance and scalability for high-concurrency applications compared to traditional PHP environments.
-*   **Robust Ecosystem**: Leverage the vast and mature Java ecosystem, including thousands of libraries, extensive documentation, and strong community support.
-*   **Type Safety**: Java's strong type system helps catch errors at compile-time, leading to more reliable and maintainable code.
-*   **Enterprise-Ready**: Spring Boot is a de-facto standard for building enterprise-grade applications, providing robust features for security, transaction management, and more.
+* **Performance & Scalability** — Leverage Java’s multithreaded architecture and Spring Boot’s non-blocking features for superior performance in high-concurrency workloads.
+* **Enterprise Ecosystem** — Tap into the mature Java ecosystem, rich with libraries, tools, and industry support.
+* **Type Safety** — Java’s static typing helps detect logic errors at compile-time, increasing reliability and maintainability.
+* **Enterprise-Grade Foundation** — Spring Boot is a global standard for large-scale applications, offering integrated support for security, transactions, and configuration management.
 
-> **Note:** The GraphQL Application for Java feature is not available in the community version.
+> **Note:** The GraphQL Application Generator for Java is available only in the **Professional Edition** of MagicAppBuilder.
 
 ## New Feature: GraphQL Application Generator for Node.js
 
-Continuing its expansion into diverse technology stacks, MagicAppBuilder 1.29.0 now also includes a **GraphQL application generator for Node.js**. This allows developers to harness the speed and scalability of Node.js for their backend services, providing another powerful alternative alongside PHP and Java.
+Expanding its support for modern development stacks, MagicAppBuilder 1.29.0 also introduces the **GraphQL Application Generator for Node.js**.
+This feature lets developers harness the **speed and scalability** of Node.js to build efficient GraphQL APIs — offering another powerful option alongside PHP and Java.
 
-The generator creates a complete, modern Node.js application using industry-standard tools:
+The generator creates a fully functional Node.js application with the following components:
 
-*   **Project Setup**: A standard `package.json` with all necessary dependencies like Express, Apollo Server, and a database driver (e.g., `mysql2`).
-*   **GraphQL Schema and Resolvers**: Automatically generates the GraphQL schema (`typeDefs`) and the corresponding resolver functions to handle queries and mutations.
-*   **Database Integration**: Sets up a database connection and provides simple data access logic to interact with your database.
-*   **Express Server**: A lightweight Express.js server configured with Apollo Server to expose the GraphQL endpoint.
-*   **Ready-to-Use Frontend**: A simple yet functional HTML, CSS, and JavaScript frontend that communicates with the generated Node.js backend.
+* **Project Setup** — A `package.json` file pre-configured with dependencies such as Express, Apollo Server, and the appropriate database driver (e.g., `mysql2`).
+* **GraphQL Schema & Resolvers** — Auto-generated schema (`typeDefs`) and resolver files for handling queries and mutations.
+* **Database Integration** — Prebuilt database connection and data access utilities for streamlined CRUD operations.
+* **Express Server** — A lightweight Express.js server integrated with Apollo Server to expose the GraphQL endpoint.
+* **Frontend Integration** — A simple yet complete web frontend (HTML, CSS, JS) that communicates directly with the Node.js backend.
 
-### Why Node.js?
+### Why Choose Node.js?
 
-*   **Asynchronous and Non-Blocking**: Built on an event-driven, non-blocking I/O model, Node.js is exceptionally efficient for building scalable, real-time applications that handle many concurrent connections.
-*   **JavaScript Everywhere**: Use a single language (JavaScript/TypeScript) across your entire stack, from frontend to backend, simplifying development and team collaboration.
-*   **Rich Ecosystem**: Tap into the vast npm registry, the largest ecosystem of open-source libraries in the world.
-*   **Fast Performance**: Powered by Google's V8 engine, Node.js compiles JavaScript into native machine code, delivering impressive performance for backend logic.
+* **Asynchronous and Non-Blocking** — Ideal for high-throughput, real-time systems that handle large numbers of concurrent connections.
+* **JavaScript Everywhere** — Develop both frontend and backend in a single language, simplifying your workflow and reducing context switching.
+* **Rich npm Ecosystem** — Access the world’s largest open-source package repository for rapid feature development.
+* **High Performance** — Powered by Google’s V8 engine, Node.js delivers native-like execution speed for backend logic.
 
-> **Note:** The GraphQL Application for Node.js feature is not available in the community version.
+> **Note:** The GraphQL Application Generator for Node.js is available only in the **Professional Edition** of MagicAppBuilder.
 
 ## Enhancements
 
 ### Consistent Boolean Handling Across All Databases
 
-To ensure predictable behavior and cross-database compatibility, boolean values (`true`/`false`) are now consistently normalized to integers (`1`/`0`) at the GraphQL API layer. This change applies to all supported database management systems, including MySQL, PostgreSQL, SQLite, and SQL Server.
+To improve cross-database compatibility, boolean values (`true`/`false`) are now standardized as integer representations (`1`/`0`) at the GraphQL layer.
+This change ensures consistent behavior across all supported databases — including **MySQL**, **PostgreSQL**, **SQLite**, and **SQL Server** — even on systems that lack native boolean support.
 
-This normalization is handled by the `normalizeBoolean()` and `normalizeBooleanInputs()` helper functions in the generated `graphql.php`, which ensures that the database receives a consistent integer representation for boolean types, preventing potential type-casting issues with drivers that do not natively support booleans (like SQLite and SQL Server).
+This logic is handled by the helper functions `normalizeBoolean()` and `normalizeBooleanInputs()` within the generated `graphql.php` file, ensuring seamless type consistency and preventing driver-level conversion errors.
 
-### Dynamic Menu Control via `frontend-config.json`
 
-Developers can now dynamically control the visibility of entities in the generated application's sidebar menu directly from the `frontend-config.json` file. A new boolean property, `menu`, has been added to each entity's configuration.
+### Dynamic Menu Configuration via `frontend-config.json`
 
--   Setting `"menu": true` (default) will display the entity in the navigation menu.
--   Setting `"menu": false` will hide it from the menu, allowing developers to create "hidden" or system-only entities that are still accessible via the API but not directly through the main navigation.
+Developers can now control the visibility of entities in the sidebar menu through a simple configuration flag in `frontend-config.json`.
 
-This provides greater flexibility in designing the user interface and managing application navigation without modifying generated code.
+* `"menu": true` — The entity appears in the sidebar menu (default).
+* `"menu": false` — The entity is hidden from the UI but remains accessible via API.
 
-### In-Memory Cache for GraphQL Queries
+This improvement allows developers to easily manage which entities are visible to users without modifying frontend source code — ideal for creating **system entities**, **hidden resources**, or **API-only models**.
 
-To improve performance and reduce database load, an optional in-memory caching layer has been introduced for GraphQL queries. When enabled, this feature caches the results of `find-by-id` queries, so that subsequent identical requests are served from memory instead of hitting the database.
+### Optional In-Memory Cache for GraphQL Queries
 
--   **How to Enable**: Caching can be turned on or off in the generated `graphql.php` file by calling `InMemoryCache::setEnabled(true);`.
--   **Benefit**: This is particularly effective for frequently accessed data, resulting in significantly faster response times and a more efficient application.
--   **Implementation**: The caching logic is provided by the `inc/InMemoryCache.php` file included in the generated project.
+To enhance performance and minimize redundant database hits, MagicAppBuilder now supports an **in-memory caching layer** for GraphQL queries.
+When enabled, identical `find-by-id` queries are served from cache instead of re-querying the database.
 
-### UI Fix for Reserved Columns Modal
+* **Enable Cache:** Activate via `InMemoryCache::setEnabled(true);` in `graphql.php`.
+* **Benefits:** Reduces database load and dramatically improves response times for frequently accessed data.
+* **Implementation:** The caching mechanism is handled by `inc/InMemoryCache.php`, included in every generated GraphQL project.
 
-Fixed a display issue in Application Settings where the Reserved Columns modal would overflow, hiding the footer buttons. The modal's height is now limited to ensure all elements are visible and accessible.
+### UI Fix: Reserved Columns Modal
+
+Resolved a UI issue where the **Reserved Columns** modal could overflow vertically, hiding action buttons.
+The modal now has a maximum height and improved scrolling behavior, ensuring that all controls remain visible and accessible.
+
