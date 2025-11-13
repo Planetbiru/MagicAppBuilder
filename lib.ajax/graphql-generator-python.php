@@ -49,7 +49,7 @@ function setDatabaseConfigurationPython($application, $databaseConfiguration)
             $url = '';
             if ($driver == 'mysql' || $driver == 'mariadb') {
                 // Requires `mysql-connector-python`
-                $url = "mysql+mysqlconnector://$user:$pass@$host:$port/$dbName";
+                $url = "mysql+aiomysql://$user:$pass@$host:$port/$dbName";
             } else if ($driver == 'pgsql') {
                 // Requires `asyncpg`
                 $url = "postgresql+asyncpg://$user:$pass@$host:$port/$dbName";

@@ -410,7 +410,7 @@ XML;
      */
     public function generate()
     {
-        $files = [];
+        $files = array();
         $this->projectConfig['basePackagePath'] = 'src/main/java/' . str_replace('.', '/', $this->projectConfig['packageName']);
         $packagePath = 'src/main/java/' . str_replace('.', '/', $this->projectConfig['packageName']);
 
@@ -421,9 +421,9 @@ XML;
         $files[] = ['name' => $packagePath . '/' . $this->pascalCase($this->projectConfig['artifactId']) . 'Application.java', 'content' => $this->generateMainAppClass()];
 
         // 4. GraphQL Schema, Entities, Repositories, DTOs, Controllers
-        $allSchemaParts = [];
-        $allQueryFields = [];
-        $allMutationFields = [];
+        $allSchemaParts = array();
+        $allQueryFields = array();
+        $allMutationFields = array();
 
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             // Generate individual Java files
@@ -443,6 +443,7 @@ XML;
         $files[] = ['name' => $packagePath . '/util/SpecificationBuilder.java', 'content' => $this->generateSpecificationBuilder()];
         $files[] = ['name' => $packagePath . '/util/FilterCriteria.java', 'content' => $this->generateFilterCriteria()];
         $files[] = ['name' => $packagePath . '/util/SearchOperation.java', 'content' => $this->generateSearchOperation()];
+        $files[] = ['name' => $packagePath . '/util/AuditTrailUtil.java', 'content' => $this->generateAuditTrailUtil()];
         $files[] = ['name' => $packagePath . '/util/GenericSpecification.java', 'content' => $this->generateGenericSpecification()];
 
         // 5.1. DTOs for GraphQL inputs
@@ -700,14 +701,14 @@ JAVA;
      * @param array $visited An array to prevent infinite loops in circular dependencies.
      * @return array A flat list of all nested attribute paths.
      */
-    private function getNestedAttributePaths($tableName, $currentPath = '', &$visited = [])
+    private function getNestedAttributePaths($tableName, $currentPath = '', &$visited = array())
     {
         if (isset($visited[$tableName])) {
             return []; // Avoid infinite recursion on circular dependencies
         }
         $visited[$tableName] = true;
 
-        $paths = [];
+        $paths = array();
         $tableInfo = $this->analyzedSchema[$tableName];
 
         foreach ($tableInfo['columns'] as $colInfo) {
@@ -816,6 +817,7 @@ import $package.model.dto.SortInput;
 import $package.model.dto.{$ucCamelName}Input;{$relatedEntityImports}
 import $package.model.entity.$ucCamelName;
 import $package.model.repository.{$ucCamelName}Repository;
+import $package.util.AuditTrailUtil;
 import $package.util.SearchOperation;
 import $package.util.SpecificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -911,9 +913,6 @@ public class {$ucCamelName}Controller {
         return {$camelName}Repository.save({$camelName});
     }
 
-    // Field resolvers for relationships and snake_case to camelCase mapping
-{$this->generateFieldResolvers($tableName, $tableInfo)}
-
     @MutationMapping
     public boolean delete{$ucCamelName}(@Argument $pkJavaType id) {
         {$camelName}Repository.deleteById(id);
@@ -921,19 +920,15 @@ public class {$ucCamelName}Controller {
     }
 }
 JAVA;
-        
-        $code = str_replace("}\n}", "}", $code);
-        
+
         // Inject field resolvers before the final closing brace
         $fieldResolvers = $this->generateFieldResolvers($tableName, $tableInfo);
         $lastBracePos = strrpos($code, '}');
         if ($lastBracePos !== false) {
-            $code = substr_replace($code, $fieldResolvers . "\n}", $lastBracePos, 1);
+            // Insert the resolvers before the last closing brace of the class
+            $code = substr_replace($code, $fieldResolvers, $lastBracePos, 0);
         }
 
-        $code .= <<<JAVA
-}
-JAVA;
         return $code;
     }
 
@@ -957,8 +952,9 @@ JAVA;
             if ($colName !== $camelColName) {
                 $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
                 $baseJavaType = basename(str_replace('\\', '/', $javaType));
+                $upperCamelColName = PicoStringUtil::upperCamelize($colName);
                 $resolvers .= "\n    @SchemaMapping(typeName = \"$ucCamelTableName\", field = \"$colName\")\n";
-                $resolvers .= "    public $baseJavaType get".PicoStringUtil::upperCamelize($colName)."($ucCamelTableName $camelTableName) {\n";
+                $resolvers .= "    public $baseJavaType get{$upperCamelColName}($ucCamelTableName $camelTableName) {\n";
                 $resolvers .= "        return {$camelTableName}.get{$ucCamelColName}();\n";
                 $resolvers .= "    }\n";
             }
@@ -1082,6 +1078,140 @@ public class FilterCriteria {
     private String key;
     private SearchOperation operation;
     private Object value;
+}
+JAVA;
+    }
+
+    /**
+     * Generates the AuditTrailUtil class for audit trail information.
+     *
+     * @return string The Java code for AuditTrailUtil.java.
+     */
+    private function generateAuditTrailUtil()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.util;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+/**
+ * Utility class for handling audit trail information such as user details and IP addresses.
+ * This class provides static methods to access security and request context information.
+ */
+public final class AuditTrailUtil {
+
+    private AuditTrailUtil() {
+        // Private constructor to prevent instantiation of this utility class.
+    }
+
+    /**
+     * Retrieves the username of the currently authenticated user.
+     *
+     * @return The username of the logged-in user, or "anonymous" if no user is authenticated.
+     */
+    public static String getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "anonymous";
+        }
+
+        Object principal = authentication.getPrincipal();
+        if ("anonymousUser".equals(principal)) {
+            return "anonymous";
+        }
+
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getUsername();
+        }
+
+        return principal.toString();
+    }
+
+    /**
+     * Retrieves the client's IP address from the current request.
+     * It checks for the 'X-FORWARDED-FOR' header first, which is common for requests
+     * coming through a proxy.
+     *
+     * @return The client's IP address, or "unknown" if the request context is not available.
+     */
+    public static String getCurrentIp() {
+        ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (sra == null) {
+            return "unknown"; // safer default
+        }
+
+        HttpServletRequest request = sra.getRequest();
+        String remoteAddr = request.getHeader("X-FORWARDED-FOR");
+
+        if (remoteAddr == null || remoteAddr.isEmpty()) {
+            remoteAddr = request.getRemoteAddr();
+        } else {
+            // Jika ada beberapa IP (proxy chain), ambil yang pertama
+            remoteAddr = remoteAddr.split(",")[0].trim();
+        }
+
+        return remoteAddr;
+    }
+
+    /**
+     * Converts a long value into the appropriate object based on the specified data type.
+     *
+     * @param value     The long value to convert.
+     * @param dataType  The target data type as a string (e.g., "String", "Integer", "DateTime").
+     * @return The value converted into the specified type.
+     */
+    public static Object valueOf(long value, String dataType) {
+        if (dataType == null) {
+            return value;
+        }
+
+        switch (dataType.toLowerCase()) {
+            case "string":
+                return String.valueOf(value);
+
+            case "integer":
+                return (int) value;
+
+            case "long":
+                return value;
+
+            case "double":
+                return (double) value;
+
+            case "float":
+                return (float) value;
+
+            case "boolean":
+                return value != 0;
+
+            case "date":
+                // Return Date object (not String)
+                return new Date(value);
+
+            case "datestring":
+                return new SimpleDateFormat("yyyy-MM-dd").format(new Date(value));
+
+            case "datetime":
+                // Return Date object
+                return new Date(value);
+
+            case "datetimestring":
+                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(value));
+
+            default:
+                return value;
+        }
+    }
 }
 JAVA;
     }
@@ -1848,8 +1978,8 @@ GQL;
     private function generateDtoToEntityMapping($tableName, $tableInfo, $entityVar, $dtoVar, $action) {
         $mappingCode = "";
         $backendHandledColumnNames = $this->getBackendHandledColumnNames();
-        $skippedColumns = [];
-        $inputColumns = [];
+        $skippedColumns = array();
+        $inputColumns = array();
         
 
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
@@ -1893,28 +2023,28 @@ GQL;
                 {
                     if($key == 'timeCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(auditTrailUtil.valueOf(System.getCurrentTime(), \"$dataType\"));\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.valueOf(System.currentTimeMillis(), \"$dataType\"));\n";
                     }
                     if($key == 'adminCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(auditTrailUtil.getCurrentUser());\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentUser());\n";
                     }
                     if($key == 'ipCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(auditTrailUtil.getCurrentIp());\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentIp());\n";
                     }
                 }
                 if($key == 'timeEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(auditTrailUtil.valueOf(System.getCurrentTime(), \"$dataType\"));\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.valueOf(System.currentTimeMillis(), \"$dataType\"));\n";
                 }
                 if($key == 'adminEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(auditTrailUtil.getCurrentUser());\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentUser());\n";
                 }
                 if($key == 'ipEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(auditTrailUtil.getCurrentIp());\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentIp());\n";
                 }
 
             }
