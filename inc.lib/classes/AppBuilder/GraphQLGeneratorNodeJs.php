@@ -12,85 +12,14 @@ namespace AppBuilder;
  */
 class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
 {
-    private $schema;
-    private $analyzedSchema = array();
-    private $reservedColumns = [];
-    private $backendHandledColumns = [];
-    private $activeField = 'active';
-    private $displayField = 'name';
-    private $useCache = false; // Caching is not implemented for Node.js version yet
-
-    public function __construct($schema, $reservedColumns = null, $backendHandledColumns = array(), $useCache = false)
-    {
-        $this->schema = $schema;
-        $this->backendHandledColumns = $backendHandledColumns;
-        $this->useCache = $useCache;
-
-        if (isset($reservedColumns) && isset($reservedColumns['columns'])) {
-            $arr = array();
-            foreach ($reservedColumns['columns'] as $value) {
-                $arr[$value['key']] = $value;
-                if ($value['key'] == 'active') {
-                    $this->activeField = $value['name'];
-                }
-                if ($value['key'] == 'name') {
-                    $this->displayField = $value['name'];
-                }
-            }
-            $this->reservedColumns = $arr;
-        }
-
-        $this->analyzeSchema();
-    }
-
-    private function analyzeSchema()
-    {
-        $tableNames = array();
-        foreach ($this->schema['entities'] as $entity) {
-            $tableNames[] = $entity['name'];
-        }
-
-        foreach ($this->schema['entities'] as $entity) {
-            $tableName = $entity['name'];
-            $primaryKey = $tableName . '_id';
-
-            $this->analyzedSchema[$tableName] = array(
-                'name' => $tableName,
-                'primaryKey' => $primaryKey,
-                'columns' => array(),
-                'hasActiveColumn' => false
-            );
-
-            foreach ($entity['columns'] as $column) {
-                $columnName = $column['name'];
-                if ($column['primaryKey']) {
-                    $this->analyzedSchema[$tableName]['primaryKey'] = $columnName;
-                    $primaryKey = $columnName;
-                }
-                $this->analyzedSchema[$tableName]['columns'][$columnName] = array(
-                    'type' => $column['type'],
-                    'length' => $column['length'],
-                    'isPrimaryKey' => $column['primaryKey'],
-                    'isAutoIncrement' => $column['autoIncrement'],
-                    'isForeignKey' => false,
-                    'references' => null,
-                    'primaryKeyValue' => isset($column['primaryKeyValue']) ? $column['primaryKeyValue'] : null
-                );
-                if ($columnName === $this->activeField) {
-                    $this->analyzedSchema[$tableName]['hasActiveColumn'] = true;
-                }
-
-                if ($columnName !== $primaryKey && substr($columnName, -3) === '_id') {
-                    $refTableName = substr($columnName, 0, -3);
-                    if (in_array($refTableName, $tableNames)) {
-                        $this->analyzedSchema[$tableName]['columns'][$columnName]['isForeignKey'] = true;
-                        $this->analyzedSchema[$tableName]['columns'][$columnName]['references'] = $refTableName;
-                    }
-                }
-            }
-        }
-    }
-
+    /**
+     * Constructor for the `GraphQLGeneratorNodeJs` class.
+     *
+     * @param array $analyzedSchema The analyzed database schema.
+     * @param string $displayField The default display field for entities.
+     * @param string|null $activeField The field used to indicate active records, if any.
+     * @param array $backendHandledColumns Columns that are managed by the backend.
+     */
     private function mapDbTypeToSequelizeType($dbType, $length = null)
     {
         $dbType = strtolower($dbType);
@@ -116,105 +45,11 @@ class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
         return 'DataTypes.STRING'; // Default
     }
 
-    private function mapDbTypeToGqlType($dbType, $length = null)
-    {
-        $dbType = strtolower($dbType);
-        if (strpos($dbType, 'varchar') !== false || strpos($dbType, 'text') !== false || strpos($dbType, 'date') !== false || strpos($dbType, 'timestamp') !== false) {
-            return 'GraphQLString';
-        }
-        if (strpos($dbType, 'decimal') !== false || strpos($dbType, 'float') !== false || strpos($dbType, 'double') !== false) {
-            return 'GraphQLFloat';
-        }
-        if ((strpos($dbType, 'tinyint') !== false && isset($length) && $length == '1') || strpos($dbType, 'bool') !== false || strpos($dbType, 'bit') !== false) {
-            return 'GraphQLBoolean';
-        }
-        if (strpos($dbType, 'int') !== false) {
-            return 'GraphQLInt';
-        }
-        return 'GraphQLString'; // Default
-    }
-
-    private function camelCase($string)
-    {
-        return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $string))));
-    }
-
-    private function pascalCase($string)
-    {
-        return ucfirst($this->camelCase($string));
-    }
-
     /**
-     * Converts a camelCase string to snake_case.
+     * Generates the complete set of files for the Node.js GraphQL API.
      *
-     * @param string $str The camelCase string.
-     * @return string The converted snake_case string.
+     * @return array An array of files, each represented as an associative array with 'name' and 'content' keys.
      */
-    public function camelCaseToSnakeCase($str) {
-        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $str));
-    }
-
-    /**
-     * Converts a snake_case string to camelCase.
-     *
-     * @param string $str The snake_case string.
-     * @return string The converted camelCase string.
-     */
-    public function snakeCaseToCamelCase($str) {
-        $words = explode('_', strtolower($str));
-        $camel = array_shift($words);
-        foreach ($words as $word) {
-            $camel .= ucfirst($word);
-        }
-        return $camel;
-    }
-
-    /**
-     * Converts a snake_case string to Title Case.
-     *
-     * @param string $str The snake_case string.
-     * @return string The converted Title Case string.
-     */
-    public function snakeCaseToTitleCase($str) {
-        $str = str_replace('_', ' ', strtolower($str));
-        return $this->titleCase($str);
-    }
-
-    /**
-     * Converts a string to Title Case.
-     *
-     * @param string $str The input string.
-     * @return string The converted Title Case string.
-     */
-    public function titleCase($str) {
-        $words = explode(' ', strtolower(trim($str)));
-        foreach ($words as &$word) {
-            $word = ucfirst($word);
-        }
-        return implode(' ', $words);
-    }
-
-    /**
-     * Converts a camelCase string to Title Case.
-     *
-     * @param string $str The camelCase string.
-     * @return string The converted Title Case string.
-     */
-    public function camelCaseToTitleCase($str) {
-        return $this->snakeCaseToTitleCase($this->camelCaseToSnakeCase($str));
-    }
-
-    private function pluralize($string)
-    {
-        if (substr($string, -1) === 'y') {
-            return substr($string, 0, -1) . 'ies';
-        }
-        if (substr($string, -1) === 's') {
-            return $string . 'es';
-        }
-        return $string . 's';
-    }
-
     public function generate()
     {
         $files = [];
@@ -235,6 +70,11 @@ class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
         return $files;
     }
 
+    /**
+     * Generates the `package.json` file for the Node.js project.
+     *
+     * @return string The content of the `package.json` file.
+     */
     private function generatePackageJson()
     {
         return <<<JSON
@@ -265,6 +105,10 @@ class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
 JSON;
     }
 
+    /**
+     * Generates the `.env` file for the Node.js project.
+     * @return string The content of the `.env` file.
+     */
     private function generateEnvFile()
     {
         return <<<ENV
@@ -286,6 +130,10 @@ CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1,http://localhost:3000,htt
 ENV;
     }
 
+    /**
+     * Generates the `server.js` file for the Node.js project.
+     * @return string The content of the `server.js` file.
+     */
     private function generateServerJs()
     {
         return <<<JS
@@ -353,6 +201,10 @@ sequelize.authenticate()
 JS;
     }
 
+    /**
+     * Generates the `database.js` file for the Node.js project.
+     * @return string The content of the `database.js` file.
+     */
     private function generateDatabaseJs()
     {
         return <<<JS
@@ -404,7 +256,14 @@ Object.keys(models).forEach(modelName => {
 module.exports = { sequelize, models };
 JS;
     }
-
+    
+    /**
+     * Generates the model file for a specific table.
+     *
+     * @param string $tableName The name of the table.
+     * @param array $tableInfo The information about the table.
+     * @return string The content of the model file.
+     */
     private function generateModelFile($tableName, $tableInfo)
     {
         $pascalName = $this->pascalCase($tableName);
@@ -449,6 +308,10 @@ module.exports = (sequelize, DataTypes) => {
 JS;
     }
 
+    /**
+     * Generates the `schema.js` file for the Node.js project.
+     * @return string The content of the `schema.js` file.
+     */
     private function generateSchemaJs()
     {
         return <<<JS
@@ -463,9 +326,12 @@ module.exports = new GraphQLSchema({
 JS;
     }
 
+    /**
+     * Generates the `types.js` file for the Node.js project.
+     * @return string The content of the `types.js` file.
+     */
     private function generateTypesJs()
     {
-        $typeImports = "";
         $typeExports = "";
         $typeDefinitions = "";
 
@@ -637,6 +503,10 @@ $typeExports
 JS;
     }
 
+    /**
+     * Generates the `resolvers.js` file for the Node.js project.
+     * @return string The content of the `resolvers.js` file.
+     */
     private function generateResolversJs()
     {
         $queryFields = "";
@@ -768,206 +638,6 @@ JS;
     }
 
     /**
-     * Normalize a database-specific column type into a generic type.
-     *
-     * Supported DBMS: MySQL, MariaDB, PostgreSQL, SQLite, SQL Server
-     *
-     * Possible return values:
-     * - string
-     * - integer
-     * - float
-     * - boolean
-     * - date
-     * - time
-     * - datetime
-     * - binary
-     * - json
-     * - uuid
-     * - enum
-     * - geometry
-     * - unknown
-     *
-     * @param string $dbType The raw column type from the database (e.g., VARCHAR(255), INT, NUMERIC(10,2), TEXT, etc.)
-     * @return string One of the normalized type names listed above.
-     */
-    function normalizeDbType($dbType, $length = null)
-    {
-        $type = strtolower(trim($dbType));
-
-        if($type == 'tinyint' && isset($length) && $length == '1'){
-            return 'boolean';
-        }
-
-        // Remove size and precision (e.g. varchar(255) → varchar)
-        $type = preg_replace('/\(.+\)/', '', $type);
-
-        // Common integer types
-        $integerTypes = [
-            'int', 'integer', 'smallint', 'mediumint', 'bigint', 'serial', 'bigserial', 'tinyint'
-        ];
-
-        // Common float/decimal types
-        $floatTypes = [
-            'float', 'double', 'decimal', 'numeric', 'real', 'money', 'smallmoney'
-        ];
-
-        // Common string/text types
-        $stringTypes = [
-            'char', 'varchar', 'text', 'tinytext', 'mediumtext', 'longtext', 'nchar', 'nvarchar', 'citext', 'uuid'
-        ];
-
-        // Common date/time types
-        $dateTypes = [
-            'date', 'datetime', 'timestamp', 'time', 'year'
-        ];
-
-        // Boolean types
-        $booleanTypes = [
-            'boolean', 'bool', 'bit'
-        ];
-
-        // Binary types
-        $binaryTypes = [
-            'blob', 'binary', 'varbinary', 'image', 'bytea'
-        ];
-
-        // JSON types
-        $jsonTypes = [
-            'json', 'jsonb'
-        ];
-
-        // Normalize by matching
-        if (in_array($type, $integerTypes, true)) {
-            // Detect MySQL TINYINT(1) as boolean
-            if (strpos($dbType, 'tinyint(1)') !== false) {
-                return 'boolean';
-            }
-            return 'integer';
-        }
-
-        if (in_array($type, $floatTypes, true)) {
-            return 'float';
-        }
-
-        if (in_array($type, $booleanTypes, true)) {
-            return 'boolean';
-        }
-
-        if (in_array($type, $stringTypes, true)) {
-            // UUID is string-like but semantically different
-            return $type === 'uuid' ? 'uuid' : 'string';
-        }
-
-        if (in_array($type, $jsonTypes, true)) {
-            return 'json';
-        }
-
-        if (in_array($type, $binaryTypes, true)) {
-            return 'binary';
-        }
-
-        if (in_array($type, $dateTypes, true)) {
-            if ($type === 'time') return 'time';
-            if ($type === 'date') return 'date';
-            return 'datetime'; // timestamp, datetime, etc.
-        }
-
-        // Default fallback
-        return 'string';
-    }
-
-    /**
-     * Generates a JSON config file for the frontend.
-     * This file contains metadata about entities, fields, and relationships.
-     *
-     * @return string The JSON formatted content for frontend-config.json.
-     */
-    public function generateFrontendConfigJson()
-    {
-        $sortOrder = 1;
-        $frontendConfig = array();
-        foreach ($this->analyzedSchema as $tableName => $tableInfo) {
-            $camelName = $this->camelCase($tableName);
-            $pluralCamelName = $this->pluralize($camelName);
-            
-            $textareaColumns = isset($tableInfo['textareaColumns']) && is_array($tableInfo['textareaColumns']) ? $tableInfo['textareaColumns'] : array();
-            
-            $columns = array();
-            foreach($tableInfo['columns'] as $colName => $colInfo) {
-                $columns[$colName] = array(
-                    'type' => $this->mapDbTypeToGqlType($colInfo['type'], $colInfo['length']),
-                    'dataType' => $this->normalizeDbType($colInfo['type'], $colInfo['length']),
-                    'isPrimaryKey' => $colInfo['isPrimaryKey'],
-                    'isForeignKey' => $colInfo['isForeignKey'],
-                    'references' => $colInfo['references'] ? $colInfo['references'] : null,
-                    'element' => in_array($colName, $textareaColumns) ? 'textarea' : 'input',
-                );
-                if($colInfo['isPrimaryKey'])
-                {
-                    $columns[$colName]['primaryKeyValue'] = $colInfo['primaryKeyValue'] ? $colInfo['primaryKeyValue'] : 'autogenerated';
-                }
-            }
-
-            $frontendConfig[$camelName] = array(
-                'name' => $camelName,
-                'pluralName' => $pluralCamelName,
-                'displayName' => $this->camelCaseToTitleCase($camelName),
-                'originalName' => $tableName,
-                'displayField' => $this->displayField,
-                'activeField' => $this->activeField,
-                'primaryKey' => $tableInfo['primaryKey'],
-                'hasActiveColumn' => $tableInfo['hasActiveColumn'],
-                'sortOrder' => $sortOrder++,
-                'menu' => true,
-                'columns' => $columns,
-                'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : [],
-                'backendHandledColumns' => array_column($this->backendHandledColumns, 'columnName'),
-            );
-        }
-        
-        return json_encode([
-            'booleanDisplay' => array(
-                'trueLabelKey' => 'yes',
-                'falseLabelKey' => 'no'
-            ),
-            'pagination' => array (
-                'pageSize' => 20,
-                'maxPageSize' => 100,
-                'minPageSize' => 1
-            ),
-            'entities' => $frontendConfig
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    }
-
-    /**
-     * Generates a JSON file for frontend language translations.
-     * This file contains human-readable names for entities and their fields.
-     *
-     * @return string The JSON formatted content for frontend-language.json.
-     */
-    public function generateFrontendLanguageJson()
-    {
-        $frontendConfig = array();
-        foreach ($this->analyzedSchema as $tableName => $tableInfo) {
-            $columns = array();
-            foreach($tableInfo['columns'] as $colName => $colInfo) {
-                if($colInfo['isForeignKey'] && \MagicObject\Util\PicoStringUtil::endsWith($colName, '_id'))
-                {
-                    $columns[$colName] = $this->snakeCaseToTitleCase(substr($colName, 0, strlen($colName) - 3)); 
-                }
-                else
-                {
-                    $columns[$colName] = $this->snakeCaseToTitleCase($colName); 
-                }
-            }
-            $frontendConfig[$tableName]['name'] = trim($tableName);
-            $frontendConfig[$tableName]['displayName'] = $this->snakeCaseToTitleCase($tableName);
-            $frontendConfig[$tableName]['columns'] = $columns;
-        }
-        return json_encode(['entities' => $frontendConfig], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    }
-
-    /**
      * Generates a markdown manual with examples for all queries and mutations.
      *
      * @return string The markdown content.
@@ -1095,38 +765,5 @@ JS;
         $manualContent .= "**Example:** To get the second page of 10 items: `limit: 10, offset: 10`\r\n\r\n";
 
         return $manualContent;
-    }
-
-    private function getFieldsForManual($tableInfo, $noRelations = false)
-    {
-        $fieldsString = "";
-        foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
-            $camelColName = $this->camelCase($columnName);
-            if (!$columnInfo['isForeignKey']) {
-                $fieldsString .= "    " . $columnName . "\r\n";
-            } else if (!$noRelations) {
-                $refTableName = $columnInfo['references'];
-                $fieldsString .= "    " . $refTableName . " {\r\n";
-                $fieldsString .= "      " . $this->camelCase($this->analyzedSchema[$refTableName]['primaryKey']) . "\r\n";
-                $fieldsString .= "    }\r\n";
-            }
-        }
-        return $fieldsString;
-    }
-
-    private function getInputFieldsForManual($tableInfo)
-    {
-        $inputExampleString = "";
-        foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
-            if ($columnName === $tableInfo['primaryKey'] && ($columnInfo['isAutoIncrement'] || $columnInfo['primaryKeyValue'] == 'autogenerated')) continue;
-            
-            $gqlType = $this->mapDbTypeToGqlType($columnInfo['type'], $columnInfo['length']);
-            $exampleValue = '"string"';
-            if ($gqlType === 'GraphQLInt') $exampleValue = '123';
-            if ($gqlType === 'GraphQLFloat') $exampleValue = '123.45';
-            if ($gqlType === 'GraphQLBoolean') $exampleValue = 'true';
-            $inputExampleString .= "    " . $columnName . ": " . $exampleValue . "\r\n";
-        }
-        return array($inputExampleString, $inputExampleString);
     }
 }

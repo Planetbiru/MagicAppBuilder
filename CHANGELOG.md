@@ -3778,6 +3778,33 @@ The generator creates a fully functional Node.js application with the following 
 
 > **Note:** The GraphQL Application Generator for Node.js is available only in the **Professional Edition** of MagicAppBuilder.
 
+## New Feature: GraphQL Application Generator for Python
+
+In addition to Java and Node.js, MagicAppBuilder 1.29.0 now introduces the **GraphQL Application Generator for Python**, providing a powerful option for developers who prefer Python's simplicity and extensive data science ecosystem.
+
+The generator scaffolds a complete, production-ready Python application using a modern, high-performance stack:
+
+*   **FastAPI** — A high-performance web framework for building APIs with Python 3.7+ based on standard Python type hints.
+*   **SQLAlchemy 2.0** — The Python SQL toolkit and Object Relational Mapper that gives application developers the full power and flexibility of SQL.
+*   **Ariadne** — A schema-first Python library for implementing GraphQL servers, making schema management clean and intuitive.
+
+The generated project includes:
+
+*   **Full Project Structure** — A well-organized project with `models`, `resolvers`, and `schema` directories.
+*   **SQLAlchemy Models** — Python classes that map directly to your database tables.
+*   **GraphQL Schema & Resolvers** — Automatically generated `type_defs` and resolver functions for all your entities.
+*   **Advanced Filtering & Pagination** — List queries come with built-in support for dynamic filtering, sorting, and pagination.
+*   **Ready-to-Use Frontend** — A complete web frontend (HTML, CSS, JS) that communicates with the Python backend.
+
+### Why Choose Python?
+
+*   **Developer Productivity** — Python's clean syntax and extensive standard library allow for rapid development.
+*   **Rich Ecosystem** — Leverage a vast ecosystem of libraries for data analysis, machine learning, and more.
+*   **Asynchronous Support** — Built on FastAPI, the generated application is fully asynchronous, making it highly efficient for I/O-bound operations.
+*   **Easy to Learn & Use** — Python is known for its gentle learning curve, making it accessible to developers of all skill levels.
+
+> **Note:** The GraphQL Application Generator for Python is available only in the **Professional Edition** of MagicAppBuilder.
+
 ## Enhancements
 
 ### Consistent Boolean Handling Across All Databases
@@ -3810,4 +3837,3 @@ When enabled, identical `find-by-id` queries are served from cache instead of re
 
 Resolved a UI issue where the **Reserved Columns** modal could overflow vertically, hiding action buttons.
 The modal now has a maximum height and improved scrolling behavior, ensuring that all controls remain visible and accessible.
-
