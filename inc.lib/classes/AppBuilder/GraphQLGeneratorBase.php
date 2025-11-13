@@ -203,7 +203,6 @@ class GraphQLGeneratorBase
         if (!isset($tableInfo) || !isset($tableInfo['columns'])) {
             return false;
         }
-        
         $columnNames = $this->getColumnNames($tableInfo);
         $backendHandledColumns = $this->backendHandledColumns();
         foreach ($backendHandledColumns as $columnName) {
@@ -212,9 +211,7 @@ class GraphQLGeneratorBase
             }
         }
         return false;
-        
     }
-    
 
     /**
      * Converts a string to camelCase.
@@ -224,7 +221,7 @@ class GraphQLGeneratorBase
      */
     protected function camelCase($str)
     {
-        return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $str))));
+        return PicoStringUtil::camelize($str);
     }
 
     /**
@@ -245,7 +242,7 @@ class GraphQLGeneratorBase
      * @return string The converted snake_case string.
      */
     protected function camelCaseToSnakeCase($str) {
-        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $str));
+        return PicoStringUtil::snakeize($str);
     }
 
     /**

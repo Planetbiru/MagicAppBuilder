@@ -487,7 +487,8 @@ spring.application.name={$this->projectConfig['name']}
 # Database Configuration (Please update with your details)
 app.security.require-login=$requireLoginValue
 
-# Session Management (optional, uncomment to use Redis)
+# Session Management
+spring.session.store-type=none # Default to none, uncomment below to use Redis
 # spring.session.store-type=redis
 # spring.data.redis.host=localhost
 # spring.data.redis.port=6379
@@ -527,8 +528,11 @@ PROPERTIES;
     private function generateMainAppClass() {
         $className = $this->pascalCase($this->projectConfig['artifactId']) . 'Application';
         $content = "package {$this->projectConfig['packageName']};\n\n";
+        $content .= "import org.springframework.boot.autoconfigure.EnableAutoConfiguration;\n";
         $content .= "import org.springframework.boot.SpringApplication;\n";
         $content .= "import org.springframework.boot.autoconfigure.SpringBootApplication;\n";
+        $content .= "import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;\n";
+        $content .= "import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;\n";
         if ($this->useCache) {
             $content .= "import org.springframework.cache.annotation.EnableCaching;\n";
         }
@@ -537,6 +541,7 @@ PROPERTIES;
             $content .= "@EnableCaching\n";
         }
         $content .= "@SpringBootApplication\n";
+        $content .= "@EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class, RedisRepositoriesAutoConfiguration.class})\n";
         $content .= "public class $className {\n\n";
         $content .= "    public static void main(String[] args) {\n";
         $content .= "        SpringApplication.run($className.class, args);\n";
@@ -564,7 +569,7 @@ PROPERTIES;
 
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
-            $fieldName = $colName; // Use original column name
+            $fieldName = $colName; // Use original column name without camelCase conversion
 
             if (strpos($javaType, 'LocalDateTime') !== false) $hasLdt = true;
             if (strpos($javaType, 'LocalDate') !== false) $hasLd = true;
@@ -805,6 +810,32 @@ public class {$ucCamelName}Controller {
         {$camelName}Repository.deleteById(id);
         return true;
     }
+}
+JAVA;
+
+        // Add field resolvers for foreign key relationships
+        foreach ($tableInfo['columns'] as $colName => $colInfo) {
+            if ($colInfo['isForeignKey']) {
+                $refTableName = $colInfo['references'];
+                $refCamelName = $this->camelCase($refTableName);
+                $refUcCamelName = ucfirst($refCamelName);
+                $refRepositoryName = $refCamelName . "Repository";
+
+                $code .= "\n";
+                $code .= "    @Autowired\n";
+                $code .= "    private {$refUcCamelName}Repository {$refRepositoryName};\n\n";
+
+                $code .= "    @SchemaMapping(typeName = \"$ucCamelName\", field = \"$refTableName\")\n";
+                $code .= "    public $refUcCamelName resolve".ucfirst($refCamelName)."($ucCamelName {$camelName}) {\n";
+                $code .= "        if ({$camelName}.get".PicoStringUtil::upperCamelize($colName)."() == null) {\n";
+                $code .= "            return null;\n";
+                $code .= "        }\n";
+                $code .= "        return {$refRepositoryName}.findById({$camelName}.get".PicoStringUtil::upperCamelize($colName)."()).orElse(null);\n";
+                $code .= "    }\n";
+            }
+        }
+
+        $code .= <<<JAVA
 }
 JAVA;
     }
@@ -1187,6 +1218,7 @@ JAVA;
 package {$package}.config;
 
 import {$package}.model.entity.Admin;
+import org.springframework.beans.factory.annotation.Value;
 import {$package}.model.repository.AdminRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -1194,10 +1226,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Collections;
 
