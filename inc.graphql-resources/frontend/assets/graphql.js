@@ -33,8 +33,8 @@ class GraphQLClientApp {
             apiUrl: 'graphql.php',
             loginUrl: 'login.php',
             logoutUrl: 'logout.php',
-            entityLanguageUrl: 'entity-language.php',
-            i18nUrl: 'language.php',
+            entityLanguageUrl: 'entity-language.php?lang={lang}',
+            i18nUrl: 'language.php?lang={lang}',
             languageConfigUrl: 'available-language.php',
             themeConfigUrl: 'available-theme.php',
             defaultThemeUrl: 'assets/style.min.css',
@@ -500,7 +500,7 @@ class GraphQLClientApp {
     async loadLanguage() {
         try {
             if (this.entityLanguageUrl) {
-                let url = `${this.entityLanguageUrl}?lang=${this.languageId}`;
+                let url = this.entityLanguageUrl.replace('{lang}', this.languageId);
                 const response = await fetch(url, {
                     headers: {
                         'X-Requested-With': 'xmlhttprequest',
@@ -514,7 +514,7 @@ class GraphQLClientApp {
                     throw new Error("Authentication required.");
                 }
                 if (!response.ok) {
-                    throw new Error(`Failed to load language from ${this.entityLanguageUrl}`); // NOSONAR
+                    throw new Error(`Failed to load language from ${url}`); // NOSONAR
                 }
                 let data = await response.json();
                 this.entityLanguagePack[this.languageId] = {};
@@ -541,7 +541,7 @@ class GraphQLClientApp {
     async loadI18n() {
         try {
             if (this.i18nUrl) {
-                let url = `${this.i18nUrl}?lang=${this.languageId}`;
+                let url = this.i18nUrl.replace('{lang}', this.languageId);
                 const response = await fetch(url, {
                     headers: {
                         'X-Requested-With': 'xmlhttprequest',
@@ -551,7 +551,7 @@ class GraphQLClientApp {
                     }
                 });
                 if (!response.ok) {
-                    throw new Error(`Failed to load i18n from ${this.i18nUrl}`); // NOSONAR
+                    throw new Error(`Failed to load i18n from ${url}`); // NOSONAR
                 }
                 this.i18n = await response.json();
             }
@@ -2294,10 +2294,7 @@ class GraphQLClientApp {
             }
             else
             {
-
-
                 if (col.isForeignKey && !noRelations) {
-                    // TODO:
                     fields.push(colName);
                     const relationNameCamelCase = col.references;
                     const relatedEntity = this.config.entities[this.camelCase(relationNameCamelCase)];

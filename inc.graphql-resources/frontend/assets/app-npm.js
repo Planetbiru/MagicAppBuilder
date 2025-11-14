@@ -27,13 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // URL to handle user logout requests.
         logoutUrl: backendBaseUrl + 'logout',
         // URL to fetch language translations for entity and column names.
-        entityLanguageUrl: frontendBaseUrl + 'entity-language',
+        entityLanguageUrl: frontendBaseUrl + 'entity-language-{lang}.json',
         // URL to fetch general UI translations (i18n).
-        i18nUrl: frontendBaseUrl + 'language',
+        i18nUrl: frontendBaseUrl + 'language-{lang}.json',
         // URL to get the list of available themes.
-        themeConfigUrl: frontendBaseUrl + 'available-theme',
+        themeConfigUrl: frontendBaseUrl + 'available-theme.json',
         // URL to get the list of available languages.
-        languageConfigUrl: frontendBaseUrl + 'available-language',
+        languageConfigUrl: frontendBaseUrl + 'available-language.json',
 
         // --- Default field names ---
 

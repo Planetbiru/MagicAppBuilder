@@ -1110,6 +1110,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public final class AuditTrailUtil {
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private AuditTrailUtil() {
         // Private constructor to prevent instantiation of this utility class.
     }
@@ -1156,7 +1159,7 @@ public final class AuditTrailUtil {
         if (remoteAddr == null || remoteAddr.isEmpty()) {
             remoteAddr = request.getRemoteAddr();
         } else {
-            // Jika ada beberapa IP (proxy chain), ambil yang pertama
+            // If there are multiple IPs (proxy chain), take the first one
             remoteAddr = remoteAddr.split(",")[0].trim();
         }
 
@@ -1199,14 +1202,14 @@ public final class AuditTrailUtil {
                 return new Date(value);
 
             case "datestring":
-                return new SimpleDateFormat("yyyy-MM-dd").format(new Date(value));
+                return DATE_FORMAT.format(new Date(value));
 
             case "datetime":
                 // Return Date object
                 return new Date(value);
 
             case "datetimestring":
-                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(value));
+                return DATETIME_FORMAT.format(new Date(value));
 
             default:
                 return value;
@@ -1744,16 +1747,21 @@ JAVA;
         return <<<JAVA
 package $package.controller;
 
-import $package.config.Sha1PasswordEncoder;
-import $package.controller.dto.LoginRequest;
-import $package.controller.dto.LoginResponse;
-import $package.model.repository.AdminRepository;
+import com.planetbiru.graphqlapplication.config.Sha1PasswordEncoder;
+import com.planetbiru.graphqlapplication.controller.dto.LoginRequest;
+import com.planetbiru.graphqlapplication.controller.dto.LoginResponse;
+import com.planetbiru.graphqlapplication.model.repository.AdminRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import java.util.Collections;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -1782,9 +1790,16 @@ public class AuthController {
         return adminRepository.findByUsername(username)
                 .filter(admin -> admin.getPassword().equals(passwordEncoder.encode(password)))
                 .map(admin -> {
-                    session.setAttribute("username", admin.getUsername());
-                    // Store the single-hashed password in the session for subsequent requests.
-                    session.setAttribute("password", singleHashedPassword);
+                    // Create an authentication token
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                            admin.getUsername(),
+                            singleHashedPassword,
+                            Collections.emptyList() // Use authorities/roles if you have them
+                    );
+                    // Set the authentication in the security context
+                    SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(authentication);
+                    SecurityContextHolder.setContext(context);
                     return ResponseEntity.ok(new LoginResponse(true, "Login successful"));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)

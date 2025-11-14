@@ -1,11 +1,14 @@
 // Global variable to hold the application instance.
 let graphqlApp = null;
 
-let backendBaseUrl = ''; // Base URL for API endpoints, if needed.
+let backendBaseUrl = 'http://localhost:8000/'; // Base URL for API endpoints, if needed.
 let frontendBaseUrl = ''; // Base URL for frontend pages, if needed.
 
 // Wait for the DOM to be fully loaded before initializing the application.
 document.addEventListener('DOMContentLoaded', () => {
+
+
+
     /**
      * Create a single instance of the GraphQLClientApp.
      * The constructor handles the entire initialization process, including fetching
@@ -16,21 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Configuration for backend communication ---
 
         // URL to fetch the main frontend configuration (entities, columns, etc.).
-        configUrl: backendBaseUrl + 'frontend-config.php',
+        configUrl: backendBaseUrl + 'frontend-config',
         // The endpoint for all GraphQL queries and mutations.
-        apiUrl: backendBaseUrl + 'graphql.php',
+        apiUrl: backendBaseUrl + 'graphql',
         // URL to handle user login requests.
-        loginUrl: backendBaseUrl + 'login.php',
+        loginUrl: backendBaseUrl + 'login',
         // URL to handle user logout requests.
-        logoutUrl: backendBaseUrl + 'logout.php',
+        logoutUrl: backendBaseUrl + 'logout',
         // URL to fetch language translations for entity and column names.
-        entityLanguageUrl: frontendBaseUrl + 'entity-language.php?lang={lang}',
+        entityLanguageUrl: frontendBaseUrl + 'entity-language-{lang}.json',
         // URL to fetch general UI translations (i18n).
-        i18nUrl: frontendBaseUrl + 'language.php?lang={lang}',
+        i18nUrl: frontendBaseUrl + 'language-{lang}.json',
         // URL to get the list of available themes.
-        themeConfigUrl: frontendBaseUrl + 'available-theme.php',
+        themeConfigUrl: frontendBaseUrl + 'available-theme.json',
         // URL to get the list of available languages.
-        languageConfigUrl: frontendBaseUrl + 'available-language.php',
+        languageConfigUrl: frontendBaseUrl + 'available-language.json',
 
         // --- Default field names ---
 
@@ -54,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     graphqlApp.pages['dashboard'] = {
-        url: 'dashboard.php',
+        url: 'dashboard',
         title: 'dashboard', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -84,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     graphqlApp.pages['user-profile'] = {
-        url: 'user-profile.php',
+        url: 'user-profile',
         title: 'profile', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -113,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['user-profile-update'] = {
-        url: 'user-profile-update.php',
+        url: 'user-profile-update',
         title: 'profile', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -142,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['settings'] = {
-        url: 'settings.php',
+        url: 'settings',
         title: 'settings', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -171,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['settings-update'] = {
-        url: 'settings-update.php',
+        url: 'settings-update',
         title: 'settings', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -200,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['message'] = {
-        url: 'message.php',
+        url: 'message',
         title: 'message', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -229,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['notification'] = {
-        url: 'notification.php',
+        url: 'notification',
         title: 'notification', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -258,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     graphqlApp.pages['admin'] = {
-        url: 'admin.php',
+        url: 'admin',
         title: 'admin', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -288,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     graphqlApp.pages['update-password'] = {
-        url: 'update-password.php',
+        url: 'update-password',
         title: 'update_password', // The translation key for the page title.
         method: 'GET',
         headers: {
@@ -353,7 +356,7 @@ async function handleProfileUpdate(event) {
     const form = document.getElementById('profile-update-form');
     const formData = new FormData(form);
     try {
-        const response = await fetch('user-profile.php', {
+        const response = await fetch('user-profile', {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'xmlhttprequest',
@@ -380,7 +383,7 @@ async function handlePasswordUpdate(event) {
     const form = document.getElementById('password-update-form');
     const formData = new FormData(form);
     try {
-        const response = await fetch('update-password.php', {
+        const response = await fetch('update-password', {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'xmlhttprequest',
@@ -408,7 +411,7 @@ async function handleSettingsUpdate(event) {
     const formData = new FormData(form);
     let limit = parseInt(form.querySelector('[name="pageSize"]').value);
     try {
-        const response = await fetch('settings.php', {
+        const response = await fetch('settings', {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'xmlhttprequest',
@@ -444,7 +447,7 @@ async function handleAdminSave(event, adminId = null) {
     }
 
     try {
-        const response = await fetch('admin.php', {
+        const response = await fetch('admin', {
             method: 'POST',
             body: formData,
             headers: {
@@ -475,7 +478,7 @@ async function handleAdminChangePassword(event, adminId) {
     formData.append('adminId', adminId);
 
     try {
-        const response = await fetch('admin.php', {
+        const response = await fetch('admin', {
             method: 'POST',
             body: formData,
             headers: {
@@ -514,7 +517,7 @@ async function handleAdminToggleActive(adminId, isActive) {
     formData.append('adminId', adminId);
 
     try {
-        const response = await fetch('admin.php', {
+        const response = await fetch('admin', {
             method: 'POST',
             body: formData,
             headers: {
@@ -545,7 +548,7 @@ async function handleAdminDelete(adminId) {
     formData.append('adminId', adminId);
 
     try {
-        await fetch('admin.php', {
+        await fetch('admin', {
             method: 'POST',
             body: formData,
             headers: {
@@ -581,7 +584,7 @@ async function handleMessageDelete(messageId) {
     formData.append('messageId', messageId);
 
     try {
-        const response = await fetch('message.php', {
+        const response = await fetch('message', {
             method: 'POST',
             body: formData,
             headers: { 'X-Requested-With': 'xmlhttprequest' }
@@ -627,7 +630,7 @@ async function handleNotificationDelete(notificationId) {
     formData.append('notificationId', notificationId);
 
     try {
-        const response = await fetch('notification.php', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'xmlhttprequest' } });
+        const response = await fetch('notification', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'xmlhttprequest' } });
         const result = await response.json();
         if (result.success) {
             const hash = window.location.hash;
@@ -658,7 +661,7 @@ async function markMessageAsUnread(messageId, fromView = 'list') {
     formData.append('messageId', messageId);
 
     try {
-        const response = await fetch('message.php', {
+        const response = await fetch('message', {
             method: 'POST',
             headers: {
                 'X-Requested-with': 'xmlhttprequest',
@@ -688,7 +691,7 @@ async function markNotificationAsUnread(notificationId, fromView = 'list') {
     formData.append('notificationId', notificationId);
 
     try {
-        const response = await fetch('notification.php', {
+        const response = await fetch('notification', {
             method: 'POST',
             headers: {
                 'X-Requested-with': 'xmlhttprequest',
