@@ -1703,8 +1703,10 @@ class GraphQLClientApp {
                 value = item[colName];
             }
 
-            formHtml += `<div class="form-group">`;
-            formHtml += `<label for="${colName}">${this.getEntityLabel(this.currentEntity, colName)}</label>`;
+            
+            let formElement = '';
+            let formElementType = 'text';
+            formElement += `<label for="${colName}">${this.getEntityLabel(this.currentEntity, colName)}</label>`;
             if (col.isForeignKey) {
                 const relationName = col.references;
                 const relatedEntity = this.config.entities[this.camelCase(relationName)];
@@ -1712,16 +1714,18 @@ class GraphQLClientApp {
                 const relatedData = relatedEntity ? (await this.fetchAll(relatedEntity, { activeOnly: !id })) : [];
                 const displayField = relatedEntity.displayField || relatedEntity.primaryKey;
 
-                formHtml += `<select id="${colName}" name="${colName}">`;
-                formHtml += `<option value="">${this.t('select_option')}</option>`;
+                formElement += `<select id="${colName}" name="${colName}">`;
+                formElement += `<option value="">${this.t('select_option')}</option>`;
                 relatedData.forEach(relItem => {
                     const relId = relItem[relatedEntity.primaryKey];
                     const relDisplay = relItem[displayField] || relId;
-                    formHtml += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay}</option>`;
+                    formElement += `<option value="${relId}" ${relId == value ? 'selected' : ''}>${relDisplay}</option>`;
                 });
-                formHtml += `</select>`;
+                formElement += `</select>`;
+                formElementType = 'select';
             } else if (col.element === 'textarea') {
-                formHtml += `<textarea id="${colName}" name="${colName}" spellcheck="false" autocomplete="off">${value}</textarea>`;
+                formElement += `<textarea id="${colName}" name="${colName}" spellcheck="false" autocomplete="off">${value}</textarea>`;
+                formElementType = 'textarea';
             } else {
                 let activeField = this.currentEntity.activeField || this.defaultActiveField;
                 let inputType = 'text';
@@ -1733,24 +1737,31 @@ class GraphQLClientApp {
                 // From dataType
                 if (col.dataType.includes('datetime') || col.dataType.includes('timestamp')) {
                     inputType = 'datetime-local';
+                    formElementType = 'text';
                 } else if (col.dataType.includes('date')) {
                     inputType = 'date';
+                    formElementType = 'text';
                 }
                 else if (col.dataType.includes('time')) {
                     inputType = 'time';
+                    formElementType = 'text';
                 }
                 else if (col.dataType.includes('float')) {
                     // Two attributes
                     inputType = 'number" step="any';
+                    formElementType = 'text';
                 }
 
                 if (inputType === 'checkbox') {
-                    formHtml += `<input type="checkbox" id="${colName}" name="${colName}" ${value ? 'checked' : ''}>`;
+                    formElement += `<input type="checkbox" id="${colName}" name="${colName}" ${value ? 'checked' : ''}>`;
+                    formElementType = 'checkbox';
                 } else {
-                    formHtml += `<input type="${inputType}" id="${colName}" name="${colName}" value="${value}" autocomplete="off">`;
+                    formElement += `<input type="${inputType}" id="${colName}" name="${colName}" value="${value}" autocomplete="off">`;
+                    formElementType = 'text';
                 }
+                
             }
-            formHtml += `</div>`;
+            formHtml += `<div class="form-group form-element-${formElementType}">${formElement}</div>`;
         }
 
         // Add a placeholder for form-level error messages

@@ -290,7 +290,7 @@ html.sidebar-collapsed .sidebar {
 .close-button {
   color: #aaa;
   position: absolute;
-  top: 10px;
+  top: 7px;
   right: 20px;
   font-size: 28px;
   font-weight: bold;
@@ -859,4 +859,14 @@ input[type=number]::-webkit-outer-spin-button {
     background-color: #eee;
     border-left: 1px solid #ccc;
     /* Further styling like hover effects, background images for arrows, etc. */
+}
+
+/* Checkbox Form Group Styling */
+.form-group.form-element-checkbox {
+  direction: rtl;
+  text-align: left;
+  label {
+    display: inline;
+    margin-left: 2px;
+  }
 }
