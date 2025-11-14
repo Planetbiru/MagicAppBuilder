@@ -159,6 +159,8 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/en.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'langs/i18n/id.json');
         
+        addDirectoryToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
+        
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.scss", 'assets/style.scss');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'assets/style.css');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'assets/style.css.map');

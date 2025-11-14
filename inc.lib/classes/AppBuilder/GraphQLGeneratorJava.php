@@ -387,14 +387,6 @@ class GraphQLGeneratorJava extends GraphQLGeneratorBase
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -445,6 +437,7 @@ XML;
         $files[] = ['name' => $packagePath . '/util/SearchOperation.java', 'content' => $this->generateSearchOperation()];
         $files[] = ['name' => $packagePath . '/util/AuditTrailUtil.java', 'content' => $this->generateAuditTrailUtil()];
         $files[] = ['name' => $packagePath . '/util/GenericSpecification.java', 'content' => $this->generateGenericSpecification()];
+        $files[] = ['name' => $packagePath . '/util/ScalarValueUtil.java', 'content' => $this->generateScalarValueUtil()];
 
         // 5.1. DTOs for GraphQL inputs
         $files[] = ['name' => $packagePath . '/model/dto/FilterInput.java', 'content' => $this->generateFilterInputDto()];
@@ -469,6 +462,7 @@ XML;
         $files[] = ['name' => $packagePath . '/controller/dto/LoginResponse.java', 'content' => $this->generateLoginResponseDto()];
         $files[] = ['name' => $packagePath . '/controller/AuthController.java', 'content' => $this->generateAuthController()];
         $files[] = ['name' => $packagePath . '/controller/AppController.java', 'content' => $this->generateAppController()];
+        $files[] = ['name' => $packagePath . '/controller/StaticAssetController.java', 'content' => $this->generateStaticAssetController()];
         $files[] = ['name' => $packagePath . '/config/ObjectScalar.java', 'content' => $this->generateObjectScalar()];
         $files[] = ['name' => $packagePath . '/config/GraphQlConfig.java', 'content' => $this->generateGraphQlConfig()];
         $files[] = ['name' => $packagePath . '/controller/dto/ProfileUpdateRequest.java', 'content' => $this->generateProfileUpdateRequestDto()];
@@ -573,8 +567,16 @@ PROPERTIES;
             $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
             $fieldName = $this->camelCase($colName);
             
-            if (strpos($javaType, 'LocalDateTime') !== false) $hasLdt = true;
-            if (strpos($javaType, 'LocalDate') !== false) $hasLd = true;
+            if (strpos($javaType, 'LocalDateTime') !== false)
+            {
+                $fields .= "    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd HH:mm:ss\")\n";
+                $hasLdt = true;
+            }
+            else if (strpos($javaType, 'LocalDate') !== false) 
+            {
+                $fields .= "    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd\")\n";
+                $hasLd = true;
+            }
             
             if ($colInfo['isPrimaryKey']) {
                 $fields .= "    @Id\n";
@@ -582,6 +584,7 @@ PROPERTIES;
                     $fields .= "    @GeneratedValue(strategy = GenerationType.IDENTITY)\n";
                 }
                 if ($fieldName !== $colName) {
+                    $fields .= "    @GeneratedValue(strategy = GenerationType.UUID)\n";
                     $fields .= "    @Column(name = \"$colName\")\n";
                 }
             } else if ($colInfo['isForeignKey']) {
@@ -603,11 +606,12 @@ PROPERTIES;
                 $fields .= "    @Column(name = \"$colName\")\n";
             }
             // No need for @Column(name=...) if physical strategy is used and field name matches
-            $fields .= "    private " . basename(str_replace('\\', '/', $javaType)) . " $fieldName;\n\n";
+            $fields .= "    private " . basename(str_replace(['\\', '.'], '/', $javaType)) . " $fieldName;\n\n";
         }
 
         if ($hasLdt) $imports .= "import java.time.LocalDateTime;\n";
         if ($hasLd) $imports .= "import java.time.LocalDate;\n";
+        if ($hasLdt || $hasLd) $imports .= "import com.fasterxml.jackson.annotation.JsonFormat;\n";
         if ($hasManyToOne) $imports .= "import com.fasterxml.jackson.annotation.JsonIgnore;\n";
 
         return <<<JAVA
@@ -759,15 +763,27 @@ JAVA;
             }
             $fieldName = $this->camelCase($colName);
 
-            if (strpos($javaType, 'LocalDateTime') !== false) $hasLdt = true;
-            if (strpos($javaType, 'LocalDate') !== false) $hasLd = true;
+            if (strpos($javaType, 'LocalDateTime') !== false)
+            {
+                $fields .= "    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd HH:mm:ss\")\n";
+                $hasLdt = true;
+            }
+            else if (strpos($javaType, 'LocalDate') !== false) 
+            {
+                $fields .= "    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd\")\n";
+                $hasLd = true;
+            }
+            
 
             if ($fieldName !== $colName) {
                 $fields .= "    @JsonProperty(\"$colName\")\n";
             }
-            $fields .= "    private " . basename(str_replace('\\', '/', $javaType)) . " $fieldName;\n\n";
+
+
+            $fields .= "    private " . basename(str_replace(['\\', '.'], '/', $javaType)) . " $fieldName;\n\n";
         }
 
+        if ($hasLdt || $hasLd) $imports .= "import com.fasterxml.jackson.annotation.JsonFormat;\n";
         if ($hasLdt) $imports .= "import java.time.LocalDateTime;\n";
         if ($hasLd) $imports .= "import java.time.LocalDate;\n";
 
@@ -778,6 +794,114 @@ $imports
 @Data
 public class $className {
 $fields}
+JAVA;
+    }
+
+    private function generateScalarValueUtil() {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.util;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+
+/**
+ * Utility class for handling scalar value conversions, particularly for custom GraphQL scalars.
+ * This class provides methods to parse string values into various data types and to format
+ * date-time objects into strings and vice-versa.
+ */
+public class ScalarValueUtil {
+
+    /**
+     * The date-time format string "yyyy-MM-dd HH:mm:ss".
+     */
+    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    /**
+     * The date format string "yyyy-MM-dd".
+     */
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+
+    /**
+     * Parses a string value into an object of a specified target type.
+     * @param value The string value to parse.
+     * @param targetType The target class type to convert the value into.
+     * @return The parsed object of the target type.
+     * @throws IllegalArgumentException if the target type is not supported.
+     */
+    public static Object parseValue(String value, Class<?> targetType) {
+        if (targetType == String.class) {
+            return value;
+        } else if (targetType == Integer.class) {
+            return Integer.parseInt(value);
+        } else if (targetType == Long.class) {
+            return Long.parseLong(value);
+        } else if (targetType == Boolean.class) {
+            return Boolean.parseBoolean(value);
+        } else if (targetType == Double.class) {
+            return Double.parseDouble(value);
+        } else if (targetType == Float.class) {
+            return Float.parseFloat(value);
+        } else if (targetType == UUID.class) {
+            return UUID.fromString(value);
+        }
+        // Add more type conversions as needed
+        throw new IllegalArgumentException("Unsupported target type: " + targetType.getName());
+    }
+
+    /**
+     * Converts a LocalDateTime object to a string using the defined DATE_TIME_FORMAT.
+     * @param datetime The LocalDateTime object to convert.
+     * @return A string representation of the date-time, or null if the input is null.
+     */
+    public static String localDateTimeToString(LocalDateTime datetime) {
+        if (datetime == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ScalarValueUtil.DATE_TIME_FORMAT);
+        return datetime.format(formatter);
+    }
+
+    /**
+     * Converts a LocalDate object to a date string using the defined DATE_FORMAT.
+     * @param datetime The LocalDate object to convert.
+     * @return A string representation of the date part, or null if the input is null.
+     */
+    public static String localDateToString(LocalDate datetime) {
+        if (datetime == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ScalarValueUtil.DATE_FORMAT);
+        return datetime.format(formatter);
+    }
+
+    /**
+     * Converts a string in the DATE_TIME_FORMAT to a LocalDateTime object.
+     * @param datetime The string to convert.
+     * @return A LocalDateTime object, or null if the input string is null or empty.
+     */
+    public static LocalDateTime stringToLocalDateTime(String datetime) {
+        if (datetime == null || datetime.isEmpty()) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ScalarValueUtil.DATE_TIME_FORMAT);
+        return LocalDateTime.parse(datetime, formatter);
+    }
+
+    /**
+     * Converts a string in the DATE_FORMAT to a LocalDateTime object. Note that the time components will be set to zero.
+     * @param datetime The date string to convert.
+     * @return A LocalDate object parsed from the date string, or null if the input string is null or empty.
+     */
+    public static LocalDate stringToLocalDate(String datetime) {
+        if (datetime == null || datetime.isEmpty()) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ScalarValueUtil.DATE_FORMAT);
+        return LocalDate.parse(datetime, formatter);
+    }
+}
 JAVA;
     }
 
@@ -805,8 +929,15 @@ JAVA;
         foreach ($tableInfo['columns'] as $colInfo) {
             if ($colInfo['isForeignKey']) {
                 $refClassName = ucfirst($this->camelCase($colInfo['references']));
-                $relatedEntityImports .= "import $package.model.entity.$refClassName;\n";
+                $relatedEntityImports .= "\nimport $package.model.entity.$refClassName;";
             }
+        }
+
+        $fieldResolvers = $this->generateFieldResolvers($tableName, $tableInfo);
+        if(strpos($fieldResolvers, 'ScalarValueUtil') !== false) {
+            $importScalarValueUtil = "\nimport $package.util.ScalarValueUtil;";
+        } else {
+            $importScalarValueUtil = "";
         }
 
         $code = <<<JAVA
@@ -829,7 +960,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Controller;$importScalarValueUtil
 
 import java.util.List;
 import java.util.Map;
@@ -922,7 +1053,7 @@ public class {$ucCamelName}Controller {
 JAVA;
 
         // Inject field resolvers before the final closing brace
-        $fieldResolvers = $this->generateFieldResolvers($tableName, $tableInfo);
+        
         $lastBracePos = strrpos($code, '}');
         if ($lastBracePos !== false) {
             // Insert the resolvers before the last closing brace of the class
@@ -952,10 +1083,22 @@ JAVA;
             if ($colName !== $camelColName) {
                 $javaType = $this->mapDbTypeToJavaType($colInfo['type'], $colInfo['length']);
                 $baseJavaType = basename(str_replace('\\', '/', $javaType));
+
+                $returnValue = "{$camelTableName}.get{$ucCamelColName}()";
+
+                if(strpos($baseJavaType, 'LocalDateTime') !== false) {
+                    $baseJavaType = 'String'; // Or custom scalar
+                    $returnValue = "ScalarValueUtil.localDateTimeToString($returnValue)";
+                }
+                else if(strpos($baseJavaType, 'LocalDate') !== false) {
+                    $baseJavaType = 'String'; // Or custom scalar
+                    $returnValue = "ScalarValueUtil.localDateToString($returnValue)";
+                }
+
                 $upperCamelColName = PicoStringUtil::upperCamelize($colName);
                 $resolvers .= "\n    @SchemaMapping(typeName = \"$ucCamelTableName\", field = \"$colName\")\n";
                 $resolvers .= "    public $baseJavaType get{$upperCamelColName}($ucCamelTableName $camelTableName) {\n";
-                $resolvers .= "        return {$camelTableName}.get{$ucCamelColName}();\n";
+                $resolvers .= "        return $returnValue;\n";
                 $resolvers .= "    }\n";
             }
     
@@ -1748,20 +1891,14 @@ JAVA;
 package $package.controller;
 
 import com.planetbiru.graphqlapplication.config.Sha1PasswordEncoder;
-import com.planetbiru.graphqlapplication.controller.dto.LoginRequest;
 import com.planetbiru.graphqlapplication.controller.dto.LoginResponse;
 import com.planetbiru.graphqlapplication.model.repository.AdminRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import java.util.Collections;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -1790,16 +1927,9 @@ public class AuthController {
         return adminRepository.findByUsername(username)
                 .filter(admin -> admin.getPassword().equals(passwordEncoder.encode(password)))
                 .map(admin -> {
-                    // Create an authentication token
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(
-                            admin.getUsername(),
-                            singleHashedPassword,
-                            Collections.emptyList() // Use authorities/roles if you have them
-                    );
-                    // Set the authentication in the security context
-                    SecurityContext context = SecurityContextHolder.createEmptyContext();
-                    context.setAuthentication(authentication);
-                    SecurityContextHolder.setContext(context);
+                    session.setAttribute("username", admin.getUsername());
+                    // Store the single-hashed password in the session for subsequent requests.
+                    session.setAttribute("password", singleHashedPassword);
                     return ResponseEntity.ok(new LoginResponse(true, "Login successful"));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -1832,15 +1962,16 @@ JAVA;
 package $package.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -1854,25 +1985,48 @@ public class AppController {
         this.objectMapper = objectMapper;
     }
 
-
     // Replicates available-language.php
-    @GetMapping("/available-language")
-    public Map<String, Object> getAvailableLanguages() {
-        // This should ideally read from a file, but hardcoding for simplicity
-        return Map.of(
-            "default", "en",
-            "supported", Map.of("en", "English", "id", "Indonesia")
-        );
+    @GetMapping(value = "/available-language", produces = "application/json")
+    public Object getAvailableLanguages() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:static/langs/available-language.json");
+        String jsonContent = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+        return objectMapper.readValue(jsonContent, Object.class);
     }
 
     // Replicates available-theme.php
     @GetMapping("/available-theme")
-    public Object[] getAvailableThemes() {
-        // This should scan a directory, but hardcoding for simplicity
-        return new Object[]{
-            Map.of("name", "dark-blue", "title", "Dark Blue"),
-            Map.of("name", "light-green", "title", "Light Green")
-        };
+    public Object[] getAvailableThemes() throws IOException {
+        List<Map<String, String>> themes = new ArrayList<>();
+        Resource resource = resourceLoader.getResource("classpath:static/assets/themes/");
+
+        if (resource.exists()) {
+            File themesDir = resource.getFile();
+            if (themesDir.isDirectory()) {
+                File[] themeSubDirs = themesDir.listFiles(File::isDirectory);
+                if (themeSubDirs != null) {
+                    for (File dir : themeSubDirs) {
+                        String name = dir.getName();
+                        String title = toTitleCase(name.replace('-', ' '));
+                        themes.add(Map.of("name", name, "title", title));
+                    }
+                }
+            }
+        }
+        return themes.toArray();
+    }
+
+    private String toTitleCase(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        StringBuilder converted = new StringBuilder();
+        boolean convertNext = true;
+        for (char ch : text.toCharArray()) {
+            ch = convertNext ? Character.toTitleCase(ch) : Character.toLowerCase(ch);
+            converted.append(ch);
+            convertNext = Character.isSpaceChar(ch);
+        }
+        return converted.toString();
     }
 
     // Replicates frontend-config.php
@@ -1884,6 +2038,70 @@ public class AppController {
     }
     
     // Other endpoints like /user-profile, /settings etc. would go here
+}
+JAVA;
+    }
+
+    private function generateStaticAssetController() {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.controller;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.HandlerMapping;
+
+import java.io.IOException;
+import java.nio.file.Files;
+
+@RestController
+public class StaticAssetController {
+
+    private final ServletContext servletContext;
+
+    public StaticAssetController(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
+
+    /**
+     * Handles requests for static assets under /assets/**, /langs/**, etc.
+     * It reads the requested file from the classpath's /static directory.
+     *
+     * @param request The incoming HTTP request.
+     * @return A ResponseEntity containing the file's content or a 404 error.
+     */
+    @GetMapping({"/assets/**", "/langs/**"})
+    public ResponseEntity<byte[]> getStaticAsset(HttpServletRequest request) {
+        // Extract the path from the request URL (e.g., "assets/themes/style.css")
+        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+        // Construct the resource path within the classpath
+        Resource resource = new ClassPathResource("static/" + path);
+
+        if (resource.exists() && resource.isReadable()) {
+            try {
+                String mimeType = servletContext.getMimeType(resource.getFilename());
+                MediaType mediaType = MediaType.parseMediaType(mimeType != null ? mimeType : MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+                byte[] content = Files.readAllBytes(resource.getFile().toPath());
+
+                return ResponseEntity.ok().contentType(mediaType).body(content);
+            } catch (IOException e) {
+                // Log the exception
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            // If the file is not found, return a 404 error
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }
 JAVA;
     }
@@ -2038,7 +2256,7 @@ GQL;
                 {
                     if($key == 'timeCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.valueOf(System.currentTimeMillis(), \"$dataType\"));\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(java.time.LocalDateTime.now());\n";
                     }
                     if($key == 'adminCreate')
                     {
@@ -2051,7 +2269,7 @@ GQL;
                 }
                 if($key == 'timeEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.valueOf(System.currentTimeMillis(), \"$dataType\"));\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(java.time.LocalDateTime.now());\n";
                 }
                 if($key == 'adminEdit')
                 {

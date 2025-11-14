@@ -167,112 +167,204 @@ try {
         false // requireLogin
     );
 
-    // --- Create Backend ZIP ---
-    $backendZip = new ZipArchive();
-    $backendZipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
-    if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-        throw new Exception("Could not create backend ZIP file.");
+    if($withFrontend)
+    {
+        // Add frontend generation to one zip file
+        $zip = new ZipArchive();
+        $zipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new Exception("Could not create backend ZIP file.");
+        }
+
+        $backendFiles = $generator->generate();
+
+        // application.properties
+        $applicationProperties = $generator->generateApplicationProperties();
+        $applicationProperties = setDatabaseConfiguration($app, $applicationProperties);
+        $backendFiles[] = ['name' => 'src/main/resources/application.properties', 'content' => $applicationProperties];
+
+
+        foreach ($backendFiles as $file) {
+            $zip->addFromString($file['name'], $file['content']);
+        }
+
+        // Add Maven Wrapper files to backend zip
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw", 'mvnw');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw.cmd", 'mvnw.cmd');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
+        
+
+
+        // Add generated frontend config files
+        $zip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
+
+        // Add language files
+        $zip->addFromString('src/main/resources/static/langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
+        $entityLanguagePacks = $generator->generateFrontendLanguageJson();
+        $zip->addFromString('src/main/resources/static/langs/entity/source.json', $entityLanguagePacks);
+        $zip->addFromString('src/main/resources/static/langs/entity/en.json', $entityLanguagePacks); // Assume 'en' is default
+
+        // Add i18n files
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'src/main/resources/static/langs/i18n/source.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'src/main/resources/static/langs/i18n/en.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'src/main/resources/static/langs/i18n/id.json');
+
+        // Add assets
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'src/main/resources/static/assets');
+
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.scss", 'src/main/resources/static/assets/style.scss');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'src/main/resources/static/assets/style.css');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'src/main/resources/static/assets/style.css.map');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.min.css", 'src/main/resources/static/assets/style.min.css');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.js", 'src/main/resources/static/assets/app.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.min.js", 'src/main/resources/static/assets/app.min.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'src/main/resources/static/assets/graphql.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'src/main/resources/static/assets/graphql.min.js');
+
+        
+        // Add index.html
+        $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
+        $indexFileContent = str_replace('{APP_NAME}', $app->getName(), $indexFileContent);
+        $zip->addFromString('src/main/resources/static/index.html', $indexFileContent);
+
+        // Add icon files
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'android-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'apple-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'favicon');
+
+
+        // Add documentation to the root of the main zip
+        $manualMd = $generator->generateManual();
+        $zip->addFromString('manual.md', $manualMd);
+        $appName = $app->getName();
+        $manualHtml = generateManualHtml($manualMd, $appName);
+        $zip->addFromString('manual.html', $manualHtml);
+
+        $readmeContent = generateReadmeJava($appName, $generator);
+        $zip->addFromString('README.md', $readmeContent);
+        $zip->close();
+
+        // Send the ZIP file as a download
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . $app->getApplicationId() . '-graphql-java.zip"');
+        header('Content-Length: ' . filesize($zipFilePath));
+        readfile($zipFilePath);
+
+        // Delete the temporary file
+        unlink($zipFilePath);
+        exit();
     }
+    else
+    {
 
-    $backendFiles = $generator->generate();
+        // --- Create Backend ZIP ---
+        $backendZip = new ZipArchive();
+        $backendZipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
+        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new Exception("Could not create backend ZIP file.");
+        }
 
-    // application.properties
-    $applicationProperties = $generator->generateApplicationProperties();
-    $applicationProperties = setDatabaseConfiguration($app, $applicationProperties);
-    $backendFiles[] = ['name' => 'src/main/resources/application.properties', 'content' => $applicationProperties];
+        $backendFiles = $generator->generate();
+
+        // application.properties
+        $applicationProperties = $generator->generateApplicationProperties();
+        $applicationProperties = setDatabaseConfiguration($app, $applicationProperties);
+        $backendFiles[] = ['name' => 'src/main/resources/application.properties', 'content' => $applicationProperties];
 
 
-    foreach ($backendFiles as $file) {
-        $backendZip->addFromString($file['name'], $file['content']);
+        foreach ($backendFiles as $file) {
+            $backendZip->addFromString($file['name'], $file['content']);
+        }
+
+        // Add Maven Wrapper files to backend zip
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw", 'mvnw');
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw.cmd", 'mvnw.cmd');
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
+        
+        $backendZip->close();
+
+        // --- Create Frontend ZIP ---
+        $frontendZip = new ZipArchive();
+        $frontendZipFilePath = tempnam(sys_get_temp_dir(), 'frontend_');
+        if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new Exception("Could not create frontend ZIP file.");
+        }
+
+        // Add generated frontend config files
+        $frontendZip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
+
+        // Add language files
+        $frontendZip->addFromString('langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
+        $entityLanguagePacks = $generator->generateFrontendLanguageJson();
+        $frontendZip->addFromString('langs/entity/source.json', $entityLanguagePacks);
+        $frontendZip->addFromString('langs/entity/en.json', $entityLanguagePacks); // Assume 'en' is default
+
+        // Add i18n files
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/source.json');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/en.json');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'langs/i18n/id.json');
+
+        // Add assets
+        addDirectoryToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
+
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.scss", 'assets/style.scss');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'assets/style.css');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'assets/style.css.map');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.min.css", 'assets/style.min.css');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.js", 'assets/app.js');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.min.js", 'assets/app.min.js');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'assets/graphql.js');
+        $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'assets/graphql.min.js');
+
+         
+        // Add index.html
+        $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
+        $indexFileContent = str_replace('{APP_NAME}', $app->getName(), $indexFileContent);
+        $frontendZip->addFromString('index.html', $indexFileContent);
+
+        // Add icon files
+        addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'icon-');
+        addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'android-icon-');
+        addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'apple-icon-');
+        addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'favicon');
+
+        $frontendZip->close();
+
+        // --- Create Main ZIP ---
+        $mainZip = new ZipArchive();
+        $mainZipFilePath = tempnam(sys_get_temp_dir(), 'main_zip_');
+        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new Exception("Could not create main ZIP file.");
+        }
+
+        // Add backend.zip and frontend.zip to the main zip
+        $mainZip->addFile($backendZipFilePath, 'backend.zip');
+        $mainZip->addFile($frontendZipFilePath, 'frontend.zip');
+
+        // Add documentation to the root of the main zip
+        $manualMd = $generator->generateManual();
+        $mainZip->addFromString('manual.md', $manualMd);
+        $appName = $app->getName();
+        $manualHtml = generateManualHtml($manualMd, $appName);
+        $mainZip->addFromString('manual.html', $manualHtml);
+
+        $readmeContent = generateReadmeJava($appName, $generator);
+        $mainZip->addFromString('README.md', $readmeContent);
+        $mainZip->close();
+
+        // Send the ZIP file as a download
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . $app->getApplicationId() . '-graphql-java.zip"');
+        header('Content-Length: ' . filesize($mainZipFilePath));
+        readfile($mainZipFilePath);
+
+        // Delete the temporary file
+        unlink($backendZipFilePath);
+        unlink($frontendZipFilePath);
+        unlink($mainZipFilePath);
+        exit();
     }
-
-    // Add Maven Wrapper files to backend zip
-    $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw", 'mvnw');
-    $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw.cmd", 'mvnw.cmd');
-    //$backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/.mvn/wrapper/maven-wrapper.jar", '.mvn/wrapper/maven-wrapper.jar');
-    $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
-    
-    $backendZip->close();
-
-    // --- Create Frontend ZIP ---
-    $frontendZip = new ZipArchive();
-    $frontendZipFilePath = tempnam(sys_get_temp_dir(), 'frontend_');
-    if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-        throw new Exception("Could not create frontend ZIP file.");
-    }
-
-    // Add generated frontend config files
-    $frontendZip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
-
-    // Add language files
-    $frontendZip->addFromString('langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
-    $entityLanguagePacks = $generator->generateFrontendLanguageJson();
-    $frontendZip->addFromString('langs/entity/source.json', $entityLanguagePacks);
-    $frontendZip->addFromString('langs/entity/en.json', $entityLanguagePacks); // Assume 'en' is default
-
-    // Add i18n files
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/source.json');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/en.json');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'langs/i18n/id.json');
-
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.scss", 'assets/style.scss');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'assets/style.css');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'assets/style.css.map');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.min.css", 'assets/style.min.css');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.js", 'assets/app.js');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.min.js", 'assets/app.min.js');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'assets/graphql.js');
-    $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'assets/graphql.min.js');
-
-    // Add assets
-    addDirectoryToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
-    
-    // Add index.html
-    $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
-    $indexFileContent = str_replace('{APP_NAME}', $app->getName(), $indexFileContent);
-    $frontendZip->addFromString('index.html', $indexFileContent);
-
-    // Add icon files
-    addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'icon-');
-    addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'android-icon-');
-    addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'apple-icon-');
-    addFilesWithPrefixToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend", '', 'favicon');
-
-    $frontendZip->close();
-
-    // --- Create Main ZIP ---
-    $mainZip = new ZipArchive();
-    $mainZipFilePath = tempnam(sys_get_temp_dir(), 'main_zip_');
-    if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-        throw new Exception("Could not create main ZIP file.");
-    }
-
-    // Add backend.zip and frontend.zip to the main zip
-    $mainZip->addFile($backendZipFilePath, 'backend.zip');
-    $mainZip->addFile($frontendZipFilePath, 'frontend.zip');
-
-    // Add documentation to the root of the main zip
-    $manualMd = $generator->generateManual();
-    $mainZip->addFromString('manual.md', $manualMd);
-    $appName = $app->getName();
-    $manualHtml = generateManualHtml($manualMd, $appName);
-    $mainZip->addFromString('manual.html', $manualHtml);
-
-    $readmeContent = generateReadmeJava($appName, $generator);
-    $mainZip->addFromString('README.md', $readmeContent);
-    $mainZip->close();
-
-    // Send the ZIP file as a download
-    header('Content-Type: application/zip');
-    header('Content-Disposition: attachment; filename="' . $app->getApplicationId() . '-graphql-java.zip"');
-    header('Content-Length: ' . filesize($mainZipFilePath));
-    readfile($mainZipFilePath);
-
-    // Delete the temporary file
-    unlink($backendZipFilePath);
-    unlink($frontendZipFilePath);
-    unlink($mainZipFilePath);
-    exit();
 
 } catch (Exception $e) {
     header("Content-Type: application/json");

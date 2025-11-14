@@ -1,11 +1,14 @@
 // Global variable to hold the application instance.
 let graphqlApp = null;
 
-let backendBaseUrl = 'http://localhost:8080/'; // Base URL for API endpoints, if needed.
+let backendBaseUrl = ''; // Base URL for API endpoints, if needed.
 let frontendBaseUrl = ''; // Base URL for frontend pages, if needed.
 
 // Wait for the DOM to be fully loaded before initializing the application.
 document.addEventListener('DOMContentLoaded', () => {
+
+
+
     /**
      * Create a single instance of the GraphQLClientApp.
      * The constructor handles the entire initialization process, including fetching
@@ -24,13 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // URL to handle user logout requests.
         logoutUrl: backendBaseUrl + 'logout',
         // URL to fetch language translations for entity and column names.
-        entityLanguageUrl: frontendBaseUrl + 'entity-language-{lang}.json',
+        entityLanguageUrl: frontendBaseUrl + 'langs/entity/{lang}.json',
         // URL to fetch general UI translations (i18n).
-        i18nUrl: frontendBaseUrl + 'language-{lang}.json',
+        i18nUrl: frontendBaseUrl + 'langs/i18n/{lang}.json',
         // URL to get the list of available themes.
-        themeConfigUrl: frontendBaseUrl + 'available-theme.json',
+        themeConfigUrl: frontendBaseUrl + 'available-theme',
         // URL to get the list of available languages.
-        languageConfigUrl: frontendBaseUrl + 'available-language.json',
+        languageConfigUrl: frontendBaseUrl + 'available-language',
 
         // --- Default field names ---
 

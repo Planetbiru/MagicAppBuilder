@@ -128,6 +128,9 @@ try {
     $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/en.json');
     $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'langs/i18n/id.json');
 
+    // Add assets
+    addDirectoryToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
+
     $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.scss", 'assets/style.scss');
     $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'assets/style.css');
     $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'assets/style.css.map');
@@ -137,8 +140,6 @@ try {
     $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'assets/graphql.js');
     $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'assets/graphql.min.js');
 
-    // Add assets
-    addDirectoryToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
     
     // Add index.html
     $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
