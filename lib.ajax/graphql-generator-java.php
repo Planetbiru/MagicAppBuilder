@@ -164,7 +164,7 @@ try {
             'verboseLogging' => $verboseLogging
         ),
         $verboseLogging,
-        false // requireLogin
+        true // requireLogin
     );
 
     if($withFrontend)

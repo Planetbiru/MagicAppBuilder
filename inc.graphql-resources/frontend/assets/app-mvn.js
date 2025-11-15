@@ -355,6 +355,7 @@ function backToList(type) {
 async function handleProfileUpdate(event) {
     const form = document.getElementById('profile-update-form');
     const formData = new FormData(form);
+
     try {
         const response = await fetch('user-profile', {
             method: 'POST',
@@ -382,6 +383,7 @@ async function handleProfileUpdate(event) {
 async function handlePasswordUpdate(event) {
     const form = document.getElementById('password-update-form');
     const formData = new FormData(form);
+
     try {
         const response = await fetch('update-password', {
             method: 'POST',

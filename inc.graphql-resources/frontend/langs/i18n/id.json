@@ -117,5 +117,21 @@
     "notification_deleted_successfully": "Notifikasi berhasil dihapus.",
     "refresh_app": "Segarkan Aplikasi",
     "app_refreshed_successfully": "Aplikasi berhasil disegarkan.",
-    "app_refresh_failed": "Gagal menyegarkan aplikasi."
+    "app_refresh_failed": "Gagal menyegarkan aplikasi.",
+    "password_is_required": "Kata sandi harus diisi.",
+    "admin_created_successfully": "Admin berhasil dibuat.",
+    "admin_id_required": "ID Admin diperlukan.",
+    "admin_updated_successfully": "Admin berhasil diperbarui.",
+    "cannot_deactivate_self": "Anda tidak dapat menonaktifkan akun Anda sendiri.",
+    "admin_status_updated": "Status admin berhasil diperbarui.",
+    "cannot_delete_self": "Anda tidak dapat menghapus akun Anda sendiri.",
+    "admin_deleted_successfully": "Admin berhasil dihapus.",
+    "add_new_admin": "Tambah Admin Baru",
+    "admin_level": "Level Admin",
+    "no_admins_found": "Tidak ada admin yang ditemukan.",
+    "admin_not_found": "Admin tidak ditemukan.",
+    "time_create": "Waktu Dibuat",
+    "time_edit": "Waktu Diubah",
+    "edit_admin": "Ubah Admin",
+    "back_to_detail": "Kembali ke Detail"
 }

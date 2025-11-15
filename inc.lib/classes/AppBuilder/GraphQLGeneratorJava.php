@@ -109,11 +109,17 @@ class GraphQLGeneratorJava extends GraphQLGeneratorBase
         $manualContent .= "spring.application.name=YourAppName\r\n\r\n";
         $manualContent .= "# Database Configuration (Please update with your details)\r\n";
         $manualContent .= "app.security.require-login=true\r\n\r\n";
+        $manualContent .= "# Default language for i18n\r\n";
+        $manualContent .= "app.i18n.default-language=en\r\n\r\n";
         $manualContent .= "# Session Management (optional, uncomment to use Redis)\r\n";
         $manualContent .= "# spring.session.store-type=redis\r\n";
         $manualContent .= "# spring.data.redis.host=localhost\r\n";
         $manualContent .= "# spring.data.redis.port=6379\r\n";
         $manualContent .= "# spring.session.timeout=30m\r\n\r\n";
+        $manualContent .= "# Session and Cookie Lifetime\r\n";
+        $manualContent .= "# Set session timeout. e.g., 30m for 30 minutes, 1h for 1 hour.\r\n";
+        $manualContent .= "server.servlet.session.timeout=30m\r\n";
+        $manualContent .= "server.servlet.session.cookie.max-age=30m\r\n\r\n";
         $manualContent .= "# CORS Configuration (Cross-Origin Resource Sharing)\r\n";
         $manualContent .= "app.security.cors.enabled=true\r\n";
         $manualContent .= "app.security.cors.allowed-origins=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:8080\r\n\r\n";
@@ -123,7 +129,7 @@ class GraphQLGeneratorJava extends GraphQLGeneratorBase
         $manualContent .= "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver\r\n\r\n";
         $manualContent .= "# JPA/Hibernate Configuration\r\n";
         $manualContent .= "spring.jpa.hibernate.ddl-auto=update\r\n";
-        $manualContent .= "spring.jpa.show-sql=true\r\n";
+        $manualContent .= "spring.jpa.show-sql=false\r\n";
         $manualContent .= "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect\r\n";
         $manualContent .= "spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl\r\n\r\n";
         $manualContent .= "# GraphQL Properties\r\n";
@@ -350,11 +356,35 @@ class GraphQLGeneratorJava extends GraphQLGeneratorBase
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
+
+        <!-- Database Drivers -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- End of Database Drivers -->
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -438,6 +468,11 @@ XML;
         $files[] = ['name' => $packagePath . '/util/AuditTrailUtil.java', 'content' => $this->generateAuditTrailUtil()];
         $files[] = ['name' => $packagePath . '/util/GenericSpecification.java', 'content' => $this->generateGenericSpecification()];
         $files[] = ['name' => $packagePath . '/util/ScalarValueUtil.java', 'content' => $this->generateScalarValueUtil()];
+        $files[] = ['name' => $packagePath . '/util/ValueUtil.java', 'content' => $this->generateValueUtil()];
+        $files[] = ['name' => $packagePath . '/util/QueryUtil.java', 'content' => $this->generateQueryUtil()];
+        $files[] = ['name' => $packagePath . '/util/I18nUtil.java', 'content' => $this->generateI18nUtil()];
+
+        $files[] = ['name' => $packagePath . '/exceptions/GlobalExceptionHandler.java', 'content' => $this->geterateGlobalExceptionHandler()];
 
         // 5.1. DTOs for GraphQL inputs
         $files[] = ['name' => $packagePath . '/model/dto/FilterInput.java', 'content' => $this->generateFilterInputDto()];
@@ -453,19 +488,29 @@ XML;
         $files[] = ['name' => $packagePath . '/config/CorsConfig.java', 'content' => $this->generateCorsConfig()];
         $files[] = ['name' => $packagePath . '/config/SessionAuthFilter.java', 'content' => $this->generateSessionAuthFilter()];
         $files[] = ['name' => $packagePath . '/config/Sha1PasswordEncoder.java', 'content' => $this->generateSha1PasswordEncoder()];
+        $files[] = ['name' => $packagePath . '/config/ObjectScalar.java', 'content' => $this->generateObjectScalar()];
+        $files[] = ['name' => $packagePath . '/config/GraphQlConfig.java', 'content' => $this->generateGraphQlConfig()];
+
+        $files[] = ['name' => $packagePath . '/model/entity/core/Admin.java', 'content' => $this->generateAdminEntity()];
+        $files[] = ['name' => $packagePath . '/model/repository/core/AdminRepository.java', 'content' => $this->generateAdminRepository()];
+
         $files[] = ['name' => $packagePath . '/service/JpaUserDetailsService.java', 'content' => $this->generateUserDetailsService()];
-        $files[] = ['name' => $packagePath . '/model/entity/Admin.java', 'content' => $this->generateAdminEntity()];
-        $files[] = ['name' => $packagePath . '/model/repository/AdminRepository.java', 'content' => $this->generateAdminRepository()];
+        
 
         // 7. Auth and App Controllers
         $files[] = ['name' => $packagePath . '/controller/dto/LoginRequest.java', 'content' => $this->generateLoginRequestDto()];
         $files[] = ['name' => $packagePath . '/controller/dto/LoginResponse.java', 'content' => $this->generateLoginResponseDto()];
-        $files[] = ['name' => $packagePath . '/controller/AuthController.java', 'content' => $this->generateAuthController()];
-        $files[] = ['name' => $packagePath . '/controller/AppController.java', 'content' => $this->generateAppController()];
-        $files[] = ['name' => $packagePath . '/controller/StaticAssetController.java', 'content' => $this->generateStaticAssetController()];
-        $files[] = ['name' => $packagePath . '/config/ObjectScalar.java', 'content' => $this->generateObjectScalar()];
-        $files[] = ['name' => $packagePath . '/config/GraphQlConfig.java', 'content' => $this->generateGraphQlConfig()];
+
+        $files[] = ['name' => $packagePath . '/controller/core/AuthController.java', 'content' => $this->generateAuthController()];
+        $files[] = ['name' => $packagePath . '/controller/core/AppController.java', 'content' => $this->generateAppController()];
+        $files[] = ['name' => $packagePath . '/controller/core/StaticAssetController.java', 'content' => $this->generateStaticAssetController()];
+
+        $files[] = ['name' => $packagePath . '/controller/core/UpdatePasswordController.java', 'content' => $this->generateUpdatePasswordController()];
+        $files[] = ['name' => $packagePath . '/controller/core/UserProfileController.java', 'content' => $this->generateUserProfileController()];
+        $files[] = ['name' => $packagePath . '/controller/core/AdminController.java', 'content' => $this->generateAdminController()];
+
         $files[] = ['name' => $packagePath . '/controller/dto/ProfileUpdateRequest.java', 'content' => $this->generateProfileUpdateRequestDto()];
+        
 
         return $files;
     }
@@ -482,12 +527,20 @@ spring.application.name={$this->projectConfig['name']}
 # Database Configuration (Please update with your details)
 app.security.require-login=$requireLoginValue
 
+# Default language for i18n
+app.i18n.default-language=en
+
 # Session Management
 spring.session.store-type=none # Default to none, uncomment below to use Redis
 # spring.session.store-type=redis
 # spring.data.redis.host=localhost
 # spring.data.redis.port=6379
 # spring.session.timeout=30m
+
+# Session and Cookie Lifetime
+# Set session timeout. e.g., 30m for 30 minutes, 1h for 1 hour.
+server.servlet.session.timeout=30m
+server.servlet.session.cookie.max-age=30m
 
 # CORS Configuration (Cross-Origin Resource Sharing)
 app.security.cors.enabled=true
@@ -499,7 +552,7 @@ spring.datasource.password={DB_PASS}
 spring.datasource.driver-class-name={DB_DRIVER_CLASS}
 
 # JPA/Hibernate Configuration
-spring.jpa.show-sql=true
+spring.jpa.show-sql=false
 spring.jpa.properties.hibernate.dialect={DB_DIALECT}
 
 # Use database column names directly without converting to camelCase
@@ -581,10 +634,16 @@ PROPERTIES;
             if ($colInfo['isPrimaryKey']) {
                 $fields .= "    @Id\n";
                 if ($colInfo['isAutoIncrement']) {
-                    $fields .= "    @GeneratedValue(strategy = GenerationType.IDENTITY)\n";
+                    if($colInfo['primaryKeyValue'] == 'autogenerated')
+                    {
+                        $fields .= "    @GeneratedValue(strategy = GenerationType.IDENTITY)\n";
+                    }
                 }
                 if ($fieldName !== $colName) {
-                    $fields .= "    @GeneratedValue(strategy = GenerationType.UUID)\n";
+                    if($colInfo['primaryKeyValue'] == 'autogenerated')
+                    {
+                        $fields .= "    @GeneratedValue(strategy = GenerationType.UUID)\n";
+                    }
                     $fields .= "    @Column(name = \"$colName\")\n";
                 }
             } else if ($colInfo['isForeignKey']) {
@@ -598,7 +657,9 @@ PROPERTIES;
                 $fields .= "    private " . basename(str_replace('\\', '/', $javaType)) . " $fieldName;\n\n";
                 
                 // Add the object relationship
+                $fields .= "    @JsonIgnore\n";
                 $fields .= "    @ManyToOne(fetch = FetchType.LAZY)\n";
+                $fields .= "    @NotFound(action = NotFoundAction.IGNORE)\n";
                 $fields .= "    @JoinColumn(name = \"$colName\", insertable = false, updatable = false)\n";
                 $fields .= "    private $refClassName $refFieldName;\n\n";
                 continue; // Skip the separate ID field generation for foreign keys
@@ -611,14 +672,24 @@ PROPERTIES;
 
         if ($hasLdt) $imports .= "import java.time.LocalDateTime;\n";
         if ($hasLd) $imports .= "import java.time.LocalDate;\n";
+
+        if ($hasManyToOne) {
+            $imports .= "\n";
+            $imports .= "import org.hibernate.annotations.NotFound;\n";
+            $imports .= "import org.hibernate.annotations.NotFoundAction;\n";
+            $imports .= "\n";
+        }
+
         if ($hasLdt || $hasLd) $imports .= "import com.fasterxml.jackson.annotation.JsonFormat;\n";
         if ($hasManyToOne) $imports .= "import com.fasterxml.jackson.annotation.JsonIgnore;\n";
+        $imports .= "import com.fasterxml.jackson.annotation.JsonIgnoreProperties;\n";
 
         return <<<JAVA
 package $package.model.entity;
 
 $imports
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "$tableName")
 public class $className implements Serializable {
@@ -646,10 +717,17 @@ JAVA;
             }
         }
 
-        $imports = "import org.springframework.data.jpa.repository.JpaRepository;\n";
-        $imports .= "import org.springframework.data.jpa.repository.JpaSpecificationExecutor;\n";
+        $imports = "import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;\n\n";
         $imports .= "import $package.model.entity.$className;\n";
-        $imports .= "import org.springframework.data.jpa.repository.EntityGraph;\n";
+
         if ($this->useCache) {
             $imports .= "import org.springframework.cache.annotation.Cacheable;\n";
         }
@@ -664,6 +742,25 @@ JAVA;
         }
 
 
+        /*
+        @Modifying
+        @Query("UPDATE Blok b SET b.blokId = :newId WHERE b.blokId = :oldId")
+        void updateId(@Param("oldId") String oldId, @Param("newId") String newId);
+        */
+        $modifying = "";
+        foreach ($tableInfo['columns'] as $colname => $col) {
+            if ($col['isPrimaryKey']) {
+                $camelCasePk = $this->camelCase($colname);
+                $upperCamelCasePk = ucfirst($camelCasePk);
+                $pkJavaType = $this->mapDbTypeToJavaType($col['type'], $col['length']);
+                $modifying = "    @Modifying\n\n";
+                $modifying .= "    @Transactional\n";
+                $modifying .= "    @Query(\"UPDATE $className b SET b.$camelCasePk = :newId WHERE b.$camelCasePk = :oldId\")\n";
+                $modifying .= "    int update{$upperCamelCasePk}(@Param(\"oldId\") $pkJavaType oldId, @Param(\"newId\") $pkJavaType newId);\n";
+            }
+        }
+
+
         return <<<JAVA
 package $package.model.repository;
 
@@ -673,6 +770,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface {$className}Repository extends JpaRepository<$className, $pkJavaType>, JpaSpecificationExecutor<$className> {
 $findByIdMethod
+$modifying
 }
 JAVA;
     }
@@ -745,13 +843,19 @@ JAVA;
         $className = ucfirst($camelName) . "Input";
         $package = $this->projectConfig['packageName'];
 
-        $imports = "import com.fasterxml.jackson.annotation.JsonProperty;\nimport lombok.Data;\n";
+        $backendHandledColumnNames = $this->getBackendHandledColumnNames();
+
+        $imports = "import com.fasterxml.jackson.annotation.JsonIgnoreProperties;\n\nimport lombok.Data;\n";
         $fields = "";
         $hasLdt = false;
         $hasLd = false;
 
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             if ($colName === $tableInfo['primaryKey'] && ($colInfo['isAutoIncrement'] || $colInfo['primaryKeyValue'] == 'autogenerated')) {
+                continue;
+            }
+
+            if(in_array($colName, $backendHandledColumnNames)) {
                 continue;
             }
             
@@ -776,7 +880,8 @@ JAVA;
             
 
             if ($fieldName !== $colName) {
-                $fields .= "    @JsonProperty(\"$colName\")\n";
+                // TODO:
+                // $fields .= "    @JsonProperty(\"$colName\")\n";
             }
 
 
@@ -792,11 +897,380 @@ package $package.model.dto;
 
 $imports
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class $className {
 $fields}
 JAVA;
     }
 
+    /**
+     * Generates the GlobalExceptionHandler class to handle exceptions across the application.
+     * This class uses `@ControllerAdvice` and `@GraphQlExceptionHandler` to catch exceptions
+     * and format them into standard GraphQL errors.
+     *
+     * @return string The Java code for the GlobalExceptionHandler class.
+     */
+    private function geterateGlobalExceptionHandler()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.exceptions;
+
+import graphql.GraphQLError;
+import graphql.GraphqlErrorBuilder;
+import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
+import org.springframework.graphql.execution.ErrorType;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @GraphQlExceptionHandler
+    public GraphQLError handleRuntimeException(RuntimeException ex) {
+        ErrorType errorType = ErrorType.INTERNAL_ERROR;
+        if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("not found")) {
+            errorType = ErrorType.NOT_FOUND;
+        } else if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("invalid")) {
+            errorType = ErrorType.BAD_REQUEST;
+        }
+
+        return GraphqlErrorBuilder.newError().message(ex.getMessage()).errorType(errorType).build();
+    }
+}
+JAVA;
+    }
+
+    /**
+     * Generates the I18nUtil class for handling internationalization (i18n).
+     * This utility class loads translation strings from JSON files located in
+     * `src/main/resources/static/langs/i18n/`. It caches translations in memory
+     * to improve performance and provides a `t()` method to retrieve translated
+     * strings by key and language. It also supports a default language as a fallback.
+     *
+     * @return string The Java code for the I18nUtil class.
+     */
+    private function generateI18nUtil()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.util;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Component
+public class I18nUtil {
+
+    private final ObjectMapper objectMapper;
+    private final Map<String, Map<String, String>> translationsCache = new ConcurrentHashMap<>();
+
+    @Value("\${app.i18n.default-language:en}")
+    private String defaultLanguage;
+
+    public I18nUtil(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    private Map<String, String> loadTranslations(String lang) {
+        return translationsCache.computeIfAbsent(lang, l -> {
+            try {
+                Resource resource = new ClassPathResource("static/langs/i18n/" + l + ".json");
+                if (!resource.exists()) {
+                    // If the requested language file doesn't exist, try loading the default
+                    if (!l.equals(defaultLanguage)) {
+                        return loadTranslations(defaultLanguage);
+                    }
+                    return Collections.emptyMap();
+                }
+                try (InputStream inputStream = resource.getInputStream()) {
+                    return objectMapper.readValue(inputStream, new TypeReference<>() {});
+                }
+            } catch (IOException e) {
+                // Log the error
+                e.printStackTrace();
+                return Collections.emptyMap();
+            }
+        });
+    }
+
+    public String t(String code, String lang) {
+        return t(code, lang, null);
+    }
+
+    public String t(String code, String lang, Object[] args) {
+        String language = (lang == null || lang.trim().isEmpty()) ? defaultLanguage : lang;
+        Map<String, String> translations = loadTranslations(language);
+        String message = translations.getOrDefault(code, snakaCaseToTitleCase(code));
+
+        if (args != null && args.length > 0) {
+            return String.format(message, args);
+        }
+        return message;
+    }
+
+    public String snakaCaseToTitleCase(String input) {
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = true;
+
+        for (char c : input.toCharArray()) {
+            if (c == '_') {
+                capitalizeNext = true;
+                result.append(" ");
+            } else {
+                if (capitalizeNext) {
+                    result.append(Character.toUpperCase(c));
+                    capitalizeNext = false;
+                } else {
+                    result.append(Character.toLowerCase(c)); 
+                }
+            }
+        }
+
+        return result.toString().trim();
+    }
+
+}
+JAVA;
+    }
+
+    /**
+     * Generates the QueryUtil Java class.
+     * This utility class provides static methods to create Spring Data `Pageable` and `Specification` objects
+     * from GraphQL arguments for pagination, sorting, and filtering. It centralizes the
+     * logic for building database queries based on client requests.
+     *
+     * @return string The Java code for the QueryUtil class.
+     */
+    private function generateQueryUtil() {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.util;
+
+import $package.model.dto.FilterInput;
+import $package.model.dto.SortInput;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
+
+/**
+ * A utility class to help build Spring Data Pageable and Specification objects
+ * from GraphQL query arguments. This centralizes the logic for pagination, sorting,
+ * and filtering.
+ */
+public class QueryUtil {
+
+    private QueryUtil() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Creates a Pageable object based on GraphQL pagination and sorting arguments.
+     *
+     * @param limit   The maximum number of items to return.
+     * @param offset  The number of items to skip from the beginning.
+     * @param page    The page number (1-based).
+     * @param size    The size of a page.
+     * @param orderBy A list of sorting criteria.
+     * @return A {@link Pageable} object configured with the provided arguments.
+     */
+    public static Pageable createPageable(Integer limit, Integer offset, Integer page, Integer size, List<SortInput> orderBy) {
+        int pageSize = (limit != null) ? limit : (size != null ? size : 20);
+        int pageNum = 0;
+        if (offset != null && pageSize > 0) {
+            pageNum = offset / pageSize;
+        } else if (page != null) {
+            pageNum = page > 0 ? page - 1 : 0; // Convert 1-based page to 0-based
+        }
+
+        Sort sort = Sort.unsorted();
+        if (orderBy != null && !orderBy.isEmpty()) {
+            List<Sort.Order> orders = orderBy.stream()
+                    .map(order -> new Sort.Order(Sort.Direction.fromString(order.getDirection()), ValueUtil.toCamelCase(order.getField())))
+                    .toList();
+            sort = Sort.by(orders);
+        }
+
+        return PageRequest.of(pageNum, pageSize, sort);
+    }
+
+    /**
+     * Creates a Specification object from a list of filter criteria.
+     *
+     * @param filter A list of filtering criteria.
+     * @param <T>    The entity type to which the specification will be applied.
+     * @return A {@link Specification} object, or null if the filter is empty.
+     */
+    public static <T> Specification<T> createSpecification(List<FilterInput> filter) {
+        SpecificationBuilder<T> builder = new SpecificationBuilder<>();
+        if (filter != null) {
+            for (FilterInput f : filter) {
+                String operator = (f.getOperator() == null || f.getOperator().isEmpty()) ? "EQUALS" : f.getOperator().toUpperCase();
+                builder.with(ValueUtil.toCamelCase(f.getField()), SearchOperation.valueOf(operator), f.getValue());
+            }
+        }
+        return builder.build();
+    }
+}
+JAVA;
+
+    }
+
+    /**
+     * Generates the ValueUtil Java class for handling naming conversions and map-to-DTO conversions.
+     *
+     * @return string The content of the ValueUtil class.
+     */
+    private function generateValueUtil() {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.util;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature; 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * A utility class for handling naming conversions, specifically between snake_case
+ * and camelCase, and for converting Maps to DTOs. This is particularly useful
+ * for adapting data structures received from GraphQL arguments into strongly-typed
+ * Java objects.
+ */
+public class ValueUtil {
+
+    private static final ObjectMapper MAPPER = createObjectMapper();
+
+    private ValueUtil() {
+        // Private constructor to prevent public instantiation
+    }
+
+    private static ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        // Ensures Jackson can convert from broader Java numeric types (like Long) to DTO Integer/Boolean fields.
+        mapper.configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, false);
+        mapper.configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, true);
+        
+        // If the input map has fields that don't exist in the DTO, they will be ignored.
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        
+        return mapper;
+    }
+
+    /**
+     * Converts the keys of a Map from snake_case to camelCase.
+     * @param snakeCaseMap The input map with snake_case keys.
+     * @return A new map with camelCase keys.
+     */
+    public static Map<String, Object> convertSnakeToCamelCase(Map<String, Object> snakeCaseMap) {
+        if (snakeCaseMap == null) {
+            return Collections.emptyMap();
+        }
+        Map<String, Object> camelCaseMap = new HashMap<>();
+        for (Map.Entry<String, Object> entry : snakeCaseMap.entrySet()) {
+            camelCaseMap.put(toCamelCase(entry.getKey()), entry.getValue());
+        }
+        return camelCaseMap;
+    }
+
+    /**
+     * Converts a Map with camelCase keys to an instance of a target DTO class.
+     * @param camelCaseMap The map with camelCase keys.
+     * @param targetClass The class of the target DTO.
+     * @param <T> The type of the DTO.
+     * @return An instance of the target DTO populated with data from the map.
+     */
+    public static <T> T convertMapToDto(Map<String, Object> camelCaseMap, Class<T> targetClass) {
+        if (camelCaseMap == null || camelCaseMap.isEmpty()) {
+            try {
+                return targetClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to instantiate empty target class: " + targetClass.getName(), e);
+            }
+        }
+        return MAPPER.convertValue(camelCaseMap, targetClass);
+    }
+    
+    /**
+     * A convenience method that converts a Map with snake_case keys directly to a target DTO.
+     * It first converts the keys to camelCase and then converts the map to the DTO.
+     * @param snakeCaseMap The input map with snake_case keys.
+     * @param targetClass The class of the target DTO.
+     * @param <T> The type of the DTO.
+     * @return An instance of the target DTO.
+     */
+    public static <T> T convertSnakeCaseToDto(Map<String, Object> snakeCaseMap, Class<T> targetClass) {
+        Map<String, Object> camelCaseMap = convertSnakeToCamelCase(snakeCaseMap);
+        return convertMapToDto(camelCaseMap, targetClass);
+    }
+
+    /**
+     * Converts a single snake_case string to camelCase.
+     * For example, "sort_order" becomes "sortOrder".
+     * @param snakeCase The string in snake_case.
+     * @return The converted string in camelCase.
+     */
+    public static String toCamelCase(String snakeCase) {
+        if (snakeCase == null || snakeCase.isEmpty()) {
+            return snakeCase;
+        }
+        StringBuilder builder = new StringBuilder();
+        boolean nextUpper = false;
+        for (char c : snakeCase.toCharArray()) {
+            if (c == '_') {
+                nextUpper = true;
+            } else if (nextUpper) {
+                builder.append(Character.toUpperCase(c));
+                nextUpper = false;
+            } else {
+                builder.append(c);
+            }
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Checks if an object has a valid value to be used as a primary key.
+     * Valid value criteria:
+     * 1. Not null.
+     * 2. If it is a String, it must not be empty or contain only whitespace.
+     *
+     * @param value The object to be checked.
+     * @return `true` if the value is valid, `false` otherwise.
+     */
+    public static boolean valuable(Object value) {
+        if (value == null) {
+            return false;
+        }
+        if (value instanceof String) {
+            return !((String) value).trim().isEmpty();
+        }
+        return true;
+    }
+}
+JAVA;
+    }
+
+    /**
+     * Generates the `ScalarValueUtil` class, which provides utility methods
+     * for parsing and formatting scalar values, especially for handling
+     * custom GraphQL scalars like `Date` and `DateTime`.
+     * @return string The content of the `ScalarValueUtil` class.
+     */
     private function generateScalarValueUtil() {
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
@@ -918,9 +1392,11 @@ JAVA;
         $package = $this->projectConfig['packageName'];
         $schemaMappings = "";
         $pkJavaType = 'String';
+        $pkAutogenerated = false;
         foreach ($tableInfo['columns'] as $col) {
             if ($col['isPrimaryKey']) {
                 $pkJavaType = $this->mapDbTypeToJavaType($col['type'], $col['length']);
+                $pkAutogenerated = $col['isAutoIncrement'] || $col['primaryKeyValue'] == 'autogenerated';
                 break;
             }
         }
@@ -940,6 +1416,27 @@ JAVA;
             $importScalarValueUtil = "";
         }
 
+        $returnUpdate = "        return {$camelName}Repository.save({$camelName});\n";
+        if(!$pkAutogenerated)
+        {
+            $returnUpdate = "        {$camelName}Repository.save({$camelName});\n";
+            $returnUpdate .= "        int rowsAffected;\n";
+            foreach ($tableInfo['columns'] as $colName => $col) {
+                if ($col['isPrimaryKey']) {
+                    $camelCasePk = $this->camelCase($colName);
+                    $upperCamelCasePk = ucfirst($camelCasePk);;
+                    $returnUpdate .= "        // Update $camelCasePk\n";
+                    $returnUpdate .= "        if(ValueUtil.valuable(dtoInput.get{$upperCamelCasePk}())) {\n";
+                    $returnUpdate .= "            rowsAffected = {$camelName}Repository.update{$upperCamelCasePk}({$camelName}.get{$upperCamelCasePk}(), dtoInput.get{$upperCamelCasePk}());\n";
+                    $returnUpdate .= "            if (rowsAffected > 0) {\n";
+                    $returnUpdate .= "                $camelName.set{$upperCamelCasePk}(dtoInput.get{$upperCamelCasePk}());\n";
+                    $returnUpdate .= "            }\n";
+                    $returnUpdate .= "        }\n";
+                }
+            }
+            $returnUpdate .= "        return $camelName;\n";
+        }
+
         $code = <<<JAVA
 package $package.controller;
 
@@ -949,22 +1446,20 @@ import $package.model.dto.{$ucCamelName}Input;{$relatedEntityImports}
 import $package.model.entity.$ucCamelName;
 import $package.model.repository.{$ucCamelName}Repository;
 import $package.util.AuditTrailUtil;
-import $package.util.SearchOperation;
-import $package.util.SpecificationBuilder;
+import $package.util.QueryUtil;
+import $package.util.ValueUtil;$importScalarValueUtil
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.stereotype.Controller;$importScalarValueUtil
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Controller
 public class {$ucCamelName}Controller {
@@ -986,35 +1481,10 @@ public class {$ucCamelName}Controller {
             @Argument List<SortInput> orderBy,
             @Argument List<FilterInput> filter) {
 
-        int pageSize = (limit != null) ? limit : (size != null ? size : 20);
-        int pageNum = 0;
-        if (offset != null && pageSize > 0) {
-            pageNum = offset / pageSize;
-        } else if (page != null) {
-            pageNum = page > 0 ? page - 1 : 0; // Convert 1-based page to 0-based
-        }
+        Pageable pageable = QueryUtil.createPageable(limit, offset, page, size, orderBy);
+        Specification<$ucCamelName> specification = QueryUtil.createSpecification(filter);
 
-        Sort sort = Sort.unsorted();
-        if (orderBy != null && !orderBy.isEmpty()) {
-            List<Sort.Order> orders = orderBy.stream()
-                    .map(order -> new Sort.Order(Sort.Direction.fromString(order.getDirection()), order.getField()))
-                    .toList();
-            sort = Sort.by(orders);
-        }
-
-        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
-
-        SpecificationBuilder<$ucCamelName> builder = new SpecificationBuilder<>();
-        if (filter != null) {
-            for (FilterInput f : filter) {
-                String operator = (f.getOperator() == null || f.getOperator().isEmpty()) 
-                                  ? "EQUALS" 
-                                  : f.getOperator().toUpperCase();
-                builder.with(f.getField(), SearchOperation.valueOf(operator), f.getValue());
-            }
-        }
-
-        Page<$ucCamelName> resultPage = {$camelName}Repository.findAll(builder.build(), pageable);
+        Page<$ucCamelName> resultPage = {$camelName}Repository.findAll(specification, pageable);
 
         return Map.of(
             "items", resultPage.getContent(),
@@ -1028,27 +1498,28 @@ public class {$ucCamelName}Controller {
     }
 
     @MutationMapping
-    public $ucCamelName create{$ucCamelName}(@Argument {$ucCamelName}Input input) {
+    public $ucCamelName create{$ucCamelName}(@Argument Map<String, Object> input) {
         $ucCamelName {$camelName} = new $ucCamelName();
-        // Manual mapping from DTO to Entity. Consider using a library like MapStruct.
-{$this->generateDtoToEntityMapping($tableName, $tableInfo, $camelName, 'input', 'create')}
+        // Manual mapping from Map<String, Object> to Entity.
+{$this->generateDtoToEntityMapping($tableName, $tableInfo, $camelName, 'dtoInput', 'create')}
         return {$camelName}Repository.save({$camelName});
     }
 
     @MutationMapping
-    public $ucCamelName update{$ucCamelName}(@Argument $pkJavaType id, @Argument {$ucCamelName}Input input) {
+    public $ucCamelName update{$ucCamelName}(@Argument $pkJavaType id, @Argument Map<String, Object> input) {
         $ucCamelName {$camelName} = {$camelName}Repository.findById(id)
             .orElseThrow(() -> new RuntimeException("{$ucCamelName} not found with id " + id));
-        // Manual mapping from DTO to Entity. Consider using a library like MapStruct.
-{$this->generateDtoToEntityMapping($tableName, $tableInfo, $camelName, 'input', 'update')}
-        return {$camelName}Repository.save({$camelName});
-    }
+        // Manual mapping from Map<String, Object> to Entity.
+{$this->generateDtoToEntityMapping($tableName, $tableInfo, $camelName, 'dtoInput', 'update')}
+$returnUpdate    }
 
     @MutationMapping
     public boolean delete{$ucCamelName}(@Argument $pkJavaType id) {
         {$camelName}Repository.deleteById(id);
         return true;
     }
+
+{$this->generateToggleActiveMutation($tableName, $tableInfo)}
 }
 JAVA;
 
@@ -1240,6 +1711,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -1263,17 +1735,17 @@ public final class AuditTrailUtil {
     /**
      * Retrieves the username of the currently authenticated user.
      *
-     * @return The username of the logged-in user, or "anonymous" if no user is authenticated.
+     * @return The username of the logged-in user, or "" if no user is authenticated.
      */
     public static String getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return "anonymous";
+            return "";
         }
 
         Object principal = authentication.getPrincipal();
         if ("anonymousUser".equals(principal)) {
-            return "anonymous";
+            return "";
         }
 
         if (principal instanceof UserDetails userDetails) {
@@ -1307,6 +1779,28 @@ public final class AuditTrailUtil {
         }
 
         return remoteAddr;
+    }
+
+    /**
+     * Retrieves the ID of the currently authenticated admin user from the session.
+     *
+     * @return The admin ID as a String, or null if not found in the session.
+     */
+    public static String getUserId() {
+        ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (sra == null) {
+            return null;
+        }
+
+        HttpServletRequest request = sra.getRequest();
+        HttpSession session = request.getSession(false); // Do not create a new session
+        if (session != null) {
+            Object adminId = session.getAttribute("adminId");
+            if (adminId != null) {
+                return adminId.toString();
+            }
+        }
+        return null;
     }
 
     /**
@@ -1481,6 +1975,7 @@ JAVA;
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
 package {$package}.config;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -1495,11 +1990,8 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import {$package}.service.JpaUserDetailsService;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import {$package}.model.repository.AdminRepository;
+import {$package}.model.repository.core.AdminRepository;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.context.annotation.Bean;
 
 @Configuration
@@ -1553,8 +2045,8 @@ public class SecurityConfig {
                         "/favicon.ico"
                     ).permitAll()
                     .requestMatchers(
-                        "/graphiql/**", 
-                        "/vendor/**"
+                        "/graphiql/**",
+                        "/vendor/**" // GraphiQL dependencies
                         ).permitAll() // Allow GraphiQL UI
                     .anyRequest().authenticated()
                 )
@@ -1633,21 +2125,17 @@ JAVA;
         return <<<JAVA
 package {$package}.config;
 
-import {$package}.model.entity.Admin;
-import org.springframework.beans.factory.annotation.Value;
-import {$package}.model.repository.AdminRepository;
+import {$package}.model.repository.core.AdminRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -1669,27 +2157,18 @@ public class SessionAuthFilter extends OncePerRequestFilter {
             String username = (String) session.getAttribute("username");
             String sessionPasswordHash = (String) session.getAttribute("password"); // This is sha1(password)
 
-            // Only proceed if there is no existing authentication
-            if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                adminRepository.findByUsername(username).ifPresent(admin -> {
-                    // Re-create the single hash of the password from the database's double hash
-                    // This logic is complex. A simpler way is to just trust the session hash.
-                    // For this implementation, we'll validate the session hash against the user from DB.
-                    
-                    Sha1PasswordEncoder encoder = new Sha1PasswordEncoder();
-                    String expectedSingleHash = encoder.sha1(encoder.sha1(admin.getPassword())); // This is incorrect, let's simplify
-
-                    // We need to re-validate the session password.
-                    // The password in DB is sha1(sha1(plain_password))
-                    // The password in Session is sha1(plain_password)
-                    // So, we hash the session password again and compare with DB password.
-                    if (encoder.sha1(sessionPasswordHash).equals(admin.getPassword())) {
-                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                                username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
-                });
-            }
+            adminRepository.findByUsername(username).ifPresent(admin -> {
+                Sha1PasswordEncoder encoder = new Sha1PasswordEncoder();
+                // We need to re-validate the session password against the one in the database.
+                // The password in DB is sha1(sha1(plain_password))
+                // The password in Session is sha1(plain_password)
+                // So, we hash the session password again and compare with DB password.
+                if (encoder.sha1(sessionPasswordHash).equals(admin.getPassword())) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            });
         }
         filterChain.doFilter(request, response);
     }
@@ -1756,7 +2235,7 @@ JAVA;
         return <<<JAVA
 package $package.service;
 
-import $package.model.repository.AdminRepository;
+import $package.model.repository.core.AdminRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -1796,7 +2275,7 @@ JAVA;
         $package = $this->projectConfig['packageName'];
         // A simplified Admin entity based on auth.php and login.php logic
         return <<<JAVA
-package $package.model.entity;
+package $package.model.entity.core;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -1830,10 +2309,12 @@ JAVA;
     private function generateAdminRepository() {
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
-package $package.model.repository;
+package $package.model.repository.core;
 
-import $package.model.entity.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import $package.model.entity.core.Admin;
+
 import java.util.Optional;
 
 public interface AdminRepository extends JpaRepository<Admin, String> {
@@ -1851,6 +2332,7 @@ JAVA;
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
 package $package.controller.dto;
+
 import lombok.Data;
 @Data
 public class LoginRequest {
@@ -1869,6 +2351,7 @@ JAVA;
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
 package $package.controller.dto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 @Data
@@ -1888,11 +2371,11 @@ JAVA;
     private function generateAuthController() {
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
-package $package.controller;
+package $package.controller.core;
 
-import com.planetbiru.graphqlapplication.config.Sha1PasswordEncoder;
-import com.planetbiru.graphqlapplication.controller.dto.LoginResponse;
-import com.planetbiru.graphqlapplication.model.repository.AdminRepository;
+import $package.config.Sha1PasswordEncoder;
+import $package.controller.dto.LoginResponse;
+import $package.model.repository.core.AdminRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -1930,6 +2413,9 @@ public class AuthController {
                     session.setAttribute("username", admin.getUsername());
                     // Store the single-hashed password in the session for subsequent requests.
                     session.setAttribute("password", singleHashedPassword);
+                    session.setAttribute("adminId", admin.getAdminId());
+                    session.setAttribute("adminName", admin.getName());
+                    session.setAttribute("adminEmail", admin.getEmail());
                     return ResponseEntity.ok(new LoginResponse(true, "Login successful"));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -1959,7 +2445,7 @@ JAVA;
     private function generateAppController() {
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
-package $package.controller;
+package $package.controller.core;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -2042,10 +2528,825 @@ public class AppController {
 JAVA;
     }
 
+    /**
+     * Generates the `AdminController` class for managing admin users.
+     *
+     * This controller provides RESTful endpoints for CRUD (Create, Read, Update, Delete) operations on the Admin entity.
+     * Additionally, it handles functionalities such as toggling the active status, changing passwords,
+     * and displaying the admin list and details. The methods within it directly generate HTML content
+     * for the user interface (UI).
+     *
+     * @return string The Java code for the `AdminController` class.
+     */
+    private function generateAdminController() {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.controller.core;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import $package.util.I18nUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/admin")
+public class AdminController {
+
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private I18nUtil i18nUtil;
+
+    @Value("classpath:frontend-config.json")
+    private Resource configFile;
+
+    private String sha1(String input) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] result = md.digest(input.getBytes(StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder();
+        for (byte b : result) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
+    private String hashPassword(String password) throws NoSuchAlgorithmException {
+        return sha1(sha1(password));
+    }
+
+    private Map<String, Object> getAppAdmin(HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            return null;
+        }
+        String sql = "SELECT * FROM admin WHERE username = :username";
+        MapSqlParameterSource params = new MapSqlParameterSource("username", username);
+        try {
+            return jdbcTemplate.queryForMap(sql, params);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @GetMapping(produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> handleAdminView(
+            @RequestParam(value = "view", required = false, defaultValue = "list") String view,
+            @RequestParam(value = "adminId", required = false) String adminId,
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestHeader(value = "X-Language-Id", required = false) String lang,
+            HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        try {
+            switch (view) {
+                case "create":
+                    return ResponseEntity.ok(buildCreateEditForm(null, lang));
+                case "edit":
+                    return ResponseEntity.ok(buildCreateEditForm(adminId, lang));
+                case "change-password":
+                    return ResponseEntity.ok(buildChangePasswordForm(adminId, lang));
+                case "detail":
+                    return ResponseEntity.ok(buildDetailView(adminId, lang, session));
+                default:
+                    return ResponseEntity.ok(buildListView(search, page, lang));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> handleAdminAction(
+            @RequestParam("action") String action,
+            HttpServletRequest request,
+            @RequestHeader(value = "X-Language-Id", required = false) String lang) {
+
+        HttpSession session = request.getSession(false);
+        Map<String, Object> appAdmin = getAppAdmin(session);
+        if (appAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "User not authenticated"));
+        }
+
+        String adminId = request.getParameter("adminId");
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            switch (action) {
+                case "create":
+                case "update":
+                    return saveAdmin(request, action, adminId, appAdmin, lang);
+                case "toggle_active":
+                    return toggleActive(adminId, appAdmin, lang);
+                case "change_password":
+                    return changePassword(request, adminId, lang);
+                case "delete":
+                    return deleteAdmin(adminId, appAdmin, lang);
+                default:
+                    response.put("success", false);
+                    response.put("message", "Invalid action");
+                    return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    private ResponseEntity<Map<String, Object>> saveAdmin(HttpServletRequest request, String action, String adminId, Map<String, Object> appAdmin, String lang) throws NoSuchAlgorithmException {
+        String name = request.getParameter("name");
+        String username = request.getParameter("username");
+        String email = request.getParameter("email");
+        String adminLevelId = request.getParameter("admin_level_id");
+        boolean active = request.getParameter("active") != null;
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", name);
+        params.addValue("username", username);
+        params.addValue("email", email);
+
+        if ("create".equals(action)) {
+            String password = request.getParameter("password");
+            if (password == null || password.isEmpty()) {
+                throw new IllegalArgumentException(i18nUtil.t("password_is_required", lang));
+            }
+            String hashedPassword = hashPassword(password);
+            String newId = UUID.randomUUID().toString();
+
+            String sql = "INSERT INTO admin (admin_id, name, username, email, password, admin_level_id, active, time_create, admin_create, ip_create) " +
+                         "VALUES (:admin_id, :name, :username, :email, :password, :admin_level_id, :active, :time_create, :admin_create, :ip_create)";
+            params.addValue("admin_id", newId);
+            params.addValue("password", hashedPassword);
+            params.addValue("admin_level_id", adminLevelId);
+            params.addValue("active", active ? 1 : 0);
+            params.addValue("time_create", new Date());
+            params.addValue("admin_create", appAdmin.get("admin_id"));
+            params.addValue("ip_create", request.getRemoteAddr());
+            jdbcTemplate.update(sql, params);
+            return ResponseEntity.ok(Map.of("success", true, "message", i18nUtil.t("admin_created_successfully", lang)));
+
+        } else { // update
+            if (adminId == null) throw new IllegalArgumentException(i18nUtil.t("admin_id_required", lang));
+
+            // Prevent user from changing their own level or deactivating themselves
+            if (adminId.equals(appAdmin.get("admin_id"))) {
+                active = true;
+                adminLevelId = (String) appAdmin.get("admin_level_id");
+            }
+
+            String sql = "UPDATE admin SET name = :name, username = :username, email = :email, admin_level_id = :admin_level_id, active = :active, " +
+                         "time_edit = :time_edit, admin_edit = :admin_edit, ip_edit = :ip_edit WHERE admin_id = :admin_id";
+            params.addValue("admin_level_id", adminLevelId);
+            params.addValue("active", active ? 1 : 0);
+            params.addValue("time_edit", new Date());
+            params.addValue("admin_edit", appAdmin.get("admin_id"));
+            params.addValue("ip_edit", request.getRemoteAddr());
+            params.addValue("admin_id", adminId);
+            jdbcTemplate.update(sql, params);
+            return ResponseEntity.ok(Map.of("success", true, "message", i18nUtil.t("admin_updated_successfully", lang)));
+        }
+    }
+
+    private ResponseEntity<Map<String, Object>> toggleActive(String adminId, Map<String, Object> appAdmin, String lang) {
+        if (adminId == null) throw new IllegalArgumentException(i18nUtil.t("admin_id_required", lang));
+        if (adminId.equals(appAdmin.get("admin_id"))) {
+            throw new IllegalArgumentException(i18nUtil.t("cannot_deactivate_self", lang));
+        }
+
+        String sqlSelect = "SELECT active FROM admin WHERE admin_id = :admin_id";
+        Boolean currentStatus = jdbcTemplate.queryForObject(sqlSelect, new MapSqlParameterSource("admin_id", adminId), Boolean.class);
+
+        int newStatus = (currentStatus != null && currentStatus) ? 0 : 1;
+
+        String sqlUpdate = "UPDATE admin SET active = :active WHERE admin_id = :admin_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("active", newStatus);
+        params.addValue("admin_id", adminId);
+        jdbcTemplate.update(sqlUpdate, params);
+
+        return ResponseEntity.ok(Map.of("success", true, "message", i18nUtil.t("admin_status_updated", lang)));
+    }
+
+    private ResponseEntity<Map<String, Object>> changePassword(HttpServletRequest request, String adminId, String lang) throws NoSuchAlgorithmException {
+        if (adminId == null) throw new IllegalArgumentException(i18nUtil.t("admin_id_required", lang));
+        String password = request.getParameter("password");
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException(i18nUtil.t("password_is_required", lang));
+        }
+        String hashedPassword = hashPassword(password);
+        String sql = "UPDATE admin SET password = :password WHERE admin_id = :admin_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("password", hashedPassword);
+        params.addValue("admin_id", adminId);
+        jdbcTemplate.update(sql, params);
+        return ResponseEntity.ok(Map.of("success", true, "message", i18nUtil.t("password_updated_successfully", lang)));
+    }
+
+    private ResponseEntity<Map<String, Object>> deleteAdmin(String adminId, Map<String, Object> appAdmin, String lang) {
+        if (adminId == null) throw new IllegalArgumentException(i18nUtil.t("admin_id_required", lang));
+        if (adminId.equals(appAdmin.get("admin_id"))) {
+            throw new IllegalArgumentException(i18nUtil.t("cannot_delete_self", lang));
+        }
+        String sql = "DELETE FROM admin WHERE admin_id = :admin_id";
+        jdbcTemplate.update(sql, new MapSqlParameterSource("admin_id", adminId));
+        return ResponseEntity.ok(Map.of("success", true, "message", i18nUtil.t("admin_deleted_successfully", lang)));
+    }
+
+    private String buildListView(String search, int page, String lang) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode rootNode = mapper.readTree(configFile.getInputStream());
+        int pageSize = rootNode.path("pagination").path("pageSize").asInt(20);
+
+        int offset = (page - 1) * pageSize;
+
+        StringBuilder html = new StringBuilder();
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        String whereClause = "";
+        if (search != null && !search.isEmpty()) {
+            whereClause = " WHERE (a.name LIKE :search OR a.username LIKE :search)";
+            params.addValue("search", "%" + search + "%");
+        }
+
+        String countSql = "SELECT COUNT(*) FROM admin a" + whereClause;
+        Integer totalAdmins = jdbcTemplate.queryForObject(countSql, params, Integer.class);
+        int totalPages = (totalAdmins != null) ? (int) Math.ceil((double) totalAdmins / pageSize) : 0;
+
+        String sql = "SELECT a.admin_id, a.name, a.username, a.email, a.active, al.name as admin_level_name " +
+                "FROM admin a " +
+                "LEFT JOIN admin_level al ON a.admin_level_id = al.admin_level_id " +
+                whereClause +
+                " ORDER BY a.name LIMIT :limit OFFSET :offset";
+        params.addValue("limit", pageSize);
+        params.addValue("offset", offset);
+
+        List<Map<String, Object>> admins = jdbcTemplate.queryForList(sql, params);
+
+        // Build search form
+        html.append("<div id=\"filter-container\" class=\"filter-container\" style=\"display: block;\">")
+            .append("<form id=\"admin-search-form\" class=\"search-form\" onsubmit=\"handleAdminSearch(event)\">")
+            .append("<div class=\"filter-controls\">")
+            .append("<div class=\"form-group\">")
+            .append("<label for=\"username\">").append(i18nUtil.t("name", lang)).append("</label>")
+            .append("<input type=\"text\" name=\"search\" id=\"username\" placeholder=\"").append(i18nUtil.t("name", lang)).append("\" value=\"").append(search != null ? search : "").append("\">")
+            .append("</div>")
+            .append("<button type=\"submit\" class=\"btn btn-primary\">").append(i18nUtil.t("search", lang)).append("</button>")
+            .append("<a href=\"#admin?view=create\" class=\"btn btn-primary\">").append(i18nUtil.t("add_new_admin", lang)).append("</a>")
+            .append("</div></form></div>");
+
+        // Build table
+        html.append("<div class=\"table-container\"><table class=\"table table-striped\"><thead><tr>")
+            .append("<th>").append(i18nUtil.t("name", lang)).append("</th>")
+            .append("<th>").append(i18nUtil.t("username", lang)).append("</th>")
+            .append("<th>").append(i18nUtil.t("email", lang)).append("</th>")
+            .append("<th>").append(i18nUtil.t("admin_level", lang)).append("</th>")
+            .append("<th>").append(i18nUtil.t("status", lang)).append("</th>")
+            .append("<th>").append(i18nUtil.t("actions", lang)).append("</th>")
+            .append("</tr></thead><tbody>");
+
+        if (admins.isEmpty()) {
+            html.append("<tr><td colspan=\"6\">").append(i18nUtil.t("no_admins_found", lang)).append("</td></tr>");
+        } else {
+            for (Map<String, Object> admin : admins) {
+                boolean isActive = (Boolean) admin.getOrDefault("active", false);
+                String adminId = (String) admin.get("admin_id");
+                html.append("<tr class=\"").append(isActive ? "" : "inactive").append("\">")
+                    .append("<td>").append(admin.get("name")).append("</td>")
+                    .append("<td>").append(admin.get("username")).append("</td>")
+                    .append("<td>").append(admin.get("email")).append("</td>")
+                    .append("<td>").append(admin.get("admin_level_name")).append("</td>")
+                    .append("<td>").append(isActive ? i18nUtil.t("active", lang) : i18nUtil.t("inactive", lang)).append("</td>")
+                    .append("<td class=\"actions\">")
+                    .append("<a href=\"#admin?view=detail&adminId=").append(adminId).append("\" class=\"btn btn-sm btn-info\">").append(i18nUtil.t("view", lang)).append("</a> ")
+                    .append("<a href=\"#admin?view=edit&adminId=").append(adminId).append("\" class=\"btn btn-sm btn-primary\">").append(i18nUtil.t("edit", lang)).append("</a>")
+                    .append("</td></tr>");
+            }
+        }
+        html.append("</tbody></table></div>");
+
+        // Build pagination
+        html.append("<div class=\"pagination-container\">");
+        if (totalPages > 1) {
+            String searchQuery = (search != null && !search.isEmpty()) ? "&search=" + search : "";
+            html.append("<span>").append(i18nUtil.t("page_of", lang, new Object[]{page, totalPages, totalAdmins})).append("</span>");
+            html.append("<div>");
+            if (page > 1) {
+                html.append("<a href=\"#admin?page=").append(page - 1).append(searchQuery).append("\" class=\"btn btn-secondary\">").append(i18nUtil.t("previous", lang)).append("</a> ");
+            }
+            if (page < totalPages) {
+                html.append("<a href=\"#admin?page=").append(page + 1).append(searchQuery).append("\" class=\"btn btn-secondary\">").append(i18nUtil.t("next", lang)).append("</a>");
+            }
+            html.append("</div>");
+        }
+        html.append("</div>");
+
+        return html.toString();
+    }
+
+    private String buildDetailView(String adminId, String lang, HttpSession session) {
+        Map<String, Object> appAdmin = getAppAdmin(session);
+        String sql = "SELECT a.*, al.name as admin_level_name FROM admin a LEFT JOIN admin_level al ON a.admin_level_id = al.admin_level_id WHERE a.admin_id = :admin_id";
+        Map<String, Object> admin = jdbcTemplate.queryForMap(sql, new MapSqlParameterSource("admin_id", adminId));
+
+        if (admin == null) {
+            return "<p>" + i18nUtil.t("admin_not_found", lang) + "</p>";
+        }
+
+        boolean isActive = (Boolean) admin.getOrDefault("active", false);
+        boolean isSelf = adminId.equals(appAdmin.get("admin_id"));
+
+        StringBuilder html = new StringBuilder();
+        html.append("<div class=\"back-controls\">")
+            .append("<a href=\"#admin\" class=\"btn btn-secondary\">").append(i18nUtil.t("back_to_list", lang)).append("</a> ")
+            .append("<a href=\"#admin?view=edit&adminId=").append(adminId).append("\" class=\"btn btn-primary\">").append(i18nUtil.t("edit", lang)).append("</a> ");
+
+        if (!isSelf) {
+            html.append("<a href=\"#admin?view=change-password&adminId=").append(adminId).append("\" class=\"btn btn-warning\">").append(i18nUtil.t("change_password", lang)).append("</a> ")
+                .append("<button class=\"btn ").append(isActive ? "btn-warning" : "btn-success").append("\" onclick=\"handleAdminToggleActive('").append(adminId).append("', ").append(isActive).append(")\">")
+                .append(isActive ? i18nUtil.t("deactivate", lang) : i18nUtil.t("activate", lang))
+                .append("</button> ")
+                .append("<button class=\"btn btn-danger\" onclick=\"handleAdminDelete('").append(adminId).append("')\">").append(i18nUtil.t("delete", lang)).append("</button>");
+        }
+        html.append("</div>");
+
+        html.append("<div class=\"table-container detail-view\"><table class=\"table\"><tbody>")
+            .append("<tr><td><strong>").append(i18nUtil.t("admin_id", lang)).append("</strong></td><td>").append(admin.get("admin_id")).append("</td></tr>")
+            .append("<tr><td><strong>").append(i18nUtil.t("name", lang)).append("</strong></td><td>").append(admin.get("name")).append("</td></tr>")
+            // ... other fields
+            .append("<tr><td><strong>").append(i18nUtil.t("username", lang)).append("</strong></td><td>").append(admin.get("username")).append("</td></tr>")
+            .append("<tr><td><strong>").append(i18nUtil.t("email", lang)).append("</strong></td><td>").append(admin.get("email")).append("</td></tr>")
+            .append("<tr><td><strong>").append(i18nUtil.t("admin_level", lang)).append("</strong></td><td>").append(admin.get("admin_level_name")).append("</td></tr>")
+            .append("<tr><td><strong>").append(i18nUtil.t("status", lang)).append("</strong></td><td>").append(isActive ? i18nUtil.t("active", lang) : i18nUtil.t("inactive", lang)).append("</td></tr>")
+            .append("<tr><td><strong>").append(i18nUtil.t("time_create", lang)).append("</strong></td><td>").append(admin.get("time_create")).append("</td></tr>")
+            .append("<tr><td><strong>").append(i18nUtil.t("time_edit", lang)).append("</strong></td><td>").append(admin.get("time_edit")).append("</td></tr>")
+            .append("</tbody></table></div>");
+
+        return html.toString();
+    }
+
+    private String buildCreateEditForm(String adminId, String lang) {
+        Map<String, Object> admin = null;
+        boolean isCreate = (adminId == null);
+        if (!isCreate) {
+            String sql = "SELECT * FROM admin WHERE admin_id = :admin_id";
+            admin = jdbcTemplate.queryForMap(sql, new MapSqlParameterSource("admin_id", adminId));
+        }
+
+        String adminLevelsSql = "SELECT admin_level_id, name FROM admin_level WHERE active = 1 ORDER BY sort_order";
+        List<Map<String, Object>> adminLevels = jdbcTemplate.queryForList(adminLevelsSql, new MapSqlParameterSource());
+
+        StringBuilder html = new StringBuilder();
+        html.append("<div class=\"back-controls\">")
+            .append("<a href=\"#admin\" class=\"btn btn-secondary\">").append(i18nUtil.t("back_to_list", lang)).append("</a>")
+            .append("</div>")
+            .append("<div class=\"table-container detail-view\">")
+            .append("<h3>").append(i18nUtil.t(isCreate ? "add_new_admin" : "edit_admin", lang)).append("</h3>")
+            .append("<form id=\"admin-form\" class=\"form-group\" onsubmit=\"handleAdminSave(event, '").append(adminId != null ? adminId : "").append("'); return false;\">")
+            .append("<table class=\"table table-borderless\">");
+
+        // Name
+        html.append("<tr><td>").append(i18nUtil.t("name", lang)).append("</td><td><input type=\"text\" name=\"name\" value=\"").append(admin != null ? admin.get("name") : "").append("\" required autocomplete=\"off\"></td></tr>");
+        // Username
+        html.append("<tr><td>").append(i18nUtil.t("username", lang)).append("</td><td><input type=\"text\" name=\"username\" value=\"").append(admin != null ? admin.get("username") : "").append("\" required autocomplete=\"off\"></td></tr>");
+        // Email
+        html.append("<tr><td>").append(i18nUtil.t("email", lang)).append("</td><td><input type=\"email\" name=\"email\" value=\"").append(admin != null ? admin.get("email") : "").append("\" required autocomplete=\"off\"></td></tr>");
+
+        if (isCreate) {
+            html.append("<tr><td>").append(i18nUtil.t("password", lang)).append("</td><td><input type=\"password\" name=\"password\" required autocomplete=\"new-password\"></td></tr>");
+        }
+
+        // Admin Level
+        html.append("<tr><td>").append(i18nUtil.t("admin_level", lang)).append("</td><td><select name=\"admin_level_id\" required>");
+        html.append("<option value=\"\">").append(i18nUtil.t("select_option", lang)).append("</option>");
+        for (Map<String, Object> level : adminLevels) {
+            String levelId = (String) level.get("admin_level_id");
+            String selected = (admin != null && levelId.equals(admin.get("admin_level_id"))) ? "selected" : "";
+            html.append("<option value=\"").append(levelId).append("\" ").append(selected).append(">").append(level.get("name")).append("</option>");
+        }
+        html.append("</select></td></tr>");
+
+        // Active
+        boolean isActive = (admin != null && (Boolean) admin.getOrDefault("active", false)) || isCreate;
+        html.append("<tr><td>").append(i18nUtil.t("active", lang)).append("</td><td class=\"form-group form-element-checkbox\"><input type=\"checkbox\" name=\"active\" ").append(isActive ? "checked" : "").append("></td></tr>");
+
+        // Buttons
+        html.append("<tr><td></td><td>")
+            .append("<button type=\"submit\" class=\"btn btn-success\">").append(i18nUtil.t("save", lang)).append("</button> ")
+            .append("<a href=\"#admin\" class=\"btn btn-secondary\">").append(i18nUtil.t("cancel", lang)).append("</a>")
+            .append("</td></tr>");
+
+        html.append("</table></form></div>");
+        return html.toString();
+    }
+
+    private String buildChangePasswordForm(String adminId, String lang) {
+        StringBuilder html = new StringBuilder();
+        html.append("<div class=\"back-controls\">")
+            .append("<a href=\"#admin/detail/").append(adminId).append("\" class=\"btn btn-secondary\">").append(i18nUtil.t("back_to_detail", lang)).append("</a>")
+            .append("</div>")
+            .append("<div class=\"table-container detail-view\">")
+            .append("<h3>").append(i18nUtil.t("change_password", lang)).append("</h3>")
+            .append("<form id=\"change-password-form\" class=\"form-group\" onsubmit=\"handleAdminChangePassword(event, '").append(adminId).append("'); return false;\">")
+            .append("<table class=\"table table-borderless\">")
+            .append("<tr><td>").append(i18nUtil.t("new_password", lang)).append("</td><td><input type=\"password\" name=\"password\" required autocomplete=\"new-password\"></td></tr>")
+            .append("<tr><td></td><td>")
+            .append("<button type=\"submit\" class=\"btn btn-success\">").append(i18nUtil.t("update", lang)).append("</button> ")
+            .append("<a href=\"#admin/detail/").append(adminId).append("\" class=\"btn btn-secondary\">").append(i18nUtil.t("cancel", lang)).append("</a>")
+            .append("</td></tr>")
+            .append("</table></form></div>");
+        return html.toString();
+    }
+}
+JAVA;
+    }
+
+    /**
+     * Generates the UserProfileController class.
+     * This controller is responsible for managing the current user's profile. It provides endpoints
+     * to display the user's profile information and an edit form. It also handles the POST request
+     * to update the user's details in the database. The views are rendered as HTML directly.
+     *
+     * @return string The Java code for the UserProfileController class.
+     */
+    private function generateUserProfileController() {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.controller.core;
+
+import {$package}.util.I18nUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import org.springframework.web.util.HtmlUtils;
+
+@RestController
+public class UserProfileController {
+
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private I18nUtil i18nUtil;
+
+    /**
+     * Handles GET requests to display the user's profile information as an HTML view.
+     * This corresponds to the main profile view.
+     *
+     * @param request The incoming HttpServletRequest, used to get the session.
+     * @return A ResponseEntity containing the HTML string for the view or an error.
+     */
+    @GetMapping(value = "/user-profile", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> getUserProfileView(HttpServletRequest request, @RequestHeader(value = "X-Language-Id", required = false) String lang) {
+        return generateProfileView(request, false, lang);
+    }
+
+    /**
+     * Handles GET requests to display the user profile update form as an HTML view.
+     * This corresponds to the edit profile page.
+     *
+     * @param request The incoming HttpServletRequest, used to get the session.
+     * @return A ResponseEntity containing the HTML string for the form or an error.
+     */
+    @GetMapping(value = "/user-profile-update", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> getUserProfileUpdateView(HttpServletRequest request, @RequestHeader(value = "X-Language-Id", required = false) String lang) {
+        return generateProfileView(request, true, lang);
+    }
+
+    private ResponseEntity<String> generateProfileView(HttpServletRequest request, boolean isUpdateForm, String lang) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+        String username = (String) session.getAttribute("username");
+        Locale locale = request.getLocale();
+
+        String sql = "SELECT admin.*, (SELECT admin_level.name FROM admin_level WHERE admin_level.admin_level_id = admin.admin_level_id) AS admin_level_name FROM admin WHERE admin.username = :username";
+        MapSqlParameterSource params = new MapSqlParameterSource("username", username);
+
+        try {
+            Map<String, Object> admin = jdbcTemplate.queryForMap(sql, params);
+            String htmlContent = isUpdateForm ? buildUpdateFormHtml(admin, lang) : buildDetailViewHtml(admin, lang);
+            return ResponseEntity.ok(htmlContent);
+        } catch (Exception e) {
+            // Log the exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    private String buildDetailViewHtml(Map<String, Object> admin, String lang) {
+        StringBuilder html = new StringBuilder();
+        html.append("<div class=\"table-container detail-view\">")
+            .append("<form action=\"\" class=\"form-group\">")
+            .append("<table class=\"table table-borderless\">");
+
+        // Helper lambda to append rows
+        appendRow(html, i18nUtil.t("admin_id", lang), get(admin, "admin_id"));
+        appendRow(html, i18nUtil.t("name", lang), get(admin, "name"));
+        appendRow(html, i18nUtil.t("username", lang), get(admin, "username"));
+        appendRow(html, i18nUtil.t("gender", lang), "M".equals(get(admin, "gender")) ? i18nUtil.t("male", lang) : i18nUtil.t("female", lang));
+        appendRow(html, i18nUtil.t("birthday", lang), get(admin, "birth_day"));
+        appendRow(html, i18nUtil.t("phone", lang), get(admin, "phone"));
+        appendRow(html, i18nUtil.t("email", lang), get(admin, "email"));
+        appendRow(html, i18nUtil.t("admin_level_id", lang), get(admin, "admin_level_name"));
+        appendRow(html, i18nUtil.t("language_id", lang), get(admin, "language_id"));
+        appendRow(html, i18nUtil.t("last_reset_password", lang), get(admin, "last_reset_password"));
+        appendRow(html, i18nUtil.t("blocked", lang), (Boolean) admin.getOrDefault("blocked", false) ? i18nUtil.t("yes", lang) : i18nUtil.t("no", lang));
+        appendRow(html, i18nUtil.t("active", lang), (Boolean) admin.getOrDefault("active", false) ? i18nUtil.t("yes", lang) : i18nUtil.t("no", lang));
+
+        html.append("<tr><td></td><td>")
+            .append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"window.location='#user-profile-update'\">").append(i18nUtil.t("edit", lang)).append("</button> ")
+            .append("<button type=\"button\" class=\"btn btn-warning\" onclick=\"window.location='#update-password'\">").append(i18nUtil.t("update_password", lang)).append("</button>")
+            .append("</td></tr>");
+
+        html.append("</table></form></div>");
+        return html.toString();
+    }
+
+    private String buildUpdateFormHtml(Map<String, Object> admin, String lang) {
+        StringBuilder html = new StringBuilder();
+        html.append("<div class=\"table-container detail-view\">")
+            .append("<form id=\"profile-update-form\" class=\"form-group\" onsubmit=\"handleProfileUpdate(event); return false;\">")
+            .append("<table class=\"table table-borderless\">");
+
+        appendInputRow(html, i18nUtil.t("admin_id", lang), "admin_id", get(admin, "admin_id"), true);
+        appendInputRow(html, i18nUtil.t("name", lang), "name", get(admin, "name"), false);
+        appendInputRow(html, i18nUtil.t("username", lang), "username", get(admin, "username"), true);
+
+        // Gender select
+        String gender = get(admin, "gender");
+        html.append("<tr><td>").append(i18nUtil.t("gender", lang)).append("</td><td>")
+            .append("<select name=\"gender\" class=\"form-control\">")
+            .append("<option value=\"M\" ").append("M".equals(gender) ? "selected" : "").append(">").append(i18nUtil.t("male", lang)).append("</option>")
+            .append("<option value=\"F\" ").append("F".equals(gender) ? "selected" : "").append(">").append(i18nUtil.t("female", lang)).append("</option>")
+            .append("</select></td></tr>");
+
+        appendInputRow(html, i18nUtil.t("birthday", lang), "birth_day", get(admin, "birth_day"), false, "date");
+        appendInputRow(html, i18nUtil.t("phone", lang), "phone", get(admin, "phone"), false);
+        appendInputRow(html, i18nUtil.t("email", lang), "email", get(admin, "email"), false, "email");
+
+        // Buttons
+        html.append("<tr><td></td><td>")
+            .append("<button type=\"submit\" class=\"btn btn-success\">").append(i18nUtil.t("update", lang)).append("</button> ")
+            .append("<button type=\"button\" class=\"btn btn-secondary\" onclick=\"window.location='#user-profile'\">").append(i18nUtil.t("cancel", lang)).append("</button>")
+            .append("</td></tr>");
+
+        html.append("</table></form></div>");
+        return html.toString();
+    }
+
+    // --- Helper Methods ---
+
+    private String get(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return value != null ? HtmlUtils.htmlEscape(value.toString()) : "";
+    }
+
+    private void appendRow(StringBuilder sb, String label, String value) {
+        sb.append("<tr><td>").append(label).append("</td><td>").append(value).append("</td></tr>");
+    }
+
+    private void appendInputRow(StringBuilder sb, String label, String name, String value, boolean readonly) {
+        appendInputRow(sb, label, name, value, readonly, "text");
+    }
+
+    private void appendInputRow(StringBuilder sb, String label, String name, String value, boolean readonly, String type) {
+        sb.append("<tr><td>").append(label).append("</td><td>")
+            .append("<input type=\"").append(type).append("\" name=\"").append(name)
+            .append("\" class=\"form-control\" value=\"").append(value)
+            .append("\" autocomplete=\"off\" ").append(readonly ? "readonly" : "")
+            .append("></td></tr>");
+    }
+
+    /**
+     * Handles POST requests to update the user's profile.
+     * It reads the updated profile data from the request body and updates the database.
+     *
+     * @param request The incoming HttpServletRequest, used to get the session and locale.
+     * @return A ResponseEntity indicating success or failure.
+     */
+    @PostMapping("/user-profile")
+    public ResponseEntity<Map<String, Object>> updateUserProfile(
+            HttpServletRequest request,
+            @RequestHeader(value = "X-Language-Id", required = false) String lang,
+            @RequestParam("name") String name,
+            @RequestParam("email") String email,
+            @RequestParam("gender") String gender,
+            @RequestParam("birth_day") String birthDay,
+            @RequestParam("phone") String phone) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "User not authenticated"));
+        }
+        String username = (String) session.getAttribute("username");
+        try {
+            String sql = "UPDATE admin SET name = :name, email = :email, gender = :gender, birth_day = :birth_day, phone = :phone WHERE username = :username";
+
+            MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("name", name);
+            params.addValue("email", email);
+            params.addValue("gender", gender);
+            params.addValue("birth_day", birthDay);
+            params.addValue("phone", phone);
+            params.addValue("username", username); // Use session username for security
+
+            jdbcTemplate.update(sql, params);
+
+            String successMessage = i18nUtil.t("profile_updated_successfully", lang);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", successMessage);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Log the exception
+            String errorMessage = i18nUtil.t("failed_to_update_profile", lang, new Object[]{e.getMessage()});
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", errorMessage);
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+}
+JAVA;
+    }
+
+    /**
+     * Generates the UserProfileController class.
+     * This controller is responsible for managing the current user's profile. It provides endpoints
+     * to display the user's profile information and an edit form. It also handles the POST request
+     * to update the user's details in the database. The views are rendered as HTML directly.
+     *
+     * @return string The Java code for the UserProfileController class.
+     */
+    private function generateUpdatePasswordController() {
+        $package = $this->projectConfig['packageName'];
+        return <<<JAVA
+package $package.controller.core;
+
+import $package.config.Sha1PasswordEncoder;
+import $package.model.entity.core.Admin;
+import $package.model.repository.core.AdminRepository;
+import $package.util.I18nUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+public class UpdatePasswordController {
+
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    @Autowired
+    private Sha1PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private I18nUtil i18nUtil;
+
+    /**
+     * Handles GET requests to display the update password form.
+     * @param request The incoming HttpServletRequest to get the locale.
+     * @return A ResponseEntity containing the HTML string for the form.
+     */
+    @GetMapping(value = "/update-password", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> getUpdatePasswordView(HttpServletRequest request, @RequestHeader(value = "X-Language-Id", required = false) String lang) {
+        String html = buildUpdatePasswordFormHtml(lang);
+        return ResponseEntity.ok(html);
+    }
+
+    private String buildUpdatePasswordFormHtml(String lang) {
+        return "<div class=\"table-container detail-view\">" +
+                "<form id=\"password-update-form\" class=\"form-group\" onsubmit=\"handlePasswordUpdate(event); return false;\">" +
+                "<table class=\"table table-borderless\">" +
+                "<tr><td>" + i18nUtil.t("current_password", lang) + "</td>" +
+                "<td><input type=\"password\" name=\"current_password\" class=\"form-control\" required autocomplete=\"current-password\"></td></tr>" +
+                "<tr><td>" + i18nUtil.t("new_password", lang) + "</td>" +
+                "<td><input type=\"password\" name=\"new_password\" class=\"form-control\" required autocomplete=\"new-password\"></td></tr>" +
+                "<tr><td>" + i18nUtil.t("confirm_password", lang) + "</td>" +
+                "<td><input type=\"password\" name=\"confirm_password\" class=\"form-control\" required autocomplete=\"new-password\"></td></tr>" +
+                "<tr><td></td><td>" +
+                "<button type=\"submit\" class=\"btn btn-success\">" + i18nUtil.t("update", lang) + "</button> " +
+                "<button type=\"button\" class=\"btn btn-secondary\" onclick=\"window.location='#user-profile'\">" + i18nUtil.t("cancel", lang) + "</button>" +
+                "</td></tr>" +
+                "</table></form></div>";
+    }
+
+    /**
+     * Handles POST requests to update the user's password.
+     * @param request The incoming HttpServletRequest to get session and locale.
+     * @param currentPassword The user's current password.
+     * @param newPassword The new password.
+     * @param confirmPassword The confirmation of the new password.
+     * @return A ResponseEntity indicating success or failure.
+     */
+    @PostMapping("/update-password")
+    public ResponseEntity<Map<String, Object>> updatePassword(
+            HttpServletRequest request,
+            @RequestHeader(value = "X-Language-Id", required = false) String lang,
+            @RequestParam("current_password") String currentPassword,
+            @RequestParam("new_password") String newPassword,
+            @RequestParam("confirm_password") String confirmPassword) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("username") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "User not authenticated"));
+        }
+        String username = (String) session.getAttribute("username");
+
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", i18nUtil.t("password_mismatch", lang)));
+        }
+
+        Optional<Admin> adminOptional = adminRepository.findByUsername(username);
+        if (adminOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "User not found"));
+        }
+
+        Admin admin = adminOptional.get();
+        if (!passwordEncoder.matches(currentPassword, admin.getPassword())) { //NOSONAR
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", i18nUtil.t("incorrect_current_password", lang)));
+        }
+
+        try {
+            String newHashedPassword = passwordEncoder.encode(newPassword);
+            String sql = "UPDATE admin SET password = :password WHERE username = :username";
+            MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("password", newHashedPassword);
+            params.addValue("username", username);
+            jdbcTemplate.update(sql, params);
+
+            return ResponseEntity.ok(Map.of("success", true, "message", i18nUtil.t("password_updated_successfully", lang)));
+        } catch (Exception e) {
+            // Log the exception
+            String errorMessage = i18nUtil.t("failed_to_update_password", lang, new Object[]{e.getMessage()});
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "message", errorMessage));
+        }
+    }
+}
+JAVA;
+    }
+
+    /**
+     * Generates the StaticAssetController class.
+     * This controller serves static assets like CSS, JavaScript, and images from the classpath.
+     *
+     * @return string The Java code for the StaticAssetController class.
+     */
     private function generateStaticAssetController() {
         $package = $this->projectConfig['packageName'];
         return <<<JAVA
-package $package.controller;
+package $package.controller.core;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.ServletContext;
@@ -2183,13 +3484,19 @@ type {$ucCamelName}Page {
     hasPrevious: Boolean
 }
 GQL;
+        $pkType = $this->mapJavaTypeToGqlType($this->mapDbTypeToJavaType($tableInfo['columns'][$tableInfo['primaryKey']]['type'], $tableInfo['columns'][$tableInfo['primaryKey']]['length']));
 
-        $queries = "    {$camelName}(id: ID!): $ucCamelName\n";
+        $queries = "    {$camelName}(id: {$pkType}!): $ucCamelName\n";
         $queries .= "    {$pluralCamelName}(limit: Int, offset: Int, page: Int, size: Int, orderBy: [SortInput], filter: [FilterInput]): {$ucCamelName}Page\n";
 
         $mutations = "    create{$ucCamelName}(input: {$ucCamelName}Input!): $ucCamelName\n";
-        $mutations .= "    update{$ucCamelName}(id: ID!, input: {$ucCamelName}Input!): $ucCamelName\n";
-        $mutations .= "    delete{$ucCamelName}(id: ID!): Boolean\n";
+        $mutations .= "    update{$ucCamelName}(id: {$pkType}!, input: {$ucCamelName}Input!): $ucCamelName\n";
+        $mutations .= "    delete{$ucCamelName}(id: {$pkType}!): Boolean\n";
+        
+        if ($tableInfo['hasActiveColumn']) {
+            $activeField = $this->camelCase($this->activeField);
+            $mutations .= "    toggle{$ucCamelName}Active(id: {$pkType}!, $activeField: Boolean!): $ucCamelName\n";
+        }
 
         return [
             'types' => $types,
@@ -2210,47 +3517,72 @@ GQL;
      */
     private function generateDtoToEntityMapping($tableName, $tableInfo, $entityVar, $dtoVar, $action) {
         $mappingCode = "";
+
+        $mappingCode .= "        {$this->upperCamelCase($tableName)}Input {$dtoVar} = ValueUtil.convertSnakeCaseToDto(input, {$this->upperCamelCase($tableName)}Input.class);\n";
+
+
         $backendHandledColumnNames = $this->getBackendHandledColumnNames();
         $skippedColumns = array();
         $inputColumns = array();
         
 
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
-            $inputColumns[] = $colName;
-            if ($colName === $tableInfo['primaryKey'] && ($colInfo['isAutoIncrement'] || $colInfo['primaryKeyValue'] == 'autogenerated')) {
+            
+            if ($colName === $tableInfo['primaryKey'] && ($colInfo['isAutoIncrement'] || $colInfo['primaryKeyValue'] == 'autogenerated' || $action == 'update')) {
                 continue;
+            }
+            if ($colName === $tableInfo['primaryKey'] && $action == 'create')
+            {
+                $camelCasePk = $this->camelCase($colName);
+                $upperCamelCasePk = ucfirst($camelCasePk);
+                $mappingCode .= "        // Validate  primary key\n";
+                $mappingCode .= "        if(!ValueUtil.valuable(dtoInput.get{$upperCamelCasePk}()))\n";
+                $mappingCode .= "        {\n";
+                $mappingCode .= "            throw new RuntimeException(\"Invalid input: $camelCasePk is required\");\n";
+                $mappingCode .= "        }\n";
             }
 
             if(in_array($colName, $backendHandledColumnNames)) {
                 $skippedColumns[] = $colName;
                 continue;
             }
+            $inputColumns[] = $colName;
             
-            if ($colInfo['isForeignKey']) {
-                $refTableName = $colInfo['references'];
-                $refCamelName = $this->camelCase($refTableName);
-                $ucRefCamelName = ucfirst($refCamelName);
-                $camelColName = $this->camelCase($colName);
-                $ucCamelColName = ucfirst($camelColName);
-                $mappingCode .= "        if (input.get{$ucCamelColName}() != null) {\n";
-                $mappingCode .= "            {$this->projectConfig['packageName']}.model.entity.$ucRefCamelName {$refCamelName} = new {$this->projectConfig['packageName']}.model.entity.$ucRefCamelName();\n";
-                $refTableInfo = $this->analyzedSchema[$refTableName];
-                $refTablePrimaryKey = $refTableInfo['primaryKey'];
-                $mappingCode .= "            {$refCamelName}.set".ucfirst($this->camelCase($refTablePrimaryKey))."(input.get{$ucCamelColName}());\n";
-                $mappingCode .= "            {$entityVar}.set".ucfirst($refCamelName)."({$refCamelName});\n";
-                $mappingCode .= "        }\n";
-            } else {
-                $camelColName = $this->camelCase($colName);
-                $ucCamelColName = ucfirst($camelColName);
-                $mappingCode .= "        {$entityVar}.set{$ucCamelColName}({$dtoVar}.get{$ucCamelColName}());\n";
-            }
+            
+            $camelColName = $this->camelCase($colName);
+            $ucCamelColName = ucfirst($camelColName);
+            $mappingCode .= "        {$entityVar}.set{$ucCamelColName}({$dtoVar}.get{$ucCamelColName}());\n";
+            
         }
-
         foreach($this->backendHandledColumns as $key=>$col)
         {
             $colName = $col['columnName'];
-            $dataType = $col['type'];
-            if(in_array($colName, $inputColumns))
+            if(in_array($colName, $inputColumns) || in_array($colName, $skippedColumns))
+            {
+                if($key == 'adminCreate' || $key == 'adminEdit')
+                {
+                    $mappingCode .= "        String currentUserId = AuditTrailUtil.getUserId();\n";
+                    break;
+                }
+            }
+        }
+        foreach($this->backendHandledColumns as $key=>$col)
+        {
+            $colName = $col['columnName'];
+            if(in_array($colName, $inputColumns) || in_array($colName, $skippedColumns))
+            {
+                if($key == 'ipCreate' || $key == 'ipEdit')
+                {
+                    $mappingCode .= "        String currentUserIp = AuditTrailUtil.getCurrentIp();\n";
+                    break;
+                }
+            }
+        }
+        foreach($this->backendHandledColumns as $key=>$col)
+        {
+            
+            $colName = $col['columnName'];
+            if(in_array($colName, $inputColumns) || in_array($colName, $skippedColumns))
             {
                 if($action == 'create')
                 {
@@ -2260,11 +3592,11 @@ GQL;
                     }
                     if($key == 'adminCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentUser());\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserId);\n";
                     }
                     if($key == 'ipCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentIp());\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserIp);\n";
                     }
                 }
                 if($key == 'timeEdit')
@@ -2273,11 +3605,11 @@ GQL;
                 }
                 if($key == 'adminEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentUser());\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserId);\n";
                 }
                 if($key == 'ipEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentIp());\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserIp);\n";
                 }
 
             }
@@ -2482,5 +3814,66 @@ JAVA;
     public function getVerboseLogging()
     {
         return $this->verboseLogging;
+    }
+
+    /**
+     * Generates the toggleActive mutation method if the table has an active column.
+     *
+     * @param string $tableName The name of the table.
+     * @param array $tableInfo The table information.
+     * @return string The generated Java method code, or an empty string.
+     */
+    private function generateToggleActiveMutation($tableName, $tableInfo)
+    {
+        if (!$tableInfo['hasActiveColumn']) {
+            return "";
+        }
+
+        $camelName = $this->camelCase($tableName);
+        $ucCamelName = ucfirst($camelName);
+        $activeField = $this->activeField;
+        $ucActiveField = ucfirst($this->camelCase($activeField));
+        $pkJavaType = 'String'; // Default
+        $inputColumns = array();
+        foreach ($tableInfo['columns'] as $columnName=>$col) {
+            $inputColumns[] = $columnName;
+        }
+        foreach ($tableInfo['columns'] as $col) {
+            if ($col['isPrimaryKey']) {
+                $pkJavaType = $this->mapDbTypeToJavaType($col['type'], $col['length']);
+                break;
+            }
+        }
+
+        $mappingCode = "";
+        foreach($this->backendHandledColumns as $key=>$col)
+        {
+            $colName = $col['columnName'];
+            if(in_array($colName, $inputColumns))
+            {
+                if($key == 'timeEdit')
+                {
+                    $mappingCode .= "        {$camelName}.set".ucfirst($this->camelCase($colName))."(java.time.LocalDateTime.now());\n";
+                }
+                if($key == 'adminEdit')
+                {
+                    $mappingCode .= "        {$camelName}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getUserId());\n";
+                }
+                if($key == 'ipEdit')
+                {
+                    $mappingCode .= "        {$camelName}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentIp());\n";
+                }
+
+            }
+        }
+
+        return <<<JAVA
+    @MutationMapping
+    public $ucCamelName toggle{$ucCamelName}Active(@Argument $pkJavaType id, @Argument(name = "$activeField") boolean $activeField) {
+        $ucCamelName $camelName = {$camelName}Repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("{$ucCamelName} not found with id " + id));
+        $camelName.set$ucActiveField($activeField);\n{$mappingCode}        return {$camelName}Repository.save($camelName);
+    }
+JAVA;
     }
 }

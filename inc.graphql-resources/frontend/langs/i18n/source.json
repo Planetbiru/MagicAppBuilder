@@ -117,5 +117,21 @@
     "notification_deleted_successfully": "Notification deleted successfully.",
     "refresh_app": "Refresh Application",
     "app_refreshed_successfully": "Application has been refreshed successfully.",
-    "app_refresh_failed": "Failed to refresh the application."
+    "app_refresh_failed": "Failed to refresh the application.",
+    "password_is_required": "Password is required.",
+    "admin_created_successfully": "Admin created successfully.",
+    "admin_id_required": "Admin ID is required.",
+    "admin_updated_successfully": "Admin updated successfully.",
+    "cannot_deactivate_self": "You cannot deactivate your own account.",
+    "admin_status_updated": "Admin status updated successfully.",
+    "cannot_delete_self": "You cannot delete your own account.",
+    "admin_deleted_successfully": "Admin deleted successfully.",
+    "add_new_admin": "Add New Admin",
+    "admin_level": "Admin Level",
+    "no_admins_found": "No admins found.",
+    "admin_not_found": "Admin not found.",
+    "time_create": "Time Create",
+    "time_edit": "Time Edit",
+    "edit_admin": "Edit Admin",
+    "back_to_detail": "Back to Detail"
 }

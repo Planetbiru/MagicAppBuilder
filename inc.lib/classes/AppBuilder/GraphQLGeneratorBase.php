@@ -225,6 +225,17 @@ class GraphQLGeneratorBase
     }
 
     /**
+     * Converts a string to lowerCamelCase.
+     *
+     * @param string $str The input string.
+     * @return string The converted lowerCamelCase string.
+     */
+    protected function upperCamelCase($str)
+    {
+        return PicoStringUtil::upperCamelize($str);
+    }
+
+    /**
      * Converts a string to PascalCase.
      *
      * @param string $str The input string.
