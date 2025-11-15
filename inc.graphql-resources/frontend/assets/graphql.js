@@ -875,13 +875,7 @@ class GraphQLClientApp {
             }
 
             const result = await response.json();
-
-            if (result.errors) {
-                console.error('GraphQL Errors:', result.errors);
-                console.error(`Error: ${result.errors[0].message}`);
-                throw new Error(result.errors[0].message);
-            }
-            return result.data;
+            return result;
         } catch (error) {
             // Re-throw the error so that calling functions can handle it
             throw error;
@@ -1187,15 +1181,27 @@ class GraphQLClientApp {
             this.dom.tableDataContainer.innerHTML = this.t('loading');
             this.dom.paginationContainer.innerHTML = '';
 
-            const data = await this.gqlQuery(query, {
+            const queryResult = await this.gqlQuery(query, {
                 limit: this.state.limit,
                 offset: offset,
                 orderBy: orderByForQuery,
                 filter: filterForQuery,
             });
+            const data = queryResult.data;
             const result = data[this.currentEntity.pluralName];
-            this.renderTable(result.items); // Renders into tableDataContainer
+            if(result && result.items && result.items.length > 0)
+            {
+                this.renderTable(result.items); // Renders into tableDataContainer
+            }
+            else
+            {
+                this.dom.tableDataContainer.innerHTML = `<p style="color: red;">Data not found</p>`;
+            }
             this.renderPagination(result);
+            if(result.errors && result.errors.length > 0)
+            {
+                console.error(result.errors);
+            }
         } catch (error) {
             this.dom.tableDataContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
         }
@@ -1594,7 +1600,8 @@ class GraphQLClientApp {
         `;
 
         try {
-            const data = await this.gqlQuery(query, { id });
+            const queryResult = await this.gqlQuery(query, { id });
+            const data = queryResult.data;
             this.showPageWrapper();
             const item = data[this.currentEntity.name]; // NOSONAR
             let detailHtml = `<div class="back-controls">
@@ -1672,7 +1679,8 @@ class GraphQLClientApp {
         if (id) {
             const fields = this.getFieldsForQuery(this.currentEntity, 2, 2); // Fetch with relations for edit form
             const query = `query GetForEdit($id: String!) { ${this.currentEntity.name}(id: $id) { ${fields} } }`;
-            const data = await this.gqlQuery(query, { id }); // NOSONAR
+            const queryResult = await this.gqlQuery(query, { id }); // NOSONAR
+            const data = queryResult.data;
             item = data[this.currentEntity.name];
         }
 
@@ -1903,7 +1911,8 @@ class GraphQLClientApp {
         `;
 
         try {
-            await this.gqlQuery(mutation); // No variables needed
+            let queryResult = await this.gqlQuery(mutation); // No variables needed
+            if(queryResult.errors) throw new Error(queryResult.errors[0].message);
             this.closeModal();
             this.updateTableView(); // Refresh list
         } catch (error) {
@@ -1935,7 +1944,7 @@ class GraphQLClientApp {
             }
         `;
         try {
-            await this.gqlQuery(mutation); // No variables needed
+            const queryResult = await this.gqlQuery(mutation); // No variables needed
             this.updateTableView();
             this.closeConfirmModal();
         } catch (error) {
@@ -1970,7 +1979,7 @@ class GraphQLClientApp {
             }
         `;
         try {
-            await this.gqlQuery(mutation); // No variables needed
+            const queryResult = await this.gqlQuery(mutation); // No variables needed
             this.updateTableView();
             this.closeConfirmModal();
         } catch (error) {
@@ -2340,7 +2349,8 @@ class GraphQLClientApp {
         }
         const query = `query FetchAll($limit: Int, $filter: [FilterInput]) { ${entity.pluralName}(limit: $limit, filter: $filter) { items { ${fields} } } }`;
         try {
-            const data = await this.gqlQuery(query, { limit: 1000, filter: filterForQuery }); // Use a large limit to fetch all items
+            const queryResult = await this.gqlQuery(query, { limit: 1000, filter: filterForQuery }); // Use a large limit to fetch all items
+            const data = queryResult.data;
             return data[entity.pluralName].items;
         } catch (error) {
             console.error(`Failed to pre-fetch ${entity.pluralName}:`, error);

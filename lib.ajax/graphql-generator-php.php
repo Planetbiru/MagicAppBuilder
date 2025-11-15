@@ -159,16 +159,10 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/en.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'langs/i18n/id.json');
         
-        addDirectoryToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
         
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.scss", 'assets/style.scss');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'assets/style.css');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'assets/style.css.map');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.min.css", 'assets/style.min.css');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-php.js", 'assets/app.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-php.min.js", 'assets/app.min.js');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'assets/graphql.js');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'assets/graphql.min.js');
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/inc/I18n.php", 'inc/I18n.php');
         if($inMemoryCache)
@@ -304,7 +298,7 @@ try {
         // Delete the temporary file
         unlink($zipFilePath);
         exit();
-    }    
+    }
 } catch (Exception $e) {
     header("Content-Type: application/json");
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
