@@ -875,12 +875,6 @@ class GraphQLClientApp {
             }
 
             const result = await response.json();
-
-            if (result.errors) {
-                console.error('GraphQL Errors:', result.errors);
-                console.error(`Error: ${result.errors[0].message}`);
-                throw new Error(result.errors[0].message);
-            }
             return result.data;
         } catch (error) {
             // Re-throw the error so that calling functions can handle it
@@ -1194,8 +1188,19 @@ class GraphQLClientApp {
                 filter: filterForQuery,
             });
             const result = data[this.currentEntity.pluralName];
-            this.renderTable(result.items); // Renders into tableDataContainer
+            if(result && result.items && result.items.length > 0)
+            {
+                this.renderTable(result.items); // Renders into tableDataContainer
+            }
+            else
+            {
+                this.dom.tableDataContainer.innerHTML = `<p style="color: red;">Data not found</p>`;
+            }
             this.renderPagination(result);
+            if(result.errors && result.errors.length > 0)
+            {
+                console.error(result.errors);
+            }
         } catch (error) {
             this.dom.tableDataContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
         }
