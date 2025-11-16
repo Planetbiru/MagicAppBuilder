@@ -171,7 +171,7 @@ $nameInIndonesian = array(
 ?><form name="formdatabase" id="formdatabase" method="post" action="" class="config-table">
     <div class="collapsible-card">
         <div id="accordion-setting" class="accordion">
-        <div class="card">
+        <div class="card card-application">
             <div class="card-header" id="heading0">
                 <h5 class="mb-0">
                     <button type="button" class="btn" data-toggle="collapse" data-target="#collapse0" aria-expanded="true" aria-controls="collapse0">
@@ -298,7 +298,7 @@ $nameInIndonesian = array(
         </div>
 
         <div id="accordion" class="accordion">
-        <div class="card">
+        <div class="card card-database">
             <div class="card-header" id="heading1">
                 <h5 class="mb-0">
                     <button type="button" class="btn" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
@@ -392,7 +392,7 @@ $nameInIndonesian = array(
             </div>
         </div>
 
-        <div class="card">
+        <div class="card card-account-security">
             <div class="card-header" id="heading2">
                 <h5 class="mb-0">
                     <button type="button" class="btn" data-toggle="collapse" data-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
@@ -432,7 +432,7 @@ $nameInIndonesian = array(
         </div>
 
 
-        <div class="card">
+        <div class="card card-sessions">
             <div class="card-header" id="heading3">
                 <h5 class="mb-0">
                     <button type="button" class="btn" data-toggle="collapse" data-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
@@ -500,7 +500,7 @@ $nameInIndonesian = array(
                 </div>
             </div>
         </div>
-        <div class="card">
+        <div class="card card-reserved-columns">
             <div class="card-header" id="heading4">
                 <h5 class="mb-0">
                     <button type="button" class="btn" data-toggle="collapse" data-target="#collapse4" aria-expanded="true" aria-controls="collapse4">

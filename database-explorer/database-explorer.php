@@ -368,9 +368,19 @@ if(!isset($databaseName))
             <div class="modal-body">
                 <form>
                     <div class="entity-type-selector">
+                        <label>Programming Language</label>
+                        <select class="form-control programming-language-selector">
+                            <option value="php">PHP</option>
+                            <option value="java">Java (Commercial Use)</option>
+                            <option value="nodejs">Node.js (Commercial Use)</option>
+                            <option value="python">Python (Commercial Use)</option>
+                        </select>
+                        &nbsp;
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
                         &nbsp;
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
+                        &nbsp;
+                        <label><input type="checkbox" class="in-memory-cache-checker" data-entity-type="in-memory-cache" onchange="editor.inMemoryCacheChange(this)"> In-Memory Cache</label>
                     </div>
                     <div class="entity-selector-container"></div>
                 </form>

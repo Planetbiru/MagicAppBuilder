@@ -150,6 +150,7 @@ class EntityEditor {
         this.graphqlAppData = {
             custom: true,
             system: false,
+            inMemoryCache: false,
             entities: [],
             entitySelector: []
         }
@@ -2433,6 +2434,11 @@ class EntityEditor {
         }
     }
 
+    inMemoryCacheChange(element)
+    {
+
+    }
+
     /**
      * Gathers all entities and their selected columns from the UI, typically from a modal
      * for schema generation. It clones the selected entities and filters their columns
@@ -2569,7 +2575,7 @@ class EntityEditor {
      * @param {Object} request An object containing the entities to be included in the GraphQL schema.
      */
     exportGraphQLSchema(request) {
-        // send to server for processing
+        const programmingLanguage = request.programmingLanguage || 'php';
         fetch('../lib.ajax/graphql-generator.php', {
             method: 'POST',
             headers: {
@@ -2577,20 +2583,29 @@ class EntityEditor {
             },
             body: JSON.stringify(request)
         })
-        .then(response => response.blob())
-        .then(blob => {
-            // Create a link to download the file
-            let { applicationId} = getMetaValues();
-
-            if(applicationId == '')
-            {
-                applicationId = 'app';
+        .then(async response => {
+            // Try to extract filename from Content-Disposition
+            let filename = null;
+            const disposition = response.headers.get('Content-Disposition');
+            if (disposition && disposition.includes('filename=')) {
+                const match = disposition.match(/filename\*?=(?:UTF-8''|["']?)([^"';\n]+)/i);
+                if (match && match[1]) {
+                    filename = decodeURIComponent(match[1]);
+                }
             }
 
+            // Fallback filename
+            if (!filename) {
+                let { applicationId } = getMetaValues();
+                if (!applicationId) applicationId = 'app';
+                filename = `${applicationId}-graphql-${programmingLanguage}.zip`;
+            }
+
+            const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${applicationId}-graphql.zip`;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -2600,6 +2615,7 @@ class EntityEditor {
             console.error('Error generating GraphQL schema:', error);
         });
     }
+
 
     /**
      * Handles the confirmation action in the GraphQL generator modal.
@@ -2613,7 +2629,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": false,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2630,7 +2648,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": true,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }

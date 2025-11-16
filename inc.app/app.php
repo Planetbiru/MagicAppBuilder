@@ -90,6 +90,7 @@ notification:
     http_request_timeout: 10
 
 iddleDuration: 3000
+groupId: com.planetbiru
 ", true, true, true);
     $builderConfig->getDatabase()->setDatabaseFilePath($defaultDatabasePath);
     $yaml = $builderConfig->dumpYaml();

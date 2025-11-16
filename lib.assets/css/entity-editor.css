@@ -568,7 +568,7 @@ label {
 }
 
 .entity-selector-container {
-  max-height: calc(100vh - 238px);
+  max-height: calc(100vh - 250px);
   overflow: auto;
 }
 
@@ -585,6 +585,6 @@ label {
   border-bottom: 1px solid #cccccc;
   padding: 0px 9px 4px 9px;
   margin-bottom: 4px;
-  height: 24px;
+  height: 36px;
   box-sizing: border-box;
 }/*# sourceMappingURL=entity-editor.css.map */
