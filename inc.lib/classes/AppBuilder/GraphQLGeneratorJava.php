@@ -717,8 +717,7 @@ JAVA;
             }
         }
 
-        $imports = "import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.EntityGraph;
+        $imports = "import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -728,17 +727,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;\n\n";
         $imports .= "import $package.model.entity.$className;\n";
 
-        if ($this->useCache) {
-            $imports .= "import org.springframework.cache.annotation.Cacheable;\n";
-        }
+
         $imports .= "import java.util.Optional;\n";
         $entityGraphAnnotation = $this->buildEntityGraphAnnotation($tableName);
-        $findByIdMethod = "Optional<$className> findById($pkJavaType id);";
-        if ($this->useCache) {
-            $findByIdMethod = "@Cacheable(value = \"$camelName\", key = \"#id\")\n    " . $findByIdMethod;
-        }
+        $findByIdMethod = "    @Override\n";
+        $findByIdMethod .= "    Optional<$className> findById($pkJavaType id);";
         if(!empty($entityGraphAnnotation)) {
-            $findByIdMethod = $entityGraphAnnotation . "    " . $findByIdMethod;
+            $findByIdMethod = $entityGraphAnnotation . $findByIdMethod;
         }
 
 
@@ -753,9 +748,9 @@ import org.springframework.transaction.annotation.Transactional;\n\n";
                 $camelCasePk = $this->camelCase($colname);
                 $upperCamelCasePk = ucfirst($camelCasePk);
                 $pkJavaType = $this->mapDbTypeToJavaType($col['type'], $col['length']);
-                $modifying = "    @Modifying\n\n";
+                $modifying = "\n    @Modifying\n";
                 $modifying .= "    @Transactional\n";
-                $modifying .= "    @Query(\"UPDATE $className b SET b.$camelCasePk = :newId WHERE b.$camelCasePk = :oldId\")\n";
+                $modifying .= "    @Query(\"UPDATE $className a SET a.$camelCasePk = :newId WHERE a.$camelCasePk = :oldId\")\n";
                 $modifying .= "    int update{$upperCamelCasePk}(@Param(\"oldId\") $pkJavaType oldId, @Param(\"newId\") $pkJavaType newId);\n";
             }
         }
@@ -765,7 +760,6 @@ import org.springframework.transaction.annotation.Transactional;\n\n";
 package $package.model.repository;
 
 $imports
-import org.springframework.stereotype.Repository;
 
 @Repository
 public interface {$className}Repository extends JpaRepository<$className, $pkJavaType>, JpaSpecificationExecutor<$className> {
@@ -1062,8 +1056,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A utility class to help build Spring Data Pageable and Specification objects
@@ -1122,6 +1118,26 @@ public class QueryUtil {
             }
         }
         return builder.build();
+    }
+
+    /**
+     * Creates a Map representing the paginated result from a Page object.
+     * This is commonly used to structure the response for GraphQL list queries.
+     *
+     * @param resultPage The {@link Page} object returned from a repository query.
+     * @param <T>        The entity type contained in the page.
+     * @return A {@link Map} containing pagination details and the list of items.
+     */
+    public static <T> Map<String, Object> createPageResultMap(Page<T> resultPage) {
+        return Map.of(
+            "items", resultPage.getContent(),
+            "total", resultPage.getTotalElements(),
+            "limit", resultPage.getSize(),
+            "page", resultPage.getNumber() + 1, // Frontend pages are usually 1-based
+            "totalPages", resultPage.getTotalPages(),
+            "hasNext", resultPage.hasNext(),
+            "hasPrevious", resultPage.hasPrevious()
+        );
     }
 }
 JAVA;
@@ -1457,6 +1473,7 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -1486,18 +1503,11 @@ public class {$ucCamelName}Controller {
 
         Page<$ucCamelName> resultPage = {$camelName}Repository.findAll(specification, pageable);
 
-        return Map.of(
-            "items", resultPage.getContent(),
-            "total", resultPage.getTotalElements(),
-            "limit", resultPage.getSize(),
-            "page", resultPage.getNumber() + 1, // Frontend pages are usually 1-based
-            "totalPages", resultPage.getTotalPages(),
-            "hasNext", resultPage.hasNext(),
-            "hasPrevious", resultPage.hasPrevious()
-        );
+        return QueryUtil.createPageResultMap(resultPage);
     }
 
     @MutationMapping
+    @Transactional
     public $ucCamelName create{$ucCamelName}(@Argument Map<String, Object> input) {
         $ucCamelName {$camelName} = new $ucCamelName();
         // Manual mapping from Map<String, Object> to Entity.
@@ -1506,6 +1516,7 @@ public class {$ucCamelName}Controller {
     }
 
     @MutationMapping
+    @Transactional
     public $ucCamelName update{$ucCamelName}(@Argument $pkJavaType id, @Argument Map<String, Object> input) {
         $ucCamelName {$camelName} = {$camelName}Repository.findById(id)
             .orElseThrow(() -> new RuntimeException("{$ucCamelName} not found with id " + id));
@@ -1514,6 +1525,7 @@ public class {$ucCamelName}Controller {
 $returnUpdate    }
 
     @MutationMapping
+    @Transactional
     public boolean delete{$ucCamelName}(@Argument $pkJavaType id) {
         {$camelName}Repository.deleteById(id);
         return true;
@@ -1762,7 +1774,7 @@ public final class AuditTrailUtil {
      *
      * @return The client's IP address, or "unknown" if the request context is not available.
      */
-    public static String getCurrentIp() {
+    public static String getUserIp() {
         ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (sra == null) {
             return "unknown"; // safer default
@@ -3561,7 +3573,7 @@ GQL;
             {
                 if($key == 'adminCreate' || $key == 'adminEdit')
                 {
-                    $mappingCode .= "        String currentUserId = AuditTrailUtil.getUserId();\n";
+                    $mappingCode .= "        String appCurrentUserId = AuditTrailUtil.getUserId();\n";
                     break;
                 }
             }
@@ -3573,7 +3585,7 @@ GQL;
             {
                 if($key == 'ipCreate' || $key == 'ipEdit')
                 {
-                    $mappingCode .= "        String currentUserIp = AuditTrailUtil.getCurrentIp();\n";
+                    $mappingCode .= "        String appCurrentUserIp = AuditTrailUtil.getUserIp();\n";
                     break;
                 }
             }
@@ -3592,11 +3604,11 @@ GQL;
                     }
                     if($key == 'adminCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserId);\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(appCurrentUserId);\n";
                     }
                     if($key == 'ipCreate')
                     {
-                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserIp);\n";
+                        $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(appCurrentUserIp);\n";
                     }
                 }
                 if($key == 'timeEdit')
@@ -3605,11 +3617,11 @@ GQL;
                 }
                 if($key == 'adminEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserId);\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(appCurrentUserId);\n";
                 }
                 if($key == 'ipEdit')
                 {
-                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(currentUserIp);\n";
+                    $mappingCode .= "        {$entityVar}.set".ucfirst($this->camelCase($colName))."(appCurrentUserIp);\n";
                 }
 
             }
@@ -3861,7 +3873,7 @@ JAVA;
                 }
                 if($key == 'ipEdit')
                 {
-                    $mappingCode .= "        {$camelName}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getCurrentIp());\n";
+                    $mappingCode .= "        {$camelName}.set".ucfirst($this->camelCase($colName))."(AuditTrailUtil.getUserIp());\n";
                 }
 
             }
@@ -3869,6 +3881,7 @@ JAVA;
 
         return <<<JAVA
     @MutationMapping
+    @Transactional
     public $ucCamelName toggle{$ucCamelName}Active(@Argument $pkJavaType id, @Argument(name = "$activeField") boolean $activeField) {
         $ucCamelName $camelName = {$camelName}Repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("{$ucCamelName} not found with id " + id));
