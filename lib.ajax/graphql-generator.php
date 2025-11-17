@@ -215,19 +215,19 @@ $applicationId = isset($data['applicationId']) ? $data['applicationId'] : null;
 $inMemoryCache = isset($data['inMemoryCache']) && ($data['inMemoryCache'] == 'true' || $data['inMemoryCache'] == '1' || $data['inMemoryCache'] === true) ? true : false;
 $verboseLogging = isset($data['verboseLogging']) && ($data['verboseLogging'] == 'true' || $data['verboseLogging'] == '1' || $data['verboseLogging'] === true) ? true : false;
 
-if($language === 'java') {
-    require_once __DIR__ . "/graphql-generator-java.php";
-    exit;
-} else if($language === 'php') {
+if($language === 'php' && file_exists(__DIR__ . "/graphql-generator-php.php")) {
     require_once __DIR__ . "/graphql-generator-php.php";
     exit;
-} else if($language === 'nodejs') {
+} else if($language === 'java' && file_exists(__DIR__ . "/graphql-generator-java.php")) {
+    require_once __DIR__ . "/graphql-generator-java.php";
+    exit;
+} else if($language === 'nodejs' && file_exists(__DIR__ . "/graphql-generator-nodejs.php")) {
     require_once __DIR__ . "/graphql-generator-nodejs.php";
     exit;
-} else if($language === 'python') {
+} else if($language === 'python' && file_exists(__DIR__ . "/graphql-generator-python.php")) {
     require_once __DIR__ . "/graphql-generator-python.php";
     exit;
-} else if($language === 'kotlin') {
+} else if($language === 'kotlin' && file_exists(__DIR__ . "/graphql-generator-kotlin.php")) {
     require_once __DIR__ . "/graphql-generator-kotlin.php";
     exit;
 } else {

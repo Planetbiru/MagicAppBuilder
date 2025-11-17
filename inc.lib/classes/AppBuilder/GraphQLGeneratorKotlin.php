@@ -2,8 +2,6 @@
 
 namespace AppBuilder;
 
-use MagicObject\Util\PicoStringUtil;
-
 /**
  * The `GraphQLGeneratorKotlin` class is a powerful tool designed to automatically generate a complete Spring Boot GraphQL API in Kotlin from a JSON file that defines database entities.
  * It inspects the schema to understand tables, columns, primary keys, and foreign key relationships.
@@ -39,6 +37,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
      * @param array $projectConfig Project configuration details.
      * @param bool $verboseLogging Whether to enable verbose logging.
      * @param bool $requireLogin Whether to require login.
+     * @throws \Exception
      */
     public function __construct($schema, $reservedColumns = null, $backendHandledColumns = array(), $useCache = false, $projectConfig = array(), $verboseLogging = false, $requireLogin = true)
     {
@@ -65,7 +64,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
      * Maps a database type to a Kotlin type.
      *
      * @param string $dbType The database column type (e.g., VARCHAR, INT, TIMESTAMP).
-     * @param int|null $length The length of the column.
+     * @param ?int $length The length of the column.
      * @return string The corresponding Kotlin type string.
      */
     private function mapDbTypeToKotlinType($dbType, $length = null)
@@ -121,6 +120,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
     /**
      * Main function to generate all files for the Spring Boot project.
      *
+     * @param bool $withFrontend Deprecated parameter, not used.
      * @return array An array of file definitions, each with 'name' and 'content'.
      */
     public function generate()
@@ -131,6 +131,10 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
         // 1. Gradle build files
         $files[] = ['name' => 'build.gradle.kts', 'content' => $this->generateBuildGradleKts()];
         $files[] = ['name' => 'settings.gradle.kts', 'content' => $this->generateSettingsGradleKts()];
+        $files[] = ['name' => 'gradle', 'content' => $this->generateGradle()];
+        $files[] = ['name' => 'gradle.bat', 'content' => $this->generateGradleBat()];
+        $files[] = ['name' => 'gradle/wrapper/gradle-wrapper.properties', 'content' => $this->generateGradleWrapper()];
+
 
         // 2. Main Application Class
         $files[] = ['name' => $packagePath . '/' . $this->pascalCase($this->projectConfig['artifactId']) . 'Application.kt', 'content' => $this->generateMainAppClass()];
@@ -185,6 +189,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
 
     /**
      * Generates the application.properties file.
+     *
      * @return string The content of application.properties.
      */
     public function generateApplicationProperties()
@@ -222,6 +227,7 @@ PROPERTIES;
 
     /**
      * Generates the build.gradle.kts file.
+     *
      * @return string The content of the build.gradle.kts file.
      */
     private function generateBuildGradleKts()
@@ -286,6 +292,7 @@ GRADLE;
 
     /**
      * Generates the settings.gradle.kts file.
+     *
      * @return string The content of the settings.gradle.kts file.
      */
     private function generateSettingsGradleKts()
@@ -296,6 +303,7 @@ GRADLE;
 
     /**
      * Generates the main Spring Boot application class in Kotlin.
+     *
      * @return string The content of the main application class.
      */
     private function generateMainAppClass()
@@ -326,6 +334,7 @@ KOTLIN;
      * Generates the Kotlin entity data class for a given table.
      * @param string $tableName The name of the database table.
      * @param array $tableInfo The information about the table's columns.
+     *
      * @return string The content of the entity class.
      */
     private function generateEntityClass($tableName, $tableInfo)
@@ -377,6 +386,7 @@ KOTLIN;
      * Generates the Kotlin repository interface for a given table.
      * @param string $tableName The name of the database table.
      * @param array $tableInfo The information about the table's columns.
+     *
      * @return string The content of the repository interface.
      */
     private function generateRepositoryInterface($tableName, $tableInfo)
@@ -421,6 +431,7 @@ KOTLIN;
      * Generates the DTO data class for a given table.
      * @param string $tableName The name of the database table.
      * @param array $tableInfo The information about the table's columns.
+     *
      * @return string The content of the DTO class.
      */
     private function generateDtoClass($tableName, $tableInfo)
@@ -462,6 +473,7 @@ KOTLIN;
      * Generates the Controller class for a given table.
      * @param string $tableName The name of the database table.
      * @param array $tableInfo The information about the table's columns.
+     *
      * @return string The content of the Controller class.
      */
     private function generateControllerClass($tableName, $tableInfo)
@@ -547,6 +559,7 @@ KOTLIN;
      * Generates the GraphQL schema parts for a given table.
      * @param string $tableName The name of the table.
      * @param array $tableInfo The table information.
+     *
      * @return array An array containing 'types', 'queries', and 'mutations' strings.
      */
     private function getSchemaPartsForTable($tableName, $tableInfo)
@@ -616,6 +629,7 @@ GQL;
      * @param array $allSchemaParts Array of type definitions.
      * @param array $allQueryFields Array of query definitions.
      * @param array $allMutationFields Array of mutation definitions.
+     *
      * @return string The complete GraphQL schema.
      */
     private function generateCombinedSchema($allSchemaParts, $allQueryFields, $allMutationFields)
@@ -666,6 +680,7 @@ GQL;
     /**
      * Generates a markdown manual with examples for all queries and mutations.
      *
+     * @param bool $withFrontend Deprecated parameter, not used.
      * @return string The markdown content.
      */
     public function generateManual()
@@ -831,11 +846,20 @@ GQL;
 
     //<editor-fold desc="Utility and Config Generators">
 
+    /**
+     * Get project configuration.
+     *
+     * @return array<string, string>
+     */
     public function getProjectConfig()
     {
         return $this->projectConfig;
     }
 
+    /**
+     * Generates the SpecificationBuilder.kt file.
+     * @return string
+     */
     private function generateSpecificationBuilder()
     {
         $package = $this->projectConfig['packageName'];
@@ -869,6 +893,10 @@ class SpecificationBuilder<T> {
 KOTLIN;
     }
 
+    /**
+     * Generates the FilterCriteria.kt file.
+     * @return string
+     */
     private function generateFilterCriteria()
     {
         $package = $this->projectConfig['packageName'];
@@ -883,6 +911,10 @@ data class FilterCriteria(
 KOTLIN;
     }
 
+    /**
+     * Generates the SearchOperation.kt file.
+     * @return string
+     */
     private function generateSearchOperation()
     {
         $package = $this->projectConfig['packageName'];
@@ -903,6 +935,10 @@ enum class SearchOperation {
 KOTLIN;
     }
 
+    /**
+     * Generates the GenericSpecification.kt file.
+     * @return string
+     */
     private function generateGenericSpecification()
     {
         $package = $this->projectConfig['packageName'];
@@ -950,6 +986,10 @@ class GenericSpecification<T>(private val criteria: FilterCriteria) : Specificat
 KOTLIN;
     }
 
+    /**
+     * Generates the FilterInput.kt DTO file.
+     * @return string
+     */
     private function generateFilterInputDto()
     {
         $package = $this->projectConfig['packageName'];
@@ -964,6 +1004,10 @@ data class FilterInput(
 KOTLIN;
     }
 
+    /**
+     * Generates the SortInput.kt DTO file.
+     * @return string
+     */
     private function generateSortInputDto()
     {
         $package = $this->projectConfig['packageName'];
@@ -977,10 +1021,10 @@ data class SortInput(
 KOTLIN;
     }
 
-    //</editor-fold>
-
-    //<editor-fold desc="Security and Auth Generators">
-
+    /**
+     * Generates the SecurityConfig.kt file.
+     * @return string
+     */
     private function generateSecurityConfig()
     {
         $package = $this->projectConfig['packageName'];
@@ -1034,6 +1078,10 @@ class SecurityConfig(private val userDetailsService: JpaUserDetailsService) {
 KOTLIN;
     }
 
+    /**
+     * Generates the CorsConfig.kt file.
+     * @return string
+     */
     private function generateCorsConfig()
     {
         $package = $this->projectConfig['packageName'];
@@ -1070,6 +1118,10 @@ class CorsConfig {
 KOTLIN;
     }
 
+    /**
+     * Generates the Sha1PasswordEncoder.kt file.
+     * @return string
+     */
     private function generateSha1PasswordEncoder()
     {
         $package = $this->projectConfig['packageName'];
@@ -1104,6 +1156,10 @@ class Sha1PasswordEncoder : PasswordEncoder {
 KOTLIN;
     }
 
+    /**
+     * Generates the JpaUserDetailsService.kt file.
+     * @return string
+     */
     private function generateUserDetailsService()
     {
         $package = $this->projectConfig['packageName'];
@@ -1134,6 +1190,10 @@ class JpaUserDetailsService(private val adminRepository: AdminRepository) : User
 KOTLIN;
     }
 
+    /**
+     * Generates the Admin.kt entity file.
+     * @return string
+     */
     private function generateAdminEntity()
     {
         $package = $this->projectConfig['packageName'];
@@ -1162,6 +1222,10 @@ data class Admin(
 KOTLIN;
     }
 
+    /**
+     * Generates the AdminRepository.kt file.
+     * @return string
+     */
     private function generateAdminRepository()
     {
         $package = $this->projectConfig['packageName'];
@@ -1178,6 +1242,10 @@ interface AdminRepository : JpaRepository<Admin, String> {
 KOTLIN;
     }
 
+    /**
+     * Generates the LoginRequest.kt DTO file.
+     * @return string
+     */
     private function generateLoginRequestDto()
     {
         $package = $this->projectConfig['packageName'];
@@ -1191,6 +1259,10 @@ data class LoginRequest(
 KOTLIN;
     }
 
+    /**
+     * Generates the LoginResponse.kt DTO file.
+     * @return string
+     */
     private function generateLoginResponseDto()
     {
         $package = $this->projectConfig['packageName'];
@@ -1204,6 +1276,10 @@ data class LoginResponse(
 KOTLIN;
     }
 
+    /**
+     * Generates the AuthController.kt file.
+     * @return string
+     */
     private function generateAuthController()
     {
         $package = $this->projectConfig['packageName'];
@@ -1263,5 +1339,286 @@ class AuthController(
 KOTLIN;
     }
 
-    //</editor-fold>
+    /**
+     * Generates the gradlew.bat batch script for Windows.
+     *
+     * @return string The content of the gradlew.bat script.
+     */
+    private function generateGradleBat()
+    {
+        return <<<KOTLIN
+@rem
+@rem Copyright 2015 the original author or authors.
+@rem
+@rem Licensed under the Apache License, Version 2.0 (the "License");
+@rem you may not use this file except in compliance with the License.
+@rem You may obtain a copy of the License at
+@rem
+@rem      https://www.apache.org/licenses/LICENSE-2.0
+@rem
+@rem Unless required by applicable law or agreed to in writing, software
+@rem distributed under the License is distributed on an "AS IS" BASIS,
+@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@rem See the License for the specific language governing permissions and
+@rem limitations under the License.
+@rem
+@rem SPDX-License-Identifier: Apache-2.0
+@rem
+
+@if "%DEBUG%"=="" @echo off
+@rem ##########################################################################
+@rem
+@rem  Gradle startup script for Windows
+@rem
+@rem ##########################################################################
+
+@rem Set local scope for the variables with windows NT shell
+if "%OS%"=="Windows_NT" setlocal
+
+set DIRNAME=%~dp0
+if "%DIRNAME%"=="" set DIRNAME=.
+@rem This is normally unused
+set APP_BASE_NAME=%~n0
+set APP_HOME=%DIRNAME%
+
+@rem Resolve any "." and ".." in APP_HOME to make it shorter.
+for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
+
+@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+
+@rem Find java.exe
+if defined JAVA_HOME goto findJavaFromJavaHome
+
+set JAVA_EXE=java.exe
+%JAVA_EXE% -version >NUL 2>&1
+if %ERRORLEVEL% equ 0 goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+goto fail
+
+:findJavaFromJavaHome
+set JAVA_HOME=%JAVA_HOME:"=%
+set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+
+if exist "%JAVA_EXE%" goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+goto fail
+
+:downloadWrapper
+echo.
+echo Downloading Gradle Wrapper Jar...
+
+@rem Parse gradle-wrapper.properties to find the Gradle version from distributionUrl
+setlocal
+set WRAPPER_PROPERTIES="%APP_HOME%\gradle\wrapper\gradle-wrapper.properties"
+for /f "tokens=1,2 delims==" %%a in ('findstr /i "distributionUrl" %WRAPPER_PROPERTIES%') do (
+    if /i "%%a"=="distributionUrl" (
+        set "DIST_URL=%%b"
+    )
+)
+
+for /f "tokens=5 delims=/-" %%v in ("%DIST_URL%") do set GRADLE_VERSION=%%v
+endlocal & set GRADLE_VERSION=%GRADLE_VERSION%
+
+set WRAPPER_JAR_URL=https://repo1.maven.org/maven2/org/gradle/gradle-wrapper/%GRADLE_VERSION%/gradle-wrapper-%GRADLE_VERSION%.jar
+set WRAPPER_JAR_DIR=%APP_HOME%\gradle\wrapper
+set WRAPPER_JAR_PATH=%WRAPPER_JAR_DIR%\gradle-wrapper.jar
+
+echo Downloading from %WRAPPER_JAR_URL%
+if not exist "%WRAPPER_JAR_DIR%" mkdir "%WRAPPER_JAR_DIR%"
+powershell.exe -Command "Invoke-WebRequest -Uri %WRAPPER_JAR_URL% -OutFile %WRAPPER_JAR_PATH%"
+goto execute
+
+:execute
+@rem Setup the command line
+
+set CLASSPATH=
+
+
+@rem Execute Gradle
+if not exist "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" (
+    goto downloadWrapper
+)
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %*
+
+:end
+@rem End local scope for the variables with windows NT shell
+if %ERRORLEVEL% equ 0 goto mainEnd
+
+:fail
+rem Set variable GRADLE_EXIT_CONSOLE if you need the _script_ return code instead of
+rem the _cmd.exe /c_ return code!
+set EXIT_CODE=%ERRORLEVEL%
+if %EXIT_CODE% equ 0 set EXIT_CODE=1
+if not ""=="%GRADLE_EXIT_CONSOLE%" exit %EXIT_CODE%
+exit /b %EXIT_CODE%
+
+:mainEnd
+if "%OS%"=="Windows_NT" endlocal
+
+:omega
+KOTLIN;
+    }
+
+    /**
+     * Generates the gradlew shell script for POSIX systems.
+     * @return string The content of the gradlew script.
+     */
+    private function generateGradle()
+    {
+        return <<<KOTLIN
+#!/bin/sh
+
+#
+# Copyright 2015 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# ##########################################################################
+#
+#  Gradle startup script for UN*X
+#
+# ##########################################################################
+
+# Attempt to set APP_HOME
+# Resolve links: \$0 may be a link
+PRG="\$0"
+# Need this for relative symlinks.
+while [ -h "\$PRG" ] ; do
+    ls=`ls -ld "\$PRG"`
+    link=`expr "\$ls" : '.*-> \(.*\)\$'`
+    if expr "\$link" : '/.*' > /dev/null; then
+        PRG="\$link"
+    else
+        PRG=`dirname "\$PRG"`"/\$link"
+    fi
+done
+SAVED="`pwd`"
+cd "`dirname \"\$PRG\"`/" >/dev/null
+APP_HOME="`pwd -P`"
+cd "\$SAVED" >/dev/null
+
+APP_NAME="Gradle"
+APP_BASE_NAME=`basename "\$0"`
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+# Find java.exe
+if [ -n "\$JAVA_HOME" ] ; then
+    if [ -x "\$JAVA_HOME/jre/sh/java" ] ; then
+        # IBM's JDK on AIX uses strange locations for the executables
+        JAVACMD="\$JAVA_HOME/jre/sh/java"
+    else
+        JAVACMD="\$JAVA_HOME/bin/java"
+    fi
+    if [ ! -x "\$JAVACMD" ] ; then
+        die "ERROR: JAVA_HOME is set to an invalid directory: \$JAVA_HOME
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+else
+    JAVACMD="java"
+    which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+fi
+
+download_wrapper() {
+    echo
+    echo "Downloading Gradle Wrapper Jar..."
+
+    WRAPPER_PROPERTIES="\$APP_HOME/gradle/wrapper/gradle-wrapper.properties"
+    if [ -f "\$WRAPPER_PROPERTIES" ]; then
+        DIST_URL=`grep -e "distributionUrl" "\$WRAPPER_PROPERTIES" | cut -d'=' -f2`
+        # Extract version from URL, e.g. https://.../gradle-8.3-bin.zip
+        GRADLE_VERSION=`echo "\$DIST_URL" | sed -n 's/.*-\([0-9.]*\(-[a-zA-Z0-9]*\)*\)-\(bin\|all\).zip/\1/p'`
+    fi
+
+    if [ -z "\$GRADLE_VERSION" ]; then
+        # Fallback if parsing fails
+        echo "Could not determine Gradle version from wrapper properties. Please run 'gradle wrapper' task."
+        exit 1
+    fi
+
+    WRAPPER_JAR_URL="https://repo1.maven.org/maven2/org/gradle/gradle-wrapper/\$GRADLE_VERSION/gradle-wrapper-\$GRADLE_VERSION.jar"
+    WRAPPER_JAR_DIR="\$APP_HOME/gradle/wrapper"
+    WRAPPER_JAR_PATH="\$WRAPPER_JAR_DIR/gradle-wrapper.jar"
+
+    echo "Downloading from \$WRAPPER_JAR_URL"
+    mkdir -p "\$WRAPPER_JAR_DIR"
+    
+    # Download using curl or wget
+    if command -v curl >/dev/null 2>&1; then
+        curl -L -o "\$WRAPPER_JAR_PATH" "\$WRAPPER_JAR_URL"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "\$WRAPPER_JAR_PATH" "\$WRAPPER_JAR_URL"
+    else
+        echo "ERROR: Neither curl nor wget is available to download the wrapper."
+        exit 1
+    fi
+}
+
+
+# Execute Gradle
+
+WRAPPER_JAR="\$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+if [ ! -f "\$WRAPPER_JAR" ]; then
+    download_wrapper
+fi
+
+exec "\$JAVACMD" \
+    \${DEFAULT_JVM_OPTS} \
+    \${JAVA_OPTS} \
+    \${GRADLE_OPTS} \
+    "-Dorg.gradle.appname=\$APP_BASE_NAME" \
+    -jar "\$WRAPPER_JAR" \
+    "\$@"
+KOTLIN;
+    }
+
+    /**
+     * Generates the gradle-wrapper.properties file.
+     * @return string The content of the gradle-wrapper.properties file.
+     */
+    private function generateGradleWrapper()
+    {
+        return <<<KOTLIN
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+KOTLIN;
+    }
 }

@@ -106,64 +106,152 @@ try {
         true // requireLogin
     );
 
-    // --- Create Backend ZIP ---
-    $backendZip = new ZipArchive();
-    $backendZipFilePath = tempnam(sys_get_temp_dir(), 'backend_kotlin_');
-    if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-        throw new Exception("Could not create backend ZIP file.");
+    if($withFrontend)
+    {
+        // Add frontend generation to one zip file
+        $zip = new ZipArchive();
+        $zipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new Exception("Could not create backend ZIP file.");
+        }
+
+        $backendFiles = $generator->generate();
+
+        // application.properties
+        $applicationProperties = $generator->generateApplicationProperties();
+        $applicationProperties = setDatabaseConfigurationKotlin($app, $applicationProperties);
+        $backendFiles[] = ['name' => 'src/main/resources/application.properties', 'content' => $applicationProperties];
+
+
+        foreach ($backendFiles as $file) {
+            $zip->addFromString($file['name'], $file['content']);
+        }
+
+        // Add Gradle Wrapper files
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradlew", 'gradlew');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradlew.bat", 'gradlew.bat');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradle", 'gradle');
+
+        // Add generated frontend config files
+        $zip->addFromString('src/main/resources/static/config/frontend-config.json', $generator->generateFrontendConfigJson());
+
+        // Add language files
+        $zip->addFromString('src/main/resources/static/langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
+        $entityLanguagePacks = $generator->generateFrontendLanguageJson();
+        $zip->addFromString('src/main/resources/static/langs/entity/source.json', $entityLanguagePacks);
+        $zip->addFromString('src/main/resources/static/langs/entity/en.json', $entityLanguagePacks); // Assume 'en' is default
+
+        // Add i18n files
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'src/main/resources/static/langs/i18n/source.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'src/main/resources/static/langs/i18n/en.json');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'src/main/resources/static/langs/i18n/id.json');
+
+        // Add assets
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'src/main/resources/static/assets');
+
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.scss", 'src/main/resources/static/assets/style.scss');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'src/main/resources/static/assets/style.css');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'src/main/resources/static/assets/style.css.map');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.min.css", 'src/main/resources/static/assets/style.min.css');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-gradle.js", 'src/main/resources/static/assets/app.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-gradle.min.js", 'src/main/resources/static/assets/app.min.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'src/main/resources/static/assets/graphql.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'src/main/resources/static/assets/graphql.min.js');
+
+        
+        // Add index.html
+        $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
+        $indexFileContent = str_replace('{APP_NAME}', $app->getName(), $indexFileContent);
+        $zip->addFromString('src/main/resources/static/index.html', $indexFileContent);
+
+        // Add icon files
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'android-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'apple-icon-');
+        addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'src/main/resources/static', 'favicon');
+
+        // Add documentation to the root of the main zip
+        $manualMd = $generator->generateManual();
+        $zip->addFromString('manual.md', $manualMd);
+        $appName = $app->getName();
+        $manualHtml = generateManualHtml($manualMd, $appName);
+        $zip->addFromString('manual.html', $manualHtml);
+
+        $readmeContent = generateReadmeKotlin($appName, $generator);
+        $zip->addFromString('README.md', $readmeContent);
+        $zip->close();
+
+        // Send the ZIP file as a download
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . $app->getApplicationId() . '-graphql-kotlin.zip"');
+        header('Content-Length: ' . filesize($zipFilePath));
+        readfile($zipFilePath);
+
+        // Delete the temporary file
+        unlink($zipFilePath);
+        exit();
     }
+    else
+    {
+        // --- Create Backend ZIP ---
+        $backendZip = new ZipArchive();
+        $backendZipFilePath = tempnam(sys_get_temp_dir(), 'backend_kotlin_');
+        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new Exception("Could not create backend ZIP file.");
+        }
 
-    $backendFiles = $generator->generate();
+        $backendFiles = $generator->generate();
 
-    // application.properties
-    $applicationProperties = $generator->generateApplicationProperties();
-    $applicationProperties = setDatabaseConfigurationKotlin($app, $applicationProperties);
-    $backendFiles[] = ['name' => 'src/main/resources/application.properties', 'content' => $applicationProperties];
+        // application.properties
+        $applicationProperties = $generator->generateApplicationProperties();
+        $applicationProperties = setDatabaseConfigurationKotlin($app, $applicationProperties);
+        $backendFiles[] = ['name' => 'src/main/resources/application.properties', 'content' => $applicationProperties];
 
-    foreach ($backendFiles as $file) {
-        $backendZip->addFromString($file['name'], $file['content']);
+        foreach ($backendFiles as $file) {
+            $backendZip->addFromString($file['name'], $file['content']);
+        }
+
+        // Add Gradle Wrapper files
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradlew", 'gradlew');
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradlew.bat", 'gradlew.bat');
+        addDirectoryToZip($backendZip, dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradle", 'gradle');
+
+        $backendZip->close();
+
+        // For now, we'll follow the Java/Python model of separate zips.
+        // The logic for a single integrated zip can be added later if needed.
+
+        // --- Create Main ZIP ---
+        $mainZip = new ZipArchive();
+        $mainZipFilePath = tempnam(sys_get_temp_dir(), 'main_kotlin_zip_');
+        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new Exception("Could not create main ZIP file.");
+        }
+
+        $mainZip->addFile($backendZipFilePath, 'backend.zip');
+        // NOTE: Frontend zip generation is omitted for brevity but would be identical to graphql-generator-java.php
+
+        $manualMd = $generator->generateManual();
+        $mainZip->addFromString('manual.md', $manualMd);
+        $appName = $app->getName();
+        $manualHtml = generateManualHtml($manualMd, $appName);
+        $mainZip->addFromString('manual.html', $manualHtml);
+
+        $readmeContent = generateReadmeKotlin($appName, $generator);
+        $mainZip->addFromString('README.md', $readmeContent);
+        $mainZip->close();
+
+        // Send the ZIP file as a download
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . $app->getApplicationId() . '-graphql-kotlin.zip"');
+        header('Content-Length: ' . filesize($mainZipFilePath));
+        readfile($mainZipFilePath);
+
+        // Delete the temporary files
+        unlink($backendZipFilePath);
+        unlink($mainZipFilePath);
+        exit();
     }
-
-    // Add Gradle Wrapper files
-    $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradlew", 'gradlew');
-    $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradlew.bat", 'gradlew.bat');
-    addDirectoryToZip($backendZip, dirname(__DIR__) . "/inc.graphql-resources/backend/gradle/gradle", 'gradle');
-
-    $backendZip->close();
-
-    // For now, we'll follow the Java/Python model of separate zips.
-    // The logic for a single integrated zip can be added later if needed.
-
-    // --- Create Main ZIP ---
-    $mainZip = new ZipArchive();
-    $mainZipFilePath = tempnam(sys_get_temp_dir(), 'main_kotlin_zip_');
-    if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-        throw new Exception("Could not create main ZIP file.");
-    }
-
-    $mainZip->addFile($backendZipFilePath, 'backend.zip');
-    // NOTE: Frontend zip generation is omitted for brevity but would be identical to graphql-generator-java.php
-
-    $manualMd = $generator->generateManual();
-    $mainZip->addFromString('manual.md', $manualMd);
-    $appName = $app->getName();
-    $manualHtml = generateManualHtml($manualMd, $appName);
-    $mainZip->addFromString('manual.html', $manualHtml);
-
-    $readmeContent = generateReadmeKotlin($appName, $generator);
-    $mainZip->addFromString('README.md', $readmeContent);
-    $mainZip->close();
-
-    // Send the ZIP file as a download
-    header('Content-Type: application/zip');
-    header('Content-Disposition: attachment; filename="' . $app->getApplicationId() . '-graphql-kotlin.zip"');
-    header('Content-Length: ' . filesize($mainZipFilePath));
-    readfile($mainZipFilePath);
-
-    // Delete the temporary files
-    unlink($backendZipFilePath);
-    unlink($mainZipFilePath);
-    exit();
 } catch (Exception $e) {
     header("Content-Type: application/json");
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);

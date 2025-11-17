@@ -3805,6 +3805,28 @@ The generated project includes:
 
 > **Note:** The GraphQL Application Generator for Python is available only in the **Professional Edition** of MagicAppBuilder.
 
+## New Feature: GraphQL Application Generator for Kotlin (Spring Boot with Gradle)
+
+MagicAppBuilder 1.29.0 now supports generating GraphQL applications using **Kotlin**, a modern, concise, and safe programming language that runs on the JVM. This generator leverages the power of **Spring Boot** and the flexibility of the **Gradle build system**.
+
+The generator creates a complete, production-ready Kotlin project, including:
+
+*   **Full Project Structure** — A ready-to-build Gradle project (`build.gradle.kts`) with all necessary dependencies for Spring Boot, Spring GraphQL, and Spring Data JPA.
+*   **Kotlin Data Classes for Entities** — Clean, idiomatic Kotlin data classes annotated with `@Entity` for efficient object-relational mapping.
+*   **Spring Data Repositories** — Auto-generated `JpaRepository` interfaces providing built-in CRUD operations.
+*   **GraphQL Controllers** — Kotlin controllers using `@QueryMapping` and `@MutationMapping` annotations to expose data endpoints.
+*   **Advanced Filtering** — A `SpecificationBuilder` class that converts GraphQL filter arguments into JPA Specifications for dynamic queries.
+*   **Ready-to-Use Frontend** — A functional HTML, CSS, and JavaScript frontend that connects seamlessly with the generated backend.
+
+### Why Choose Kotlin?
+
+*   **Concise and Expressive** — Write less code with more power, reducing boilerplate and improving readability.
+*   **Null Safety** — Kotlin's type system helps eliminate null pointer exceptions, making your code more robust.
+*   **Full Java Interoperability** — Seamlessly use existing Java libraries and frameworks, including the entire Spring ecosystem.
+*   **Modern Language Features** — Benefit from features like coroutines for asynchronous programming, extension functions, and more.
+
+> **Note:** The GraphQL Application Generator for Kotlin is available only in the **Professional Edition** of MagicAppBuilder.
+
 ## Enhancements
 
 ### Consistent Boolean Handling Across All Databases
