@@ -227,6 +227,9 @@ if($language === 'java') {
 } else if($language === 'python') {
     require_once __DIR__ . "/graphql-generator-python.php";
     exit;
+} else if($language === 'kotlin') {
+    require_once __DIR__ . "/graphql-generator-kotlin.php";
+    exit;
 } else {
     http_response_code(400);
     echo json_encode(["error" => "Unsupported programming language"]);
