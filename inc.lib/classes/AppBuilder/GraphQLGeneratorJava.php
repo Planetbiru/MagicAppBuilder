@@ -1490,7 +1490,7 @@ public class {$ucCamelName}Controller {
     }
 
     @QueryMapping
-    public Map<String, Object> {$pluralCamelName}(
+    public Map<String, Object> {$pluralCamelName} (
             @Argument Integer limit,
             @Argument Integer offset,
             @Argument Integer page,

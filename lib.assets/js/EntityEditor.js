@@ -2845,9 +2845,10 @@ class EntityEditor {
             tr.dataset.col = col.name;
 
             let ta = '';
+            let taChecked = col.type.toLowerCase().indexOf('text') != -1 ? ' checked' : '';
             if(!col.primaryKey && !col.name.endsWith('_id'))
             {
-                ta = `<input type="checkbox" class="textarea-graphql" data-col="${col.name}">`;
+                ta = `<input type="checkbox" class="textarea-graphql" data-col="${col.name}"${taChecked}>`;
             }
 
             tr.innerHTML = `
