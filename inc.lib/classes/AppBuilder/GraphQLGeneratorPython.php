@@ -86,6 +86,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         $files = [];
         $files[] = ['name' => 'requirements.txt', 'content' => $this->generateRequirementsTxt()];
         $files[] = ['name' => '.env', 'content' => $this->generateEnvFile()];
+        $files[] = ['name' => '.env.example', 'content' => $this->generateEnvFile()];
         $files[] = ['name' => 'main.py', 'content' => $this->generateMainPy()];
         $files[] = ['name' => 'database.py', 'content' => $this->generateDatabasePy()];
         $files[] = ['name' => 'schema.py', 'content' => $this->generateSchemaPy()];
@@ -143,11 +144,36 @@ TXT;
     private function generateEnvFile()
     {
         return <<<ENV
-# Database Configuration
-# Example for PostgreSQL: postgresql+asyncpg://user:password@host:port/dbname
-# Example for MySQL: mysql+mysqlconnector://user:password@host:port/dbname
-# Example for SQLite: sqlite+aiosqlite:///database.db
-DATABASE_URL={DB_URL}
+# --- Application Configuration Example ---
+# Copy this file to .env and fill in your actual configuration.
+# The .env file should NOT be committed to version control.
+
+APP_HOST=127.0.0.1
+APP_PORT=8000
+
+# --- Database Configuration ---
+# Choose one: sqlite, mysql, mariadb, postgresql, sqlserver
+DB_DRIVER={DB_DRIVER}
+
+# For other databases, configure host, port, etc.
+DB_HOST={DB_HOST}
+DB_PORT={DB_PORT}
+DB_DATABASE={DB_DATABASE}
+DB_FILE={DB_FILE}
+DB_USERNAME={DB_USERNAME}
+DB_PASSWORD={DB_PASSWORD}
+
+# Set to True to log all SQL statements to the console
+DB_ECHO={DB_ECHO}
+
+# --- GraphQL Configuration ---
+# Set to True to enable Ariadne's debug mode for detailed logging
+GRAPHQL_DEBUG=True
+
+# --- CORS Configuration ---
+# Comma-separated list of allowed origins for Cross-Origin Resource Sharing
+CORS_ALLOWED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000
+
 SECRET_KEY=your-super-secret-key-change-me
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -164,7 +190,10 @@ ENV;
         return <<<PYTHON
 import os
 from contextlib import asynccontextmanager
+import uvicorn
 from fastapi import FastAPI, Request, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from ariadne import make_executable_schema, graphql_sync
 from ariadne.asgi import GraphQL
@@ -181,10 +210,10 @@ async def lifespan(app: FastAPI):
         # Use this to create tables. In production, you might use Alembic migrations.
         # await conn.run_sync(Base.metadata.create_all)
         pass
-    print("Startup complete.")
+    # print("Startup complete.")
     yield
     # Shutdown logic
-    print("Shutting down.")
+    # print("Shutting down.")
 
 app = FastAPI(lifespan=lifespan)
 
@@ -199,12 +228,52 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Determine GraphQL debug mode from environment variable
+graphql_debug_mode = os.getenv("GRAPHQL_DEBUG", "False").lower() in ("true", "1", "t", "yes")
+
 executable_schema = make_executable_schema(type_defs, resolvers)
-graphql_app = GraphQL(executable_schema, debug=True)
+graphql_app = GraphQL(executable_schema, debug=graphql_debug_mode)
+
+# Mount static files directory
+app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+app.mount("/langs", StaticFiles(directory="static/langs"), name="langs")
 
 @app.get("/")
-def read_root():
-    return {"hello": "world"}
+async def read_base():
+    return FileResponse('static/index.html')
+
+@app.get("/index.html")
+async def read_index():
+    return FileResponse('static/index.html')
+
+@app.get("/favicon.ico")
+async def read_index():
+    return FileResponse('static/favicon.ico')
+        
+@app.get("/available-language.json")
+async def read_index():
+    return FileResponse('static/langs/available-language.json')
+    
+@app.get("/frontend-config.json")
+async def read_index():
+    return FileResponse('static/config/frontend-config.json')
+
+@app.get("/available-theme.json")
+async def get_available_themes():
+    themes_path = 'static/assets/themes'
+    themes = []
+    if os.path.isdir(themes_path):
+        for dir_entry in os.scandir(themes_path):
+            if dir_entry.is_dir():
+                # Check for either style.scss or a compiled style.css
+                if os.path.exists(os.path.join(dir_entry.path, 'style.scss')) or os.path.exists(os.path.join(dir_entry.path, 'style.css')):
+                    theme_name = dir_entry.name
+                    theme_title = theme_name.replace('-', ' ').replace('_', ' ').title()
+                    themes.append({'name': theme_name, 'title': theme_title})
+    
+    response = Response(content=f"[{', '.join([f'{{\"name\": \"{t["name"]}\", \"title\": \"{t["title"]}\"}}' for t in themes])}]", media_type="application/json")
+    response.headers["Cache-Control"] = "public, max-age=86400" # Cache for 24 hours
+    return response
 
 @app.post("/graphql/")
 async def handle_graphql(request: Request):
@@ -214,6 +283,11 @@ async def handle_graphql(request: Request):
 async def handle_graphql_get(request: Request, response: Response):
     return await graphql_app.handle_request(request)
 
+if __name__ == "__main__":
+    # Membaca host dan port dari environment variables, dengan nilai default
+    app_host = os.getenv("APP_HOST", "127.0.0.1")
+    app_port = int(os.getenv("APP_PORT", 8000))
+    uvicorn.run("main:app", host=app_host, port=app_port, reload=True)
 PYTHON;
     }
 
@@ -232,9 +306,36 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# --- Database Connection Settings ---
+DB_DRIVER = os.getenv("DB_DRIVER", "sqlite")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT")
+DB_DATABASE = os.getenv("DB_DATABASE", "database")
+DB_FILE = os.getenv("DB_FILE", "database.db")
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_ECHO = os.getenv("DB_ECHO", "False").lower() in ("true", "1", "t", "yes")
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+DATABASE_URL = ""
+
+if DB_DRIVER == "sqlite":
+    # For SQLite, DB_DATABASE is the file path. Driver: aiosqlite (built-in with Python 3.8+)
+    DATABASE_URL = f"sqlite+aiosqlite:///{DB_FILE}"
+elif DB_DRIVER == "mysql":
+    # Requires asyncmy: pip install asyncmy
+    DATABASE_URL = f"mysql+asyncmy://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 3306}/{DB_DATABASE}"
+elif DB_DRIVER == "mariadb":
+    # Also uses asyncmy: pip install asyncmy
+    DATABASE_URL = f"mysql+asyncmy://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 3306}/{DB_DATABASE}"
+elif DB_DRIVER == "postgresql":
+    # Requires asyncpg: pip install asyncpg
+    DATABASE_URL = f"postgresql+asyncpg://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 5432}/{DB_DATABASE}"
+elif DB_DRIVER == "sqlserver":
+    # Requires aioodbc and pyodbc: pip install aioodbc pyodbc
+    # Also requires the Microsoft ODBC Driver for SQL Server to be installed on the system.
+    DATABASE_URL = f"mssql+aioodbc://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 1433}/{DB_DATABASE}?driver=ODBC+Driver+17+for+SQL+Server"
+
+engine = create_async_engine(DATABASE_URL, echo=DB_ECHO)
 
 AsyncSessionLocal = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
@@ -390,6 +491,10 @@ PYTHON;
             $mutation_fields .= "    create$pascalName(input: {$pascalName}Input!): $pascalName\n";
             $mutation_fields .= "    update$pascalName(id: ID!, input: {$pascalName}Input!): $pascalName\n";
             $mutation_fields .= "    delete$pascalName(id: ID!): Boolean\n";
+            if ($tableInfo['hasActiveColumn']) {
+                $activeField = $this->camelCase($this->activeField);
+                $mutation_fields .= "    toggle{$pascalName}Active(id: ID!, {$activeField}: Boolean!): $pascalName\n";
+            }
         }
 
         $gql_schema .= "    type Query {\n$query_fields    }\n\n";
@@ -420,6 +525,7 @@ PYTHON;
         $create_mutation_name = "resolve_create" . $pascalName;
         $update_mutation_name = "resolve_update" . $pascalName;
         $delete_mutation_name = "resolve_delete" . $pascalName;
+        $toggle_active_mutation_name = "resolve_toggle" . $pascalName . "Active";
 
         $content = <<<PYTHON
 from sqlalchemy import func
@@ -550,6 +656,38 @@ async def $delete_mutation_name(obj, info, id):
 
 PYTHON;
 
+        if ($tableInfo['hasActiveColumn']) {
+            $activeField = $this->camelCase($this->activeField);
+            $backendHandledColumns = $this->getBackendHandledColumnNames();
+            $mappingCode = "";
+
+            if (in_array('time_edit', $backendHandledColumns)) {
+                $mappingCode .= "    entity.time_edit = datetime.utcnow()\n";
+            }
+            // Note: admin_edit and ip_edit would require passing context from the request,
+            // which is a more advanced topic involving middleware and dependency injection.
+            // For now, we'll just update the time.
+
+            $content .= <<<PYTHON
+async def $toggle_active_mutation_name(obj, info, id, $activeField):
+    db = await anext(get_db())
+    stmt = select($pascalName).where($pascalName.$pk == id)
+    result = await db.execute(stmt)
+    entity = result.scalar_one_or_none()
+
+    if entity is None:
+        raise Exception(f"$pascalName with id {id} not found")
+
+    setattr(entity, '$activeField', $activeField)
+$mappingCode
+    await db.commit()
+    await db.refresh(entity)
+    return entity
+
+PYTHON;
+        }
+
+
         // Add a placeholder for the relationship resolver
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             if ($colInfo['isForeignKey']) {
@@ -564,6 +702,16 @@ PYTHON;
             }
         }
 
+        $mutations = [
+            ['fieldName' => "create$pascalName", 'resolverName' => $create_mutation_name, 'tableName' => $tableName],
+            ['fieldName' => "update$pascalName", 'resolverName' => $update_mutation_name, 'tableName' => $tableName],
+            ['fieldName' => "delete$pascalName", 'resolverName' => $delete_mutation_name, 'tableName' => $tableName]
+        ];
+
+        if ($tableInfo['hasActiveColumn']) {
+            $mutations[] = ['fieldName' => "toggle{$pascalName}Active", 'resolverName' => $toggle_active_mutation_name, 'tableName' => $tableName];
+        }
+
         return [
             'content' => $content,
             'resolvers' => [
@@ -571,10 +719,7 @@ PYTHON;
                     ['fieldName' => $camelName, 'resolverName' => $single_query_resolver_name, 'tableName' => $tableName],
                     ['fieldName' => $pluralCamelName, 'resolverName' => $query_resolver_name, 'tableName' => $tableName]
                 ],
-                'mutation' => [
-                    ['fieldName' => "create$pascalName", 'resolverName' => $create_mutation_name, 'tableName' => $tableName],
-                    ['fieldName' => "update$pascalName", 'resolverName' => $update_mutation_name, 'tableName' => $tableName],
-                    ['fieldName' => "delete$pascalName", 'resolverName' => $delete_mutation_name, 'tableName' => $tableName]                ]
+                'mutation' => $mutations
             ]
         ];
     }
