@@ -350,6 +350,8 @@ KTS;
         $files[] = ['name' => $packagePath . '/controller/dto/LoginRequest.kt', 'content' => $this->generateLoginRequestDtoKt()];
         $files[] = ['name' => $packagePath . '/controller/dto/LoginResponse.kt', 'content' => $this->generateLoginResponseDtoKt()];
         $files[] = ['name' => $packagePath . '/controller/core/AuthController.kt', 'content' => $this->generateAuthControllerKt()];
+        $files[] = ['name' => $packagePath . '/controller/core/UserProfileController.kt', 'content' => $this->generateUserProfileController()];
+        
 
         return $files;
     }
@@ -605,7 +607,7 @@ KOTLIN;
         $importSet = array();
 
         $nCols = count($tableInfo['columns']);
-        $i = 0;
+        $i = 1;
 
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             $kotlinType = $this->mapDbTypeToKotlinType($colInfo['type'], $colInfo['length']);
@@ -654,13 +656,7 @@ KOTLIN;
                 $fields .= "    @Column(name = \"$colName\")\n";
             }
             
-            $fields .= "    var $fieldName: " . basename(str_replace('\\', '/', $kotlinType)) . "? = null";
-            $i++;
-            if( $i < $nCols ) {
-                $fields .= ",";
-            }
-            $fields .= "\n\n";
-            
+            $fields .= "    var $fieldName: " . basename(str_replace('\\', '/', $kotlinType)) . "? = null,\n\n";
             
         }
         
@@ -669,6 +665,7 @@ KOTLIN;
         // Use 'class' instead of 'data class' if there are no fields to avoid compilation errors.
         $classType = !empty(trim($fields)) ? 'data class' : 'class';
         $fields = rtrim($fields);
+        $fields = rtrim($fields, ", ");
 
         return <<<KOTLIN
 package $packageName.model.entity;
@@ -1152,6 +1149,15 @@ object QueryUtil {
             "hasPrevious" to resultPage.hasPrevious()
         )
     }
+
+    fun <T> createSpecification(filter: List<FilterInput>?): Specification<T>? {
+        if (filter.isNullOrEmpty()) {
+            return null
+        }
+        val builder = SpecificationBuilder<T>()
+        filter.forEach { f -> builder.with(f.field, SearchOperation.valueOf(f.operator.uppercase()), f.value) }
+        return builder.build()
+    }
 }
 KOTLIN;
     }
@@ -1177,7 +1183,11 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+@EnableMethodSecurity(prePostEnabled = true)
+class SecurityConfig(
+    private val jpaUserDetailsService: JpaUserDetailsService,
+    private val passwordEncoder: Sha1PasswordEncoder
+) {
 
     @Value("\${app.security.require-login:true}")
     private val requireLogin: Boolean = true
@@ -1186,37 +1196,29 @@ class SecurityConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http {
             csrf { disable() }
-            logout { disable() }
-
-            if (!requireLogin) {
-                authorizeRequests {
-                    anyRequest.permitAll()
+            authorizeRequests {
+                authorize("/login", permitAll)
+                authorize("/logout", permitAll)
+                authorize("/update-password", permitAll)
+                authorize("/graphiql", permitAll)
+                authorize("/vendor/**", permitAll)
+                authorize("/index.html", permitAll)
+                authorize("/", permitAll)
+                if (requireLogin) {
+                    authorize(anyRequest, authenticated)
+                } else {
+                    authorize(anyRequest, permitAll)
                 }
-                sessionManagement {
-                    sessionCreationPolicy = SessionCreationPolicy.STATELESS
-                }
-            } else {
-                authorizeRequests {
-                    listOf(
-                        "/login", "/logout", "/", "/index.html", "/assets/**", "/favicon.ico",
-                        "/graphiql/**", "/vendor/**"
-                    ).forEach { authorize(it, permitAll) }
-                    anyRequest.authenticated()
-                }
-                // Additional session/filter configuration would go here
             }
+            userDetailsService = jpaUserDetailsService
         }
         return http.build()
     }
-}
 
-@Configuration
-@ConditionalOnProperty(name = "spring.session.store-type", havingValue = "redis")
-@EnableRedisHttpSession
-class RedisSessionConfig {
-    // This class is intentionally empty.
-    // Its purpose is to conditionally enable Redis session management
-    // based on the application properties.
+    @Configuration
+    @ConditionalOnProperty(value = ["spring.session.store-type"], havingValue = "redis")
+    @EnableRedisHttpSession
+    class RedisSessionConfig
 }
 KOTLIN;
     }
@@ -1238,21 +1240,17 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
+@Configuration
 class CorsConfig {
 
-    @Value("\${app.security.cors.allowed-origins:}")
-    private lateinit var allowedOrigins: Array<String>
+    @Value("$"."{app.cors.origins:*}")
+    private lateinit var origins: String
 
     @Bean
-    @ConditionalOnProperty(name = "app.security.cors.enabled", havingValue = "true")
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**") // Apply to all endpoints
-                        .allowedOrigins(*allowedOrigins)
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true)
+                registry.addMapping("/**").allowedOrigins(*origins.split(",").toTypedArray())
             }
         }
     }
@@ -1316,14 +1314,12 @@ import org.springframework.stereotype.Service
 class JpaUserDetailsService(private val adminRepository: AdminRepository) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        return adminRepository.findByUsername(username)
-            .map { admin ->
-                User.withUsername(admin.username)
-                    .password(admin.password)
-                    .roles("USER")
-                    .build()
-            }
-            .orElseThrow { UsernameNotFoundException("User not found with username: \$username") }
+        val admin = adminRepository.findByUsername(username)
+            .orElseThrow { UsernameNotFoundException("Username not found: $username") }
+
+        return User.withUsername(admin.username!!)
+            .password(admin.password!!)
+            .authorities("USER").build()
     }
 }
 KOTLIN;
@@ -1411,6 +1407,46 @@ data class LoginResponse(
 KOTLIN;
     }
 
+    private function generateUserProfileController()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package $package.controller.core
+
+import $package.model.repository.AdminRepository
+import jakarta.servlet.http.HttpSession
+import org.springframework.graphql.data.method.annotation.QueryMapping
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.stereotype.Controller
+
+data class UserProfile(val username: String)
+
+@Controller
+class UserProfileController(private val adminRepository: AdminRepository) {
+
+    @QueryMapping
+    @PreAuthorize("isAuthenticated()")
+    fun userProfile(session: HttpSession): UserProfile? {
+        val username = session.getAttribute("username") as? String
+        if (username != null) {
+            val adminOptional = adminRepository.findByUsername(username)
+            if (adminOptional.isPresent) {
+                val admin = adminOptional.get()
+                return UserProfile(username = admin.username!!)
+            }
+        }
+        return null
+    }
+
+    @QueryMapping
+    fun me(session: HttpSession): Map<String, Any?> {
+        return mapOf("username" to session.getAttribute("username"))
+    }
+}
+KOTLIN;
+
+    }
+
     /**
      * Generates the AuthController class in Kotlin.
      * @return string The Kotlin code for AuthController.kt.
@@ -1436,7 +1472,7 @@ class AuthController(
     private val passwordEncoder: Sha1PasswordEncoder
 ) {
 
-    @Value("\${app.security.require-login:true}")
+    @Value("$"."{app.security.require-login:true}")
     private val requireLogin: Boolean = true
 
     @PostMapping("/login")
@@ -1444,21 +1480,29 @@ class AuthController(
         if (!requireLogin) {
             return ResponseEntity.ok(LoginResponse(true, "Success"))
         }
+
         val singleHashedPassword = passwordEncoder.sha1(password)
-        return adminRepository.findByUsername(username)
-            .filter { admin -> passwordEncoder.matches(password, admin.password) }
-            .map { admin ->
-                session.setAttribute("username", admin.username)
-                session.setAttribute("password", singleHashedPassword)
-                session.setAttribute("adminId", admin.adminId)
-                ResponseEntity.ok(LoginResponse(true, "Login successful"))
+        val adminOptional = adminRepository.findByUsername(username)
+
+        if (adminOptional.isPresent) {
+            val admin = adminOptional.get()
+            if (admin.password == passwordEncoder.encode(password)) {
+                session.setAttribute("username", admin.username!!)
+                session.setAttribute("password", singleHashedPassword) // Store single hash
+                return ResponseEntity.ok(LoginResponse(true, "Login successful"))
             }
-            .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse(false, "Invalid credentials")))
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(LoginResponse(false, "Invalid credentials"))
     }
 
-    @RequestMapping("/logout", method = [RequestMethod.GET, RequestMethod.POST])
+    @RequestMapping(value = ["/logout"], method = [RequestMethod.GET, RequestMethod.POST])
     fun logout(request: HttpServletRequest): ResponseEntity<LoginResponse> {
-        request.session?.invalidate()
+        if (!requireLogin) {
+            return ResponseEntity.ok(LoginResponse(true, "Success"))
+        }
+        request.session.invalidate()
         return ResponseEntity.ok(LoginResponse(true, "Logout successful"))
     }
 }
@@ -1610,6 +1654,13 @@ KOTLIN;
                     $baseKotlinType = 'String?';
                     $returnValue = "ScalarValueUtil.localDateToString($returnValue)";
                 }
+                else if(strpos($baseKotlinType, 'LocalTime') !== false) {
+                    $baseKotlinType = 'String?';
+                    $returnValue = "ScalarValueUtil.localTimeToString($returnValue)";
+                }
+                else {
+                    $baseKotlinType = $baseKotlinType.'?';
+                }
 
                 $resolvers .= "\n    @SchemaMapping(typeName = \"$ucCamelTableName\", field = \"$colName\")\n";
                 $resolvers .= "    fun get{$ucCamelColName}($camelTableName: $ucCamelTableName): $baseKotlinType {\n";
@@ -1652,11 +1703,10 @@ class SpecificationBuilder<T> {
             return null
         }
         val specs = params.map { GenericSpecification<T>(it) }
-        var result = specs[0]
-        for (i in 1 until specs.size) {
-            result = result.and(specs[i])
+
+        return specs.reduceOrNull { acc: Specification<T>, spec ->
+            acc.and(spec)
         }
-        return result
     }
 }
 KOTLIN;
@@ -1705,7 +1755,7 @@ import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
 import org.springframework.data.jpa.domain.Specification
 
-class GenericSpecification<T>(private val criteria: FilterCriteria) : Specification<T> {
+lass GenericSpecification<T>(private val criteria: FilterCriteria) : Specification<T> {
 
     override fun toPredicate(root: Root<T>, query: CriteriaQuery<*>, builder: CriteriaBuilder): Predicate? {
         val key = criteria.key
@@ -1724,14 +1774,27 @@ class GenericSpecification<T>(private val criteria: FilterCriteria) : Specificat
             }
         }
 
+        @Suppress("UNCHECKED_CAST")
         return when (criteria.operation) {
             SearchOperation.EQUALS -> builder.equal(root.get<Any>(key), typedValue)
             SearchOperation.NOT_EQUALS -> builder.notEqual(root.get<Any>(key), typedValue)
-            SearchOperation.GREATER_THAN -> builder.greaterThan(root.get(key), typedValue.toString())
-            SearchOperation.GREATER_THAN_OR_EQUALS -> builder.greaterThanOrEqualTo(root.get(key), typedValue.toString())
-            SearchOperation.LESS_THAN -> builder.lessThan(root.get(key), typedValue.toString())
-            SearchOperation.LESS_THAN_OR_EQUALS -> builder.lessThanOrEqualTo(root.get(key), typedValue.toString())
-            SearchOperation.CONTAINS -> if (fieldType == String::class.java) builder.like(root.get(key), "%\$typedValue%") else builder.equal(root.get(key), typedValue)
+            SearchOperation.GREATER_THAN -> {
+                val comparableValue = typedValue as? Comparable<Any>
+                comparableValue?.let { builder.greaterThan(root.get(key), it) }
+            }
+            SearchOperation.GREATER_THAN_OR_EQUALS -> {
+                val comparableValue = typedValue as? Comparable<Any>
+                comparableValue?.let { builder.greaterThanOrEqualTo(root.get(key), it) }
+            }
+            SearchOperation.LESS_THAN -> {
+                val comparableValue = typedValue as? Comparable<Any>
+                comparableValue?.let { builder.lessThan(root.get(key), it) }
+            }
+            SearchOperation.LESS_THAN_OR_EQUALS -> {
+                val comparableValue = typedValue as? Comparable<Any>
+                comparableValue?.let { builder.lessThanOrEqualTo(root.get(key), it) }
+            }
+            SearchOperation.CONTAINS -> if (fieldType == String::class.java) builder.like(root.get(key), "%$typedValue%") else builder.equal(root.get<Any>(key), typedValue)
             SearchOperation.IN -> root.get<Any>(key).`in`(typedValue as? Collection<*>)
             SearchOperation.NOT_IN -> builder.not(root.get<Any>(key).`in`(typedValue as? Collection<*>))
         }
@@ -1890,28 +1953,23 @@ import graphql.schema.CoercingParseLiteralException
 import graphql.schema.CoercingParseValueException
 import graphql.schema.CoercingSerializeException
 
-class ObjectScalar : Coercing<Any, Any> {
+@Configuration
+class ObjectScalar {
 
-    @Throws(CoercingSerializeException::class)
-    override fun serialize(dataFetcherResult: Any): Any {
-        return dataFetcherResult
-    }
+    @Bean
+    fun runtimeWiringConfigurer(): RuntimeWiringConfigurer {
+        val objectScalar = GraphQLScalarType.newScalar()
+            .name("Object")
+            .description("A custom scalar that handles Object values")
+            .coercing(object : Coercing<Any?, Any?> {
+                override fun serialize(dataFetcherResult: Any): Any? = dataFetcherResult
+                override fun parseValue(input: Any): Any? = input
+                override fun parseLiteral(input: Value<*>, variables: CoercingParseLiteralVariables): Any? = (input as? graphql.language.ObjectValue)?.objectFields
+            })
+            .build()
 
-    @Throws(CoercingParseValueException::class)
-    override fun parseValue(input: Any): Any {
-        return input
-    }
-
-    @Throws(CoercingParseLiteralException::class)
-    override fun parseLiteral(input: Value<*>): Any? {
-        return when (input) {
-            is StringValue -> input.value
-            is IntValue -> input.value
-            is FloatValue -> input.value
-            is BooleanValue -> input.isValue
-            is ArrayValue -> input.values.map { parseLiteral(it) }
-            is ObjectValue -> input.objectFields.associate { it.name to parseLiteral(it.value) }
-            else -> null
+        return RuntimeWiringConfigurer { wiringBuilder: RuntimeWiring.Builder ->
+            wiringBuilder.scalar(objectScalar)
         }
     }
 }
