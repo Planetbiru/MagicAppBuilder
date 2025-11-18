@@ -325,6 +325,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gin-contrib/static"
 	"net/http"
+	"os"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 )
@@ -349,7 +350,11 @@ func NewServer() *Server {
 
 // Run starts the HTTP server.
 func (s *Server) Run() error {
-	return s.router.Run(":8080")
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8080" // Default port
+	}
+	return s.router.Run(":" + port)
 }
 
 // graphqlHandler returns a Gin handler for the GraphQL endpoint.
