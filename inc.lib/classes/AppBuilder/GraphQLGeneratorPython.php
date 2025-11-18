@@ -148,7 +148,7 @@ TXT;
 # Copy this file to .env and fill in your actual configuration.
 # The .env file should NOT be committed to version control.
 
-APP_HOST=127.0.0.1
+APP_HOST=localhost
 APP_PORT=8000
 
 # --- Database Configuration ---
