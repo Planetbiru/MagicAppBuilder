@@ -101,7 +101,55 @@ function setDatabaseConfigurationPythonExample($databaseConfiguration)
 }
 
 $reservedColumnMap = createReservedColumnMap(isset($reservedColumns['columns']) ? $reservedColumns['columns'] : []);
-$backendHandledColumns = []; // Define if needed for Python version
+$backendHandledColumns = []; 
+
+if(isset($reservedColumnMap['time_create']))
+{
+    $backendHandledColumns['timeCreate'] = [
+        'columnName' => $reservedColumnMap['time_create'],
+        'type' => 'datetime'
+    ];
+}
+
+if(isset($reservedColumnMap['time_edit']))
+{
+    $backendHandledColumns['timeEdit'] = [
+        'columnName' => $reservedColumnMap['time_edit'],
+        'type' => 'datetime'
+    ];
+}
+
+if(isset($reservedColumnMap['admin_create']))
+{
+    $backendHandledColumns['adminCreate'] = [
+        'columnName' => $reservedColumnMap['admin_create'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['admin_edit']))
+{
+    $backendHandledColumns['adminEdit'] = [
+        'columnName' => $reservedColumnMap['admin_edit'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['ip_create']))
+{
+    $backendHandledColumns['ipCreate'] = [
+        'columnName' => $reservedColumnMap['ip_create'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['ip_edit']))
+{
+    $backendHandledColumns['ipEdit'] = [
+        'columnName' => $reservedColumnMap['ip_edit'],
+        'type' => 'string'
+    ];
+}
 
 try {
     $application = getApplication($databaseBuilder, $applicationId);

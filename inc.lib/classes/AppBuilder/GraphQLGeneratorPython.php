@@ -12,6 +12,20 @@ namespace AppBuilder;
  */
 class GraphQLGeneratorPython extends GraphQLGeneratorBase
 {
+    /**
+     * Constructor for GraphQLGeneratorPython.
+     *
+     * @param array      $schema                Decoded JSON schema.
+     * @param array|null $reservedColumns       Reserved column definitions.
+     * @param array      $backendHandledColumns Columns handled by the backend.
+     * @param bool       $useCache              Whether to use in-memory caching for queries.
+     */
+    public function __construct($schema, $reservedColumns = null, $backendHandledColumns = array(), $useCache = false)
+    {
+        parent::__construct($schema, $reservedColumns, $backendHandledColumns, $useCache);
+    }
+
+
 
     /** 
      * Maps database column types to SQLAlchemy column types.
@@ -90,6 +104,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         $files[] = ['name' => 'main.py', 'content' => $this->generateMainPy()];
         $files[] = ['name' => 'database.py', 'content' => $this->generateDatabasePy()];
         $files[] = ['name' => 'schema.py', 'content' => $this->generateSchemaPy()];
+        $files[] = ['name' => 'utils/query_helpers.py', 'content' => $this->generateQueryHelpersPy()];
 
         $allResolvers = [];
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
@@ -316,25 +331,35 @@ DB_USERNAME = os.getenv("DB_USERNAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_ECHO = os.getenv("DB_ECHO", "False").lower() in ("true", "1", "t", "yes")
 
-DATABASE_URL = ""
+def _get_database_url() -> str:
+    """Constructs the database URL from environment variables."""
+    if DB_DRIVER == "sqlite":
+        # For SQLite, DB_DATABASE is the file path. Driver: aiosqlite
+        return f"sqlite+aiosqlite:///{DB_FILE}"
+    
+    # Ensure username and password are not None for other drivers
+    username = DB_USERNAME or ""
+    password = DB_PASSWORD or ""
 
-if DB_DRIVER == "sqlite":
-    # For SQLite, DB_DATABASE is the file path. Driver: aiosqlite (built-in with Python 3.8+)
-    DATABASE_URL = f"sqlite+aiosqlite:///{DB_FILE}"
-elif DB_DRIVER == "mysql":
-    # Requires asyncmy: pip install asyncmy
-    DATABASE_URL = f"mysql+asyncmy://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 3306}/{DB_DATABASE}"
-elif DB_DRIVER == "mariadb":
-    # Also uses asyncmy: pip install asyncmy
-    DATABASE_URL = f"mysql+asyncmy://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 3306}/{DB_DATABASE}"
-elif DB_DRIVER == "postgresql":
-    # Requires asyncpg: pip install asyncpg
-    DATABASE_URL = f"postgresql+asyncpg://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 5432}/{DB_DATABASE}"
-elif DB_DRIVER == "sqlserver":
-    # Requires aioodbc and pyodbc: pip install aioodbc pyodbc
-    # Also requires the Microsoft ODBC Driver for SQL Server to be installed on the system.
-    DATABASE_URL = f"mssql+aioodbc://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT or 1433}/{DB_DATABASE}?driver=ODBC+Driver+17+for+SQL+Server"
+    if DB_DRIVER in ("mysql", "mariadb"):
+        # Requires aiomysql: pip install aiomysql
+        port = DB_PORT or 3306
+        return f"mysql+aiomysql://{username}:{password}@{DB_HOST}:{port}/{DB_DATABASE}"
+    
+    if DB_DRIVER == "postgresql":
+        # Requires asyncpg: pip install asyncpg
+        port = DB_PORT or 5432
+        return f"postgresql+asyncpg://{username}:{password}@{DB_HOST}:{port}/{DB_DATABASE}"
+    
+    if DB_DRIVER == "sqlserver":
+        # Requires aioodbc and pyodbc. Also requires the Microsoft ODBC Driver for SQL Server.
+        port = DB_PORT or 1433
+        odbc_driver = os.getenv("DB_ODBC_DRIVER", "ODBC Driver 17 for SQL Server").replace(" ", "+")
+        return f"mssql+aioodbc://{username}:{password}@{DB_HOST}:{port}/{DB_DATABASE}?driver={odbc_driver}"
 
+    raise ValueError(f"Unsupported DB_DRIVER: {DB_DRIVER}. Supported drivers are: sqlite, mysql, mariadb, postgresql, sqlserver.")
+
+DATABASE_URL = _get_database_url()
 engine = create_async_engine(DATABASE_URL, echo=DB_ECHO)
 
 AsyncSessionLocal = sessionmaker(
@@ -449,6 +474,8 @@ PYTHON;
             $camelName = $tableName;
             $pluralCamelName = $this->pluralize($tableName);
 
+            $pkType = '';
+
             // Type
             $gql_schema .= "    type $pascalName {\n";
             foreach ($tableInfo['columns'] as $colName => $colInfo) {
@@ -458,6 +485,13 @@ PYTHON;
                     $refPascalName = $this->pascalCase($colInfo['references']);
                     $gql_schema .= "        {$colInfo['references']}: $refPascalName\n";
                 }
+                if ($colInfo['isPrimaryKey'] && empty($pkType)) {
+                    $pkType = $gqlType;
+                }
+            }
+            if(empty($pkType))
+            {
+                $pkType = 'String';
             }
             $gql_schema .= "    }\n\n";
 
@@ -484,16 +518,16 @@ PYTHON;
             $gql_schema .= "    }\n\n";
 
             // Queries
-            $query_fields .= "    $camelName(id: ID!): $pascalName\n";
+            $query_fields .= "    $camelName(id: $pkType!): $pascalName\n";
             $query_fields .= "    $pluralCamelName(limit: Int, offset: Int, page: Int, orderBy: [SortInput], filter: [FilterInput]): {$pascalName}Page\n";
 
             // Mutations
             $mutation_fields .= "    create$pascalName(input: {$pascalName}Input!): $pascalName\n";
-            $mutation_fields .= "    update$pascalName(id: ID!, input: {$pascalName}Input!): $pascalName\n";
-            $mutation_fields .= "    delete$pascalName(id: ID!): Boolean\n";
+            $mutation_fields .= "    update$pascalName(id: $pkType!, input: {$pascalName}Input!): $pascalName\n";
+            $mutation_fields .= "    delete$pascalName(id: $pkType!): Boolean\n";
             if ($tableInfo['hasActiveColumn']) {
                 $activeField = $this->camelCase($this->activeField);
-                $mutation_fields .= "    toggle{$pascalName}Active(id: ID!, {$activeField}: Boolean!): $pascalName\n";
+                $mutation_fields .= "    toggle{$pascalName}Active(id: $pkType!, {$activeField}: Boolean!): $pascalName\n";
             }
         }
 
@@ -532,6 +566,8 @@ from sqlalchemy import func
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from models.$tableName import $pascalName
+from utils.query_helpers import apply_filters, apply_ordering
+from datetime import datetime, date
 from database import get_db
 
 async def $single_query_resolver_name(obj, info, id):
@@ -565,40 +601,12 @@ PYTHON;
     if load_options:
         stmt = stmt.options(*load_options)
 
-    if filter:
-        where_clauses = []
-        for f in filter:
-            field_name = f.get('field')
-            value = f.get('value')
-            operator = f.get('operator', 'EQUALS').upper()
-            
-            column = getattr($pascalName, field_name, None)
-            if column is None:
-                continue
+    # Apply filtering
+    stmt = apply_filters(stmt, $pascalName, filter)
+    count_stmt = apply_filters(count_stmt, $pascalName, filter)
 
-            if operator == 'EQUALS':
-                where_clauses.append(column == value)
-            elif operator == 'NOT_EQUALS':
-                where_clauses.append(column != value)
-            elif operator == 'CONTAINS':
-                where_clauses.append(column.like(f"%{value}%"))
-            elif operator == 'GREATER_THAN':
-                where_clauses.append(column > value)
-            elif operator == 'GREATER_THAN_OR_EQUALS':
-                where_clauses.append(column >= value)
-            elif operator == 'LESS_THAN':
-                where_clauses.append(column < value)
-            elif operator == 'LESS_THAN_OR_EQUALS':
-                where_clauses.append(column <= value)
-            # Add more operators as needed (e.g., IN, NOT_IN)
-
-        if where_clauses:
-            stmt = stmt.where(*where_clauses)
-            count_stmt = count_stmt.where(*where_clauses)
-
-    if orderBy:
-        order_clauses = [getattr($pascalName, o['field']).asc() if o.get('direction', 'ASC').upper() == 'ASC' else getattr($pascalName, o['field']).desc() for o in orderBy]
-        stmt = stmt.order_by(*order_clauses)
+    # Apply ordering
+    stmt = apply_ordering(stmt, $pascalName, orderBy)
 
     total = (await db.execute(count_stmt)).scalar_one()
     
@@ -619,6 +627,12 @@ PYTHON;
 
 async def $create_mutation_name(obj, info, input):
     db = await anext(get_db())
+    
+    # Convert datetime/date objects to strings for database compatibility
+    for key, value in input.items():
+        if isinstance(value, (datetime, date)):
+            input[key] = value.strftime('%Y-%m-%d %H:%M:%S') if isinstance(value, datetime) else value.isoformat()
+            
     new_entity = $pascalName(**input)
     db.add(new_entity)
     await db.commit()
@@ -635,6 +649,9 @@ async def $update_mutation_name(obj, info, id, input):
         raise Exception(f"$pascalName with id {id} not found")
 
     for key, value in input.items():
+        # Convert datetime/date objects to strings for database compatibility
+        if isinstance(value, (datetime, date)):
+            value = value.strftime('%Y-%m-%d %H:%M:%S') if isinstance(value, datetime) else value.isoformat()
         setattr(entity, key, value)
     
     await db.commit()
@@ -793,6 +810,57 @@ PYTHON;
             $content .= "from .$tableName import $pascalName\n";
         }
         return $content;
+    }
+
+    /** 
+     * Generates the content for utils/query_helpers.py.
+     *
+     * @return string The content of the query helpers file.
+     */
+    private function generateQueryHelpersPy()
+    {
+        return <<<PYTHON
+def apply_filters(stmt, model, filter_list):
+    """Applies a list of filters to a SQLAlchemy query statement."""
+    if not filter_list:
+        return stmt
+
+    where_clauses = []
+    for f in filter_list:
+        field_name = f.get('field')
+        value = f.get('value')
+        operator = f.get('operator', 'EQUALS').upper()
+        
+        column = getattr(model, field_name, None)
+        if column is None:
+            continue
+
+        if operator == 'EQUALS':
+            where_clauses.append(column == value)
+        elif operator == 'NOT_EQUALS':
+            where_clauses.append(column != value)
+        elif operator == 'CONTAINS':
+            where_clauses.append(column.like(f"%{value}%"))
+        elif operator == 'GREATER_THAN':
+            where_clauses.append(column > value)
+        elif operator == 'GREATER_THAN_OR_EQUALS':
+            where_clauses.append(column >= value)
+        elif operator == 'LESS_THAN':
+            where_clauses.append(column < value)
+        elif operator == 'LESS_THAN_OR_EQUALS':
+            where_clauses.append(column <= value)
+
+    if where_clauses:
+        stmt = stmt.where(*where_clauses)
+    return stmt
+
+def apply_ordering(stmt, model, order_by_list):
+    """Applies a list of ordering clauses to a SQLAlchemy query statement."""
+    if order_by_list:
+        order_clauses = [getattr(model, o['field']).asc() if o.get('direction', 'ASC').upper() == 'ASC' else getattr(model, o['field']).desc() for o in order_by_list]
+        stmt = stmt.order_by(*order_clauses)
+    return stmt
+PYTHON;
     }
 
     /** 
