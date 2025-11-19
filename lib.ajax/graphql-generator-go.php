@@ -101,7 +101,7 @@ try {
         $backendHandledColumns,
         $inMemoryCache,
         [
-            'moduleName' => 'github.com/magicapp/' . $application->getApplicationId(),
+            'moduleName' => $application->getApplicationId(),
             'appName' => $appName,
             'description' => $application->getDescription()
         ],
