@@ -108,11 +108,19 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         $files[] = ['name' => 'routers/admin.py', 'content' => $this->generateAdminController()];
         $files[] = ['name' => 'routers/profile.py', 'content' => $this->generateProfileController()];
         $files[] = ['name' => 'routers/auth.py', 'content' => $this->generateAuthController()];
+        $files[] = ['name' => 'routers/message.py', 'content' => $this->generateMessageController()];
+        $files[] = ['name' => 'routers/notification.py', 'content' => $this->generateNotificationController()];
+
 
         $files[] = ['name' => 'utils/query_helpers.py', 'content' => $this->generateQueryHelpersPy()];
         $files[] = ['name' => 'utils/pagination.py', 'content' => $this->generatePagination()];
         $files[] = ['name' => 'constants/constants.py', 'content' => $this->generateConstants()];
         $files[] = ['name' => 'models/core/admin.py', 'content' => $this->generateAdmin()];
+
+        $files[] = ['name' => 'models/core/admin_level.py', 'content' => $this->generateAdminLevel()];
+        $files[] = ['name' => 'models/core/message_folder.py', 'content' => $this->generateMessageFolder()];
+        $files[] = ['name' => 'models/core/message.py', 'content' => $this->generateMessage()];
+        $files[] = ['name' => 'models/core/notification.py', 'content' => $this->generateNotification()];
 
 
         $allResolvers = [];
@@ -226,7 +234,7 @@ from database import engine, Base
 
 
 from schema import type_defs, resolvers
-from routers import profile, admin, auth
+from routers import profile, admin, auth, message, notification
 from routers.auth import login_required
 import html
 from fastapi.staticfiles import StaticFiles
@@ -279,6 +287,8 @@ app.mount("/langs", StaticFiles(directory="static/langs"), name="langs")
 app.include_router(profile.router)
 app.include_router(admin.router)
 app.include_router(auth.router)
+app.include_router(message.router)
+app.include_router(notification.router)
 
 
 @app.get("/frontend-config.json", dependencies=[Depends(login_required)])
@@ -412,6 +422,10 @@ Base = declarative_base()
 # This ensures that when Base.metadata.create_all is called, it knows about all tables.
 from models.lantai import Lantai
 from models.core.admin import Admin
+from models.core.admin_level import AdminLevel
+from models.core.message_folder import MessageFolder
+from models.core.message import Message
+from models.core.notification import Notification
 
 async def get_db():
     async with AsyncSessionLocal() as session:
@@ -819,6 +833,541 @@ async def logout1(request: Request, username: str = Depends(login_required)):
 async def logout2(request: Request, username: str = Depends(login_required)):
     request.session.clear()
     return {"success": True, "message": "You have been successfully logged out."}
+PYTHON;
+    }
+
+    private function generateMessageController()
+    {
+        return <<<PYTHON
+import html
+from datetime import datetime
+from typing import Optional
+from math import ceil
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi.responses import HTMLResponse, JSONResponse
+from sqlalchemy import func, or_, and_
+from sqlalchemy.future import select
+from sqlalchemy.orm import aliased
+
+from database import get_db
+from models.core.admin import Admin
+from models.core.message import Message
+from routers.auth import login_required
+
+router = APIRouter()
+
+
+def h(text):
+    """Helper untuk escape HTML dan menangani nilai None."""
+    return html.escape(str(text)) if text is not None else ""
+
+
+@router.post("/message")
+async def handle_message_action(
+    request: Request,
+    username: str = Depends(login_required),
+    db=Depends(get_db),
+):
+    """
+    Menangani aksi POST untuk pesan, seperti 'mark_as_unread' atau 'delete'.
+    """
+    form_data = await request.form()
+    action = form_data.get("action")
+    message_id = form_data.get("messageId")
+
+    if not message_id:
+        raise HTTPException(status_code=400, detail="Message ID is required.")
+
+    # Dapatkan admin saat ini
+    admin_stmt = select(Admin).where(Admin.username == username)
+    current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
+    if not current_admin:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    # Dapatkan pesan
+    message_stmt = select(Message).where(Message.message_id == message_id)
+    message = (await db.execute(message_stmt)).scalar_one_or_none()
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found.")
+
+    if action == "mark_as_unread":
+        if message.receiver_id != current_admin.admin_id:
+            raise HTTPException(status_code=403, detail="Forbidden")
+        message.is_read = False
+        message.time_read = None
+        await db.commit()
+        return JSONResponse(
+            {"success": True, "message": "Message marked as unread."}
+        )
+
+    elif action == "delete":
+        if (
+            message.sender_id != current_admin.admin_id
+            and message.receiver_id != current_admin.admin_id
+        ):
+            raise HTTPException(status_code=403, detail="Forbidden")
+        await db.delete(message)
+        await db.commit()
+        return JSONResponse(
+            {"success": True, "message": "Message deleted successfully."}
+        )
+
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action.")
+
+
+@router.get("/message", response_class=HTMLResponse)
+async def get_messages(
+    request: Request,
+    username: str = Depends(login_required),
+    db=Depends(get_db),
+    messageId: Optional[str] = None,
+    page: int = 1,
+    search: Optional[str] = None,
+):
+    """
+    Mengambil daftar pesan atau detail pesan tunggal.
+    """
+    admin_stmt = select(Admin).where(Admin.username == username)
+    current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
+    if not current_admin:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    current_admin_id = current_admin.admin_id
+
+    if messageId:
+        # --- Tampilan Detail Pesan ---
+        Sender = aliased(Admin)
+        Receiver = aliased(Admin)
+        stmt = (
+            select(Message, Sender.name, Receiver.name)
+            .outerjoin(Sender, Message.sender_id == Sender.admin_id)
+            .outerjoin(Receiver, Message.receiver_id == Receiver.admin_id)
+            .where(Message.message_id == messageId)
+            .where(
+                or_(
+                    Message.sender_id == current_admin_id,
+                    Message.receiver_id == current_admin_id,
+                )
+            )
+        )
+        result = (await db.execute(stmt)).first()
+
+        if not result:
+            return HTMLResponse('<div class="table-container detail-view">No message found.</div>')
+
+        message, sender_name, receiver_name = result
+
+        # Tandai sebagai sudah dibaca
+        if message.receiver_id == current_admin_id and not message.is_read:
+            message.is_read = True
+            message.time_read = datetime.now()
+            await db.commit()
+            await db.refresh(message)
+
+        status_display = (
+            f'<span class="status-read">Read at {h(message.time_read.strftime("%Y-%m-%d %H:%M:%S"))}</span>'
+            if message.is_read
+            else '<span class="status-unread">Unread</span>'
+        )
+
+        buttons_html = ""
+        if message.receiver_id == current_admin_id and message.is_read:
+            buttons_html = f"""
+            <button class="btn btn-primary" onclick="markMessageAsUnread('{message.message_id}', 'detail')">Mark as Unread</button>
+            <button class="btn btn-danger" onclick="handleMessageDelete('{message.message_id}')">Delete</button>
+            """
+
+        html_content = f"""
+        <div class="back-controls">
+            <button id="back-to-list" class="btn btn-secondary" onclick="backToList('message')">Back to List</button>
+            {buttons_html}
+        </div>
+        <div class="message-container">
+            <div class="message-header">
+                <h3>{h(message.subject)}</h3>
+                <div class="message-meta">
+                    <div><strong>From:</strong> {h(sender_name or 'System')}</div>
+                    <div><strong>To:</strong> {h(receiver_name or 'System')}</div>
+                    <div><strong>Time:</strong> {h(message.time_create.strftime('%Y-%m-%d %H:%M:%S'))}</div>
+                    <div><strong>Status:</strong> {status_display}</div>
+                </div>
+            </div>
+            <div class="message-body">
+                {h(message.content).replace(chr(10), '<br>')}
+            </div>
+        </div>
+        """
+        return HTMLResponse(content=html_content)
+
+    else:
+        # --- Tampilan Daftar Pesan ---
+        PAGE_SIZE = 20
+        offset = (page - 1) * PAGE_SIZE
+
+        Sender = aliased(Admin)
+        Receiver = aliased(Admin)
+
+        base_query = (
+            select(Message, Sender.name, Receiver.name)
+            .outerjoin(Sender, Message.sender_id == Sender.admin_id)
+            .outerjoin(Receiver, Message.receiver_id == Receiver.admin_id)
+            .where(
+                or_(
+                    Message.sender_id == current_admin_id,
+                    Message.receiver_id == current_admin_id,
+                )
+            )
+        )
+
+        if search:
+            search_term = f"%{search}%"
+            base_query = base_query.where(
+                or_(
+                    Message.subject.ilike(search_term),
+                    Message.content.ilike(search_term),
+                    Sender.name.ilike(search_term),
+                    Receiver.name.ilike(search_term),
+                )
+            )
+
+        # Hitung total pesan
+        count_stmt = select(func.count()).select_from(base_query.subquery())
+        total_messages = (await db.execute(count_stmt)).scalar_one()
+        total_pages = ceil(total_messages / PAGE_SIZE)
+
+        # Ambil pesan untuk halaman saat ini
+        messages_stmt = (
+            base_query.order_by(Message.time_create.desc())
+            .limit(PAGE_SIZE)
+            .offset(offset)
+        )
+        results = (await db.execute(messages_stmt)).all()
+
+        search_query_str = f"&search={html.escape(search)}" if search else ""
+
+        # Render list
+        list_items_html = ""
+        if not results:
+            list_items_html = "<p>No messages found.</p>"
+        else:
+            for message, sender_name, _ in results:
+                is_read_class = "read" if message.is_read else "unread"
+                content_snippet = h(message.content[:150] if message.content else "") + ("..." if message.content and len(message.content) > 150 else "")
+                
+                action_buttons = ""
+                if message.receiver_id == current_admin_id and message.is_read:
+                    action_buttons = f"""
+                    <button class="btn btn-sm btn-secondary" onclick="markMessageAsUnread('{message.message_id}', 'list')">Mark as Unread</button>
+                    <button class="btn btn-sm btn-danger" onclick="handleMessageDelete('{message.message_id}')">Delete</button>
+                    """
+
+                list_items_html += f"""
+                <div class="message-item {is_read_class}">
+                    <span class="message-status-indicator"></span>
+                    <div class="message-header">
+                        <div class="message-link-wrapper">
+                            <a href="#message?messageId={message.message_id}" class="message-link">
+                                <span class="message-sender">{h(sender_name or 'System')}</span>
+                                <span class="message-subject">{h(message.subject)}</span>
+                            </a>
+                            <span class="message-time">{h(message.time_create.strftime('%Y-%m-%d %H:%M:%S'))}</span>
+                            {action_buttons}
+                        </div>
+                    </div>
+                    <div class="message-content">{content_snippet}</div>
+                </div>
+                """
+
+        # Render pagination
+        pagination_html = ""
+        if total_pages > 1:
+            pagination_html += f"<span>Page {page} of {total_pages} ({total_messages} messages)</span>"
+            if page > 1:
+                pagination_html += f'<a href="#message?page={page - 1}{search_query_str}" class="btn btn-secondary">Previous</a>'
+            # Simplified pagination links for brevity
+            for i in range(max(1, page - 2), min(total_pages + 1, page + 3)):
+                 btn_class = 'btn-primary' if i == page else 'btn-secondary'
+                 pagination_html += f'<a href="#message?page={i}{search_query_str}" class="btn {btn_class}">{i}</a>'
+            if page < total_pages:
+                pagination_html += f'<a href="#message?page={page + 1}{search_query_str}" class="btn btn-secondary">Next</a>'
+
+        html_content = f"""
+        <div id="filter-container" class="filter-container" style="display: block;">
+            <form id="message-search-form" class="search-form" onsubmit="handleMessageSearch(event)">
+                <div class="filter-controls">
+                    <div class="form-group">
+                        <label for="search_message">Search</label>
+                        <input type="text" name="search" id="search_message" placeholder="Search" value="{h(search or '')}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+        <div class="message-list-container">{list_items_html}</div>
+        <div class="pagination-container">{pagination_html}</div>
+        """
+        return HTMLResponse(content=html_content)
+PYTHON;
+            
+    }
+
+    private function generateNotificationController()
+    {
+        return <<<PYTHON
+import html
+from datetime import datetime
+from typing import Optional
+from math import ceil
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from sqlalchemy import func, or_
+from sqlalchemy.future import select
+
+from database import get_db
+from models.core.admin import Admin
+from models.core.notification import Notification
+from routers.auth import login_required
+
+router = APIRouter()
+
+
+def h(text):
+    """Helper untuk escape HTML dan menangani nilai None."""
+    return html.escape(str(text)) if text is not None else ""
+
+
+@router.post("/notification")
+async def handle_notification_action(
+    request: Request,
+    username: str = Depends(login_required),
+    db=Depends(get_db),
+):
+    """
+    Menangani aksi POST untuk notifikasi, seperti 'mark_as_unread' atau 'delete'.
+    """
+    form_data = await request.form()
+    action = form_data.get("action")
+    notification_id = form_data.get("notificationId")
+
+    if not notification_id:
+        raise HTTPException(status_code=400, detail="Notification ID is required.")
+
+    # Dapatkan admin saat ini
+    admin_stmt = select(Admin).where(Admin.username == username)
+    current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
+    if not current_admin:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    # Dapatkan notifikasi
+    stmt = select(Notification).where(Notification.notification_id == notification_id)
+    notification = (await db.execute(stmt)).scalar_one_or_none()
+    if not notification:
+        raise HTTPException(status_code=404, detail="Notification not found.")
+
+    # Periksa izin
+    is_authorized = (notification.admin_id == current_admin.admin_id) or \
+                    (notification.admin_group == current_admin.admin_level_id)
+    if not is_authorized:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    if action == "mark_as_unread":
+        notification.is_read = False
+        notification.time_read = None
+        await db.commit()
+        return JSONResponse(
+            {"success": True, "message": "Notification marked as unread."}
+        )
+
+    elif action == "delete":
+        await db.delete(notification)
+        await db.commit()
+        return JSONResponse(
+            {"success": True, "message": "Notification deleted successfully."}
+        )
+
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action.")
+
+
+@router.get("/notification", response_class=HTMLResponse)
+async def get_notifications(
+    request: Request,
+    username: str = Depends(login_required),
+    db=Depends(get_db),
+    notificationId: Optional[str] = None,
+    page: int = 1,
+    search: Optional[str] = None,
+):
+    """
+    Mengambil daftar notifikasi atau detail notifikasi tunggal.
+    """
+    admin_stmt = select(Admin).where(Admin.username == username)
+    current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
+    if not current_admin:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    current_admin_id = current_admin.admin_id
+    current_admin_level_id = current_admin.admin_level_id
+
+    if notificationId:
+        # --- Tampilan Detail Notifikasi ---
+        stmt = (
+            select(Notification)
+            .where(Notification.notification_id == notificationId)
+            .where(
+                or_(
+                    Notification.admin_id == current_admin_id,
+                    Notification.admin_group == current_admin_level_id,
+                )
+            )
+        )
+        notification = (await db.execute(stmt)).scalar_one_or_none()
+
+        if not notification:
+            return HTMLResponse('<div class="table-container detail-view">No notification found.</div>')
+
+        # Tandai sebagai sudah dibaca
+        if not notification.is_read:
+            notification.is_read = True
+            notification.time_read = datetime.now()
+            notification.ip_read = request.client.host
+            await db.commit()
+            await db.refresh(notification)
+
+        status_display = (
+            f'<span class="status-read">Read at {h(notification.time_read.strftime("%Y-%m-%d %H:%M:%S"))}</span>'
+            if notification.is_read
+            else '<span class="status-unread">Unread</span>'
+        )
+
+        buttons_html = ""
+        if notification.is_read:
+            buttons_html = f"""
+            <button class="btn btn-primary" onclick="markNotificationAsUnread('{notification.notification_id}', 'detail')">Mark as Unread</button>
+            <button class="btn btn-danger" onclick="handleNotificationDelete('{notification.notification_id}')">Delete</button>
+            """
+        
+        link_button = f'<p><a href="{h(notification.link)}" target="_blank" class="btn btn-primary mt-3">More Info</a></p>' if notification.link else ""
+
+        html_content = f"""
+        <div class="back-controls">
+            <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')">Back to List</button>
+            {buttons_html}
+        </div>
+        <div class="notification-container">
+            <div class="notification-header">
+                <h3>{h(notification.subject)}</h3>
+                <div class="message-meta">
+                    <div><strong>Time:</strong> {h(notification.time_create.strftime('%Y-%m-%d %H:%M:%S'))}</div>
+                    <div><strong>Status:</strong> {status_display}</div>
+                </div>
+            </div>
+            <div class="message-body">
+                {h(notification.content).replace(chr(10), '<br>')}
+                {link_button}
+            </div>
+        </div>
+        """
+        return HTMLResponse(content=html_content)
+
+    else:
+        # --- Tampilan Daftar Notifikasi ---
+        PAGE_SIZE = 20
+        offset = (page - 1) * PAGE_SIZE
+
+        where_clause = or_(
+            Notification.admin_id == current_admin_id,
+            Notification.admin_group == current_admin_level_id,
+        )
+
+        if search:
+            search_term = f"%{search}%"
+            where_clause = or_(
+                where_clause,
+                Notification.subject.ilike(search_term),
+                Notification.content.ilike(search_term),
+            )
+
+        # Hitung total notifikasi
+        count_stmt = select(func.count(Notification.notification_id)).where(where_clause)
+        total_notifications = (await db.execute(count_stmt)).scalar_one()
+        total_pages = ceil(total_notifications / PAGE_SIZE)
+
+        # Ambil notifikasi untuk halaman saat ini
+        stmt = (
+            select(Notification)
+            .where(where_clause)
+            .order_by(Notification.time_create.desc())
+            .limit(PAGE_SIZE)
+            .offset(offset)
+        )
+        notifications = (await db.execute(stmt)).scalars().all()
+
+        search_query_str = f"&search={html.escape(search)}" if search else ""
+
+        # Render list
+        list_items_html = ""
+        if not notifications:
+            list_items_html = "<p>No notifications found.</p>"
+        else:
+            for notification in notifications:
+                is_read_class = "read" if notification.is_read else "unread"
+                content_snippet = h(notification.content[:150] if notification.content else "") + ("..." if notification.content and len(notification.content) > 150 else "")
+                
+                action_buttons = ""
+                if notification.is_read:
+                    action_buttons = f"""
+                    <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('{notification.notification_id}', 'list')">Mark as Unread</button>
+                    <button class="btn btn-sm btn-danger" onclick="handleNotificationDelete('{notification.notification_id}')">Delete</button>
+                    """
+
+                list_items_html += f"""
+                <div class="message-item {is_read_class}">
+                    <span class="message-status-indicator"></span>
+                    <div class="notification-header">
+                        <div class="message-link-wrapper">
+                            <a href="#notification?notificationId={notification.notification_id}" class="message-link">
+                                <span class="message-subject">{h(notification.subject)}</span>
+                            </a>
+                            <span class="message-time">{h(notification.time_create.strftime('%Y-%m-%d %H:%M:%S'))}</span>
+                            {action_buttons}
+                        </div>
+                    </div>
+                    <div class="message-content">{content_snippet}</div>
+                </div>
+                """
+
+        # Render pagination
+        pagination_html = ""
+        if total_pages > 1:
+            pagination_html += f"<span>Page {page} of {total_pages} ({total_notifications} notifications)</span>"
+            if page > 1:
+                pagination_html += f'<a href="#notification?page={page - 1}{search_query_str}" class="btn btn-secondary">Previous</a>'
+            for i in range(max(1, page - 2), min(total_pages + 1, page + 3)):
+                 btn_class = 'btn-primary' if i == page else 'btn-secondary'
+                 pagination_html += f'<a href="#notification?page={i}{search_query_str}" class="btn {btn_class}">{i}</a>'
+            if page < total_pages:
+                pagination_html += f'<a href="#notification?page={page + 1}{search_query_str}" class="btn btn-secondary">Next</a>'
+
+        html_content = f"""
+        <div id="filter-container" class="filter-container" style="display: block;">
+            <form id="notification-search-form" class="search-form" onsubmit="handleNotificationSearch(event)">
+                <div class="filter-controls">
+                    <div class="form-group">
+                        <label for="search_notification">Search</label>
+                        <input type="text" name="search" id="search_notification" placeholder="Search" value="{h(search or '')}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+        <div class="message-list-container">{list_items_html}</div>
+        <div class="pagination-container">{pagination_html}</div>
+        """
+        return HTMLResponse(content=html_content)
 PYTHON;
     }
 
@@ -1455,6 +2004,86 @@ PYTHON;
         ];
     }
 
+    private function generateAdminLevel() {
+        return <<<PYTHON
+from sqlalchemy import Column, String, Integer, Boolean
+from database import Base
+
+class AdminLevel(Base):
+    __tablename__ = 'admin_level'
+
+    admin_level_id = Column(String(40), primary_key=True)
+    name = Column(String(100), nullable=False)
+    sort_order = Column(Integer, default=0)
+    active = Column(Boolean, default=True)
+PYTHON;
+    }
+
+    private function generateMessageFolder()
+    {
+        return <<<PYTHON
+from sqlalchemy import Column, String, Integer, Boolean
+from database import Base
+
+class MessageFolder(Base):
+    __tablename__ = 'message_folder'
+
+    message_folder_id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False)
+    sort_order = Column(Integer, default=0)
+    active = Column(Boolean, default=True)
+PYTHON;
+    }
+
+    private function generateMessage()
+    {
+        return <<<PYTHON
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from database import Base
+from datetime import datetime
+
+class Message(Base):
+    __tablename__ = 'message'
+
+    message_id = Column(String(40), primary_key=True)
+    message_folder_id = Column(Integer, ForeignKey('message_folder.message_folder_id'))
+    sender_id = Column(String(40), ForeignKey('admin.admin_id'))
+    receiver_id = Column(String(40), ForeignKey('admin.admin_id'))
+    subject = Column(String(255), nullable=False)
+    content = Column(Text)
+    time_create = Column(DateTime, default=datetime.utcnow)
+    is_read = Column(Boolean, default=False)
+    time_read = Column(DateTime)
+
+    sender = relationship("Admin", foreign_keys=[sender_id])
+    receiver = relationship("Admin", foreign_keys=[receiver_id])
+PYTHON;
+    }
+
+    private function generateNotification()
+    {
+        return <<<PYTHON
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
+from database import Base
+from datetime import datetime
+
+class Notification(Base):
+    __tablename__ = 'notification'
+
+    notification_id = Column(String(40), primary_key=True)
+    admin_id = Column(Integer, ForeignKey('admin.admin_id'), nullable=True)
+    admin_group = Column(String(40), ForeignKey('admin_level.admin_level_id'), nullable=True)
+    subject = Column(String(255), nullable=False)
+    content = Column(Text)
+    link = Column(String(255))
+    time_create = Column(DateTime, default=datetime.utcnow)
+    is_read = Column(Boolean, default=False)
+    time_read = Column(DateTime, nullable=True)
+    ip_read = Column(String(50), nullable=True)
+PYTHON;
+    }
+
     private function generateAdmin() {
         return <<<PYTHON
 from sqlalchemy import Column, String, Boolean, Date, Text, DateTime
@@ -1688,7 +2317,7 @@ Once created, you need to activate it. The command differs depending on your ope
 
 **On Windows:**
 ```bash
-.\venv\Scripts\activate
+.\\venv\\Scripts\\activate
 ```
 
 **On macOS/Linux:**
