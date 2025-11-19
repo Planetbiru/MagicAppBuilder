@@ -418,21 +418,21 @@ AsyncSessionLocal = sessionmaker(
 # Define Base first so that models can import it without a circular dependency.
 Base = declarative_base()
 
-# Import all models here so that Base has them registered
-# This ensures that when Base.metadata.create_all is called, it knows about all tables.
-from models.lantai import Lantai
-from models.core.admin import Admin
-from models.core.admin_level import AdminLevel
-from models.core.message_folder import MessageFolder
-from models.core.message import Message
-from models.core.notification import Notification
-
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 PYTHON;
     }
 
+    /**
+     * Generates the Python code for the admin management controller (router).
+     * This controller provides FastAPI endpoints for CRUD operations on the Admin model,
+     * including creating, reading, updating, and deleting admin users. It also handles
+     * actions like toggling the active status and changing passwords for other admins.
+     * The endpoints render HTML fragments for a dynamic, single-page-like interface.
+     *
+     * @return string The generated Python code for the admin router.
+     */
     private function generateAdminController()
     {
         return <<<PYTHON
@@ -773,6 +773,14 @@ async def get_admin_views(
 PYTHON;
     }
 
+    /**
+     * Generates the Python code for the authentication controller (router).
+     * This includes the `/login` and `/logout` endpoints. It also defines the
+     * `login_required` dependency, which can be used to protect other endpoints,
+     * ensuring that only authenticated users can access them.
+     *
+     * @return string The generated Python code for the auth router.
+     */
     private function generateAuthController()
     {
         return <<<PYTHON
@@ -836,6 +844,14 @@ async def logout2(request: Request, username: str = Depends(login_required)):
 PYTHON;
     }
 
+    /**
+     * Generates the Python code for the message controller (router).
+     * This controller manages endpoints related to user-to-user messaging.
+     * It provides functionality to list messages (inbox), view a single message detail,
+     * and perform actions such as deleting a message or marking it as unread.
+     *
+     * @return string The generated Python code for the message router.
+     */
     private function generateMessageController()
     {
         return <<<PYTHON
@@ -859,7 +875,7 @@ router = APIRouter()
 
 
 def h(text):
-    """Helper untuk escape HTML dan menangani nilai None."""
+    """Helper to escape HTML and handle None values."""
     return html.escape(str(text)) if text is not None else ""
 
 
@@ -869,9 +885,7 @@ async def handle_message_action(
     username: str = Depends(login_required),
     db=Depends(get_db),
 ):
-    """
-    Menangani aksi POST untuk pesan, seperti 'mark_as_unread' atau 'delete'.
-    """
+    """Handles POST actions for messages, such as 'mark_as_unread' or 'delete'."""
     form_data = await request.form()
     action = form_data.get("action")
     message_id = form_data.get("messageId")
@@ -879,13 +893,13 @@ async def handle_message_action(
     if not message_id:
         raise HTTPException(status_code=400, detail="Message ID is required.")
 
-    # Dapatkan admin saat ini
+    # Get the current admin
     admin_stmt = select(Admin).where(Admin.username == username)
     current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
     if not current_admin:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    # Dapatkan pesan
+    # Get the message
     message_stmt = select(Message).where(Message.message_id == message_id)
     message = (await db.execute(message_stmt)).scalar_one_or_none()
     if not message:
@@ -926,9 +940,7 @@ async def get_messages(
     page: int = 1,
     search: Optional[str] = None,
 ):
-    """
-    Mengambil daftar pesan atau detail pesan tunggal.
-    """
+    """Retrieves a list of messages or a single message detail."""
     admin_stmt = select(Admin).where(Admin.username == username)
     current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
     if not current_admin:
@@ -937,7 +949,7 @@ async def get_messages(
     current_admin_id = current_admin.admin_id
 
     if messageId:
-        # --- Tampilan Detail Pesan ---
+        # --- Message Detail View ---
         Sender = aliased(Admin)
         Receiver = aliased(Admin)
         stmt = (
@@ -959,7 +971,7 @@ async def get_messages(
 
         message, sender_name, receiver_name = result
 
-        # Tandai sebagai sudah dibaca
+        # Mark as read
         if message.receiver_id == current_admin_id and not message.is_read:
             message.is_read = True
             message.time_read = datetime.now()
@@ -1002,7 +1014,7 @@ async def get_messages(
         return HTMLResponse(content=html_content)
 
     else:
-        # --- Tampilan Daftar Pesan ---
+        # --- Message List View ---
         PAGE_SIZE = 20
         offset = (page - 1) * PAGE_SIZE
 
@@ -1032,12 +1044,12 @@ async def get_messages(
                 )
             )
 
-        # Hitung total pesan
+        # Count total messages
         count_stmt = select(func.count()).select_from(base_query.subquery())
         total_messages = (await db.execute(count_stmt)).scalar_one()
         total_pages = ceil(total_messages / PAGE_SIZE)
 
-        # Ambil pesan untuk halaman saat ini
+        # Fetch messages for the current page
         messages_stmt = (
             base_query.order_by(Message.time_create.desc())
             .limit(PAGE_SIZE)
@@ -1113,6 +1125,14 @@ PYTHON;
             
     }
 
+    /**
+     * Generates the Python code for the notification controller (router).
+     * This controller handles endpoints for system-wide or user-specific notifications.
+     * It allows fetching a list of notifications, viewing a single notification,
+     * and performing actions like deleting or marking a notification as unread.
+     *
+     * @return string The generated Python code for the notification router.
+     */
     private function generateNotificationController()
     {
         return <<<PYTHON
@@ -1135,7 +1155,7 @@ router = APIRouter()
 
 
 def h(text):
-    """Helper untuk escape HTML dan menangani nilai None."""
+    """Helper to escape HTML and handle None values."""
     return html.escape(str(text)) if text is not None else ""
 
 
@@ -1145,9 +1165,7 @@ async def handle_notification_action(
     username: str = Depends(login_required),
     db=Depends(get_db),
 ):
-    """
-    Menangani aksi POST untuk notifikasi, seperti 'mark_as_unread' atau 'delete'.
-    """
+    """Handles POST actions for notifications, such as 'mark_as_unread' or 'delete'."""
     form_data = await request.form()
     action = form_data.get("action")
     notification_id = form_data.get("notificationId")
@@ -1155,19 +1173,19 @@ async def handle_notification_action(
     if not notification_id:
         raise HTTPException(status_code=400, detail="Notification ID is required.")
 
-    # Dapatkan admin saat ini
+    # Get the current admin
     admin_stmt = select(Admin).where(Admin.username == username)
     current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
     if not current_admin:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    # Dapatkan notifikasi
+    # Get the notification
     stmt = select(Notification).where(Notification.notification_id == notification_id)
     notification = (await db.execute(stmt)).scalar_one_or_none()
     if not notification:
         raise HTTPException(status_code=404, detail="Notification not found.")
 
-    # Periksa izin
+    # Check permissions
     is_authorized = (notification.admin_id == current_admin.admin_id) or \
                     (notification.admin_group == current_admin.admin_level_id)
     if not is_authorized:
@@ -1201,9 +1219,7 @@ async def get_notifications(
     page: int = 1,
     search: Optional[str] = None,
 ):
-    """
-    Mengambil daftar notifikasi atau detail notifikasi tunggal.
-    """
+    """Retrieves a list of notifications or a single notification detail."""
     admin_stmt = select(Admin).where(Admin.username == username)
     current_admin = (await db.execute(admin_stmt)).scalar_one_or_none()
     if not current_admin:
@@ -1213,7 +1229,7 @@ async def get_notifications(
     current_admin_level_id = current_admin.admin_level_id
 
     if notificationId:
-        # --- Tampilan Detail Notifikasi ---
+        # --- Notification Detail View ---
         stmt = (
             select(Notification)
             .where(Notification.notification_id == notificationId)
@@ -1229,7 +1245,7 @@ async def get_notifications(
         if not notification:
             return HTMLResponse('<div class="table-container detail-view">No notification found.</div>')
 
-        # Tandai sebagai sudah dibaca
+        # Mark as read
         if not notification.is_read:
             notification.is_read = True
             notification.time_read = datetime.now()
@@ -1274,7 +1290,7 @@ async def get_notifications(
         return HTMLResponse(content=html_content)
 
     else:
-        # --- Tampilan Daftar Notifikasi ---
+        # --- Notification List View ---
         PAGE_SIZE = 20
         offset = (page - 1) * PAGE_SIZE
 
@@ -1291,12 +1307,12 @@ async def get_notifications(
                 Notification.content.ilike(search_term),
             )
 
-        # Hitung total notifikasi
+        # Count total notifications
         count_stmt = select(func.count(Notification.notification_id)).where(where_clause)
         total_notifications = (await db.execute(count_stmt)).scalar_one()
         total_pages = ceil(total_notifications / PAGE_SIZE)
 
-        # Ambil notifikasi untuk halaman saat ini
+        # Fetch notifications for the current page
         stmt = (
             select(Notification)
             .where(where_clause)
@@ -1371,6 +1387,14 @@ async def get_notifications(
 PYTHON;
     }
 
+    /**
+     * Generates the Python code for the user profile controller (router).
+     * This controller provides endpoints for the currently logged-in user to manage
+     * their own profile. It includes routes to view, edit, and update their personal
+     * information, as well as a separate flow for changing their password.
+     *
+     * @return string The generated Python code for the profile router.
+     */
     private function generateProfileController()
     {
         return <<<PYTHON
@@ -1405,23 +1429,20 @@ async def get_user_profile(
     db = Depends(get_db),
     action: Optional[str] = None
 ):
-    """
-    Mengambil data profil pengguna dan menampilkannya sebagai HTML.
-    Mendukung ?action=update untuk menampilkan form edit.
-    """
+    """Fetches user profile data and displays it as HTML. Supports ?action=update to show the edit form."""
     stmt = select(Admin).where(Admin.username == username)
     result = await db.execute(stmt)
     admin = result.scalar_one_or_none()
 
     if not admin:
-        raise HTTPException(status_code=404, detail="Pengguna tidak ditemukan.")
+        raise HTTPException(status_code=404, detail="User not found.")
 
-    # Helper untuk escape HTML dan menangani nilai None
+    # Helper to escape HTML and handle None values
     def h(text):
         return html.escape(str(text)) if text is not None else ""
 
     if action == 'update':
-        # Mode Update: Tampilkan form untuk edit
+        # Update Mode: Display the edit form
         birth_day_value = h(admin.birth_day.isoformat() if admin.birth_day else "")
         html_content = f"""
         <div class="table-container detail-view">
@@ -1454,7 +1475,7 @@ async def get_user_profile(
         </div>
         """
     else:
-        # Mode Tampilan: Tampilkan detail profil
+        # View Mode: Display profile details
         gender_display = "Male" if admin.gender == 'M' else ("Female" if admin.gender == 'F' else "")
         blocked_display = "Yes" if admin.blocked else "No"
         active_display = "Yes" if admin.active else "No"
@@ -1506,7 +1527,7 @@ async def update_user_profile(
     admin = result.scalar_one_or_none()
 
     if not admin:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pengguna tidak ditemukan.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
     
     # Manually create a dictionary of the form data to update
     update_data = {"name": name, "email": email, "gender": gender, "birth_day": birth_day, "phone": phone}
@@ -1515,7 +1536,7 @@ async def update_user_profile(
             setattr(admin, key, value)
     
     await db.commit()
-    return {"success": True, "message": "Profil berhasil diperbarui."}
+    return {"success": True, "message": "Profile updated successfully."}
 
 @router.get("/update-password", response_class=HTMLResponse)
 async def get_update_password_form(username: str = Depends(login_required)):
@@ -1557,10 +1578,10 @@ async def handle_update_password(
     confirm_password: str = Form(...)
 ):
     if not new_password or not current_password:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Semua field harus diisi.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="All fields must be filled.")
 
     if new_password != confirm_password:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password baru tidak cocok.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New passwords do not match.")
 
     stmt = select(Admin).where(Admin.username == username)
     result = await db.execute(stmt)
@@ -1568,13 +1589,13 @@ async def handle_update_password(
 
     hashed_current_password = hashlib.sha1(hashlib.sha1(current_password.encode('utf-8')).hexdigest().encode('utf-8')).hexdigest()
     if not admin or admin.password != hashed_current_password:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Password saat ini salah.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is incorrect.")
 
     admin.password = hashlib.sha1(hashlib.sha1(new_password.encode('utf-8')).hexdigest().encode('utf-8')).hexdigest()
     admin.last_reset_password = datetime.now()
 
     await db.commit()
-    return {"success": True, "message": "Password berhasil diperbarui."}
+    return {"success": True, "message": "Password updated successfully."}
 PYTHON;
     }
 
@@ -2019,6 +2040,12 @@ class AdminLevel(Base):
 PYTHON;
     }
 
+    /**
+     * Generates the SQLAlchemy model class for the 'message_folder' table.
+     * This model represents folders for organizing messages, such as 'Inbox' or 'Sent'.
+     *
+     * @return string The Python code for the MessageFolder model.
+     */
     private function generateMessageFolder()
     {
         return <<<PYTHON
@@ -2035,6 +2062,13 @@ class MessageFolder(Base):
 PYTHON;
     }
 
+    /**
+     * Generates the SQLAlchemy model class for the 'message' table.
+     * This model defines the structure for private messages between users (admins),
+     * including relationships to the sender and receiver.
+     *
+     * @return string The Python code for the Message model.
+     */
     private function generateMessage()
     {
         return <<<PYTHON
@@ -2061,6 +2095,13 @@ class Message(Base):
 PYTHON;
     }
 
+    /**
+     * Generates the SQLAlchemy model class for the 'notification' table.
+     * This model defines the structure for system notifications, which can be targeted
+     * to a specific admin or an entire admin level (group).
+     *
+     * @return string The Python code for the Notification model.
+     */
     private function generateNotification()
     {
         return <<<PYTHON
@@ -2084,6 +2125,12 @@ class Notification(Base):
 PYTHON;
     }
 
+    /**
+     * Generates the SQLAlchemy model class for the 'admin_level' table.
+     * This model defines the structure and columns for admin roles or levels.
+     *
+     * @return string The Python code for the AdminLevel model.
+     */
     private function generateAdmin() {
         return <<<PYTHON
 from sqlalchemy import Column, String, Boolean, Date, Text, DateTime
