@@ -973,9 +973,11 @@ type {$pascalName}Page {
     hasPrev: Boolean!
 }
 GQL;
+        $camelMethodName = 'get'.ucfirst($camelName);
+        $pluralMethodName = 'get'.ucfirst($pluralCamelName);
 
-        $queries = "    $camelName(id: $pkGqlType): $pascalName\n";
-        $queries .= "    $pluralCamelName(limit: Int, offset: Int, page: Int, orderBy: [SortInput], filter: [FilterInput]): {$pascalName}Page\n";
+        $queries = "    $camelMethodName(id: $pkGqlType): $pascalName\n";
+        $queries .= "    $pluralMethodName(limit: Int, offset: Int, page: Int, orderBy: [SortInput], filter: [FilterInput]): {$pascalName}Page\n";
 
         $mutations = "    create{$pascalName}(input: New{$pascalName}!): $pascalName\n";
         $mutations .= "    update{$pascalName}(id: $pkGqlType, input: New{$pascalName}!): $pascalName\n";
