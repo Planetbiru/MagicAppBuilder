@@ -2351,7 +2351,14 @@ class GraphQLClientApp {
         try {
             const queryResult = await this.gqlQuery(query, { limit: 1000, filter: filterForQuery }); // Use a large limit to fetch all items
             const data = queryResult.data;
-            return data[entity.pluralName].items;
+            if(typeof data != 'undefined' && data[entity.pluralName] && data[entity.pluralName].items)
+            {
+                return data[entity.pluralName].items;
+            }
+            else
+            {
+                return [];
+            }
         } catch (error) {
             console.error(`Failed to pre-fetch ${entity.pluralName}:`, error);
             return [];
