@@ -230,6 +230,9 @@ if($language === 'php' && file_exists(__DIR__ . "/graphql-generator-php.php")) {
 } else if($language === 'kotlin' && file_exists(__DIR__ . "/graphql-generator-kotlin.php")) {
     require_once __DIR__ . "/graphql-generator-kotlin.php";
     exit;
+} else if($language === 'go' && file_exists(__DIR__ . "/graphql-generator-go.php")) {
+    require_once __DIR__ . "/graphql-generator-go.php";
+    exit;
 } else {
     http_response_code(400);
     echo json_encode(["error" => "Unsupported programming language"]);
