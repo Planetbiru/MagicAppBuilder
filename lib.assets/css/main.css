@@ -1532,6 +1532,10 @@ table.table.table-enum tr > td:last-child {
   right: 0;
   z-index: 2041;
 }
+.session-expired-alert .btn {
+  margin-top: auto;
+  margin-bottom: 0;
+}
 
 .card-reserved-columns .card-body {
   max-height: calc(100vh - 360px);

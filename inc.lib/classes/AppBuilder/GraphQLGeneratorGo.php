@@ -2,8 +2,6 @@
 
 namespace AppBuilder;
 
-use MagicObject\Util\PicoStringUtil;
-
 /**
  * The `GraphQLGeneratorGo` class is a powerful tool designed to automatically generate a complete Go GraphQL API from a JSON file that defines database entities.
  * It inspects the schema to understand tables, columns, primary keys, and foreign key relationships.
@@ -219,6 +217,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/vektah/gqlparser/v2 v2.5.11
 	gorm.io/driver/mysql v1.5.6
+	gorm.io/driver/sqlite v1.5.5
 	gorm.io/gorm v1.25.9
 )
 
@@ -243,6 +242,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -325,6 +325,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gin-contrib/static"
 	"net/http"
+	"os"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 )
@@ -349,7 +350,11 @@ func NewServer() *Server {
 
 // Run starts the HTTP server.
 func (s *Server) Run() error {
-	return s.router.Run(":8080")
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8080" // Default port
+	}
+	return s.router.Run(":" + port)
 }
 
 // graphqlHandler returns a Gin handler for the GraphQL endpoint.
@@ -437,6 +442,7 @@ func Init() {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	dbname := os.Getenv("DB_NAME")
+    dbfile := os.Getenv("DB_FILE") // For SQLite, DB_FILE is the file path
 	sslmode := os.Getenv("DB_SSLMODE") // For PostgreSQL
 
 	var dsn string
@@ -447,7 +453,11 @@ func Init() {
 		dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, pass, dbname, port, sslmode)
 		dialector = postgres.Open(dsn)
 	case "sqlite":
-		dsn = dbname // For SQLite, DB_NAME is the file path
+		dsn = dbfile
+		if dsn == "" {
+			// Fallback to DB_NAME if DB_FILE is not set
+			dsn = dbname
+		}
 		dialector = sqlite.Open(dsn)
 	case "sqlserver", "mssql":
 		dsn = fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s", user, pass, host, port, dbname)
@@ -474,6 +484,12 @@ func Init() {
 GO;
     }
 
+    /**
+     * Generates the list of model structs for GORM's AutoMigrate function.
+     * This list is injected into the database.go file.
+     *
+     * @return string A string containing the list of models, e.g., "&models.User{},\n&models.Product{},\n".
+     */
     private function generateAutoMigrateModels()
     {
         $modelsList = "";
@@ -860,6 +876,9 @@ DB_USER=your_username
 DB_PASS=your_password
 DB_NAME=your_database_name
 
+# For SQLite, DB_NAME is used as the file path, e.g., gorm.db
+DB_FILE=your_database_file.db
+
 # For PostgreSQL, you can add sslmode (e.g., disable, require, verify-full)
 # DB_SSLMODE=disable
 
@@ -1007,6 +1026,7 @@ GQL;
         $manualContent .= "    DB_USER=your_username\r\n";
         $manualContent .= "    DB_PASS=your_password\r\n";
         $manualContent .= "    DB_NAME=your_database_name\r\n";
+        $manualContent .= "    DB_FILE=your_database_file.db\r\n";
         $manualContent .= "    DB_DIALECT=mysql # Can be mysql, postgres, sqlite, or sqlserver\r\n";
         $manualContent .= "    ```\r\n\r\n";
 

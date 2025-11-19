@@ -37,6 +37,7 @@ function setDatabaseConfigurationGo($application, $envContent)
             $envContent = str_replace('127.0.0.1', $databaseConfig->getHost(), $envContent);
             $envContent = str_replace('3306', $databaseConfig->getPort(), $envContent);
             $envContent = str_replace('your_database_name', $databaseConfig->getDatabaseName(), $envContent);
+            $envContent = str_replace('your_database_file.db', $databaseConfig->getDatabaseFilePath(), $envContent);
         }
     }
     return $envContent;
