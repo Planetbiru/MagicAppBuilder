@@ -374,8 +374,8 @@ if(!isset($databaseName))
                             <option value="java">Java (Commercial Use)</option>
                             <option value="nodejs">Node.js (Commercial Use)</option>
                             <option value="python">Python (Commercial Use)</option>
-                            <option value="kotlin">Kotlin (Commercial Use)</option>
-                            <option value="go">Go (Commercial Use)</option>
+                            <option value="kotlin">Kotlin (Experimental)</option>
+                            <option value="go">Go (Experimental)</option>
                         </select>
                         &nbsp;
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
@@ -387,7 +387,7 @@ if(!isset($databaseName))
                     <div class="entity-selector-container"></div>
                 </form>
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerate()">Generate GraphQL</button>
                 &nbsp;
                 <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerateWithFrontend()">Generate GraphQL with Frontend</button>

@@ -2,8 +2,6 @@
 
 namespace AppBuilder;
 
-use MagicObject\Util\PicoStringUtil;
-
 /**
  * The `GraphQLGeneratorKotlin` class is a powerful tool designed to automatically generate a complete Spring Boot GraphQL API in Kotlin from a JSON file that defines database entities.
  * It inspects the schema to understand tables, columns, primary keys, and foreign key relationships.
@@ -118,108 +116,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
         }
     }
 
-    /**
-     * Main function to generate all files for the Spring Boot project.
-     *
-     * @return array An array of file definitions, each with 'name' and 'content'.
-     */
-    public function generate()
-    {
-        $files = array();
-        $packagePath = 'src/main/kotlin/' . str_replace('.', '/', $this->projectConfig['packageName']);
-
-        // 1. Gradle build files
-        $files[] = ['name' => 'build.gradle.kts', 'content' => $this->generateBuildGradleKts()];
-        $files[] = ['name' => 'settings.gradle.kts', 'content' => $this->generateSettingsGradleKts()];
-
-        // 2. Main Application Class
-        $files[] = ['name' => $packagePath . '/' . $this->pascalCase($this->projectConfig['artifactId']) . 'Application.kt', 'content' => $this->generateMainAppClass()];
-
-        // 3. GraphQL Schema, Entities, Repositories, DTOs, Controllers
-        $allSchemaParts = array();
-        $allQueryFields = array();
-        $allMutationFields = array();
-
-        foreach ($this->analyzedSchema as $tableName => $tableInfo) {
-            // Generate individual Kotlin files
-            $files[] = ['name' => $packagePath . '/model/entity/' . ucfirst($this->camelCase($tableName)) . '.kt', 'content' => $this->generateEntityClass($tableName, $tableInfo)];
-            $files[] = ['name' => $packagePath . '/model/repository/' . ucfirst($this->camelCase($tableName)) . 'Repository.kt', 'content' => $this->generateRepositoryInterface($tableName, $tableInfo)];
-            $files[] = ['name' => $packagePath . '/model/dto/' . ucfirst($this->camelCase($tableName)) . 'Input.kt', 'content' => $this->generateDtoClass($tableName, $tableInfo)];
-            $files[] = ['name' => $packagePath . '/controller/' . ucfirst($this->camelCase($tableName)) . 'Controller.kt', 'content' => $this->generateControllerClass($tableName, $tableInfo)];
-
-            // Collect schema parts to be merged later
-            $schemaParts = $this->getSchemaPartsForTable($tableName, $tableInfo);
-            $allSchemaParts[] = $schemaParts['types'];
-            $allQueryFields[] = $schemaParts['queries'];
-            $allMutationFields[] = $schemaParts['mutations'];
-        }
-
-        // 4. Utility classes
-        $files[] = ['name' => $packagePath . '/util/SpecificationBuilder.kt', 'content' => $this->generateSpecificationBuilder()];
-        $files[] = ['name' => $packagePath . '/util/FilterCriteria.kt', 'content' => $this->generateFilterCriteria()];
-        $files[] = ['name' => $packagePath . '/util/SearchOperation.kt', 'content' => $this->generateSearchOperation()];
-        $files[] = ['name' => $packagePath . '/util/GenericSpecification.kt', 'content' => $this->generateGenericSpecification()];
-
-        // 5. DTOs for GraphQL inputs
-        $files[] = ['name' => $packagePath . '/model/dto/FilterInput.kt', 'content' => $this->generateFilterInputDto()];
-        $files[] = ['name' => $packagePath . '/model/dto/SortInput.kt', 'content' => $this->generateSortInputDto()];
-
-        // 6. Combined GraphQL schema file
-        $files[] = ['name' => 'src/main/resources/graphql/schema.graphqls', 'content' => $this->generateCombinedSchema($allSchemaParts, $allQueryFields, $allMutationFields)];
-
-        // 7. Security and Auth files
-        $files[] = ['name' => $packagePath . '/config/SecurityConfig.kt', 'content' => $this->generateSecurityConfig()];
-        $files[] = ['name' => $packagePath . '/config/CorsConfig.kt', 'content' => $this->generateCorsConfig()];
-        $files[] = ['name' => $packagePath . '/config/Sha1PasswordEncoder.kt', 'content' => $this->generateSha1PasswordEncoder()];
-        $files[] = ['name' => $packagePath . '/service/JpaUserDetailsService.kt', 'content' => $this->generateUserDetailsService()];
-        $files[] = ['name' => $packagePath . '/model/entity/Admin.kt', 'content' => $this->generateAdminEntity()];
-        $files[] = ['name' => $packagePath . '/model/repository/AdminRepository.kt', 'content' => $this->generateAdminRepository()];
-
-        // 8. Auth and App Controllers
-        $files[] = ['name' => $packagePath . '/controller/dto/LoginRequest.kt', 'content' => $this->generateLoginRequestDto()];
-        $files[] = ['name' => $packagePath . '/controller/dto/LoginResponse.kt', 'content' => $this->generateLoginResponseDto()];
-        $files[] = ['name' => $packagePath . '/controller/AuthController.kt', 'content' => $this->generateAuthController()];
-
-        return $files;
-    }
-
-    /**
-     * Generates the application.properties file.
-     * @return string The content of application.properties.
-     */
-    public function generateApplicationProperties()
-    {
-        $requireLoginValue = $this->requireLogin ? 'true' : 'false';
-        return <<<PROPERTIES
-spring.application.name={$this->projectConfig['name']}
-
-# Database Configuration (Please update with your details)
-app.security.require-login=$requireLoginValue
-
-# CORS Configuration (Cross-Origin Resource Sharing)
-app.security.cors.enabled=true
-app.security.cors.allowed-origins=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:8080
-
-spring.datasource.url={DB_URL}
-spring.datasource.username={DB_USER}
-spring.datasource.password={DB_PASS}
-spring.datasource.driver-class-name={DB_DRIVER_CLASS}
-
-# JPA/Hibernate Configuration
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect={DB_DIALECT}
-
-# Use database column names directly without converting to camelCase
-spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-# GraphQL Configuration
-spring.graphql.graphiql.enabled=true
-spring.graphql.schema.locations=classpath:graphql/
-spring.graphql.schema.file-extensions=.graphqls
-
-PROPERTIES;
-    }
-
+    
     /**
      * Generates the build.gradle.kts file.
      * @return string The content of the build.gradle.kts file.
@@ -1451,7 +1348,7 @@ class JpaUserDetailsService(private val adminRepository: AdminRepository) : User
 
     override fun loadUserByUsername(username: String): UserDetails {
         val admin = adminRepository.findByUsername(username)
-            .orElseThrow { UsernameNotFoundException("Username not found: $username") }
+            .orElseThrow { UsernameNotFoundException("Username not found: \$username") }
 
         return User.withUsername(admin.username!!)
             .password(admin.password!!)
