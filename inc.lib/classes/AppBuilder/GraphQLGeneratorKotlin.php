@@ -15,7 +15,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
 {
     
     /**
-     * @var array<string, string> Project configuration for build.gradle.kts and package structure.
+     * @var array<string, string> Project configuration for pom.xml and package structure.
      */
     private $projectConfig = array();
     
@@ -206,85 +206,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
         return $manualContent;
     }
     
-    /**
-     * Generates the content for the build.gradle.kts file.
-     * This includes the necessary dependencies for running the Kotlin-based GraphQL API.
-     *
-     * @return string The Kotlin DSL formatted content for build.gradle.kts.
-     */
-    public function generateBuildGradleKts()
-    {
-        $config = $this->projectConfig;
-        return <<<KTS
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-plugins {
-    id("org.springframework.boot") version "3.2.5"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "{$config['kotlinVersion']}"
-    kotlin("plugin.spring") version "{$config['kotlinVersion']}"
-    kotlin("plugin.jpa") version "{$config['kotlinVersion']}"
-}
-
-group = "{$config['groupId']}"
-version = "{$config['version']}"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_{$config['javaVersion']}
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-graphql")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.session:spring-session-data-redis")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-
-    // Database Drivers
-    runtimeOnly("com.mysql:mysql-connector-j")
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
-    runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("com.microsoft.sqlserver:mssql-jdbc")
-    runtimeOnly("org.xerial:sqlite-jdbc")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework:spring-webflux")
-    testImplementation("org.springframework.graphql:spring-graphql-test")
-    testImplementation("org.springframework.security:spring-security-test")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = "{$config['javaVersion']}"
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-// All-open plugin for JPA
-allOpen {
-    annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.Embeddable")
-    annotation("jakarta.persistence.MappedSuperclass")
-}
-
-// No-arg plugin for JPA
-noArg {
-    annotation("jakarta.persistence.Entity")
-}
-KTS;
-    }
-
+    
     /**
      * Main function to generate all files for the Spring Boot project.
      *
@@ -295,10 +217,13 @@ KTS;
         $files = array();
         $packagePath = 'src/main/kotlin/' . str_replace('.', '/', $this->projectConfig['packageName']);
 
-        // 1. Gradle build files
-        $files[] = ['name' => 'build.gradle.kts', 'content' => $this->generateBuildGradleKts()];
-        $files[] = ['name' => 'settings.gradle.kts', 'content' => 'rootProject.name = "' . $this->projectConfig['artifactId'] . '"'];
-        //$files[] = ['name' => 'mvnw.cmd', 'content' => $this->generateMvnwCmd()];
+        $files[] = ['name' => 'pom.xml', 'content' => $this->generatePom()];
+        $files[] = ['name' => 'mvnw.cmd', 'content' => $this->generateMvnwCmd()];
+        $files[] = ['name' => 'mvnw', 'content' => $this->generateMvnw()];
+        $files[] = ['name' => '.mvn/wrapper\maven-wrapper.properties', 'content' => 'wrapperVersion=3.3.4
+distributionType=only-script
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.11/apache-maven-3.9.11-bin.zip
+'];
 
         // 2. Main Application Class
         $files[] = ['name' => $packagePath . '/' . $this->pascalCase($this->projectConfig['artifactId']) . 'Application.kt', 'content' => $this->generateMainAppClass()];
@@ -356,6 +281,484 @@ KTS;
         return $files;
     }
 
+    private function generateMvnw()
+    {
+        return <<<CMD
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Apache Maven Wrapper startup batch script, version 3.3.4
+#
+# Optional ENV vars
+# -----------------
+#   JAVA_HOME - location of a JDK home dir, required when download maven via java source
+#   MVNW_REPOURL - repo url base for downloading maven distribution
+#   MVNW_USERNAME/MVNW_PASSWORD - user and password for downloading maven
+#   MVNW_VERBOSE - true: enable verbose log; debug: trace the mvnw script; others: silence the output
+# ----------------------------------------------------------------------------
+
+set -euf
+[ "\${MVNW_VERBOSE-}" != debug ] || set -x
+
+# OS specific support.
+native_path() { printf %s\\n "\$1"; }
+case "\$(uname)" in
+CYGWIN* | MINGW*)
+  [ -z "\${JAVA_HOME-}" ] || JAVA_HOME="\$(cygpath --unix "\$JAVA_HOME")"
+  native_path() { cygpath --path --windows "\$1"; }
+  ;;
+esac
+
+# set JAVACMD and JAVACCMD
+set_java_home() {
+  # For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
+  if [ -n "\${JAVA_HOME-}" ]; then
+    if [ -x "\$JAVA_HOME/jre/sh/java" ]; then
+      # IBM's JDK on AIX uses strange locations for the executables
+      JAVACMD="\$JAVA_HOME/jre/sh/java"
+      JAVACCMD="\$JAVA_HOME/jre/sh/javac"
+    else
+      JAVACMD="\$JAVA_HOME/bin/java"
+      JAVACCMD="\$JAVA_HOME/bin/javac"
+
+      if [ ! -x "\$JAVACMD" ] || [ ! -x "\$JAVACCMD" ]; then
+        echo "The JAVA_HOME environment variable is not defined correctly, so mvnw cannot run." >&2
+        echo "JAVA_HOME is set to \"\$JAVA_HOME\", but \"\\\$JAVA_HOME/bin/java\" or \"\\\$JAVA_HOME/bin/javac\" does not exist." >&2
+        return 1
+      fi
+    fi
+  else
+    JAVACMD="\$(
+      'set' +e
+      'unset' -f command 2>/dev/null
+      'command' -v java
+    )" || :
+    JAVACCMD="\$(
+      'set' +e
+      'unset' -f command 2>/dev/null
+      'command' -v javac
+    )" || :
+
+    if [ ! -x "\${JAVACMD-}" ] || [ ! -x "\${JAVACCMD-}" ]; then
+      echo "The java/javac command does not exist in PATH nor is JAVA_HOME set, so mvnw cannot run." >&2
+      return 1
+    fi
+  fi
+}
+
+# hash string like Java String::hashCode
+hash_string() {
+  str="\${1:-}" h=0
+  while [ -n "\$str" ]; do
+    char="\${str%"\${str#?}"}"
+    h=\$(((h * 31 + \$(LC_CTYPE=C printf %d "'\$char")) % 4294967296))
+    str="\${str#?}"
+  done
+  printf %x\\n \$h
+}
+
+verbose() { :; }
+[ "\${MVNW_VERBOSE-}" != true ] || verbose() { printf %s\\n "\${1-}"; }
+
+die() {
+  printf %s\\n "\$1" >&2
+  exit 1
+}
+
+trim() {
+  # MWRAPPER-139:
+  #   Trims trailing and leading whitespace, carriage returns, tabs, and linefeeds.
+  #   Needed for removing poorly interpreted newline sequences when running in more
+  #   exotic environments such as mingw bash on Windows.
+  printf "%s" "\${1}" | tr -d '[:space:]'
+}
+
+scriptDir="\$(dirname "\$0")"
+scriptName="\$(basename "\$0")"
+
+# parse distributionUrl and optional distributionSha256Sum, requires .mvn/wrapper/maven-wrapper.properties
+while IFS="=" read -r key value; do
+  case "\${key-}" in
+  distributionUrl) distributionUrl=\$(trim "\${value-}") ;;
+  distributionSha256Sum) distributionSha256Sum=\$(trim "\${value-}") ;;
+  esac
+done <"\$scriptDir/.mvn/wrapper/maven-wrapper.properties"
+[ -n "\${distributionUrl-}" ] || die "cannot read distributionUrl property in \$scriptDir/.mvn/wrapper/maven-wrapper.properties"
+
+case "\${distributionUrl##*/}" in
+maven-mvnd-*bin.*)
+  MVN_CMD=mvnd.sh _MVNW_REPO_PATTERN=/maven/mvnd/
+  case "\${PROCESSOR_ARCHITECTURE-}\${PROCESSOR_ARCHITEW6432-}:\$(uname -a)" in
+  *AMD64:CYGWIN* | *AMD64:MINGW*) distributionPlatform=windows-amd64 ;;
+  :Darwin*x86_64) distributionPlatform=darwin-amd64 ;;
+  :Darwin*arm64) distributionPlatform=darwin-aarch64 ;;
+  :Linux*x86_64*) distributionPlatform=linux-amd64 ;;
+  *)
+    echo "Cannot detect native platform for mvnd on \$(uname)-\$(uname -m), use pure java version" >&2
+    distributionPlatform=linux-amd64
+    ;;
+  esac
+  distributionUrl="\${distributionUrl%-bin.*}-\$distributionPlatform.zip"
+  ;;
+maven-mvnd-*) MVN_CMD=mvnd.sh _MVNW_REPO_PATTERN=/maven/mvnd/ ;;
+*) MVN_CMD="mvn\${scriptName#mvnw}" _MVNW_REPO_PATTERN=/org/apache/maven/ ;;
+esac
+
+# apply MVNW_REPOURL and calculate MAVEN_HOME
+# maven home pattern: ~/.m2/wrapper/dists/{apache-maven-<version>,maven-mvnd-<version>-<platform>}/<hash>
+[ -z "\${MVNW_REPOURL-}" ] || distributionUrl="\$MVNW_REPOURL\$_MVNW_REPO_PATTERN\${distributionUrl#*"\$_MVNW_REPO_PATTERN"}"
+distributionUrlName="\${distributionUrl##*/}"
+distributionUrlNameMain="\${distributionUrlName%.*}"
+distributionUrlNameMain="\${distributionUrlNameMain%-bin}"
+MAVEN_USER_HOME="\${MAVEN_USER_HOME:-\${HOME}/.m2}"
+MAVEN_HOME="\${MAVEN_USER_HOME}/wrapper/dists/\${distributionUrlNameMain-}/\$(hash_string "\$distributionUrl")"
+
+exec_maven() {
+  unset MVNW_VERBOSE MVNW_USERNAME MVNW_PASSWORD MVNW_REPOURL || :
+  exec "\$MAVEN_HOME/bin/\$MVN_CMD" "\$@" || die "cannot exec \$MAVEN_HOME/bin/\$MVN_CMD"
+}
+
+if [ -d "\$MAVEN_HOME" ]; then
+  verbose "found existing MAVEN_HOME at \$MAVEN_HOME"
+  exec_maven "\$@"
+fi
+
+case "\${distributionUrl-}" in
+*?-bin.zip | *?maven-mvnd-?*-?*.zip) ;;
+*) die "distributionUrl is not valid, must match *-bin.zip or maven-mvnd-*.zip, but found '\${distributionUrl-}'" ;;
+esac
+
+# prepare tmp dir
+if TMP_DOWNLOAD_DIR="\$(mktemp -d)" && [ -d "\$TMP_DOWNLOAD_DIR" ]; then
+  clean() { rm -rf -- "\$TMP_DOWNLOAD_DIR"; }
+  trap clean HUP INT TERM EXIT
+else
+  die "cannot create temp dir"
+fi
+
+mkdir -p -- "\${MAVEN_HOME%/*}"
+
+# Download and Install Apache Maven
+verbose "Couldn't find MAVEN_HOME, downloading and installing it ..."
+verbose "Downloading from: \$distributionUrl"
+verbose "Downloading to: \$TMP_DOWNLOAD_DIR/\$distributionUrlName"
+
+# select .zip or .tar.gz
+if ! command -v unzip >/dev/null; then
+  distributionUrl="\${distributionUrl%.zip}.tar.gz"
+  distributionUrlName="\${distributionUrl##*/}"
+fi
+
+# verbose opt
+__MVNW_QUIET_WGET=--quiet __MVNW_QUIET_CURL=--silent __MVNW_QUIET_UNZIP=-q __MVNW_QUIET_TAR=''
+[ "\${MVNW_VERBOSE-}" != true ] || __MVNW_QUIET_WGET='' __MVNW_QUIET_CURL='' __MVNW_QUIET_UNZIP='' __MVNW_QUIET_TAR=v
+
+# normalize http auth
+case "\${MVNW_PASSWORD:+has-password}" in
+'') MVNW_USERNAME='' MVNW_PASSWORD='' ;;
+has-password) [ -n "\${MVNW_USERNAME-}" ] || MVNW_USERNAME='' MVNW_PASSWORD='' ;;
+esac
+
+if [ -z "\${MVNW_USERNAME-}" ] && command -v wget >/dev/null; then
+  verbose "Found wget ... using wget"
+  wget \${__MVNW_QUIET_WGET:+"\$__MVNW_QUIET_WGET"} "\$distributionUrl" -O "\$TMP_DOWNLOAD_DIR/\$distributionUrlName" || die "wget: Failed to fetch \$distributionUrl"
+elif [ -z "\${MVNW_USERNAME-}" ] && command -v curl >/dev/null; then
+  verbose "Found curl ... using curl"
+  curl \${__MVNW_QUIET_CURL:+"\$__MVNW_QUIET_CURL"} -f -L -o "\$TMP_DOWNLOAD_DIR/\$distributionUrlName" "\$distributionUrl" || die "curl: Failed to fetch \$distributionUrl"
+elif set_java_home; then
+  verbose "Falling back to use Java to download"
+  javaSource="\$TMP_DOWNLOAD_DIR/Downloader.java"
+  targetZip="\$TMP_DOWNLOAD_DIR/\$distributionUrlName"
+  cat >"\$javaSource" <<-END
+	public class Downloader extends java.net.Authenticator
+	{
+	  protected java.net.PasswordAuthentication getPasswordAuthentication()
+	  {
+	    return new java.net.PasswordAuthentication( System.getenv( "MVNW_USERNAME" ), System.getenv( "MVNW_PASSWORD" ).toCharArray() );
+	  }
+	  public static void main( String[] args ) throws Exception
+	  {
+	    setDefault( new Downloader() );
+	    java.nio.file.Files.copy( java.net.URI.create( args[0] ).toURL().openStream(), java.nio.file.Paths.get( args[1] ).toAbsolutePath().normalize() );
+	  }
+	}
+	END
+  # For Cygwin/MinGW, switch paths to Windows format before running javac and java
+  verbose " - Compiling Downloader.java ..."
+  "\$(native_path "\$JAVACCMD")" "\$(native_path "\$javaSource")" || die "Failed to compile Downloader.java"
+  verbose " - Running Downloader.java ..."
+  "\$(native_path "\$JAVACMD")" -cp "\$(native_path "\$TMP_DOWNLOAD_DIR")" Downloader "\$distributionUrl" "\$(native_path "\$targetZip")"
+fi
+
+# If specified, validate the SHA-256 sum of the Maven distribution zip file
+if [ -n "\${distributionSha256Sum-}" ]; then
+  distributionSha256Result=false
+  if [ "\$MVN_CMD" = mvnd.sh ]; then
+    echo "Checksum validation is not supported for maven-mvnd." >&2
+    echo "Please disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties." >&2
+    exit 1
+  elif command -v sha256sum >/dev/null; then
+    if echo "\$distributionSha256Sum  \$TMP_DOWNLOAD_DIR/\$distributionUrlName" | sha256sum -c - >/dev/null 2>&1; then
+      distributionSha256Result=true
+    fi
+  elif command -v shasum >/dev/null; then
+    if echo "\$distributionSha256Sum  \$TMP_DOWNLOAD_DIR/\$distributionUrlName" | shasum -a 256 -c >/dev/null 2>&1; then
+      distributionSha256Result=true
+    fi
+  else
+    echo "Checksum validation was requested but neither 'sha256sum' or 'shasum' are available." >&2
+    echo "Please install either command, or disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties." >&2
+    exit 1
+  fi
+  if [ \$distributionSha256Result = false ]; then
+    echo "Error: Failed to validate Maven distribution SHA-256, your Maven distribution might be compromised." >&2
+    echo "If you updated your Maven version, you need to update the specified distributionSha256Sum property." >&2
+    exit 1
+  fi
+fi
+
+# unzip and move
+if command -v unzip >/dev/null; then
+  unzip \${__MVNW_QUIET_UNZIP:+"\$__MVNW_QUIET_UNZIP"} "\$TMP_DOWNLOAD_DIR/\$distributionUrlName" -d "\$TMP_DOWNLOAD_DIR" || die "failed to unzip"
+else
+  tar xzf\${__MVNW_QUIET_TAR:+"\$__MVNW_QUIET_TAR"} "\$TMP_DOWNLOAD_DIR/\$distributionUrlName" -C "\$TMP_DOWNLOAD_DIR" || die "failed to untar"
+fi
+
+# Find the actual extracted directory name (handles snapshots where filename != directory name)
+actualDistributionDir=""
+
+# First try the expected directory name (for regular distributions)
+if [ -d "\$TMP_DOWNLOAD_DIR/\$distributionUrlNameMain" ]; then
+  if [ -f "\$TMP_DOWNLOAD_DIR/\$distributionUrlNameMain/bin/\$MVN_CMD" ]; then
+    actualDistributionDir="\$distributionUrlNameMain"
+  fi
+fi
+
+# If not found, search for any directory with the Maven executable (for snapshots)
+if [ -z "\$actualDistributionDir" ]; then
+  # enable globbing to iterate over items
+  set +f
+  for dir in "\$TMP_DOWNLOAD_DIR"/*; do
+    if [ -d "\$dir" ]; then
+      if [ -f "\$dir/bin/\$MVN_CMD" ]; then
+        actualDistributionDir="\$(basename "\$dir")"
+        break
+      fi
+    fi
+  done
+  set -f
+fi
+
+if [ -z "\$actualDistributionDir" ]; then
+  verbose "Contents of \$TMP_DOWNLOAD_DIR:"
+  verbose "\$(ls -la "\$TMP_DOWNLOAD_DIR")"
+  die "Could not find Maven distribution directory in extracted archive"
+fi
+
+verbose "Found extracted Maven distribution directory: \$actualDistributionDir"
+printf %s\\n "\$distributionUrl" >"\$TMP_DOWNLOAD_DIR/\$actualDistributionDir/mvnw.url"
+mv -- "\$TMP_DOWNLOAD_DIR/\$actualDistributionDir" "\$MAVEN_HOME" || [ -d "\$MAVEN_HOME" ] || die "fail to move MAVEN_HOME"
+
+clean || :
+exec_maven "\$@"
+CMD;
+    }
+
+    private function generatePom()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<POM
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>$package</groupId>
+    <artifactId>graphql-application</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>GraphQL Application</name>
+    <description>GraphQL Application</description>
+    <properties>
+        <java.version>21</java.version>
+        <kotlin.version>1.9.23</kotlin.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.graphql</groupId>
+            <artifactId>spring-graphql-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>\${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>\${project.basedir}/src/test/kotlin</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>\${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals> <goal>test-compile</goal> </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <args>
+                        <arg>-Xjsr305=strict</arg>
+                    </args>
+                    <compilerPlugins>
+                        <plugin>all-open</plugin>
+                        <plugin>no-arg</plugin>
+                    </compilerPlugins>
+                    <pluginOptions>
+                        <option>all-open:annotation=org.springframework.stereotype.Component</option>
+                        <option>all-open:annotation=org.springframework.transaction.annotation.Transactional</option>
+                        <option>all-open:annotation=org.springframework.scheduling.annotation.Async</option>
+                        <option>all-open:annotation=org.springframework.cache.annotation.Cacheable</option>
+                        <option>all-open:annotation=org.springframework.boot.test.context.SpringBootTest</option>
+                        <option>all-open:annotation=org.springframework.validation.annotation.Validated</option>
+                        <option>no-arg:annotation=jakarta.persistence.Entity</option>
+                    </pluginOptions>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-allopen</artifactId>
+                        <version>\${kotlin.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>\${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+POM;
+    }
+
     private function generateMvnwCmd()
     {
         return <<<CMD
@@ -380,7 +783,7 @@ KTS;
 @REM ----------------------------------------------------------------------------
 
 @REM ----------------------------------------------------------------------------
-@REM Apache Maven Wrapper startup batch script, version 3.3.2
+@REM Apache Maven Wrapper startup batch script, version 3.3.4
 @REM
 @REM Optional ENV vars
 @REM   MVNW_REPOURL - repo url base for downloading maven distribution
@@ -401,7 +804,7 @@ KTS;
 @SET __MVNW_ARG0_NAME__=
 @SET MVNW_USERNAME=
 @SET MVNW_PASSWORD=
-@IF NOT "%__MVNW_CMD__%"=="" (%__MVNW_CMD__% %*)
+@IF NOT "%__MVNW_CMD__%"=="" ("%__MVNW_CMD__%" %*)
 @echo Cannot start maven from wrapper >&2 && exit /b 1
 @GOTO :EOF
 : end batch / begin powershell #>
@@ -434,16 +837,30 @@ switch -wildcard -casesensitive ( \$(\$distributionUrl -replace '^.*/','') ) {
 # apply MVNW_REPOURL and calculate MAVEN_HOME
 # maven home pattern: ~/.m2/wrapper/dists/{apache-maven-<version>,maven-mvnd-<version>-<platform>}/<hash>
 if (\$env:MVNW_REPOURL) {
-  \$MVNW_REPO_PATTERN = if (\$USE_MVND) { "/org/apache/maven/" } else { "/maven/mvnd/" }
-  \$distributionUrl = "\$env:MVNW_REPOURL\$MVNW_REPO_PATTERN\$(\$distributionUrl -replace '^.*'+\$MVNW_REPO_PATTERN,'')"
+  \$MVNW_REPO_PATTERN = if (\$USE_MVND -eq \$False) { "/org/apache/maven/" } else { "/maven/mvnd/" }
+  \$distributionUrl = "\$env:MVNW_REPOURL\$MVNW_REPO_PATTERN\$(\$distributionUrl -replace "^.*\$MVNW_REPO_PATTERN",'')"
 }
 \$distributionUrlName = \$distributionUrl -replace '^.*/',''
 \$distributionUrlNameMain = \$distributionUrlName -replace '\.[^.]*\$','' -replace '-bin\$',''
-\$MAVEN_HOME_PARENT = "\$HOME/.m2/wrapper/dists/\$distributionUrlNameMain"
+
+\$MAVEN_M2_PATH = "\$HOME/.m2"
 if (\$env:MAVEN_USER_HOME) {
-  \$MAVEN_HOME_PARENT = "\$env:MAVEN_USER_HOME/wrapper/dists/\$distributionUrlNameMain"
+  \$MAVEN_M2_PATH = "\$env:MAVEN_USER_HOME"
 }
-\$MAVEN_HOME_NAME = ([System.Security.Cryptography.MD5]::Create().ComputeHash([byte[]][char[]]\$distributionUrl) | ForEach-Object {\$_.ToString("x2")}) -join ''
+
+if (-not (Test-Path -Path \$MAVEN_M2_PATH)) {
+    New-Item -Path \$MAVEN_M2_PATH -ItemType Directory | Out-Null
+}
+
+\$MAVEN_WRAPPER_DISTS = \$null
+if ((Get-Item \$MAVEN_M2_PATH).Target[0] -eq \$null) {
+  \$MAVEN_WRAPPER_DISTS = "\$MAVEN_M2_PATH/wrapper/dists"
+} else {
+  \$MAVEN_WRAPPER_DISTS = (Get-Item \$MAVEN_M2_PATH).Target[0] + "/wrapper/dists"
+}
+
+\$MAVEN_HOME_PARENT = "\$MAVEN_WRAPPER_DISTS/\$distributionUrlNameMain"
+\$MAVEN_HOME_NAME = ([System.Security.Cryptography.SHA256]::Create().ComputeHash([byte[]][char[]]\$distributionUrl) | ForEach-Object {\$_.ToString("x2")}) -join ''
 \$MAVEN_HOME = "\$MAVEN_HOME_PARENT/\$MAVEN_HOME_NAME"
 
 if (Test-Path -Path "\$MAVEN_HOME" -PathType Container) {
@@ -495,7 +912,33 @@ if (\$distributionSha256Sum) {
 
 # unzip and move
 Expand-Archive "\$TMP_DOWNLOAD_DIR/\$distributionUrlName" -DestinationPath "\$TMP_DOWNLOAD_DIR" | Out-Null
-Rename-Item -Path "\$TMP_DOWNLOAD_DIR/\$distributionUrlNameMain" -NewName \$MAVEN_HOME_NAME | Out-Null
+
+# Find the actual extracted directory name (handles snapshots where filename != directory name)
+\$actualDistributionDir = ""
+
+# First try the expected directory name (for regular distributions)
+\$expectedPath = Join-Path "\$TMP_DOWNLOAD_DIR" "\$distributionUrlNameMain"
+\$expectedMvnPath = Join-Path "\$expectedPath" "bin/\$MVN_CMD"
+if ((Test-Path -Path \$expectedPath -PathType Container) -and (Test-Path -Path \$expectedMvnPath -PathType Leaf)) {
+  \$actualDistributionDir = \$distributionUrlNameMain
+}
+
+# If not found, search for any directory with the Maven executable (for snapshots)
+if (!\$actualDistributionDir) {
+  Get-ChildItem -Path "\$TMP_DOWNLOAD_DIR" -Directory | ForEach-Object {
+    \$testPath = Join-Path \$_.FullName "bin/\$MVN_CMD"
+    if (Test-Path -Path \$testPath -PathType Leaf) {
+      \$actualDistributionDir = \$_.Name
+    }
+  }
+}
+
+if (!\$actualDistributionDir) {
+  Write-Error "Could not find Maven distribution directory in extracted archive"
+}
+
+Write-Verbose "Found extracted Maven distribution directory: \$actualDistributionDir"
+Rename-Item -Path "\$TMP_DOWNLOAD_DIR/\$actualDistributionDir" -NewName \$MAVEN_HOME_NAME | Out-Null
 try {
   Move-Item -Path "\$TMP_DOWNLOAD_DIR/\$MAVEN_HOME_NAME" -Destination \$MAVEN_HOME_PARENT | Out-Null
 } catch {
@@ -521,7 +964,7 @@ CMD;
 spring.application.name={$this->projectConfig['name']}
 
 # Database Configuration (Please update with your details)
-app.security.require-login=$requireLoginValue
+app.security.require-login=false
 
 # Default language for i18n
 app.i18n.default-language=en
@@ -561,6 +1004,8 @@ spring.graphql.schema.file-extensions=.graphqls
 
 # Caching (optional)
 # spring.cache.type=caffeine
+
+app.cors.origins="*"
 PROPERTIES;
     }
 
@@ -820,8 +1265,8 @@ KOTLIN;
             $pkUpperCamelCase = $this->pascalCase($pkInfo['name']);
             $returnUpdate = "        {$camelName}Repository.save(entity)\n";
             $returnUpdate .= "        // Update $pkCamelCase\n";
-            $returnUpdate .= "        input.$pkCamelCase?.let {\n";
-            $returnUpdate .= "            val rowsAffected = {$camelName}Repository.update${pkUpperCamelCase}(entity.$pkCamelCase!!, it)\n";
+            $returnUpdate .= "        dtoInput.$pkCamelCase?.let {\n";
+            $returnUpdate .= "            val rowsAffected = {$camelName}Repository.update{$pkUpperCamelCase}(entity.$pkCamelCase!!, it)\n";
             $returnUpdate .= "            if (rowsAffected > 0) {\n";
             $returnUpdate .= "                entity.$pkCamelCase = it\n";
             $returnUpdate .= "            }\n";
@@ -845,6 +1290,7 @@ import $package.model.dto.SortInput
 import $package.model.dto.{$ucCamelName}Input
 import $package.model.entity.$ucCamelName
 import $package.model.repository.{$ucCamelName}Repository
+import $package.model.repository.core.AdminRepository
 import $package.util.QueryUtil
 import $package.util.ValueUtil
 import $package.util.AuditTrailUtil$importScalarValueUtil$relatedEntityImports
@@ -1115,11 +1561,13 @@ KOTLIN;
         return <<<KOTLIN
 package $package.util
 
+import $package.model.dto.FilterInput
 import $package.model.dto.SortInput
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
 
 object QueryUtil {
 
@@ -1150,13 +1598,15 @@ object QueryUtil {
         )
     }
 
-    fun <T> createSpecification(filter: List<FilterInput>?): Specification<T>? {
+    fun <T> createSpecification(filter: List<FilterInput>?): Specification<T> {
         if (filter.isNullOrEmpty()) {
-            return null
+            return Specification.where(null)
         }
         val builder = SpecificationBuilder<T>()
-        filter.forEach { f -> builder.with(f.field, SearchOperation.valueOf(f.operator.uppercase()), f.value) }
-        return builder.build()
+        filter.forEach { f ->
+            f.value?.let { builder.with(f.field, SearchOperation.valueOf(f.operator?.uppercase() ?: "EQUALS"), it) }
+        }
+        return builder.build() ?: Specification.where(null)
     }
 }
 KOTLIN;
@@ -1172,46 +1622,67 @@ KOTLIN;
         return <<<KOTLIN
 package $package.config
 
+import $package.service.JpaUserDetailsService
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
-import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
     private val jpaUserDetailsService: JpaUserDetailsService,
-    private val passwordEncoder: Sha1PasswordEncoder
 ) {
 
-    @Value("\${app.security.require-login:true}")
+    @Value("\\\${app.security.require-login}")
     private val requireLogin: Boolean = true
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+
         http {
-            csrf { disable() }
-            authorizeRequests {
-                authorize("/login", permitAll)
-                authorize("/logout", permitAll)
-                authorize("/update-password", permitAll)
-                authorize("/graphiql", permitAll)
-                authorize("/vendor/**", permitAll)
-                authorize("/index.html", permitAll)
-                authorize("/", permitAll)
+            csrf {
+                ignoringRequestMatchers(
+                    AntPathRequestMatcher("/login"),
+                    AntPathRequestMatcher("/logout"),
+                    AntPathRequestMatcher("/graphql/**")
+                )
+            }
+
+            authorizeHttpRequests {
+
                 if (requireLogin) {
+
+                    // daftar endpoint publik (dipanggil satu-satu)
+                    authorize(AntPathRequestMatcher("/login"), permitAll)
+                    authorize(AntPathRequestMatcher("/logout"), permitAll)
+                    authorize(AntPathRequestMatcher("/graphiql/**"), permitAll)
+                    authorize(AntPathRequestMatcher("/vendor/**"), permitAll)
+                    authorize(AntPathRequestMatcher("/index.html"), permitAll)
+                    authorize(AntPathRequestMatcher("/"), permitAll)
+                    authorize(AntPathRequestMatcher("/*.js"), permitAll)
+                    authorize(AntPathRequestMatcher("/*.css"), permitAll)
+                    authorize(AntPathRequestMatcher("/*.ico"), permitAll)
+                    authorize(AntPathRequestMatcher("/assets/**"), permitAll)
+                    authorize(AntPathRequestMatcher("/langs/**"), permitAll)
+
+                    // selain itu wajib login
                     authorize(anyRequest, authenticated)
+
                 } else {
                     authorize(anyRequest, permitAll)
                 }
             }
-            userDetailsService = jpaUserDetailsService
         }
+
         return http.build()
     }
 
@@ -1233,24 +1704,22 @@ KOTLIN;
 package $package.config
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-@Configuration
-class CorsConfig {
-
-    @Value("$"."{app.cors.origins:*}")
-    private lateinit var origins: String
-
+class CorsConfig(
+    @Value("\\\${app.cors.origins}") private val origins: String
+) {
     @Bean
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**").allowedOrigins(*origins.split(",").toTypedArray())
+                registry.addMapping("/**")
+                    .allowedOrigins(*origins.split(",").map { it.trim() }.toTypedArray())
+                    .allowedMethods("*")
             }
         }
     }
@@ -1268,9 +1737,11 @@ KOTLIN;
 package $package.config
 
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Component
 import java.math.BigInteger
 import java.security.MessageDigest
 
+@Component
 class Sha1PasswordEncoder : PasswordEncoder {
 
     override fun encode(rawPassword: CharSequence): String {
@@ -1306,6 +1777,7 @@ package $package.service
 
 import $package.model.repository.core.AdminRepository
 import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
@@ -1315,7 +1787,7 @@ class JpaUserDetailsService(private val adminRepository: AdminRepository) : User
 
     override fun loadUserByUsername(username: String): UserDetails {
         val admin = adminRepository.findByUsername(username)
-            .orElseThrow { UsernameNotFoundException("Username not found: $username") }
+            .orElseThrow { UsernameNotFoundException("Username not found: \$username") }
 
         return User.withUsername(admin.username!!)
             .password(admin.password!!)
@@ -1413,7 +1885,7 @@ KOTLIN;
         return <<<KOTLIN
 package $package.controller.core
 
-import $package.model.repository.AdminRepository
+import $package.model.repository.core.AdminRepository
 import jakarta.servlet.http.HttpSession
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.security.access.prepost.PreAuthorize
@@ -1469,14 +1941,18 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class AuthController(
     private val adminRepository: AdminRepository,
-    private val passwordEncoder: Sha1PasswordEncoder
+    private val passwordEncoder: Sha1PasswordEncoder,
+    @Value("\\\${app.security.require-login}") 
+    private val requireLogin: Boolean
 ) {
 
-    @Value("$"."{app.security.require-login:true}")
-    private val requireLogin: Boolean = true
-
     @PostMapping("/login")
-    fun login(@RequestParam username: String, @RequestParam password: String, session: HttpSession): ResponseEntity<LoginResponse> {
+    fun login(
+        @RequestParam username: String,
+        @RequestParam password: String,
+        session: HttpSession
+    ): ResponseEntity<LoginResponse> {
+
         if (!requireLogin) {
             return ResponseEntity.ok(LoginResponse(true, "Success"))
         }
@@ -1488,7 +1964,7 @@ class AuthController(
             val admin = adminOptional.get()
             if (admin.password == passwordEncoder.encode(password)) {
                 session.setAttribute("username", admin.username!!)
-                session.setAttribute("password", singleHashedPassword) // Store single hash
+                session.setAttribute("password", singleHashedPassword)
                 return ResponseEntity.ok(LoginResponse(true, "Login successful"))
             }
         }
@@ -1601,6 +2077,7 @@ KOTLIN;
         $camelName = $this->camelCase($tableName);
         $ucCamelName = $this->pascalCase($tableName);
         $activeField = $this->activeField;
+        $camelActiveField = $this->camelCase($activeField);
         $ucActiveField = $this->pascalCase($activeField);
         
         $pkInfo = $this->findPrimaryKeyInfo($tableInfo);
@@ -1624,7 +2101,7 @@ KOTLIN;
     fun toggle{$ucCamelName}Active(@Argument id: $pkKotlinType, @Argument(name = "$activeField") $activeField: Boolean): $ucCamelName {
         val entity = {$camelName}Repository.findById(id)
                 .orElseThrow { RuntimeException("{$ucCamelName} not found with id \$id") }
-        entity.$ucActiveField = $activeField
+        entity.$camelActiveField = $activeField
 $mappingCode
         return {$camelName}Repository.save(entity)
     }
@@ -1688,6 +2165,7 @@ KOTLIN;
         return <<<KOTLIN
 package $package.util
 
+import jakarta.persistence.criteria.Predicate
 import org.springframework.data.jpa.domain.Specification
 
 class SpecificationBuilder<T> {
@@ -1702,11 +2180,22 @@ class SpecificationBuilder<T> {
         if (params.isEmpty()) {
             return null
         }
-        val specs = params.map { GenericSpecification<T>(it) }
 
-        return specs.reduceOrNull { acc: Specification<T>, spec ->
-            acc.and(spec)
+        val specs: List<Specification<T>> = params.map { criteria ->
+            Specification<T> { root, query, builder ->
+                val value = criteria.value
+                val key = criteria.key
+                when (criteria.operation) {
+                    SearchOperation.EQUALS -> builder.equal(root.get<Any>(key), value)
+                    SearchOperation.CONTAINS -> builder.like(root.get(key), "%\$value%")
+                    SearchOperation.GREATER_THAN -> builder.greaterThan(root.get(key), value as Comparable<Any>)
+                    SearchOperation.LESS_THAN -> builder.lessThan(root.get(key), value as Comparable<Any>)
+                    else -> builder.conjunction() // Return a predicate that is always true for unhandled cases
+                }
+            }
         }
+
+        return specs.reduceOrNull { acc, spec -> acc.and(spec) }
     }
 }
 KOTLIN;
@@ -1755,7 +2244,7 @@ import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
 import org.springframework.data.jpa.domain.Specification
 
-lass GenericSpecification<T>(private val criteria: FilterCriteria) : Specification<T> {
+class GenericSpecification<T>(private val criteria: FilterCriteria) : Specification<T> {
 
     override fun toPredicate(root: Root<T>, query: CriteriaQuery<*>, builder: CriteriaBuilder): Predicate? {
         val key = criteria.key
@@ -1794,7 +2283,7 @@ lass GenericSpecification<T>(private val criteria: FilterCriteria) : Specificati
                 val comparableValue = typedValue as? Comparable<Any>
                 comparableValue?.let { builder.lessThanOrEqualTo(root.get(key), it) }
             }
-            SearchOperation.CONTAINS -> if (fieldType == String::class.java) builder.like(root.get(key), "%$typedValue%") else builder.equal(root.get<Any>(key), typedValue)
+            SearchOperation.CONTAINS -> if (fieldType == String::class.java) builder.like(root.get(key), "%\$typedValue%") else builder.equal(root.get<Any>(key), typedValue)
             SearchOperation.IN -> root.get<Any>(key).`in`(typedValue as? Collection<*>)
             SearchOperation.NOT_IN -> builder.not(root.get<Any>(key).`in`(typedValue as? Collection<*>))
         }
@@ -1947,29 +2436,34 @@ KOTLIN;
         return <<<KOTLIN
 package $package.config
 
-import graphql.language.*
+import graphql.language.Value
+import graphql.language.ObjectValue
 import graphql.schema.Coercing
 import graphql.schema.CoercingParseLiteralException
-import graphql.schema.CoercingParseValueException
-import graphql.schema.CoercingSerializeException
+import graphql.GraphQLContext
+import org.springframework.stereotype.Component
+import java.util.Locale
 
-@Configuration
-class ObjectScalar {
+@Component
+class ObjectScalar : Coercing<Any?, Any?> {
+    override fun serialize(dataFetcherResult: Any, graphQLContext: GraphQLContext, locale: Locale): Any? {
+        return dataFetcherResult
+    }
 
-    @Bean
-    fun runtimeWiringConfigurer(): RuntimeWiringConfigurer {
-        val objectScalar = GraphQLScalarType.newScalar()
-            .name("Object")
-            .description("A custom scalar that handles Object values")
-            .coercing(object : Coercing<Any?, Any?> {
-                override fun serialize(dataFetcherResult: Any): Any? = dataFetcherResult
-                override fun parseValue(input: Any): Any? = input
-                override fun parseLiteral(input: Value<*>, variables: CoercingParseLiteralVariables): Any? = (input as? graphql.language.ObjectValue)?.objectFields
-            })
-            .build()
+    override fun parseValue(input: Any, graphQLContext: GraphQLContext, locale: Locale): Any? {
+        return input
+    }
 
-        return RuntimeWiringConfigurer { wiringBuilder: RuntimeWiring.Builder ->
-            wiringBuilder.scalar(objectScalar)
+    fun parseLiteral(
+        input: Value<*>,
+        variables: Map<String, Any>,
+        graphQLContext: GraphQLContext,
+        locale: Locale
+    ): Any? {
+        return if (input is ObjectValue) {
+            input.objectFields.associate { it.name to it.value }
+        } else {
+            throw CoercingParseLiteralException("Expected an ObjectValue literal but was: \$input")
         }
     }
 }
@@ -1985,6 +2479,7 @@ KOTLIN;
         return <<<KOTLIN
 package $package.config
 
+import $package.config.ObjectScalar
 import graphql.schema.GraphQLScalarType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -1992,13 +2487,12 @@ import org.springframework.graphql.execution.RuntimeWiringConfigurer
 
 @Configuration
 class GraphQlConfig {
-
     @Bean
-    fun runtimeWiringConfigurer(): RuntimeWiringConfigurer {
+    fun runtimeWiringConfigurer(objectScalar: ObjectScalar): RuntimeWiringConfigurer {
         val objectScalar = GraphQLScalarType.newScalar()
             .name("Object")
             .description("A custom scalar that can represent any JSON-like object.")
-            .coercing(ObjectScalar())
+            .coercing(objectScalar)
             .build()
 
         return RuntimeWiringConfigurer { builder ->
