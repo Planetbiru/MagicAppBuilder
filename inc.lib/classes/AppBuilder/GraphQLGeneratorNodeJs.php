@@ -88,6 +88,8 @@ class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "multer": "^1.4.5-lts.1",
+    "connect-session-sequelize": "^7.1.7",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -96,6 +98,7 @@ class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
     "mysql2": "^3.2.0",
     "pg": "^8.10.0",
     "sequelize": "^6.29.3",
+    "express-session": "^1.18.0",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
@@ -127,6 +130,8 @@ PORT=4000
 # CORS Configuration
 # Comma-separated list of allowed origins. Do not use spaces between origins.
 CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:4000,http://127.0.0.1:4000,http://127.0.0.1:3000,http://localhost:8080
+
+REQUIRE_LOGIN=true
 ENV;
     }
 
@@ -144,7 +149,17 @@ const cors = require('cors');
 const schema = require('./schema/schema');
 const fs = require('fs');
 const path = require('path');
-const { sequelize } = require('./config/database');
+const { sequelize, models } = require('./config/database');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const crypto = require('crypto');
+const multer = require('multer');
+const authMiddleware = require('./middleware/authMiddleware');
+const conditionalAuth = require('./middleware/conditionalAuth');
+const profileRoutes = require('./routes/profileRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -164,33 +179,166 @@ const corsOptions = {
   },
   credentials: true,
 };
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Middleware to parse URL-encoded bodies (for form data)
+app.use(express.urlencoded({ extended: true }));
+
+// Apply CORS after body parsers
 app.use(cors(corsOptions));
 
+// Session configuration
+const sessionStore = new SequelizeStore({
+    db: sequelize,
+    table: 'Session', // This should match the table name of the model
+    modelKey: 'Session' // Tell the store to look for models.Session
+});
+
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || 'a-very-secret-key-for-development',
+        store: sessionStore,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+            // secure: process.env.NODE_ENV === 'production', // Enable in production for HTTPS
+            httpOnly: true
+        },
+    })
+);
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Endpoint to serve frontend configuration
-app.get('/frontend-config', (req, res) => {
+app.get('/frontend-config.json', conditionalAuth, (req, res) => {
+    // Set headers to prevent browser caching
+    res.set({
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    });
+
     const configPath = path.join(__dirname, 'config', 'frontend-config.json');
-    fs.readFile(configPath, 'utf8', (err, data) => {
+    res.sendFile(configPath, (err) => {
         if (err) {
-            console.error('Error reading frontend-config.json:', err);
-            res.status(500).send({ error: 'Could not load frontend configuration.' });
-            return;
+            console.error('Error sending frontend-config.json:', err);
+            if (!res.headersSent) {
+                res.status(500).send({ error: 'Could not load frontend configuration.' });
+            }
         }
-        res.setHeader('Content-Type', 'application/json');
-        res.send(data);
+    });
+});
+
+// Endpoint to serve available languages configuration
+app.get('/available-language.json', (req, res) => {
+    const langPath = path.join(__dirname, 'public', 'langs', 'available-language.json');
+    res.sendFile(langPath, (err) => {
+        if (err) {
+            console.error('Error sending available-language.json:', err);
+            if (!res.headersSent) {
+                res.status(404).send({ error: 'Available languages configuration not found.' });
+            }
+        }
+    });
+});
+
+// Endpoint to serve available theme
+app.get('/available-theme.json', (req, res) => {
+    const themesPath = path.join(__dirname, 'public', 'assets', 'themes');
+    fs.readdir(themesPath, { withFileTypes: true }, (err, dirents = []) => {
+        if (err) {
+            console.error('Error reading themes directory:', err);
+            return res.status(500).send({ error: 'Could not read themes directory.' });
+        }
+
+        const themes = dirents
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name)
+            .filter(themeName => {
+                const stylePath = path.join(themesPath, themeName, 'style.min.css');
+                return fs.existsSync(stylePath);
+            })
+            .map(themeName => ({
+                name: themeName,
+                title: themeName.replace(/[-_]/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
+            }));
+
+        res.json(themes);
+    });
+});
+
+// --- Auth Endpoints ---
+
+// Initialize multer for parsing multipart/form-data
+const upload = multer();
+
+// POST /login
+app.post('/login', upload.none(), async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'Username and password are required.' });
+    }
+
+    try {
+        // Ensure the admin model is loaded before attempting to use it
+        if (!models.admin) {
+            console.error('Error: Admin model (models.admin) is undefined. Please check if models/admin.js exists and is correctly defined.');
+            return res.status(500).json({ success: false, message: 'Server configuration error: Admin model not found.' });
+        }
+        const user = await models.admin.findOne({ where: { username } });
+
+        // Replicate the double sha1 hashing
+        const hash1 = crypto.createHash('sha1').update(password).digest('hex');
+        const passwordHash = crypto.createHash('sha1').update(hash1).digest('hex');
+
+        if (user && passwordHash === user.password) {
+            // Set session on successful login
+            req.session.username = user.username;
+            req.session.userId = user.admin_id;
+
+            return res.json({ success: true });
+        } else {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ success: false, message: 'An internal error occurred during login.' });
+    }
+});
+
+// POST /logout
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).json({ success: false, message: 'Could not log out, please try again.' });
+        }
+        // Clear the cookie on the client side
+        res.clearCookie('connect.sid'); // The default session cookie name
+        return res.json({ success: true });
     });
 });
 
 
-app.use('/graphql', graphqlHTTP({
-    schema,
-    graphiql: true, // Enable GraphiQL interface for testing
-}));
+// Use the profile routes
+app.use('/', profileRoutes);
+app.use('/', adminRoutes);
+app.use('/', messageRoutes);
+app.use('/', notificationRoutes);
+
+app.use('/graphql', conditionalAuth, graphqlHTTP({ schema, graphiql: true }));
 
 const PORT = process.env.PORT || 4000;
 
 sequelize.authenticate()
     .then(() => {
         console.log('Database connection has been established successfully.');
+        sequelize.sync(); // Sync all models, including the Session table
         app.listen(PORT, () => {
             console.log(`Server running on http://localhost:\${PORT}/graphql`);
         });
@@ -208,7 +356,7 @@ JS;
     private function generateDatabaseJs()
     {
         return <<<JS
-const { Sequelize } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 
 const sequelize = new Sequelize(
     process.env.DB_NAME,
@@ -239,19 +387,42 @@ const fs = require('fs');
 const path = require('path');
 const modelsDir = path.join(__dirname, '../models');
 
-fs.readdirSync(modelsDir)
-  .filter(file => file.indexOf('.') !== 0 && file.slice(-3) === '.js')
-  .forEach(file => {
-    const model = require(path.join(modelsDir, file))(sequelize, Sequelize.DataTypes);
-    models[model.name] = model;
-  });
+// Define the Session model explicitly for connect-session-sequelize
+models.Session = sequelize.define('Session', {
+  sid: {
+    type: Sequelize.STRING,
+    primaryKey: true,
+  },
+  expires: Sequelize.DATE,
+  data: Sequelize.TEXT,
+});
 
+
+const loadModels = (dir) => {
+  fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      // Recurse into subdirectory
+      loadModels(fullPath);
+    } else if (entry.isFile() && entry.name.indexOf('.') !== 0 && entry.name.slice(-3) === '.js') {
+      // Load the model file
+      const model = require(fullPath)(sequelize, DataTypes);
+      if (model && model.name) {
+        models[model.name] = model;
+      }
+    }
+  });
+};
+
+loadModels(modelsDir); // Start the recursive loading from the base models directory
 // Set up associations
 Object.keys(models).forEach(modelName => {
   if (models[modelName].associate) {
     models[modelName].associate(models);
   }
 });
+
+console.log('Models loaded from config/database.js:', Object.keys(models));
 
 module.exports = { sequelize, models };
 JS;
@@ -681,17 +852,23 @@ JS;
         $manualContent .= "# file: .env\r\n";
         $manualContent .= "\r\n# Database Configuration\r\n";
         $manualContent .= "# Supported dialects: 'mysql', 'postgres', 'sqlite', 'mariadb', 'mssql'\r\n";
-        $manualContent .= "DB_DIALECT=mysql\r\n";
-        $manualContent .= "DB_HOST=localhost\r\n";
-        $manualContent .= "DB_PORT=3306\r\n";
-        $manualContent .= "DB_USER=your_username\r\n";
-        $manualContent .= "DB_PASS=your_password\r\n";
-        $manualContent .= "DB_NAME=your_database_name\r\n";
-        $manualContent .= "\r\n# Server Configuration\r\n";
-        $manualContent .= "PORT=4000\r\n";
-        $manualContent .= "\r\n# CORS Configuration\r\n";
-        $manualContent .= "# Comma-separated list of allowed origins. Do not use spaces between origins.\r\n";
-        $manualContent .= "CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1,http://localhost:3000\r\n";
+        $manualContent .= "# Database Configuration
+# Supported dialects: 'mysql', 'postgres', 'sqlite', 'mariadb', 'mssql'
+DB_DIALECT={DB_DIALECT}
+DB_HOST={DB_HOST}
+DB_PORT={DB_PORT}
+DB_USER={DB_USER}
+DB_PASS={DB_PASS}
+DB_NAME={DB_NAME}
+
+# Server Configuration
+PORT=4000
+
+# CORS Configuration
+# Comma-separated list of allowed origins. Do not use spaces between origins.
+CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:4000,http://127.0.0.1:4000,http://127.0.0.1:3000,http://localhost:8080
+
+REQUIRE_LOGIN=true";
         $manualContent .= "```\r\n\r\n";
         $manualContent .= "Make sure to replace `your_database_name`, `your_username`, and `your_password` with your actual database credentials.\r\n\r\n";
 
