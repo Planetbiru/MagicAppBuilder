@@ -190,7 +190,7 @@ try {
 
 
         // Add generated frontend config files
-        $zip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
+        $zip->addFromString('src/main/resources/static/config/frontend-config.json', $generator->generateFrontendConfigJson());
 
         // Add language files
         $zip->addFromString('src/main/resources/static/langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
