@@ -961,51 +961,123 @@ CMD;
     public function generateApplicationProperties() {
         $requireLoginValue = $this->requireLogin ? 'true' : 'false';
         return <<<PROPERTIES
+############################################
+# 1. APPLICATION
+############################################
+
+# The name of the Spring Boot application.
 spring.application.name={$this->projectConfig['name']}
 
-# Database Configuration (Please update with your details)
-app.security.require-login=false
-
-# Default language for i18n
+# Default language used for internationalization (i18n).
 app.i18n.default-language=en
 
-# Session Management
-spring.session.store-type=none # Default to none, uncomment below to use Redis
-# spring.session.store-type=redis
-# spring.data.redis.host=localhost
-# spring.data.redis.port=6379
-# spring.session.timeout=30m
 
-# Session and Cookie Lifetime
-# Set session timeout. e.g., 30m for 30 minutes, 1h for 1 hour.
-server.servlet.session.timeout=30m
-server.servlet.session.cookie.max-age=30m
+############################################
+# 2. SECURITY SETTINGS
+############################################
 
-# CORS Configuration (Cross-Origin Resource Sharing)
+# Whether user login is required to access protected endpoints.
+app.security.require-login=false
+
+# Enables CORS (Cross-Origin Resource Sharing).
 app.security.cors.enabled=true
+
+# List of allowed origins for CORS requests.
 app.security.cors.allowed-origins=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:4000,http://127.0.0.1:4000,http://127.0.0.1:3000,http://localhost:8080
 
+# Additional global override to allow all origins (*). Not recommended for production.
+app.cors.origins="*"
+
+
+############################################
+# 3. SESSION MANAGEMENT
+############################################
+
+# Session store type. "none" means using default servlet container session.
+spring.session.store-type=none
+
+# Disables Redis repository auto-configuration.
+spring.data.redis.repositories.enabled=false
+
+# Excludes Redis auto-configuration since Redis is not used.
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+
+# Session timeout duration.
+server.servlet.session.timeout=30m
+
+# Maximum lifetime for the session cookie.
+server.servlet.session.cookie.max-age=30m
+
+
+############################################
+# 4. DATABASE CONFIGURATION
+############################################
+
+# JDBC connection URL for the MySQL database.
 spring.datasource.url={DB_URL}
+
+# Database username.
 spring.datasource.username={DB_USER}
+
+# Database password. Should be moved to environment variables for security.
 spring.datasource.password={DB_PASS}
+
+# MySQL JDBC driver class name.
 spring.datasource.driver-class-name={DB_DRIVER_CLASS}
 
-# JPA/Hibernate Configuration
+
+############################################
+# 5. JPA / HIBERNATE
+############################################
+
+# Whether Hibernate should show executed SQL statements in logs.
 spring.jpa.show-sql=false
+
+# Hibernate SQL dialect for MySQL.
 spring.jpa.properties.hibernate.dialect={DB_DIALECT}
 
-# Use database column names directly without converting to camelCase
+# Uses the same column names as in the database without name conversion.
 spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-# GraphQL Configuration
+
+############################################
+# 6. GRAPHQL CONFIGURATION
+############################################
+
+# Enables GraphiQL web interface for testing GraphQL queries.
 spring.graphql.graphiql.enabled=true
+
+# Folder where GraphQL schema files are located.
 spring.graphql.schema.locations=classpath:graphql/
+
+# File extension for GraphQL schema definition files.
 spring.graphql.schema.file-extensions=.graphqls
 
-# Caching (optional)
+
+############################################
+# 7. CACHING (Optional)
+############################################
+
+# Enables Caffeine caching if uncommented.
 # spring.cache.type=caffeine
 
-app.cors.origins="*"
+
+############################################
+# 8. REDIS CONFIG (FOR application-redis.properties)
+############################################
+
+# Enables Redis session store when using Redis profile.
+# spring.session.store-type=redis
+
+# Redis server hostname.
+# spring.data.redis.host=localhost
+
+# Redis server port.
+# spring.data.redis.port=6379
+
+# Session timeout when using Redis-backed sessions.
+# spring.session.timeout=30m
+
 PROPERTIES;
     }
 
