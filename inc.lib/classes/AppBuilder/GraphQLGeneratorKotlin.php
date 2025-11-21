@@ -769,7 +769,7 @@ CMD;
         <version>3.2.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>$package</groupId>
+    <groupId>com.planetbiru.graphqlapplication</groupId>
     <artifactId>graphql-application</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>GraphQL Application</name>
@@ -1542,14 +1542,18 @@ import $package.util.I18nUtil
 import $package.util.QueryUtil
 import $package.util.ValueUtil
 import $package.util.AuditTrailUtil$importScalarValueUtil$relatedEntityImports
+
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.graphql.data.method.annotation.SchemaMapping
-import org.springframework.http.server.ServerHttpRequest
+
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestHeader
+
+import graphql.schema.DataFetchingEnvironment
+
 import java.util.Optional
 
 @Controller
@@ -1581,10 +1585,9 @@ class {$ucCamelName}Controller(
     @MutationMapping
     @Transactional
     fun create{$ucCamelName}(
-        @Argument input: Map<String, Any>,
-        request: ServerHttpRequest
+        @Argument input: Map<String, Any>
     ): $ucCamelName {
-        val lang = request.headers.getFirst("X-Language-Id")
+        val lang = AuditTrailUtil.getLanguageId()
         val dtoInput = ValueUtil.convertSnakeCaseToDto(input, {$ucCamelName}Input::class.java)
         val entity = {$ucCamelName}()
 {$this->generateDtoToEntityMappingKt($tableName, $tableInfo, 'entity', 'dtoInput', 'create')}
@@ -1595,10 +1598,9 @@ class {$ucCamelName}Controller(
     @Transactional
     fun update{$ucCamelName}(
         @Argument id: $pkKotlinType,
-        @Argument input: Map<String, Any>,
-        request: ServerHttpRequest
+        @Argument input: Map<String, Any>
     ): $ucCamelName {
-        val lang = request.headers.getFirst("X-Language-Id")
+        val lang = AuditTrailUtil.getLanguageId()
         val dtoInput = ValueUtil.convertSnakeCaseToDto(input, {$ucCamelName}Input::class.java)
         val entity = {$camelName}Repository.findById(id)
             .orElseThrow { RuntimeException(i18n.t("no_item_found_with_id", lang, "$tableName", id)) }
@@ -3547,11 +3549,10 @@ KOTLIN;
     @MutationMapping
     @Transactional
     fun toggle{$ucCamelName}Active(
-        @Argument id: $pkKotlinType, 
-        @Argument(name = "$activeField") $activeField: Boolean,
-        request: ServerHttpRequest
+        @Argument id: $pkKotlinType,
+        @Argument(name = "$activeField") $activeField: Boolean
     ): $ucCamelName {
-        val lang = request.headers.getFirst("X-Language-Id")
+        val lang = AuditTrailUtil.getLanguageId()
         val entity = {$camelName}Repository.findById(id)
                 .orElseThrow { RuntimeException(i18n.t("no_item_found_with_id", lang, "$tableName", id)) }
         entity.$camelActiveField = $activeField
