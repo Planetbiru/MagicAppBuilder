@@ -2440,6 +2440,30 @@ class EntityEditor {
     }
 
     /**
+     * Returns the base column name by removing the "_id" suffix if present.
+     *
+     * @param {string} name - The original column name.
+     * @returns {string} The base name without the "_id" suffix, or an empty string if the input is falsy.
+     *
+     * @example
+     * baseColumnName('user_id'); // "user"
+     * baseColumnName('email');   // "email"
+     * baseColumnName(null);      // ""
+     */
+    baseColumnName(name)
+    {
+        if(!name)
+        {
+            return '';
+        }
+        if(name.endsWith('_id'))
+        {
+            return name.substring(0, name.length - 3);
+        }
+        return name;
+    }
+
+    /**
      * Gathers all entities and their selected columns from the UI, typically from a modal
      * for schema generation. It clones the selected entities and filters their columns
      * based on user selection.
@@ -2505,12 +2529,22 @@ class EntityEditor {
                             if(filterVal != '')
                             {
                                 // { "name": "nama", "type": "string", "operator": "CONTAINS", "element": "text" }
-                                filters.push({
+                                let filter = {
                                     "name": col.name,
                                     "type": 'string',
                                     "operator": filterVal.indexOf('CONTAINS') !== -1 ? 'CONTAINS' : 'EQUALS',
                                     "element": filterVal.indexOf('select') !== -1 ? 'select' : 'text'
-                                })
+                                };
+                                let rel = _this.baseColumnName(filter.name);
+                                if(filter.element == 'select' && selected.includes(rel))
+                                {
+                                    filter.entity = rel;
+                                }
+                                else
+                                {
+                                    null;
+                                }
+                                filters.push(filter)
                             }
                             let textareaCheckbox = entitySelector.querySelector(`input.textarea-graphql[data-col="${col.name}"]`);
                             if(textareaCheckbox && textareaCheckbox.checked)
@@ -2523,6 +2557,7 @@ class EntityEditor {
                         {
                             newEntity.filters = filters;
                         }
+                        newEntity.filterEntities = filters.length == 0 ? 0 : newEntity.filters.filter(f=>f.entity != null).length;
                         if(textareas.length > 0)
                         {
                             newEntity.textareaColumns = textareas;

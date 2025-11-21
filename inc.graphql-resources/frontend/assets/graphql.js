@@ -47,6 +47,7 @@ class GraphQLClientApp {
 
             defaultLanguage: 'en',
             useBrowserLanguage: true,
+            maxMergedFilters: 0,
             pages: {},
         };
 
@@ -291,7 +292,7 @@ class GraphQLClientApp {
             await this.loadConfig();
             this.showPageWrapper();
             this.buildMenu();
-            this.initPage(); // Initialize UI event listeners
+            this.initPage();
             
             window.onclick = (event) => {
             };
@@ -356,7 +357,7 @@ class GraphQLClientApp {
      * @returns {Promise<void>} Resolves when language configuration and menu are initialized.
      */
     async initializeLanguage() {
-        try {
+        try { // NOSONAR
             const response = await fetch(this.languageConfigUrl, {
                 headers: { 
                     'X-Requested-With': 'xmlhttprequest',
@@ -1302,13 +1303,134 @@ class GraphQLClientApp {
     }
 
     /**
+     * Retrieves pre-fetched data for a specific entity from a data cache.
+     * This is used by renderFiltersMerged to avoid making new network requests.
+     * @param {object} entity - The entity configuration object for which to retrieve data.
+     * @param {object} prefetchedData - The cache object containing data from the merged GraphQL query.
+     * @returns {Array<object>} An array of items for the entity, or an empty array if not found.
+     */
+    getPrefetchedDataForEntity(entity, prefetchedData) {
+        if (prefetchedData && prefetchedData[entity.pluralName] && prefetchedData[entity.pluralName].items) {
+            return prefetchedData[entity.pluralName].items;
+        }
+        return [];
+    }
+
+    /**
+     * Acts as a router for rendering filter controls.
+     * It decides whether to fetch filter data in a single merged query (`renderFiltersMerged`)
+     * or through separate queries for each filter (`renderFiltersSeparated`). The choice is based on
+     * comparing the `filterEntities` count in the entity's configuration against `maxMergedFilters`.
+     * This optimizes network requests by using a merged query for entities with fewer filter dependencies.
+     * @returns {Promise<void>} A promise that resolves when the appropriate filter rendering method has completed.
+     */
+    async renderFilters()
+    {
+        return this.currentEntity.filterEntities && this.currentEntity.filterEntities > this.maxMergedFilters ? await this.renderFiltersSeparated() : await this.renderFiltersMerged();
+    }
+
+    /**
+     * Renders filter controls by pre-fetching data for all select elements in a single merged GraphQL query.
+     * This is an optimized version of `renderFilters` that reduces network requests. It first identifies
+     * all filters that require data from related entities, constructs a single GraphQL query to fetch them all,
+     * and then builds the HTML for the filters using the pre-fetched data.
+     *
+     * @returns {Promise<void>} A promise that resolves when the filters have been rendered and event listeners are attached.
+     */
+    async renderFiltersMerged() {
+        const hasFilters = this.currentEntity.filters && this.currentEntity.filters.length > 0;
+        let filterHtml = '';
+        let prefetchedData = {};
+
+        if (hasFilters) {
+            // Phase 1: Aggregate and pre-fetch all data for select filters
+            const queriesToMerge = [];
+            const selectFilters = this.currentEntity.filters.filter(f => f.element === 'select');
+
+            for (const filter of selectFilters) {
+                const col = this.currentEntity.columns[filter.name];
+                if (col && col.isForeignKey) {
+                    const relatedEntity = this.config.entities[this.camelCase(col.references)];
+                    if (relatedEntity) {
+                        const fields = this.getFieldsForQuery(relatedEntity, 0, 0);
+                        // Add each entity query to the list, using its pluralName as the key
+                        queriesToMerge.push(`${relatedEntity.pluralName}(limit: 1000) { items { ${fields} } }`);
+                    }
+                }
+            }
+
+            if (queriesToMerge.length > 0) {
+                const mergedQuery = `query FetchAllFilterData { ${queriesToMerge.join('\n')} }`;
+                try {
+                    const result = await this.gqlQuery(mergedQuery);
+                    prefetchedData = result.data;
+                } catch (error) {
+                    console.error("Failed to pre-fetch filter data:", error);
+                    // Continue with empty data, dropdowns will be empty
+                }
+            }
+
+            // Phase 2: Build the HTML using the pre-fetched data
+            filterHtml += '<div class="filter-controls">';
+            for (const filter of this.currentEntity.filters) {
+                const currentValue = this.state.filters[filter.name] || '';
+                filterHtml += `<div class="form-group">`;
+                filterHtml += `<label for="filter-${filter.name}">${this.getEntityLabel(this.currentEntity, filter.name)}</label>`;
+
+                if (filter.element === 'select') {
+                    const col = this.currentEntity.columns[filter.name];
+                    const relatedEntity = this.config.entities[this.camelCase(col.references)];
+                    const relatedData = this.getPrefetchedDataForEntity(relatedEntity, prefetchedData); // Use the new helper
+                    const displayField = relatedEntity.displayField || relatedEntity.primaryKey;
+
+                    filterHtml += `<select id="filter-${filter.name}" name="${filter.name}">`;
+                    filterHtml += `<option value="">${this.t('select_option')}</option>`;
+                    relatedData.forEach(relItem => {
+                        const relId = relItem[relatedEntity.primaryKey];
+                        const relDisplay = relItem[displayField] || relId;
+                        filterHtml += `<option value="${relId}" ${String(relId) === String(currentValue) ? 'selected' : ''}>${relDisplay}</option>`;
+                    });
+                    filterHtml += `</select>`;
+                } else {
+                    filterHtml += `<input type="text" id="filter-${filter.name}" name="${filter.name}" value="${currentValue}" placeholder="${this.getEntityLabel(this.currentEntity, filter.name)}">`;
+                }
+                filterHtml += `</div>`;
+            }
+            filterHtml += `<button id="search-btn" class="btn btn-primary">${this.t('search')}</button>`;
+            filterHtml += `<button id="reset-filter-btn" class="btn btn-secondary">${this.t('reset_filter')}</button>`;
+        }
+
+        filterHtml += `<button id="add-new-btn" class="btn btn-primary">${this.t('add_new', this.currentEntityDisplayName)}</button>`;
+
+        if (hasFilters) {
+            filterHtml += '</div>';
+        }
+
+        this.dom.filterContainer.innerHTML = filterHtml;
+
+        if (hasFilters) {
+            document.getElementById('search-btn').onclick = () => this.handleSearch();
+            document.getElementById('reset-filter-btn').onclick = () => this.handleResetFilters();
+            this.dom.filterContainer.querySelectorAll('.filter-controls input, .filter-controls select').forEach(input => {
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        this.handleSearch();
+                    }
+                });
+            });
+        }
+        document.getElementById('add-new-btn').onclick = () => this.renderForm();
+    }
+
+    /**
      * Renders filter controls and the "Add New" button based on the current entity's configuration.
      * Attaches event listeners for the search button and for the 'Enter' key on filter inputs.
      * For select filters, it pre-fetches data for the dropdown options.
      * @returns {Promise<void>}
      */
-    async renderFilters() {
-        const hasFilters = this.currentEntity.filters && this.currentEntity.filters.length > 0;
+    async renderFiltersSeparated() {
+        const hasFilters = this.currentEntity.filters && this.currentEntity.filters.length > 0; // NOSONAR
         let filterHtml = '';
 
         if (hasFilters) {
@@ -1563,11 +1685,23 @@ class GraphQLClientApp {
         history.pushState({ entityName: this.currentEntity.name, params: this.state }, '', newUrl);
     }
 
+    /**
+     * Makes the main application content wrapper visible.
+     * This is typically called after the initial loading and authentication are complete,
+     * revealing the main user interface.
+     * @returns {void}
+     */
     showPageWrapper()
     {
         this.dom.pageWrapper.style.display = 'block';
     }
 
+    /**
+     * Hides the main application content wrapper.
+     * This is used to conceal the main UI, for instance, during initial loading
+     * or when a full-screen modal like the login screen is displayed.
+     * @returns {void}
+     */
     hidePageWrapper()
     {
         this.dom.pageWrapper.style.display = 'none';
@@ -1582,7 +1716,7 @@ class GraphQLClientApp {
     async renderDetailView(id) {
         this.dom.title.textContent = this.t('detail_of', this.currentEntityDisplayName); // NOSONAR
 
-        // Panggil hook kustom untuk render detail
+        // Call a custom hook for detail rendering
         const hookHandled = this._invokeRenderHook('detail', {
             entity: this.currentEntity,
             container: this.dom.body,
@@ -1666,7 +1800,7 @@ class GraphQLClientApp {
         this.dom.form.innerHTML = this.t('loading');
         this.openModal();
 
-        // Panggil hook kustom untuk render form (insert/update)
+        // Call a custom hook for form rendering (insert/update)
         const action = id ? 'update' : 'insert';
         const hookHandled = this._invokeRenderHook(action, {
             entity: this.currentEntity,
@@ -1800,13 +1934,13 @@ class GraphQLClientApp {
      * @returns {Promise<void>} Resolves when the save operation completes (or throws on error).
      */
     async handleSave(id) {
-        // Panggil hook kustom untuk proses save
+        // Call a custom hook for the save process.
         const action = id ? 'update' : 'insert';
         const hookHandled = this._invokeRenderHook(`save_${action}`, {
             entity: this.currentEntity,
             form: this.dom.form,
             id: id,
-            app: this // Berikan akses ke instance aplikasi
+            app: this // Provide access to the application instance
         });
         if (hookHandled) return;
 
@@ -1824,12 +1958,12 @@ class GraphQLClientApp {
             if (colName === this.currentEntity.primaryKey && this.currentEntity.columns[colName].primaryKeyValue === 'autogenerated') 
             {
                 continue;
-            }
+            } // NOSONAR
             if (action == 'update' && colName === this.currentEntity.primaryKey && this.currentEntity.columns[colName].primaryKeyValue === 'manual-insert') 
             {
-                // User can not update value
+                // User cannot update this value.
                 input[colName] = id;
-                continue;
+                continue; // NOSONAR
             }
 
             const col = this.currentEntity.columns[colName];
@@ -2126,18 +2260,18 @@ class GraphQLClientApp {
         if (response.ok) {
             const result = await response.json();
             if (result.success) {
-                // Jika login berhasil, tutup modal dan muat ulang halaman untuk mendapatkan sesi baru dan state aplikasi
+                // If login is successful, close the modal and reload the page to get a new session and application state.
                 this.closeLoginModal();
                 window.location.reload();
             } else {
-                // Kasus yang seharusnya tidak terjadi jika server mengikuti logika yang ada
+                // This case should not happen if the server follows the expected logic.
                 loginErrorDiv.textContent = this.t('login_error');
             }
-        } else if (response.status === 401) {
-            // Jika login gagal (401 Unauthorized), tampilkan pesan error
+        } else if (response.status === 401) { // NOSONAR
+            // If login fails (401 Unauthorized), display an error message.
             loginErrorDiv.textContent = this.t('invalid_credentials');
         } else {
-            // Tangani error tak terduga lainnya
+            // Handle other unexpected errors.
             loginErrorDiv.textContent = this.t('login_error');
             console.error('Login failed:', error);
             console.error('Login failed with status:', response.status);

@@ -111,6 +111,7 @@ class GraphQLGeneratorBase
                 'columns' => array(),
                 'hasActiveColumn' => false,
                 'filters' => isset($entity['filters']) ? $entity['filters'] : array(),
+                'filterEntities' => isset($entity['filterEntities']) ? $entity['filterEntities'] : 0,
                 'textareaColumns' => isset($entity['textareaColumns']) ? $entity['textareaColumns'] : array(),
                 'description' => isset($entity['description']) ? $entity['description'] : null,
                 
@@ -395,6 +396,7 @@ class GraphQLGeneratorBase
                 'menu' => true,
                 'columns' => $columns,
                 'filters' => isset($tableInfo['filters']) ? $tableInfo['filters'] : [],
+                'filterEntities' => isset($tableInfo['filterEntities']) ? $tableInfo['filterEntities'] : 0,
                 'backendHandledColumns' => array_column($this->backendHandledColumns, 'columnName'),
                 
             );
