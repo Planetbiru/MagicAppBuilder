@@ -33,6 +33,7 @@
     "save": "Save",
     "close": "Close",
     "no_items_found": "No items found.",
+    "no_item_found_with_id": "No {0} item found with ID {1}",
     "back_to_list": "Back to List",
     "failed_to_fetch_details": "Failed to fetch details.",
     "select_option": "Select an option...",

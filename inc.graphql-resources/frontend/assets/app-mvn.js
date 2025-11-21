@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // An object to define custom rendering functions for specific entities or views.
         customRenderers: {},
 
+        maxMergedFilters: 8
+
     });
 
     graphqlApp.pages['dashboard'] = {

@@ -245,12 +245,20 @@ distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-mav
             $allQueryFields[] = $schemaParts['queries'];
             $allMutationFields[] = $schemaParts['mutations'];
         }
+
+        // 4. Combined GraphQL Schema
+        $files[] = ['name' => 'src/main/resources/graphql/schema.graphqls', 'content' => $this->generateCombinedSchema($allSchemaParts, $allQueryFields, $allMutationFields)];
+
+        $staticFiles = $this->generateStaticFiles($files, $packagePath);
+        return array_merge($files, $staticFiles);
+
+        /*
         
         // 4. Utility and DTO classes (converted to Kotlin)
         // Note: The original Java generator has many utility classes. Each needs a Kotlin equivalent.
         // For brevity, I'm showing the conversion pattern with a few key files.
-        $files[] = ['name' => $packagePath . '/model/dto/FilterInput.kt', 'content' => $this->generateFilterInputDtoKt()];
-        $files[] = ['name' => $packagePath . '/model/dto/SortInput.kt', 'content' => $this->generateSortInputDtoKt()];
+        $files[] = ['name' => $packagePath . '/model/dto/core/FilterInput.kt', 'content' => $this->generateFilterInputDtoKt()];
+        $files[] = ['name' => $packagePath . '/model/dto/core/SortInput.kt', 'content' => $this->generateSortInputDtoKt()];
         $files[] = ['name' => $packagePath . '/util/SpecificationBuilder.kt', 'content' => $this->generateSpecificationBuilderKt()];
         $files[] = ['name' => $packagePath . '/util/FilterCriteria.kt', 'content' => $this->generateFilterCriteriaKt()];
         $files[] = ['name' => $packagePath . '/util/SearchOperation.kt', 'content' => $this->generateSearchOperationKt()];
@@ -260,26 +268,191 @@ distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-mav
         $files[] = ['name' => $packagePath . '/util/ValueUtil.kt', 'content' => $this->generateValueUtilKt()];
         $files[] = ['name' => $packagePath . '/util/ScalarValueUtil.kt', 'content' => $this->generateScalarValueUtilKt()];
 
-        // 5. Combined GraphQL Schema
-        $files[] = ['name' => 'src/main/resources/graphql/schema.graphqls', 'content' => $this->generateCombinedSchema($allSchemaParts, $allQueryFields, $allMutationFields)];
-
         // 6. Security and Auth files (converted to Kotlin)
         $files[] = ['name' => $packagePath . '/config/SecurityConfig.kt', 'content' => $this->generateSecurityConfigKt()];
         $files[] = ['name' => $packagePath . '/config/CorsConfig.kt', 'content' => $this->generateCorsConfigKt()];
         $files[] = ['name' => $packagePath . '/config/Sha1PasswordEncoder.kt', 'content' => $this->generateSha1PasswordEncoderKt()];
         $files[] = ['name' => $packagePath . '/config/ObjectScalar.kt', 'content' => $this->generateObjectScalarKt()];
         $files[] = ['name' => $packagePath . '/config/GraphQlConfig.kt', 'content' => $this->generateGraphQlConfigKt()];
+        
         $files[] = ['name' => $packagePath . '/model/entity/core/Admin.kt', 'content' => $this->generateAdminEntityKt()];
+        $files[] = ['name' => $packagePath . '/model/entity/core/AdminLevel.kt', 'content' => $this->generateAdminLevelEntityKt()];
+        $files[] = ['name' => $packagePath . '/model/entity/core/Message.kt', 'content' => $this->generateMessageEntityKt()];
+        $files[] = ['name' => $packagePath . '/model/entity/core/MessageFolder.kt', 'content' => $this->generateMessageFolderEntityKt()];
+        $files[] = ['name' => $packagePath . '/model/entity/core/Notification.kt', 'content' => $this->generateNotificationEntityKt()];
+        
+        $files[] = ['name' => $packagePath . '/model/repository/core/AdminLevelRepository.kt', 'content' => $this->generateAdminLevelRepositoryKt()];
         $files[] = ['name' => $packagePath . '/model/repository/core/AdminRepository.kt', 'content' => $this->generateAdminRepositoryKt()];
+        $files[] = ['name' => $packagePath . '/model/repository/core/MessageFolderRepository.kt', 'content' => $this->generateMessageFolderRepositoryKt()];
+        $files[] = ['name' => $packagePath . '/model/repository/core/MessageRepository.kt', 'content' => $this->generateMessageRepositoryKt()];
+        $files[] = ['name' => $packagePath . '/model/repository/core/NotificationRepository.kt', 'content' => $this->generateNotificationRepositoryKt()];
+
         $files[] = ['name' => $packagePath . '/service/JpaUserDetailsService.kt', 'content' => $this->generateUserDetailsServiceKt()];
         $files[] = ['name' => $packagePath . '/controller/dto/LoginRequest.kt', 'content' => $this->generateLoginRequestDtoKt()];
         $files[] = ['name' => $packagePath . '/controller/dto/LoginResponse.kt', 'content' => $this->generateLoginResponseDtoKt()];
-        $files[] = ['name' => $packagePath . '/controller/core/AuthController.kt', 'content' => $this->generateAuthControllerKt()];
+
+        $files[] = ['name' => $packagePath . '/controller/core/AdminController.kt', 'content' => $this->generateAdminController()];
+        $files[] = ['name' => $packagePath . '/controller/core/AuthController.kt', 'content' => $this->generateAuthController()];        
+        $files[] = ['name' => $packagePath . '/controller/core/FrontendConfigController.kt', 'content' => $this->generateFrontendConfigController()];
+        $files[] = ['name' => $packagePath . '/controller/core/MessageController.kt', 'content' => $this->generateMessageController()];
+        $files[] = ['name' => $packagePath . '/controller/core/NotificationController.kt', 'content' => $this->generateNotificationController()];
         $files[] = ['name' => $packagePath . '/controller/core/UserProfileController.kt', 'content' => $this->generateUserProfileController()];
         
 
         return $files;
+        */
     }
+
+    private function generateStaticFiles($files, $packagePath)
+    {
+        $baseDir = dirname(dirname(dirname(__DIR__))) . '/inc.graphql-resources/backend/kotlin/';
+
+        // 5. Utility and DTO classes (converted to Kotlin)
+        $files[] = ['name' => $packagePath . '/model/dto/core/FilterInput.kt', 
+                    'content' => $this->getKotlinFileTemplate('model/dto/core/FilterInput.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/dto/core/SortInput.kt', 
+                    'content' => $this->getKotlinFileTemplate('model/dto/core/SortInput.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/SpecificationBuilder.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/SpecificationBuilder.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/FilterCriteria.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/FilterCriteria.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/SearchOperation.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/SearchOperation.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/GenericSpecification.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/GenericSpecification.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/QueryUtil.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/QueryUtil.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/AuditTrailUtil.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/AuditTrailUtil.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/ValueUtil.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/ValueUtil.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/ScalarValueUtil.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/ScalarValueUtil.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/util/I18nUtil.kt', 
+                    'content' => $this->getKotlinFileTemplate('util/I18nUtil.kt', $this->projectConfig, $baseDir)];
+
+
+        // 6. Security and Auth files
+        $files[] = ['name' => $packagePath . '/config/SecurityConfig.kt', 
+                    'content' => $this->getKotlinFileTemplate('config/SecurityConfig.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/config/CorsConfig.kt', 
+                    'content' => $this->getKotlinFileTemplate('config/CorsConfig.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/config/Sha1PasswordEncoder.kt', 
+                    'content' => $this->getKotlinFileTemplate('config/Sha1PasswordEncoder.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/config/ObjectScalar.kt', 
+                    'content' => $this->getKotlinFileTemplate('config/ObjectScalar.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/config/GraphQlConfig.kt', 
+                    'content' => $this->getKotlinFileTemplate('config/GraphQlConfig.kt', $this->projectConfig, $baseDir)];
+
+
+        // Entities
+        $files[] = ['name' => $packagePath . '/model/entity/core/Admin.kt',
+                    'content' => $this->getKotlinFileTemplate('model/entity/core/Admin.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/entity/core/AdminLevel.kt',
+                    'content' => $this->getKotlinFileTemplate('model/entity/core/AdminLevel.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/entity/core/Message.kt',
+                    'content' => $this->getKotlinFileTemplate('model/entity/core/Message.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/entity/core/MessageFolder.kt',
+                    'content' => $this->getKotlinFileTemplate('model/entity/core/MessageFolder.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/entity/core/Notification.kt',
+                    'content' => $this->getKotlinFileTemplate('model/entity/core/Notification.kt', $this->projectConfig, $baseDir)];
+
+
+        // Repositories
+        $files[] = ['name' => $packagePath . '/model/repository/core/AdminLevelRepository.kt', 
+                    'content' => $this->getKotlinFileTemplate('model/repository/core/AdminLevelRepository.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/repository/core/AdminRepository.kt', 
+                    'content' => $this->getKotlinFileTemplate('model/repository/core/AdminRepository.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/repository/core/MessageFolderRepository.kt', 
+                    'content' => $this->getKotlinFileTemplate('model/repository/core/MessageFolderRepository.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/repository/core/MessageRepository.kt', 
+                    'content' => $this->getKotlinFileTemplate('model/repository/core/MessageRepository.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/model/repository/core/NotificationRepository.kt', 
+                    'content' => $this->getKotlinFileTemplate('model/repository/core/NotificationRepository.kt', $this->projectConfig, $baseDir)];
+
+
+        // Services & DTOs
+        $files[] = ['name' => $packagePath . '/service/JpaUserDetailsService.kt', 
+                    'content' => $this->getKotlinFileTemplate('service/JpaUserDetailsService.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/controller/dto/LoginRequest.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/dto/LoginRequest.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/controller/dto/LoginResponse.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/dto/LoginResponse.kt', $this->projectConfig, $baseDir)];
+
+
+        // Controllers
+        $files[] = ['name' => $packagePath . '/controller/core/AdminController.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/core/AdminController.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/controller/core/AuthController.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/core/AuthController.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/controller/core/FrontendConfigController.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/core/FrontendConfigController.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/controller/core/MessageController.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/core/MessageController.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/controller/core/NotificationController.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/core/NotificationController.kt', $this->projectConfig, $baseDir)];
+
+        $files[] = ['name' => $packagePath . '/controller/core/UserProfileController.kt', 
+                    'content' => $this->getKotlinFileTemplate('controller/core/UserProfileController.kt', $this->projectConfig, $baseDir)];
+
+        return $files;
+    }
+
+    /**
+     * Loads a Kotlin template file, applies package prefix detection,
+     * replaces placeholders using projectConfig, and returns the processed content.
+     *
+     * @param string $path           Path relative to "templates/kotlin/" (e.g. "util/QueryUtil.kt")
+     * @param array  $projectConfig  Configuration array for placeholder replacement
+     *
+     * @return string Processed Kotlin content
+     * @throws Exception If template file is not found
+     */
+    public function getKotlinFileTemplate($path, $projectConfig, $baseDir)
+    {
+        
+        $templateFile = $baseDir . $path;
+
+        if (!file_exists($templateFile)) {
+            throw new \Exception("Template not found: " . $templateFile);
+        }
+
+        // Load file
+        $content = file_get_contents($templateFile);
+
+        $content = str_replace('com.planetbiru.graphqlapplication', $projectConfig['packageName'], $content);
+
+        return $content;
+    }
+
 
     private function generateMvnw()
     {
@@ -968,6 +1141,8 @@ CMD;
 # The name of the Spring Boot application.
 spring.application.name={$this->projectConfig['name']}
 
+spring.main.allow-bean-definition-overriding=true
+
 # Default language used for internationalization (i18n).
 app.i18n.default-language=en
 
@@ -1357,12 +1532,13 @@ KOTLIN;
         return <<<KOTLIN
 package $package.controller
 
-import $package.model.dto.FilterInput
-import $package.model.dto.SortInput
+import $package.model.dto.core.FilterInput
+import $package.model.dto.core.SortInput
 import $package.model.dto.{$ucCamelName}Input
 import $package.model.entity.$ucCamelName
 import $package.model.repository.{$ucCamelName}Repository
 import $package.model.repository.core.AdminRepository
+import $package.util.I18nUtil
 import $package.util.QueryUtil
 import $package.util.ValueUtil
 import $package.util.AuditTrailUtil$importScalarValueUtil$relatedEntityImports
@@ -1370,12 +1546,17 @@ import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.graphql.data.method.annotation.SchemaMapping
+import org.springframework.http.server.ServerHttpRequest
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.RequestHeader
 import java.util.Optional
 
 @Controller
-class {$ucCamelName}Controller(private val {$camelName}Repository: {$ucCamelName}Repository) {
+class {$ucCamelName}Controller(
+    private val {$camelName}Repository: {$ucCamelName}Repository,
+    private val i18n: I18nUtil
+) {
 
     @QueryMapping
     fun {$camelName}(@Argument id: $pkKotlinType): $ucCamelName? {
@@ -1399,7 +1580,11 @@ class {$ucCamelName}Controller(private val {$camelName}Repository: {$ucCamelName
 
     @MutationMapping
     @Transactional
-    fun create{$ucCamelName}(@Argument input: Map<String, Any>): $ucCamelName {
+    fun create{$ucCamelName}(
+        @Argument input: Map<String, Any>,
+        request: ServerHttpRequest
+    ): $ucCamelName {
+        val lang = request.headers.getFirst("X-Language-Id")
         val dtoInput = ValueUtil.convertSnakeCaseToDto(input, {$ucCamelName}Input::class.java)
         val entity = {$ucCamelName}()
 {$this->generateDtoToEntityMappingKt($tableName, $tableInfo, 'entity', 'dtoInput', 'create')}
@@ -1408,10 +1593,15 @@ class {$ucCamelName}Controller(private val {$camelName}Repository: {$ucCamelName
 
     @MutationMapping
     @Transactional
-    fun update{$ucCamelName}(@Argument id: $pkKotlinType, @Argument input: Map<String, Any>): $ucCamelName {
+    fun update{$ucCamelName}(
+        @Argument id: $pkKotlinType,
+        @Argument input: Map<String, Any>,
+        request: ServerHttpRequest
+    ): $ucCamelName {
+        val lang = request.headers.getFirst("X-Language-Id")
         val dtoInput = ValueUtil.convertSnakeCaseToDto(input, {$ucCamelName}Input::class.java)
         val entity = {$camelName}Repository.findById(id)
-            .orElseThrow { RuntimeException("{$ucCamelName} not found with id \$id") }
+            .orElseThrow { RuntimeException(i18n.t("no_item_found_with_id", lang, "$tableName", id)) }
 {$this->generateDtoToEntityMappingKt($tableName, $tableInfo, 'entity', 'dtoInput', 'update')}
 $returnUpdate
     }
@@ -1633,8 +1823,8 @@ KOTLIN;
         return <<<KOTLIN
 package $package.util
 
-import $package.model.dto.FilterInput
-import $package.model.dto.SortInput
+import $package.model.dto.core.FilterInput
+import $package.model.dto.core.SortInput
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -1869,6 +2059,229 @@ class JpaUserDetailsService(private val adminRepository: AdminRepository) : User
 KOTLIN;
     }
 
+    private function generateNotificationEntityKt()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package com.planetbiru.graphqlapplication.model.entity.core
+
+import jakarta.persistence.*
+import java.time.LocalDateTime
+
+@Entity
+@Table(name = "notification")
+data class Notification(
+    @Id
+    @Column(name = "notification_id", nullable = false, length = 40)
+    var notificationId: String,
+
+    @Column(name = "notification_type", length = 40)
+    var notificationType: String? = null,
+
+    @Column(name = "admin_group", length = 40)
+    var adminGroup: String? = null,
+
+    @Column(name = "admin_id", length = 40, insertable = false, updatable = false)
+    var adminId: String? = null,
+
+    @Column(name = "icon", length = 40)
+    var icon: String? = null,
+
+    @Column(name = "subject", length = 255)
+    var subject: String? = null,
+
+    @Lob
+    @Column(name = "content")
+    var content: String? = null,
+
+    @Lob
+    @Column(name = "link")
+    var link: String? = null,
+
+    @Column(name = "is_read")
+    var isRead: Boolean = false,
+
+    @Column(name = "time_create")
+    var timeCreate: LocalDateTime? = null,
+
+    @Column(name = "ip_create", length = 50)
+    var ipCreate: String? = null,
+
+    @Column(name = "time_read")
+    var timeRead: LocalDateTime? = null,
+
+    @Column(name = "ip_read", length = 50)
+    var ipRead: String? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", referencedColumnName = "admin_id")
+    val admin: Admin? = null
+)
+KOTLIN;
+    }
+
+    private function generateMessageFolderEntityKt()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package com.planetbiru.graphqlapplication.model.entity.core
+
+import jakarta.persistence.*
+import java.time.LocalDateTime
+
+@Entity
+@Table(name = "message_folder")
+data class MessageFolder(
+    @Id
+    @Column(name = "message_folder_id", nullable = false, length = 40)
+    var messageFolderId: String,
+
+    @Column(name = "name", length = 100)
+    var name: String? = null,
+
+    @Column(name = "admin_id", length = 40)
+    var adminId: String? = null,
+
+    @Column(name = "sort_order")
+    var sortOrder: Int? = null,
+
+    @Column(name = "time_create")
+    var timeCreate: LocalDateTime? = null,
+
+    @Column(name = "time_edit")
+    var timeEdit: LocalDateTime? = null,
+
+    @Column(name = "admin_create", length = 40)
+    var adminCreate: String? = null,
+
+    @Column(name = "admin_edit", length = 40)
+    var adminEdit: String? = null,
+
+    @Column(name = "ip_create", length = 50)
+    var ipCreate: String? = null,
+
+    @Column(name = "ip_edit", length = 50)
+    var ipEdit: String? = null,
+
+    @Column(name = "active")
+    var active: Boolean? = true,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", referencedColumnName = "admin_id", insertable = false, updatable = false)
+    val admin: Admin? = null
+)
+KOTLIN;
+    }
+
+    private function generateMessageEntityKt()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package com.planetbiru.graphqlapplication.model.entity.core
+
+import jakarta.persistence.*
+import java.time.LocalDateTime
+
+@Entity
+@Table(name = "message")
+data class Message(
+    @Id
+    @Column(name = "message_id", nullable = false, length = 40)
+    var messageId: String,
+
+    @Column(name = "message_direction", length = 40)
+    var messageDirection: String? = null,
+
+    @Column(name = "sender_id", length = 40, insertable = false, updatable = false)
+    var senderId: String? = null,
+
+    @Column(name = "receiver_id", length = 40, insertable = false, updatable = false)
+    var receiverId: String? = null,
+
+    @Column(name = "message_folder_id", length = 40, insertable = false, updatable = false)
+    var messageFolderId: String? = null,
+
+    @Column(name = "icon", length = 40)
+    var icon: String? = null,
+
+    @Column(name = "subject", length = 255)
+    var subject: String? = null,
+
+    @Lob
+    @Column(name = "content")
+    var content: String? = null,
+
+    @Lob
+    @Column(name = "link")
+    var link: String? = null,
+
+    @Column(name = "is_read")
+    var isRead: Boolean = false,
+
+    @Column(name = "time_create")
+    var timeCreate: LocalDateTime? = null,
+
+    @Column(name = "ip_create", length = 50)
+    var ipCreate: String? = null,
+
+    @Column(name = "time_read")
+    var timeRead: LocalDateTime? = null,
+
+    @Column(name = "ip_read", length = 50)
+    var ipRead: String? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", referencedColumnName = "admin_id")
+    val sender: Admin? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id", referencedColumnName = "admin_id")
+    val receiver: Admin? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "message_folder_id", referencedColumnName = "message_folder_id")
+    val messageFolder: MessageFolder? = null
+)
+KOTLIN;
+    }
+
+    private function generateAdminLevelEntityKt()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package com.planetbiru.graphqlapplication.model.entity.core
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import java.time.LocalDateTime
+
+@Entity
+@Table(name = "admin_level")
+data class AdminLevel(
+    @Id
+    @Column(name = "admin_level_id")
+    val adminLevelId: String,
+
+    @Column(name = "name")
+    val name: String? = null,
+
+    @Column(name = "special_access")
+    val specialAccess: Boolean? = false,
+
+    @Column(name = "sort_order")
+    val sortOrder: Int? = 0,
+
+    @Column(name = "default_data")
+    val defaultData: Boolean? = false,
+
+    @Column(name = "active")
+    val active: Boolean? = true
+)
+KOTLIN;
+    }
+
     /**
      * Generates the Admin entity class in Kotlin.
      * @return string The Kotlin code for Admin.kt.
@@ -1951,6 +2364,574 @@ data class LoginResponse(
 KOTLIN;
     }
 
+    private function generateFrontendConfigController()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package $package.controller.core
+
+import $package.util.I18nUtil
+import jakarta.servlet.http.HttpSession
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
+import org.springframework.core.io.support.ResourcePatternResolver
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.util.StreamUtils
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestParam
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.util.Locale
+
+data class ThemeDto(val name: String, val title: String)
+
+/**
+ * REST controller for serving frontend configuration.
+ */
+@org.springframework.web.bind.annotation.RestController
+class FrontendConfigController(
+    private val resourceLoader: ResourceLoader,
+    private val resourcePatternResolver: ResourcePatternResolver,
+    @Value("\\\${app.security.require-login}") private val requireLogin: Boolean,
+    private val i18n: I18nUtil
+) {
+
+    /**
+     * {@code GET /frontend-config} : get the frontend configuration.
+     *
+     * @return the [ResponseEntity] with status `200 (OK)` and the configuration in body,
+     * or with status `401 (Unauthorized)` if login is required,
+     * or with status `500 (Internal Server Error)` if the configuration file could not be read.
+     */
+    @GetMapping("/frontend-config")
+    fun getFrontendConfig(
+        session: HttpSession,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
+    ): ResponseEntity<String> {
+        if (requireLogin && session.getAttribute("username") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
+        }
+
+        return try {
+            val resource = resourceLoader.getResource("classpath:static/config/frontend-config.json")
+            val config = StreamUtils.copyToString(resource.inputStream, StandardCharsets.UTF_8)
+            ResponseEntity.ok()
+                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(config)
+        } catch (e: IOException) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(i18n.t("error_reading_frontend_config", lang))
+        }
+    }
+
+    /**
+     * {@code GET /available-language.json} : get the available languages configuration.
+     *
+     * @return the [ResponseEntity] with status `200 (OK)` and the configuration in body,
+     * or with status `500 (Internal Server Error)` if the configuration file could not be read.
+     */
+    @GetMapping("/available-language")
+    fun getAvailableLanguages(
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
+    ): ResponseEntity<String> {
+        try {
+            val resource = resourceLoader.getResource("classpath:static/langs/available-language.json")
+            val config = StreamUtils.copyToString(resource.inputStream, StandardCharsets.UTF_8)
+            return ResponseEntity.ok()
+                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
+                .contentType(MediaType.APPLICATION_JSON).body(config)
+        } catch (e: IOException) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(i18n.t("error_reading_language_config", lang))
+        }
+    }
+
+    /**
+     * {@code GET /available-theme.json} : get the list of available themes.
+     *
+     * @return the [ResponseEntity] with status `200 (OK)` and the list of themes in body,
+     * or with status `500 (Internal Server Error)` if an error occurs.
+     */
+    @GetMapping("/available-theme")
+    fun getAvailableThemes(
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
+    ): ResponseEntity<Any> {
+        try {
+            val resources: Array<Resource> = resourcePatternResolver.getResources("classpath:static/assets/themes/*/style.min.css")
+            val themes = resources.mapNotNull { resource ->
+                try {
+                    val themeDir = resource.file.parentFile
+                    if (themeDir.isDirectory) {
+                        val themeName = themeDir.name
+                        val title = themeName.replace('-', ' ').replace('_', ' ')
+                            .split(' ')
+                            .joinToString(" ") { it.replaceFirstChar { char -> if (char.isLowerCase()) char.titlecase(Locale.getDefault()) else char.toString() } }
+                        ThemeDto(name = themeName, title = title)
+                    } else {
+                        null
+                    }
+                } catch (e: IOException) {
+                    // Ignore resources that are not file-based (e.g., inside a JAR)
+                    null
+                }
+            }
+            return ResponseEntity.ok()
+                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
+                .contentType(MediaType.APPLICATION_JSON).body(themes)
+        } catch (e: IOException) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(i18n.t("error_scanning_themes", lang))
+        }
+    }
+}
+KOTLIN;
+    }
+
+    private function generateMessageController()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package $package.controller.core
+
+import $package.model.entity.core.Message
+import $package.model.repository.core.MessageRepository
+import $package.util.I18nUtil
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpSession
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestParam
+import java.time.LocalDateTime
+
+@Controller
+class MessageController(
+    private val messageRepository: MessageRepository,
+    private val i18n: I18nUtil
+) {
+
+    private fun getCurrentAdminId(session: HttpSession): String? {
+        return session.getAttribute("adminId") as? String
+    }
+
+    @GetMapping("/message")
+    fun handleMessageGet(
+        @RequestParam(required = false) messageId: String?,
+        @RequestParam(required = false) search: String?,
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
+        session: HttpSession
+    ): ResponseEntity<String> {
+        val currentAdminId = getCurrentAdminId(session)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
+
+        val htmlContent = if (messageId != null) {
+            buildDetailView(messageId, currentAdminId, lang)
+        } else {
+            buildListView(search, page, currentAdminId, lang)
+        }
+
+        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(htmlContent)
+    }
+
+    @PostMapping("/message")
+    fun handleMessagePost(
+        session: HttpSession,
+        request: HttpServletRequest,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
+    ): ResponseEntity<*> {
+        val currentAdminId = getCurrentAdminId(session)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("unauthorized", lang)))
+
+        val params = request.parameterMap.mapValues { it.value.firstOrNull() ?: "" }
+        val action = params["action"]
+        val messageId = params["messageId"] ?: return ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("message_id_required", lang)))
+
+        return try {
+            when (action) {
+                "mark_as_unread" -> markAsUnread(messageId, currentAdminId, lang)
+                "delete" -> deleteMessage(messageId, currentAdminId, lang)
+                else -> ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("invalid_action", lang)))
+            }
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("success" to false, "message" to e.message))
+        }
+    }
+
+    private fun markAsUnread(messageId: String, currentAdminId: String, lang: String?): ResponseEntity<*> {
+        val message = messageRepository.findById(messageId).orElseThrow { RuntimeException(i18n.t("message_not_found", lang)) }
+        if (message.receiverId == currentAdminId) {
+            message.isRead = false
+            message.timeRead = null
+            messageRepository.save(message)
+            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("message_marked_as_unread", lang)))
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
+    }
+
+    private fun deleteMessage(messageId: String, currentAdminId: String, lang: String?): ResponseEntity<*> {
+        val message = messageRepository.findById(messageId).orElseThrow { RuntimeException(i18n.t("message_not_found", lang)) }
+        if (message.senderId == currentAdminId || message.receiverId == currentAdminId) {
+            messageRepository.delete(message)
+            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("message_deleted_successfully", lang)))
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
+    }
+
+    private fun buildListView(search: String?, page: Int, currentAdminId: String, lang: String?): String {
+        val pageSize = 20
+        val pageable = PageRequest.of(page - 1, pageSize, Sort.by("timeCreate").descending())
+
+        val messagePage = if (!search.isNullOrBlank()) {
+            messageRepository.findBySenderIdOrReceiverIdAndSearch(currentAdminId, search, pageable)
+        } else {
+            messageRepository.findBySenderIdOrReceiverId(currentAdminId, currentAdminId, pageable)
+        }
+
+        val messages = messagePage.content
+
+        val messageItems = if (messages.isNotEmpty()) {
+            messages.joinToString("") { message ->
+                val isReadClass = if (message.isRead) "read" else "unread"
+                val contentSnippet = message.content?.take(150)?.let { if (it.length == 150) "\$it..." else it } ?: ""
+                val actionButtons = if (message.receiverId == currentAdminId && message.isRead) {
+                    """
+                    <button class="btn btn-sm btn-secondary" onclick="markMessageAsUnread('\${message.messageId}', 'list')">\${i18n.t("mark_as_unread", lang)}</button>
+                    <button class="btn btn-sm btn-danger" onclick="handleMessageDelete('\${message.messageId}')">\${i18n.t("delete", lang)}</button>
+                    """
+                } else ""
+
+                """
+                <div class="message-item \$isReadClass">
+                    <span class="message-status-indicator"></span>
+                    <div class="message-header">
+                        <div class="message-link-wrapper">
+                            <a href="#message?messageId=\${message.messageId}" class="message-link">
+                                <span class="message-sender">\${message.sender?.name ?: i18n.t("system", lang)}</span>
+                                <span class="message-subject">\${message.subject ?: ""}</span>
+                            </a>
+                            <span class="message-time">\${message.timeCreate}</span>
+                            \$actionButtons
+                        </div>
+                    </div>
+                    <div class="message-content">\${contentSnippet}</div>
+                </div>
+                """
+            }
+        } else {
+            "<p>\${i18n.t("no_message", lang)}</p>"
+        }
+
+        // Simplified pagination for brevity
+        return """
+        <div id="filter-container" class="filter-container" style="display: block;">
+            <form id="message-search-form" class="search-form" onsubmit="handleMessageSearch(event)">
+                <div class="filter-controls">
+                    <div class="form-group">
+                        <label for="search_message">\${i18n.t("search", lang)}</label>
+                        <input type="text" name="search" id="search_message" placeholder="\${i18n.t("search", lang)}" value="\${search ?: ""}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">\${i18n.t("search", lang)}</button>
+                </div>
+            </form>
+        </div>
+        <div class="message-list-container">
+            \$messageItems
+        </div>
+        """.trimIndent()
+    }
+
+    private fun buildDetailView(messageId: String, currentAdminId: String, lang: String?): String {
+        val messageOpt = messageRepository.findByMessageIdAndUser(messageId, currentAdminId)
+        if (messageOpt.isEmpty) {
+            return """<div class="table-container detail-view">\${i18n.t("no_message", lang)}</div>"""
+        }
+
+        val message = messageOpt.get()
+
+        // Mark as read
+        if (message.receiverId == currentAdminId && !message.isRead) {
+            message.isRead = true
+            message.timeRead = LocalDateTime.now()
+            messageRepository.save(message)
+        }
+
+        val actionButtons = if (message.receiverId == currentAdminId && message.isRead) {
+            """
+            <button class="btn btn-primary" onclick="markMessageAsUnread('\${message.messageId}', 'detail')">\${i18n.t("mark_as_unread", lang)}</button>
+            <button class="btn btn-danger" onclick="handleMessageDelete('\${message.messageId}')">\${i18n.t("delete", lang)}</button>
+            """
+        } else ""
+
+        val statusHtml = if (message.isRead) {
+            """<span class="status-read">\${i18n.t("read_at", lang)} \${message.timeRead}</span>"""
+        } else {
+            """<span class="status-unread">\${i18n.t("unread", lang)}</span>"""
+        }
+
+        return """
+        <div class="back-controls">
+            <button id="back-to-list" class="btn btn-secondary" onclick="backToList('message')">\${i18n.t("back_to_list", lang)}</button>
+            \$actionButtons
+        </div>
+        <div class="message-container">
+            <div class="message-header">
+                <h3>\${message.subject ?: ""}</h3>
+                <div class="message-meta">
+                    <div><strong>\${i18n.t("from", lang)}:</strong> \${message.sender?.name ?: i18n.t("system", lang)}</div>
+                    <div><strong>\${i18n.t("to", lang)}:</strong> \${message.receiver?.name ?: i18n.t("system", lang)}</div>
+                    <div><strong>\${i18n.t("time", lang)}:</strong> \${message.timeCreate}</div>
+                    <div><strong>\${i18n.t("status", lang)}:</strong> \$statusHtml</div>
+                </div>
+            </div>
+            <div class="message-body">
+                \${message.content?.replace("\n", "<br>") ?: ""}
+            </div>
+        </div>
+        """.trimIndent()
+    }
+}
+KOTLIN;
+    }
+    private function generateNotificationController()
+    {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package $package.controller.core
+
+import $package.model.repository.core.AdminRepository
+import $package.model.repository.core.NotificationRepository
+import $package.util.I18nUtil
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpSession
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestParam
+import java.time.LocalDateTime
+
+@Controller
+class NotificationController(
+    private val notificationRepository: NotificationRepository,
+    private val adminRepository: AdminRepository,
+    private val i18n: I18nUtil
+) {
+
+    private fun getCurrentAdminId(session: HttpSession): String? {
+        return session.getAttribute("adminId") as? String
+    }
+
+    @GetMapping("/notification")
+    fun handleNotificationGet(
+        @RequestParam(required = false) notificationId: String?,
+        @RequestParam(required = false) search: String?,
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
+        session: HttpSession,
+        request: HttpServletRequest
+    ): ResponseEntity<String> {
+        val currentAdminId = getCurrentAdminId(session)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
+
+        val admin = adminRepository.findById(currentAdminId).orElse(null)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("admin_not_found", lang))
+
+        val htmlContent = if (notificationId != null) {
+            buildDetailView(notificationId, admin.adminId, admin.adminLevelId, request.remoteAddr, lang)
+        } else {
+            buildListView(search, page, admin.adminId, admin.adminLevelId, lang)
+        }
+
+        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(htmlContent)
+    }
+
+    @PostMapping("/notification")
+    fun handleNotificationPost(
+        session: HttpSession,
+        request: HttpServletRequest,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
+    ): ResponseEntity<*> {
+        val currentAdminId = getCurrentAdminId(session)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("unauthorized", lang)))
+
+        val admin = adminRepository.findById(currentAdminId).orElse(null)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("admin_not_found", lang)))
+
+        val params = request.parameterMap.mapValues { it.value.firstOrNull() ?: "" }
+        val action = params["action"]
+        val notificationId = params["notificationId"] ?: return ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("notification_id_required", lang)))
+
+        return try {
+            when (action) {
+                "mark_as_unread" -> markAsUnread(notificationId, admin.adminId, admin.adminLevelId, lang)
+                "delete" -> deleteNotification(notificationId, admin.adminId, admin.adminLevelId, lang)
+                else -> ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("invalid_action", lang)))
+            }
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("success" to false, "message" to e.message))
+        }
+    }
+
+    private fun markAsUnread(notificationId: String, adminId: String, adminLevelId: String?, lang: String?): ResponseEntity<*> {
+        val notification = notificationRepository.findById(notificationId).orElseThrow { RuntimeException(i18n.t("notification_not_found", lang)) }
+        if (notification.adminId == adminId || notification.adminGroup == adminLevelId) {
+            notification.isRead = false
+            notification.timeRead = null
+            notificationRepository.save(notification)
+            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("notification_marked_as_unread", lang)))
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
+    }
+
+    private fun deleteNotification(notificationId: String, adminId: String, adminLevelId: String?, lang: String?): ResponseEntity<*> {
+        val notification = notificationRepository.findById(notificationId).orElseThrow { RuntimeException(i18n.t("notification_not_found", lang)) }
+        if (notification.adminId == adminId || notification.adminGroup == adminLevelId) {
+            notificationRepository.delete(notification)
+            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("notification_deleted_successfully", lang)))
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
+    }
+
+    private fun buildListView(search: String?, page: Int, adminId: String, adminLevelId: String?, lang: String?): String {
+        val pageSize = 20
+        val pageable = PageRequest.of(page - 1, pageSize, Sort.by("timeCreate").descending())
+
+        val notificationPage = if (!search.isNullOrBlank()) {
+            notificationRepository.findByAdminIdOrAdminGroupAndSearch(adminId, adminLevelId, search, pageable)
+        } else {
+            notificationRepository.findByAdminIdOrAdminGroup(adminId, adminLevelId, pageable)
+        }
+
+        val notifications = notificationPage.content
+
+        val notificationItems = if (notifications.isNotEmpty()) {
+            notifications.joinToString("") { notification ->
+                val isReadClass = if (notification.isRead) "read" else "unread"
+                val contentSnippet = notification.content?.take(150)?.let { if (it.length == 150) "\$it..." else it } ?: ""
+                val actionButtons = if (notification.isRead) {
+                    """
+                    <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('\${notification.notificationId}', 'list')">\${i18n.t("mark_as_unread", lang)}</button>
+                    <button class="btn btn-sm btn-danger" onclick="handleNotificationDelete('\${notification.notificationId}')">\${i18n.t("delete", lang)}</button>
+                    """
+                } else ""
+
+                """
+                <div class="message-item \$isReadClass">
+                    <span class="message-status-indicator"></span>
+                    <div class="notification-header">
+                        <div class="message-link-wrapper">
+                            <a href="#notification?notificationId=\${notification.notificationId}" class="message-link">
+                                <span class="message-subject">\${notification.subject ?: ""}</span>
+                            </a>
+                            <span class="message-time">\${notification.timeCreate}</span>
+                            \$actionButtons
+                        </div>
+                    </div>
+                    <div class="message-content">\${contentSnippet}</div>
+                </div>
+                """
+            }
+        } else {
+            "<p>No notification</p>"
+        }
+
+        // Simplified pagination for brevity
+        return """
+        <div id="filter-container" class="filter-container" style="display: block;">
+            <form id="notification-search-form" class="search-form" onsubmit="handleNotificationSearch(event)">
+                <div class="filter-controls">
+                    <div class="form-group">
+                        <label for="search_notification">\${i18n.t("search", lang)}</label>
+                        <input type="text" name="search" id="search_notification" placeholder="\${i18n.t("search", lang)}" value="\${search ?: ""}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">\${i18n.t("search", lang)}</button>
+                </div>
+            </form>
+        </div>
+        <div class="message-list-container">
+            \$notificationItems
+        </div>
+        """.trimIndent()
+    }
+
+    private fun buildDetailView(notificationId: String, adminId: String, adminLevelId: String?, ipRead: String, lang: String?): String {
+        val notificationOpt = notificationRepository.findByIdAndAdmin(notificationId, adminId, adminLevelId)
+        if (notificationOpt.isEmpty) {
+            return """<div class="table-container detail-view">\${i18n.t("no_notification", lang)}</div>"""
+        }
+
+        val notification = notificationOpt.get()
+
+        // Mark as read
+        if (!notification.isRead) {
+            notification.isRead = true
+            notification.timeRead = LocalDateTime.now()
+            notification.ipRead = ipRead
+            notificationRepository.save(notification)
+        }
+
+        val actionButtons = if (notification.isRead) {
+            """
+            <button class="btn btn-primary" onclick="markNotificationAsUnread('\${notification.notificationId}', 'detail')">\${i18n.t("mark_as_unread", lang)}</button>
+            <button class="btn btn-danger" onclick="handleNotificationDelete('\${notification.notificationId}')">\${i18n.t("delete", lang)}</button>
+            """
+        } else ""
+
+        val statusHtml = if (notification.isRead) {
+            """<span class="status-read">\${i18n.t("read_at", lang)} \${notification.timeRead}</span>"""
+        } else {
+            """<span class="status-unread">\${i18n.t("unread", lang)}</span>"""
+        }
+
+        val linkButton = if (!notification.link.isNullOrBlank()) {
+            """<p><a href="\${notification.link}" target="_blank" class="btn btn-primary mt-3">\${i18n.t("more_info", lang)}</a></p>"""
+        } else ""
+
+        return """
+        <div class="back-controls">
+            <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')">\${i18n.t("back_to_list", lang)}</button>
+            \$actionButtons
+        </div>
+        <div class="notification-container">
+            <div class="notification-header">
+                <h3>\${notification.subject ?: ""}</h3>
+                <div class="message-meta">
+                    <div><strong>\${i18n.t("time", lang)}:</strong> \${notification.timeCreate}</div>
+                    <div><strong>\${i18n.t("status", lang)}:</strong> \$statusHtml</div>
+                </div>
+            </div>
+            <div class="message-body">
+                \${notification.content?.replace("\n", "<br>") ?: ""}
+                \$linkButton
+            </div>
+        </div>
+        """.trimIndent()
+    }
+}
+KOTLIN;
+    }
+
     private function generateUserProfileController()
     {
         $package = $this->projectConfig['packageName'];
@@ -1991,30 +2972,407 @@ KOTLIN;
 
     }
 
+    private function generateAdminController() {
+        $package = $this->projectConfig['packageName'];
+        return <<<KOTLIN
+package $package.controller.core
+
+import $package.config.Sha1PasswordEncoder
+import $package.util.I18nUtil
+import $package.model.entity.core.Admin
+import $package.model.repository.core.AdminLevelRepository
+import $package.model.repository.core.AdminRepository
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpSession
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
+import $package.model.entity.core.AdminLevel
+import java.time.LocalDateTime
+import java.util.UUID
+
+@Controller
+class AdminController(
+    private val adminRepository: AdminRepository,
+    private val adminLevelRepository: AdminLevelRepository,
+    private val passwordEncoder: Sha1PasswordEncoder,
+    private val i18n: I18nUtil
+) {
+
+    private fun getCurrentAdminId(session: HttpSession): String? {
+        return session.getAttribute("adminId") as? String
+    }
+
+    @GetMapping("/admin")
+    fun handleAdminGet(
+        @RequestParam(required = false) action: String?,
+        @RequestParam(required = false) adminId: String?,
+        @RequestParam(required = false) search: String?,
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
+        session: HttpSession,
+        request: HttpServletRequest
+    ): ResponseEntity<String> {
+        val currentAdminId = getCurrentAdminId(session)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
+
+        val htmlContent = when (action) {
+            "create" -> buildCreateEditForm(null, lang)
+            "edit" -> adminRepository.findById(adminId ?: "").map { buildCreateEditForm(it, lang) }.orElse(i18n.t("admin_not_found", lang))
+            "change-password" -> buildChangePasswordForm(adminId, lang)
+            "detail" -> adminRepository.findById(adminId ?: "").map { buildDetailView(it, currentAdminId, lang) }.orElse(i18n.t("admin_not_found", lang))
+            else -> buildListView(search, page, currentAdminId, lang)
+        }
+
+        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(htmlContent)
+    }
+
+    @PostMapping("/admin")
+    fun handleAdminPost(
+        @RequestParam action: String,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
+        session: HttpSession,
+        request: HttpServletRequest
+    ): ResponseEntity<*> {
+        val currentAdminId = getCurrentAdminId(session)
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("unauthorized", lang)))
+
+        // Manually build the parameters map from the request to reliably handle multipart/form-data
+        val params = request.parameterMap.mapValues { entry ->
+            entry.value.firstOrNull() ?: ""
+        }
+        return try {
+            when (params["action"]) {
+                "create" -> createAdmin(params, currentAdminId, request.remoteAddr, lang)
+                "update" -> updateAdmin(params, currentAdminId, request.remoteAddr, lang)
+                "toggle_active" -> toggleAdminActive(params, currentAdminId, lang)
+                "change_password" -> changeAdminPassword(params, lang)
+                "delete" -> deleteAdmin(params, currentAdminId, lang)
+                else -> ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("invalid_action", lang)))
+            }
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("success" to false, "message" to e.message))
+        }
+    }
+
+    private fun createAdmin(params: Map<String, String>, currentAdminId: String, ip: String, lang: String?): ResponseEntity<*> {
+        val password = params["password"] ?: throw IllegalArgumentException(i18n.t("password_is_required", lang))
+        if (password.isBlank()) throw IllegalArgumentException(i18n.t("password_is_required", lang))
+
+        val username = params["username"] ?: throw IllegalArgumentException("Username is required.")
+        val newAdmin = Admin(
+            adminId = UUID.randomUUID().toString(),
+            name = params["name"],
+            username = username,
+            email = params["email"],
+            password = passwordEncoder.encode(password),
+            adminLevelId = params["admin_level_id"],
+            active = params["active"] == "on",
+            timeCreate = LocalDateTime.now(),
+            adminCreate = currentAdminId,
+            ipCreate = ip
+        )
+        adminRepository.save(newAdmin)
+        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_created_successfully", lang)))
+    }
+
+    private fun updateAdmin(params: Map<String, String>, currentAdminId: String, ip: String, lang: String?): ResponseEntity<*> {
+        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
+        val adminToUpdate = adminRepository.findById(adminId).orElseThrow { RuntimeException(i18n.t("admin_not_found", lang)) }
+
+        var active = params["active"] == "on"
+        var adminLevelId = params["admin_level_id"]
+
+        // Prevent user from deactivating or changing their own level
+        if (adminId == currentAdminId) {
+            active = true
+            adminLevelId = adminToUpdate.adminLevelId
+        }
+
+        val username = params["username"] ?: adminToUpdate.username
+        val updatedAdmin = adminToUpdate.copy(
+            name = params["name"],
+            username = username,
+            email = params["email"],
+            adminLevelId = adminLevelId,
+            active = active,
+            timeEdit = LocalDateTime.now(),
+            adminEdit = currentAdminId, // This will now work
+            ipEdit = ip // This will now work
+        )
+        adminRepository.save(updatedAdmin)
+        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_updated_successfully", lang)))
+    }
+
+    private fun toggleAdminActive(params: Map<String, String>, currentAdminId: String, lang: String?): ResponseEntity<*> {
+        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
+        if (adminId == currentAdminId) throw IllegalStateException(i18n.t("cannot_deactivate_self", lang))
+
+        val admin = adminRepository.findById(adminId).orElseThrow { RuntimeException(i18n.t("admin_not_found", lang)) }
+        admin.active = !admin.active
+        adminRepository.save(admin)
+        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_status_updated", lang)))
+    }
+
+    private fun changeAdminPassword(params: Map<String, String>, lang: String?): ResponseEntity<*> {
+        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
+        val password = params["password"] ?: throw IllegalArgumentException(i18n.t("password_is_required", lang))
+        if (password.isBlank()) throw IllegalArgumentException(i18n.t("password_is_required", lang))
+
+        val admin = adminRepository.findById(adminId).orElseThrow { RuntimeException(i18n.t("admin_not_found", lang)) }
+        admin.password = passwordEncoder.encode(password)
+        adminRepository.save(admin)
+        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("password_updated_successfully", lang)))
+    }
+
+    private fun deleteAdmin(params: Map<String, String>, currentAdminId: String, lang: String?): ResponseEntity<*> {
+        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
+        if (adminId == currentAdminId) throw IllegalStateException(i18n.t("cannot_delete_self", lang))
+
+        adminRepository.deleteById(adminId)
+        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_deleted_successfully", lang)))
+    }
+
+    // --- HTML View Builders ---
+    
+    private fun otherUsersController(admin: Admin, currentAdminId: String, lang: String?): String {
+        if (admin.adminId == currentAdminId) {
+            return ""
+        }
+        val toggleAction = if (admin.active) i18n.t("deactivate", lang) else i18n.t("activate", lang)
+        val toggleClass = if (admin.active) "btn-warning" else "btn-success"
+        return """
+            <a href="javascript:;" onclick="handleAdminToggleActive('\${admin.adminId}')" class="btn btn-sm \${toggleClass}">\${toggleAction}</a>
+            <a href="javascript:;" onclick="handleAdminDelete('\${admin.adminId}')" class="btn btn-sm btn-danger">\${i18n.t("delete", lang)}</a>
+        """.trimIndent()
+    }
+
+    private fun buildListView(search: String?, page: Int, currentAdminId: String, lang: String?): String {
+        val pageSize = 20
+        val pageable = PageRequest.of(page - 1, pageSize, Sort.by("name"))
+
+        val adminPage = if (!search.isNullOrBlank()) {
+            adminRepository.findByNameContainingOrUsernameContaining(search, search, pageable)
+        } else {
+            adminRepository.findAll(pageable)
+        }
+
+        val admins = adminPage.content 
+        
+
+        val rows = if (admins.isNotEmpty()) {
+            admins.joinToString("") { admin: Admin ->
+                """
+                <tr class="\${if (!admin.active) "inactive" else "active"}">
+                    <td>\${admin.name ?: ""}</td>
+                    <td>\${admin.username ?: ""}</td>
+                    <td>\${admin.email ?: ""}</td>
+                    <td>\${admin.adminLevel?.name ?: ""}</td>
+                    <td>\${if (admin.active) i18n.t("active", lang) else i18n.t("inactive", lang)}</td>
+                    <td class="actions">
+                        <a href="#admin?action=detail&adminId=\${admin.adminId}" class="btn btn-sm btn-info">\${i18n.t("view", lang)}</a>
+                        <a href="#admin?action=edit&adminId=\${admin.adminId}" class="btn btn-sm btn-primary">\${i18n.t("edit", lang)}</a>
+                        \${otherUsersController(admin, currentAdminId, lang)}
+                    </td>
+                </tr>
+                """.trimIndent()
+            }
+        } else {
+            """<tr><td colspan="6">\${i18n.t("no_admins_found", lang)}</td></tr>"""
+        }
+
+        // Simplified pagination for brevity
+        return """
+        <div id="filter-container" class="filter-container" style="display: block;">
+            <form id="admin-search-form" class="search-form" onsubmit="handleAdminSearch(event)"> 
+                <div class="filter-controls">
+                    
+                    <div class="form-group">
+                        <label for="username">\${i18n.t("name", lang)} or \${i18n.t("username", lang)}</label>
+                        <input type="text" name="search" id="username" placeholder="\${i18n.t("name", lang)} or \${i18n.t("username", lang)}" value="\${search ?: ""}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">\${i18n.t("search", lang)}</button>
+                    <a href="#admin?action=create" class="btn btn-primary">\${i18n.t("add_new_admin", lang)}</a>
+                    
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table class="table table-data-list table-striped">
+                <thead><tr><th>\${i18n.t("name", lang)}</th><th>\${i18n.t("username", lang)}</th><th>\${i18n.t("email", lang)}</th><th>\${i18n.t("admin_level", lang)}</th><th>\${i18n.t("status", lang)}</th><th>\${i18n.t("actions", lang)}</th></tr></thead>
+                <tbody>\$rows</tbody>
+            </table>
+        </div>
+        """.trimIndent()
+    }
+
+    private fun buildDetailView(admin: Admin, currentAdminId: String, lang: String?): String {
+        val actionButtons = if (admin.adminId != currentAdminId) {
+            """
+            <a href="#admin?action=change-password&adminId=\${admin.adminId}" class="btn btn-warning">\${i18n.t("update_password", lang)}</a>
+            <button class="btn \${if (admin.active) "btn-warning" else "btn-success"}" onclick="handleAdminToggleActive('\${admin.adminId}')">
+                \${if (admin.active) i18n.t("deactivate", lang) else i18n.t("activate", lang)}
+            </button>
+            <button class="btn btn-danger" onclick="handleAdminDelete('\${admin.adminId}')">\${i18n.t("delete", lang)}</button>
+            """.trimIndent()
+        } else ""
+
+        return """
+        <div class="back-controls">
+            <a href="#admin" class="btn btn-secondary">\${i18n.t("back_to_list", lang)}</a>
+            <a href="#admin?action=edit&adminId=\${admin.adminId}" class="btn btn-primary">\${i18n.t("edit", lang)}</a>
+            \$actionButtons
+        </div>
+        <div class="table-container detail-view">
+            <table class="table">
+                <tbody>
+                    <tr><td><strong>\${i18n.t("admin_id", lang)}</strong></td><td>\${admin.adminId}</td></tr>
+                    <tr><td><strong>\${i18n.t("name", lang)}</strong></td><td>\${admin.name ?: ""}</td></tr>
+                    <tr><td><strong>\${i18n.t("username", lang)}</strong></td><td>\${admin.username ?: ""}</td></tr>
+                    <tr><td><strong>\${i18n.t("email", lang)}</strong></td><td>\${admin.email ?: ""}</td></tr>
+                    <tr><td><strong>\${i18n.t("admin_level", lang)}</strong></td><td>\${admin.adminLevel?.name ?: ""}</td></tr>
+                    <tr><td><strong>\${i18n.t("status", lang)}</strong></td><td>\${if (admin.active) i18n.t("active", lang) else i18n.t("inactive", lang)}</td></tr>
+                    <tr><td><strong>\${i18n.t("time_create", lang)}</strong></td><td>\${admin.timeCreate}</td></tr>
+                    <tr><td><strong>\${i18n.t("time_edit", lang)}</strong></td><td>\${admin.timeEdit ?: ""}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        """.trimIndent()
+    }
+
+    private fun buildCreateEditForm(admin: Admin?, lang: String?): String {
+        val isCreate = admin == null
+        val adminLevels = adminLevelRepository.findByActive(true)
+        val levelOptions = adminLevels.joinToString("") { level: AdminLevel ->
+            val selected = if (admin?.adminLevelId == level.adminLevelId) "selected" else ""
+            """<option value="\${level.adminLevelId}" \$selected>\${level.name}</option>"""
+        }
+
+        return """
+        <div class="back-controls">
+            <a href="#admin" class="btn btn-secondary">\${i18n.t("back_to_list", lang)}</a>
+        </div>
+        <div class="table-container detail-view">
+            <h3>\${if (isCreate) i18n.t("add_new_admin", lang) else i18n.t("edit_admin", lang)}</h3>
+            <form id="admin-form" class="form-group" onsubmit="handleAdminSave(event, '\${admin?.adminId ?: ""}'); return false;">
+                <input type="hidden" name="action" value="\${if (isCreate) "create" else "update"}">
+                <input type="hidden" name="adminId" value="\${admin?.adminId ?: ""}">
+                <table class="table table-borderless">
+                    <tr>
+                        <td>\${i18n.t("name", lang)}</td>
+                        <td><input type="text" name="name" value="\${admin?.name ?: ""}" required autocomplete="off"></td>
+                    </tr>
+                    <tr>
+                        <td>\${i18n.t("username", lang)}</td>
+                        <td><input type="text" name="username" value="\${admin?.username ?: ""}" required autocomplete="off"></td>
+                    </tr>
+                    <tr>
+                        <td>\${i18n.t("email", lang)}</td>
+                        <td><input type="email" name="email" value="\${admin?.email ?: ""}" required autocomplete="off"></td>
+                    </tr>
+                    \${if (isCreate) """
+                    <tr>
+                        <td>\${i18n.t("password", lang)}</td>
+                        <td><input type="password" name="password" required autocomplete="new-password"></td>
+                    </tr>
+                    """ else ""}
+                    <tr>
+                        <td>\${i18n.t("admin_level", lang)}</td>
+                        <td>
+                            <select name="admin_level_id" required>
+                                <option value="">\${i18n.t("select_option", lang)}</option>
+                                \$levelOptions
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>\${i18n.t("active", lang)}</td>
+                        <td><input type="checkbox" name="active" \${if (admin?.active != false) "checked" else ""} value="on"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <button type="submit" class="btn btn-success">\${i18n.t("save", lang)}</button>
+                            <a href="#admin" class="btn btn-secondary">\${i18n.t("cancel", lang)}</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        """.trimIndent()
+    }
+
+    private fun buildChangePasswordForm(adminId: String?, lang: String?): String {
+        if (adminId.isNullOrBlank()) return i18n.t("admin_id_required", lang)
+        return """
+        <div class="back-controls">
+            <a href="#admin?action=detail&adminId=\$adminId" class="btn btn-secondary">\${i18n.t("back_to_detail", lang)}</a>
+        </div>
+        <div class="table-container detail-view">
+            <h3>Change Password</h3>
+            <form id="change-password-form" class="form-group" onsubmit="handleAdminChangePassword(event, '\$adminId'); return false;">
+                 <input type="hidden" name="action" value="change_password">
+                 <input type="hidden" name="adminId" value="\$adminId">
+                <table class="table table-borderless">
+                    <tr>
+                        <td>\${i18n.t("new_password", lang)}</td>
+                        <td><input type="password" name="password" required autocomplete="new-password"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <button type="submit" class="btn btn-success">\${i18n.t("update", lang)}</button>
+                            <a href="#admin?action=detail&adminId=\$adminId" class="btn btn-secondary">\${i18n.t("cancel", lang)}</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        """.trimIndent()
+    }
+}
+KOTLIN;
+    }
     /**
      * Generates the AuthController class in Kotlin.
      * @return string The Kotlin code for AuthController.kt.
      */
-    private function generateAuthControllerKt() {
+    private function generateAuthController() {
         $package = $this->projectConfig['packageName'];
         return <<<KOTLIN
 package $package.controller.core
 
 import $package.config.Sha1PasswordEncoder
 import $package.controller.dto.LoginResponse
+import $package.util.I18nUtil
 import $package.model.repository.core.AdminRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpSession
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.*
+
 
 @RestController
 class AuthController(
     private val adminRepository: AdminRepository,
     private val passwordEncoder: Sha1PasswordEncoder,
-    @Value("\\\${app.security.require-login}") 
+    private val i18n: I18nUtil,
+    @Value("\\\${app.security.require-login}")
     private val requireLogin: Boolean
 ) {
 
@@ -2022,11 +3380,12 @@ class AuthController(
     fun login(
         @RequestParam username: String,
         @RequestParam password: String,
-        session: HttpSession
+        session: HttpSession,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
     ): ResponseEntity<LoginResponse> {
 
         if (!requireLogin) {
-            return ResponseEntity.ok(LoginResponse(true, "Success"))
+            return ResponseEntity.ok(LoginResponse(true, i18n.t("success", lang)))
         }
 
         val singleHashedPassword = passwordEncoder.sha1(password)
@@ -2037,21 +3396,31 @@ class AuthController(
             if (admin.password == passwordEncoder.encode(password)) {
                 session.setAttribute("username", admin.username!!)
                 session.setAttribute("password", singleHashedPassword)
-                return ResponseEntity.ok(LoginResponse(true, "Login successful"))
+                session.setAttribute("adminId", admin.adminId)
+
+                val authorities = listOf(SimpleGrantedAuthority("ROLE_ADMIN"))
+                val auth = UsernamePasswordAuthenticationToken(admin.username, null, authorities)
+                SecurityContextHolder.getContext().authentication = auth
+
+                return ResponseEntity.ok(LoginResponse(true, i18n.t("login_successful", lang)))
             }
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(LoginResponse(false, "Invalid credentials"))
+            .body(LoginResponse(false, i18n.t("invalid_credentials", lang)))
     }
 
     @RequestMapping(value = ["/logout"], method = [RequestMethod.GET, RequestMethod.POST])
-    fun logout(request: HttpServletRequest): ResponseEntity<LoginResponse> {
+    fun logout(
+        request: HttpServletRequest,
+        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
+    ): ResponseEntity<LoginResponse> {
         if (!requireLogin) {
-            return ResponseEntity.ok(LoginResponse(true, "Success"))
+            return ResponseEntity.ok(LoginResponse(true, i18n.t("success", lang)))
         }
         request.session.invalidate()
-        return ResponseEntity.ok(LoginResponse(true, "Logout successful"))
+        SecurityContextHolder.clearContext()
+        return ResponseEntity.ok(LoginResponse(true, i18n.t("logout_successful", lang)))
     }
 }
 KOTLIN;
@@ -2095,8 +3464,9 @@ KOTLIN;
                 $mappingCode .= "        }\n";
             }
         }
-
+        $columnNames = [];
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
+            $columnNames[] = $colName;
             if ($colName === $tableInfo['primaryKey'] && ($colInfo['isAutoIncrement'] || $colInfo['primaryKeyValue'] == 'autogenerated' || $action == 'update')) {
                 continue;
             }
@@ -2113,22 +3483,22 @@ KOTLIN;
         $hasIpEdit = false;
 
         foreach($this->backendHandledColumns as $key => $col) {
-            if ($action == 'create' && $key == 'timeCreate') {
+            if ($action == 'create' && $key == 'timeCreate' && in_array($col['columnName'], $columnNames)) {
                 $mappingCode .= "        $entityVar.".$this->camelCase($col['columnName'])." = java.time.LocalDateTime.now()\n";
             }
-            if ($action == 'create' && $key == 'adminCreate') {
+            if ($action == 'create' && $key == 'adminCreate' && in_array($col['columnName'], $columnNames)) {
                 $mappingCode .= "        $entityVar.".$this->camelCase($col['columnName'])." = AuditTrailUtil.getUserId()\n";
             }
-            if ($action == 'create' && $key == 'ipCreate') {
+            if ($action == 'create' && $key == 'ipCreate' && in_array($col['columnName'], $columnNames)) {
                 $mappingCode .= "        $entityVar.".$this->camelCase($col['columnName'])." = AuditTrailUtil.getUserIp()\n";
             }
-            if ($key == 'timeEdit') {
+            if ($key == 'timeEdit' && in_array($col['columnName'], $columnNames)) {
                 $hasTimeEdit = true;
             }
-            if ($key == 'adminEdit') {
+            if ($key == 'adminEdit' && in_array($col['columnName'], $columnNames)) {
                 $hasAdminEdit = true;
             }
-            if ($key == 'ipEdit') {
+            if ($key == 'ipEdit' && in_array($col['columnName'], $columnNames)) {
                 $hasIpEdit = true;
             }
         }
@@ -2145,6 +3515,12 @@ KOTLIN;
         if (!$tableInfo['hasActiveColumn']) {
             return "";
         }
+        
+        $columnNames = [];
+
+        foreach ($tableInfo['columns'] as $colName => $colInfo) {
+            $columnNames[] = $colName;
+        }
 
         $camelName = $this->camelCase($tableName);
         $ucCamelName = $this->pascalCase($tableName);
@@ -2156,13 +3532,13 @@ KOTLIN;
         $pkKotlinType = $pkInfo ? $this->mapDbTypeToKotlinType($pkInfo['type'], $pkInfo['length']) : 'String';
 
         $mappingCode = "";
-        if (isset($this->backendHandledColumns['timeEdit'])) {
+        if (isset($this->backendHandledColumns['timeEdit']) && in_array($this->backendHandledColumns['timeEdit']['columnName'], $columnNames)) {
             $mappingCode .= "        entity.".$this->camelCase($this->backendHandledColumns['timeEdit']['columnName'])." = java.time.LocalDateTime.now()\n";
         }
-        if (isset($this->backendHandledColumns['adminEdit'])) {
+        if (isset($this->backendHandledColumns['adminEdit']) && in_array($this->backendHandledColumns['adminEdit']['columnName'], $columnNames)) {
             $mappingCode .= "        entity.".$this->camelCase($this->backendHandledColumns['adminEdit']['columnName'])." = AuditTrailUtil.getUserId()\n";
         }
-        if (isset($this->backendHandledColumns['ipEdit'])) {
+        if (isset($this->backendHandledColumns['ipEdit']) && in_array($this->backendHandledColumns['ipEdit']['columnName'], $columnNames)) {
             $mappingCode .= "        entity.".$this->camelCase($this->backendHandledColumns['ipEdit']['columnName'])." = AuditTrailUtil.getUserIp()\n";
         }
 
@@ -2170,9 +3546,14 @@ KOTLIN;
 
     @MutationMapping
     @Transactional
-    fun toggle{$ucCamelName}Active(@Argument id: $pkKotlinType, @Argument(name = "$activeField") $activeField: Boolean): $ucCamelName {
+    fun toggle{$ucCamelName}Active(
+        @Argument id: $pkKotlinType, 
+        @Argument(name = "$activeField") $activeField: Boolean,
+        request: ServerHttpRequest
+    ): $ucCamelName {
+        val lang = request.headers.getFirst("X-Language-Id")
         val entity = {$camelName}Repository.findById(id)
-                .orElseThrow { RuntimeException("{$ucCamelName} not found with id \$id") }
+                .orElseThrow { RuntimeException(i18n.t("no_item_found_with_id", lang, "$tableName", id)) }
         entity.$camelActiveField = $activeField
 $mappingCode
         return {$camelName}Repository.save(entity)

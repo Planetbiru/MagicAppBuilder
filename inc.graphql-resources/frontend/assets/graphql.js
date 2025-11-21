@@ -1188,8 +1188,13 @@ class GraphQLClientApp {
                 orderBy: orderByForQuery,
                 filter: filterForQuery,
             });
-            const data = queryResult.data;
-            const result = data[this.currentEntity.pluralName];
+            let result = {};
+            if(queryResult && queryResult.data)
+            {
+                const data = queryResult && queryResult.data ? queryResult.data : {};
+                result = data && data[this.currentEntity.pluralName] ? data[this.currentEntity.pluralName] : {};
+            }
+
             if(result && result.items && result.items.length > 0)
             {
                 this.renderTable(result.items); // Renders into tableDataContainer

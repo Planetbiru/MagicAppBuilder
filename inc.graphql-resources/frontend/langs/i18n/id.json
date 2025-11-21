@@ -26,6 +26,7 @@
     "edit_entity": "Ubah {0}",
     "add_new_entity": "Tambah {0} Baru",
     "no_items_found": "Tidak ada data.",
+    "no_item_found_with_id": "Tidak ada item {0} dengan ID {1}",
     "actions": "Aksi",
     "view": "Lihat",
     "edit": "Ubah",
