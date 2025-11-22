@@ -456,6 +456,16 @@ func playgroundHandler() gin.HandlerFunc {
 GO;
     }
 
+    private function goName($name)
+    {
+        $name = $this->pascalCase($name);
+        if(PicoStringUtil::endsWith($name, 'Id'))
+        {
+            $name = substr($name, 0, strlen($name) - 2).'ID';
+        }
+        return $name;
+    }
+
     /**
      * Generates a model file (struct) for a given table.
      *
@@ -471,7 +481,7 @@ GO;
 
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             $goType = $this->mapDbTypeToGoType($colInfo['type'], $colInfo['length']);
-            $fieldName = $this->pascalCase($colName);
+            $fieldName = $this->goName($colName);
             $jsonTag = $this->camelCase($colName);
 
             if (strpos($goType, 'time.Time') !== false) {
@@ -539,7 +549,7 @@ GO;
                 $goType = $this->mapDbTypeToGoType($colInfo['type'], $colInfo['length']);
                 // For inputs, use pointers to distinguish between zero values and omitted fields
                 $goType = "*" . $goType;
-                $fieldName = $this->pascalCase($colName);
+                $fieldName = $this->goName($colName);
                 $jsonTag = $this->camelCase($colName);
                 $inputFields .= "    $fieldName $goType `json:\"$jsonTag\"`\n";
             }
@@ -641,7 +651,7 @@ GO;
 
             // Get One Query
             $queryFuncs .= <<<GO
-func (r *queryResolver) {$pascalName}(ctx context.Context, id {$pkGoType}) (*model.{$pascalName}, error) {
+func (r *QueryResolver) {$pascalName}(ctx context.Context, id {$pkGoType}) (*model.{$pascalName}, error) {
 	var result model.{$pascalName}
 	if err := r.DB.First(&result, "{$tableInfo['primaryKey']} = ?", id).Error; err != nil {
 		return nil, err
@@ -652,7 +662,7 @@ func (r *queryResolver) {$pascalName}(ctx context.Context, id {$pkGoType}) (*mod
 GO;
             // Get List Query
             $queryFuncs .= <<<GO
-func (r *queryResolver) {$pluralCamelName}(ctx context.Context, limit *int, offset *int, page *int, orderBy []*model.SortInput, filter []*model.FilterInput) (*model.{$pascalName}Page, error) {
+func (r *QueryResolver) {$pluralCamelName}(ctx context.Context, limit *int, offset *int, page *int, orderBy []*model.SortInput, filter []*model.FilterInput) (*model.{$pascalName}Page, error) {
 	var items []*model.{$pascalName}
 	var total int64
 
@@ -712,13 +722,13 @@ import (
 )
 
 // Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+func (r *Resolver) Mutation() generated.MutationResolver { return &MutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+func (r *Resolver) Query() generated.QueryResolver { return &QueryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type MutationResolver struct{ *Resolver }
+type QueryResolver struct{ *Resolver }
 
 $mutationFuncs
 $queryFuncs
@@ -760,7 +770,7 @@ GO;
         }
 
         return <<<GO
-func (r *mutationResolver) Create{$pascalName}(ctx context.Context, input model.{$inputName}) (*model.{$pascalName}, error) {
+func (r *MutationResolver) Create{$pascalName}(ctx context.Context, input model.{$inputName}) (*model.{$pascalName}, error) {
 $pkValidation
 	newRecord := model.{$pascalName}{}
 
@@ -797,7 +807,7 @@ GO;
         }
 
         return <<<GO
-func (r *mutationResolver) Update{$pascalName}(ctx context.Context, id {$pkGoType}, input model.{$inputName}) (*model.{$pascalName}, error) {
+func (r *MutationResolver) Update{$pascalName}(ctx context.Context, id {$pkGoType}, input model.{$inputName}) (*model.{$pascalName}, error) {
 	var existingRecord model.{$pascalName}
 	if err := r.DB.First(&existingRecord, "{$pkColName} = ?", id).Error; err != nil {
 		return nil, fmt.Errorf("{$pascalName} with id %v not found", id)
@@ -835,7 +845,7 @@ GO;
         }
 
         return <<<GO
-func (r *mutationResolver) Delete{$pascalName}(ctx context.Context, id {$pkGoType}) (bool, error) {
+func (r *MutationResolver) Delete{$pascalName}(ctx context.Context, id {$pkGoType}) (bool, error) {
 	if err := r.DB.Delete(&model.{$pascalName}{}, "{$pkColName} = ?", id).Error; err != nil {
 		return false, err
 	}
@@ -1317,7 +1327,7 @@ func ApplyFilter(db *gorm.DB, filter model.FilterInput) *gorm.DB {
 			op = " <> ?"
 		case "CONTAINS":
 			op = " LIKE ?"
-			val = fmt.Sprintf("%%%s%%", *filter.Value)
+			val = fmt.Sprintf("%%%s%%", filter.Value)
 		case "GREATER_THAN":
 			op = " > ?"
 		case "GREATER_THAN_OR_EQUALS":
@@ -1328,10 +1338,10 @@ func ApplyFilter(db *gorm.DB, filter model.FilterInput) *gorm.DB {
 			op = " <= ?"
 		case "IN":
 			op = " IN (?)"
-			val = strings.Split(*filter.Value, ",")
+			val = strings.Split(fmt.Sprintf("%v", filter.Value), ",")
 		case "NOT_IN":
 			op = " NOT IN (?)"
-			val = strings.Split(*filter.Value, ",")
+			val = strings.Split(fmt.Sprintf("%v", filter.Value), ",")
 		}
 	}
 	return db.Where(ToSnakeCase(filter.Field)+op, val)
