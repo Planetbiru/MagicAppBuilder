@@ -150,6 +150,7 @@ class EntityEditor {
         this.graphqlAppData = {
             custom: true,
             system: false,
+            inMemoryCache: false,
             entities: [],
             entitySelector: []
         }
@@ -2433,6 +2434,35 @@ class EntityEditor {
         }
     }
 
+    inMemoryCacheChange(element)
+    {
+
+    }
+
+    /**
+     * Returns the base column name by removing the "_id" suffix if present.
+     *
+     * @param {string} name - The original column name.
+     * @returns {string} The base name without the "_id" suffix, or an empty string if the input is falsy.
+     *
+     * @example
+     * baseColumnName('user_id'); // "user"
+     * baseColumnName('email');   // "email"
+     * baseColumnName(null);      // ""
+     */
+    baseColumnName(name)
+    {
+        if(!name)
+        {
+            return '';
+        }
+        if(name.endsWith('_id'))
+        {
+            return name.substring(0, name.length - 3);
+        }
+        return name;
+    }
+
     /**
      * Gathers all entities and their selected columns from the UI, typically from a modal
      * for schema generation. It clones the selected entities and filters their columns
@@ -2499,12 +2529,22 @@ class EntityEditor {
                             if(filterVal != '')
                             {
                                 // { "name": "nama", "type": "string", "operator": "CONTAINS", "element": "text" }
-                                filters.push({
+                                let filter = {
                                     "name": col.name,
                                     "type": 'string',
                                     "operator": filterVal.indexOf('CONTAINS') !== -1 ? 'CONTAINS' : 'EQUALS',
                                     "element": filterVal.indexOf('select') !== -1 ? 'select' : 'text'
-                                })
+                                };
+                                let rel = _this.baseColumnName(filter.name);
+                                if(filter.element == 'select' && selected.includes(rel))
+                                {
+                                    filter.entity = rel;
+                                }
+                                else
+                                {
+                                    null;
+                                }
+                                filters.push(filter)
                             }
                             let textareaCheckbox = entitySelector.querySelector(`input.textarea-graphql[data-col="${col.name}"]`);
                             if(textareaCheckbox && textareaCheckbox.checked)
@@ -2517,6 +2557,7 @@ class EntityEditor {
                         {
                             newEntity.filters = filters;
                         }
+                        newEntity.filterEntities = filters.length == 0 ? 0 : newEntity.filters.filter(f=>f.entity != null).length;
                         if(textareas.length > 0)
                         {
                             newEntity.textareaColumns = textareas;
@@ -2569,7 +2610,7 @@ class EntityEditor {
      * @param {Object} request An object containing the entities to be included in the GraphQL schema.
      */
     exportGraphQLSchema(request) {
-        // send to server for processing
+        const programmingLanguage = request.programmingLanguage || 'php';
         fetch('../lib.ajax/graphql-generator.php', {
             method: 'POST',
             headers: {
@@ -2577,20 +2618,29 @@ class EntityEditor {
             },
             body: JSON.stringify(request)
         })
-        .then(response => response.blob())
-        .then(blob => {
-            // Create a link to download the file
-            let { applicationId} = getMetaValues();
-
-            if(applicationId == '')
-            {
-                applicationId = 'app';
+        .then(async response => {
+            // Try to extract filename from Content-Disposition
+            let filename = null;
+            const disposition = response.headers.get('Content-Disposition');
+            if (disposition && disposition.includes('filename=')) {
+                const match = disposition.match(/filename\*?=(?:UTF-8''|["']?)([^"';\n]+)/i);
+                if (match && match[1]) {
+                    filename = decodeURIComponent(match[1]);
+                }
             }
 
+            // Fallback filename
+            if (!filename) {
+                let { applicationId } = getMetaValues();
+                if (!applicationId) applicationId = 'app';
+                filename = `${applicationId}-graphql-${programmingLanguage}.zip`;
+            }
+
+            const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${applicationId}-graphql.zip`;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -2600,6 +2650,7 @@ class EntityEditor {
             console.error('Error generating GraphQL schema:', error);
         });
     }
+
 
     /**
      * Handles the confirmation action in the GraphQL generator modal.
@@ -2613,7 +2664,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": false,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2630,7 +2683,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": true,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2825,9 +2880,10 @@ class EntityEditor {
             tr.dataset.col = col.name;
 
             let ta = '';
+            let taChecked = col.type.toLowerCase().indexOf('text') != -1 ? ' checked' : '';
             if(!col.primaryKey && !col.name.endsWith('_id'))
             {
-                ta = `<input type="checkbox" class="textarea-graphql" data-col="${col.name}">`;
+                ta = `<input type="checkbox" class="textarea-graphql" data-col="${col.name}"${taChecked}>`;
             }
 
             tr.innerHTML = `

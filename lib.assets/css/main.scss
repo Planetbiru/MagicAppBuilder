@@ -1786,4 +1786,16 @@ table.table.table-enum
   left: 0;
   right: 0;
   z-index: 2041;
+  .btn {
+	margin-top: auto;
+	margin-bottom: 0;
+  }
 }
+
+.card-reserved-columns .card-body {
+  max-height: calc(100vh - 360px);
+  display: block;
+  min-height: 200px;
+  overflow: auto;
+}
+

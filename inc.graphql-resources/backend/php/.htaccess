@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Block access to the vendor directory
+  RewriteRule ^vendor/ - [F,L]
+</IfModule>
+
+# Block access to sensitive files
+<FilesMatch "^(composer\.json|composer\.lock)$">
+    Require all denied
+</FilesMatch>
