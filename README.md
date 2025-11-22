@@ -538,8 +538,12 @@ composer dump-autoload --ignore-platform-reqs
 | Monolith Application       | Yes       | Yes       |
 | Export Project             | Yes       | Yes       |
 | Import Project             | Yes       | Yes       |
-| Micro-Services Application | No        | Yes       |
 | Data Restoration           | No        | Yes       |
+| PHP GraphQL App            | Yes       | Yes       |
+| Java GraphQL App           | No        | Yes       |
+| Kotlin GraphQL App         | No        | Yes       |
+| Node.js GraphQL App        | No        | Yes       |
+| Python GraphQL App         | No        | Yes       |
 
 ## Browser Support
 

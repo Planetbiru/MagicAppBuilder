@@ -225,7 +225,7 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
 
             // Detail Query
             $code .= "        // Query for a single " . $tableName . "\r\n";
-            $code .= "        '" . $camelName . "' => [\r\n";
+            $code .= "        '" . $camelName . "' => array(\r\n";
             $code .= "            'type' => \$" . $typeName . ",\r\n";
             $code .= "            'args' => array(\r\n";
             $code .= "                'id' => Type::nonNull(Type::string()),\r\n";
@@ -255,11 +255,11 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
             }
             
             $code .= "            },\r\n";
-            $code .= "        ],\r\n\r\n";
+            $code .= "        ),\r\n\r\n";
 
             // List Query with Filter and Pagination
             $code .= "        // Query for a list of " . $tableName . "s\r\n";
-            $code .= "        '" . $pluralCamelName . "' => [\r\n";
+            $code .= "        '" . $pluralCamelName . "' => array(\r\n";
             $code .= "            'type' => \$" . $pageTypeName . ",\r\n";
             $code .= "            'args' => array(\r\n";
             $code .= "                'limit' => Type::int(),\r\n";
@@ -376,7 +376,7 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
             $code .= "                    'items' => \$items,\r\n";
             $code .= "                );\r\n";
             $code .= "            },\r\n";
-            $code .= "        ],\r\n\r\n";
+            $code .= "        ),\r\n\r\n";
         }
 
         $code = rtrim($code, ",\r\n\r\n") . "\r\n";
