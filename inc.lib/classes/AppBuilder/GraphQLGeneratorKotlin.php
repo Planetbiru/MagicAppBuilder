@@ -1,7 +1,6 @@
 <?php
 
 namespace AppBuilder;
-use MagicObject\Util\PicoStringUtil;
 
 /**
  * The `GraphQLGeneratorKotlin` class is a powerful tool designed to automatically generate a complete Spring Boot GraphQL API in Kotlin from a JSON file that defines database entities.
@@ -203,6 +202,37 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
             $manualContent .= "```\r\n\r\n";
         }
 
+        // --- API Reference Guide ---
+        $manualContent .= "## API Reference Guide\r\n\r\n";
+        $manualContent .= "This section provides a reference for common arguments used in list queries.\r\n\r\n";
+
+        // Filtering
+        $manualContent .= "### Filtering (`filter`)\r\n\r\n";
+        $manualContent .= "The `filter` argument allows you to narrow down results based on field values. It accepts a list of filter objects, which are combined with `AND` logic.\r\n\r\n";
+        $manualContent .= "| Operator       | Description                                      | Example                                                |\r\n";
+        $manualContent .= "|----------------|--------------------------------------------------|--------------------------------------------------------|\r\n";
+        $manualContent .= "| `EQUALS`       | Finds records where the field exactly matches the value. | `{field: \"status\", value: \"published\"}`                |\r\n";
+        $manualContent .= "| `NOT_EQUALS`   | Finds records where the field does not match the value. | `{field: \"status\", value: \"archived\", operator: NOT_EQUALS}` |\r\n";
+        $manualContent .= "| `CONTAINS`     | Finds records where the text field contains the value (`LIKE '%value%'`). | `{field: \"title\", value: \"love\", operator: CONTAINS}` |\r\n";
+        $manualContent .= "| `GREATER_THAN_OR_EQUALS` | Finds records where the numeric/date field is greater than or equal to the value. | `{field: \"price\", value: \"99.99\", operator: GREATER_THAN_OR_EQUALS}` |\r\n";
+        $manualContent .= "| `GREATER_THAN` | Finds records where the numeric/date field is greater than the value. | `{field: \"price\", value: \"100\", operator: GREATER_THAN}` |\r\n";
+        $manualContent .= "| `LESS_THAN_OR_EQUALS`    | Finds records where the numeric/date field is less than or equal to the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN_OR_EQUALS}`   |\r\n";
+        $manualContent .= "| `LESS_THAN`    | Finds records where the numeric/date field is less than the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN}`   |\r\n";
+        $manualContent .= "| `IN` / `NOT_IN` | Finds records where the field value is in (or not in) a comma-separated list of values. | `{field: \"category_id\", value: \"1,2,3\", operator: IN}` |\r\n\r\n";
+
+        // Sorting
+        $manualContent .= "### Sorting (`orderBy`)\r\n\r\n";
+        $manualContent .= "The `orderBy` argument sorts the results. It accepts a list of sort objects.\r\n\r\n";
+        $manualContent .= "- `field`: The name of the field to sort by (e.g., `\"name\"`).\r\n";
+        $manualContent .= "- `direction`: The sort direction. Can be `ASC` (ascending) or `DESC` (descending). Defaults to `ASC`.\r\n\r\n";
+        $manualContent .= "**Example:** `orderBy: [{field: \"release_date\", direction: DESC}]`\r\n\r\n";
+
+        // Pagination
+        $manualContent .= "### Pagination (`limit` & `offset`)\r\n\r\n";
+        $manualContent .= "- `limit`: Specifies the maximum number of records to return.\r\n";
+        $manualContent .= "- `offset`: Specifies the number of records to skip from the beginning.\r\n\r\n";
+        $manualContent .= "**Example:** To get the second page of 10 items: `limit: 10, offset: 10`\r\n\r\n";
+
         return $manualContent;
     }
     
@@ -252,55 +282,6 @@ distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-mav
         $staticFiles = $this->generateStaticFiles($files, $packagePath);
         return array_merge($files, $staticFiles);
 
-        /*
-        
-        // 4. Utility and DTO classes (converted to Kotlin)
-        // Note: The original Java generator has many utility classes. Each needs a Kotlin equivalent.
-        // For brevity, I'm showing the conversion pattern with a few key files.
-        $files[] = ['name' => $packagePath . '/model/dto/core/FilterInput.kt', 'content' => $this->generateFilterInputDtoKt()];
-        $files[] = ['name' => $packagePath . '/model/dto/core/SortInput.kt', 'content' => $this->generateSortInputDtoKt()];
-        $files[] = ['name' => $packagePath . '/util/SpecificationBuilder.kt', 'content' => $this->generateSpecificationBuilderKt()];
-        $files[] = ['name' => $packagePath . '/util/FilterCriteria.kt', 'content' => $this->generateFilterCriteriaKt()];
-        $files[] = ['name' => $packagePath . '/util/SearchOperation.kt', 'content' => $this->generateSearchOperationKt()];
-        $files[] = ['name' => $packagePath . '/util/GenericSpecification.kt', 'content' => $this->generateGenericSpecificationKt()];
-        $files[] = ['name' => $packagePath . '/util/QueryUtil.kt', 'content' => $this->generateQueryUtilKt()];
-        $files[] = ['name' => $packagePath . '/util/AuditTrailUtil.kt', 'content' => $this->generateAuditTrailUtilKt()];
-        $files[] = ['name' => $packagePath . '/util/ValueUtil.kt', 'content' => $this->generateValueUtilKt()];
-        $files[] = ['name' => $packagePath . '/util/ScalarValueUtil.kt', 'content' => $this->generateScalarValueUtilKt()];
-
-        // 6. Security and Auth files (converted to Kotlin)
-        $files[] = ['name' => $packagePath . '/config/SecurityConfig.kt', 'content' => $this->generateSecurityConfigKt()];
-        $files[] = ['name' => $packagePath . '/config/CorsConfig.kt', 'content' => $this->generateCorsConfigKt()];
-        $files[] = ['name' => $packagePath . '/config/Sha1PasswordEncoder.kt', 'content' => $this->generateSha1PasswordEncoderKt()];
-        $files[] = ['name' => $packagePath . '/config/ObjectScalar.kt', 'content' => $this->generateObjectScalarKt()];
-        $files[] = ['name' => $packagePath . '/config/GraphQlConfig.kt', 'content' => $this->generateGraphQlConfigKt()];
-        
-        $files[] = ['name' => $packagePath . '/model/entity/core/Admin.kt', 'content' => $this->generateAdminEntityKt()];
-        $files[] = ['name' => $packagePath . '/model/entity/core/AdminLevel.kt', 'content' => $this->generateAdminLevelEntityKt()];
-        $files[] = ['name' => $packagePath . '/model/entity/core/Message.kt', 'content' => $this->generateMessageEntityKt()];
-        $files[] = ['name' => $packagePath . '/model/entity/core/MessageFolder.kt', 'content' => $this->generateMessageFolderEntityKt()];
-        $files[] = ['name' => $packagePath . '/model/entity/core/Notification.kt', 'content' => $this->generateNotificationEntityKt()];
-        
-        $files[] = ['name' => $packagePath . '/model/repository/core/AdminLevelRepository.kt', 'content' => $this->generateAdminLevelRepositoryKt()];
-        $files[] = ['name' => $packagePath . '/model/repository/core/AdminRepository.kt', 'content' => $this->generateAdminRepositoryKt()];
-        $files[] = ['name' => $packagePath . '/model/repository/core/MessageFolderRepository.kt', 'content' => $this->generateMessageFolderRepositoryKt()];
-        $files[] = ['name' => $packagePath . '/model/repository/core/MessageRepository.kt', 'content' => $this->generateMessageRepositoryKt()];
-        $files[] = ['name' => $packagePath . '/model/repository/core/NotificationRepository.kt', 'content' => $this->generateNotificationRepositoryKt()];
-
-        $files[] = ['name' => $packagePath . '/service/JpaUserDetailsService.kt', 'content' => $this->generateUserDetailsServiceKt()];
-        $files[] = ['name' => $packagePath . '/controller/dto/LoginRequest.kt', 'content' => $this->generateLoginRequestDtoKt()];
-        $files[] = ['name' => $packagePath . '/controller/dto/LoginResponse.kt', 'content' => $this->generateLoginResponseDtoKt()];
-
-        $files[] = ['name' => $packagePath . '/controller/core/AdminController.kt', 'content' => $this->generateAdminController()];
-        $files[] = ['name' => $packagePath . '/controller/core/AuthController.kt', 'content' => $this->generateAuthController()];        
-        $files[] = ['name' => $packagePath . '/controller/core/FrontendConfigController.kt', 'content' => $this->generateFrontendConfigController()];
-        $files[] = ['name' => $packagePath . '/controller/core/MessageController.kt', 'content' => $this->generateMessageController()];
-        $files[] = ['name' => $packagePath . '/controller/core/NotificationController.kt', 'content' => $this->generateNotificationController()];
-        $files[] = ['name' => $packagePath . '/controller/core/UserProfileController.kt', 'content' => $this->generateUserProfileController()];
-        
-
-        return $files;
-        */
     }
 
     private function generateStaticFiles($files, $packagePath)
@@ -453,7 +434,20 @@ distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-mav
         return $content;
     }
 
-
+    /**
+     * Generates the content of the Maven Wrapper script (`mvnw`) for Unix-based systems.
+     *
+     * This method returns the full shell script required to bootstrap the Maven Wrapper.
+     * The generated script includes:
+     * - License information and header comments
+     * - Environment variable handling (JAVA_HOME, MVNW_REPOURL, MVNW_VERBOSE, etc.)
+     * - Automatic download of the correct Maven distribution if it is not already installed
+     * - Support for checksum validation
+     * - Extraction and setup of the Maven distribution
+     * - Execution of the Maven command with passed arguments
+     *
+     * @return string The complete Maven Wrapper shell script.
+     */
     private function generateMvnw()
     {
         return <<<CMD
@@ -755,6 +749,31 @@ exec_maven "\$@"
 CMD;
     }
 
+    /**
+     * Generates the contents of the Maven `pom.xml` file for the generated project.
+     *
+     * This method builds and returns a complete POM definition configured for:
+     * - Spring Boot 3.2.x using the official starter parent
+     * - Kotlin (including stdlib, reflect, and compiler plugins)
+     * - GraphQL, JPA, Validation, Web, Security, Redis, and Session modules
+     * - Multiple database drivers (MySQL, MariaDB, PostgreSQL, SQL Server, SQLite)
+     * - Spring Boot testing dependencies for JUnit, WebFlux, GraphQL, and Security
+     *
+     * The generated POM also:
+     * - Sets Java version to 21
+     * - Sets Kotlin version to 1.9.23
+     * - Defines `src/main/kotlin` and `src/test/kotlin` as the source directories
+     * - Configures the Kotlin Maven plugin with:
+     *      - strict nullability (`-Xjsr305=strict`)
+     *      - all-open plugin (Spring annotations made open)
+     *      - no-arg plugin (JPA entities)
+     *
+     * The returned XML string is intended to be written directly as
+     * `pom.xml` in the root of the generated project directory.
+     *
+     * @return string
+     *         The full Maven POM XML content.
+     */
     private function generatePom()
     {
         $package = $this->projectConfig['packageName'];
@@ -932,6 +951,27 @@ CMD;
 POM;
     }
 
+    /**
+     * Generates the full contents of the Windows Maven Wrapper script (`mvnw.cmd`).
+     *
+     * This method returns a large heredoc string representing the official
+     * Apache Maven Wrapper batch script, including both the Batch and PowerShell
+     * portions required for bootstrapping Maven on Windows systems.
+     *
+     * The generated script:
+     * - Reads Maven Wrapper configuration from `.mvn/wrapper/maven-wrapper.properties`
+     * - Supports MVND (Maven Daemon) when applicable
+     * - Downloads the required Maven distribution automatically if not available
+     * - Validates SHA-256 checksums when configured
+     * - Extracts and installs the Maven distribution into the user’s `~/.m2` directory
+     * - Outputs the correct command path (`MVN_CMD`) for execution
+     *
+     * The script is returned verbatim and is intended to be written directly to
+     * a file named `mvnw.cmd` in a generated project structure.
+     *
+     * @return string
+     *         The full contents of the Windows Maven Wrapper script.
+     */
     private function generateMvnwCmd()
     {
         return <<<CMD
@@ -1396,7 +1436,6 @@ KOTLIN;
         $imports .= "import $packageName.model.entity.$className\n";
 
         $modifying = "";
-        $findByIdMethod = "";
 
         $pkInfo = $this->findPrimaryKeyInfo($tableInfo);
         if ($pkInfo) {
@@ -1783,1656 +1822,6 @@ GQL;
     }
 
     /**
-     * Generates the FilterInput DTO class in Kotlin.
-     * @return string The Kotlin code for FilterInput.kt.
-     */
-    private function generateFilterInputDtoKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.model.dto
-
-data class FilterInput(
-    val field: String,
-    val value: Any?,
-    val operator: String?
-)
-KOTLIN;
-    }
-
-    /**
-     * Generates the SortInput DTO class in Kotlin.
-     * @return string The Kotlin code for SortInput.kt.
-     */
-    private function generateSortInputDtoKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.model.dto
-
-data class SortInput(
-    val field: String,
-    val direction: String? = "ASC"
-)
-KOTLIN;
-    }
-
-    /**
-     * Generates the QueryUtil object in Kotlin.
-     *
-     * @return string The Kotlin code for QueryUtil.kt.
-     */
-    private function generateQueryUtilKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-import $package.model.dto.core.FilterInput
-import $package.model.dto.core.SortInput
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.domain.Specification
-
-object QueryUtil {
-
-    fun createPageable(limit: Int?, offset: Int?, page: Int?, size: Int?, orderBy: List<SortInput>?): Pageable {
-        val pageSize = limit ?: size ?: 20
-        val pageNum = when {
-            offset != null && pageSize > 0 -> offset / pageSize
-            page != null -> if (page > 0) page - 1 else 0
-            else -> 0
-        }
-
-        val sort = orderBy?.map {
-            Sort.Order(Sort.Direction.fromString(it.direction ?: "ASC"), it.field)
-        }?.let { Sort.by(it) } ?: Sort.unsorted()
-
-        return PageRequest.of(pageNum, pageSize, sort)
-    }
-
-    fun <T> createPageResultMap(resultPage: Page<T>): Map<String, Any> {
-        return mapOf(
-            "items" to resultPage.content,
-            "total" to resultPage.totalElements,
-            "limit" to resultPage.size,
-            "page" to resultPage.number + 1,
-            "totalPages" to resultPage.totalPages,
-            "hasNext" to resultPage.hasNext(),
-            "hasPrevious" to resultPage.hasPrevious()
-        )
-    }
-
-    fun <T> createSpecification(filter: List<FilterInput>?): Specification<T> {
-        if (filter.isNullOrEmpty()) {
-            return Specification.where(null)
-        }
-        val builder = SpecificationBuilder<T>()
-        filter.forEach { f ->
-            f.value?.let { builder.with(f.field, SearchOperation.valueOf(f.operator?.uppercase() ?: "EQUALS"), it) }
-        }
-        return builder.build() ?: Specification.where(null)
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the SecurityConfig class for application security in Kotlin.
-     *
-     * @return string The Kotlin code for SecurityConfig.kt.
-     */
-    private function generateSecurityConfigKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.config
-
-import $package.service.JpaUserDetailsService
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.invoke
-import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession
-
-@Configuration
-@EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
-class SecurityConfig(
-    private val jpaUserDetailsService: JpaUserDetailsService,
-) {
-
-    @Value("\\\${app.security.require-login}")
-    private val requireLogin: Boolean = true
-
-    @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-
-        http {
-            csrf {
-                ignoringRequestMatchers(
-                    AntPathRequestMatcher("/login"),
-                    AntPathRequestMatcher("/logout"),
-                    AntPathRequestMatcher("/graphql/**")
-                )
-            }
-
-            authorizeHttpRequests {
-
-                if (requireLogin) {
-
-                    // daftar endpoint publik (dipanggil satu-satu)
-                    authorize(AntPathRequestMatcher("/login"), permitAll)
-                    authorize(AntPathRequestMatcher("/logout"), permitAll)
-                    authorize(AntPathRequestMatcher("/graphiql/**"), permitAll)
-                    authorize(AntPathRequestMatcher("/vendor/**"), permitAll)
-                    authorize(AntPathRequestMatcher("/index.html"), permitAll)
-                    authorize(AntPathRequestMatcher("/"), permitAll)
-                    authorize(AntPathRequestMatcher("/*.js"), permitAll)
-                    authorize(AntPathRequestMatcher("/*.css"), permitAll)
-                    authorize(AntPathRequestMatcher("/*.ico"), permitAll)
-                    authorize(AntPathRequestMatcher("/assets/**"), permitAll)
-                    authorize(AntPathRequestMatcher("/langs/**"), permitAll)
-
-                    // selain itu wajib login
-                    authorize(anyRequest, authenticated)
-
-                } else {
-                    authorize(anyRequest, permitAll)
-                }
-            }
-        }
-
-        return http.build()
-    }
-
-    @Configuration
-    @ConditionalOnProperty(value = ["spring.session.store-type"], havingValue = "redis")
-    @EnableRedisHttpSession
-    class RedisSessionConfig
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the CorsConfig class for CORS configuration in Kotlin.
-     * @return string The Kotlin code for CorsConfig.kt.
-     */
-    private function generateCorsConfigKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.config
-
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-
-@Configuration
-class CorsConfig(
-    @Value("\\\${app.cors.origins}") private val origins: String
-) {
-    @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                    .allowedOrigins(*origins.split(",").map { it.trim() }.toTypedArray())
-                    .allowedMethods("*")
-            }
-        }
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the Sha1PasswordEncoder class in Kotlin.
-     * @return string The Kotlin code for Sha1PasswordEncoder.kt.
-     */
-    private function generateSha1PasswordEncoderKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.config
-
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.stereotype.Component
-import java.math.BigInteger
-import java.security.MessageDigest
-
-@Component
-class Sha1PasswordEncoder : PasswordEncoder {
-
-    override fun encode(rawPassword: CharSequence): String {
-        return sha1(sha1(rawPassword.toString()))
-    }
-
-    override fun matches(rawPassword: CharSequence, encodedPassword: String): Boolean {
-        return encodedPassword == encode(rawPassword)
-    }
-
-    fun sha1(input: String): String {
-        val md = MessageDigest.getInstance("SHA-1")
-        val messageDigest = md.digest(input.toByteArray())
-        val no = BigInteger(1, messageDigest)
-        var hashtext = no.toString(16)
-        while (hashtext.length < 40) {
-            hashtext = "0\$hashtext"
-        }
-        return hashtext
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the JpaUserDetailsService class in Kotlin.
-     * @return string The Kotlin code for JpaUserDetailsService.kt.
-     */
-    private function generateUserDetailsServiceKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.service
-
-import $package.model.repository.core.AdminRepository
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.stereotype.Service
-
-@Service
-class JpaUserDetailsService(private val adminRepository: AdminRepository) : UserDetailsService {
-
-    override fun loadUserByUsername(username: String): UserDetails {
-        val admin = adminRepository.findByUsername(username)
-            .orElseThrow { UsernameNotFoundException("Username not found: \$username") }
-
-        return User.withUsername(admin.username!!)
-            .password(admin.password!!)
-            .authorities("USER").build()
-    }
-}
-KOTLIN;
-    }
-
-    private function generateNotificationEntityKt()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package com.planetbiru.graphqlapplication.model.entity.core
-
-import jakarta.persistence.*
-import java.time.LocalDateTime
-
-@Entity
-@Table(name = "notification")
-data class Notification(
-    @Id
-    @Column(name = "notification_id", nullable = false, length = 40)
-    var notificationId: String,
-
-    @Column(name = "notification_type", length = 40)
-    var notificationType: String? = null,
-
-    @Column(name = "admin_group", length = 40)
-    var adminGroup: String? = null,
-
-    @Column(name = "admin_id", length = 40, insertable = false, updatable = false)
-    var adminId: String? = null,
-
-    @Column(name = "icon", length = 40)
-    var icon: String? = null,
-
-    @Column(name = "subject", length = 255)
-    var subject: String? = null,
-
-    @Lob
-    @Column(name = "content")
-    var content: String? = null,
-
-    @Lob
-    @Column(name = "link")
-    var link: String? = null,
-
-    @Column(name = "is_read")
-    var isRead: Boolean = false,
-
-    @Column(name = "time_create")
-    var timeCreate: LocalDateTime? = null,
-
-    @Column(name = "ip_create", length = 50)
-    var ipCreate: String? = null,
-
-    @Column(name = "time_read")
-    var timeRead: LocalDateTime? = null,
-
-    @Column(name = "ip_read", length = 50)
-    var ipRead: String? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", referencedColumnName = "admin_id")
-    val admin: Admin? = null
-)
-KOTLIN;
-    }
-
-    private function generateMessageFolderEntityKt()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package com.planetbiru.graphqlapplication.model.entity.core
-
-import jakarta.persistence.*
-import java.time.LocalDateTime
-
-@Entity
-@Table(name = "message_folder")
-data class MessageFolder(
-    @Id
-    @Column(name = "message_folder_id", nullable = false, length = 40)
-    var messageFolderId: String,
-
-    @Column(name = "name", length = 100)
-    var name: String? = null,
-
-    @Column(name = "admin_id", length = 40)
-    var adminId: String? = null,
-
-    @Column(name = "sort_order")
-    var sortOrder: Int? = null,
-
-    @Column(name = "time_create")
-    var timeCreate: LocalDateTime? = null,
-
-    @Column(name = "time_edit")
-    var timeEdit: LocalDateTime? = null,
-
-    @Column(name = "admin_create", length = 40)
-    var adminCreate: String? = null,
-
-    @Column(name = "admin_edit", length = 40)
-    var adminEdit: String? = null,
-
-    @Column(name = "ip_create", length = 50)
-    var ipCreate: String? = null,
-
-    @Column(name = "ip_edit", length = 50)
-    var ipEdit: String? = null,
-
-    @Column(name = "active")
-    var active: Boolean? = true,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", referencedColumnName = "admin_id", insertable = false, updatable = false)
-    val admin: Admin? = null
-)
-KOTLIN;
-    }
-
-    private function generateMessageEntityKt()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package com.planetbiru.graphqlapplication.model.entity.core
-
-import jakarta.persistence.*
-import java.time.LocalDateTime
-
-@Entity
-@Table(name = "message")
-data class Message(
-    @Id
-    @Column(name = "message_id", nullable = false, length = 40)
-    var messageId: String,
-
-    @Column(name = "message_direction", length = 40)
-    var messageDirection: String? = null,
-
-    @Column(name = "sender_id", length = 40, insertable = false, updatable = false)
-    var senderId: String? = null,
-
-    @Column(name = "receiver_id", length = 40, insertable = false, updatable = false)
-    var receiverId: String? = null,
-
-    @Column(name = "message_folder_id", length = 40, insertable = false, updatable = false)
-    var messageFolderId: String? = null,
-
-    @Column(name = "icon", length = 40)
-    var icon: String? = null,
-
-    @Column(name = "subject", length = 255)
-    var subject: String? = null,
-
-    @Lob
-    @Column(name = "content")
-    var content: String? = null,
-
-    @Lob
-    @Column(name = "link")
-    var link: String? = null,
-
-    @Column(name = "is_read")
-    var isRead: Boolean = false,
-
-    @Column(name = "time_create")
-    var timeCreate: LocalDateTime? = null,
-
-    @Column(name = "ip_create", length = 50)
-    var ipCreate: String? = null,
-
-    @Column(name = "time_read")
-    var timeRead: LocalDateTime? = null,
-
-    @Column(name = "ip_read", length = 50)
-    var ipRead: String? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", referencedColumnName = "admin_id")
-    val sender: Admin? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id", referencedColumnName = "admin_id")
-    val receiver: Admin? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_folder_id", referencedColumnName = "message_folder_id")
-    val messageFolder: MessageFolder? = null
-)
-KOTLIN;
-    }
-
-    private function generateAdminLevelEntityKt()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package com.planetbiru.graphqlapplication.model.entity.core
-
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-import java.time.LocalDateTime
-
-@Entity
-@Table(name = "admin_level")
-data class AdminLevel(
-    @Id
-    @Column(name = "admin_level_id")
-    val adminLevelId: String,
-
-    @Column(name = "name")
-    val name: String? = null,
-
-    @Column(name = "special_access")
-    val specialAccess: Boolean? = false,
-
-    @Column(name = "sort_order")
-    val sortOrder: Int? = 0,
-
-    @Column(name = "default_data")
-    val defaultData: Boolean? = false,
-
-    @Column(name = "active")
-    val active: Boolean? = true
-)
-KOTLIN;
-    }
-
-    /**
-     * Generates the Admin entity class in Kotlin.
-     * @return string The Kotlin code for Admin.kt.
-     */
-    private function generateAdminEntityKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.model.entity.core
-
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-
-@Entity
-@Table(name = "admin")
-data class Admin(
-    @Id
-    @Column(name = "admin_id")
-    var adminId: String? = null,
-    var username: String? = null,
-    var password: String? = null,
-    var name: String? = null,
-    var email: String? = null,
-    var phone: String? = null,
-    @Column(name = "admin_level_id")
-    var adminLevelId: String? = null
-)
-KOTLIN;
-    }
-
-    /**
-     * Generates the AdminRepository interface in Kotlin.
-     * @return string The Kotlin code for AdminRepository.kt.
-     */
-    private function generateAdminRepositoryKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.model.repository.core
-
-import $package.model.entity.core.Admin
-import org.springframework.data.jpa.repository.JpaRepository
-import java.util.Optional
-
-interface AdminRepository : JpaRepository<Admin, String> {
-    fun findByUsername(username: String): Optional<Admin>
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the LoginRequest DTO in Kotlin.
-     * @return string The Kotlin code for LoginRequest.kt.
-     */
-    private function generateLoginRequestDtoKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.dto
-
-data class LoginRequest(
-    val username: String,
-    val password: String
-)
-KOTLIN;
-    }
-
-    /**
-     * Generates the LoginResponse DTO in Kotlin.
-     * @return string The Kotlin code for LoginResponse.kt.
-     */
-    private function generateLoginResponseDtoKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.dto
-
-data class LoginResponse(
-    val success: Boolean,
-    val message: String
-)
-KOTLIN;
-    }
-
-    private function generateFrontendConfigController()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.core
-
-import $package.util.I18nUtil
-import jakarta.servlet.http.HttpSession
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.Resource
-import org.springframework.core.io.ResourceLoader
-import org.springframework.core.io.support.ResourcePatternResolver
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.util.StreamUtils
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.nio.charset.StandardCharsets
-import java.util.Locale
-
-data class ThemeDto(val name: String, val title: String)
-
-/**
- * REST controller for serving frontend configuration.
- */
-@org.springframework.web.bind.annotation.RestController
-class FrontendConfigController(
-    private val resourceLoader: ResourceLoader,
-    private val resourcePatternResolver: ResourcePatternResolver,
-    @Value("\\\${app.security.require-login}") private val requireLogin: Boolean,
-    private val i18n: I18nUtil
-) {
-
-    /**
-     * {@code GET /frontend-config} : get the frontend configuration.
-     *
-     * @return the [ResponseEntity] with status `200 (OK)` and the configuration in body,
-     * or with status `401 (Unauthorized)` if login is required,
-     * or with status `500 (Internal Server Error)` if the configuration file could not be read.
-     */
-    @GetMapping("/frontend-config")
-    fun getFrontendConfig(
-        session: HttpSession,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
-    ): ResponseEntity<String> {
-        if (requireLogin && session.getAttribute("username") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
-        }
-
-        return try {
-            val resource = resourceLoader.getResource("classpath:static/config/frontend-config.json")
-            val config = StreamUtils.copyToString(resource.inputStream, StandardCharsets.UTF_8)
-            ResponseEntity.ok()
-                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
-                .header("Pragma", "no-cache")
-                .header("Expires", "0")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(config)
-        } catch (e: IOException) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(i18n.t("error_reading_frontend_config", lang))
-        }
-    }
-
-    /**
-     * {@code GET /available-language.json} : get the available languages configuration.
-     *
-     * @return the [ResponseEntity] with status `200 (OK)` and the configuration in body,
-     * or with status `500 (Internal Server Error)` if the configuration file could not be read.
-     */
-    @GetMapping("/available-language")
-    fun getAvailableLanguages(
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
-    ): ResponseEntity<String> {
-        try {
-            val resource = resourceLoader.getResource("classpath:static/langs/available-language.json")
-            val config = StreamUtils.copyToString(resource.inputStream, StandardCharsets.UTF_8)
-            return ResponseEntity.ok()
-                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
-                .header("Pragma", "no-cache")
-                .header("Expires", "0")
-                .contentType(MediaType.APPLICATION_JSON).body(config)
-        } catch (e: IOException) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(i18n.t("error_reading_language_config", lang))
-        }
-    }
-
-    /**
-     * {@code GET /available-theme.json} : get the list of available themes.
-     *
-     * @return the [ResponseEntity] with status `200 (OK)` and the list of themes in body,
-     * or with status `500 (Internal Server Error)` if an error occurs.
-     */
-    @GetMapping("/available-theme")
-    fun getAvailableThemes(
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
-    ): ResponseEntity<Any> {
-        try {
-            val resources: Array<Resource> = resourcePatternResolver.getResources("classpath:static/assets/themes/*/style.min.css")
-            val themes = resources.mapNotNull { resource ->
-                try {
-                    val themeDir = resource.file.parentFile
-                    if (themeDir.isDirectory) {
-                        val themeName = themeDir.name
-                        val title = themeName.replace('-', ' ').replace('_', ' ')
-                            .split(' ')
-                            .joinToString(" ") { it.replaceFirstChar { char -> if (char.isLowerCase()) char.titlecase(Locale.getDefault()) else char.toString() } }
-                        ThemeDto(name = themeName, title = title)
-                    } else {
-                        null
-                    }
-                } catch (e: IOException) {
-                    // Ignore resources that are not file-based (e.g., inside a JAR)
-                    null
-                }
-            }
-            return ResponseEntity.ok()
-                .header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
-                .header("Pragma", "no-cache")
-                .header("Expires", "0")
-                .contentType(MediaType.APPLICATION_JSON).body(themes)
-        } catch (e: IOException) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(i18n.t("error_scanning_themes", lang))
-        }
-    }
-}
-KOTLIN;
-    }
-
-    private function generateMessageController()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.core
-
-import $package.model.entity.core.Message
-import $package.model.repository.core.MessageRepository
-import $package.util.I18nUtil
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpSession
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import java.time.LocalDateTime
-
-@Controller
-class MessageController(
-    private val messageRepository: MessageRepository,
-    private val i18n: I18nUtil
-) {
-
-    private fun getCurrentAdminId(session: HttpSession): String? {
-        return session.getAttribute("adminId") as? String
-    }
-
-    @GetMapping("/message")
-    fun handleMessageGet(
-        @RequestParam(required = false) messageId: String?,
-        @RequestParam(required = false) search: String?,
-        @RequestParam(defaultValue = "1") page: Int,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
-        session: HttpSession
-    ): ResponseEntity<String> {
-        val currentAdminId = getCurrentAdminId(session)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
-
-        val htmlContent = if (messageId != null) {
-            buildDetailView(messageId, currentAdminId, lang)
-        } else {
-            buildListView(search, page, currentAdminId, lang)
-        }
-
-        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(htmlContent)
-    }
-
-    @PostMapping("/message")
-    fun handleMessagePost(
-        session: HttpSession,
-        request: HttpServletRequest,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
-    ): ResponseEntity<*> {
-        val currentAdminId = getCurrentAdminId(session)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("unauthorized", lang)))
-
-        val params = request.parameterMap.mapValues { it.value.firstOrNull() ?: "" }
-        val action = params["action"]
-        val messageId = params["messageId"] ?: return ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("message_id_required", lang)))
-
-        return try {
-            when (action) {
-                "mark_as_unread" -> markAsUnread(messageId, currentAdminId, lang)
-                "delete" -> deleteMessage(messageId, currentAdminId, lang)
-                else -> ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("invalid_action", lang)))
-            }
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("success" to false, "message" to e.message))
-        }
-    }
-
-    private fun markAsUnread(messageId: String, currentAdminId: String, lang: String?): ResponseEntity<*> {
-        val message = messageRepository.findById(messageId).orElseThrow { RuntimeException(i18n.t("message_not_found", lang)) }
-        if (message.receiverId == currentAdminId) {
-            message.isRead = false
-            message.timeRead = null
-            messageRepository.save(message)
-            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("message_marked_as_unread", lang)))
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
-    }
-
-    private fun deleteMessage(messageId: String, currentAdminId: String, lang: String?): ResponseEntity<*> {
-        val message = messageRepository.findById(messageId).orElseThrow { RuntimeException(i18n.t("message_not_found", lang)) }
-        if (message.senderId == currentAdminId || message.receiverId == currentAdminId) {
-            messageRepository.delete(message)
-            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("message_deleted_successfully", lang)))
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
-    }
-
-    private fun buildListView(search: String?, page: Int, currentAdminId: String, lang: String?): String {
-        val pageSize = 20
-        val pageable = PageRequest.of(page - 1, pageSize, Sort.by("timeCreate").descending())
-
-        val messagePage = if (!search.isNullOrBlank()) {
-            messageRepository.findBySenderIdOrReceiverIdAndSearch(currentAdminId, search, pageable)
-        } else {
-            messageRepository.findBySenderIdOrReceiverId(currentAdminId, currentAdminId, pageable)
-        }
-
-        val messages = messagePage.content
-
-        val messageItems = if (messages.isNotEmpty()) {
-            messages.joinToString("") { message ->
-                val isReadClass = if (message.isRead) "read" else "unread"
-                val contentSnippet = message.content?.take(150)?.let { if (it.length == 150) "\$it..." else it } ?: ""
-                val actionButtons = if (message.receiverId == currentAdminId && message.isRead) {
-                    """
-                    <button class="btn btn-sm btn-secondary" onclick="markMessageAsUnread('\${message.messageId}', 'list')">\${i18n.t("mark_as_unread", lang)}</button>
-                    <button class="btn btn-sm btn-danger" onclick="handleMessageDelete('\${message.messageId}')">\${i18n.t("delete", lang)}</button>
-                    """
-                } else ""
-
-                """
-                <div class="message-item \$isReadClass">
-                    <span class="message-status-indicator"></span>
-                    <div class="message-header">
-                        <div class="message-link-wrapper">
-                            <a href="#message?messageId=\${message.messageId}" class="message-link">
-                                <span class="message-sender">\${message.sender?.name ?: i18n.t("system", lang)}</span>
-                                <span class="message-subject">\${message.subject ?: ""}</span>
-                            </a>
-                            <span class="message-time">\${message.timeCreate}</span>
-                            \$actionButtons
-                        </div>
-                    </div>
-                    <div class="message-content">\${contentSnippet}</div>
-                </div>
-                """
-            }
-        } else {
-            "<p>\${i18n.t("no_message", lang)}</p>"
-        }
-
-        // Simplified pagination for brevity
-        return """
-        <div id="filter-container" class="filter-container" style="display: block;">
-            <form id="message-search-form" class="search-form" onsubmit="handleMessageSearch(event)">
-                <div class="filter-controls">
-                    <div class="form-group">
-                        <label for="search_message">\${i18n.t("search", lang)}</label>
-                        <input type="text" name="search" id="search_message" placeholder="\${i18n.t("search", lang)}" value="\${search ?: ""}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">\${i18n.t("search", lang)}</button>
-                </div>
-            </form>
-        </div>
-        <div class="message-list-container">
-            \$messageItems
-        </div>
-        """.trimIndent()
-    }
-
-    private fun buildDetailView(messageId: String, currentAdminId: String, lang: String?): String {
-        val messageOpt = messageRepository.findByMessageIdAndUser(messageId, currentAdminId)
-        if (messageOpt.isEmpty) {
-            return """<div class="table-container detail-view">\${i18n.t("no_message", lang)}</div>"""
-        }
-
-        val message = messageOpt.get()
-
-        // Mark as read
-        if (message.receiverId == currentAdminId && !message.isRead) {
-            message.isRead = true
-            message.timeRead = LocalDateTime.now()
-            messageRepository.save(message)
-        }
-
-        val actionButtons = if (message.receiverId == currentAdminId && message.isRead) {
-            """
-            <button class="btn btn-primary" onclick="markMessageAsUnread('\${message.messageId}', 'detail')">\${i18n.t("mark_as_unread", lang)}</button>
-            <button class="btn btn-danger" onclick="handleMessageDelete('\${message.messageId}')">\${i18n.t("delete", lang)}</button>
-            """
-        } else ""
-
-        val statusHtml = if (message.isRead) {
-            """<span class="status-read">\${i18n.t("read_at", lang)} \${message.timeRead}</span>"""
-        } else {
-            """<span class="status-unread">\${i18n.t("unread", lang)}</span>"""
-        }
-
-        return """
-        <div class="back-controls">
-            <button id="back-to-list" class="btn btn-secondary" onclick="backToList('message')">\${i18n.t("back_to_list", lang)}</button>
-            \$actionButtons
-        </div>
-        <div class="message-container">
-            <div class="message-header">
-                <h3>\${message.subject ?: ""}</h3>
-                <div class="message-meta">
-                    <div><strong>\${i18n.t("from", lang)}:</strong> \${message.sender?.name ?: i18n.t("system", lang)}</div>
-                    <div><strong>\${i18n.t("to", lang)}:</strong> \${message.receiver?.name ?: i18n.t("system", lang)}</div>
-                    <div><strong>\${i18n.t("time", lang)}:</strong> \${message.timeCreate}</div>
-                    <div><strong>\${i18n.t("status", lang)}:</strong> \$statusHtml</div>
-                </div>
-            </div>
-            <div class="message-body">
-                \${message.content?.replace("\n", "<br>") ?: ""}
-            </div>
-        </div>
-        """.trimIndent()
-    }
-}
-KOTLIN;
-    }
-    private function generateNotificationController()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.core
-
-import $package.model.repository.core.AdminRepository
-import $package.model.repository.core.NotificationRepository
-import $package.util.I18nUtil
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpSession
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import java.time.LocalDateTime
-
-@Controller
-class NotificationController(
-    private val notificationRepository: NotificationRepository,
-    private val adminRepository: AdminRepository,
-    private val i18n: I18nUtil
-) {
-
-    private fun getCurrentAdminId(session: HttpSession): String? {
-        return session.getAttribute("adminId") as? String
-    }
-
-    @GetMapping("/notification")
-    fun handleNotificationGet(
-        @RequestParam(required = false) notificationId: String?,
-        @RequestParam(required = false) search: String?,
-        @RequestParam(defaultValue = "1") page: Int,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
-        session: HttpSession,
-        request: HttpServletRequest
-    ): ResponseEntity<String> {
-        val currentAdminId = getCurrentAdminId(session)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
-
-        val admin = adminRepository.findById(currentAdminId).orElse(null)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("admin_not_found", lang))
-
-        val htmlContent = if (notificationId != null) {
-            buildDetailView(notificationId, admin.adminId, admin.adminLevelId, request.remoteAddr, lang)
-        } else {
-            buildListView(search, page, admin.adminId, admin.adminLevelId, lang)
-        }
-
-        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(htmlContent)
-    }
-
-    @PostMapping("/notification")
-    fun handleNotificationPost(
-        session: HttpSession,
-        request: HttpServletRequest,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
-    ): ResponseEntity<*> {
-        val currentAdminId = getCurrentAdminId(session)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("unauthorized", lang)))
-
-        val admin = adminRepository.findById(currentAdminId).orElse(null)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("admin_not_found", lang)))
-
-        val params = request.parameterMap.mapValues { it.value.firstOrNull() ?: "" }
-        val action = params["action"]
-        val notificationId = params["notificationId"] ?: return ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("notification_id_required", lang)))
-
-        return try {
-            when (action) {
-                "mark_as_unread" -> markAsUnread(notificationId, admin.adminId, admin.adminLevelId, lang)
-                "delete" -> deleteNotification(notificationId, admin.adminId, admin.adminLevelId, lang)
-                else -> ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("invalid_action", lang)))
-            }
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("success" to false, "message" to e.message))
-        }
-    }
-
-    private fun markAsUnread(notificationId: String, adminId: String, adminLevelId: String?, lang: String?): ResponseEntity<*> {
-        val notification = notificationRepository.findById(notificationId).orElseThrow { RuntimeException(i18n.t("notification_not_found", lang)) }
-        if (notification.adminId == adminId || notification.adminGroup == adminLevelId) {
-            notification.isRead = false
-            notification.timeRead = null
-            notificationRepository.save(notification)
-            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("notification_marked_as_unread", lang)))
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
-    }
-
-    private fun deleteNotification(notificationId: String, adminId: String, adminLevelId: String?, lang: String?): ResponseEntity<*> {
-        val notification = notificationRepository.findById(notificationId).orElseThrow { RuntimeException(i18n.t("notification_not_found", lang)) }
-        if (notification.adminId == adminId || notification.adminGroup == adminLevelId) {
-            notificationRepository.delete(notification)
-            return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("notification_deleted_successfully", lang)))
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("success" to false, "message" to i18n.t("forbidden", lang)))
-    }
-
-    private fun buildListView(search: String?, page: Int, adminId: String, adminLevelId: String?, lang: String?): String {
-        val pageSize = 20
-        val pageable = PageRequest.of(page - 1, pageSize, Sort.by("timeCreate").descending())
-
-        val notificationPage = if (!search.isNullOrBlank()) {
-            notificationRepository.findByAdminIdOrAdminGroupAndSearch(adminId, adminLevelId, search, pageable)
-        } else {
-            notificationRepository.findByAdminIdOrAdminGroup(adminId, adminLevelId, pageable)
-        }
-
-        val notifications = notificationPage.content
-
-        val notificationItems = if (notifications.isNotEmpty()) {
-            notifications.joinToString("") { notification ->
-                val isReadClass = if (notification.isRead) "read" else "unread"
-                val contentSnippet = notification.content?.take(150)?.let { if (it.length == 150) "\$it..." else it } ?: ""
-                val actionButtons = if (notification.isRead) {
-                    """
-                    <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('\${notification.notificationId}', 'list')">\${i18n.t("mark_as_unread", lang)}</button>
-                    <button class="btn btn-sm btn-danger" onclick="handleNotificationDelete('\${notification.notificationId}')">\${i18n.t("delete", lang)}</button>
-                    """
-                } else ""
-
-                """
-                <div class="message-item \$isReadClass">
-                    <span class="message-status-indicator"></span>
-                    <div class="notification-header">
-                        <div class="message-link-wrapper">
-                            <a href="#notification?notificationId=\${notification.notificationId}" class="message-link">
-                                <span class="message-subject">\${notification.subject ?: ""}</span>
-                            </a>
-                            <span class="message-time">\${notification.timeCreate}</span>
-                            \$actionButtons
-                        </div>
-                    </div>
-                    <div class="message-content">\${contentSnippet}</div>
-                </div>
-                """
-            }
-        } else {
-            "<p>No notification</p>"
-        }
-
-        // Simplified pagination for brevity
-        return """
-        <div id="filter-container" class="filter-container" style="display: block;">
-            <form id="notification-search-form" class="search-form" onsubmit="handleNotificationSearch(event)">
-                <div class="filter-controls">
-                    <div class="form-group">
-                        <label for="search_notification">\${i18n.t("search", lang)}</label>
-                        <input type="text" name="search" id="search_notification" placeholder="\${i18n.t("search", lang)}" value="\${search ?: ""}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">\${i18n.t("search", lang)}</button>
-                </div>
-            </form>
-        </div>
-        <div class="message-list-container">
-            \$notificationItems
-        </div>
-        """.trimIndent()
-    }
-
-    private fun buildDetailView(notificationId: String, adminId: String, adminLevelId: String?, ipRead: String, lang: String?): String {
-        val notificationOpt = notificationRepository.findByIdAndAdmin(notificationId, adminId, adminLevelId)
-        if (notificationOpt.isEmpty) {
-            return """<div class="table-container detail-view">\${i18n.t("no_notification", lang)}</div>"""
-        }
-
-        val notification = notificationOpt.get()
-
-        // Mark as read
-        if (!notification.isRead) {
-            notification.isRead = true
-            notification.timeRead = LocalDateTime.now()
-            notification.ipRead = ipRead
-            notificationRepository.save(notification)
-        }
-
-        val actionButtons = if (notification.isRead) {
-            """
-            <button class="btn btn-primary" onclick="markNotificationAsUnread('\${notification.notificationId}', 'detail')">\${i18n.t("mark_as_unread", lang)}</button>
-            <button class="btn btn-danger" onclick="handleNotificationDelete('\${notification.notificationId}')">\${i18n.t("delete", lang)}</button>
-            """
-        } else ""
-
-        val statusHtml = if (notification.isRead) {
-            """<span class="status-read">\${i18n.t("read_at", lang)} \${notification.timeRead}</span>"""
-        } else {
-            """<span class="status-unread">\${i18n.t("unread", lang)}</span>"""
-        }
-
-        val linkButton = if (!notification.link.isNullOrBlank()) {
-            """<p><a href="\${notification.link}" target="_blank" class="btn btn-primary mt-3">\${i18n.t("more_info", lang)}</a></p>"""
-        } else ""
-
-        return """
-        <div class="back-controls">
-            <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')">\${i18n.t("back_to_list", lang)}</button>
-            \$actionButtons
-        </div>
-        <div class="notification-container">
-            <div class="notification-header">
-                <h3>\${notification.subject ?: ""}</h3>
-                <div class="message-meta">
-                    <div><strong>\${i18n.t("time", lang)}:</strong> \${notification.timeCreate}</div>
-                    <div><strong>\${i18n.t("status", lang)}:</strong> \$statusHtml</div>
-                </div>
-            </div>
-            <div class="message-body">
-                \${notification.content?.replace("\n", "<br>") ?: ""}
-                \$linkButton
-            </div>
-        </div>
-        """.trimIndent()
-    }
-}
-KOTLIN;
-    }
-
-    private function generateUserProfileController()
-    {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.core
-
-import $package.model.repository.core.AdminRepository
-import jakarta.servlet.http.HttpSession
-import org.springframework.graphql.data.method.annotation.QueryMapping
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.stereotype.Controller
-
-data class UserProfile(val username: String)
-
-@Controller
-class UserProfileController(private val adminRepository: AdminRepository) {
-
-    @QueryMapping
-    @PreAuthorize("isAuthenticated()")
-    fun userProfile(session: HttpSession): UserProfile? {
-        val username = session.getAttribute("username") as? String
-        if (username != null) {
-            val adminOptional = adminRepository.findByUsername(username)
-            if (adminOptional.isPresent) {
-                val admin = adminOptional.get()
-                return UserProfile(username = admin.username!!)
-            }
-        }
-        return null
-    }
-
-    @QueryMapping
-    fun me(session: HttpSession): Map<String, Any?> {
-        return mapOf("username" to session.getAttribute("username"))
-    }
-}
-KOTLIN;
-
-    }
-
-    private function generateAdminController() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.core
-
-import $package.config.Sha1PasswordEncoder
-import $package.util.I18nUtil
-import $package.model.entity.core.Admin
-import $package.model.repository.core.AdminLevelRepository
-import $package.model.repository.core.AdminRepository
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpSession
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.domain.Specification
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
-import $package.model.entity.core.AdminLevel
-import java.time.LocalDateTime
-import java.util.UUID
-
-@Controller
-class AdminController(
-    private val adminRepository: AdminRepository,
-    private val adminLevelRepository: AdminLevelRepository,
-    private val passwordEncoder: Sha1PasswordEncoder,
-    private val i18n: I18nUtil
-) {
-
-    private fun getCurrentAdminId(session: HttpSession): String? {
-        return session.getAttribute("adminId") as? String
-    }
-
-    @GetMapping("/admin")
-    fun handleAdminGet(
-        @RequestParam(required = false) action: String?,
-        @RequestParam(required = false) adminId: String?,
-        @RequestParam(required = false) search: String?,
-        @RequestParam(defaultValue = "1") page: Int,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
-        session: HttpSession,
-        request: HttpServletRequest
-    ): ResponseEntity<String> {
-        val currentAdminId = getCurrentAdminId(session)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(i18n.t("unauthorized", lang))
-
-        val htmlContent = when (action) {
-            "create" -> buildCreateEditForm(null, lang)
-            "edit" -> adminRepository.findById(adminId ?: "").map { buildCreateEditForm(it, lang) }.orElse(i18n.t("admin_not_found", lang))
-            "change-password" -> buildChangePasswordForm(adminId, lang)
-            "detail" -> adminRepository.findById(adminId ?: "").map { buildDetailView(it, currentAdminId, lang) }.orElse(i18n.t("admin_not_found", lang))
-            else -> buildListView(search, page, currentAdminId, lang)
-        }
-
-        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(htmlContent)
-    }
-
-    @PostMapping("/admin")
-    fun handleAdminPost(
-        @RequestParam action: String,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?,
-        session: HttpSession,
-        request: HttpServletRequest
-    ): ResponseEntity<*> {
-        val currentAdminId = getCurrentAdminId(session)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("success" to false, "message" to i18n.t("unauthorized", lang)))
-
-        // Manually build the parameters map from the request to reliably handle multipart/form-data
-        val params = request.parameterMap.mapValues { entry ->
-            entry.value.firstOrNull() ?: ""
-        }
-        return try {
-            when (params["action"]) {
-                "create" -> createAdmin(params, currentAdminId, request.remoteAddr, lang)
-                "update" -> updateAdmin(params, currentAdminId, request.remoteAddr, lang)
-                "toggle_active" -> toggleAdminActive(params, currentAdminId, lang)
-                "change_password" -> changeAdminPassword(params, lang)
-                "delete" -> deleteAdmin(params, currentAdminId, lang)
-                else -> ResponseEntity.badRequest().body(mapOf("success" to false, "message" to i18n.t("invalid_action", lang)))
-            }
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("success" to false, "message" to e.message))
-        }
-    }
-
-    private fun createAdmin(params: Map<String, String>, currentAdminId: String, ip: String, lang: String?): ResponseEntity<*> {
-        val password = params["password"] ?: throw IllegalArgumentException(i18n.t("password_is_required", lang))
-        if (password.isBlank()) throw IllegalArgumentException(i18n.t("password_is_required", lang))
-
-        val username = params["username"] ?: throw IllegalArgumentException("Username is required.")
-        val newAdmin = Admin(
-            adminId = UUID.randomUUID().toString(),
-            name = params["name"],
-            username = username,
-            email = params["email"],
-            password = passwordEncoder.encode(password),
-            adminLevelId = params["admin_level_id"],
-            active = params["active"] == "on",
-            timeCreate = LocalDateTime.now(),
-            adminCreate = currentAdminId,
-            ipCreate = ip
-        )
-        adminRepository.save(newAdmin)
-        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_created_successfully", lang)))
-    }
-
-    private fun updateAdmin(params: Map<String, String>, currentAdminId: String, ip: String, lang: String?): ResponseEntity<*> {
-        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
-        val adminToUpdate = adminRepository.findById(adminId).orElseThrow { RuntimeException(i18n.t("admin_not_found", lang)) }
-
-        var active = params["active"] == "on"
-        var adminLevelId = params["admin_level_id"]
-
-        // Prevent user from deactivating or changing their own level
-        if (adminId == currentAdminId) {
-            active = true
-            adminLevelId = adminToUpdate.adminLevelId
-        }
-
-        val username = params["username"] ?: adminToUpdate.username
-        val updatedAdmin = adminToUpdate.copy(
-            name = params["name"],
-            username = username,
-            email = params["email"],
-            adminLevelId = adminLevelId,
-            active = active,
-            timeEdit = LocalDateTime.now(),
-            adminEdit = currentAdminId, // This will now work
-            ipEdit = ip // This will now work
-        )
-        adminRepository.save(updatedAdmin)
-        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_updated_successfully", lang)))
-    }
-
-    private fun toggleAdminActive(params: Map<String, String>, currentAdminId: String, lang: String?): ResponseEntity<*> {
-        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
-        if (adminId == currentAdminId) throw IllegalStateException(i18n.t("cannot_deactivate_self", lang))
-
-        val admin = adminRepository.findById(adminId).orElseThrow { RuntimeException(i18n.t("admin_not_found", lang)) }
-        admin.active = !admin.active
-        adminRepository.save(admin)
-        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_status_updated", lang)))
-    }
-
-    private fun changeAdminPassword(params: Map<String, String>, lang: String?): ResponseEntity<*> {
-        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
-        val password = params["password"] ?: throw IllegalArgumentException(i18n.t("password_is_required", lang))
-        if (password.isBlank()) throw IllegalArgumentException(i18n.t("password_is_required", lang))
-
-        val admin = adminRepository.findById(adminId).orElseThrow { RuntimeException(i18n.t("admin_not_found", lang)) }
-        admin.password = passwordEncoder.encode(password)
-        adminRepository.save(admin)
-        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("password_updated_successfully", lang)))
-    }
-
-    private fun deleteAdmin(params: Map<String, String>, currentAdminId: String, lang: String?): ResponseEntity<*> {
-        val adminId = params["adminId"] ?: throw IllegalArgumentException(i18n.t("admin_id_required", lang))
-        if (adminId == currentAdminId) throw IllegalStateException(i18n.t("cannot_delete_self", lang))
-
-        adminRepository.deleteById(adminId)
-        return ResponseEntity.ok(mapOf("success" to true, "message" to i18n.t("admin_deleted_successfully", lang)))
-    }
-
-    // --- HTML View Builders ---
-    
-    private fun otherUsersController(admin: Admin, currentAdminId: String, lang: String?): String {
-        if (admin.adminId == currentAdminId) {
-            return ""
-        }
-        val toggleAction = if (admin.active) i18n.t("deactivate", lang) else i18n.t("activate", lang)
-        val toggleClass = if (admin.active) "btn-warning" else "btn-success"
-        return """
-            <a href="javascript:;" onclick="handleAdminToggleActive('\${admin.adminId}')" class="btn btn-sm \${toggleClass}">\${toggleAction}</a>
-            <a href="javascript:;" onclick="handleAdminDelete('\${admin.adminId}')" class="btn btn-sm btn-danger">\${i18n.t("delete", lang)}</a>
-        """.trimIndent()
-    }
-
-    private fun buildListView(search: String?, page: Int, currentAdminId: String, lang: String?): String {
-        val pageSize = 20
-        val pageable = PageRequest.of(page - 1, pageSize, Sort.by("name"))
-
-        val adminPage = if (!search.isNullOrBlank()) {
-            adminRepository.findByNameContainingOrUsernameContaining(search, search, pageable)
-        } else {
-            adminRepository.findAll(pageable)
-        }
-
-        val admins = adminPage.content 
-        
-
-        val rows = if (admins.isNotEmpty()) {
-            admins.joinToString("") { admin: Admin ->
-                """
-                <tr class="\${if (!admin.active) "inactive" else "active"}">
-                    <td>\${admin.name ?: ""}</td>
-                    <td>\${admin.username ?: ""}</td>
-                    <td>\${admin.email ?: ""}</td>
-                    <td>\${admin.adminLevel?.name ?: ""}</td>
-                    <td>\${if (admin.active) i18n.t("active", lang) else i18n.t("inactive", lang)}</td>
-                    <td class="actions">
-                        <a href="#admin?action=detail&adminId=\${admin.adminId}" class="btn btn-sm btn-info">\${i18n.t("view", lang)}</a>
-                        <a href="#admin?action=edit&adminId=\${admin.adminId}" class="btn btn-sm btn-primary">\${i18n.t("edit", lang)}</a>
-                        \${otherUsersController(admin, currentAdminId, lang)}
-                    </td>
-                </tr>
-                """.trimIndent()
-            }
-        } else {
-            """<tr><td colspan="6">\${i18n.t("no_admins_found", lang)}</td></tr>"""
-        }
-
-        // Simplified pagination for brevity
-        return """
-        <div id="filter-container" class="filter-container" style="display: block;">
-            <form id="admin-search-form" class="search-form" onsubmit="handleAdminSearch(event)"> 
-                <div class="filter-controls">
-                    
-                    <div class="form-group">
-                        <label for="username">\${i18n.t("name", lang)} or \${i18n.t("username", lang)}</label>
-                        <input type="text" name="search" id="username" placeholder="\${i18n.t("name", lang)} or \${i18n.t("username", lang)}" value="\${search ?: ""}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">\${i18n.t("search", lang)}</button>
-                    <a href="#admin?action=create" class="btn btn-primary">\${i18n.t("add_new_admin", lang)}</a>
-                    
-                </div>
-            </form>
-        </div>
-
-        <div class="table-container">
-            <table class="table table-data-list table-striped">
-                <thead><tr><th>\${i18n.t("name", lang)}</th><th>\${i18n.t("username", lang)}</th><th>\${i18n.t("email", lang)}</th><th>\${i18n.t("admin_level", lang)}</th><th>\${i18n.t("status", lang)}</th><th>\${i18n.t("actions", lang)}</th></tr></thead>
-                <tbody>\$rows</tbody>
-            </table>
-        </div>
-        """.trimIndent()
-    }
-
-    private fun buildDetailView(admin: Admin, currentAdminId: String, lang: String?): String {
-        val actionButtons = if (admin.adminId != currentAdminId) {
-            """
-            <a href="#admin?action=change-password&adminId=\${admin.adminId}" class="btn btn-warning">\${i18n.t("update_password", lang)}</a>
-            <button class="btn \${if (admin.active) "btn-warning" else "btn-success"}" onclick="handleAdminToggleActive('\${admin.adminId}')">
-                \${if (admin.active) i18n.t("deactivate", lang) else i18n.t("activate", lang)}
-            </button>
-            <button class="btn btn-danger" onclick="handleAdminDelete('\${admin.adminId}')">\${i18n.t("delete", lang)}</button>
-            """.trimIndent()
-        } else ""
-
-        return """
-        <div class="back-controls">
-            <a href="#admin" class="btn btn-secondary">\${i18n.t("back_to_list", lang)}</a>
-            <a href="#admin?action=edit&adminId=\${admin.adminId}" class="btn btn-primary">\${i18n.t("edit", lang)}</a>
-            \$actionButtons
-        </div>
-        <div class="table-container detail-view">
-            <table class="table">
-                <tbody>
-                    <tr><td><strong>\${i18n.t("admin_id", lang)}</strong></td><td>\${admin.adminId}</td></tr>
-                    <tr><td><strong>\${i18n.t("name", lang)}</strong></td><td>\${admin.name ?: ""}</td></tr>
-                    <tr><td><strong>\${i18n.t("username", lang)}</strong></td><td>\${admin.username ?: ""}</td></tr>
-                    <tr><td><strong>\${i18n.t("email", lang)}</strong></td><td>\${admin.email ?: ""}</td></tr>
-                    <tr><td><strong>\${i18n.t("admin_level", lang)}</strong></td><td>\${admin.adminLevel?.name ?: ""}</td></tr>
-                    <tr><td><strong>\${i18n.t("status", lang)}</strong></td><td>\${if (admin.active) i18n.t("active", lang) else i18n.t("inactive", lang)}</td></tr>
-                    <tr><td><strong>\${i18n.t("time_create", lang)}</strong></td><td>\${admin.timeCreate}</td></tr>
-                    <tr><td><strong>\${i18n.t("time_edit", lang)}</strong></td><td>\${admin.timeEdit ?: ""}</td></tr>
-                </tbody>
-            </table>
-        </div>
-        """.trimIndent()
-    }
-
-    private fun buildCreateEditForm(admin: Admin?, lang: String?): String {
-        val isCreate = admin == null
-        val adminLevels = adminLevelRepository.findByActive(true)
-        val levelOptions = adminLevels.joinToString("") { level: AdminLevel ->
-            val selected = if (admin?.adminLevelId == level.adminLevelId) "selected" else ""
-            """<option value="\${level.adminLevelId}" \$selected>\${level.name}</option>"""
-        }
-
-        return """
-        <div class="back-controls">
-            <a href="#admin" class="btn btn-secondary">\${i18n.t("back_to_list", lang)}</a>
-        </div>
-        <div class="table-container detail-view">
-            <h3>\${if (isCreate) i18n.t("add_new_admin", lang) else i18n.t("edit_admin", lang)}</h3>
-            <form id="admin-form" class="form-group" onsubmit="handleAdminSave(event, '\${admin?.adminId ?: ""}'); return false;">
-                <input type="hidden" name="action" value="\${if (isCreate) "create" else "update"}">
-                <input type="hidden" name="adminId" value="\${admin?.adminId ?: ""}">
-                <table class="table table-borderless">
-                    <tr>
-                        <td>\${i18n.t("name", lang)}</td>
-                        <td><input type="text" name="name" value="\${admin?.name ?: ""}" required autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                        <td>\${i18n.t("username", lang)}</td>
-                        <td><input type="text" name="username" value="\${admin?.username ?: ""}" required autocomplete="off"></td>
-                    </tr>
-                    <tr>
-                        <td>\${i18n.t("email", lang)}</td>
-                        <td><input type="email" name="email" value="\${admin?.email ?: ""}" required autocomplete="off"></td>
-                    </tr>
-                    \${if (isCreate) """
-                    <tr>
-                        <td>\${i18n.t("password", lang)}</td>
-                        <td><input type="password" name="password" required autocomplete="new-password"></td>
-                    </tr>
-                    """ else ""}
-                    <tr>
-                        <td>\${i18n.t("admin_level", lang)}</td>
-                        <td>
-                            <select name="admin_level_id" required>
-                                <option value="">\${i18n.t("select_option", lang)}</option>
-                                \$levelOptions
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>\${i18n.t("active", lang)}</td>
-                        <td><input type="checkbox" name="active" \${if (admin?.active != false) "checked" else ""} value="on"></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <button type="submit" class="btn btn-success">\${i18n.t("save", lang)}</button>
-                            <a href="#admin" class="btn btn-secondary">\${i18n.t("cancel", lang)}</a>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-        """.trimIndent()
-    }
-
-    private fun buildChangePasswordForm(adminId: String?, lang: String?): String {
-        if (adminId.isNullOrBlank()) return i18n.t("admin_id_required", lang)
-        return """
-        <div class="back-controls">
-            <a href="#admin?action=detail&adminId=\$adminId" class="btn btn-secondary">\${i18n.t("back_to_detail", lang)}</a>
-        </div>
-        <div class="table-container detail-view">
-            <h3>Change Password</h3>
-            <form id="change-password-form" class="form-group" onsubmit="handleAdminChangePassword(event, '\$adminId'); return false;">
-                 <input type="hidden" name="action" value="change_password">
-                 <input type="hidden" name="adminId" value="\$adminId">
-                <table class="table table-borderless">
-                    <tr>
-                        <td>\${i18n.t("new_password", lang)}</td>
-                        <td><input type="password" name="password" required autocomplete="new-password"></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <button type="submit" class="btn btn-success">\${i18n.t("update", lang)}</button>
-                            <a href="#admin?action=detail&adminId=\$adminId" class="btn btn-secondary">\${i18n.t("cancel", lang)}</a>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-        """.trimIndent()
-    }
-}
-KOTLIN;
-    }
-    /**
-     * Generates the AuthController class in Kotlin.
-     * @return string The Kotlin code for AuthController.kt.
-     */
-    private function generateAuthController() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.controller.core
-
-import $package.config.Sha1PasswordEncoder
-import $package.controller.dto.LoginResponse
-import $package.util.I18nUtil
-import $package.model.repository.core.AdminRepository
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpSession
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.*
-
-
-@RestController
-class AuthController(
-    private val adminRepository: AdminRepository,
-    private val passwordEncoder: Sha1PasswordEncoder,
-    private val i18n: I18nUtil,
-    @Value("\\\${app.security.require-login}")
-    private val requireLogin: Boolean
-) {
-
-    @PostMapping("/login")
-    fun login(
-        @RequestParam username: String,
-        @RequestParam password: String,
-        session: HttpSession,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
-    ): ResponseEntity<LoginResponse> {
-
-        if (!requireLogin) {
-            return ResponseEntity.ok(LoginResponse(true, i18n.t("success", lang)))
-        }
-
-        val singleHashedPassword = passwordEncoder.sha1(password)
-        val adminOptional = adminRepository.findByUsername(username)
-
-        if (adminOptional.isPresent) {
-            val admin = adminOptional.get()
-            if (admin.password == passwordEncoder.encode(password)) {
-                session.setAttribute("username", admin.username!!)
-                session.setAttribute("password", singleHashedPassword)
-                session.setAttribute("adminId", admin.adminId)
-
-                val authorities = listOf(SimpleGrantedAuthority("ROLE_ADMIN"))
-                val auth = UsernamePasswordAuthenticationToken(admin.username, null, authorities)
-                SecurityContextHolder.getContext().authentication = auth
-
-                return ResponseEntity.ok(LoginResponse(true, i18n.t("login_successful", lang)))
-            }
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(LoginResponse(false, i18n.t("invalid_credentials", lang)))
-    }
-
-    @RequestMapping(value = ["/logout"], method = [RequestMethod.GET, RequestMethod.POST])
-    fun logout(
-        request: HttpServletRequest,
-        @RequestHeader(value = "X-Language-Id", required = false) lang: String?
-    ): ResponseEntity<LoginResponse> {
-        if (!requireLogin) {
-            return ResponseEntity.ok(LoginResponse(true, i18n.t("success", lang)))
-        }
-        request.session.invalidate()
-        SecurityContextHolder.clearContext()
-        return ResponseEntity.ok(LoginResponse(true, i18n.t("logout_successful", lang)))
-    }
-}
-KOTLIN;
-    }
-
-    // The following methods are placeholders for the full conversion.
-    // The original Java generator has many more files it creates (Admin entities, Auth controllers, etc.).
-    // Each would need a corresponding `generate...Kt()` method here.
-
-    /**
      * Get whether to enable verbose logging in the generated application.
      *
      * @return bool True if verbose logging is enabled, false otherwise.
@@ -3442,6 +1831,30 @@ KOTLIN;
         return $this->verboseLogging;
     }
 
+    /**
+     * Retrieves metadata information about the primary key column from the table definition.
+     *
+     * This method scans all columns in the provided table metadata and returns the full
+     * column information for the one marked as the primary key. The returned array
+     * includes all properties from the column definition plus an additional `name`
+     * field representing the column name.
+     *
+     * Example returned structure:
+     * [
+     *     'name' => 'id',
+     *     'type' => 'varchar',
+     *     'length' => 40,
+     *     'isPrimaryKey' => true,
+     *     'isAutoIncrement' => false,
+     *     'primaryKeyValue' => 'autogenerated'
+     * ]
+     *
+     * @param array $tableInfo
+     *        Table metadata containing a `columns` array with column definitions.
+     *
+     * @return array|null
+     *         The primary key column information, or null if no primary key exists.
+     */
     private function findPrimaryKeyInfo($tableInfo)
     {
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
@@ -3452,6 +1865,50 @@ KOTLIN;
         return null;
     }
 
+    /**
+     * Generates Kotlin code for mapping DTO input fields into an entity instance.
+     *
+     * The generated mapping logic respects several rules:
+     * - Primary key handling:
+     *     - For `create` actions: validates non-auto-increment primary keys when required.
+     *     - For `update` actions: skips primary key assignment.
+     * - Skips backend-managed columns (timeCreate, timeEdit, adminCreate, adminEdit, ipCreate, ipEdit).
+     * - For regular columns: generates Kotlin code to assign values only when the DTO field is not null.
+     * - Automatically fills backend-handled fields depending on the action:
+     *     - On create: assigns creation time, user, and IP if applicable.
+     *     - On update: assigns edit time, user, and IP if applicable.
+     *
+     * @param string $tableName
+     *        Name of the database table.
+     *
+     * @param array $tableInfo
+     *        Table metadata, containing:
+     *        [
+     *            'primaryKey' => string,
+     *            'columns' => [
+     *                'column_name' => [
+     *                    'name' => string,
+     *                    'type' => string,
+     *                    'length' => int|null,
+     *                    'isAutoIncrement' => bool,
+     *                    'primaryKeyValue' => string|null
+     *                ],
+     *                ...
+     *            ]
+     *        ]
+     *
+     * @param string $entityVar
+     *        Variable name used for the Kotlin entity object inside generated code.
+     *
+     * @param string $dtoVar
+     *        Variable name used for the DTO input object.
+     *
+     * @param string $action
+     *        Either "create" or "update", affecting which mapping rules apply.
+     *
+     * @return string
+     *         Kotlin source code representing the DTO-to-entity mapping.
+     */
     private function generateDtoToEntityMappingKt($tableName, $tableInfo, $entityVar, $dtoVar, $action) {
         $mappingCode = "";
 
@@ -3512,6 +1969,40 @@ KOTLIN;
         return $mappingCode;
     }
 
+    /**
+     * Generates a Kotlin GraphQL mutation method used to toggle the "active" status
+     * of an entity. This mutation handles updating the active field as well as
+     * applying backend-managed fields such as timeEdit, adminEdit, and ipEdit when
+     * those columns exist.
+     *
+     * The generated Kotlin code includes:
+     * - @MutationMapping function for toggling the active state
+     * - Parameter mapping for the primary key and active flag
+     * - Automatic update of audit fields (edit time, admin, IP) if present
+     * - Error handling when the entity is not found
+     *
+     * @param string $tableName
+     *        The name of the database table.
+     *
+     * @param array $tableInfo
+     *        Metadata describing the table, including:
+     *        [
+     *            'hasActiveColumn' => bool,
+     *            'columns' => [
+     *                'column_name' => [
+     *                    'type' => string,
+     *                    'length' => int|null,
+     *                    'isForeignKey' => bool,
+     *                    'references' => string|null
+     *                ],
+     *                ...
+     *            ]
+     *        ]
+     *
+     * @return string
+     *         Kotlin source code defining the GraphQL mutation, or an empty
+     *         string if the table does not contain an active column.
+     */
     private function generateToggleActiveMutationKt($tableName, $tableInfo)
     {
         if (!$tableInfo['hasActiveColumn']) {
@@ -3562,6 +2053,36 @@ $mappingCode
 KOTLIN;
     }
 
+    /**
+     * Generates Kotlin GraphQL field resolvers for a specific database table.
+     *
+     * This function automatically builds Kotlin resolver methods based on the
+     * table structure and column definitions. It handles:
+     * - Field name differences between database (snake_case) and Kotlin (camelCase)
+     * - Mapping database types to Kotlin types
+     * - Converting LocalDate, LocalTime, and LocalDateTime values into String
+     * - Generating resolvers for foreign key relationships
+     *
+     * @param string $tableName
+     *        The name of the database table.
+     *
+     * @param array $tableInfo
+     *        Detailed table metadata with the following structure:
+     *        [
+     *            'columns' => [
+     *                'column_name' => [
+     *                    'type' => string,         // Database column type
+     *                    'length' => int|null,     // Column length if applicable
+     *                    'isForeignKey' => bool,   // Whether this column is a foreign key
+     *                    'references' => string|null // Referenced table name if FK
+     *                ],
+     *                ...
+     *            ]
+     *        ]
+     *
+     * @return string
+     *         The generated Kotlin code containing GraphQL field resolvers.
+     */
     private function generateFieldResolversKt($tableName, $tableInfo) {
         $resolvers = "";
         $ucCamelTableName = $this->pascalCase($tableName);
@@ -3613,349 +2134,5 @@ KOTLIN;
     
         return $resolvers;
     }
-
-    private function generateSpecificationBuilderKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-import jakarta.persistence.criteria.Predicate
-import org.springframework.data.jpa.domain.Specification
-
-class SpecificationBuilder<T> {
-    private val params: MutableList<FilterCriteria> = mutableListOf()
-
-    fun with(key: String, operation: SearchOperation, value: Any?): SpecificationBuilder<T> {
-        params.add(FilterCriteria(key, operation, value))
-        return this
-    }
-
-    fun build(): Specification<T>? {
-        if (params.isEmpty()) {
-            return null
-        }
-
-        val specs: List<Specification<T>> = params.map { criteria ->
-            Specification<T> { root, query, builder ->
-                val value = criteria.value
-                val key = criteria.key
-                when (criteria.operation) {
-                    SearchOperation.EQUALS -> builder.equal(root.get<Any>(key), value)
-                    SearchOperation.CONTAINS -> builder.like(root.get(key), "%\$value%")
-                    SearchOperation.GREATER_THAN -> builder.greaterThan(root.get(key), value as Comparable<Any>)
-                    SearchOperation.LESS_THAN -> builder.lessThan(root.get(key), value as Comparable<Any>)
-                    else -> builder.conjunction() // Return a predicate that is always true for unhandled cases
-                }
-            }
-        }
-
-        return specs.reduceOrNull { acc, spec -> acc.and(spec) }
-    }
-}
-KOTLIN;
-    }
-
-    private function generateFilterCriteriaKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-data class FilterCriteria(
-    val key: String,
-    val operation: SearchOperation,
-    val value: Any?
-)
-KOTLIN;
-    }
-
-    private function generateSearchOperationKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-enum class SearchOperation {
-    EQUALS,
-    NOT_EQUALS,
-    CONTAINS,
-    GREATER_THAN,
-    GREATER_THAN_OR_EQUALS,
-    LESS_THAN,
-    LESS_THAN_OR_EQUALS,
-    IN,
-    NOT_IN
-}
-KOTLIN;
-    }
-
-    private function generateGenericSpecificationKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-import jakarta.persistence.criteria.CriteriaBuilder
-import jakarta.persistence.criteria.CriteriaQuery
-import jakarta.persistence.criteria.Predicate
-import jakarta.persistence.criteria.Root
-import org.springframework.data.jpa.domain.Specification
-
-class GenericSpecification<T>(private val criteria: FilterCriteria) : Specification<T> {
-
-    override fun toPredicate(root: Root<T>, query: CriteriaQuery<*>, builder: CriteriaBuilder): Predicate? {
-        val key = criteria.key
-        val value = criteria.value
-        val fieldType = root.get<Any>(key).javaType
-
-        val typedValue = value?.let {
-            val stringValue = it.toString()
-            when (fieldType) {
-                Integer::class.java, Int::class.java -> stringValue.toIntOrNull()
-                Long::class.java, Long::class.java -> stringValue.toLongOrNull()
-                Double::class.java, Double::class.java -> stringValue.toDoubleOrNull()
-                Float::class.java, Float::class.java -> stringValue.toFloatOrNull()
-                Boolean::class.java, Boolean::class.java -> stringValue.toBoolean()
-                else -> stringValue
-            }
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        return when (criteria.operation) {
-            SearchOperation.EQUALS -> builder.equal(root.get<Any>(key), typedValue)
-            SearchOperation.NOT_EQUALS -> builder.notEqual(root.get<Any>(key), typedValue)
-            SearchOperation.GREATER_THAN -> {
-                val comparableValue = typedValue as? Comparable<Any>
-                comparableValue?.let { builder.greaterThan(root.get(key), it) }
-            }
-            SearchOperation.GREATER_THAN_OR_EQUALS -> {
-                val comparableValue = typedValue as? Comparable<Any>
-                comparableValue?.let { builder.greaterThanOrEqualTo(root.get(key), it) }
-            }
-            SearchOperation.LESS_THAN -> {
-                val comparableValue = typedValue as? Comparable<Any>
-                comparableValue?.let { builder.lessThan(root.get(key), it) }
-            }
-            SearchOperation.LESS_THAN_OR_EQUALS -> {
-                val comparableValue = typedValue as? Comparable<Any>
-                comparableValue?.let { builder.lessThanOrEqualTo(root.get(key), it) }
-            }
-            SearchOperation.CONTAINS -> if (fieldType == String::class.java) builder.like(root.get(key), "%\$typedValue%") else builder.equal(root.get<Any>(key), typedValue)
-            SearchOperation.IN -> root.get<Any>(key).`in`(typedValue as? Collection<*>)
-            SearchOperation.NOT_IN -> builder.not(root.get<Any>(key).`in`(typedValue as? Collection<*>))
-        }
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the AuditTrailUtil object in Kotlin.
-     * @return string The Kotlin code for AuditTrailUtil.kt.
-     */
-    private function generateAuditTrailUtilKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-import jakarta.servlet.http.HttpServletRequest
-import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.web.context.request.ServletRequestAttributes
-
-object AuditTrailUtil {
-
-    /**
-     * Retrieves the client's IP address from the current request.
-     * It checks for the 'X-FORWARDED-FOR' header first.
-     */
-    fun getUserIp(): String? {
-        val request = (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)?.request ?: return null
-        var remoteAddr = request.getHeader("X-FORWARDED-FOR")
-        if (remoteAddr.isNullOrEmpty()) {
-            remoteAddr = request.remoteAddr
-        } else {
-            remoteAddr = remoteAddr.split(",")[0].trim()
-        }
-        return remoteAddr
-    }
-
-    /**
-     * Retrieves the ID of the currently authenticated admin user from the session.
-     */
-    fun getUserId(): String? {
-        val request = (RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes)?.request ?: return null
-        val session = request.getSession(false)
-        return session?.getAttribute("adminId") as? String
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the ValueUtil object in Kotlin for handling naming conversions and map-to-DTO conversions.
-     * @return string The content of the ValueUtil class.
-     */
-    private function generateValueUtilKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-
-object ValueUtil {
-
-    private val MAPPER: ObjectMapper = ObjectMapper().apply {
-        registerKotlinModule()
-        registerModule(JavaTimeModule())
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, true)
-    }
-
-    /**
-     * Converts a Map with snake_case keys directly to a target DTO.
-     */
-    fun <T> convertSnakeCaseToDto(snakeCaseMap: Map<String, Any>?, targetClass: Class<T>): T {
-        val camelCaseMap = convertSnakeToCamelCase(snakeCaseMap)
-        return MAPPER.convertValue(camelCaseMap, targetClass)
-    }
-
-    /**
-     * Converts the keys of a Map from snake_case to camelCase.
-     */
-    private fun convertSnakeToCamelCase(snakeCaseMap: Map<String, Any>?): Map<String, Any> {
-        if (snakeCaseMap == null) {
-            return emptyMap()
-        }
-        return snakeCaseMap.mapKeys { toCamelCase(it.key) }
-    }
-
-    /**
-     * Converts a single snake_case string to camelCase.
-     */
-    fun toCamelCase(snakeCase: String): String {
-        return snakeCase.split('_').reduceIndexed { index, acc, part ->
-            if (index == 0) part else acc + part.replaceFirstChar { it.uppercase() }
-        }
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the `ScalarValueUtil` object in Kotlin.
-     * @return string The content of the `ScalarValueUtil` class.
-     */
-    private function generateScalarValueUtilKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.util
-
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-object ScalarValueUtil {
-
-    private const val DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
-    private const val DATE_FORMAT = "yyyy-MM-dd"
-
-    private val dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)
-    private val dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT)
-
-    fun localDateTimeToString(datetime: LocalDateTime?): String? {
-        return datetime?.format(dateTimeFormatter)
-    }
-
-    fun localDateToString(date: LocalDate?): String? {
-        return date?.format(dateFormatter)
-    }
-
-    fun stringToLocalDateTime(datetime: String?): LocalDateTime? {
-        return if (datetime.isNullOrEmpty()) null else LocalDateTime.parse(datetime, dateTimeFormatter)
-    }
-
-    fun stringToLocalDate(date: String?): LocalDate? {
-        return if (date.isNullOrEmpty()) null else LocalDate.parse(date, dateFormatter)
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the ObjectScalar class for GraphQL custom scalar type in Kotlin.
-     * @return string The Java code for ObjectScalar.java.
-     */
-    private function generateObjectScalarKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.config
-
-import graphql.language.Value
-import graphql.language.ObjectValue
-import graphql.schema.Coercing
-import graphql.schema.CoercingParseLiteralException
-import graphql.GraphQLContext
-import org.springframework.stereotype.Component
-import java.util.Locale
-
-@Component
-class ObjectScalar : Coercing<Any?, Any?> {
-    override fun serialize(dataFetcherResult: Any, graphQLContext: GraphQLContext, locale: Locale): Any? {
-        return dataFetcherResult
-    }
-
-    override fun parseValue(input: Any, graphQLContext: GraphQLContext, locale: Locale): Any? {
-        return input
-    }
-
-    fun parseLiteral(
-        input: Value<*>,
-        variables: Map<String, Any>,
-        graphQLContext: GraphQLContext,
-        locale: Locale
-    ): Any? {
-        return if (input is ObjectValue) {
-            input.objectFields.associate { it.name to it.value }
-        } else {
-            throw CoercingParseLiteralException("Expected an ObjectValue literal but was: \$input")
-        }
-    }
-}
-KOTLIN;
-    }
-
-    /**
-     * Generates the GraphQlConfig class for GraphQL configuration in Kotlin.
-     * @return string The Java code for GraphQlConfig.java.
-     */
-    private function generateGraphQlConfigKt() {
-        $package = $this->projectConfig['packageName'];
-        return <<<KOTLIN
-package $package.config
-
-import $package.config.ObjectScalar
-import graphql.schema.GraphQLScalarType
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.graphql.execution.RuntimeWiringConfigurer
-
-@Configuration
-class GraphQlConfig {
-    @Bean
-    fun runtimeWiringConfigurer(objectScalar: ObjectScalar): RuntimeWiringConfigurer {
-        val objectScalar = GraphQLScalarType.newScalar()
-            .name("Object")
-            .description("A custom scalar that can represent any JSON-like object.")
-            .coercing(objectScalar)
-            .build()
-
-        return RuntimeWiringConfigurer { builder ->
-            builder.scalar(objectScalar)
-        }
-    }
-}
-KOTLIN;
-    }
-
     
 }

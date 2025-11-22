@@ -8,18 +8,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
  * Configuration class for setting up Cross-Origin Resource Sharing (CORS).
- * This class defines the global CORS configuration for the application, allowing
- * requests from specified origins.
+ * This class defines the global CORS configuration for the application,
+ * allowing requests from specified origins.
  *
- * @property origins A comma-separated string of allowed origins, injected from the `app.cors.origins` application property.
+ * @property origins A comma-separated string of allowed origins,
+ * injected from the `app.cors.origins` application property.
  */
 @Configuration
 class CorsConfig(
     @Value("\${app.cors.origins}") private val origins: String
 ) {
+
     /**
      * Creates a [WebMvcConfigurer] bean that configures CORS mappings.
-     * It applies the CORS settings to all endpoints (`/**`) and allows all HTTP methods.
+     * It applies the CORS settings to all endpoints 
+     * and allows all HTTP methods.
+     *
      * The allowed origins are parsed from the `origins` property.
      *
      * @return A [WebMvcConfigurer] instance with the defined CORS configuration.
