@@ -154,7 +154,6 @@ const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const crypto = require('crypto');
 const multer = require('multer');
-const authMiddleware = require('./middleware/authMiddleware');
 const conditionalAuth = require('./middleware/conditionalAuth');
 const profileRoutes = require('./routes/profileRoutes');
 const adminRoutes = require('./routes/adminRoutes');
@@ -713,11 +712,23 @@ JS;
             $pascalName = $this->pascalCase($tableName);
             $pluralCamelName = $this->pluralize($camelName);
             $primaryKey = $this->camelCase($tableInfo['primaryKey']);
+            error_log(print_r($tableInfo, true));
+            $hasActiveColumn = $tableInfo['hasActiveColumn'];
+            $activeField = $this->activeField;
+            $pkType = 'GraphQLString';
+            foreach($tableInfo['columns'] as $col)
+            {
+                if($col['isPrimaryKey'])
+                {
+                    $pkType = $this->mapDbTypeToNodeJsGqlType($col['type'], $col['length']);
+                    break;
+                }
+            }
 
             // --- Query Resolvers ---
             $queryFields .= "        $camelName: {\n";
             $queryFields .= "            type: types.{$pascalName}Type,\n";
-            $queryFields .= "            args: { id: { type: new GraphQLNonNull(GraphQLID) } },\n";
+            $queryFields .= "            args: { id: { type: new GraphQLNonNull($pkType) } },\n";
             $queryFields .= "            resolve(parent, args) {\n";
             $queryFields .= "                return models.$pascalName.findByPk(args.id);\n";
             $queryFields .= "            }\n";
@@ -783,7 +794,7 @@ JS;
             $mutationFields .= "        update$pascalName: {\n";
             $mutationFields .= "            type: types.{$pascalName}Type,\n";
             $mutationFields .= "            args: {\n";
-            $mutationFields .= "                id: { type: new GraphQLNonNull(GraphQLID) },\n";
+            $mutationFields .= "                id: { type: new GraphQLNonNull($pkType) },\n";
             $mutationFields .= "                input: { type: new GraphQLNonNull(types.{$pascalName}InputType) }\n";
             $mutationFields .= "            },\n";
             $mutationFields .= "            async resolve(parent, args) {\n";
@@ -794,9 +805,26 @@ JS;
             $mutationFields .= "            }\n";
             $mutationFields .= "        },\n";
 
+            if($hasActiveColumn)
+            {
+            $mutationFields .= "        toggle{$pascalName}Active: {\n";
+            $mutationFields .= "            type: types.{$pascalName}Type,\n";
+            $mutationFields .= "            args: {\n";
+            $mutationFields .= "                id: { type: new GraphQLNonNull($pkType) },\n";
+            $mutationFields .= "                $activeField: { type: new GraphQLNonNull(GraphQLBoolean) }\n";
+            $mutationFields .= "            },\n";
+            $mutationFields .= "            async resolve(parent, args) {\n";
+            $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
+            $mutationFields .= "                if (!item) throw new Error('$pascalName not found');\n";
+            $mutationFields .= "                await item.update({ $activeField: args.$activeField });\n";
+            $mutationFields .= "                return item;\n";
+            $mutationFields .= "            }\n";
+            $mutationFields .= "        },\n";
+            }
+
             $mutationFields .= "        delete$pascalName: {\n";
             $mutationFields .= "            type: GraphQLBoolean,\n";
-            $mutationFields .= "            args: { id: { type: new GraphQLNonNull(GraphQLID) } },\n";
+            $mutationFields .= "            args: { id: { type: new GraphQLNonNull($pkType) } },\n";
             $mutationFields .= "            async resolve(parent, args) {\n";
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
             $mutationFields .= "                if (!item) throw new Error('$pascalName not found');\n";

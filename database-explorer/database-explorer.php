@@ -372,9 +372,9 @@ if(!isset($databaseName))
                         <select class="form-control programming-language-selector">
                             <option value="php">PHP</option>
                             <option value="java">Java (Commercial Use)</option>
+                            <option value="kotlin">Kotlin (Experimental)</option>
                             <option value="nodejs">Node.js (Commercial Use)</option>
                             <option value="python">Python (Commercial Use)</option>
-                            <option value="kotlin">Kotlin (Experimental)</option>
                             <option value="go">Go (Experimental)</option>
                         </select>
                         &nbsp;
