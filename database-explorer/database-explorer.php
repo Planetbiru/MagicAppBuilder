@@ -375,7 +375,6 @@ if(!isset($databaseName))
                             <option value="kotlin">Kotlin (Experimental)</option>
                             <option value="nodejs">Node.js (Commercial Use)</option>
                             <option value="python">Python (Commercial Use)</option>
-                            <option value="go">Go (Experimental)</option>
                         </select>
                         &nbsp;
                         <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
