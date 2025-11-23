@@ -1357,7 +1357,7 @@ class GraphQLClientApp {
                 if (col && col.isForeignKey) {
                     const relatedEntity = this.config.entities[this.camelCase(col.references)];
                     if (relatedEntity) {
-                        const fields = this.getFieldsForQuery(relatedEntity, 0, 0);
+                        const fields = this.getFieldsForQuery(relatedEntity, 0, 1);
                         // Add each entity query to the list, using its pluralName as the key
                         queriesToMerge.push(`${relatedEntity.pluralName}(limit: 1000) { items { ${fields} } }`);
                     }
@@ -2538,5 +2538,9 @@ class GraphQLClientApp {
  * @returns {string} The generated label.
  */
 GraphQLClientApp.prototype._generateLabelFromKey = function (key) {
-    return key.replace(/_/g, ' ').replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.substr(1).toLowerCase());
+    return key
+        .replace(/_/g, ' ')
+        .replace(/\w\S*/g, (w) => 
+            w.charAt(0).toUpperCase() + w.substring(1).toLowerCase()
+        );
 };
