@@ -65,6 +65,53 @@ function generateReadmeGo($appName, $generator)
         "The GraphQL playground will be available at `http://localhost:8080/`.\n";
 }
 
+class ZipSimulator
+{
+    private $baseDirectory = '';
+    public function __construct($baseDirectory)
+    {
+        $this->baseDirectory = $baseDirectory;
+    }
+    public function addFromString($fileName, $content)
+    {
+        $path = $this->constructPath($fileName);
+        $this->prepareDirectory($path);
+        file_put_contents($path, $content);
+    }
+    public function addFile($source, $fileName)
+    {
+        $path = $this->constructPath($fileName);
+        $this->prepareDirectory($path);
+        copy($source, $path);
+    }
+    private function constructPath($fileName)
+    {
+        $fileName = ltrim($fileName, "\\/");
+        if(!empty($this->baseDirectory))
+        {
+            $path = rtrim($this->baseDirectory, "\\/")."/".ltrim($fileName);
+        }
+        else
+        {
+            $path = $fileName;
+        }
+        $path = str_replace(array("//", "\\\\"), "/", $path);
+        return $path;
+    }
+    private function prepareDirectory($path)
+    {
+        $dirname = dirname($path);
+        if(!file_exists($dirname))
+        {
+            mkdir($dirname, 0755, true);
+        }
+    }
+    public function close()
+    {
+        // Do nothing
+    }
+}
+
 $reservedColumnMap = createReservedColumnMap($reservedColumns['columns']);
 $groupId = $builderConfig->issetGroupId() ? $builderConfig->getGroupId() : 'com.planetbiru';
 
@@ -99,7 +146,7 @@ try {
         $backendHandledColumns,
         false, // useCache is not relevant for Go in this context
         array(
-            'moduleName' => str_replace('-', '', $app->getApplicationId()),
+            'moduleName' => str_replace(array('-', '.', '_', ' ', '/', '\\'), '', $app->getApplicationId()),
             'goVersion' => '1.21',
             'appName' => $app->getName(),
             'appDescription' => $app->getDescription(),
@@ -108,11 +155,14 @@ try {
     );
 
     // Create a single ZIP file for the Go project
+    $zip = new ZipSimulator(dirname(dirname(__DIR__)) . '/go-test');
+    /*
     $zip = new ZipArchive();
     $zipFilePath = tempnam(sys_get_temp_dir(), 'golang_app_');
     if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
         throw new Exception("Could not create Go project ZIP file.");
     }
+    */
 
     // Generate all Go files
     $backendFiles = $generator->generate();
@@ -129,6 +179,9 @@ DB_PASS={DB_PASS}
 SERVER_PORT=8080
 SESSION_SECRET=a-very-secret-key-that-you-should-change
 REQUIRE_LOGIN=false
+
+GRAPHQL_ENDPOINT=/graphql
+GRAPHQL_SCHEMA=schema/schema.graphql
 ENV;
 
     $envContent = setGoEnvConfiguration($app, $envTemplate);
