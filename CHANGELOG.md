@@ -3840,6 +3840,31 @@ Built using modern, high-performance frameworks:
 > **Available only in the Professional Edition.**
 
 
+# **New Feature: GraphQL Application Generator for Go**
+
+MagicAppBuilder 2.0 now supports the Go ecosystem with the **Go GraphQL Application Generator**.
+
+This generator creates a high-performance, concurrent GraphQL backend using idiomatic Go practices and popular libraries:
+
+### **What the Generator Produces**
+
+*   **Complete Project Structure** — A standard Go project with a `go.mod` file for dependency management.
+*   **GraphQL Schema & Resolvers** — Auto-generated `.graphqls` schema and corresponding Go resolver stubs.
+*   **Advanced Filtering & Pagination** — Built into all list queries.
+*   **Ready-to-Run Server** — A pre-configured HTTP server using Chi.
+*   **Web Frontend** — A minimal HTML/CSS/JS UI that connects to the backend.
+
+### **Why Go?**
+
+*   **Exceptional Performance** — Compiled to native machine code, offering C-like speed.
+*   **Built-in Concurrency** — Goroutines and channels make concurrent programming simple and efficient.
+*   **Statically Typed** — Catches errors at compile time, ensuring robust applications.
+*   **Simple & Clean Syntax** — Easy to learn and maintain.
+*   **Ideal for Microservices** — Lightweight and fast, perfect for building scalable backend services.
+
+> **Available only in the Professional Edition.**
+
+
 ## **Enhancements**
 
 ### Consistent Boolean Handling Across All Databases

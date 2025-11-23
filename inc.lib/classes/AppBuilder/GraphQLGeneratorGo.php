@@ -129,7 +129,7 @@ class GraphQLGeneratorGo extends GraphQLGeneratorBase
         $files[] = ['name' => 'main.go', 'content' => $this->generateMainGo()];
 
         // 3. GraphQL setup
-        $files[] = ['name' => 'schema/schema.graphql', 'content' => $this->generateCombinedSchema()];
+        $files[] = ['name' => 'schema/schema.graphqls', 'content' => $this->generateCombinedSchema()];
 
         // 4. Models (Entities and DTOs)
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
@@ -152,17 +152,23 @@ class GraphQLGeneratorGo extends GraphQLGeneratorBase
 
         // 6. Security and Auth
         $files[] = ['name' => 'handler/auth.go', 'content' => $this->generateAuthGo()];
-        // $files[] = ['name' => 'modelcore/admin.go', 'content' => $this->generateAdminModelGo()];
 
-        // 7. Utility
-        // $files[] = ['name' => 'util/util.go', 'content' => $this->generateUtilGo()];
-
-        // 8. Manual
+        // 7. Manual
         $files[] = ['name' => 'manual.md', 'content' => $this->generateManual()];
 
         return $files;
     }
 
+    /**
+     * Generates the Go configuration file.
+     *
+     * This file initializes a global `IsPostgres` flag based on the `DB_DRIVER`
+     * environment variable. The flag allows other components (e.g., query
+     * builders or resolvers) to apply PostgreSQL-specific behavior such as
+     * using ILIKE instead of LIKE.
+     *
+     * @return string The generated Go source code for config/config.go
+     */
     private function geterateConfig()
     {
         return <<<GO
@@ -185,6 +191,21 @@ func init() {
 GO;
     }
 
+    /**
+     * Generates the Go query builder utilities.
+     *
+     * This includes:
+     * - `BuildQuery`: Generates SQL WHERE and ORDER BY clauses based on
+     *   GraphQL-style filter and sort inputs. Supports dynamic operators,
+     *   PostgreSQL-specific LIKE/ILIKE rules, and safe parameter binding.
+     *
+     * - `PaginationArgs`: Represents incoming pagination-related fields.
+     *
+     * - `GetPagination`: Computes page, limit, and offset values based
+     *   on GraphQL pagination inputs, supporting default values and overrides.
+     *
+     * @return string The generated Go source code for input/query_builder.go
+     */
     private function geterateQueryBuilder()
     {
         return <<<GO
@@ -316,6 +337,18 @@ func GetPagination(args PaginationArgs) (limit, page, offset int32) {
 }
 GO;
     }
+    /**
+     * Generates Go structs that represent GraphQL input types.
+     *
+     * Includes:
+     * - `FilterInput`: Defines a filter rule with a field name, operator,
+     *   and dynamic value using the custom `Any` scalar.
+     * - `SortInput`: Defines sort order, including optional direction.
+     *
+     * These types are used when building dynamic filter and sorting queries.
+     *
+     * @return string The generated Go source code for input/input.go
+     */
     private function geterateInput()
     {
         return <<<GO
@@ -336,6 +369,19 @@ type SortInput struct {
 GO;
     }
 
+    /**
+     * Generates the implementation of the custom `Any` GraphQL scalar.
+     *
+     * This scalar:
+     * - Accepts any JSON value from the client.
+     * - Stores it internally as an empty interface.
+     * - Implements GraphQL unmarshalling for incoming values.
+     * - Implements JSON marshaling when returning values.
+     *
+     * It is used primarily for dynamic filtering values.
+     *
+     * @return string The generated Go source code for input/any_scalar.go
+     */
     private function geterateAnyScalar()
     {
 return <<<GO
@@ -370,22 +416,47 @@ func (a *Any) Value() interface{} {
 GO;
     }
 
+    /**
+     * Generates a Go file containing constant values used across the
+     * GraphQL application. These constants cover:
+     *
+     * - Standard datetime formatting
+     * - Keys used for storing and retrieving session values
+     * - Keys for retrieving contextual metadata such as the client IP
+     *
+     * @return string The generated Go source code for constant/constant.go
+     */
     private function geterateConstant()
     {
         return <<<GO
 package constant
 
 const (
-	DateTimeFormat string = "2006-01-02 15:04:05"
-    RemoteAddr string     = "RemoteAddr"
-	SessionKey string     = "SessionKey"
+	DateTimeFormat string  = "2006-01-02 15:04:05"
+    RemoteAddr string      = "RemoteAddr"
+	SessionKey string      = "SessionKey"
 	SessionUsername string = "SessionUsername"
 	SessionPassword string = "SessionPassword"
-	SessionAdminId string = "SessionAdminId"
+	SessionAdminId string  = "SessionAdminId"
 )
 GO;
     }
 
+    /**
+     * Generates the root GraphQL resolver interface and implementation.
+     *
+     * The generated code includes:
+     * - `ResolverRoot` interface: Defines contract for all entity resolvers.
+     * - `RootResolver` struct: Stores shared dependencies such as the DB
+     *   connection and resolver instances.
+     * - `NewRootResolver`: Instantiates a root resolver and initializes all
+     *   table-specific query resolvers.
+     *
+     * This acts as the central point that gqlgen / graphql-go uses to
+     * resolve all queries and mutations.
+     *
+     * @return string The generated Go source code for resolver/root_resolver.go
+     */
     private function generateResolverRoot()
     {
         $packageName = $this->projectConfig['moduleName'];
@@ -430,6 +501,17 @@ $code3
 GO;
     }
 
+    /**
+     * Generates resolver files for every analyzed database table.
+     *
+     * Each resolver file includes:
+     * - Type definitions
+     * - Query resolvers
+     * - Mutation resolvers (if implemented)
+     * - Field resolvers for foreign-key relationships
+     *
+     * @return array List of generated resolver files, each containing filename and content.
+     */
     private function generateResolvers()
     {
         $resolvers = [];
@@ -439,6 +521,21 @@ GO;
         return $resolvers;
     }
 
+    /**
+     * Generates the complete resolver file for a specific database table.
+     *
+     * A resolver file contains:
+     * - Required import statements
+     * - Type resolver definitions
+     * - Field-level resolver methods
+     * - Query resolvers (single and paginated list)
+     * - Foreign key relationship resolvers
+     *
+     * @param string $tableName The database table name.
+     * @param array $tableInfo  Metadata describing the table structure.
+     *
+     * @return string The complete Go resolver source file for this entity.
+     */
     private function generateResolver($tableName, $tableInfo)
     {
         $contents = [];
@@ -452,6 +549,18 @@ GO;
         return implode("\r\n", $contents);
     }
 
+    /**
+     * Generates the import section for a resolver file.
+     *
+     * Imports are determined dynamically based on:
+     * - Project module name
+     * - Whether the table uses UUID auto-generation
+     * - Whether PostgreSQL-specific behavior may be needed
+     *
+     * @param array $tableInfo Metadata describing the table structure.
+     *
+     * @return string A formatted import block.
+     */
     private function generateResolverImport($tableInfo)
     {
         $packageName = $this->projectConfig['moduleName'];
@@ -476,13 +585,26 @@ GO;
 
         if($autogenerated)
         {
-             $libraries[] = "\r\n\t\"github.com/google/uuid\"";
+            $libraries[] = "\r\n\t\"github.com/google/uuid\"";
         }
         
         return "import(\r\n".implode("\r\n", $libraries)."\r\n)\r\n";
         
     }
 
+    /**
+     * Generates Go type declarations for an entity resolver.
+     *
+     * Includes:
+     * - Query resolver struct for entity-level operations
+     * - Item resolver struct for field-level access
+     * - Page resolver struct for paginated list responses
+     *
+     * @param string $tableName The database table name.
+     * @param array $tableInfo  Metadata describing the table structure.
+     *
+     * @return string Resolver type definitions as Go source code.
+     */
     private function generateResolverType($tableName, $tableInfo)
     {
         $pascalName = $this->pascalCase($tableName);
@@ -514,13 +636,29 @@ type {$resolverName}PageResolver struct {
         return implode("\r\n", $contents);
     }
 
+    /**
+     * Generates GraphQL query resolver methods for a database entity.
+     *
+     * The generated methods include:
+     * - Field resolver methods for every column
+     * - Relationship resolvers for foreign keys
+     * - A single-item query (fetch by primary key)
+     * - A paginated list query with filtering and sorting
+     *
+     * Pagination, filtering, and sorting are delegated to the query builder,
+     * while this resolver focuses on translating the data into model objects.
+     *
+     * @param string $tableName The database table name.
+     * @param array $tableInfo  Metadata describing the table structure.
+     *
+     * @return string Query resolver implementations as Go source code.
+     */
     private function generateResolverQuery($tableName, $tableInfo)
     {
         $pascalName = $this->pascalCase($tableName);
         $pascalNamePlural = $this->pluralize($pascalName);
         $singleResolver = "{$pascalName}Resolver";
         $pageResolver = "{$pascalName}PageResolver";
-
 
         $methods = [];
         $columnInfo = [];
@@ -552,19 +690,7 @@ type {$resolverName}PageResolver struct {
         $entityMethods = implode("\r\n", $methods);
 
         $addCols = [];
-        /*
-        &m.BlokID,
-		&m.Nama,
-		&m.LantaiID,
-		&m.SortOrder,
-		&m.AdminBuat,
-		&m.AdminUbah,
-		&m.WaktuBuat,
-		&m.WaktuUbah,
-		&m.IpBuat,
-		&m.IpUbah,
-		&m.Aktif,
-        */
+
         $relMethods = [];
 
         foreach($tableInfo['columns'] as $columnName => $col)
@@ -591,30 +717,6 @@ func (r *$singleResolver) {$pascalEntityName}(ctx context.Context) (*{$pascalEnt
         }
 
         $relationMethods = implode("\r\n", $relMethods);
-
-        /*
-// Lantai resolves the related Lantai for this Blok.
-func (r *$singleResolver) Lantai(ctx context.Context) (*LantaiResolver, error) {
-	if r.m.LantaiID == nil {
-		return nil, nil
-	}
-	return r.r.root.Lantai(ctx, struct{ ID string }{ID: *r.m.LantaiID})
-}
-*/
-
-        /*
-func (r *$singleResolver) Blok_id() *string    { return &r.m.BlokID }
-func (r *$singleResolver) Nama() *string       { return r.m.Nama }
-func (r *$singleResolver) Lantai_id() *string  { return r.m.LantaiID }
-func (r *$singleResolver) Sort_order() *int32  { return r.m.SortOrder }
-func (r *$singleResolver) Admin_buat() *string { return r.m.AdminBuat }
-func (r *$singleResolver) Admin_ubah() *string { return r.m.AdminUbah }
-func (r *$singleResolver) Waktu_buat() *string { return r.m.WaktuBuat }
-func (r *$singleResolver) Waktu_ubah() *string { return r.m.WaktuUbah }
-func (r *$singleResolver) Ip_buat() *string    { return r.m.IpBuat }
-func (r *$singleResolver) Ip_ubah() *string    { return r.m.IpUbah }
-func (r *$singleResolver) Aktif() *bool        { return r.m.Aktif }
-*/
         
         $addresOfColumns1 = implode("\r\n", $addCols);
         $addresOfColumns1 = str_replace("\t\t\t", "\t\t", $addresOfColumns1);
@@ -734,6 +836,47 @@ GO;
         return $queries;
     }
 
+    /**
+     * Generates Go GraphQL resolver mutation code for the specified database table.
+     *
+     * This method analyzes table metadata (columns, primary key, auto-increment,
+     * auto-generated fields, backend-handled fields, etc.) and produces complete
+     * mutation implementations for:
+     * - Create
+     * - Update
+     * - Delete
+     * - ToggleActive
+     *
+     * The generated Go code includes:
+     * - Input struct definitions
+     * - Field type mappings based on database column types
+     * - INSERT and UPDATE query builders
+     * - Automatic handling for backend-managed fields such as:
+     *   - Creation time (timeCreate)
+     *   - Update time (timeEdit)
+     *   - Creation IP (ipCreate)
+     *   - Update IP (ipEdit)
+     *   - Admin ID for creation (adminCreate)
+     *   - Admin ID for update (adminEdit)
+     * - Support for UUID auto-generation when required
+     * - Dynamic update field building based on non-null input values
+     *
+     * @param string $tableName
+     *     Name of the database table to generate resolver mutations for.
+     *
+     * @param array $tableInfo
+     *     Table structure information, including:
+     *     - columns: array of column definitions
+     *     - primary key properties
+     *     - auto-increment or auto-generated indicators
+     *
+     * @return string
+     *     A complete Go-language source code block containing all mutation
+     *     resolvers for the specified table, ready to be written into a .go file.
+     *
+     * @throws Exception
+     *     Throws an exception if required metadata is missing or inconsistent.
+     */
     private function generateResolverMutation($tableName, $tableInfo)
     {
         $pascalName = $this->pascalCase($tableName);
@@ -859,8 +1002,6 @@ GO;
                 }
             }
         }
-        // fields = append(fields, "admin_ubah = ?")
-        // params = append(params, ctx.Value(constant.SessionAdminId).(string))
 
         $tp[] = "{$this->activeField} = ?";
 
@@ -1249,12 +1390,27 @@ func main() {
 	log.Printf("Serving available themes on http://localhost:%s/available-theme", serverPort)
 	log.Printf("Serving frontend config on http://localhost:%s/frontend-config", serverPort)
 	log.Printf("Serving assets from ./%s on http://localhost:%s%s", assetsDir, serverPort, assetsPath)
-	log.Printf("Serving static index.html on http://localhost:%s/", serverPort)
+	log.Printf("Serving web page index.html on http://localhost:%s/", serverPort)
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }
 GO;
     }
 
+    /**
+     * Converts a given name into a Go-style exported field name.
+     *
+     * This method first transforms the input into PascalCase, ensuring that
+     * the generated name follows Go's exported identifier convention.
+     * Additionally, it normalizes any trailing "Id" into the Go-preferred "ID".
+     *
+     * Examples:
+     * - "user_id"   → "UserID"
+     * - "adminName" → "AdminName"
+     * - "roleId"    → "RoleID"
+     *
+     * @param string $name The original column or field name.
+     * @return string The transformed Go-style field name.
+     */
     private function goName($name)
     {
         $name = $this->pascalCase($name);
@@ -1341,7 +1497,7 @@ GO;
     /**
      * Generates the combined GraphQL schema file.
      *
-     * @return string The content of schema.graphqls.
+     * @return string The content of schema.graphqlss.
      */
     private function generateCombinedSchema()
     {
@@ -1659,182 +1815,6 @@ GO;
     }
 
     /**
-     * Generates the util.go file with helper functions.
-     *
-     * @return string The content of util.go.
-     */
-    public function generateUtilGo()
-    {
-        $moduleName = $this->projectConfig['moduleName'];
-        $backendHandledColumns = $this->getBackendHandledColumnNames();
-        $timeCreateCol = isset($this->backendHandledColumns['timeCreate']) ? $this->pascalCase($this->backendHandledColumns['timeCreate']['columnName']) : '';
-        $adminCreateCol = isset($this->backendHandledColumns['adminCreate']) ? $this->pascalCase($this->backendHandledColumns['adminCreate']['columnName']) : '';
-        $timeEditCol = isset($this->backendHandledColumns['timeEdit']) ? $this->pascalCase($this->backendHandledColumns['timeEdit']['columnName']) : '';
-        $adminEditCol = isset($this->backendHandledColumns['adminEdit']) ? $this->pascalCase($this->backendHandledColumns['adminEdit']['columnName']) : '';
-
-        $setCreateFields = "";
-        if ($timeCreateCol) $setCreateFields .= "    setField(model, \"{$timeCreateCol}\", time.Now())\n";
-        if ($adminCreateCol) $setCreateFields .= "    setField(model, \"{$adminCreateCol}\", adminID)\n";
-
-        $setUpdateFields = "";
-        if ($timeEditCol) $setUpdateFields .= "    setField(model, \"{$timeEditCol}\", time.Now())\n";
-        if ($adminEditCol) $setUpdateFields .= "    setField(model, \"{$adminEditCol}\", adminID)\n";
-
-        return <<<GO
-package util
-
-import (
-	"context"
-	"fmt"
-	"reflect"
-	"strings"
-	"time"
-
-	"{$moduleName}/auth"
-	"{$moduleName}/graph/model"
-	"gorm.io/gorm"
-)
-
-// Paginator holds pagination data
-type Paginator struct {
-	Limit  int
-	Offset int
-	Page   int
-}
-
-// NewPaginator creates a Paginator from GraphQL arguments
-func NewPaginator(limit, offset, page *int) *Paginator {
-	p := &Paginator{Limit: 20, Page: 1} // Defaults
-
-	if limit != nil {
-		p.Limit = *limit
-	}
-	if page != nil && *page > 0 {
-		p.Page = *page
-		p.Offset = (*page - 1) * p.Limit
-	} else if offset != nil {
-		p.Offset = *offset
-		if p.Limit > 0 {
-			p.Page = (*offset / p.Limit) + 1
-		}
-	}
-	return p
-}
-
-func (p *Paginator) TotalPages(total int) int {
-	if p.Limit == 0 {
-		return 0
-	}
-	return (total + p.Limit - 1) / p.Limit
-}
-
-func (p *Paginator) HasNext(total int) bool {
-	return p.Page < p.TotalPages(total)
-}
-
-func (p *Paginator) HasPrev() bool {
-	return p.Page > 1
-}
-
-// ApplyFilter applies a single filter to a GORM query
-func ApplyFilter(db *gorm.DB, filter model.FilterInput) *gorm.DB {
-	op := " = ?" // Default operator
-	var val interface{} = filter.Value
-
-	if filter.Operator != nil {
-		switch strings.ToUpper(string(*filter.Operator)) {
-		case "NOT_EQUALS":
-			op = " <> ?"
-		case "CONTAINS":
-			op = " LIKE ?"
-			val = fmt.Sprintf("%%%s%%", filter.Value)
-		case "GREATER_THAN":
-			op = " > ?"
-		case "GREATER_THAN_OR_EQUALS":
-			op = " >= ?"
-		case "LESS_THAN":
-			op = " < ?"
-		case "LESS_THAN_OR_EQUALS":
-			op = " <= ?"
-		case "IN":
-			op = " IN (?)"
-			val = strings.Split(fmt.Sprintf("%v", filter.Value), ",")
-		case "NOT_IN":
-			op = " NOT IN (?)"
-			val = strings.Split(fmt.Sprintf("%v", filter.Value), ",")
-		}
-	}
-	return db.Where(ToSnakeCase(filter.Field)+op, val)
-}
-
-// ApplyOrderBy applies sorting to a GORM query
-func ApplyOrderBy(db *gorm.DB, sort model.SortInput) *gorm.DB {
-	direction := "ASC"
-	if sort.Direction != nil && strings.ToUpper(string(*sort.Direction)) == "DESC" {
-		direction = "DESC"
-	}
-	return db.Order(fmt.Sprintf("%s %s", ToSnakeCase(sort.Field), direction))
-}
-
-// ToSnakeCase converts a string from camelCase to snake_case.
-func ToSnakeCase(str string) string {
-	var result []rune
-	for i, r := range str {
-		if r >= 'A' && r <= 'Z' {
-			if i > 0 {
-				result = append(result, '_')
-			}
-			result = append(result, r+('a'-'A'))
-		} else {
-			result = append(result, r)
-		}
-	}
-	return string(result)
-}
-
-// MapInputToModel maps fields from an input struct to a model struct.
-func MapInputToModel(input interface{}, model interface{}) {
-	inputValue := reflect.ValueOf(input)
-	modelValue := reflect.ValueOf(model).Elem()
-
-	for i := 0; i < inputValue.NumField(); i++ {
-		inputField := inputValue.Field(i)
-		if inputField.IsNil() {
-			continue
-		}
-
-		fieldName := inputValue.Type().Field(i).Name
-		modelField := modelValue.FieldByName(fieldName)
-
-		if modelField.IsValid() && modelField.CanSet() {
-			modelField.Set(inputField.Elem())
-		}
-	}
-}
-
-// SetAuditFieldsForCreate sets creation audit fields on a model.
-func SetAuditFieldsForCreate(model interface{}, ctx context.Context) {
-	adminID := ctx.Value(auth.AdminIDKey)
-$setCreateFields
-}
-
-// SetAuditFieldsForUpdate sets update audit fields on a model.
-func SetAuditFieldsForUpdate(model interface{}, ctx context.Context) {
-	adminID := ctx.Value(auth.AdminIDKey)
-$setUpdateFields
-}
-
-func setField(obj interface{}, fieldName string, value interface{}) {
-    v := reflect.ValueOf(obj).Elem()
-    field := v.FieldByName(fieldName)
-    if field.IsValid() && field.CanSet() {
-        field.Set(reflect.ValueOf(value))
-    }
-}
-GO;
-    }
-
-    /**
      * Maps a Java type to a GraphQL type for schema generation.
      *
      * @param string $goType The Go type.
@@ -1896,7 +1876,7 @@ GO;
         $manualContent .= "    go get github.com/gorilla/sessions\n";
         $manualContent .= "    go mod tidy\n";
         $manualContent .= "    ```\n\n";
-        $manualContent .= "5.  Run the application:\n\n";
+        $manualContent .= "4.  Run the application:\n\n";
         $manualContent .= "    ```bash\n";
         $manualContent .= "    go run .\n";
         $manualContent .= "    ```\n\n";
@@ -1905,18 +1885,129 @@ GO;
         // Add query/mutation examples similar to the Java generator
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
-            $pascalName = $this->pascalCase($tableName);
+            $pluralCamelName = $this->pluralize($camelName);
+            $ucCamelName = ucfirst($camelName);
 
-            $manualContent .= "\r\n## " . $pascalName . "\r\n\r\n";
-            $manualContent .= "### Get a single " . $camelName . "\r\n\r\n";
+            $manualContent .= "## " . $ucCamelName . "\r\n\r\n";
+
+            // --- Get Fields for examples ---
+            $fieldsString = $this->getFieldsForManual($tableInfo, false);
+            $mutationFieldsString = $this->getFieldsForManual($tableInfo, true); // No relations for mutation return
+
+            // --- Query Examples ---
+            $manualContent .= "### Queries\r\n\r\n";
+
+            // Get Single Item
+            $manualContent .= "#### Get a single " . $camelName . "\r\n\r\n";
             $manualContent .= "```graphql\r\n";
-            $manualContent .= "query Get" . $pascalName . " {\r\n";
-            $manualContent .= "  " . $camelName . "(id: \"your-id\") {\r\n";
-            $manualContent .= "    # ... fields\r\n";
+            $manualContent .= "query Get" . $ucCamelName . " {\r\n";
+            $manualContent .= "  " . $camelName . "(id: \"your-" . $camelName . "-id\") {\r\n";
+            $manualContent .= $fieldsString;
             $manualContent .= "  }\r\n";
             $manualContent .= "}\r\n";
             $manualContent .= "```\r\n\r\n";
+
+            // Get List
+            $manualContent .= "#### Get a list of " . $pluralCamelName . " (with filter & sort)\r\n\r\n";
+            $manualContent .= "Supports `limit`, `offset`, `orderBy`, and `filter`.\r\n\r\n";
+
+            // Find a good column for the filter example
+            $filterField = $tableInfo['primaryKey'];
+            $filterValue = '"your-' . $camelName . '-id"';
+            $filterOperator = 'EQUALS';
+
+            // Prefer 'name' or 'title' for a CONTAINS filter
+            foreach ($tableInfo['columns'] as $columnName => $columnInfo) {
+                if (($columnName === 'name' || $columnName === 'title') && !$columnInfo['isForeignKey']) {
+                    $filterField = $columnName;
+                    $filterValue = '"some-text"';
+                    $filterOperator = 'CONTAINS';
+                    break;
+                }
+            }
+
+            $manualContent .= "```graphql\r\n";
+            $manualContent .= "query Get" . ucfirst($pluralCamelName) . " {\r\n";
+            $manualContent .= "  " . $pluralCamelName . "(\r\n    limit: 10, \r\n    offset: 0, \r\n    orderBy: [{field: \"" . $tableInfo['primaryKey'] . "\", direction: DESC}],\r\n    filter: [{field: \"" . $filterField . "\", value: " . $filterValue . ", operator: " . $filterOperator . "}]\r\n  ) {\r\n";
+            $manualContent .= "    items {\r\n";
+            $manualContent .= preg_replace('/^/m', '      ', $fieldsString); // Indent fields
+            $manualContent .= "    }\r\n";
+            $manualContent .= "    total\r\n";
+            $manualContent .= "    limit\r\n";
+            $manualContent .= "    page\r\n";
+            $manualContent .= "    totalPages\r\n";
+            $manualContent .= "    hasNext\r\n";
+            $manualContent .= "    hasPrevious\r\n";
+            $manualContent .= "  }\r\n";
+            $manualContent .= "}\r\n";
+            $manualContent .= "```\r\n\r\n";
+
+            // --- Mutation Examples ---
+            $manualContent .= "### Mutations\r\n\r\n";
+
+            // Get Input Fields for mutations
+            list($inputFieldsString, $inputExampleString) = $this->getInputFieldsForManual($tableInfo);
+
+            // Create
+            $manualContent .= "#### Create a new " . $camelName . "\r\n\r\n";
+            $manualContent .= "```graphql\r\n";
+            $manualContent .= "mutation Create" . $ucCamelName . " {\r\n";
+            $manualContent .= "  create" . $ucCamelName . "(input: {\r\n" . $inputExampleString . "  }) {\r\n";
+            $manualContent .= $mutationFieldsString;
+            $manualContent .= "  }\r\n";
+            $manualContent .= "}\r\n";
+            $manualContent .= "```\r\n\r\n";
+
+            // Update
+            $manualContent .= "#### Update an existing " . $camelName . "\r\n\r\n";
+            $manualContent .= "```graphql\r\n";
+            $manualContent .= "mutation Update" . $ucCamelName . " {\r\n";
+            $manualContent .= "  update" . $ucCamelName . "(id: \"your-" . $camelName . "-id\", input: {\r\n" . $inputExampleString . "  }) {\r\n";
+            $manualContent .= $mutationFieldsString;
+            $manualContent .= "  }\r\n";
+            $manualContent .= "}\r\n";
+            $manualContent .= "```\r\n\r\n";
+
+            // Delete
+            $manualContent .= "#### Delete a " . $camelName . "\r\n\r\n";
+            $manualContent .= "Returns `true` on success.\r\n\r\n";
+            $manualContent .= "```graphql\r\n";
+            $manualContent .= "mutation Delete" . $ucCamelName . " {\r\n";
+            $manualContent .= "  delete" . $ucCamelName . "(id: \"your-" . $camelName . "-id\")\r\n";
+            $manualContent .= "}\r\n";
+            $manualContent .= "```\r\n\r\n";
         }
+
+        // --- API Reference Guide ---
+        $manualContent .= "## API Reference Guide\r\n\r\n";
+        $manualContent .= "This section provides a reference for common arguments used in list queries.\r\n\r\n";
+
+        // Filtering
+        $manualContent .= "### Filtering (`filter`)\r\n\r\n";
+        $manualContent .= "The `filter` argument allows you to narrow down results based on field values. It accepts a list of filter objects, which are combined with `AND` logic.\r\n\r\n";
+        $manualContent .= "| Operator       | Description                                      | Example                                                |\r\n";
+        $manualContent .= "|----------------|--------------------------------------------------|--------------------------------------------------------|\r\n";
+        $manualContent .= "| `EQUALS`       | Finds records where the field exactly matches the value. | `{field: \"status\", value: \"published\"}`                |\r\n";
+        $manualContent .= "| `NOT_EQUALS`   | Finds records where the field does not match the value. | `{field: \"status\", value: \"archived\", operator: NOT_EQUALS}` |\r\n";
+        $manualContent .= "| `CONTAINS`     | Finds records where the text field contains the value (`LIKE '%value%'`). | `{field: \"title\", value: \"love\", operator: CONTAINS}` |\r\n";
+        $manualContent .= "| `GREATER_THAN_OR_EQUALS` | Finds records where the numeric/date field is greater than or equal to the value. | `{field: \"price\", value: \"99.99\", operator: GREATER_THAN_OR_EQUALS}` |\r\n";
+        $manualContent .= "| `GREATER_THAN` | Finds records where the numeric/date field is greater than the value. | `{field: \"price\", value: \"100\", operator: GREATER_THAN}` |\r\n";
+        $manualContent .= "| `LESS_THAN_OR_EQUALS`    | Finds records where the numeric/date field is less than or equal to the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN_OR_EQUALS}`   |\r\n";
+        $manualContent .= "| `LESS_THAN`    | Finds records where the numeric/date field is less than the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN}`   |\r\n";
+        $manualContent .= "| `IN` / `NOT_IN` | Finds records where the field value is in (or not in) a comma-separated list of values. | `{field: \"category_id\", value: \"1,2,3\", operator: IN}` |\r\n\r\n";
+
+        // Sorting
+        $manualContent .= "### Sorting (`orderBy`)\r\n\r\n";
+        $manualContent .= "The `orderBy` argument sorts the results. It accepts a list of sort objects.\r\n\r\n";
+        $manualContent .= "- `field`: The name of the field to sort by (e.g., `\"name\"`).\r\n";
+        $manualContent .= "- `direction`: The sort direction. Can be `ASC` (ascending) or `DESC` (descending). Defaults to `ASC`.\r\n\r\n";
+        $manualContent .= "**Example:** `orderBy: [{field: \"release_date\", direction: DESC}]`\r\n\r\n";
+
+        // Pagination
+        $manualContent .= "### Pagination (`limit` & `offset`)\r\n\r\n";
+        $manualContent .= "- `limit`: Specifies the maximum number of records to return.\r\n";
+        $manualContent .= "- `offset`: Specifies the number of records to skip from the beginning.\r\n\r\n";
+        $manualContent .= "**Example:** To get the second page of 10 items: `limit: 10, offset: 10`\r\n\r\n";
 
         return $manualContent;
     }

@@ -187,7 +187,7 @@ SESSION_SECRET=a-very-secret-key-that-you-should-change
 REQUIRE_LOGIN=true
 
 GRAPHQL_ENDPOINT=/graphql
-GRAPHQL_SCHEMA=schema/schema.graphql
+GRAPHQL_SCHEMA=schema/schema.graphqls
 ENV;
 
     $envContent = setGoEnvConfiguration($app, $envTemplate);
@@ -204,26 +204,26 @@ ENV;
     $staticPath = 'static';
     
     // Add assets
-    addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", $staticPath . 'assets');
-    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-go.js", $staticPath . 'assets/app.js');
-    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-go.min.js", $staticPath . 'assets/app.min.js');
+    addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'static/assets');
+    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-go.js", 'static/assets/app.js');
+    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-go.min.js", 'static/assets/app.min.js');
 
     // Add language files
-    $zip->addFromString($staticPath . 'langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
+    $zip->addFromString('static/langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
     $entityLanguagePacks = $generator->generateFrontendLanguageJson();
-    $zip->addFromString($staticPath . 'langs/entity/source.json', $entityLanguagePacks);
-    $zip->addFromString($staticPath . 'langs/entity/en.json', $entityLanguagePacks);
+    $zip->addFromString('static/langs/entity/source.json', $entityLanguagePacks);
+    $zip->addFromString('static/langs/entity/en.json', $entityLanguagePacks);
     $zip->addFromString('static/config/frontend-config.json', $generator->generateFrontendConfigJson());
 
     // Add i18n files
-    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", $staticPath . 'langs/i18n/source.json');
-    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", $staticPath . 'langs/i18n/en.json');
-    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", $staticPath . 'langs/i18n/id.json');
+    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'static/langs/i18n/source.json');
+    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'static/langs/i18n/en.json');
+    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'static/langs/i18n/id.json');
 
     // Add index.html
     $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
     $indexFileContent = str_replace('{APP_NAME}', $app->getName(), $indexFileContent);
-    $zip->addFromString($staticPath . 'index.html', $indexFileContent);
+    $zip->addFromString('static/index.html', $indexFileContent);
 
     // Add icon files
     addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", $staticPath, 'icon-');

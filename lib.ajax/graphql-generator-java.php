@@ -192,8 +192,6 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw", 'mvnw');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw.cmd", 'mvnw.cmd');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
-        
-
 
         // Add generated frontend config files
         $zip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
@@ -317,7 +315,6 @@ try {
         $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'assets/graphql.js');
         $frontendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'assets/graphql.min.js');
 
-         
         // Add index.html
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
         $indexFileContent = str_replace('{APP_NAME}', $app->getName(), $indexFileContent);
