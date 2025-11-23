@@ -975,6 +975,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"$moduleName/constant"
 	"$moduleName/resolver"
@@ -982,7 +983,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/graph-gophers/graphql-go"
@@ -1059,9 +1062,48 @@ func main() {
 	http.Handle(graphqlEndpoint, ipMiddleware(&relay.Handler{Schema: schema}))
 
 	// Handler for serving static assets from the /assets directory
-	assetsPath := "/assets/"
-	assetsDir := "static/assets"
-	http.Handle(assetsPath, http.StripPrefix(assetsPath, http.FileServer(http.Dir(assetsDir))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("static/assets"))))
+
+	// Handler for serving language from the /langs directory
+	http.Handle("/langs/", http.StripPrefix("/langs/", http.FileServer(http.Dir("static/langs"))))
+
+	// Handler for available themes, mimicking the PHP logic.
+	http.HandleFunc("/available-theme", func(w http.ResponseWriter, r *http.Request) {
+		themesPath := "static/assets/themes"
+
+		type Theme struct {
+			Name  string `json:"name"`
+			Title string `json:"title"`
+		}
+
+		var themes []Theme
+
+		entries, err := os.ReadDir(themesPath)
+		if err != nil {
+			log.Printf("Warning: Could not read themes directory '%s': %v", themesPath, err)
+			// Return empty list if directory doesn't exist, similar to PHP's glob behavior.
+		} else {
+			for _, entry := range entries {
+				if entry.IsDir() {
+					themeName := entry.Name()
+					cssPath := filepath.Join(themesPath, themeName, "style.min.css")
+					if _, err := os.Stat(cssPath); err == nil {
+						// File exists, add it to the list.
+						title := strings.Title(strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(themeName, "-", " "), "_", " ")))
+						themes = append(themes, Theme{Name: themeName, Title: title})
+					}
+				}
+			}
+		}
+
+		// Set headers for JSON content type and caching
+		cacheTime := 86400 // 24 hours in seconds
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", cacheTime))
+		w.Header().Set("Expires", time.Now().Add(time.Second*time.Duration(cacheTime)).Format(http.TimeFormat))
+
+		json.NewEncoder(w).Encode(themes)
+	})
 
 	// Handler for serving the static index.html file
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -1085,10 +1127,14 @@ func main() {
 		http.ServeFile(w, r, "static/config/frontend-config.json")
 	})
 
+	// Handler for favicon.ico
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/favicon.ico")
+	})
+
 	// Run HTTP server
 	serverPort := os.Getenv("SERVER_PORT")
 	log.Printf("Server is running at: http://localhost:%s%s", serverPort, graphqlEndpoint)
-	log.Printf("Serving assets from ./%s on http://localhost:%s%s", assetsDir, serverPort, assetsPath)
 	log.Printf("Serving static index.html on http://localhost:%s/", serverPort)
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }
