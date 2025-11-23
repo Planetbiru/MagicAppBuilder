@@ -151,7 +151,7 @@ class GraphQLGeneratorGo extends GraphQLGeneratorBase
         $files = array_merge($files, $resolvers);
 
         // 6. Security and Auth
-        // $files[] = ['name' => 'auth/auth.go', 'content' => $this->generateAuthGo()];
+        $files[] = ['name' => 'handler/auth.go', 'content' => $this->generateAuthGo()];
         // $files[] = ['name' => 'modelcore/admin.go', 'content' => $this->generateAdminModelGo()];
 
         // 7. Utility
@@ -385,6 +385,17 @@ GO;
     private function generateResolverRoot()
     {
         $packageName = $this->projectConfig['moduleName'];
+        $types1 = [];
+        $types2 = [];
+        foreach ($this->analyzedSchema as $tableName => $tableInfo) {
+            $pascalName = $this->pascalCase($tableName);
+            $types1[] = "\t{$pascalName}(ctx context.Context, args struct{ ID string }) (*{$pascalName}Resolver, error)";
+            $types2[] = "\t*{$pascalName}QueryResolver";
+            $types3[] = "\troot.{$pascalName}QueryResolver = New{$pascalName}QueryResolver(root)";
+        }
+        $code1 = implode("\r\n", $types1);
+        $code2 = implode("\r\n", $types2);
+        $code3 = implode("\r\n", $types3);
         return <<<GO
 package resolver
 
@@ -395,9 +406,7 @@ import (
 
 type ResolverRoot interface {
 	DBConnection() *sql.DB
-	Lantai(ctx context.Context, args struct{ ID string }) (*LantaiResolver, error)
-	Blok(ctx context.Context, args struct{ ID string }) (*BlokResolver, error)
-    Rak(ctx context.Context, args struct{ ID string }) (*RakResolver, error)
+$code1
 }
 
 func (r *RootResolver) DBConnection() *sql.DB {
@@ -406,17 +415,13 @@ func (r *RootResolver) DBConnection() *sql.DB {
 
 type RootResolver struct {
 	db *sql.DB
-	*LantaiQueryResolver
-	*BlokQueryResolver
-	*RakQueryResolver
+$code2
 }
 
 func NewRootResolver(db *sql.DB) *RootResolver {
 	root := &RootResolver{db: db}
-	root.LantaiQueryResolver = NewLantaiQueryResolver(root)
-	root.BlokQueryResolver = NewBlokQueryResolver(root)
-	root.RakQueryResolver = NewRakQueryResolver(root)
-	return root
+$code3
+    return root
 }
 GO;
     }
@@ -953,10 +958,15 @@ go $goVersion
 
 require (
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/graph-gophers/graphql-go v1.8.0
 	github.com/google/uuid v1.6.0
-	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/gorilla/sessions v1.4.0
+	github.com/graph-gophers/graphql-go v1.8.0
 	github.com/joho/godotenv v1.5.1
+)
+
+require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
 )
 MOD;
     }
@@ -978,6 +988,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"$moduleName/constant"
+	"$moduleName/handler"
 	"$moduleName/resolver"
 	"log"
 	"net"
@@ -988,10 +999,13 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/sessions"
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 	"github.com/joho/godotenv"
 )
+
+var store *sessions.CookieStore
 
 // ipMiddleware injects the client's IP address into the request context.
 func ipMiddleware(next http.Handler) http.Handler {
@@ -999,6 +1013,28 @@ func ipMiddleware(next http.Handler) http.Handler {
 		ip := GetClientIP(r)
 		ctx := context.WithValue(r.Context(), constant.RemoteAddr, ip)
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// authMiddleware checks if a user is logged in before allowing access to a handler.
+// It only enforces the check if the REQUIRE_LOGIN environment variable is set to "true".
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Only check for login if REQUIRE_LOGIN is explicitly true
+		if os.Getenv("REQUIRE_LOGIN") != "true" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		session, _ := store.Get(r, "auth-session")
+		username, ok := session.Values["username"].(string)
+
+		if !ok || username == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }
 func GetClientIP(r *http.Request) string {
@@ -1028,6 +1064,13 @@ func main() {
 	if err != nil {
 		log.Println("Warning: Could not load .env file. Using system environment variables.")
 	}
+
+	// Initialize session store
+	sessionSecret := os.Getenv("SESSION_SECRET")
+	if sessionSecret == "" {
+		log.Fatal("SESSION_SECRET environment variable is not set")
+	}
+	store = sessions.NewCookieStore([]byte(sessionSecret))
 
 	// Build DSN (Data Source Name) from environment variables
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
@@ -1061,11 +1104,13 @@ func main() {
 	graphqlEndpoint := os.Getenv("GRAPHQL_ENDPOINT")
 	http.Handle(graphqlEndpoint, ipMiddleware(&relay.Handler{Schema: schema}))
 
-	// Handler for serving static assets from the /assets directory
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("static/assets"))))
-
-	// Handler for serving language from the /langs directory
-	http.Handle("/langs/", http.StripPrefix("/langs/", http.FileServer(http.Dir("static/langs"))))
+	// Initialize and register authentication handlers
+	authHandler := &handler.AuthHandler{
+		DB:    db,
+		Store: store,
+	}
+	http.HandleFunc("/login", authHandler.Login)
+	http.HandleFunc("/logout", authHandler.Logout)
 
 	// Handler for available themes, mimicking the PHP logic.
 	http.HandleFunc("/available-theme", func(w http.ResponseWriter, r *http.Request) {
@@ -1105,6 +1150,24 @@ func main() {
 		json.NewEncoder(w).Encode(themes)
 	})
 
+	// Handler for serving static assets from the /assets directory
+	assetsPath := "/assets/"
+	assetsDir := "static/assets"
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("static/assets"))))
+	http.Handle("/langs/", http.StripPrefix("/langs/", http.FileServer(http.Dir("static/langs"))))
+
+	// Handler for frontend configuration, now protected by authMiddleware.
+	frontendConfigHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set headers to prevent caching by the browser.
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+		w.Header().Set("Surrogate-Control", "no-store")
+
+		http.ServeFile(w, r, "static/config/frontend-config.json")
+	})
+	http.Handle("/frontend-config", authMiddleware(frontendConfigHandler))
+
 	// Handler for serving the static index.html file
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// If the path is not the root, return a 404 to avoid this handler
@@ -1115,19 +1178,6 @@ func main() {
 		}
 		http.ServeFile(w, r, "static/index.html")
 	})
-
-	// Handler for frontend configuration, served with no-cache headers.
-	http.HandleFunc("/frontend-config", func(w http.ResponseWriter, r *http.Request) {
-		// Set headers to prevent caching by the browser.
-		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate")
-		w.Header().Set("Pragma", "no-cache")
-		w.Header().Set("Expires", "0")
-		w.Header().Set("Surrogate-Control", "no-store")
-
-		http.ServeFile(w, r, "static/config/frontend-config.json")
-	})
-
-	// Handler for favicon.ico
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/favicon.ico")
 	})
@@ -1135,6 +1185,11 @@ func main() {
 	// Run HTTP server
 	serverPort := os.Getenv("SERVER_PORT")
 	log.Printf("Server is running at: http://localhost:%s%s", serverPort, graphqlEndpoint)
+	log.Printf("Logout endpoint is available at http://localhost:%s/logout", serverPort)
+	log.Printf("Login endpoint is available at http://localhost:%s/login", serverPort)
+	log.Printf("Serving available themes on http://localhost:%s/available-theme", serverPort)
+	log.Printf("Serving frontend config on http://localhost:%s/frontend-config", serverPort)
+	log.Printf("Serving assets from ./%s on http://localhost:%s%s", assetsDir, serverPort, assetsPath)
 	log.Printf("Serving static index.html on http://localhost:%s/", serverPort)
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }
@@ -1307,7 +1362,7 @@ GQL;
 
             if ($colInfo['isForeignKey']) {
                 $refPascalName = $this->pascalCase($colInfo['references']);
-                $refFieldName = $this->camelCase($colInfo['references']);
+                $refFieldName = $colInfo['references'];
                 $typeFields .= "    $refFieldName: $refPascalName\n";
             }
         }
@@ -1383,82 +1438,138 @@ GQL;
     {
         $moduleName = $this->projectConfig['moduleName'];
         return <<<GO
-package auth
+package handler
 
 import (
 	"crypto/sha1"
+	"database/sql"
 	"encoding/hex"
+	"encoding/json"
+	"log"
 	"net/http"
+	"strings"
 
-	"{$moduleName}/graph/model"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"github.com/gorilla/sessions"
 )
 
-type AuthController struct {
-	DB *gorm.DB
+type AuthHandler struct {
+	DB    *sql.DB
+	Store sessions.Store
 }
 
-func NewAuthController(db *gorm.DB) *AuthController {
-	return &AuthController{DB: db}
-}
-
-type LoginRequest struct {
-	Username string `json:"username" form:"username" binding:"required"`
-	Password string `json:"password" form:"password" binding:"required"`
-}
-
-func (ac *AuthController) Login(c *gin.Context) {
-	var req LoginRequest
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	var admin model.Admin
-	if err := ac.DB.Where("username = ?", req.Username).First(&admin).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Invalid credentials"})
-		return
-	}
-
-	// MagicAppBuilder uses sha1(sha1(password))
-	hashedPassword := doubleSha1(req.Password)
-
-	if admin.Password != hashedPassword {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Invalid credentials"})
-		return
-	}
-
-	session := sessions.Default(c)
-	session.Set("adminId", admin.AdminID)
-	session.Set("username", admin.Username)
-	if err := session.Save(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Login successful"})
-}
-
-func (ac *AuthController) Logout(c *gin.Context) {
-	session := sessions.Default(c)
-	session.Clear()
-	if err := session.Save(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Logout successful"})
-}
-
-func doubleSha1(s string) string {
+// sha1(sha1(password))
+func doubleSha1(input string) string {
 	h1 := sha1.New()
-	h1.Write([]byte(s))
-	firstHash := hex.EncodeToString(h1.Sum(nil))
+	h1.Write([]byte(input))
+	step1 := hex.EncodeToString(h1.Sum(nil))
 
 	h2 := sha1.New()
-	h2.Write([]byte(firstHash))
+	h2.Write([]byte(step1))
 	return hex.EncodeToString(h2.Sum(nil))
+}
+
+// sha1(password) → yang disimpan di session
+func singleSha1(input string) string {
+	h := sha1.New()
+	h.Write([]byte(input))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// === CONTENT TYPE VALIDATION ===
+	ct := r.Header.Get("Content-Type")
+
+	if ct == "" {
+		h.respondAuthError(w, "Invalid content type")
+		return
+	}
+
+	// multipart/form-data
+	if strings.HasPrefix(ct, "multipart/form-data") {
+		if err := r.ParseMultipartForm(10 << 20); err != nil { // 10 MB
+			h.respondAuthError(w, "Invalid multipart form")
+			return
+		}
+	} else if strings.HasPrefix(ct, "application/x-www-form-urlencoded") {
+		if err := r.ParseForm(); err != nil {
+			h.respondAuthError(w, "Invalid urlencoded form")
+			return
+		}
+	} else {
+		h.respondAuthError(w, "Unsupported content type: "+ct)
+		return
+	}
+
+	// Now FormValue works
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	if username == "" || password == "" {
+		h.respondAuthError(w, "Invalid credentials")
+		return
+	}
+
+	// Fetch full user, like PHP: SELECT * FROM admin WHERE username = :username
+	var dbUsername, dbPassword string
+	err := h.DB.QueryRow(
+		"SELECT username, password FROM admin WHERE username = ?",
+		username,
+	).Scan(&dbUsername, &dbPassword)
+
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Printf("Login database error: %v", err)
+		}
+		h.respondAuthError(w, "Invalid credentials")
+		return
+	}
+
+	// Compare sha1(sha1(password))
+	if doubleSha1(password) != dbPassword {
+		h.respondAuthError(w, "Invalid credentials")
+		return
+	}
+
+	// Sukses → simpan session
+	session, _ := h.Store.Get(r, "auth-session")
+	session.Values["username"] = dbUsername
+	session.Values["password"] = singleSha1(password) // sesuai PHP
+	session.Save(r, w)
+
+	// Header + JSON output
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	json.NewEncoder(w).Encode(map[string]bool{"success": true})
+}
+
+// Logout
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	session, err := h.Store.Get(r, "auth-session")
+	if err != nil {
+		log.Printf("Could not get session on logout: %v", err)
+	}
+	session.Options.MaxAge = -1
+	session.Save(r, w)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]bool{"success": true})
+}
+
+func (h *AuthHandler) respondAuthError(w http.ResponseWriter, msg string) {
+	w.Header().Set("HTTP/1.1", "401 Unauthorized")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusUnauthorized)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": false,
+		"message": msg,
+	})
 }
 GO;
     }
@@ -1721,11 +1832,12 @@ GO;
         $manualContent .= "    go get github.com/go-sql-driver/mysql\n";
         $manualContent .= "    go get github.com/google/uuid\n";
         $manualContent .= "    go get github.com/joho/godotenv\n";
+        $manualContent .= "    go get github.com/gorilla/sessions\n";
         $manualContent .= "    go mod tidy\n";
         $manualContent .= "    ```\n\n";
         $manualContent .= "5.  Run the application:\n\n";
         $manualContent .= "    ```bash\n";
-        $manualContent .= "    go run main.go\n";
+        $manualContent .= "    go run .\n";
         $manualContent .= "    ```\n\n";
         $manualContent .= "The GraphQL playground will be available at `http://localhost:8080/`.\n";
 

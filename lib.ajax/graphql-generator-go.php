@@ -162,14 +162,13 @@ try {
     );
 
     // Create a single ZIP file for the Go project
-    $zip = new ZipSimulator(dirname(dirname(__DIR__)) . '/go-test');
-    /*
+    // $zip = new ZipSimulator(dirname(dirname(__DIR__)) . '/go-test');
+    
     $zip = new ZipArchive();
     $zipFilePath = tempnam(sys_get_temp_dir(), 'golang_app_');
     if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
         throw new Exception("Could not create Go project ZIP file.");
     }
-    */
 
     // Generate all Go files
     $backendFiles = $generator->generate();
@@ -185,7 +184,7 @@ DB_PASS={DB_PASS}
 
 SERVER_PORT=8080
 SESSION_SECRET=a-very-secret-key-that-you-should-change
-REQUIRE_LOGIN=false
+REQUIRE_LOGIN=true
 
 GRAPHQL_ENDPOINT=/graphql
 GRAPHQL_SCHEMA=schema/schema.graphql
@@ -202,10 +201,12 @@ ENV;
 
     // Add frontend assets (assuming they are served by the Go backend)
     // The server.go is already configured to serve from a 'static' directory.
-    $staticPath = 'static/';
+    $staticPath = 'static';
     
     // Add assets
     addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", $staticPath . 'assets');
+    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-go.js", $staticPath . 'assets/app.js');
+    $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-go.min.js", $staticPath . 'assets/app.min.js');
 
     // Add language files
     $zip->addFromString($staticPath . 'langs/available-language.json', file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/available-language.json"));
@@ -225,12 +226,17 @@ ENV;
     $zip->addFromString($staticPath . 'index.html', $indexFileContent);
 
     // Add icon files
+    addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", $staticPath, 'icon-');
+    addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", $staticPath, 'android-icon-');
+    addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", $staticPath, 'apple-icon-');
     addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", $staticPath, 'favicon');
 
     // Add documentation
     $manualMd = $generator->generateManual();
     $zip->addFromString('manual.md', $manualMd);
     $appName = $app->getName();
+    $manualHtml = generateManualHtml($manualMd, $appName);
+    $zip->addFromString('manual.html', $manualHtml);
     $readmeContent = generateReadmeGo($appName, $generator);
     $zip->addFromString('README.md', $readmeContent);
 
