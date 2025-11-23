@@ -82,7 +82,7 @@ class ZipSimulator
     {
         $path = $this->constructPath($fileName);
         $this->prepareDirectory($path);
-        copy($source, $path);
+        file_put_contents($path, file_get_contents($source));
     }
     private function constructPath($fileName)
     {
@@ -109,6 +109,13 @@ class ZipSimulator
     public function close()
     {
         // Do nothing
+    }
+    public function addEmptyDir($dirname)
+    {
+        if(!file_exists($dirname))
+        {
+            mkdir($dirname, 0755, true);
+        }
     }
 }
 
