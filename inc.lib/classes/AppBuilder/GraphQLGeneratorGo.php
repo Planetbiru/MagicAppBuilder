@@ -1058,9 +1058,38 @@ func main() {
 	graphqlEndpoint := os.Getenv("GRAPHQL_ENDPOINT")
 	http.Handle(graphqlEndpoint, ipMiddleware(&relay.Handler{Schema: schema}))
 
+	// Handler for serving static assets from the /assets directory
+	assetsPath := "/assets/"
+	assetsDir := "static/assets"
+	http.Handle(assetsPath, http.StripPrefix(assetsPath, http.FileServer(http.Dir(assetsDir))))
+
+	// Handler for serving the static index.html file
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// If the path is not the root, return a 404 to avoid this handler
+		// catching all undefined paths.
+		if r.URL.Path != "/" && r.URL.Path != "/index.html" {
+			http.NotFound(w, r)
+			return
+		}
+		http.ServeFile(w, r, "static/index.html")
+	})
+
+	// Handler for frontend configuration, served with no-cache headers.
+	http.HandleFunc("/frontend-config", func(w http.ResponseWriter, r *http.Request) {
+		// Set headers to prevent caching by the browser.
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+		w.Header().Set("Surrogate-Control", "no-store")
+
+		http.ServeFile(w, r, "static/config/frontend-config.json")
+	})
+
 	// Run HTTP server
 	serverPort := os.Getenv("SERVER_PORT")
 	log.Printf("Server is running at: http://localhost:%s%s", serverPort, graphqlEndpoint)
+	log.Printf("Serving assets from ./%s on http://localhost:%s%s", assetsDir, serverPort, assetsPath)
+	log.Printf("Serving static index.html on http://localhost:%s/", serverPort)
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }
 GO;
@@ -1248,7 +1277,7 @@ GQL;
                 continue;
             }
             $gqlType = $this->mapGoTypeToGqlType($this->mapDbTypeToGoType($colInfo['type'], $colInfo['length']));
-            $fieldName = $this->camelCase($colName);
+            $fieldName = $colName;
             $inputFields .= "    $fieldName: $gqlType\n";
         }
 
@@ -1286,6 +1315,11 @@ GQL;
         $mutations = "    create{$pascalName}(input: {$pascalName}Input!): $pascalName\n";
         $mutations .= "    update{$pascalName}(id: $pkGqlType, input: {$pascalName}Input!): $pascalName\n";
         $mutations .= "    delete{$pascalName}(id: $pkGqlType): Boolean!\n";
+
+        if ($tableInfo['hasActiveColumn']) {
+            $activeField = $this->camelCase($this->activeField);
+            $mutations .= "    toggle{$pascalName}Active(id: {$pkGqlType}, $activeField: Boolean!): $pascalName\n";
+        }
 
         return [
             'types' => $types,

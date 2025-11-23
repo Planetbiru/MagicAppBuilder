@@ -212,6 +212,7 @@ ENV;
     $entityLanguagePacks = $generator->generateFrontendLanguageJson();
     $zip->addFromString($staticPath . 'langs/entity/source.json', $entityLanguagePacks);
     $zip->addFromString($staticPath . 'langs/entity/en.json', $entityLanguagePacks);
+    $zip->addFromString('static/config/frontend-config.json', $generator->generateFrontendConfigJson());
 
     // Add i18n files
     $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", $staticPath . 'langs/i18n/source.json');
