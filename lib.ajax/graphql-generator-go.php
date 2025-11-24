@@ -188,6 +188,7 @@ REQUIRE_LOGIN=true
 
 GRAPHQL_ENDPOINT=/graphql
 GRAPHQL_SCHEMA=schema/schema.graphqls
+THEME_CACHE_TIME=86400
 ENV;
 
     $envContent = setGoEnvConfiguration($app, $envTemplate);

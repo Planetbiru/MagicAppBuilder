@@ -1108,7 +1108,7 @@ $uuid
 
 $paramSet
 
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, fields.Join(fields, ", "), placeholders.Join(fields, ", "))
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, strings.Join(fields, ", "), strings.Join(placeholders, ", "))
 	_, err := r.root.DBConnection().ExecContext(ctx, query, params...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create %s: %w", tableName, err)
@@ -1230,14 +1230,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"{$moduleName}/constant"
-	"{$moduleName}/handler"
-	"{$moduleName}/resolver"
+	"$moduleName/constant"
+	"$moduleName/handler"
+	"$moduleName/resolver"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -1256,20 +1257,20 @@ func ipMiddleware(next http.Handler) http.Handler {
 		ip := GetClientIP(r)
 
 		session, err := store.Get(r, constant.SessionKey)
-        if err != nil {
-            log.Printf("session error: %v", err)
-        }
+		if err != nil {
+			log.Printf("session error: %v", err)
+		}
 
-        var adminId string
-        if v, ok := session.Values[constant.SessionAdminId]; ok {
-            if s, ok2 := v.(string); ok2 {
-                adminId = s
-            }
-        }
+		var adminId string
+		if v, ok := session.Values[constant.SessionAdminId]; ok {
+			if s, ok2 := v.(string); ok2 {
+				adminId = s
+			}
+		}
 
 		ctx := r.Context()
-        ctx = context.WithValue(ctx, constant.RemoteAddr, ip)
-        ctx = context.WithValue(ctx, constant.SessionAdminId, adminId)
+		ctx = context.WithValue(ctx, constant.RemoteAddr, ip)
+		ctx = context.WithValue(ctx, constant.SessionAdminId, adminId)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -1401,10 +1402,15 @@ func main() {
 		}
 
 		// Set headers for JSON content type and caching
-		cacheTime := 86400 // 24 hours in seconds
+		cacheTimeStr := os.Getenv("THEME_CACHE_TIME")
+		cacheTime, err := strconv.Atoi(cacheTimeStr)
+		if err != nil || cacheTime <= 0 {
+			cacheTime = 86400 // Default to 24 hours (86400 seconds)
+		}
+
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", cacheTime))
-		w.Header().Set("Expires", time.Now().Add(time.Second*time.Duration(cacheTime)).Format(http.TimeFormat))
+		w.Header().Set("Expires", time.Now().Add(time.Duration(cacheTime)*time.Second).Format(http.TimeFormat))
 
 		json.NewEncoder(w).Encode(themes)
 	})
