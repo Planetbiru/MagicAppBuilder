@@ -295,9 +295,9 @@ router.get('/admin', conditionalAuth, async (req, res) => {
             }
             // Simplified pagination links for brevity
             for (let i = 1; i <= totalPages; i++) {
-                 if (i === page || (i >= page - 2 && i <= page + 2)) {
+                if (i === page || (i >= page - 2 && i <= page + 2)) {
                     listHtml += `<a href="#admin?page=${i}&search=${esc(search)}" class="btn ${i === page ? 'btn-primary' : 'btn-secondary'}">${i}</a>`;
-                 }
+                }
             }
             if (page < totalPages) {
                 listHtml += `<a href="#admin?page=${page + 1}&search=${esc(search)}" class="btn btn-secondary">Next</a>`;
