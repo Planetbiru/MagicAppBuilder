@@ -635,6 +635,43 @@ type {$resolverName}PageResolver struct {
 ";
         return implode("\r\n", $contents);
     }
+    
+    /**
+     * Undocumented function
+     *
+     * @param string[] $methods
+     * @param string $search
+     * @return string[]
+     */
+    private function prettifyMethods($methods, $search)
+    {
+        if(!isset($methods) || empty($methods))
+        {
+            return array();
+        }
+        $max = 1;
+        foreach($methods as $method)
+        {
+            $arr = explode($search, $method, 2);
+            if(count($arr) == 2)
+            {
+                $length = strlen(rtrim($arr[0], " "));
+                if($max < $length)
+                {
+                    $max = $length;
+                }
+            }
+        }
+        foreach($methods as $index => $method)
+        {
+            $arr = explode($search, $method, 2);
+            if(count($arr) == 2)
+            {
+                $methods[$index] = sprintf("%-{$max}s %s%s", rtrim($arr[0], " "), $search, $arr[1]);
+            }
+        }
+        return $methods;
+    }
 
     /**
      * Generates GraphQL query resolver methods for a database entity.
@@ -685,8 +722,9 @@ type {$resolverName}PageResolver struct {
         foreach($columnInfo as $info)
         {
             $goName = $this->goName($this->pascalCase($info['name']));
-            $methods[] = sprintf("func (r *$singleResolver) %s() *%s    { return %sr.m.$goName }", $info['name'], $info['type'], $info['pointer'] ? '&' : '');
+            $methods[] = sprintf("func (r *$singleResolver) %s() *%s { return %sr.m.$goName }", $info['name'], $info['type'], $info['pointer'] ? '&' : '');
         }
+        $methods = $this->prettifyMethods($methods, "{ return");
         $entityMethods = implode("\r\n", $methods);
 
         $addCols = [];
@@ -701,14 +739,13 @@ type {$resolverName}PageResolver struct {
                 $pascalEntityName = $this->pascalCase($relEntity);
                 $fkName = $this->goName($this->pascalCase($columnName));
                 $relMethods[] = "
-// $relEntity resolves the related $relEntity for this $pascalName.
+// $pascalEntityName resolves the related $relEntity for this $pascalName.
 func (r *$singleResolver) {$pascalEntityName}(ctx context.Context) (*{$pascalEntityName}Resolver, error) {
 	if r.m.{$fkName} == nil {
 		return nil, nil
 	}
-	return r.r.root.$pascalEntityName(ctx, struct{ ID string }{ID: *r.m.{$fkName}})
+	return r.r.root.$pascalEntityName(ctx, struct{ ID string } { ID: *r.m.{$fkName} })
 }
-
 ";
                 
             }
@@ -716,30 +753,38 @@ func (r *$singleResolver) {$pascalEntityName}(ctx context.Context) (*{$pascalEnt
             $addCols[] = "\t\t\t&m.{$goName},";
         }
 
-        $relationMethods = implode("\r\n", $relMethods);
+        $relationMethods = implode("", $relMethods);
         
         $addresOfColumns1 = implode("\r\n", $addCols);
         $addresOfColumns1 = str_replace("\t\t\t", "\t\t", $addresOfColumns1);
         $addresOfColumns2 = implode("\r\n", $addCols);
 
         $columnList = implode(", ", $columNames);
+        
+        $listMethods = <<<GO
+func (r *{$pageResolver}) Items() *[]*$singleResolver { return &r.items }
+func (r *{$pageResolver}) Total() *int32 { return &r.total }
+func (r *{$pageResolver}) Limit() *int32 { return &r.limit }
+func (r *{$pageResolver}) Page() *int32 { return &r.page }
+func (r *{$pageResolver}) TotalPages() *int32 { return &r.totalPages }
+func (r *{$pageResolver}) HasNext() *bool { return &r.hasNext }
+func (r *{$pageResolver}) HasPrevious() *bool { return &r.hasPrev }
+GO;
+        $listMethodsArr = explode("\n", $listMethods);
+        $listMethodsArr = $this->prettifyMethods($listMethodsArr, "{ return");
+        $listMethods = implode("\n", $listMethodsArr);
+        
         $queries = <<<GO
 // New{$pascalName}QueryResolver creates a new resolver for {$pascalName} queries.
 func New{$pascalName}QueryResolver(root ResolverRoot) *{$pascalName}QueryResolver {
 	return &{$pascalName}QueryResolver{root: root}
 }
 
-// Methods specific to $pascalName
+// Getter methods for $pascalName properties
 $entityMethods
-
 $relationMethods
-func (r *{$pageResolver}) Items() *[]*$singleResolver { return &r.items }
-func (r *{$pageResolver}) Total() *int32           { return &r.total }
-func (r *{$pageResolver}) Limit() *int32           { return &r.limit }
-func (r *{$pageResolver}) Page() *int32            { return &r.page }
-func (r *{$pageResolver}) TotalPages() *int32      { return &r.totalPages }
-func (r *{$pageResolver}) HasNext() *bool          { return &r.hasNext }
-func (r *{$pageResolver}) HasPrevious() *bool      { return &r.hasPrev }
+// Methods for $pascalNamePlural
+$listMethods
 
 // {$pascalName} fetches a single {$tableName} by its ID.
 func (r *{$pascalName}QueryResolver) {$pascalName}(ctx context.Context, args struct{ ID string }) (*$singleResolver, error) {
@@ -894,7 +939,8 @@ GO;
             
             $colInfo[] = [
                 'name' => $this->goName($this->pascalCase($columnName)),
-                'type' => $this->mapDbTypeToGoType($col['type'], $col['length'])
+                'columnName' => $columnName,
+                'type' => $this->mapDbTypeToGoTypeAsModel($col['type'], $col['length'])
             ];
             if($maxLength < strlen($columnName))
             {
@@ -906,8 +952,9 @@ GO;
         $columnToInsert = [];
         $updateCode = [];
         $toggleCode = [];
-        $ph = [];
+        $placeholderUpdate = [];
         $par = [];
+        $paramInsert = [];
         $backendHandledColumnNames = $this->getBackendHandledColumnNames();
         $autogeneratedCol = '';
         foreach ($tableInfo['columns'] as $colName => $col) {
@@ -926,14 +973,16 @@ GO;
             }
             $gn = $this->goName($this->pascalCase($colName));
             $columnToInsert[] = $colName;
-            $ph[] = "?";
+            $placeholderUpdate[] = "?";
             $par[] = "\tparams = append(params, args.Input.".$gn.")";
+            $paramInsert[] = "\tfields = append(fields, \"{$colName}\")\r\n\tplaceholders = append(placeholders, \"?\")\r\n\tparams = append(params, args.Input.".$gn.")\r\n";
 
             $updateCode[] = <<<GO
     if args.Input.{$gn} != nil {
         fields = append(fields, "{$colName} = ?")
         params = append(params, *args.Input.{$gn})
     }
+
 GO;
         }
         $entityColumns = [];
@@ -945,6 +994,7 @@ GO;
         $toggleCode[] = <<<GO
     fields = append(fields, "{$activeField} = ?")
     params = append(params, args.{$activeFieldPascal})
+
 GO;
 
         foreach($this->backendHandledColumns as $k=>$v)
@@ -953,53 +1003,62 @@ GO;
             if(($k == 'timeCreate' || $k == 'timeEdit') && in_array($v['columnName'], $entityColumns))
             {
                 array_push($columnToInsert, $v['columnName']);
-                array_push($ph, "?");
+                array_push($placeholderUpdate, "?");
                 array_push($par, "\tparams = append(params, time.Now().Format(constant.DateTimeFormat))"); 
                 if($k == 'timeEdit')
                 {
                     $updateCode[] = <<<GO
     fields = append(fields, "{$v['columnName']} = ?")
     params = append(params, time.Now().Format(constant.DateTimeFormat))
+
 GO;
                     $toggleCode[] = <<<GO
     fields = append(fields, "{$v['columnName']} = ?")
     params = append(params, time.Now().Format(constant.DateTimeFormat))
+
 GO;
                 }
+                $paramInsert[] = "\tfields = append(fields, \"{$v['columnName']}\")\r\n\tplaceholders = append(placeholders, \"?\")\r\n\tparams = append(params, time.Now().Format(constant.DateTimeFormat))\r\n";
             }
             if(($k == 'ipCreate' || $k == 'ipEdit') && in_array($v['columnName'], $entityColumns))
             {
                 array_push($columnToInsert, $v['columnName']);
-                array_push($ph, "?");
+                array_push($placeholderUpdate, "?");
                 array_push($par, "\tparams = append(params, ctx.Value(constant.RemoteAddr).(string))"); 
                 if($k == 'ipEdit')
                 {
                     $updateCode[] = <<<GO
     fields = append(fields, "{$v['columnName']} = ?")
     params = append(params, ctx.Value(constant.RemoteAddr).(string))
+
 GO;
                     $toggleCode[] = <<<GO
     fields = append(fields, "{$v['columnName']} = ?")
     params = append(params, ctx.Value(constant.RemoteAddr).(string))
+
 GO;
                 }
+                $paramInsert[] = "\tfields = append(fields, \"{$v['columnName']}\")\r\n\tplaceholders = append(placeholders, \"?\")\r\n\tparams = append(params, ctx.Value(constant.RemoteAddr).(string))\r\n";
             }
             if(($k == 'adminCreate' || $k == 'adminEdit') && in_array($v['columnName'], $entityColumns))
             {
                 array_push($columnToInsert, $v['columnName']);
-                array_push($ph, "?");
+                array_push($placeholderUpdate, "?");
                 array_push($par, "\tparams = append(params, ctx.Value(constant.SessionAdminId).(string))"); 
                 if($k == 'adminEdit')
                 {
                     $updateCode[] = <<<GO
     fields = append(fields, "{$v['columnName']} = ?")
     params = append(params, ctx.Value(constant.SessionAdminId).(string))
+
 GO;
                     $toggleCode[] = <<<GO
     fields = append(fields, "{$v['columnName']} = ?")
     params = append(params, ctx.Value(constant.SessionAdminId).(string))
+
 GO;
                 }
+                $paramInsert[] = "\tfields = append(fields, \"{$v['columnName']}\")\r\n\tplaceholders = append(placeholders, \"?\")\r\n\tparams = append(params, ctx.Value(constant.SessionAdminId).(string))\r\n";
             }
         }
 
@@ -1009,20 +1068,22 @@ GO;
         if($autogenerated)
         {
             array_unshift($columnToInsert, $autogeneratedCol);
-            array_unshift($ph, "?");
+            array_unshift($placeholderUpdate, "?");
             array_unshift($par, "\tparams = append(params, id)");
-            $uuid = "\tid := uuid.New().String()";
+            $uuid = "\r\n\tid := uuid.New().String()\r\n";
         }
 
-        $columns = implode(", ", $columnToInsert);
-        $placeholders = implode(", ", $ph);
-        $paramSet = implode("\r\n", $par);
+        $paramSet = implode("\r\n", $paramInsert);
         $updateCodes = implode("\r\n", $updateCode);
         $toggleCodes = implode("\r\n", $toggleCode);
 
         $defs = [];
         foreach($colInfo as $info)
         {
+            if(in_array($info['columnName'], $backendHandledColumnNames))
+            {
+                continue;
+            }
             $defs[] = sprintf("\t%-{$maxLength}s *%s", $info['name'], $info['type']);
         }
         $typeDefinitions = implode("\r\n", $defs);
@@ -1040,16 +1101,14 @@ $typeDefinitions
 func (r *{$pascalName}QueryResolver) Create{$pascalName}(ctx context.Context, args struct{ Input {$pascalName}Input }) (*{$pascalName}Resolver, error) {
 
 	tableName := "{$tableName}"
-	columns := "$columns"
-	placeholders := "$placeholders"
-
 $uuid
-
+    var fields []string
+    var placeholders []string
     var params []interface{}
 
 $paramSet
 
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders)
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, fields.Join(fields, ", "), placeholders.Join(fields, ", "))
 	_, err := r.root.DBConnection().ExecContext(ctx, query, params...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create %s: %w", tableName, err)
@@ -1101,7 +1160,7 @@ func (r *{$pascalName}QueryResolver) Delete{$pascalName}(ctx context.Context, ar
 
 // Toggle{$pascalName}Active changes the active status of a {$tableName}.
 func (r *{$pascalName}QueryResolver) Toggle{$pascalName}Active(ctx context.Context, args struct {
-	ID    string
+	ID string
 	{$activeFieldPascal} bool
 }) (*{$pascalName}Resolver, error) {
 	tableName := "{$tableName}"
