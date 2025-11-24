@@ -165,6 +165,8 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-php.min.js", 'assets/app.min.js');
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/inc/I18n.php", 'inc/I18n.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/inc/ObjectScalar.php", 'inc/ObjectScalar.php');
+        
         if($inMemoryCache)
         {
             $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/InMemoryCache.php", 'inc/InMemoryCache.php');
@@ -276,13 +278,15 @@ try {
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/composer.json", 'composer.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/composer.lock", 'composer.lock');
-        // Add all files under directory `vendor`
+        
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/inc/ObjectScalar.php", 'inc/ObjectScalar.php');
         
         if($inMemoryCache)
         {
             $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/InMemoryCache.php", 'inc/InMemoryCache.php');
         }
         
+        // Add all files under directory `vendor`
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/backend/php/vendor";
         addDirectoryToZip($zip, $vendorPath, 'vendor');
 
