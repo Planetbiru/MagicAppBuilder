@@ -87,7 +87,55 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
 
 $reservedColumnMap = createReservedColumnMap(isset($reservedColumns['columns']) ? $reservedColumns['columns'] : []);
 
-$backendHandledColumns = []; // Define if needed for Node.js version
+$backendHandledColumns = [];
+
+if(isset($reservedColumnMap['time_create']))
+{
+    $backendHandledColumns['timeCreate'] = [
+        'columnName' => $reservedColumnMap['time_create'],
+        'type' => 'datetime'
+    ];
+}
+
+if(isset($reservedColumnMap['time_edit']))
+{
+    $backendHandledColumns['timeEdit'] = [
+        'columnName' => $reservedColumnMap['time_edit'],
+        'type' => 'datetime'
+    ];
+}
+
+if(isset($reservedColumnMap['admin_create']))
+{
+    $backendHandledColumns['adminCreate'] = [
+        'columnName' => $reservedColumnMap['admin_create'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['admin_edit']))
+{
+    $backendHandledColumns['adminEdit'] = [
+        'columnName' => $reservedColumnMap['admin_edit'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['ip_create']))
+{
+    $backendHandledColumns['ipCreate'] = [
+        'columnName' => $reservedColumnMap['ip_create'],
+        'type' => 'string'
+    ];
+}
+
+if(isset($reservedColumnMap['ip_edit']))
+{
+    $backendHandledColumns['ipEdit'] = [
+        'columnName' => $reservedColumnMap['ip_edit'],
+        'type' => 'string'
+    ];
+}
 
 try {
     /** @var \MagicObject\Database\PicoDatabase $databaseBuilder */
@@ -135,6 +183,7 @@ try {
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/models/core", 'models/core');
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/routes", 'routes');
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/middleware", 'middleware');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/schema", 'schema');
 
 
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
