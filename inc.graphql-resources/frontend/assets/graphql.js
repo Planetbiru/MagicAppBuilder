@@ -1221,7 +1221,9 @@ class GraphQLClientApp {
      */
     renderTable(items) {
         let _this = this;
-        const headers = Object.keys(this.currentEntity.columns);
+        const listColumns = this.currentEntity.listColumns || [];
+        const headers = Object.keys(this.currentEntity.columns).filter(h => listColumns.length === 0 || listColumns.includes(h));
+
         let tableHtml = `
             <div class="table-container">
 
@@ -1742,6 +1744,9 @@ class GraphQLClientApp {
             const queryResult = await this.gqlQuery(query, { id });
             const data = queryResult.data;
             this.showPageWrapper();
+            
+            const detailColumns = this.currentEntity.detailColumns || [];
+
             const item = data[this.currentEntity.name]; // NOSONAR
             let detailHtml = `<div class="back-controls">
                                 <button id="back-to-list" class="btn btn-secondary">${this.t('back_to_list')}</button>
@@ -1750,6 +1755,10 @@ class GraphQLClientApp {
                     <table class="table">
                         <tbody>`;
             for (const key in this.currentEntity.columns) {
+                if(!detailColumns.includes(key))
+                {
+                    continue;
+                }
                 const col = this.currentEntity.columns[key];
                 const relationName = col.references;
                 detailHtml += `<tr>
@@ -1839,6 +1848,17 @@ class GraphQLClientApp {
 
             // Exclude backend handled columns
             if (this.currentEntity.backendHandledColumns && this.currentEntity.backendHandledColumns.includes(colName)) {
+                continue;
+            }
+            
+            let filteredColumns = action === 'insert' ? this.currentEntity.insertColumns : this.currentEntity.updateColumns;
+            if(!filteredColumns)
+            {
+                filteredColumns = [];
+            }
+            
+            if(filteredColumns.length > 0 && !filteredColumns.includes(colName))
+            {
                 continue;
             }
 
