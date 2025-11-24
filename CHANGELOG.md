@@ -3737,13 +3737,13 @@ MagicAppBuilder 2.0 marks a **major evolution** of the platform — introducing 
 This release strengthens MagicAppBuilder’s position as a powerful, multi-stack application generator supporting **PHP, Java, Kotlin, Node.js, and Python**.
 
 
-# **New Feature: GraphQL Application Generator for Java (Spring Boot with Maven)**
+## New Feature: GraphQL Application Generator for Java (Spring Boot with Maven)
 
 MagicAppBuilder 2.0 introduces the **GraphQL Application Generator for Java**, powered by the robust **Spring Boot** framework and the **Maven** build system.
 
 This feature enables developers to instantly generate fully functional, production-ready Java GraphQL backends directly from their entity schema.
 
-### **What the Generator Produces**
+### What the Generator Produces
 
 * **Full Project Structure** — A ready-to-build Maven project (`pom.xml`) with all required dependencies (Spring Boot, Spring GraphQL, Spring Data JPA).
 * **JPA Entities** — Java POJOs annotated with `@Entity` and fully mapped to database tables.
@@ -3752,7 +3752,7 @@ This feature enables developers to instantly generate fully functional, producti
 * **Advanced Filtering** — `SpecificationBuilder` for dynamic, type-safe query building with JPA Specifications.
 * **Ready-to-Use Frontend** — Minimal HTML/CSS/JS frontend pre-connected to the backend.
 
-### **Why Spring Boot with Maven?**
+### Why Spring Boot with Maven?
 
 * **Enterprise-Grade** — The global standard for large-scale Java applications.
 * **Stable Build System** — Maven provides predictable, standardized dependency management.
@@ -3763,13 +3763,13 @@ This feature enables developers to instantly generate fully functional, producti
 > **Available only in the Professional Edition.**
 
 
-# **New Feature: GraphQL Application Generator for Kotlin (Spring Boot with Maven)**
+## New Feature: GraphQL Application Generator for Kotlin (Spring Boot with Maven)
 
 MagicAppBuilder 2.0 also adds a complete **Kotlin GraphQL Application Generator**, offering a modern, concise alternative while maintaining full compatibility with the Spring ecosystem.
 
 The generator uses **Spring Boot with Maven**, ensuring consistency with the Java version.
 
-### **What the Generator Produces**
+### What the Generator Produces
 
 * **Full Project Structure** — A Maven project (`pom.xml`) with all necessary dependencies.
 * **Kotlin Data Classes** — Clean, idiomatic data classes annotated with `@Entity`.
@@ -3778,7 +3778,7 @@ The generator uses **Spring Boot with Maven**, ensuring consistency with the Jav
 * **Advanced Filtering** — JPA SpecificationBuilder adapted for Kotlin.
 * **Ready-to-Use Frontend** — HTML/CSS/JS frontend for immediate use.
 
-### **Why Kotlin?**
+### Why Kotlin?
 
 * **Concise & Expressive** — Less boilerplate, cleaner code.
 * **Null Safety** — Eliminates whole classes of runtime errors.
@@ -3788,13 +3788,13 @@ The generator uses **Spring Boot with Maven**, ensuring consistency with the Jav
 > **Available only in the Professional Edition.**
 
 
-# **New Feature: GraphQL Application Generator for Node.js**
+## New Feature: GraphQL Application Generator for Node.js
 
 MagicAppBuilder 2.0 expands to the JavaScript ecosystem by introducing the **Node.js GraphQL Application Generator**.
 
 It creates a full-featured Node.js application suitable for small projects, rapid prototyping, or scalable microservices.
 
-### **What the Generator Produces**
+### What the Generator Produces
 
 * **Project Setup** — Pre-configured `package.json` with Express, Apollo Server, and database drivers.
 * **GraphQL Schema & Resolvers** — Auto-generated `typeDefs` and resolver handlers.
@@ -3802,7 +3802,7 @@ It creates a full-featured Node.js application suitable for small projects, rapi
 * **Express Server** — Apollo Server mounted on Express.
 * **Web Frontend** — Minimal HTML/CSS/JS UI that connects to the backend.
 
-### **Why Node.js?**
+### Why Node.js?
 
 * **Non-Blocking Architecture** — Perfect for real-time and high-throughput apps.
 * **JavaScript Everywhere** — One language for both frontend and backend.
@@ -3812,7 +3812,7 @@ It creates a full-featured Node.js application suitable for small projects, rapi
 > **Available only in the Professional Edition.**
 
 
-# **New Feature: GraphQL Application Generator for Python**
+## New Feature: GraphQL Application Generator for Python
 
 MagicAppBuilder 2.0 includes a **Python GraphQL Generator**, ideal for developers who prefer Python’s simplicity and powerful ecosystem.
 
@@ -3822,7 +3822,7 @@ Built using modern, high-performance frameworks:
 * **SQLAlchemy 2.0**
 * **Ariadne GraphQL**
 
-### **What the Generator Produces**
+### What the Generator Produces
 
 * **Full Directory Structure** — Organized into `models`, `resolvers`, `schema`, etc.
 * **SQLAlchemy Models** — ORM models based on your entity schema.
@@ -3830,7 +3830,7 @@ Built using modern, high-performance frameworks:
 * **Advanced Filtering & Pagination** — Built into all list queries.
 * **Web Frontend** — Ready-to-use HTML/CSS/JS UI.
 
-### **Why Python?**
+### Why Python?
 
 * **Developer-Friendly** — Easy to learn and highly productive.
 * **Extensive Libraries** — Particularly strong for analytics and data science.
@@ -3840,13 +3840,13 @@ Built using modern, high-performance frameworks:
 > **Available only in the Professional Edition.**
 
 
-# **New Feature: GraphQL Application Generator for Go**
+## New Feature: GraphQL Application Generator for Go
 
 MagicAppBuilder 2.0 now supports the Go ecosystem with the **Go GraphQL Application Generator**.
 
 This generator creates a high-performance, concurrent GraphQL backend using idiomatic Go practices and popular libraries:
 
-### **What the Generator Produces**
+### What the Generator Produces
 
 *   **Complete Project Structure** — A standard Go project with a `go.mod` file for dependency management.
 *   **GraphQL Schema & Resolvers** — Auto-generated `.graphqls` schema and corresponding Go resolver stubs.
@@ -3854,7 +3854,7 @@ This generator creates a high-performance, concurrent GraphQL backend using idio
 *   **Ready-to-Run Server** — A pre-configured HTTP server using Chi.
 *   **Web Frontend** — A minimal HTML/CSS/JS UI that connects to the backend.
 
-### **Why Go?**
+### Why Go?
 
 *   **Exceptional Performance** — Compiled to native machine code, offering C-like speed.
 *   **Built-in Concurrency** — Goroutines and channels make concurrent programming simple and efficient.
@@ -3865,7 +3865,7 @@ This generator creates a high-performance, concurrent GraphQL backend using idio
 > **Available only in the Professional Edition.**
 
 
-## **Enhancements**
+## Enhancements
 
 ### Consistent Boolean Handling Across All Databases
 
@@ -3955,14 +3955,14 @@ In previous versions, filter-related data coming from multiple entities was load
 
 With **MagicAppBuilder 2.0**, all filter-related queries are now **merged into a single batch query**, with a defined maximum item limit (e.g., ≤ 8).
 
-### **Benefits of the New Approach**
+### Benefits of the New Approach
 
 * **Faster Filter Rendering** — Multiple filter queries are consolidated, reducing the number of round-trips to the database.
 * **Higher Efficiency** — Minimizes overhead from repetitive small queries.
 * **More Responsive UI** — Filters dependent on related data (foreign keys, enums, reference tables) load noticeably faster.
 * **Safely Bounded** — Query merging is performed only when the number of filter items is sufficiently small (e.g., ≤ 8), ensuring both speed and stability.
 
-### **Example Scenario**
+### Example Scenario
 
 A filter that previously required **8 separate queries** for 8 related entities now needs only **1 merged query**, provided that the total filter size is within the defined safe limit.
 
