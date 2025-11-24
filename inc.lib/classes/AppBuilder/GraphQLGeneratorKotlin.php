@@ -114,6 +114,8 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
 
         $manualContent .= "---\r\n\r\n";
 
+        /*
+
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
             $pluralCamelName = $this->pluralize($camelName);
@@ -160,7 +162,7 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
             $manualContent .= "query Get" . $this->pascalCase($pluralCamelName) . " {\r\n";
             $manualContent .= "  " . $pluralCamelName . "(\r\n    limit: 10, \r\n    offset: 0, \r\n    orderBy: [{field: \"" . $tableInfo['primaryKey'] . "\", direction: DESC}],\r\n    filter: [{field: \"" . $filterField . "\", value: " . $filterValue . ", operator: " . $filterOperator . "}]\r\n  ) {\r\n";
             $manualContent .= "    items {\r\n";
-            $manualContent .= preg_replace('/^/m', '      ', $fieldsString); // Indent fields
+            $manualContent .= preg_replace('/^/m', '  ', $fieldsString); // Indent fields
             $manualContent .= "    }\r\n";
             $manualContent .= "    total\r\n";
             $manualContent .= "  }\r\n";
@@ -232,6 +234,9 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
         $manualContent .= "- `limit`: Specifies the maximum number of records to return.\r\n";
         $manualContent .= "- `offset`: Specifies the number of records to skip from the beginning.\r\n\r\n";
         $manualContent .= "**Example:** To get the second page of 10 items: `limit: 10, offset: 10`\r\n\r\n";
+        */
+
+        $manualContent .= $this->generateExample();
 
         return $manualContent;
     }

@@ -2436,6 +2436,7 @@ Your server is now running at `http://127.0.0.1:8000`. You can access the Graphi
 
 ";
 
+        /*
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
             $pluralCamelName = $this->pluralize($camelName);
@@ -2546,6 +2547,9 @@ Your server is now running at `http://127.0.0.1:8000`. You can access the Graphi
         $manualContent .= "- `limit`: Specifies the maximum number of records to return.\r\n";
         $manualContent .= "- `offset`: Specifies the number of records to skip from the beginning.\r\n\r\n";
         $manualContent .= "**Example:** To get the second page of 10 items: `limit: 10, offset: 10`\r\n\r\n";
+        */
+
+        $manualContent .= $this->generateExample();
 
         return $manualContent;
     }
