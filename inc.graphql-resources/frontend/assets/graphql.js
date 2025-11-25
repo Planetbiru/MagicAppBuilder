@@ -1143,7 +1143,7 @@ class GraphQLClientApp {
      * @returns {Promise<void>} Resolves when the view is updated.
      */
     async updateTableView() {
-        const fields = this.getFieldsForQuery(this.currentEntity, 1, 1); // depth 1, maxDepth 1 (only fetch primary key and displaField if entity has displayField)
+        const fields = this.getFieldsForQuery(this.currentEntity, 1, 1, false, true); // depth 1, maxDepth 1 (only fetch primary key and displaField if entity has displayField)
         const offset = (this.state.page - 1) * this.state.limit;
 
         // Construct filter array for GQL query from state object
@@ -2445,12 +2445,17 @@ class GraphQLClientApp {
      * @param {number} [depth=1] - The maximum depth for traversing relationships.
      * @param {number} [maxDepth=1] - The maximum depth from initiator.
      * @param {boolean} [noRelations=false] - If true, only includes scalar fields.
+     * @param {boolean} [forList=false] - If true, indicate for list view
      * @returns {string} A string of fields for the GraphQL query.
      */
-    getFieldsForQuery(entity, depth = 1, maxDepth = 1, noRelations = false) { // NOSONAR
+    getFieldsForQuery(entity, depth = 1, maxDepth = 1, noRelations = false, forList = false) { // NOSONAR
         if (depth < 0) return entity.primaryKey;
         let fields = [];
         for (const colName in entity.columns) {
+            if(forList && entity.listColumns && entity.listColumns.length > 0 && !entity.listColumns.includes(colName))
+            {
+                continue;
+            }
             const col = entity.columns[colName];
 
             if(maxDepth == 1 && depth < 1)
