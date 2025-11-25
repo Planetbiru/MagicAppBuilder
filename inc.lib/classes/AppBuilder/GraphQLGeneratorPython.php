@@ -386,23 +386,28 @@ PYTHON;
         $toggle_active_mutation_name = "resolve_toggle" . $pascalName . "Active";
 
         $content = <<<PYTHON
+from datetime import datetime, date
+
 from sqlalchemy import func
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from models.$tableName import $pascalName
-from utils.query_helpers import apply_filters, apply_ordering
-from datetime import datetime, date
-from utils.pagination import create_pagination_response
-from constants.constants import DATETIME_FORMAT
+
 from database import get_db
+from models.$tableName import $pascalName
+from utils.i18n import get_translator
+from utils.pagination import create_pagination_response
+from utils.query_helpers import apply_filters, apply_ordering
+from constants.constants import DATETIME_FORMAT
 
 async def $single_query_resolver_name(obj, info, id):
     db = await anext(get_db())
+    request = info.context.get("request")
+    translator = get_translator(request)
     stmt = select($pascalName).where($pascalName.$pk == id)
     result = await db.execute(stmt)
     entity = result.scalar_one_or_none()
     if entity is None:
-        return None
+        raise Exception(translator("no_item_found_with_id", "$pascalName", id))
     return entity
 
 async def $query_resolver_name(obj, info, limit=20, offset=0, page=None, orderBy=None, filter=None):
@@ -519,12 +524,13 @@ $mappingCodeCreate
 async def $update_mutation_name(obj, info, id, input):
     db = await anext(get_db())
     request = info.context.get("request")
+    translator = get_translator(request)
     stmt = select($pascalName).where($pascalName.$pk == id)
     result = await db.execute(stmt)
     entity = result.scalar_one_or_none()
 
     if entity is None:
-        raise Exception(f"$pascalName with id {id} not found")
+        raise Exception(translator("no_item_found_with_id", "$pascalName", id))
 
     for key, value in input.items():
         # Convert datetime/date objects to strings for database compatibility
@@ -540,12 +546,14 @@ $mappingCodeUpdate
 
 async def $delete_mutation_name(obj, info, id):
     db = await anext(get_db())
+    request = info.context.get("request")
+    translator = get_translator(request)
     stmt = select($pascalName).where($pascalName.$pk == id)
     result = await db.execute(stmt)
     entity = result.scalar_one_or_none()
 
     if entity is None:
-        return False
+        raise Exception(translator("no_item_found_with_id", "$pascalName", id))
 
     await db.delete(entity)
     await db.commit()
@@ -569,12 +577,13 @@ PYTHON;
 async def $toggle_active_mutation_name(obj, info, id, $activeField):
     db = await anext(get_db())
     request = info.context.get("request")
+    translator = get_translator(request)
     stmt = select($pascalName).where($pascalName.$pk == id)
     result = await db.execute(stmt)
     entity = result.scalar_one_or_none()
 
     if entity is None:
-        raise Exception(f"$pascalName with id {id} not found")
+        raise Exception(translator("no_item_found_with_id", "$pascalName", id))
 
 $mappingCodeUpdate
 

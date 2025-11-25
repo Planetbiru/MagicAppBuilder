@@ -30,8 +30,8 @@ def _load_translation(lang: str) -> Dict[str, str]:
         return {}
 
 
-async def get_translator(request: Request) -> Callable[..., str]:
-    """FastAPI dependency to get the translator function based on the request header."""
+def get_translator(request: Request) -> Callable[..., str]:
+    """Gets the translator function based on the request header."""
     lang = request.headers.get("X-Language-Id", "en")
     translations = _load_translation(lang)
 

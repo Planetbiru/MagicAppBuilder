@@ -45,15 +45,6 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
                 $driverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver';
                 $dialect = 'org.hibernate.dialect.SQLServerDialect';
             }
-            
-            // In pom.xml, only mysql-connector-j is included by default.
-            // For other databases, the user will need to add the corresponding dependency to pom.xml.
-            // For example, for PostgreSQL:
-            // <dependency>
-            //     <groupId>org.postgresql</groupId>
-            //     <artifactId>postgresql</artifactId>
-            //     <scope>runtime</scope>
-            // </dependency>
 
             $databaseConfiguration = str_replace('{DB_URL}', $url, $databaseConfiguration);
             $databaseConfiguration = str_replace('{DB_DRIVER_CLASS}', $driverClass, $databaseConfiguration);
