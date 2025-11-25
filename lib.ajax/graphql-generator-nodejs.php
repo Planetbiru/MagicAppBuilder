@@ -177,13 +177,13 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'public/langs/i18n/id.json');
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'public/assets');
 
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-npm.js", 'public/assets/app.js');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-npm.min.js", 'public/assets/app.min.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-nodejs.js", 'public/assets/app.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-nodejs.min.js", 'public/assets/app.min.js');
 
-        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/models/core", 'models/core');
-        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/routes", 'routes');
-        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/middleware", 'middleware');
-        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/npm/schema", 'schema');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/models/core", 'models/core');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/routes", 'routes');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/middleware", 'middleware');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/schema", 'schema');
 
 
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");

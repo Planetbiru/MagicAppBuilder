@@ -189,9 +189,9 @@ try {
         }
 
         // Add Maven Wrapper files to backend zip
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw", 'mvnw');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw.cmd", 'mvnw.cmd');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/mvnw", 'mvnw');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/mvnw.cmd", 'mvnw.cmd');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
 
         // Add generated frontend config files
         $zip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
@@ -214,8 +214,8 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'src/main/resources/static/assets/style.css');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'src/main/resources/static/assets/style.css.map');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.min.css", 'src/main/resources/static/assets/style.min.css');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.js", 'src/main/resources/static/assets/app.js');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.min.js", 'src/main/resources/static/assets/app.min.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-java.js", 'src/main/resources/static/assets/app.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-java.min.js", 'src/main/resources/static/assets/app.min.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'src/main/resources/static/assets/graphql.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'src/main/resources/static/assets/graphql.min.js');
 
@@ -276,9 +276,9 @@ try {
         }
 
         // Add Maven Wrapper files to backend zip
-        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw", 'mvnw');
-        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/mvnw.cmd", 'mvnw.cmd');
-        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/mvn/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/mvnw", 'mvnw');
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/mvnw.cmd", 'mvnw.cmd');
+        $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
         
         $backendZip->close();
 
