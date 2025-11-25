@@ -157,7 +157,7 @@ function addDirectoryToZip($zip, $sourcePath, $zipPath) {
         );
         foreach ($files as $file) {
             $filePath = $file->getRealPath();
-            $relativePath = $zipPath . '/' . substr($filePath, strlen($sourcePath) + 1);
+            $relativePath = ltrim($zipPath . '/' . substr($filePath, strlen($sourcePath) + 1), '/');
             $file->isDir() ? $zip->addEmptyDir($relativePath) : $zip->addFile($filePath, $relativePath);
         }
     }

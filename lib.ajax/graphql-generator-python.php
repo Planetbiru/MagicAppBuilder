@@ -172,6 +172,10 @@ try {
 
         // Add backend files
         $backendFiles = $generator->generate();
+
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/python", '');
+
+
         foreach ($backendFiles as $file) {
             if ($file['name'] == '.env') {
                 $file['content'] = setDatabaseConfigurationPython($application, $file['content']);
@@ -191,7 +195,10 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'static/langs/i18n/source.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'static/langs/i18n/en.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'static/langs/i18n/id.json');
+
+
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'static/assets');
+        
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
         $indexFileContent = str_replace('{APP_NAME}', $application->getName(), $indexFileContent);
         $zip->addFromString('static/index.html', $indexFileContent);
