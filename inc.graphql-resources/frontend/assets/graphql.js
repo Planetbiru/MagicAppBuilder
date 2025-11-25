@@ -14,17 +14,18 @@ class GraphQLClientApp {
      * @param {string} [options.apiUrl='graphql.php'] - URL of the GraphQL API endpoint.
      * @param {string} [options.loginUrl='login.php'] - URL for handling user login.
      * @param {string} [options.logoutUrl='logout.php'] - URL for handling user logout.
-     * @param {string} [options.entityLanguageUrl='entity-language.php'] - URL to fetch entity-specific language translations.
-     * @param {string} [options.i18nUrl='language.php'] - URL to fetch UI language packs.
+     * @param {string} [options.entityLanguageUrl='entity-language.php?lang={lang}'] - URL to fetch entity-specific language translations.
+     * @param {string} [options.i18nUrl='language.php?lang={lang}'] - URL to fetch UI language packs.
      * @param {string} [options.languageConfigUrl='available-language.php'] - URL to fetch the list of available languages.
      * @param {string} [options.themeConfigUrl='available-theme.php'] - URL to fetch the list of available themes.
      * @param {string} [options.defaultThemeUrl='assets/style.min.css'] - Path to the default/fallback stylesheet.
-     * @param {object} [options.customRenderers] - Custom rendering functions for entities (e.g., for list, detail, form views).
+     * @param {object} [options.customRenderers={}] - Custom rendering functions for entities (e.g., for list, detail, form views).
      * @param {string} [options.defaultActiveField='active'] - Default field name for the 'active' status column.
      * @param {string} [options.defaultDisplayField='name'] - Default field name to use for displaying relationships if not specified.
      * @param {?string} [options.languageId=null] - The initial language ID. If null, it will be auto-detected.
      * @param {string} [options.defaultLanguage='en'] - The fallback language if auto-detection fails.
-     * @param {object} [options.pages] - An object to define custom, non-entity pages for the application.
+     * @param {number} [options.maxMergedFilters=0] - The threshold for deciding whether to merge filter data queries.
+     * @param {object} [options.pages={}] - An object to define custom, non-entity pages for the application.
      * @param {boolean} [options.useBrowserLanguage=true] - If true, attempts to use the browser's language if none is set in local storage.
      */
     constructor(options = {}) {
