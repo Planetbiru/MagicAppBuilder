@@ -691,12 +691,13 @@ class GraphQLGeneratorBase
     protected function generateExample()
     {
         $manualContent = "";
+        $activeField = $this->activeField;
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
             $camelName = $this->camelCase($tableName);
             $pascalName = $this->pascalCase($tableName);
             $pluralCamelName = $this->pluralize($camelName);
 
-            $manualContent .= "## " . $pascalName . "\r\n\r\n";
+            $manualContent .= "## {$pascalName}\r\n\r\n";
 
             $fieldsString = $this->getFieldsForManual($tableInfo, false);
             $mutationFieldsString = $this->getFieldsForManual($tableInfo, true);
@@ -704,7 +705,7 @@ class GraphQLGeneratorBase
             $manualContent .= "### Queries\r\n\r\n";
             $manualContent .= "#### Get a single " . $camelName . "\r\n\r\n";
             $manualContent .= "```graphql\r\n";
-            $manualContent .= "query Get" . $pascalName . " {\r\n";
+            $manualContent .= "query Get{$pascalName} {\r\n";
             $manualContent .= "  " . $camelName . "(id: \"your-" . $camelName . "-id\") {\r\n";
             $manualContent .= $fieldsString;
             $manualContent .= "  }\r\n";
@@ -728,8 +729,8 @@ class GraphQLGeneratorBase
 
             $manualContent .= "#### Create a new " . $camelName . "\r\n\r\n";
             $manualContent .= "```graphql\r\n";
-            $manualContent .= "mutation Create" . $pascalName . " {\r\n";
-            $manualContent .= "  create" . $pascalName . "(input: {\r\n" . $inputExampleString . "  }) {\r\n";
+            $manualContent .= "mutation Create{$pascalName} {\r\n";
+            $manualContent .= "  create{$pascalName}(input: {\r\n" . $inputExampleString . "  }) {\r\n";
             $manualContent .= $mutationFieldsString;
             $manualContent .= "  }\r\n";
             $manualContent .= "}\r\n";
@@ -737,8 +738,8 @@ class GraphQLGeneratorBase
 
             $manualContent .= "#### Update an existing " . $camelName . "\r\n\r\n";
             $manualContent .= "```graphql\r\n";
-            $manualContent .= "mutation Update" . $pascalName . " {\r\n";
-            $manualContent .= "  update" . $pascalName . "(id: \"your-" . $camelName . "-id\", input: {\r\n" . $inputExampleString . "  }) {\r\n";
+            $manualContent .= "mutation Update{$pascalName} {\r\n";
+            $manualContent .= "  update{$pascalName}(id: \"your-" . $camelName . "-id\", input: {\r\n" . $inputExampleString . "  }) {\r\n";
             $manualContent .= $mutationFieldsString;
             $manualContent .= "  }\r\n";
             $manualContent .= "}\r\n";
@@ -746,10 +747,21 @@ class GraphQLGeneratorBase
 
             $manualContent .= "#### Delete a " . $camelName . "\r\n\r\n";
             $manualContent .= "```graphql\r\n";
-            $manualContent .= "mutation Delete" . $pascalName . " {\r\n";
-            $manualContent .= "  delete" . $pascalName . "(id: \"your-" . $camelName . "-id\")\r\n";
+            $manualContent .= "mutation Delete{$pascalName} {\r\n";
+            $manualContent .= "  delete{$pascalName}(id: \"your-" . $camelName . "-id\")\r\n";
             $manualContent .= "}\r\n";
             $manualContent .= "```\r\n\r\n";
+
+            if ($tableInfo['hasActiveColumn']) {
+                $manualContent .= "#### Update active status an existing " . $camelName . "\r\n\r\n";
+                $manualContent .= "```graphql\r\n";
+                $manualContent .= "mutation Toggle{$pascalName}Active {\r\n";
+                $manualContent .= "    toggle{$pascalName}Active(id: \"your-" . $camelName . "-id\", {$activeField}: true) {\r\n";
+                $manualContent .= $mutationFieldsString;
+                $manualContent .= "}\r\n";
+                $manualContent .= "```\r\n\r\n";
+            }
+
         }
 
         // --- API Reference Guide ---

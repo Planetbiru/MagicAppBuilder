@@ -874,7 +874,23 @@ JS;
         $manualContent .= "This document provides examples for all available queries and mutations.\r\n\r\n";
         
         $manualContent .= "## Dependencies\r\n\r\n";
-        $manualContent .= "All required dependencies are defined in `package.json`. Run `npm install` to install them.\r\n\r\n";
+        $manualContent .= "All required dependencies are defined in `package.json`. 
+
+To install all dependencies, run:
+
+```
+npm install
+
+```
+
+To start the application, run:
+
+```
+npm run dev
+
+```
+
+";
 
         $manualContent .= "## Database Connection\r\n\r\n";
         $manualContent .= "This API requires a database connection. You must create and configure a `.env` file in the root of the backend project. Here is an example for connecting to a MySQL database:\r\n\r\n";
@@ -904,100 +920,6 @@ REQUIRE_LOGIN=true
         $manualContent .= "Make sure to replace `your_database_name`, `your_username`, and `your_password` with your actual database credentials.\r\n\r\n";
 
         $manualContent .= "---\r\n\r\n";
-
-        /*
-        foreach ($this->analyzedSchema as $tableName => $tableInfo) {
-            $camelName = $this->camelCase($tableName);
-            $pascalName = $this->pascalCase($tableName);
-            $pluralCamelName = $this->pluralize($camelName);
-
-            $manualContent .= "## " . $pascalName . "\r\n\r\n";
-
-            $fieldsString = $this->getFieldsForManual($tableInfo, false);
-            $mutationFieldsString = $this->getFieldsForManual($tableInfo, true);
-
-            $manualContent .= "### Queries\r\n\r\n";
-            $manualContent .= "#### Get a single " . $camelName . "\r\n\r\n";
-            $manualContent .= "```graphql\r\n";
-            $manualContent .= "query Get" . $pascalName . " {\r\n";
-            $manualContent .= "  " . $camelName . "(id: \"your-" . $camelName . "-id\") {\r\n";
-            $manualContent .= $fieldsString;
-            $manualContent .= "  }\r\n";
-            $manualContent .= "}\r\n";
-            $manualContent .= "```\r\n\r\n";
-
-            $manualContent .= "#### Get a list of " . $pluralCamelName . "\r\n\r\n";
-            $manualContent .= "```graphql\r\n";
-            $manualContent .= "query Get" . $this->pascalCase($pluralCamelName) . " {\r\n";
-            $manualContent .= "  " . $pluralCamelName . "(limit: 10, offset: 0) {\r\n";
-            $manualContent .= "    items {\r\n";
-            $manualContent .= preg_replace('/^/m', '  ', $fieldsString);
-            $manualContent .= "    }\r\n";
-            $manualContent .= "    total\r\n";
-            $manualContent .= "  }\r\n";
-            $manualContent .= "}\r\n";
-            $manualContent .= "```\r\n\r\n";
-
-            $manualContent .= "### Mutations\r\n\r\n";
-            list($inputFieldsString, $inputExampleString) = $this->getInputFieldsForManual($tableInfo);
-
-            $manualContent .= "#### Create a new " . $camelName . "\r\n\r\n";
-            $manualContent .= "```graphql\r\n";
-            $manualContent .= "mutation Create" . $pascalName . " {\r\n";
-            $manualContent .= "  create" . $pascalName . "(input: {\r\n" . $inputExampleString . "  }) {\r\n";
-            $manualContent .= $mutationFieldsString;
-            $manualContent .= "  }\r\n";
-            $manualContent .= "}\r\n";
-            $manualContent .= "```\r\n\r\n";
-
-            $manualContent .= "#### Update an existing " . $camelName . "\r\n\r\n";
-            $manualContent .= "```graphql\r\n";
-            $manualContent .= "mutation Update" . $pascalName . " {\r\n";
-            $manualContent .= "  update" . $pascalName . "(id: \"your-" . $camelName . "-id\", input: {\r\n" . $inputExampleString . "  }) {\r\n";
-            $manualContent .= $mutationFieldsString;
-            $manualContent .= "  }\r\n";
-            $manualContent .= "}\r\n";
-            $manualContent .= "```\r\n\r\n";
-
-            $manualContent .= "#### Delete a " . $camelName . "\r\n\r\n";
-            $manualContent .= "```graphql\r\n";
-            $manualContent .= "mutation Delete" . $pascalName . " {\r\n";
-            $manualContent .= "  delete" . $pascalName . "(id: \"your-" . $camelName . "-id\")\r\n";
-            $manualContent .= "}\r\n";
-            $manualContent .= "```\r\n\r\n";
-        }
-
-        // --- API Reference Guide ---
-        $manualContent .= "## API Reference Guide\r\n\r\n";
-        $manualContent .= "This section provides a reference for common arguments used in list queries.\r\n\r\n";
-
-        // Filtering
-        $manualContent .= "### Filtering (`filter`)\r\n\r\n";
-        $manualContent .= "The `filter` argument allows you to narrow down results based on field values. It accepts a list of filter objects, which are combined with `AND` logic.\r\n\r\n";
-        $manualContent .= "| Operator       | Description                                      | Example                                                |\r\n";
-        $manualContent .= "|----------------|--------------------------------------------------|--------------------------------------------------------|\r\n";
-        $manualContent .= "| `EQUALS`       | Finds records where the field exactly matches the value. | `{field: \"status\", value: \"published\"}`                |\r\n";
-        $manualContent .= "| `NOT_EQUALS`   | Finds records where the field does not match the value. | `{field: \"status\", value: \"archived\", operator: NOT_EQUALS}` |\r\n";
-        $manualContent .= "| `CONTAINS`     | Finds records where the text field contains the value (`LIKE '%value%'`). | `{field: \"title\", value: \"love\", operator: CONTAINS}` |\r\n";
-        $manualContent .= "| `GREATER_THAN_OR_EQUALS` | Finds records where the numeric/date field is greater than or equal to the value. | `{field: \"price\", value: \"99.99\", operator: GREATER_THAN_OR_EQUALS}` |\r\n";
-        $manualContent .= "| `GREATER_THAN` | Finds records where the numeric/date field is greater than the value. | `{field: \"price\", value: \"100\", operator: GREATER_THAN}` |\r\n";
-        $manualContent .= "| `LESS_THAN_OR_EQUALS`    | Finds records where the numeric/date field is less than or equal to the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN_OR_EQUALS}`   |\r\n";
-        $manualContent .= "| `LESS_THAN`    | Finds records where the numeric/date field is less than the value. | `{field: \"stock\", value: \"10\", operator: LESS_THAN}`   |\r\n";
-        $manualContent .= "| `IN` / `NOT_IN` | Finds records where the field value is in (or not in) a comma-separated list of values. | `{field: \"category_id\", value: \"1,2,3\", operator: IN}` |\r\n\r\n";
-
-        // Sorting
-        $manualContent .= "### Sorting (`orderBy`)\r\n\r\n";
-        $manualContent .= "The `orderBy` argument sorts the results. It accepts a list of sort objects.\r\n\r\n";
-        $manualContent .= "- `field`: The name of the field to sort by (e.g., `\"name\"`).\r\n";
-        $manualContent .= "- `direction`: The sort direction. Can be `ASC` (ascending) or `DESC` (descending). Defaults to `ASC`.\r\n\r\n";
-        $manualContent .= "**Example:** `orderBy: [{field: \"release_date\", direction: DESC}]`\r\n\r\n";
-
-        // Pagination
-        $manualContent .= "### Pagination (`limit` & `offset`)\r\n\r\n";
-        $manualContent .= "- `limit`: Specifies the maximum number of records to return.\r\n";
-        $manualContent .= "- `offset`: Specifies the number of records to skip from the beginning.\r\n\r\n";
-        $manualContent .= "**Example:** To get the second page of 10 items: `limit: 10, offset: 10`\r\n\r\n";
-        */
 
         $manualContent .= $this->generateExample();
 

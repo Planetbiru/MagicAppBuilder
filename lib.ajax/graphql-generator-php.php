@@ -164,8 +164,8 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-php.js", 'assets/app.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-php.min.js", 'assets/app.min.js');
 
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/inc/I18n.php", 'inc/I18n.php');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/inc/ObjectScalar.php", 'inc/ObjectScalar.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/I18n.php", 'inc/I18n.php');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/ObjectScalar.php", 'inc/ObjectScalar.php');
         
         if($inMemoryCache)
         {
