@@ -330,7 +330,13 @@ app.use('/', adminRoutes);
 app.use('/', messageRoutes);
 app.use('/', notificationRoutes);
 
-app.use('/graphql', conditionalAuth, graphqlHTTP({ schema, graphiql: true }));
+app.use('/graphql', conditionalAuth, graphqlHTTP((req) => ({
+    schema: schema,
+    graphiql: {
+        headerEditorEnabled: true,
+    },
+    context: { req: req }
+})));
 
 const PORT = process.env.PORT || 4000;
 
@@ -738,8 +744,13 @@ JS;
             $queryFields .= "        $camelName: {\n";
             $queryFields .= "            type: types.{$pascalName}Type,\n";
             $queryFields .= "            args: { id: { type: new GraphQLNonNull($pkType) } },\n";
-            $queryFields .= "            resolve(parent, args) {\n";
-            $queryFields .= "                return models.$pascalName.findByPk(args.id);\n";
+            $queryFields .= "            resolve: async (parent, args, context) => {\n";
+            $queryFields .= "                const t = getTranslator(context.req);\n";
+            $queryFields .= "                const data = await models.{$pascalName}.findByPk(args.id);\n";
+            $queryFields .= "                if (!data) {\n";
+            $queryFields .= "                    throw new Error(t('item_not_found', '$pascalName'));\n";
+            $queryFields .= "                }\n";
+            $queryFields .= "                return data;\n";
             $queryFields .= "            }\n";
             $queryFields .= "        },\n";
 
@@ -798,9 +809,10 @@ JS;
             $mutationFields .= "                id: { type: new GraphQLNonNull($pkType) },\n";
             $mutationFields .= "                input: { type: new GraphQLNonNull(types.{$pascalName}InputType) }\n";
             $mutationFields .= "            },\n";
-            $mutationFields .= "            async resolve(parent, args) {\n";
+            $mutationFields .= "            async resolve(parent, args, context) {\n";
+            $mutationFields .= "                const t = getTranslator(context.req);\n";
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
-            $mutationFields .= "                if (!item) throw new Error('$pascalName not found');\n";
+            $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
             $mutationFields .= "                await item.update(args.input);\n";
             $mutationFields .= "                return item;\n";
             $mutationFields .= "            }\n";
@@ -814,9 +826,10 @@ JS;
             $mutationFields .= "                id: { type: new GraphQLNonNull($pkType) },\n";
             $mutationFields .= "                $activeField: { type: new GraphQLNonNull(GraphQLBoolean) }\n";
             $mutationFields .= "            },\n";
-            $mutationFields .= "            async resolve(parent, args) {\n";
+            $mutationFields .= "            async resolve(parent, args, context) {\n";
+            $mutationFields .= "                const t = getTranslator(context.req);\n";
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
-            $mutationFields .= "                if (!item) throw new Error('$pascalName not found');\n";
+            $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
             $mutationFields .= "                await item.update({ $activeField: args.$activeField });\n";
             $mutationFields .= "                return item;\n";
             $mutationFields .= "            }\n";
@@ -826,9 +839,10 @@ JS;
             $mutationFields .= "        delete$pascalName: {\n";
             $mutationFields .= "            type: GraphQLBoolean,\n";
             $mutationFields .= "            args: { id: { type: new GraphQLNonNull($pkType) } },\n";
-            $mutationFields .= "            async resolve(parent, args) {\n";
+            $mutationFields .= "            async resolve(parent, args, context) {\n";
+            $mutationFields .= "                const t = getTranslator(context.req);\n";
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
-            $mutationFields .= "                if (!item) throw new Error('$pascalName not found');\n";
+            $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
             $mutationFields .= "                await item.destroy();\n";
             $mutationFields .= "                return true;\n";
             $mutationFields .= "            }\n";
@@ -838,6 +852,7 @@ JS;
         return <<<JS
 const { buildWhereClause } = require('./utils');
 const { GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLID, GraphQLBoolean } = require('graphql');
+const { getTranslator, esc } = require('../utils/i18n');
 const { models } = require('../config/database');
 const types = require('./types');
 const { v4: uuidv4 } = require('uuid');

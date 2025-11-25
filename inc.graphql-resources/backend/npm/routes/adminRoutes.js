@@ -3,23 +3,18 @@ const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const { models } = require('../config/database');
+const { getTranslator, esc } = require('../utils/i18n'); // Import getTranslator and esc
 const conditionalAuth = require('../middleware/conditionalAuth');
 const multer = require('multer');
 
 const router = express.Router();
 const upload = multer();
 
-// Helper function for sanitizing HTML output
-const esc = (str) => {
-    if (str === null || typeof str === 'undefined') return '';
-    return String(str).replace(/[&<>"']/g, (match) => {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[match];
-    });
-};
-
 // --- POST Handler for all admin actions ---
 router.post('/admin', conditionalAuth, upload.none(), async (req, res) => {
     const { action, adminId } = req.body;
+
+    const t = getTranslator(req); // Get translator function
 
     try {
         switch (action) {
@@ -28,7 +23,7 @@ router.post('/admin', conditionalAuth, upload.none(), async (req, res) => {
                 const active = req.body.active ? 1 : 0;
 
                 if (!password) {
-                    return res.status(400).json({ success: false, message: 'Password is required.' });
+                    return res.status(400).json({ success: false, message: t('password_is_required') });
                 }
                 const hash1 = crypto.createHash('sha1').update(password).digest('hex');
                 const hashedPassword = crypto.createHash('sha1').update(hash1).digest('hex');
@@ -45,12 +40,12 @@ router.post('/admin', conditionalAuth, upload.none(), async (req, res) => {
                     admin_create: req.user.admin_id,
                     ip_create: req.ip
                 });
-                return res.json({ success: true, message: 'Admin created successfully.' });
+                return res.json({ success: true, message: t('admin_created_successfully') });
             }
 
             case 'update': {
-                if (!adminId) return res.status(400).json({ success: false, message: 'Admin ID is required.' });
-                
+                if (!adminId) return res.status(400).json({ success: false, message: t('admin_id_required') });
+
                 let { name, username, email, admin_level_id } = req.body;
                 let active = req.body.active ? 1 : 0;
 
@@ -70,54 +65,56 @@ router.post('/admin', conditionalAuth, upload.none(), async (req, res) => {
                     admin_edit: req.user.admin_id,
                     ip_edit: req.ip
                 }, { where: { admin_id: adminId } });
-                return res.json({ success: true, message: 'Admin updated successfully.' });
+                return res.json({ success: true, message: t('admin_updated_successfully') });
             }
 
             case 'toggle_active': {
-                if (!adminId) return res.status(400).json({ success: false, message: 'Admin ID is required.' });
+                if (!adminId) return res.status(400).json({ success: false, message: t('admin_id_required') });
                 if (adminId === req.user.admin_id) {
-                    return res.status(403).json({ success: false, message: 'You cannot deactivate your own account.' });
+                    return res.status(403).json({ success: false, message: t('cannot_deactivate_self') });
                 }
                 const admin = await models.admin.findByPk(adminId);
-                if (!admin) return res.status(404).json({ success: false, message: 'Admin not found.' });
+                if (!admin) return res.status(404).json({ success: false, message: t('admin_not_found') });
 
                 await admin.update({ active: !admin.active });
-                return res.json({ success: true, message: 'Admin status updated successfully.' });
+                return res.json({ success: true, message: t('admin_status_updated') });
             }
 
             case 'change_password': {
-                if (!adminId) return res.status(400).json({ success: false, message: 'Admin ID is required.' });
+                if (!adminId) return res.status(400).json({ success: false, message: t('admin_id_required') });
                 const { password } = req.body;
-                if (!password) return res.status(400).json({ success: false, message: 'Password is required.' });
+                if (!password) return res.status(400).json({ success: false, message: t('password_is_required') });
 
                 const hash1 = crypto.createHash('sha1').update(password).digest('hex');
                 const hashedPassword = crypto.createHash('sha1').update(hash1).digest('hex');
 
                 await models.admin.update({ password: hashedPassword }, { where: { admin_id: adminId } });
-                return res.json({ success: true, message: 'Password updated successfully.' });
+                return res.json({ success: true, message: t('password_updated_successfully') });
             }
 
             case 'delete': {
-                if (!adminId) return res.status(400).json({ success: false, message: 'Admin ID is required.' });
+                if (!adminId) return res.status(400).json({ success: false, message: t('admin_id_required') });
                 if (adminId === req.user.admin_id) {
-                    return res.status(403).json({ success: false, message: 'You cannot delete your own account.' });
+                    return res.status(403).json({ success: false, message: t('cannot_delete_self') });
                 }
                 await models.admin.destroy({ where: { admin_id: adminId } });
-                return res.json({ success: true, message: 'Admin deleted successfully.' });
+                return res.json({ success: true, message: t('admin_deleted_successfully') });
             }
 
             default:
-                return res.status(400).json({ success: false, message: 'Invalid action specified.' });
+                return res.status(400).json({ success: false, message: t('invalid_action_specified') });
         }
     } catch (error) {
         console.error(`Admin POST action '${action}' failed:`, error);
-        res.status(500).json({ success: false, message: error.message || 'An internal server error occurred.' });
+        res.status(500).json({ success: false, message: error.message || t('unexpected_error_occurred') });
     }
 });
 
 // --- GET Handler for rendering different admin views ---
 router.get('/admin', conditionalAuth, async (req, res) => {
     const { view = 'list', adminId, search = '', page = 1 } = req.query;
+
+    const t = getTranslator(req); // Get translator function
 
     try {
         // --- Create or Edit View ---
@@ -126,34 +123,35 @@ router.get('/admin', conditionalAuth, async (req, res) => {
             let admin = null;
             if (view === 'edit') {
                 admin = await models.admin.findByPk(adminId);
+                if (!admin) return res.status(404).send(`<p>${t('admin_not_found')}</p>`); // Translate not found message
             }
 
-            const formTitle = view === 'create' ? 'Add New Admin' : 'Edit Admin';
+            const formTitle = view === 'create' ? t('add_new_admin') : t('edit_admin');
             let html = `
-                <div class="back-controls"><a href="#admin" class="btn btn-secondary">Back to List</a></div>
+                <div class="back-controls"><a href="#admin" class="btn btn-secondary">${t('back_to_list')}</a></div>
                 <div class="table-container detail-view">
                     <h3>${formTitle}</h3>
                     <form id="admin-form" class="form-group" onsubmit="handleAdminSave(event, '${esc(adminId || '')}'); return false;">
                         <table class="table table-borderless">
-                            <tr><td>Name</td><td><input type="text" name="name" value="${esc(admin?.name || '')}" required autocomplete="off"></td></tr>
-                            <tr><td>Username</td><td><input type="text" name="username" value="${esc(admin?.username || '')}" required autocomplete="off"></td></tr>
-                            <tr><td>Email</td><td><input type="email" name="email" value="${esc(admin?.email || '')}" required autocomplete="off"></td></tr>
-                            ${view === 'create' ? '<tr><td>Password</td><td><input type="password" name="password" required autocomplete="new-password"></td></tr>' : ''}
+                            <tr><td>${t('name')}</td><td><input type="text" name="name" value="${esc(admin?.name || '')}" required autocomplete="off"></td></tr>
+                            <tr><td>${t('username')}</td><td><input type="text" name="username" value="${esc(admin?.username || '')}" required autocomplete="off"></td></tr>
+                            <tr><td>${t('email')}</td><td><input type="email" name="email" value="${esc(admin?.email || '')}" required autocomplete="off"></td></tr>
+                            ${view === 'create' ? `<tr><td>${t('password')}</td><td><input type="password" name="password" required autocomplete="new-password"></td></tr>` : ''}
                             <tr>
-                                <td>Admin Level</td>
+                                <td>${t('admin_level')}</td>
                                 <td>
                                     <select name="admin_level_id" required>
-                                        <option value="">Select an option...</option>
+                                        <option value="">${t('select_option')}</option>
                                         ${adminLevels.map(level => `<option value="${level.admin_level_id}" ${admin?.admin_level_id === level.admin_level_id ? 'selected' : ''}>${esc(level.name)}</option>`).join('')}
                                     </select>
                                 </td>
                             </tr>
-                            <tr><td>Active</td><td><input type="checkbox" name="active" ${ (admin?.active || view === 'create') ? 'checked' : ''}></td></tr>
+                            <tr><td>${t('active')}</td><td><input type="checkbox" name="active" ${ (admin?.active || view === 'create') ? 'checked' : ''}></td></tr>
                             <tr>
                                 <td></td>
                                 <td>
-                                    <button type="submit" class="btn btn-success">Save</button>
-                                    <a href="#admin" class="btn btn-secondary">Cancel</a>
+                                    <button type="submit" class="btn btn-success">${t('save')}</button>
+                                    <a href="#admin" class="btn btn-secondary">${t('cancel')}</a>
                                 </td>
                             </tr>
                         </table>
@@ -165,17 +163,17 @@ router.get('/admin', conditionalAuth, async (req, res) => {
         // --- Change Password View ---
         if (view === 'change-password' && adminId) {
             let html = `
-                <div class="back-controls"><a href="#admin?view=detail&adminId=${esc(adminId)}" class="btn btn-secondary">Back to Detail</a></div>
+                <div class="back-controls"><a href="#admin?view=detail&adminId=${esc(adminId)}" class="btn btn-secondary">${t('back_to_detail')}</a></div>
                 <div class="table-container detail-view">
-                    <h3>Change Password</h3>
+                    <h3>${t('update_password')}</h3>
                     <form id="change-password-form" class="form-group" onsubmit="handleAdminChangePassword(event, '${esc(adminId)}'); return false;">
                         <table class="table table-borderless">
-                            <tr><td>New Password</td><td><input type="password" name="password" required autocomplete="new-password"></td></tr>
+                            <tr><td>${t('new_password')}</td><td><input type="password" name="password" required autocomplete="new-password"></td></tr>
                             <tr>
                                 <td></td>
                                 <td>
-                                    <button type="submit" class="btn btn-success">Update</button>
-                                    <a href="#admin?view=detail&adminId=${esc(adminId)}" class="btn btn-secondary">Cancel</a>
+                                    <button type="submit" class="btn btn-success">${t('update')}</button>
+                                    <a href="#admin?view=detail&adminId=${esc(adminId)}" class="btn btn-secondary">${t('cancel')}</a>
                                 </td>
                             </tr>
                         </table>
@@ -191,31 +189,31 @@ router.get('/admin', conditionalAuth, async (req, res) => {
                 include: { model: models.admin_level, as: 'admin_level' }
             });
 
-            if (!admin) return res.status(404).send('<p>Admin not found</p>');
+            if (!admin) return res.status(404).send(`<p>${t('admin_not_found')}</p>`);
 
             let html = `
                 <div class="back-controls">
-                    <a href="#admin" class="btn btn-secondary">Back to List</a>
-                    <a href="#admin?view=edit&adminId=${esc(admin.admin_id)}" class="btn btn-primary">Edit</a>
+                    <a href="#admin" class="btn btn-secondary">${t('back_to_list')}</a>
+                    <a href="#admin?view=edit&adminId=${esc(admin.admin_id)}" class="btn btn-primary">${t('edit')}</a>
                     ${admin.admin_id !== req.user.admin_id ? `
-                        <a href="#admin?view=change-password&adminId=${esc(admin.admin_id)}" class="btn btn-warning">Change Password</a>
+                        <a href="#admin?view=change-password&adminId=${esc(admin.admin_id)}" class="btn btn-warning">${t('update_password')}</a>
                         <button class="btn ${admin.active ? 'btn-warning' : 'btn-success'}" onclick="handleAdminToggleActive('${esc(admin.admin_id)}', ${admin.active})">
-                            ${admin.active ? 'Deactivate' : 'Activate'}
+                            ${admin.active ? t('deactivate') : t('activate')}
                         </button>
-                        <button class="btn btn-danger" onclick="handleAdminDelete('${esc(admin.admin_id)}')">Delete</button>
+                        <button class="btn btn-danger" onclick="handleAdminDelete('${esc(admin.admin_id)}')">${t('delete')}</button>
                     ` : ''}
                 </div>
                 <div class="table-container detail-view">
                     <table class="table">
                         <tbody>
-                            <tr><td><strong>Admin ID</strong></td><td>${esc(admin.admin_id)}</td></tr>
-                            <tr><td><strong>Name</strong></td><td>${esc(admin.name)}</td></tr>
-                            <tr><td><strong>Username</strong></td><td>${esc(admin.username)}</td></tr>
-                            <tr><td><strong>Email</strong></td><td>${esc(admin.email)}</td></tr>
-                            <tr><td><strong>Admin Level</strong></td><td>${esc(admin.admin_level?.name)}</td></tr>
-                            <tr><td><strong>Status</strong></td><td>${admin.active ? 'Active' : 'Inactive'}</td></tr>
-                            <tr><td><strong>Time Create</strong></td><td>${esc(admin.time_create)}</td></tr>
-                            <tr><td><strong>Time Edit</strong></td><td>${esc(admin.time_edit)}</td></tr>
+                            <tr><td><strong>${t('admin_id')}</strong></td><td>${esc(admin.admin_id)}</td></tr>
+                            <tr><td><strong>${t('name')}</strong></td><td>${esc(admin.name)}</td></tr>
+                            <tr><td><strong>${t('username')}</strong></td><td>${esc(admin.username)}</td></tr>
+                            <tr><td><strong>${t('email')}</strong></td><td>${esc(admin.email)}</td></tr>
+                            <tr><td><strong>${t('admin_level')}</strong></td><td>${esc(admin.admin_level?.name)}</td></tr>
+                            <tr><td><strong>${t('status')}</strong></td><td>${admin.active ? t('active') : t('inactive')}</td></tr>
+                            <tr><td><strong>${t('time_create')}</strong></td><td>${esc(admin.time_create)}</td></tr>
+                            <tr><td><strong>${t('time_edit')}</strong></td><td>${esc(admin.time_edit)}</td></tr>
                         </tbody>
                     </table>
                 </div>`;
@@ -243,15 +241,15 @@ router.get('/admin', conditionalAuth, async (req, res) => {
         const totalPages = Math.ceil(count / limit);
 
         let listHtml = `
-            <div id="filter-container" class="filter-container" style="display: block;">
+            <div id="filter-container" class="filter-container">
                 <form id="admin-search-form" class="search-form" onsubmit="handleAdminSearch(event)">
                     <div class="filter-controls">
                         <div class="form-group">
-                            <label for="username">Name</label>
-                            <input type="text" name="search" id="username" placeholder="Name" value="${esc(search)}">
+                            <label for="username">${t('name')}</label>
+                            <input type="text" name="search" id="username" placeholder="${t('name')}" value="${esc(search)}">
                         </div>
-                        <button type="submit" class="btn btn-primary">Search</button>
-                        <a href="#admin?view=create" class="btn btn-primary">Add New Admin</a>
+                        <button type="submit" class="btn btn-primary">${t('search')}</button>
+                        <a href="#admin?view=create" class="btn btn-primary">${t('add_new_admin')}</a>
                     </div>
                 </form>
             </div>
@@ -259,7 +257,7 @@ router.get('/admin', conditionalAuth, async (req, res) => {
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Name</th><th>Username</th><th>Email</th><th>Admin Level</th><th>Status</th><th>Actions</th>
+                            <th>${t('name')}</th><th>${t('username')}</th><th>${t('email')}</th><th>${t('admin_level')}</th><th>${t('status')}</th><th>${t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -269,47 +267,48 @@ router.get('/admin', conditionalAuth, async (req, res) => {
                                 <td>${esc(admin.username)}</td>
                                 <td>${esc(admin.email)}</td>
                                 <td>${esc(admin.admin_level?.name)}</td>
-                                <td>${admin.active ? 'Active' : 'Inactive'}</td>
+                                <td>${admin.active ? t('active') : t('inactive')}</td>
                                 <td class="actions">
-                                    <a href="#admin?view=detail&adminId=${admin.admin_id}" class="btn btn-sm btn-info">View</a>
-                                    <a href="#admin?view=edit&adminId=${admin.admin_id}" class="btn btn-sm btn-primary">Edit</a>
+                                    <a href="#admin?view=detail&adminId=${admin.admin_id}" class="btn btn-sm btn-info">${t('view')}</a>
+                                    <a href="#admin?view=edit&adminId=${admin.admin_id}" class="btn btn-sm btn-primary">${t('edit')}</a>
                                     ${admin.admin_id !== req.user.admin_id ? `
-                                        <a href="#admin?view=change-password&adminId=${admin.admin_id}" class="btn btn-sm btn-warning">Change Password</a>
+                                        <a href="#admin?view=change-password&adminId=${admin.admin_id}" class="btn btn-sm btn-warning">${t('update_password')}</a>
                                         <button class="btn btn-sm ${admin.active ? 'btn-warning' : 'btn-success'}" onclick="handleAdminToggleActive('${admin.admin_id}', ${admin.active})">
-                                            ${admin.active ? 'Deactivate' : 'Activate'}
+                                            ${admin.active ? t('deactivate') : t('activate')}
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="handleAdminDelete('${admin.admin_id}')">Delete</button>
+                                        <button class="btn btn-sm btn-danger" onclick="handleAdminDelete('${admin.admin_id}')">${t('delete')}</button>
                                     ` : ''}
                                 </td>
                             </tr>
-                        `).join('') : '<tr><td colspan="6">No admins found.</td></tr>'}
+                        `).join('') : `<tr><td colspan="6">${t('no_admins_found')}</td></tr>`}
                     </tbody>
                 </table>
             </div>`;
 
         // Pagination
         if (totalPages > 1) {
-            listHtml += `<div class="pagination-container"><span>Page ${page} of ${totalPages} (Total: ${count})</span><div>`;
-            if (page > 1) {
-                listHtml += `<a href="#admin?page=${page - 1}&search=${esc(search)}" class="btn btn-secondary">Previous</a>`;
-            }
+            listHtml += `<div class="pagination-container"><span>${t('page_of', page, totalPages, count)}</span><div>`;
+            if (page > 1) { 
+                listHtml += `<a href="#admin?page=${page - 1}&search=${esc(search)}" class="btn btn-secondary">${t('previous')}</a>`;
+            } 
             // Simplified pagination links for brevity
             for (let i = 1; i <= totalPages; i++) {
                 if (i === page || (i >= page - 2 && i <= page + 2)) {
                     listHtml += `<a href="#admin?page=${i}&search=${esc(search)}" class="btn ${i === page ? 'btn-primary' : 'btn-secondary'}">${i}</a>`;
                 }
             }
-            if (page < totalPages) {
-                listHtml += `<a href="#admin?page=${page + 1}&search=${esc(search)}" class="btn btn-secondary">Next</a>`;
-            }
+            if (page < totalPages) { 
+                listHtml += `<a href="#admin?page=${page + 1}&search=${esc(search)}" class="btn btn-secondary">${t('next')}</a>`;
+            } 
             listHtml += `</div></div>`;
         }
 
         res.send(listHtml);
 
     } catch (error) {
-        console.error(`Admin GET view '${view}' failed:`, error);
-        res.status(500).send('An internal server error occurred.');
+        const t = getTranslator(req);
+        console.error(t('failed_to_fetch_details'), error); // Generic error message
+        res.status(500).send(t('unexpected_error_occurred'));
     }
 });
 

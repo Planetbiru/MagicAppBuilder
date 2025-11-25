@@ -2,18 +2,11 @@ const express = require('express');
 const { Op } = require('sequelize');
 const { models } = require('../config/database');
 const conditionalAuth = require('../middleware/conditionalAuth');
+const { getTranslator, esc } = require('../utils/i18n'); // Import getTranslator and esc
 const multer = require('multer');
 
 const router = express.Router();
 const upload = multer();
-
-// Helper function for sanitizing HTML output
-const esc = (str) => {
-    if (str === null || typeof str === 'undefined') return '';
-    return String(str).replace(/[&<>"']/g, (match) => {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[match];
-    });
-};
 
 // --- POST Handler for notification actions ---
 router.post('/notification', conditionalAuth, upload.none(), async (req, res) => {
@@ -21,8 +14,10 @@ router.post('/notification', conditionalAuth, upload.none(), async (req, res) =>
     const currentAdminId = req.user.admin_id;
     const currentAdminLevelId = req.user.admin_level_id;
 
+    const t = getTranslator(req); // Get translator function
+
     if (!notificationId) {
-        return res.status(400).json({ success: false, message: 'Notification ID is required.' });
+        return res.status(400).json({ success: false, message: t('notification_id_required') });
     }
 
     const whereClause = {
@@ -32,17 +27,17 @@ router.post('/notification', conditionalAuth, upload.none(), async (req, res) =>
 
     try {
         if (action === 'mark_as_unread') {
-            await models.notification.update({ is_read: false, time_read: null }, { where: whereClause });
-            return res.json({ success: true, message: 'Notification marked as unread.' });
+            await models.notification.update({ is_read: false, time_read: null }, { where: whereClause }); 
+            return res.json({ success: true, message: t('notification_marked_as_unread') });
         } else if (action === 'delete') {
-            await models.notification.destroy({ where: whereClause });
-            return res.json({ success: true, message: 'Notification deleted successfully.' });
+            await models.notification.destroy({ where: whereClause }); 
+            return res.json({ success: true, message: t('notification_deleted_successfully') });
         } else {
-            return res.status(400).json({ success: false, message: 'Invalid action.' });
+            return res.status(400).json({ success: false, message: t('invalid_action_specified') });
         }
     } catch (error) {
         console.error(`Notification POST action '${action}' failed:`, error);
-        res.status(500).json({ success: false, message: error.message || 'An internal server error occurred.' });
+        res.status(500).json({ success: false, message: error.message || t('unexpected_error_occurred') });
     }
 });
 
@@ -51,6 +46,8 @@ router.get('/notification', conditionalAuth, async (req, res) => {
     const { notificationId, search = '', page = 1 } = req.query;
     const currentAdminId = req.user.admin_id;
     const currentAdminLevelId = req.user.admin_level_id;
+
+    const t = getTranslator(req); // Get translator function
 
     try {
         // --- Detail View ---
@@ -62,7 +59,7 @@ router.get('/notification', conditionalAuth, async (req, res) => {
             const notification = await models.notification.findOne({ where: whereClause });
 
             if (!notification) {
-                return res.status(404).send('<div class="table-container detail-view">Notification not found.</div>');
+                return res.status(404).send(`<div class="table-container detail-view">${t('no_notification')}</div>`);
             }
 
             // Mark as read if it's unread
@@ -73,25 +70,25 @@ router.get('/notification', conditionalAuth, async (req, res) => {
 
             const html = `
                 <div class="back-controls">
-                    <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')">Back to List</button>
+                    <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')">${t('back_to_list')}</button>
                     ${notification.is_read ? `
-                        <button class="btn btn-primary" onclick="markNotificationAsUnread('${esc(notification.notification_id)}', 'detail')">Mark as Unread</button>
-                        <button class="btn btn-danger" onclick="handleNotificationDelete('${esc(notification.notification_id)}')">Delete</button>
+                        <button class="btn btn-primary" onclick="markNotificationAsUnread('${esc(notification.notification_id)}', 'detail')">${t('mark_as_unread')}</button>
+                        <button class="btn btn-danger" onclick="handleNotificationDelete('${esc(notification.notification_id)}')">${t('delete')}</button>
                     ` : ''}
                 </div>
                 <div class="notification-container">
                     <div class="notification-header">
                         <h3>${esc(notification.subject)}</h3>
                         <div class="message-meta">
-                            <div><strong>Time:</strong> ${esc(new Date(notification.time_create).toLocaleString())}</div>
-                            <div><strong>Status:</strong> 
-                                ${notification.is_read ? `<span class="status-read">Read at ${esc(new Date(notification.time_read).toLocaleString())}</span>` : '<span class="status-unread">Unread</span>'}
+                            <div><strong>${t('time')}:</strong> ${esc(new Date(notification.time_create).toLocaleString())}</div>
+                            <div><strong>${t('status')}:</strong> 
+                                ${notification.is_read ? `<span class="status-read">${t('read_at')} ${esc(new Date(notification.time_read).toLocaleString())}</span>` : `<span class="status-unread">${t('unread')}</span>`}
                             </div>
                         </div>
                     </div>
                     <div class="message-body">
                         ${nl2br(esc(notification.content))}
-                        ${notification.link ? `<p><a href="${esc(notification.link)}" target="_blank" class="btn btn-primary mt-3">More Info</a></p>` : ''}
+                        ${notification.link ? `<p><a href="${esc(notification.link)}" target="_blank" class="btn btn-primary mt-3">${t('more_info')}</a></p>` : ''}
                     </div>
                 </div>`;
             
@@ -122,20 +119,20 @@ router.get('/notification', conditionalAuth, async (req, res) => {
         const totalPages = Math.ceil(count / limit);
 
         let listHtml = `
-            <div id="filter-container" class="filter-container" style="display: block;">
+            <div id="filter-container" class="filter-container">
                 <form id="notification-search-form" class="search-form" onsubmit="handleNotificationSearch(event)">
                     <div class="filter-controls">
                         <div class="form-group">
-                            <label for="search_notification">Search</label>
-                            <input type="text" name="search" id="search_notification" placeholder="Search" value="${esc(search)}">
+                            <label for="search_notification">${t('search')}</label>
+                            <input type="text" name="search" id="search_notification" placeholder="${t('search')}" value="${esc(search)}">
                         </div>
-                        <button type="submit" class="btn btn-primary">Search</button>
+                        <button type="submit" class="btn btn-primary">${t('search')}</button>
                     </div>
                 </form>
             </div>
 
             <div class="message-list-container">
-                ${notifications.length === 0 ? '<p>No notifications found.</p>' : notifications.map(notification => `
+                ${notifications.length === 0 ? `<p>${t('no_notification')}</p>` : notifications.map(notification => `
                     <div class="message-item ${notification.is_read ? 'read' : 'unread'}">
                         <span class="message-status-indicator"></span>
                         <div class="notification-header">
@@ -144,9 +141,9 @@ router.get('/notification', conditionalAuth, async (req, res) => {
                                     <span class="message-subject">${esc(notification.subject)}</span>
                                 </a>
                                 <span class="message-time">${esc(new Date(notification.time_create).toLocaleString())}</span>
-                                ${notification.is_read ? `
-                                    <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('${esc(notification.notification_id)}', 'list')">Mark as Unread</button>
-                                    <button class="btn btn-sm btn-danger" onclick="handleNotificationDelete('${esc(notification.notification_id)}')">Delete</button>
+                                ${notification.is_read ? ` 
+                                    <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('${esc(notification.notification_id)}', 'list')">${t('mark_as_unread')}</button>
+                                    <button class="btn btn-sm btn-danger" onclick="handleNotificationDelete('${esc(notification.notification_id)}')">${t('delete')}</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -159,22 +156,22 @@ router.get('/notification', conditionalAuth, async (req, res) => {
 
         // Pagination
         if (totalPages > 1) {
-            listHtml += `<div class="pagination-container"><span>Page ${page} of ${totalPages} (Total: ${count})</span><div>`;
+            listHtml += `<div class="pagination-container"><span>${t('page_of', page, totalPages, count)}</span><div>`;
             const searchQuery = search ? `&search=${encodeURIComponent(search)}` : '';
             if (page > 1) {
-                listHtml += `<a href="#notification?page=${page - 1}${searchQuery}" class="btn btn-secondary">Previous</a>`;
-            }
+                listHtml += `<a href="#notification?page=${page - 1}${searchQuery}" class="btn btn-secondary">${t('previous')}</a>`;
+            } 
             
             // Simplified pagination links
             for (let i = 1; i <= totalPages; i++) {
-                 if (i === page || (i >= page - 2 && i <= page + 2) || i === 1 || i === totalPages) {
+                if (i === page || (i >= page - 2 && i <= page + 2) || i === 1 || i === totalPages) {
                     if (listHtml.slice(-1) !== '>' && i > page + 2 && i < totalPages) listHtml += `<span class="pagination-ellipsis">...</span>`;
                     listHtml += `<a href="#notification?page=${i}${searchQuery}" class="btn ${i == page ? 'btn-primary' : 'btn-secondary'}">${i}</a>`;
-                 }
+                }
             }
 
             if (page < totalPages) {
-                listHtml += `<a href="#notification?page=${page + 1}${searchQuery}" class="btn btn-secondary">Next</a>`;
+                listHtml += `<a href="#notification?page=${page + 1}${searchQuery}" class="btn btn-secondary">${t('next')}</a>`;
             }
             listHtml += `</div></div>`;
         }
@@ -182,8 +179,9 @@ router.get('/notification', conditionalAuth, async (req, res) => {
         res.send(listHtml);
 
     } catch (error) {
-        console.error(`Notification GET failed:`, error);
-        res.status(500).send('An internal server error occurred.');
+        const t = getTranslator(req);
+        console.error(t('failed_to_fetch_details'), error);
+        res.status(500).send(t('unexpected_error_occurred'));
     }
 });
 

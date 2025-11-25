@@ -134,5 +134,6 @@
     "time_create": "Time Create",
     "time_edit": "Time Edit",
     "edit_admin": "Edit Admin",
-    "back_to_detail": "Back to Detail"
+    "back_to_detail": "Back to Detail",
+    "item_not_found": "{0} not found."
 }

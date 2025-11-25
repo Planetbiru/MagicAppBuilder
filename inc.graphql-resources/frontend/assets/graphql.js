@@ -328,7 +328,7 @@ class GraphQLClientApp {
             window.addEventListener('popstate', () => this.handleRouteChange());
             this.handleRouteChange(); // Handle initial route
         } catch (error) {
-            this.dom.body.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`; // NOSONAR
+            this.dom.body.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
         }
     }
 
@@ -1714,6 +1714,30 @@ class GraphQLClientApp {
     {
         this.dom.pageWrapper.style.display = 'none';
     }
+    
+    /**
+     * Escapes special HTML characters in a string to prevent HTML injection.
+     *
+     * This function replaces the following characters with their corresponding
+     * HTML entities:
+     * - &  →  &amp;
+     * - <  →  &lt;
+     * - >  →  &gt;
+     * - "  →  &quot;
+     * - '  →  &#039;
+     *
+     * @param {string} unsafe - The raw, unescaped string.
+     * @return {string} The escaped, HTML-safe string.
+     */
+    escapeHtml(unsafe)
+    {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
     /**
      * Fetches and renders the detail view for a single item.
@@ -1740,7 +1764,6 @@ class GraphQLClientApp {
                 }
             }
         `;
-
         try {
             const queryResult = await this.gqlQuery(query, { id });
             const data = queryResult.data;
@@ -1748,38 +1771,52 @@ class GraphQLClientApp {
             
             const detailColumns = this.currentEntity.detailColumns || [];
 
-            const item = data[this.currentEntity.name]; // NOSONAR
-            let detailHtml = `<div class="back-controls">
-                                <button id="back-to-list" class="btn btn-secondary">${this.t('back_to_list')}</button>
-                              </div>
-                <div class="table-container detail-view">
-                    <table class="table">
-                        <tbody>`;
-            for (const key in this.currentEntity.columns) {
-                if(!detailColumns.includes(key))
-                {
-                    continue;
-                }
-                const col = this.currentEntity.columns[key];
-                const relationName = col.references;
-                detailHtml += `<tr>
-                                    <td>${this.getEntityLabel(this.currentEntity, key)}</td>
-                                    <td>`;
-                if (col.isForeignKey && item[relationName]) { // NOSONAR
-                    let referenceValue = item[relationName][this.currentEntity.displayField];
-                    if (referenceValue === null) referenceValue = 'N/A';
-                    detailHtml += `<span>${referenceValue}</span>`;
-                } else if ((col.type.includes('boolean') || key === this.currentEntity.activeField) && this.config.booleanDisplay) {
-                    const isTrue = item[key] === 1 || item[key] === '1' || item[key] === true;
-                    detailHtml += `<span>${isTrue ? this.t(this.config.booleanDisplay.trueLabelKey) : this.t(this.config.booleanDisplay.falseLabelKey)}</span>`;
-                } else {
-                    detailHtml += `<span>${item[key] !== null ? item[key] : 'N/A'}</span>`;
-                }
-                detailHtml += `</td></tr>`;
+            const item = data[this.currentEntity.name];
+            if(!item && queryResult.errors && queryResult.errors.length > 0)
+            {
+                let errorMessage = queryResult.errors[0].message;
+                let detailHtml = `<div class="back-controls">
+                                    <button id="back-to-list" class="btn btn-secondary">${this.t('back_to_list')}</button>
+                                </div>
+                                <p style="color: red;">${this.escapeHtml(errorMessage)}</p>
+                                `
+                this.dom.tableDataContainer.innerHTML = detailHtml;
             }
-            detailHtml += `</tbody></table></div>`; // NOSONAR
-            this.dom.tableDataContainer.innerHTML = detailHtml;
+            else
+            {
+                let detailHtml = `<div class="back-controls">
+                                    <button id="back-to-list" class="btn btn-secondary">${this.t('back_to_list')}</button>
+                                </div>
+                    <div class="table-container detail-view">
+                        <table class="table">
+                            <tbody>`;
+                for (const key in this.currentEntity.columns) {
+                    if(!detailColumns.includes(key))
+                    {
+                        continue;
+                    }
+                    const col = this.currentEntity.columns[key];
+                    const relationName = col.references;
+                    detailHtml += `<tr>
+                                        <td>${this.getEntityLabel(this.currentEntity, key)}</td>
+                                        <td>`;
+                    if (col.isForeignKey && item[relationName]) { // NOSONAR
+                        let referenceValue = item[relationName][this.currentEntity.displayField];
+                        if (referenceValue === null) referenceValue = 'N/A';
+                        detailHtml += `<span>${referenceValue}</span>`;
+                    } else if ((col.type.includes('boolean') || key === this.currentEntity.activeField) && this.config.booleanDisplay) {
+                        const isTrue = item[key] === 1 || item[key] === '1' || item[key] === true;
+                        detailHtml += `<span>${isTrue ? this.t(this.config.booleanDisplay.trueLabelKey) : this.t(this.config.booleanDisplay.falseLabelKey)}</span>`;
+                    } else {
+                        detailHtml += `<span>${item[key] !== null ? item[key] : 'N/A'}</span>`;
+                    }
+                    detailHtml += `</td></tr>`;
+                }
+                detailHtml += `</tbody></table></div>`; // NOSONAR
+                this.dom.tableDataContainer.innerHTML = detailHtml;
 
+                
+            }
             document.getElementById('back-to-list').onclick = () => {
                 // Priority 1: Use history.back() if it's a safe intra-app navigation.
                 // This is the most efficient way to return to the previous state.

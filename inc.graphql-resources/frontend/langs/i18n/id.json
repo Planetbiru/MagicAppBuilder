@@ -134,5 +134,7 @@
     "time_create": "Waktu Dibuat",
     "time_edit": "Waktu Diubah",
     "edit_admin": "Ubah Admin",
-    "back_to_detail": "Kembali ke Detail"
+    "back_to_detail": "Kembali ke Detail",
+    "invalid_action_specified": "Aksi tidak valid.",
+    "item_not_found": "{0} tidak ditemukan."
 }
