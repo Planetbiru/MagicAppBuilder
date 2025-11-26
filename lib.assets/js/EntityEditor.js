@@ -1621,12 +1621,17 @@ class EntityEditor {
      */
     prepareDiagram() {
         let _this = this;
+        let ul = document.querySelector('.tabs-link-container .diagram-list.tabs');
         if (this.diagrams.length > 0) {
             this.diagrams.forEach((diagram) => {
-                let ul = document.querySelector('.tabs-link-container .diagram-list.tabs');
+                
                 _this.addDiagram(ul, diagram.name, diagram.id, diagram.entities, true);
             });
         }
+        let obj = document.querySelector('.diagram-list.tabs');
+        let maxScroll = ul.scrollWidth - obj.offsetWidth;
+        currentMarginLeft = -maxScroll;
+        ul.style.marginLeft = `${currentMarginLeft}px`;
     }
 
     /**
@@ -1693,8 +1698,9 @@ class EntityEditor {
      * @param {string} id - Unique identifier for the diagram.
      * @param {Array} entities - List of entities associated with the diagram.
      * @param {boolean} [finish=false] - Whether the diagram is in edit mode.
+     * @param {boolean} [moveTab=false] - Wheter the editor should move the tabs
      */
-    addDiagram(ul, diagramName, id, entities, finish)
+    addDiagram(ul, diagramName, id, entities, finish, moveTab = false)
     {
         let _this = this;
         finish = finish || false;
@@ -1833,7 +1839,8 @@ class EntityEditor {
         tabDragger.makeDraggable(newTab);
         
         let move = -10 - newTab.offsetWidth;
-        if(ul.offsetWidth > (ul.closest('.panel-title').offsetWidth - 50))
+
+        if(moveTab)
         {
             updateMarginLeft(move);
         }

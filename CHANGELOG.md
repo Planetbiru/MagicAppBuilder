@@ -3865,6 +3865,20 @@ This generator creates a high-performance, concurrent GraphQL backend using idio
 > **Available only in the Professional Edition.**
 
 
+## New Feature: Database Design Selector in Entity Editor
+
+The **Entity Editor** now includes a feature to **select different database designs**.
+
+Previously, if a user created a database design for an application and then changed the application's database configuration, the original design would become inaccessible. This often led to the unintentional loss of work.
+
+With this enhancement:
+
+*   Users can now **choose from a list of previously created database designs** directly within the Entity Editor.
+*   This ensures that even if the database configuration is updated, old designs remain accessible and are not lost.
+*   It provides greater flexibility and data safety, allowing developers to manage multiple design versions or switch between different database contexts without losing their work.
+
+This feature is particularly useful for developers who iterate on database schemas or manage multiple environments, as it decouples the entity design from the live database configuration.
+
 
 ### Consistent Boolean Handling Across All Databases
 
@@ -3972,4 +3986,3 @@ With **MagicAppBuilder 2.0**, all filter-related queries are now **merged into a
 ### Example Scenario
 
 A filter that previously required **8 separate queries** for 8 related entities now needs only **1 merged query**, provided that the total filter size is within the defined safe limit.
-

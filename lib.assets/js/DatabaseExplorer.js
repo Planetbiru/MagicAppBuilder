@@ -1023,7 +1023,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let diagramName = editor.getNewDiagramName();
         let randomId = (new Date()).getTime();
         let id = 'diagram-'+randomId;
-        editor.addDiagram(ul, diagramName, id, [], false);
+        editor.addDiagram(ul, diagramName, id, [], false, true);
         editor.saveDiagram();
     });
 
