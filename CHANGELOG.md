@@ -3871,7 +3871,7 @@ The **Entity Editor** now includes a feature to **select different database desi
 
 Previously, if a user created a database design for an application and then changed the application's database configuration, the original design would become inaccessible. This often led to the unintentional loss of work.
 
-With this enhancement:
+With this feature:
 
 *   Users can now **choose from a list of previously created database designs** directly within the Entity Editor.
 *   This ensures that even if the database configuration is updated, old designs remain accessible and are not lost.
@@ -3879,6 +3879,7 @@ With this enhancement:
 
 This feature is particularly useful for developers who iterate on database schemas or manage multiple environments, as it decouples the entity design from the live database configuration.
 
+## Enhancements
 
 ### Consistent Boolean Handling Across All Databases
 
