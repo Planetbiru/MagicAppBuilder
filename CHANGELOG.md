@@ -3865,7 +3865,6 @@ This generator creates a high-performance, concurrent GraphQL backend using idio
 > **Available only in the Professional Edition.**
 
 
-## Enhancements
 
 ### Consistent Boolean Handling Across All Databases
 
@@ -3939,6 +3938,14 @@ Each CRUD action uses its own dedicated column resolver:
 
 `frontend-config.json` is still used for high-level entity configuration, but column visibility is no longer tied to a single list applied everywhere.
 Instead, each action reads from standardized column-selection helpers for more precise output.
+
+### Refactored GraphQL Resolvers to Reduce Code Duplication
+
+The generated PHP GraphQL resolver (`graphql.php`) has been significantly refactored to eliminate redundant code.
+
+*   **Reusable Functions**: Logic for handling `where` clause, `order by` clause, and parameters.
+*   **Cleaner Codebase**: This change makes the resolver code cleaner, more maintainable, and easier to debug.
+*   **Consistent Behavior**: Ensures that common operations behave consistently across all entities.
 
 ## UI Fix: Reserved Columns Modal
 

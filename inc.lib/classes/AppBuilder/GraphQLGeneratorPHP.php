@@ -272,83 +272,11 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
             $code .= "                // You can customize these arrays to allow/disallow columns for filtering and sorting.\r\n";
             $code .= "                \$allowedFilterColumns = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n";
             $code .= "                \$allowedSortColumns   = array('" . implode("', '", array_keys($tableInfo['columns'])) . "');\r\n\r\n";
+            $code .= "                \$queryParts = buildQueryParts(\$args, \$allowedFilterColumns, \$allowedSortColumns);";
             $code .= "                \$baseSql = 'FROM " . $tableName . "';\r\n";
-            $code .= "                \$countSql = 'SELECT COUNT(*) as total ' . \$baseSql;\r\n";
-            $code .= "                \$dataSql = 'SELECT * ' . \$baseSql;\r\n";
-            $code .= "                \$where = array();\r\n";
-            $code .= "                \$params = array();\r\n";
-            $code .= "                \$paramIndex = 0;\r\n\r\n";
-            // Filter logic
-            $code .= "                if (!empty(\$args['filter'])) {\r\n";
-            $code .= "                    foreach (\$args['filter'] as \$filter) {\r\n";
-            $code .= "                        if (!in_array(\$filter['field'], \$allowedFilterColumns)) continue;\r\n";
-            $code .= "                        \$operator = isset(\$filter['operator']) ? \$filter['operator'] : 'EQUALS';\r\n";
-            $code .= "                        \$paramName = ':' . \$filter['field'] . \$paramIndex++;\r\n";
-            $code .= "                        switch (\$operator) {\r\n";
-            $code .= "                            case 'CONTAINS':\r\n";
-            $code .= "                                \$where[] = \$filter['field'] . ' LIKE ' . \$paramName;\r\n";
-            $code .= "                                \$params[\$paramName] = '%' . \$filter['value'] . '%';\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                            case 'GREATER_THAN_OR_EQUALS':\r\n";
-            $code .= "                                \$where[] = \$filter['field'] . ' >= ' . \$paramName;\r\n";
-            $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                            case 'GREATER_THAN':\r\n";
-            $code .= "                                \$where[] = \$filter['field'] . ' > ' . \$paramName;\r\n";
-            $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                            case 'LESS_THAN_OR_EQUALS':\r\n";
-            $code .= "                                \$where[] = \$filter['field'] . ' <= ' . \$paramName;\r\n";
-            $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                            case 'LESS_THAN':\r\n";
-            $code .= "                                \$where[] = \$filter['field'] . ' < ' . \$paramName;\r\n";
-            $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                            case 'IN':\r\n";
-            $code .= "                            case 'NOT_IN':\r\n";
-            $code .= "                                \$values = array_map('trim', explode(',', \$filter['value']));\r\n";
-            $code .= "                                if (!empty(\$values)) {\r\n";
-            $code .= "                                    \$inPlaceholders = array();\r\n";
-            $code .= "                                    foreach (\$values as \$idx => \$val) {\r\n";
-            $code .= "                                        \$inParamName = \$paramName . '_' . \$idx;\r\n";
-            $code .= "                                        \$inPlaceholders[] = \$inParamName;\r\n";
-            $code .= "                                        \$params[\$inParamName] = \$val;\r\n";
-            $code .= "                                    }\r\n";
-            $code .= "                                    \$operatorStr = (\$operator === 'NOT_IN') ? 'NOT IN' : 'IN';\r\n";
-            $code .= "                                    \$where[] = \$filter['field'] . ' ' . \$operatorStr . ' (' . implode(', ', \$inPlaceholders) . ')';\r\n";
-            $code .= "                                }\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                            case 'NOT_EQUALS':\r\n";
-            $code .= "                                \$where[] = \$filter['field'] . ' != ' . \$paramName;\r\n";
-            $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                            case 'EQUALS':\r\n";
-            $code .= "                            default:\r\n";
-            $code .= "                                \$where[] = \$filter['field'] . ' = ' . \$paramName;\r\n";
-            $code .= "                                \$params[\$paramName] = \$filter['value'];\r\n";
-            $code .= "                                break;\r\n";
-            $code .= "                        }\r\n";
-            $code .= "                    }\r\n";
-            $code .= "                }\r\n";
-            $code .= "                if (count(\$where) > 0) {\r\n";
-            $code .= "                    \$whereClause = ' WHERE ' . implode(' AND ', \$where);\r\n";
-            $code .= "                    \$countSql .= \$whereClause;\r\n";
-            $code .= "                    \$dataSql .= \$whereClause;\r\n";
-            $code .= "                }\r\n\r\n";
-            // OrderBy logic
-            $code .= "                if (!empty(\$args['orderBy'])) {\r\n";
-            $code .= "                    \$orderParts = array();\r\n";
-            $code .= "                    foreach (\$args['orderBy'] as \$order) {\r\n";
-            $code .= "                        if (in_array(\$order['field'], \$allowedSortColumns)) {\r\n";
-            $code .= "                            \$direction = (isset(\$order['direction']) && strtoupper(\$order['direction']) === 'DESC') ? 'DESC' : 'ASC';\r\n";
-            $code .= "                            \$orderParts[] = \$order['field'] . ' ' . \$direction;\r\n";
-            $code .= "                        }\r\n";
-            $code .= "                    }\r\n";
-            $code .= "                    if (!empty(\$orderParts)) {\r\n";
-            $code .= "                        \$dataSql .= ' ORDER BY ' . implode(', ', \$orderParts);\r\n";
-            $code .= "                    }\r\n";
-            $code .= "                }\r\n\r\n";
+            $code .= "                \$countSql = 'SELECT COUNT(*) as total ' . \$baseSql . \$queryParts['whereClause'];\r\n";
+            $code .= "                \$dataSql = 'SELECT * ' . \$baseSql . \$queryParts['whereClause'] . \$queryParts['orderClause'];\r\n";
+            $code .= "                \$params = \$queryParts['params'];\r\n\r\n";
             $code .= "                // Get total count\r\n";
             $code .= "                \$countStmt = \$db->prepare(\$countSql);\r\n";
             $code .= "                \$countStmt->execute(\$params);\r\n";
@@ -746,6 +674,97 @@ function getLastInsertId(\$db, \$tableName, \$primaryKeyName)
 }";
     }
 
+    private function generateQueryPartsFunction()
+    {
+        return <<<PHP
+/**
+ * Builds the WHERE and ORDER BY clauses for a SQL query based on GraphQL arguments.
+ *
+ * @param array \$args The GraphQL arguments, containing 'filter' and 'orderBy'.
+ * @param array \$allowedFilterColumns Whitelist of columns allowed for filtering.
+ * @param array \$allowedSortColumns Whitelist of columns allowed for sorting.
+ * @return array An array containing 'whereClause', 'orderClause', and 'params'.
+ */
+function buildQueryParts(\$args, \$allowedFilterColumns, \$allowedSortColumns)
+{
+    \$where = [];
+    \$params = [];
+    \$paramIndex = 0;
+
+    if (!empty(\$args['filter'])) {
+        foreach (\$args['filter'] as \$filter) {
+            if (!in_array(\$filter['field'], \$allowedFilterColumns)) {
+                continue;
+            }
+            \$operator = \$filter['operator'] ?? 'EQUALS';
+            \$paramName = ':' . \$filter['field'] . \$paramIndex++;
+            switch (\$operator) {
+                case 'CONTAINS':
+                    \$where[] = \$filter['field'] . ' LIKE ' . \$paramName;
+                    \$params[\$paramName] = '%' . \$filter['value'] . '%';
+                    break;
+                case 'GREATER_THAN_OR_EQUALS':
+                    \$where[] = \$filter['field'] . ' >= ' . \$paramName;
+                    \$params[\$paramName] = \$filter['value'];
+                    break;
+                case 'GREATER_THAN':
+                    \$where[] = \$filter['field'] . ' > ' . \$paramName;
+                    \$params[\$paramName] = \$filter['value'];
+                    break;
+                case 'LESS_THAN_OR_EQUALS':
+                    \$where[] = \$filter['field'] . ' <= ' . \$paramName;
+                    \$params[\$paramName] = \$filter['value'];
+                    break;
+                case 'LESS_THAN':
+                    \$where[] = \$filter['field'] . ' < ' . \$paramName;
+                    \$params[\$paramName] = \$filter['value'];
+                    break;
+                case 'IN':
+                case 'NOT_IN':
+                    \$values = array_map('trim', explode(',', \$filter['value']));
+                    if (!empty(\$values)) {
+                        \$inPlaceholders = [];
+                        foreach (\$values as \$idx => \$val) {
+                            \$inParamName = \$paramName . '_' . \$idx;
+                            \$inPlaceholders[] = \$inParamName;
+                            \$params[\$inParamName] = \$val;
+                        }
+                        \$operatorStr = (\$operator === 'NOT_IN') ? 'NOT IN' : 'IN';
+                        \$where[] = \$filter['field'] . ' ' . \$operatorStr . ' (' . implode(', ', \$inPlaceholders) . ')';
+                    }
+                    break;
+                case 'NOT_EQUALS':
+                    \$where[] = \$filter['field'] . ' != ' . \$paramName;
+                    \$params[\$paramName] = \$filter['value'];
+                    break;
+                case 'EQUALS':
+                default:
+                    \$where[] = \$filter['field'] . ' = ' . \$paramName;
+                    \$params[\$paramName] = \$filter['value'];
+                    break;
+            }
+        }
+    }
+
+    \$orderParts = [];
+    if (!empty(\$args['orderBy'])) {
+        foreach (\$args['orderBy'] as \$order) {
+            if (in_array(\$order['field'], \$allowedSortColumns)) {
+                \$direction = (isset(\$order['direction']) && strtoupper(\$order['direction']) === 'DESC') ? 'DESC' : 'ASC';
+                \$orderParts[] = \$order['field'] . ' ' . \$direction;
+            }
+        }
+    }
+
+    return [
+        'whereClause' => !empty(\$where) ? ' WHERE ' . implode(' AND ', \$where) : '',
+        'orderClause' => !empty(\$orderParts) ? ' ORDER BY ' . implode(', ', \$orderParts) : '',
+        'params' => \$params,
+    ];
+}
+PHP;
+    }
+
     /**
      * Generates the PHP code for a helper function that generates a unique 20-byte ID.
      *
@@ -885,6 +904,7 @@ function normalizeBoolean(\$value, \$db)
         $header .= "\r\n";
 
         $header .= $this->generateLastInsertIdFunction() . "\r\n";
+        $header .= $this->generateQueryPartsFunction() . "\r\n";
         $header .= $this->generateNewIdFunction() . "\r\n";
         $header .= $this->generateNormalizeBooleanInputsFunction() . "\r\n\r\n";
         $header .= $this->generateNormalizeBooleanFunction() . "\r\n\r\n";
