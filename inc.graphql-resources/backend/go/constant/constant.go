@@ -7,4 +7,5 @@ const (
 	SessionUsername string = "SessionUsername"
 	SessionPassword string = "SessionPassword"
 	SessionAdminId string  = "SessionAdminId"
+	LanguageKey     string = "language"
 )

@@ -147,13 +147,15 @@ try {
     /** @var \MagicObject\Database\PicoDatabase $databaseBuilder */
     $app = getApplication($databaseBuilder, $applicationId);
 
+    $moduleName = str_replace(array('-', '.', '_', ' ', '/', '\\'), '', $app->getApplicationId());
+
     $generator = new GraphQLGeneratorGo(
         $schema,
         $reservedColumns,
         $backendHandledColumns,
         false, // useCache is not relevant for Go in this context
         array(
-            'moduleName' => str_replace(array('-', '.', '_', ' ', '/', '\\'), '', $app->getApplicationId()),
+            'moduleName' => $moduleName,
             'goVersion' => '1.21',
             'appName' => $app->getName(),
             'appDescription' => $app->getDescription(),
@@ -206,7 +208,22 @@ ENV;
     // The server.go is already configured to serve from a 'static' directory.
     $staticPath = 'static';
 
-    addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/go", '');
+    addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/go", '', function($zip, $filePath, $relativePath) use ($moduleName) {
+        $extensions = ['go'];
+        // Get file extension
+        $info = pathinfo($filePath);
+        $extension = $info['extension']; 
+        if(in_array($extension, $extensions))
+        {
+            $sourceData = file_get_contents($filePath);
+            $fixedData = str_replace('"graphqlapplication/', '"'.$moduleName.'/', $sourceData);
+            $zip->addFromString($relativePath, $fixedData);
+        }
+        else
+        {
+            $zip->addFile($filePath, $relativePath);
+        }
+    });
     
     // Add assets
     addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'static/assets');

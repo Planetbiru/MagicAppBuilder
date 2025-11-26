@@ -945,6 +945,7 @@ GO;
         $colInfo = [];
         $maxLength = 1;
         $pkType = '';
+        $getLastId = '';
         foreach($tableInfo['columns'] as $columnName => $col)
         {
             if($col['isPrimaryKey'] && empty($pkName))
