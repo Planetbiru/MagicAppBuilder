@@ -31,11 +31,11 @@ let isExporting = false;
  * @returns {Function} - A debounced function.
  */
 function debounce(func, delay) {
-  let timeout;
-  return function () {
-    clearTimeout(timeout);
-    timeout = setTimeout(func, delay);
-  };
+    let timeout;
+    return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(func, delay);
+    };
 }
 
 /**
@@ -54,22 +54,43 @@ function debounce(func, delay) {
  *
  * @function getMetaValues
  * @returns {Object} An object containing:
- *   @property {string} applicationId - The application identifier.
- *   @property {string} databaseName  - The database name.
- *   @property {string} databaseSchema - The schema name in the database.
- *   @property {string} databaseType  - The database type (e.g., mysql, postgresql, sqlite).
+ * @property {string} applicationId - The application identifier.
+ * @property {string} databaseName  - The database name.
+ * @property {string} databaseSchema - The schema name in the database.
+ * @property {string} databaseType  - The database type (e.g., mysql, postgresql, sqlite).
  *
  * @example
  * const { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
  * console.log(applicationId, databaseName, databaseSchema, databaseType);
  */
 function getMetaValues() {
-  return {
-    applicationId: document.querySelector('meta[name="application-id"]').getAttribute('content'),
-    databaseName: document.querySelector('meta[name="database-name"]').getAttribute('content'),
-    databaseSchema: document.querySelector('meta[name="database-schema"]').getAttribute('content'),
-    databaseType: document.querySelector('meta[name="database-type"]').getAttribute('content')
-  };
+    return {
+        applicationId: document.querySelector('meta[name="application-id"]').getAttribute('content'),
+        databaseName: document.querySelector('meta[name="database-name"]').getAttribute('content'),
+        databaseSchema: document.querySelector('meta[name="database-schema"]').getAttribute('content'),
+        databaseType: document.querySelector('meta[name="database-type"]').getAttribute('content')
+    };
+}
+
+/**
+ * Sets metadata values in the HTML document for application and database configuration.
+ *
+ * This function updates the corresponding <meta> tags in the document head with
+ * the provided values. It is typically used to expose runtime configuration or
+ * environment details to client-side scripts.
+ *
+ * @param {string} applicationId - The unique identifier of the application.
+ * @param {string} databaseName - The name of the connected database.
+ * @param {string} databaseSchema - The schema used within the database.
+ * @param {string} databaseType - The database engine type (e.g., MySQL, PostgreSQL).
+ * @returns {void}
+ */
+function setMetaValues(applicationId, databaseName, databaseSchema, databaseType)
+{
+    document.querySelector('meta[name="application-id"]').setAttribute('content', applicationId);
+    document.querySelector('meta[name="database-name"]').setAttribute('content', databaseName);
+    document.querySelector('meta[name="database-schema"]').setAttribute('content', databaseSchema);
+    document.querySelector('meta[name="database-type"]').setAttribute('content', databaseType);
 }
 
 
@@ -77,9 +98,9 @@ function getMetaValues() {
  * Saves the vertical scroll position of the `.table-list` element to localStorage.
  */
 function saveScrollPosition() {
-  if (scrollElement) {
-    localStorage.setItem(SCROLL_POSITION_KEY, scrollElement.scrollTop.toString());
-  }
+    if (scrollElement) {
+        localStorage.setItem(SCROLL_POSITION_KEY, scrollElement.scrollTop.toString());
+    }
 }
 
 /**
@@ -87,13 +108,13 @@ function saveScrollPosition() {
  * from the value stored in localStorage.
  */
 function restoreScrollPosition() {
-  scrollElement = document.querySelector('.table-list');
-  if (!scrollElement) return;
+    scrollElement = document.querySelector('.table-list');
+    if (!scrollElement) return;
 
-  const saved = localStorage.getItem(SCROLL_POSITION_KEY);
-  if (saved !== null) {
-    scrollElement.scrollTop = parseInt(saved, 10);
-  }
+    const saved = localStorage.getItem(SCROLL_POSITION_KEY);
+    if (saved !== null) {
+        scrollElement.scrollTop = parseInt(saved, 10);
+    }
 }
 
 /**
@@ -102,13 +123,13 @@ function restoreScrollPosition() {
  * and restores the saved position on page load.
  */
 function initTableScrollPosition() {
-  scrollElement = document.querySelector('.table-list');
-  if (!scrollElement) return;
+    scrollElement = document.querySelector('.table-list');
+    if (!scrollElement) return;
 
-  const debouncedSave = debounce(saveScrollPosition, 300); // 300ms debounce
+    const debouncedSave = debounce(saveScrollPosition, 300); // 300ms debounce
 
-  scrollElement.addEventListener('scroll', debouncedSave);
-  restoreScrollPosition();
+    scrollElement.addEventListener('scroll', debouncedSave);
+    restoreScrollPosition();
 }
 
 /**
@@ -733,6 +754,25 @@ function isEditableElement(element)
         element.isContentEditable;
 }
 
+/**
+ * Loads application metadata and server-side configuration.
+ *
+ * This function first updates the HTML document's meta tags with application and
+ * database details, then fetches entity definitions and configuration data from
+ * the server based on the provided parameters.
+ *
+ * @param {string} applicationId - The unique identifier of the application.
+ * @param {string} databaseName - The name of the database to be accessed.
+ * @param {string} databaseSchema - The schema within the database.
+ * @param {string} databaseType - The type of database engine (e.g., MySQL, PostgreSQL).
+ * @returns {void}
+ */
+function loadApplicationData(applicationId, databaseName, databaseSchema, databaseType)
+{
+    setMetaValues(applicationId, databaseName, databaseSchema, databaseType);
+    fetchEntityFromServer(applicationId, databaseType, databaseName, databaseSchema);
+    fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema);
+}
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -749,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    editor = new EntityEditor('.entity-editor', 
+    editor = new EntityEditor('.entity-editor',
         {
             defaultDataType: 'VARCHAR',
             defaultDataLength: 50,
@@ -759,11 +799,11 @@ document.addEventListener('DOMContentLoaded', () => {
             callbackLoadEntity: function(){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 fetchEntityFromServer(applicationId, databaseType, databaseName, databaseSchema);
-                fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema);         
-            }, 
+                fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema);
+            },
             callbackSaveEntity: function (entities){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
             },
             callbackSaveDiagram: function (diagrams){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
@@ -773,15 +813,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 fetchTemplateFromServer(applicationId, databaseType, databaseName, databaseSchema, null, function(data){
                     reservedColumns = data;
-                });         
-            }, 
+                });
+            },
             callbackSaveTemplate: function (template){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                sendTemplateToServer(applicationId, databaseType, databaseName, databaseSchema, template); 
+                sendTemplateToServer(applicationId, databaseType, databaseName, databaseSchema, template);
             },
             callbackSaveConfig: function (template){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                sendConfigToServer(applicationId, databaseType, databaseName, databaseSchema, template); 
+                sendConfigToServer(applicationId, databaseType, databaseName, databaseSchema, template);
             }
         }
     );
@@ -1066,23 +1106,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.querySelector('.export-data-entity').addEventListener('click', function(){
-       editor.exportData(); 
+        editor.exportData(); 
     });
     
     document.querySelector('.import-data-entity').addEventListener('click', function(){
-       document.querySelector('#importDataFileInput').click();
+        document.querySelector('#importDataFileInput').click();
     });
     
     document.querySelector('.add-data-entity').addEventListener('click', function(e){
-       editor.addData(true); 
+        editor.addData(true); 
     });
     
     document.querySelector('.clear-data-entity').addEventListener('click', function(){
-       editor.clearData(); 
+        editor.clearData(); 
     });
     
     document.querySelector('.save-data-entity').addEventListener('click', function(){
-       editor.saveData(); 
+        editor.saveData(); 
     });
     
     document.querySelector('#importDataFileInput').addEventListener('change', function(event) {
@@ -1197,8 +1237,6 @@ function enableArrowKeyNavigation(tableSelector) {
         }
     });
 }
-
-
 
 /**
  * Parses a single CSV line into an array of values.
@@ -1707,13 +1745,41 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
                 const response = xhr.responseText;  // Get the response from the server
                 try {
                     const parsedData = JSON.parse(response);  // Try to parse the JSON response
-                    let data = editor.createEntitiesFromJSON(parsedData);
-                    editor.entities = data.entities || [] // Insert the received data into editor.entities
-                    editor.diagrams = data.diagrams || [];
-                    editor.refreshEntities();
-                    editor.prepareDiagram();
-                    if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
+                    if(parsedData && parsedData.entities)
+                    {
+                        let data = editor.createEntitiesFromJSON(parsedData);
+                        if(data)
+                        {
+                            editor.entities = data.entities || [] // Insert the received data into editor.entities
+                            editor.diagrams = data.diagrams || [];
+                        }
+                        else
+                        {
+                            editor.entities = [];
+                            editor.diagrams = [];
+                        }
+                        editor.refreshEntities();
+                        editor.clearDiagrams();
+                        editor.clearGeneratedQuery();
+                        editor.prepareDiagram();
+                        if (callback) callback(null, parsedData); // Call the callback with parsed data (if provided)
+                    }
+                    else
+                    {
+                        editor.entities = [];
+                        editor.diagrams = [];
+                        editor.refreshEntities();
+                        editor.clearDiagrams();
+                        editor.clearGeneratedQuery();
+                        editor.prepareDiagram();
+                    }
                 } catch (err) {
+                    editor.entities = [];
+                    editor.diagrams = [];
+                    editor.refreshEntities();
+                    editor.clearDiagrams();
+                    editor.clearGeneratedQuery();
+                    editor.prepareDiagram();
                     console.error("Error parsing JSON from fetchEntityFromServer:", err.message, response);
                 }
             } else {
@@ -1728,7 +1794,7 @@ function fetchEntityFromServer(applicationId, databaseType, databaseName, databa
 
 /**
  * Sends data to the server using the POST method with URL-encoded format.
- * 
+ *
  * @param {string} applicationId - The application ID to be sent.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -1864,7 +1930,7 @@ function sendConfigToServer(applicationId, databaseType, databaseName, databaseS
 
 /**
  * Fetches data from the server using the GET method with the provided parameters.
- * 
+ *
  * @param {string} applicationId - The application ID being used.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -1941,10 +2007,10 @@ function buildUrl(type, applicationId, databaseType, databaseName, databaseSchem
  * @param {HTMLSelectElement} selectElement - The select element whose options will be disabled.
  */
 function disableOtherOptions(selectElement) {
-  const selectedValue = selectElement.value;
-  for (let option of selectElement.options) {
-    option.disabled = option.value !== selectedValue;
-  }
+    const selectedValue = selectElement.value;
+    for (let option of selectElement.options) {
+        option.disabled = option.value !== selectedValue;
+    }
 }
 
 /**
@@ -1953,7 +2019,7 @@ function disableOtherOptions(selectElement) {
  * @param {HTMLSelectElement} selectElement - The select element whose options will be enabled.
  */
 function enableAllOptions(selectElement) {
-  for (let option of selectElement.options) {
-    option.disabled = false;
-  }
+    for (let option of selectElement.options) {
+        option.disabled = false;
+    }
 }

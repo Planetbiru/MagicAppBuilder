@@ -38,10 +38,10 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/Column.min.js"></script>
     <script src="../lib.assets/js/Entity.min.js"></script>
     <script src="../lib.assets/js/Diagram.min.js"></script>
-    <script src="../lib.assets/js/EntityEditor.min.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
+    <script src="../lib.assets/js/EntityEditor.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
     <script src="../lib.assets/js/SVGtoPNG.min.js"></script>

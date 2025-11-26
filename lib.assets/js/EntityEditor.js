@@ -2411,6 +2411,16 @@ class EntityEditor {
     }
 
     /**
+     * Clear generated query
+     */
+    clearGeneratedQuery()
+    {
+        document.querySelector('.query-generated').value = '';
+        document.querySelector('.check-all-entity-structure').checked = false;
+        document.querySelector('.check-all-entity-data').checked = false;
+    }
+
+    /**
      * Checks or unchecks all entity selectors of a specific type (custom or system).
      * This function is typically triggered by a "check all" checkbox for a group of entities.
      * It reads the `data-entity-type` attribute from the triggering element to determine
