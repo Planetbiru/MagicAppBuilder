@@ -147,13 +147,15 @@ try {
     /** @var \MagicObject\Database\PicoDatabase $databaseBuilder */
     $app = getApplication($databaseBuilder, $applicationId);
 
+    $moduleName = str_replace(array('-', '.', '_', ' ', '/', '\\'), '', $app->getApplicationId());
+
     $generator = new GraphQLGeneratorGo(
         $schema,
         $reservedColumns,
         $backendHandledColumns,
         false, // useCache is not relevant for Go in this context
         array(
-            'moduleName' => str_replace(array('-', '.', '_', ' ', '/', '\\'), '', $app->getApplicationId()),
+            'moduleName' => $moduleName,
             'goVersion' => '1.21',
             'appName' => $app->getName(),
             'appDescription' => $app->getDescription(),
@@ -189,6 +191,8 @@ REQUIRE_LOGIN=true
 GRAPHQL_ENDPOINT=/graphql
 GRAPHQL_SCHEMA=schema/schema.graphqls
 THEME_CACHE_TIME=86400
+
+DEFAULT_LANGUAGE=en
 ENV;
 
     $envContent = setGoEnvConfiguration($app, $envTemplate);
@@ -203,6 +207,23 @@ ENV;
     // Add frontend assets (assuming they are served by the Go backend)
     // The server.go is already configured to serve from a 'static' directory.
     $staticPath = 'static';
+
+    addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/go", '', function($zip, $filePath, $relativePath) use ($moduleName) {
+        $extensions = ['go'];
+        // Get file extension
+        $info = pathinfo($filePath);
+        $extension = $info['extension']; 
+        if(in_array($extension, $extensions))
+        {
+            $sourceData = file_get_contents($filePath);
+            $fixedData = str_replace('"graphqlapplication/', '"'.$moduleName.'/', $sourceData);
+            $zip->addFromString($relativePath, $fixedData);
+        }
+        else
+        {
+            $zip->addFile($filePath, $relativePath);
+        }
+    });
     
     // Add assets
     addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'static/assets');

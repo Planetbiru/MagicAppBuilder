@@ -147,8 +147,9 @@ HTML;
  * @param ZipArchive $zip The ZipArchive instance.
  * @param string $sourcePath The path to the directory to add.
  * @param string $zipPath The path inside the ZIP archive where the directory will be placed.
+ * @param callable|null $callback
  */
-function addDirectoryToZip($zip, $sourcePath, $zipPath) {
+function addDirectoryToZip($zip, $sourcePath, $zipPath, $callback = null) {
     if (is_dir($sourcePath)) {
         $zip->addEmptyDir($zipPath);
         $files = new RecursiveIteratorIterator(
@@ -158,7 +159,21 @@ function addDirectoryToZip($zip, $sourcePath, $zipPath) {
         foreach ($files as $file) {
             $filePath = $file->getRealPath();
             $relativePath = ltrim($zipPath . '/' . substr($filePath, strlen($sourcePath) + 1), '/');
-            $file->isDir() ? $zip->addEmptyDir($relativePath) : $zip->addFile($filePath, $relativePath);
+            if($file->isDir()) 
+            {
+                $zip->addEmptyDir($relativePath);
+            } 
+            else
+            {
+                if(is_callable($callback))
+                {
+                    call_user_func($callback, $zip, $filePath, $relativePath);
+                }
+                else
+                {
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
         }
     }
 }
