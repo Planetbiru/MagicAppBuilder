@@ -180,10 +180,13 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-nodejs.js", 'public/assets/app.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-nodejs.min.js", 'public/assets/app.min.js');
 
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/middleware", 'middleware');
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/models/core", 'models/core');
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/routes", 'routes');
-        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/middleware", 'middleware');
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/schema", 'schema');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/utils", 'utils');
+        addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/config", 'config');
+
 
 
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");

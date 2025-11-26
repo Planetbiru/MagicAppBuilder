@@ -56,7 +56,6 @@ class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
         $files[] = ['name' => 'package.json', 'content' => $this->generatePackageJson()];
         $files[] = ['name' => '.env', 'content' => $this->generateEnvFile()];
         $files[] = ['name' => 'server.js', 'content' => $this->generateServerJs()];
-        $files[] = ['name' => 'config/database.js', 'content' => $this->generateDatabaseJs()];
         $files[] = ['name' => 'schema/schema.js', 'content' => $this->generateSchemaJs()];
         $files[] = ['name' => 'schema/types.js', 'content' => $this->generateTypesJs()];
         $files[] = ['name' => 'schema/resolvers.js', 'content' => $this->generateResolversJs()];
@@ -123,6 +122,7 @@ DB_PORT={DB_PORT}
 DB_USER={DB_USER}
 DB_PASS={DB_PASS}
 DB_NAME={DB_NAME}
+DB_FILE={DB_FILE}
 
 # Server Configuration
 PORT=4000
