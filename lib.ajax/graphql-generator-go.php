@@ -189,6 +189,8 @@ REQUIRE_LOGIN=true
 GRAPHQL_ENDPOINT=/graphql
 GRAPHQL_SCHEMA=schema/schema.graphqls
 THEME_CACHE_TIME=86400
+
+DEFAULT_LANGUAGE=en
 ENV;
 
     $envContent = setGoEnvConfiguration($app, $envTemplate);
@@ -203,6 +205,8 @@ ENV;
     // Add frontend assets (assuming they are served by the Go backend)
     // The server.go is already configured to serve from a 'static' directory.
     $staticPath = 'static';
+
+    addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/go", '');
     
     // Add assets
     addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'static/assets');
