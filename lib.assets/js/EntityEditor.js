@@ -1833,7 +1833,10 @@ class EntityEditor {
         tabDragger.makeDraggable(newTab);
         
         let move = -10 - newTab.offsetWidth;
-        updateMarginLeft(move)
+        if(ul.offsetWidth > (ul.closest('.panel-title').offsetWidth - 50))
+        {
+            updateMarginLeft(move);
+        }
     }
 
     /**
@@ -1946,6 +1949,7 @@ class EntityEditor {
      */
     clearDiagrams()
     {
+        
         document.querySelector('.diagram-list.tabs .all-entities').classList.add('active');
 
         let diagramTab = document.querySelectorAll('.diagram-tab');
@@ -1964,6 +1968,12 @@ class EntityEditor {
             });
         }
         document.querySelector('.diagram-container #all-entities').classList.add('active');
+        let ul = document.querySelector('.diagram-list.tabs');
+        ul.style.marginLeft = '0px';
+        ul.scrollLeft = 0;
+        ul.width = 'auto';
+        ul.parentNode.scrollLeft = 0;
+        currentMarginLeft = 132;
     }
 
     /**

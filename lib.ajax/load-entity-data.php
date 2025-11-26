@@ -18,6 +18,7 @@ if ($inputPost->getDatabaseName() !== null) {
     $entities = $inputPost->getEntities();
     $diagrams = $inputPost->getDiagrams();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
+    $hash = md5("$applicationId-$databaseType-$databaseName-$databaseSchema");
 
     $selectedApplication = new EntityApplication(null, $databaseBuilder);
     try
@@ -44,6 +45,7 @@ if ($inputPost->getDatabaseName() !== null) {
             $data['diagrams'] = json_decode($diagrams);
             file_put_contents($path, json_encode($data));
         }
+        $entityCount = 0;
         if (strlen($entities) > 0) {
             $data['entities'] = json_decode($entities, true);
 
@@ -55,10 +57,38 @@ if ($inputPost->getDatabaseName() !== null) {
                 if (isset($entity['modifier']) && $entity['modifier'] == '{{userName}}') {
                     $data['entities'][$index]['modifier'] = $entityAdmin->getName();
                 }
+                $entityCount++;
             }
             
             file_put_contents($path, json_encode($data));
         }
+
+        $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
+        if(!file_exists($indexPath))
+        {
+            $indexRaw = '{}';
+        }
+        else
+        {
+            $indexRaw = file_get_contents($indexPath);
+        }
+        $index = json_decode($indexRaw, true);
+        if(!is_array($index))
+        {
+            $index = [];
+        }
+        if(!is_array($index[$hash]))
+        {
+            $index[$hash] = array();
+        }
+        $index[$hash]['applicationId'] = $applicationId;
+        $index[$hash]['databaseType'] = $databaseType;
+        $index[$hash]['databaseName'] = $databaseName;
+        $index[$hash]['databaseSchema'] = $databaseSchema;
+        $index[$hash]['entities'] = $entityCount;
+        $index[$hash]['file'] = "data/$filename";
+
+        file_put_contents($indexPath, json_encode($index, JSON_PRETTY_PRINT));
     }
     catch(Exception $e)
     {

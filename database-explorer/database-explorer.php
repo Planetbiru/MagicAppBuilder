@@ -17,7 +17,7 @@ if(!isset($databaseName))
 {
     $databaseName = "";
 }
-
+$hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schemaName");
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +27,7 @@ if(!isset($databaseName))
     <meta name="database-name" content="<?php echo $databaseConfig->getDatabaseName();?>">
     <meta name="database-schema" content="<?php echo $schemaName;?>">
     <meta name="application-id" content="<?php echo $applicationId;?>">
+    <meta name="hash" content="<?php echo $hash;?>">
     <title>Database Explorer</title>
     <link rel="icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
@@ -123,7 +124,7 @@ if(!isset($databaseName))
 
             <div class="modal-footer">
                 <button class="btn btn-primary open-structure">Open File</button>
-                &nbsp;            
+                &nbsp;
                 <button class="btn btn-success translate-structure">Import</button>
                 &nbsp;
                 <button class="btn btn-warning clear">Clear</button>
@@ -148,6 +149,10 @@ if(!isset($databaseName))
                     <div class="container">
                         <div class="left-panel">
                             <div class="object-container">
+                                <div class="schema-container">
+                                    <select class="schema-selector" onchange="onChangeDatabase(this)">
+                                    </select>
+                                </div>
                                 <div class="entity-filter">
                                     <input type="text" id="tableFilter" placeholder="Type entity name">
                                 </div>

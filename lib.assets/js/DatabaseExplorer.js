@@ -68,7 +68,8 @@ function getMetaValues() {
         applicationId: document.querySelector('meta[name="application-id"]').getAttribute('content'),
         databaseName: document.querySelector('meta[name="database-name"]').getAttribute('content'),
         databaseSchema: document.querySelector('meta[name="database-schema"]').getAttribute('content'),
-        databaseType: document.querySelector('meta[name="database-type"]').getAttribute('content')
+        databaseType: document.querySelector('meta[name="database-type"]').getAttribute('content'),
+        hash: document.querySelector('meta[name="hash"]').getAttribute('content'),
     };
 }
 
@@ -85,12 +86,13 @@ function getMetaValues() {
  * @param {string} databaseType - The database engine type (e.g., MySQL, PostgreSQL).
  * @returns {void}
  */
-function setMetaValues(applicationId, databaseName, databaseSchema, databaseType)
+function setMetaValues(applicationId, databaseName, databaseSchema, databaseType, hash)
 {
     document.querySelector('meta[name="application-id"]').setAttribute('content', applicationId);
     document.querySelector('meta[name="database-name"]').setAttribute('content', databaseName);
     document.querySelector('meta[name="database-schema"]').setAttribute('content', databaseSchema);
     document.querySelector('meta[name="database-type"]').setAttribute('content', databaseType);
+    document.querySelector('meta[name="hash"]').setAttribute('content', hash);
 }
 
 
@@ -359,13 +361,52 @@ function init() {
         }, 400);
     });
 
-    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+    let { applicationId, databaseName, databaseSchema, databaseType, hash } = getMetaValues();
 
-
+    loadDatabaseIndex(applicationId, hash);
         
     loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, function(data){
         editor.graphqlAppData = data;
     }); 
+}
+
+function onChangeDatabase(select) {
+    let selectedOption = select.options[select.selectedIndex];
+    let dataset = selectedOption.dataset; 
+    loadApplicationData(dataset.applicationId, dataset.databaseName, dataset.databaseSchema, dataset.databaseType)
+}
+
+function loadDatabaseIndex(applicationId, hash)
+{
+    $.ajax({
+        type: 'GET',
+        url: '../lib.ajax/load-entiy-index.php',
+        data: {applicationId: applicationId},
+        dataType: 'json',
+        success: function(data) {
+            let select = document.querySelector('.schema-selector');
+            select.innerHTML = '';
+            for(let index in data)
+            {
+                if(data.hasOwnProperty(index))
+                {
+                    let option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = data[index].databaseName;
+                    if(index == hash)
+                    {
+                        option.setAttribute('selected', 'selected');
+                    }
+                    option.dataset.applicationId = applicationId;
+                    option.dataset.databaseType = data[index].databaseType;
+                    option.dataset.databaseName = data[index].databaseName;
+                    option.dataset.databaseSchema = data[index].databaseSchema;
+                    
+                    select.appendChild(option);
+                }
+            }
+        }
+    })
 }
 
 /**

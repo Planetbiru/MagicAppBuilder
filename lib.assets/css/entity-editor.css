@@ -66,13 +66,21 @@ body {
 .entity-editor .left-panel .object-container .entity-filter input[type=text]:focus-visible {
   outline: none;
 }
+.entity-editor .left-panel .object-container .schema-container {
+  padding-bottom: 4px;
+}
+.entity-editor .left-panel .object-container .schema-container .schema-selector {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #eeeeee;
+}
 .entity-editor .left-panel .object-container .table-list {
   list-style-type: none;
   padding: 0;
   overflow: auto;
   padding-bottom: 2.2rem;
   margin: 5px 0 0px 0;
-  height: calc(100vh - 450px);
+  height: calc(100vh - 500px);
 }
 .entity-editor .left-panel .object-container .table-list li {
   padding: 0 1rem 0 0;
