@@ -1318,7 +1318,7 @@ class GraphQLClientApp {
      * @returns {Array<object>} An array of items for the entity, or an empty array if not found.
      */
     getPrefetchedDataForEntity(entity, prefetchedData) {
-        if (prefetchedData && prefetchedData[entity.pluralName] && prefetchedData[entity.pluralName].items) {
+        if (prefetchedData && entity && entity.pluralName && prefetchedData[entity.pluralName] && prefetchedData[entity.pluralName].items) {
             return prefetchedData[entity.pluralName].items;
         }
         return [];
@@ -1387,7 +1387,7 @@ class GraphQLClientApp {
 
                 if (filter.element === 'select') {
                     const col = this.currentEntity.columns[filter.name];
-                    const relatedEntity = this.config.entities[this.camelCase(col.references)];
+                    const relatedEntity = this.config.entities[this.camelCase(col.references)] || {};
                     const relatedData = this.getPrefetchedDataForEntity(relatedEntity, prefetchedData); // Use the new helper
                     const displayField = relatedEntity.displayField || relatedEntity.primaryKey;
 
