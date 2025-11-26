@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"graphqlapplication/constant"
 	"log"
 	"os"
 	"path/filepath"
@@ -56,11 +57,14 @@ func InitI18n(dir string) {
 // T is a function to get a translated string.
 // It will try the given language, then fallback to the default language if not found.
 func T(ctx context.Context, key string, args ...interface{}) string {
-	lang, ok := ctx.Value("language").(string)
+	lang, ok := ctx.Value(constant.LanguageKey).(string)
 	if !ok || lang == "" {
 		lang = defaultLang
 	}
+	return Translate(lang, key, args...)
+}
 
+func Translate(lang string, key string, args ...interface{}) string {
 	var message string
 	var found bool
 
