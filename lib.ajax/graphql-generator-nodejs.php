@@ -187,8 +187,6 @@ try {
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/utils", 'utils');
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/backend/nodejs/config", 'config');
 
-
-
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
         $indexFileContent = str_replace('{APP_NAME}', $application->getName(), $indexFileContent);
         $zip->addFromString('public/index.html', $indexFileContent);
