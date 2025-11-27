@@ -299,6 +299,7 @@ app.post('/login', upload.none(), async (req, res) => {
             // Set session on successful login
             req.session.username = user.username;
             req.session.userId = user.admin_id;
+            req.session.password = hash1;
 
             return res.json({ success: true });
         } else {
@@ -394,37 +395,37 @@ const modelsDir = path.join(__dirname, '../models');
 
 // Define the Session model explicitly for connect-session-sequelize
 models.Session = sequelize.define('Session', {
-  sid: {
-    type: Sequelize.STRING,
-    primaryKey: true,
-  },
-  expires: Sequelize.DATE,
-  data: Sequelize.TEXT,
+    sid: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+    },
+    expires: Sequelize.DATE,
+    data: Sequelize.TEXT,
 });
 
 
 const loadModels = (dir) => {
-  fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      // Recurse into subdirectory
-      loadModels(fullPath);
-    } else if (entry.isFile() && entry.name.indexOf('.') !== 0 && entry.name.slice(-3) === '.js') {
-      // Load the model file
-      const model = require(fullPath)(sequelize, DataTypes);
-      if (model && model.name) {
-        models[model.name] = model;
-      }
-    }
-  });
+    fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            // Recurse into subdirectory
+            loadModels(fullPath);
+        } else if (entry.isFile() && entry.name.indexOf('.') !== 0 && entry.name.slice(-3) === '.js') {
+            // Load the model file
+            const model = require(fullPath)(sequelize, DataTypes);
+            if (model && model.name) {
+                models[model.name] = model;
+            }
+        }
+    });
 };
 
 loadModels(modelsDir); // Start the recursive loading from the base models directory
 // Set up associations
 Object.keys(models).forEach(modelName => {
-  if (models[modelName].associate) {
-    models[modelName].associate(models);
-  }
+    if (models[modelName].associate) {
+        models[modelName].associate(models);
+    }
 });
 
 console.log('Models loaded from config/database.js:', Object.keys(models));
@@ -448,7 +449,7 @@ JS;
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             $sequelizeType = $this->mapDbTypeToSequelizeType($colInfo['type'], $colInfo['length']);
             $fields .= "\t\t'$colName': {\n"; // Use original column name as attribute
-            $fields .= "      type: $sequelizeType,\n"; // No need for 'field' mapping anymore
+            $fields .= "\t\t\ttype: $sequelizeType,\n"; // No need for 'field' mapping anymore
             if ($colInfo['isPrimaryKey']) {
                 $fields .= "\t\t\tprimaryKey: true,\n";
             }
@@ -468,7 +469,17 @@ JS;
         }
 
         return <<<JS
-module.exports = (sequelize, DataTypes) => {
+/**
+ * {$pascalName} Model Definition
+ *
+ * This model represents the `{$tableName}` table and defines
+ * its columns, primary keys, and associations.
+ *
+ * @param {import('sequelize').Sequelize} sequelize
+ * @param {import('sequelize').DataTypes} DataTypes
+ * @returns {import('sequelize').Model} SalesDetail
+ */
+function define{$pascalName}Model(sequelize, DataTypes) {
     const $pascalName = sequelize.define('$pascalName', {
 {$fields}
     }, {
@@ -480,7 +491,9 @@ module.exports = (sequelize, DataTypes) => {
     };
 
     return $pascalName;
-};
+}
+
+module.exports = define{$pascalName}Model;
 JS;
     }
 
@@ -729,6 +742,17 @@ JS;
             $pkType = 'GraphQLString';
             $pkCol = null;
             $pkColName = null;
+            $inputColumns = [];
+            $skippedColumns = [];
+            $backendHandledColumnNames = $this->getBackendHandledColumnNames();
+            foreach($tableInfo['columns'] as $colName => $col)
+            {
+                $inputColumns[] = $colName;
+                if(in_array($colName, $backendHandledColumnNames))
+                {
+                    $skippedColumns[] = $colName;
+                }
+            }
             foreach($tableInfo['columns'] as $colName => $col)
             {
                 if($col['isPrimaryKey'])
@@ -737,6 +761,51 @@ JS;
                     $pkColName = $colName;
                     $pkType = $this->mapDbTypeToNodeJsGqlType($col['type'], $col['length']);
                     break;
+                }
+            }
+
+            $auditTrailInsert = "";
+            $auditTrailUpdate = "";
+            $auditTrailToggle = "";
+
+            foreach($this->backendHandledColumns as $key=>$col)
+            {
+                
+                $colName = $col['columnName'];
+                if(in_array($colName, $inputColumns) || in_array($colName, $skippedColumns))
+                {
+                    if($key == 'timeCreate')
+                    {
+                        $auditTrailInsert .= "                args.input.$colName = now;\n";
+                    }
+                    if($key == 'adminCreate')
+                    {
+                        $auditTrailInsert .= "                args.input.$colName = adminId;\n";
+                    }
+                    if($key == 'ipCreate')
+                    {
+                        $auditTrailInsert .= "                args.input.$colName = ip;\n";
+                    }
+                    
+                    if($key == 'timeEdit')
+                    {
+                        $auditTrailInsert .= "                args.input.$colName = now;\n";
+                        $auditTrailUpdate .= "                args.input.$colName = now;\n";
+                        $auditTrailToggle .= "                toggle.$colName = now;\n";
+                    }
+                    if($key == 'adminEdit')
+                    {
+                        $auditTrailInsert .= "                args.input.$colName = adminId;\n";
+                        $auditTrailUpdate .= "                args.input.$colName = adminId;\n";
+                        $auditTrailToggle .= "                toggle.$colName = adminId;\n";
+                    }
+                    if($key == 'ipEdit')
+                    {
+                        $auditTrailInsert .= "                args.input.$colName = ip;\n";
+                        $auditTrailUpdate .= "                args.input.$colName = ip;\n";
+                        $auditTrailToggle .= "                toggle.$colName = ip;\n";
+                    }
+
                 }
             }
 
@@ -789,6 +858,11 @@ JS;
             $mutationFields .= "            type: types.{$pascalName}Type,\n";
             $mutationFields .= "            args: { input: { type: new GraphQLNonNull(types.{$pascalName}InputType) } },\n";
             $mutationFields .= "            resolve(parent, args) {\n";
+            $mutationFields .= "                const { session } = context.req;\n";
+            $mutationFields .= "                const ip = getIp(context.req);\n";
+            $mutationFields .= "                const adminId = session.userId;\n";
+            $mutationFields .= "                const now = toMySqlDateTime();\n";
+            
 
             if(isset($pkCol))
             {
@@ -797,6 +871,8 @@ JS;
                     $mutationFields .= "                args.input.{$pkColName} = uuidv4();\r\n";
                 }
             }
+
+            $mutationFields .= $auditTrailInsert;
 
 
             $mutationFields .= "                return models.$pascalName.create(args.input);\n";
@@ -811,8 +887,13 @@ JS;
             $mutationFields .= "            },\n";
             $mutationFields .= "            async resolve(parent, args, context) {\n";
             $mutationFields .= "                const t = getTranslator(context.req);\n";
+            $mutationFields .= "                const { session } = context.req;\n";
+            $mutationFields .= "                const ip = getIp(context.req);\n";
+            $mutationFields .= "                const adminId = session.userId;\n";
+            $mutationFields .= "                const now = toMySqlDateTime();\n";
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
             $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
+            $mutationFields .= $auditTrailUpdate;
             $mutationFields .= "                await item.update(args.input);\n";
             $mutationFields .= "                return item;\n";
             $mutationFields .= "            }\n";
@@ -828,9 +909,15 @@ JS;
             $mutationFields .= "            },\n";
             $mutationFields .= "            async resolve(parent, args, context) {\n";
             $mutationFields .= "                const t = getTranslator(context.req);\n";
+            $mutationFields .= "                const { session } = context.req;\n";
+            $mutationFields .= "                const ip = getIp(context.req);\n";
+            $mutationFields .= "                const adminId = session.userId;\n";
+            $mutationFields .= "                const now = toMySqlDateTime();\n";
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
             $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
-            $mutationFields .= "                await item.update({ $activeField: args.$activeField });\n";
+            $mutationFields .= "                let toggle = { $activeField: args.$activeField };\n";
+            $mutationFields .= $auditTrailToggle;
+            $mutationFields .= "                await item.update(toggle);\n";
             $mutationFields .= "                return item;\n";
             $mutationFields .= "            }\n";
             $mutationFields .= "        },\n";
@@ -854,8 +941,17 @@ const { buildWhereClause } = require('./utils');
 const { GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLID, GraphQLBoolean } = require('graphql');
 const { getTranslator, esc } = require('../utils/i18n');
 const { models } = require('../config/database');
+const { toMySqlDateTime } = require('../utils/date');
 const types = require('./types');
 const { v4: uuidv4 } = require('uuid');
+
+const getIp = (req) => {
+    let ip = req.ip;
+    if (ip && ip.startsWith('::ffff:')) {
+        return ip.slice(7);
+    }
+    return ip;
+}
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
