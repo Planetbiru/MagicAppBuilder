@@ -38,8 +38,8 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         $dbType = strtolower($dbType);
         if (strpos($dbType, 'varchar') !== false) return "String($length)";
         if (strpos($dbType, 'text') !== false) return "Text";
-        if (strpos($dbType, 'timestamp') !== false) return "DateTime";
-        if (strpos($dbType, 'date') !== false) return "Date";
+        if (strpos($dbType, 'timestamp') !== false) return "String";
+        if (strpos($dbType, 'date') !== false) return "String";
         if (strpos($dbType, 'decimal') !== false || strpos($dbType, 'double') !== false) return "Float";
         if (strpos($dbType, 'float') !== false) return "Float";
         if ((strpos($dbType, 'tinyint') !== false && isset($length) && $length == '1') || strpos($dbType, 'bool') !== false || strpos($dbType, 'bit') !== false) return "Boolean";
@@ -203,6 +203,7 @@ ENV;
     {
         $pascalName = $this->pascalCase($tableName);
         $pk = $tableInfo['primaryKey'];
+
         $pkType = $this->mapDbTypeToPythonType($tableInfo['columns'][$pk]['type'], $tableInfo['columns'][$pk]['length']);
 
         $imports = "from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Date, Text, ForeignKey, func\n";
@@ -364,6 +365,57 @@ PYTHON;
         return $type_defs . $gql_schema;
     }
 
+    /**
+     * Generates Python code used to update manual primary keys inside an update resolver.
+     *
+     * This function inspects the table metadata (`$tableInfo`) to identify columns marked
+     * as manually managed primary keys (`primaryKeyValue = 'manual-all'`). For each primary
+     * key column that requires manual handling, the function generates a Python code snippet
+     * that:
+     *
+     * 1. Checks whether the incoming GraphQL input contains a new primary key value.
+     * 2. Executes a direct SQL UPDATE statement to update the primary key in the database.
+     * 3. Commits the database transaction to persist the change.
+     * 4. Fetches and returns the updated entity using the new primary key value.
+     *
+     * The generated snippet references both the table name and the ORM model class,
+     * enabling it to be used inside an async SQLAlchemy-based GraphQL resolver
+     * (e.g., Strawberry, Ariadne).
+     *
+     * @param string $tableName   The name of the table for which the update logic is generated.
+     * @param string $pascalName  The PascalCase ORM model class name associated with the table.
+     * @param array  $tableInfo   Metadata describing the table columns, including primary key
+     *                            status and manual-update configuration.
+     *
+     * @return string A Python code snippet that performs a manual primary key update,
+     *                or an empty string if no manual-update primary keys exist.
+     */
+    private function primaryKeyUpdater($tableName, $pascalName, $tableInfo)
+    {
+        $primaryKeyUpdater = "";
+        foreach($tableInfo['columns'] as $colName => $col)
+        {
+            $inputColumns[] = $colName;
+            if($col['isPrimaryKey'] && $col['primaryKeyValue'] == 'manual-all')
+            {
+                $primaryKeyUpdater .= "    if input.get(\"{$colName}\") and input.get(\"{$colName}\") != id:\n";
+                $primaryKeyUpdater .= "        update_sql = \"\"\"\n";
+                $primaryKeyUpdater .= "            UPDATE {$tableName} SET {$colName} = :new_pk WHERE {$colName} = :old_pk\n";
+                $primaryKeyUpdater .= "        \"\"\"\n\n";
+                $primaryKeyUpdater .= "        await db.execute(\n";
+                $primaryKeyUpdater .= "            text(update_sql),\n";
+                $primaryKeyUpdater .= "            {\"new_pk\": input.get(\"{$colName}\"), \"old_pk\": id}\n";
+                $primaryKeyUpdater .= "        )\n";
+                $primaryKeyUpdater .= "        await db.commit()\n";
+                $primaryKeyUpdater .= "        stmt2 = select({$pascalName}).where({$pascalName}.{$colName} == input.get(\"{$colName}\"))\n";
+                $primaryKeyUpdater .= "        result2 = await db.execute(stmt2)\n";
+                $primaryKeyUpdater .= "        updated_entity = result2.scalar_one_or_none()\n";
+                $primaryKeyUpdater .= "        return updated_entity\n";
+            }
+        }
+        return $primaryKeyUpdater;
+    }
+
     /** 
      * Generates the content for resolvers/$tableName.py.
      *
@@ -385,10 +437,13 @@ PYTHON;
         $delete_mutation_name = "resolve_delete" . $pascalName;
         $toggle_active_mutation_name = "resolve_toggle" . $pascalName . "Active";
 
+        $updatePrimaryKey = $this->primaryKeyUpdater($tableName, $pascalName, $tableInfo);
+
         $content = <<<PYTHON
 from datetime import datetime, date
 
 from sqlalchemy import func
+from sqlalchemy import text
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
@@ -542,6 +597,7 @@ $mappingCodeUpdate
     
     await db.commit()
     await db.refresh(entity)
+$updatePrimaryKey    
     return entity
 
 async def $delete_mutation_name(obj, info, id):
