@@ -2,7 +2,7 @@ package systemmodel
 
 import "database/sql"
 
-// Notification merepresentasikan data dari tabel 'notification'.
+// Notification represents data from the 'notification' table.
 type Notification struct {
 	NotificationID   string
 	NotificationType sql.NullString
@@ -19,11 +19,14 @@ type Notification struct {
 	IpRead           sql.NullString
 }
 
-// NotificationPageData adalah data yang dibutuhkan untuk template daftar notifikasi.
+// NotificationPageData is the data needed for the notification list template.
 type NotificationPageData struct {
-	Notifications []Notification
-	TotalPages    int
-	CurrentPage   int
-	TotalRecords  int
-	SearchQuery   string
+	Notifications []Notification // For the list page
+	TotalPages    int            // For the list page
+	CurrentPage   int            // For the list page
+	TotalRecords  int            // For the list page
+	SearchQuery   string         // For the list page
+	AdminID       string         // Needed in some templates
+	Found         bool           // For the detail page
+	Notification  Notification   // For the detail page
 }

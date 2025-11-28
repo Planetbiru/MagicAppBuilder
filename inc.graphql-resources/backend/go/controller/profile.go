@@ -15,13 +15,13 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-// UserProfileHandler handles user profile-related logic.
+// UserProfileHandler handles all logic related to the user's own profile.
 type UserProfileHandler struct {
 	DB    *sql.DB
 	Store *sessions.CookieStore
 }
 
-// NewUserProfileHandler creates a new instance of UserProfileHandler.
+// NewUserProfileHandler creates and returns a new instance of UserProfileHandler.
 func NewUserProfileHandler(db *sql.DB, store *sessions.CookieStore) *UserProfileHandler {
 	return &UserProfileHandler{
 		DB:    db,
@@ -29,7 +29,7 @@ func NewUserProfileHandler(db *sql.DB, store *sessions.CookieStore) *UserProfile
 	}
 }
 
-// AdminProfileData defines the structure for the admin profile data to be displayed.
+// AdminProfileData defines the structure for the admin's profile data fetched from the database.
 type AdminProfileData struct {
 	AdminID           string
 	Name              sql.NullString
@@ -45,7 +45,7 @@ type AdminProfileData struct {
 	AdminLevelName    sql.NullString
 }
 
-// PageData is the structure for data passed to the HTML template.
+// PageData holds all the necessary data for rendering the user-profile.html template.
 type PageData struct {
 	Profile      AdminProfileData
 	IsUpdateMode bool
@@ -53,7 +53,8 @@ type PageData struct {
 	Lang         string
 }
 
-// GetProfile handles GET and POST requests to /user-profile.
+// GetProfile is the main HTTP handler for the /user-profile endpoint.
+// It authenticates the user via session and routes the request to GET or POST handlers.
 func (h *UserProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	session, err := h.Store.Get(r, constant.SessionKey)
 	if err != nil {
@@ -76,9 +77,9 @@ func (h *UserProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// handleGetUserProfile handles GET requests to display the profile or edit form.
+// handleGetUserProfile handles GET requests to display the user's profile page.
+// It can render a read-only view or an editable form based on the 'action=update' URL query parameter.
 func (h *UserProfileHandler) handleGetUserProfile(w http.ResponseWriter, r *http.Request, username string) {
-	// Using the injected h.DB
 	ctx := r.Context()
 
 	// Get language from header or query param, default to 'en'
@@ -86,10 +87,10 @@ func (h *UserProfileHandler) handleGetUserProfile(w http.ResponseWriter, r *http
 	if lang == "" {
 		lang = "en" // Default language
 	}
-	// Add language to the context so it can be used by util.T
+	// Add language to the context so it can be used by the translation utility.
 	ctx = context.WithValue(ctx, constant.LanguageKey, lang)
 
-	// Create an i18n closure function for the template
+	// Create an i18n closure function to be passed to the template.
 	i18nFunc := func(key string, args ...interface{}) string {
 		return util.T(ctx, key, args...)
 	}
@@ -104,6 +105,7 @@ func (h *UserProfileHandler) handleGetUserProfile(w http.ResponseWriter, r *http
 		WHERE a.username = ?`
 
 	var profile AdminProfileData
+	// Fetch the user's profile data from the database.
 	err := h.DB.QueryRow(query, username).Scan(
 		&profile.AdminID, &profile.Name, &profile.Username, &profile.Gender, &profile.BirthDay,
 		&profile.Email, &profile.Phone, &profile.LanguageID, &profile.LastResetPassword,
@@ -119,9 +121,10 @@ func (h *UserProfileHandler) handleGetUserProfile(w http.ResponseWriter, r *http
 		return
 	}
 
+	// Determine if the page should be in edit mode.
 	isUpdateMode := r.URL.Query().Get("action") == "update"
 
-	// Path to the template
+	// Prepare and parse the HTML template, injecting necessary functions.
 	tmplPath := filepath.Join("template", "user-profile.html")
 	tmpl, err := template.New(filepath.Base(tmplPath)).Funcs(template.FuncMap{
 		"T":       i18nFunc,
@@ -133,6 +136,7 @@ func (h *UserProfileHandler) handleGetUserProfile(w http.ResponseWriter, r *http
 		return
 	}
 
+	// Assemble the data structure to be passed into the template.
 	pageData := PageData{
 		Profile:      profile,
 		IsUpdateMode: isUpdateMode,
@@ -140,6 +144,7 @@ func (h *UserProfileHandler) handleGetUserProfile(w http.ResponseWriter, r *http
 		Lang:         lang,
 	}
 
+	// Execute and render the template.
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	err = tmpl.Execute(w, pageData)
 	if err != nil {
@@ -147,21 +152,22 @@ func (h *UserProfileHandler) handleGetUserProfile(w http.ResponseWriter, r *http
 	}
 }
 
-// handlePostUserProfile handles POST requests to update the profile.
+// handlePostUserProfile handles POST requests to update the user's profile.
+// It expects a multipart/form-data body and responds with JSON.
 func (h *UserProfileHandler) handlePostUserProfile(w http.ResponseWriter, r *http.Request, username string) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Limit body size for security
+	// Limit request body size for security and parse the multipart form.
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20) // 10 MB
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		http.Error(w, "Failed to parse form", http.StatusBadRequest)
 		return
 	}
 
-	// Using the injected h.DB
+	// Prepare the SQL statement for the update operation.
 	query := `
-		UPDATE admin SET 
-			name = ?, email = ?, gender = ?, birth_day = ?, phone = ? 
+		UPDATE admin SET
+			name = ?, email = ?, gender = ?, birth_day = ?, phone = ?
 		WHERE username = ?`
 
 	stmt, err := h.DB.Prepare(query)
@@ -171,13 +177,14 @@ func (h *UserProfileHandler) handlePostUserProfile(w http.ResponseWriter, r *htt
 	}
 	defer stmt.Close()
 
-	// Get values from the form
+	// Retrieve updated values from the parsed form.
 	name := r.FormValue("name")
 	email := r.FormValue("email")
 	gender := r.FormValue("gender")
 	birthDay := r.FormValue("birth_day")
 	phone := r.FormValue("phone")
 
+	// Execute the prepared statement with the new values.
 	_, err = stmt.Exec(name, email, gender, birthDay, phone, username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -189,7 +196,8 @@ func (h *UserProfileHandler) handlePostUserProfile(w http.ResponseWriter, r *htt
 	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "message": "Profile updated successfully"})
 }
 
-// UpdatePassword handles GET and POST requests to /update-password.
+// UpdatePassword is the main HTTP handler for the /update-password endpoint.
+// It authenticates the user and routes the request to GET or POST handlers.
 func (h *UserProfileHandler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	session, err := h.Store.Get(r, constant.SessionKey)
 	if err != nil {
@@ -212,7 +220,7 @@ func (h *UserProfileHandler) UpdatePassword(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-// handleGetUpdatePassword handles GET requests to display the update password form.
+// handleGetUpdatePassword handles GET requests to display the 'update-password.html' form.
 func (h *UserProfileHandler) handleGetUpdatePassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	lang := r.Header.Get("X-Language-Id")
@@ -242,7 +250,8 @@ func (h *UserProfileHandler) handleGetUpdatePassword(w http.ResponseWriter, r *h
 	}
 }
 
-// handlePostUpdatePassword handles POST requests to update the password.
+// handlePostUpdatePassword handles POST requests to update the user's password.
+// It validates the current password, checks for new password confirmation, and updates the database.
 func (h *UserProfileHandler) handlePostUpdatePassword(w http.ResponseWriter, r *http.Request, username string) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
@@ -252,6 +261,7 @@ func (h *UserProfileHandler) handlePostUpdatePassword(w http.ResponseWriter, r *
 	}
 	ctx = context.WithValue(ctx, constant.LanguageKey, lang)
 
+	// Parse form values from the POST request.
 	r.ParseForm()
 	currentPassword := r.FormValue("current_password")
 	newPassword := r.FormValue("new_password")
@@ -269,7 +279,7 @@ func (h *UserProfileHandler) handlePostUpdatePassword(w http.ResponseWriter, r *
 		return
 	}
 
-	// Fetch the current user's hashed password
+	// Fetch the current hashed password from the database to verify the user's input.
 	var dbPassword string
 	err := h.DB.QueryRow("SELECT password FROM admin WHERE username = ?", username).Scan(&dbPassword)
 	if err != nil {
@@ -278,17 +288,17 @@ func (h *UserProfileHandler) handlePostUpdatePassword(w http.ResponseWriter, r *
 		return
 	}
 
-	// Verify the current password
+	// Verify that the provided current password matches the one stored in the database.
 	if util.DoubleSha1(currentPassword) != dbPassword {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]interface{}{"success": false, "message": util.T(ctx, "incorrect_current_password")})
 		return
 	}
 
-	// Hash the new password
+	// Hash the new password before saving it.
 	newPasswordHash := util.DoubleSha1(newPassword)
 
-	// Update the database
+	// Update the password and the 'last_reset_password' timestamp in the database.
 	_, err = h.DB.Exec(
 		"UPDATE admin SET password = ?, last_reset_password = ? WHERE username = ?",
 		newPasswordHash,
@@ -301,9 +311,6 @@ func (h *UserProfileHandler) handlePostUpdatePassword(w http.ResponseWriter, r *
 		json.NewEncoder(w).Encode(map[string]interface{}{"success": false, "message": util.T(ctx, "failed_to_update_password")})
 		return
 	}
-
-	// Invalidate the old session password hash.
-	// This is good practice but would require re-login. Let's just return success for now.
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "message": util.T(ctx, "password_updated_successfully")})

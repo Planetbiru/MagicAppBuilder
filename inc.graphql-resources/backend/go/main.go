@@ -152,7 +152,7 @@ func registerRoutes(db *sql.DB, store *sessions.CookieStore) {
 
 	// Initialize and register AdminHandler
 	adminHandler := controller.NewAdminHandler(db, store)
-	http.HandleFunc("/admin", adminHandler.ListAdmins)
+	http.Handle("/admin", adminHandler)
 
 	// Initialize and register MessageHandler
 	messageHandler := controller.NewMessageHandler(db, store)

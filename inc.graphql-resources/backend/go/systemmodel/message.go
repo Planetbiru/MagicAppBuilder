@@ -2,7 +2,7 @@ package systemmodel
 
 import "database/sql"
 
-// Message merepresentasikan data dari tabel 'message'.
+// Message represents data from the 'message' table.
 type Message struct {
 	MessageID         string
 	MessageDirection  sql.NullString
@@ -18,12 +18,12 @@ type Message struct {
 	IpCreate          sql.NullString
 	TimeRead          sql.NullString
 	IpRead            sql.NullString
-	SenderName        sql.NullString // Dari JOIN
-	ReceiverName      sql.NullString // Dari JOIN
-	MessageFolderName sql.NullString // Dari JOIN
+	SenderName        sql.NullString // From JOIN
+	ReceiverName      sql.NullString // From JOIN
+	MessageFolderName sql.NullString // From JOIN
 }
 
-// MessagePageData adalah data yang dibutuhkan untuk template daftar pesan.
+// MessagePageData is the data needed for the message list template.
 type MessagePageData struct {
 	Messages     []Message
 	TotalPages   int
