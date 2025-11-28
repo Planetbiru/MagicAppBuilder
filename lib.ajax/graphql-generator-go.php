@@ -29,6 +29,7 @@ function setGoEnvConfiguration($application, $envTemplate)
             $envTemplate = str_replace('{DB_HOST}', $databaseConfig->getHost(), $envTemplate);
             $envTemplate = str_replace('{DB_PORT}', $databaseConfig->getPort(), $envTemplate);
             $envTemplate = str_replace('{DB_NAME}', $databaseConfig->getDatabaseName(), $envTemplate);
+            $envTemplate = str_replace('{DB_FILE}', $databaseConfig->getDatabaseFilePath(), $envTemplate);
             $envTemplate = str_replace('{DB_USER}', $databaseConfig->getUsername(), $envTemplate);
             $envTemplate = str_replace('{DB_PASS}', $databaseConfig->getPassword(), $envTemplate);
         }
@@ -168,7 +169,7 @@ try {
     
     $zip = new ZipArchive();
     $zipFilePath = tempnam(sys_get_temp_dir(), 'golang_app_');
-    if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+    if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
         throw new Exception("Could not create Go project ZIP file.");
     }
 
@@ -181,6 +182,7 @@ DB_DRIVER={DB_DRIVER}
 DB_HOST={DB_HOST}
 DB_PORT={DB_PORT}
 DB_NAME={DB_NAME}
+DB_FILE={DB_FILE}
 DB_USER={DB_USER}
 DB_PASS={DB_PASS}
 

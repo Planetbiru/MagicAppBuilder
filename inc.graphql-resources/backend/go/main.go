@@ -5,16 +5,16 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"graphqlapplication/constant"
-	"graphqlapplication/controller"
-	"graphqlapplication/handler"
-	"graphqlapplication/resolver"
-	"graphqlapplication/util"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"graphqlapplication/constant"
+	"graphqlapplication/controller"
+	"graphqlapplication/handler"
+	"graphqlapplication/resolver"
+	"graphqlapplication/util"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +24,7 @@ import (
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 	"github.com/joho/godotenv"
+	_ "modernc.org/sqlite"
 )
 
 var store *sessions.CookieStore
@@ -112,16 +113,26 @@ func main() {
 	// Initialize i18n translations
 	util.InitI18n("static/langs/i18n")
 
-	// Build DSN (Data Source Name) from environment variables
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
-	)
-
 	driver := os.Getenv("DB_DRIVER")
+	var dsn string
+
+	// Build DSN (Data Source Name) based on the database driver
+	if driver == "sqlite" {
+		dsn = os.Getenv("DB_FILE")
+		if dsn == "" {
+			log.Fatal("DB_DRIVER is set to sqlite, but DB_FILE environment variable is not set.")
+		}
+	} else if driver == "mysql" {
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+			os.Getenv("DB_USER"),
+			os.Getenv("DB_PASS"),
+			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
+			os.Getenv("DB_NAME"),
+		)
+	} else {
+		log.Fatalf("Unsupported database driver: %s. Supported drivers are 'mysql' and 'sqlite'.", driver)
+	}
 
 	// Open database connection
 	db, err := sql.Open(driver, dsn)
