@@ -4,14 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"graphqlapplication/constant"
-	"graphqlapplication/systemmodel"
-	"graphqlapplication/util"
-	"html/template"
 	"log"
 	"math"
 	"net/http"
-	"path/filepath"
+	"graphqlapplication/constant"
+	"graphqlapplication/systemmodel"
+	"graphqlapplication/util"
 	"strconv"
 	"time"
 
@@ -59,7 +57,8 @@ func (h *MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handleGet handles GET requests for the message list or detail view.
+// handleGet routes GET requests. If a 'messageId' query parameter is present,
+// it shows the detail view; otherwise, it displays the message list.
 func (h *MessageHandler) handleGet(w http.ResponseWriter, r *http.Request, adminID string) {
 	messageID := r.URL.Query().Get("messageId")
 	if messageID != "" {
@@ -69,7 +68,9 @@ func (h *MessageHandler) handleGet(w http.ResponseWriter, r *http.Request, admin
 	}
 }
 
-// handlePost handles POST requests for actions on messages.
+// handlePost handles POST requests for actions such as marking a message as unread or deleting it.
+// It expects a multipart/form-data body with 'action' and 'messageId' fields.
+// It responds with a JSON object indicating success or failure.
 func (h *MessageHandler) handlePost(w http.ResponseWriter, r *http.Request, adminID string) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
@@ -79,7 +80,9 @@ func (h *MessageHandler) handlePost(w http.ResponseWriter, r *http.Request, admi
 	}
 	ctx = context.WithValue(ctx, constant.LanguageKey, lang)
 
-	if err := r.ParseForm(); err != nil {
+	// Use ParseMultipartForm to handle multipart/form-data.
+	// 10 << 20 specifies a maximum of 10 MB for the in-memory part of the form.
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		http.Error(w, util.T(ctx, "failed_to_parse_form"), http.StatusBadRequest)
 		return
 	}
@@ -118,11 +121,13 @@ func (h *MessageHandler) handlePost(w http.ResponseWriter, r *http.Request, admi
 	}
 }
 
-// getDetailMessage fetches and displays a single message in detail.
+// getDetailMessage fetches and displays the details of a single message.
+// It also marks the message as read if it's unread and belongs to the current user.
 func (h *MessageHandler) getDetailMessage(w http.ResponseWriter, r *http.Request, adminID, messageID string) {
 	ctx := r.Context()
 
-	// Mark as read
+	// Attempt to mark the message as read.
+	// This is a "fire and forget" operation; we log an error but continue even if it fails.
 	_, err := h.DB.Exec("UPDATE message SET is_read = 1, time_read = ? WHERE message_id = ? AND receiver_id = ? AND (is_read = 0 OR is_read IS NULL)",
 		time.Now().Format(constant.DateTimeFormat), messageID, adminID)
 	if err != nil {
@@ -130,7 +135,11 @@ func (h *MessageHandler) getDetailMessage(w http.ResponseWriter, r *http.Request
 	}
 
 	query := `
-		SELECT m.*, mf.name AS message_folder_name, sender.name AS sender_name, receiver.name AS receiver_name
+		SELECT 
+			m.message_id, m.message_direction, m.sender_id, m.receiver_id, m.message_folder_id,
+			m.icon, m.subject, m.content, m.link, m.is_read, m.time_create, m.ip_create,
+			m.time_read, m.ip_read,
+			mf.name AS message_folder_name, sender.name AS sender_name, receiver.name AS receiver_name
 		FROM message m
 		LEFT JOIN message_folder mf ON m.message_folder_id = mf.message_folder_id
 		LEFT JOIN admin sender ON m.sender_id = sender.admin_id
@@ -156,7 +165,8 @@ func (h *MessageHandler) getDetailMessage(w http.ResponseWriter, r *http.Request
 	})
 }
 
-// getMessageList fetches and displays a list of messages with pagination and search.
+// getMessageList fetches a paginated and searchable list of messages for the current user.
+// It retrieves messages where the user is either the sender or the receiver.
 func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, adminID string) {
 	ctx := r.Context()
 
@@ -168,7 +178,7 @@ func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, 
 	offset := (page - 1) * pageSize
 	search := r.URL.Query().Get("search")
 
-	// Build query
+	// Build the WHERE clause and parameters for the query.
 	var params []interface{}
 	whereClause := "WHERE (m.sender_id = ? OR m.receiver_id = ?)"
 	params = append(params, adminID, adminID)
@@ -179,7 +189,7 @@ func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, 
 		params = append(params, searchTerm, searchTerm, searchTerm, searchTerm)
 	}
 
-	// Count total
+	// Get the total number of records matching the filter for pagination.
 	var totalRecords int
 	countQuery := "SELECT COUNT(*) FROM message m LEFT JOIN admin sender ON m.sender_id = sender.admin_id LEFT JOIN admin receiver ON m.receiver_id = receiver.admin_id " + whereClause
 	err := h.DB.QueryRow(countQuery, params...).Scan(&totalRecords)
@@ -188,7 +198,7 @@ func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	// Fetch records
+	// Fetch the actual message records for the current page.
 	listQuery := `
 		SELECT m.message_id, m.subject, m.content, m.is_read, m.time_create, m.receiver_id,
 			sender.name AS sender_name, receiver.name AS receiver_name
@@ -230,59 +240,4 @@ func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, 
 	}
 
 	renderTemplate(w, r, "message-list.html", pageData)
-}
-
-// renderTemplate is a helper function to render HTML templates.
-func renderTemplate(w http.ResponseWriter, r *http.Request, tmplName string, data interface{}) {
-	ctx := r.Context()
-	lang := r.Header.Get("X-Language-Id")
-	if lang == "" {
-		lang = "en"
-	}
-	ctx = context.WithValue(ctx, constant.LanguageKey, lang)
-
-	i18nFunc := func(key string, args ...interface{}) string {
-		return util.T(ctx, key, args...)
-	}
-
-	// Function to truncate content
-	truncateFunc := func(s string, length int) string {
-		if len(s) > length {
-			return s[:length] + "..."
-		}
-		return s
-	}
-
-	// Functions for pagination
-	add := func(a, b int) int { return a + b }
-	sub := func(a, b int) int { return a - b }
-
-	// Function to create a number sequence (for pagination)
-	seqFunc := func(start, end int) []int {
-		var s []int
-		for i := start; i <= end; i++ {
-			s = append(s, i)
-		}
-		return s
-	}
-
-	tmplPath := filepath.Join("template", tmplName)
-	tmpl, err := template.New(filepath.Base(tmplPath)).Funcs(template.FuncMap{
-		"T":        i18nFunc,
-		"truncate": truncateFunc,
-		"add":      add,
-		"sub":      sub,
-		"seq":      seqFunc,
-	}).ParseFiles(tmplPath)
-
-	if err != nil {
-		http.Error(w, util.T(ctx, "template_error", err.Error()), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, util.T(ctx, "template_execution_error", err.Error()), http.StatusInternalServerError)
-	}
 }

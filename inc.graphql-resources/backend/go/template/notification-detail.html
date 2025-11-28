@@ -1,33 +1,34 @@
+{{if .Found}}
 <div class="back-controls">
-    <button id="back-to-list" class="btn btn-secondary" onclick="backToList('notification')">{{T "back_to_list"}}</button>
-    {{if and .Found .Notification.IsRead.Bool}}
-        <button class="btn btn-primary" onclick="markNotificationAsUnread('{{.Notification.NotificationID}}', 'detail')">{{T "mark_as_unread"}}</button>
-        <button class="btn btn-danger" onclick="handleNotificationDelete('{{.Notification.NotificationID}}')">{{T "delete"}}</button>
+    <a href="#notification" class="btn btn-secondary">{{ T "back_to_list" }}</a>
+    {{if .Notification.IsRead.Bool}}
+        <button class="btn btn-primary" onclick="markNotificationAsUnread('{{.Notification.NotificationID}}', 'detail')">{{ T "mark_as_unread" }}</button>
+        <button class="btn btn-danger" onclick="handleNotificationDelete('{{.Notification.NotificationID}}')">{{ T "delete" }}</button>
     {{end}}
 </div>
-
-{{if .Found}}
 <div class="notification-container">
     <div class="notification-header">
         <h3>{{.Notification.Subject.String}}</h3>
         <div class="message-meta">
-            <div><strong>{{T "time"}}:</strong> {{.Notification.TimeCreate.String}}</div>
-            <div><strong>{{T "status"}}:</strong> 
+            <div><strong>{{ T "time" }}:</strong> {{.Notification.TimeCreate.String}}</div>
+            <div><strong>{{ T "status" }}:</strong> 
                 {{if .Notification.IsRead.Bool}}
-                    <span class="status-read">{{T "read_at_time" .Notification.TimeRead.String}}</span>
+                    <span class="status-read">{{ T "read_at" }} {{.Notification.TimeRead.String}}</span>
                 {{else}}
-                    <span class="status-unread">{{T "unread"}}</span>
+                    <span class="status-unread">{{ T "unread" }}</span>
                 {{end}}
             </div>
         </div>
     </div>
     <div class="message-body">
         {{.Notification.Content.String}}
-        {{if .Notification.Link.Valid}}<p><a href="{{.Notification.Link.String}}" target="_blank" class="btn btn-primary mt-3">{{T "more_info"}}</a></p>{{end}}
+        {{if .Notification.Link.Valid}}
+            <p><a href="{{.Notification.Link.String}}" target="_blank" class="btn btn-primary mt-3">{{ T "more_info" }}</a></p>
+        {{end}}
     </div>
 </div>
 {{else}}
 <div class="table-container detail-view">
-    {{T "no_notification_found"}}
+    {{ T "no_notification_found" }}
 </div>
 {{end}}
