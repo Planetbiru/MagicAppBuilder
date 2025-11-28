@@ -63,7 +63,7 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
      * @return string The generated PHP code.
      */
     private function generateTypes()
-    { //NOSONAR
+    {
         $code = "/**\r\n * ----------------------------------------------------------------------------\r\n * GRAPHQL TYPE DEFINITIONS\r\n * ----------------------------------------------------------------------------\r\n */\r\n\r\n";
         
         // Lazy loading requires forward declaration
@@ -118,7 +118,7 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
 
 
                     if($this->useCache)
-                    {        
+                    {
                         $code .= "                    \$refCacheKey = \"$refTableName:{\$root['$columnName']}\";\r\n";
                         $code .= "                    if (InMemoryCache::has(\$refCacheKey)) {\r\n";
                         $code .= "                        return InMemoryCache::get(\$refCacheKey);\r\n";
@@ -129,7 +129,7 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
                         $code .= "                    if (isset(\$refTableNameData) && !empty(\$refTableNameData)) {\r\n";
                         $code .= "                        InMemoryCache::set(\$refCacheKey, \$refTableNameData);\r\n";
                         $code .= "                    }\r\n";
-                        $code .= "                    return \$refTableNameData;\r\n";                      
+                        $code .= "                    return \$refTableNameData;\r\n";
                     }
                     else
                     {
@@ -233,7 +233,7 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
             $code .= "            'resolve' => function (\$root, \$args) use (\$db) {\r\n";
             
             if($this->useCache)
-            {        
+            {
                 $code .= "                \$cacheKey = \"$tableName:{\$args['id']}\";\r\n";
                 $code .= "                if (InMemoryCache::has(\$cacheKey)) {\r\n";
                 $code .= "                    return InMemoryCache::get(\$cacheKey);\r\n";
@@ -245,7 +245,6 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
                 $code .= "                    InMemoryCache::set(\$cacheKey, \$tableNameData);\r\n";
                 $code .= "                }\r\n";
                 $code .= "                return \$tableNameData;\r\n";
-            
             }
             else
             {
@@ -313,8 +312,6 @@ class GraphQLGeneratorPHP extends GraphQLGeneratorBase
 
         return $code;
     }
-
-    
 
     /**
      * Generates the PHP code for the root Mutation type.

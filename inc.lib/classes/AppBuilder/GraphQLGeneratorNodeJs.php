@@ -26,9 +26,15 @@ class GraphQLGeneratorNodeJs extends GraphQLGeneratorBase
         if (strpos($dbType, 'varchar') !== false) {
             return "DataTypes.STRING($length)";
         }
-        if (strpos($dbType, 'text') !== false || strpos($dbType, 'timestamp') !== false || strpos($dbType, 'datetime') !== false || strpos($dbType, 'date') !== false) {
-            // Treat text and all date/time types as strings to preserve their original format from the database
+        if (strpos($dbType, 'text') !== false)
+        {
             return 'DataTypes.STRING';
+        }
+        if (strpos($dbType, 'timestamp') !== false || strpos($dbType, 'datetime') !== false) {
+            return "DataTypes.DATE,\r\n\t\t\tdateFormat: 'YYYY-MM-DD HH:mm:ss'";
+        }
+        if (strpos($dbType, 'date') !== false) {
+            return "DataTypes.DATE,\r\n\t\t\tdateFormat: 'YYYY-MM-DD'";
         }
         if (strpos($dbType, 'decimal') !== false || strpos($dbType, 'double') !== false) {
             return 'DataTypes.DOUBLE';
@@ -541,6 +547,44 @@ JS;
     }
 
     /**
+     * Generates GraphQL field definitions for the given table information.
+     *
+     * This method iterates through each column in the provided table metadata
+     * and maps its database type to the corresponding Node.js GraphQL type.
+     * For columns that represent foreign keys, it also generates a resolver
+     * to fetch the referenced entity using Sequelize's `findByPk` method.
+     *
+     * @param array $tableInfo  An associative array containing table metadata,
+     *                          including a 'columns' array where each key is
+     *                          a column name and each value contains details
+     *                          such as type, length, and foreign key information.
+     *
+     * @return string  A formatted string representing GraphQL field definitions
+     *                 that can be injected into a GraphQL object type.
+     */
+    private function generateField($tableInfo)
+    {
+        $fields = "";
+        foreach ($tableInfo['columns'] as $colName => $colInfo) {
+            $gqlType = $this->mapDbTypeToNodeJsGqlType($colInfo['type'], $colInfo['length']);
+            $fields .= "        $colName: { type: $gqlType },\n";
+
+            if ($colInfo['isForeignKey']) {
+                $refTableName = $colInfo['references'];
+                $refPascalName = $this->pascalCase($refTableName);
+                $refTypeName = $refPascalName . 'Type';
+                $fields .= "        $refTableName: {\n";
+                $fields .= "            type: $refTypeName,\n";
+                $fields .= "            resolve(parent, args) {\n";
+                $fields .= "                return models.$refPascalName.findByPk(parent['$colName']);\n";
+                $fields .= "            }\n";
+                $fields .= "        },\n";
+            }
+        }
+        return $fields;
+    }
+
+    /**
      * Generates the `types.js` file for the Node.js project.
      * @return string The content of the `types.js` file.
      */
@@ -562,23 +606,7 @@ JS;
             $typeExports .= "    $inputType,\n";
 
             // --- Object Type ---
-            $fields = "";
-            foreach ($tableInfo['columns'] as $colName => $colInfo) {
-                $gqlType = $this->mapDbTypeToNodeJsGqlType($colInfo['type'], $colInfo['length']);
-                $fields .= "        $colName: { type: $gqlType },\n";
-
-                if ($colInfo['isForeignKey']) {
-                    $refTableName = $colInfo['references'];
-                    $refPascalName = $this->pascalCase($refTableName);
-                    $refTypeName = $refPascalName . 'Type';
-                    $fields .= "        $refTableName: {\n";
-                    $fields .= "            type: $refTypeName,\n";
-                    $fields .= "            resolve(parent, args) {\n";
-                    $fields .= "                return models.$refPascalName.findByPk(parent['$colName']);\n";
-                    $fields .= "            }\n";
-                    $fields .= "        },\n";
-                }
-            }
+            $fields = $this->generateField($tableInfo);        
 
             $typeDefinitions .= "const $typeName = new GraphQLObjectType({\n";
             $typeDefinitions .= "    name: '$pascalName',\n";
@@ -819,7 +847,7 @@ JS;
             $queryFields .= "                if (!data) {\n";
             $queryFields .= "                    throw new Error(t('item_not_found', '$pascalName'));\n";
             $queryFields .= "                }\n";
-            $queryFields .= "                return data;\n";
+            $queryFields .= "                return formatItemDates(data);\n";
             $queryFields .= "            }\n";
             $queryFields .= "        },\n";
 
@@ -842,7 +870,7 @@ JS;
             $queryFields .= "                const where = buildWhereClause(args.filter);\n\n";
             $queryFields .= "                const { count, rows } = await models.$pascalName.findAndCountAll({ where, limit, offset, order });\n\n";
             $queryFields .= "                return {\n";
-            $queryFields .= "                    items: rows,\n";
+            $queryFields .= "                    items: rows.map(formatItemDates),\n";
             $queryFields .= "                    total: count,\n";
             $queryFields .= "                    limit: limit,\n";
             $queryFields .= "                    page: Math.floor(offset / limit) + 1,\n";
@@ -857,7 +885,7 @@ JS;
             $mutationFields .= "        create$pascalName: {\n";
             $mutationFields .= "            type: types.{$pascalName}Type,\n";
             $mutationFields .= "            args: { input: { type: new GraphQLNonNull(types.{$pascalName}InputType) } },\n";
-            $mutationFields .= "            resolve(parent, args) {\n";
+            $mutationFields .= "            async resolve(parent, args, context) {\n";
             $mutationFields .= "                const { session } = context.req;\n";
             $mutationFields .= "                const ip = getIp(context.req);\n";
             $mutationFields .= "                const adminId = session.userId;\n";
@@ -875,7 +903,8 @@ JS;
             $mutationFields .= $auditTrailInsert;
 
 
-            $mutationFields .= "                return models.$pascalName.create(args.input);\n";
+            $mutationFields .= "                let newItem = await models.$pascalName.create(args.input);\n";
+            $mutationFields .= "                return formatItemDates(newItem);\n";
             $mutationFields .= "            }\n";
             $mutationFields .= "        },\n";
 
@@ -895,7 +924,7 @@ JS;
             $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
             $mutationFields .= $auditTrailUpdate;
             $mutationFields .= "                await item.update(args.input);\n";
-            $mutationFields .= "                return item;\n";
+            $mutationFields .= "                return formatItemDates(item);\n";
             $mutationFields .= "            }\n";
             $mutationFields .= "        },\n";
 
@@ -918,7 +947,7 @@ JS;
             $mutationFields .= "                let toggle = { $activeField: args.$activeField };\n";
             $mutationFields .= $auditTrailToggle;
             $mutationFields .= "                await item.update(toggle);\n";
-            $mutationFields .= "                return item;\n";
+            $mutationFields .= "                return formatItemDates(item);\n";
             $mutationFields .= "            }\n";
             $mutationFields .= "        },\n";
             }
@@ -939,19 +968,36 @@ JS;
         return <<<JS
 const { buildWhereClause } = require('./utils');
 const { GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLID, GraphQLBoolean } = require('graphql');
-const { getTranslator, esc } = require('../utils/i18n');
+const { getTranslator } = require('../utils/i18n');
 const { models } = require('../config/database');
-const { toMySqlDateTime } = require('../utils/date');
+const { toMySqlDateTime, formatDate } = require('../utils/date');
 const types = require('./types');
 const { v4: uuidv4 } = require('uuid');
 
 const getIp = (req) => {
     let ip = req.ip;
-    if (ip && ip.startsWith('::ffff:')) {
+    if (ip?.startsWith('::ffff:')) {
         return ip.slice(7);
     }
     return ip;
 }
+
+const formatItemDates = (item) => {
+    if (!item) return null;
+
+    const newItem = { ...item.get({ plain: true }) };
+    const attributes = item.constructor.rawAttributes;
+
+    for (const key in newItem) {
+        if (Object.hasOwn(newItem, key) && attributes[key] && newItem[key]) {
+            if (attributes[key].dateFormat) {
+                newItem[key] = formatDate(new Date(newItem[key]), attributes[key].dateFormat);
+            }
+        }
+    }
+    return newItem;
+};
+
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
