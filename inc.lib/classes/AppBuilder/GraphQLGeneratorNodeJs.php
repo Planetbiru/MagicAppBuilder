@@ -362,85 +362,6 @@ sequelize.authenticate()
     });
 JS;
     }
-
-    /**
-     * Generates the `database.js` file for the Node.js project.
-     * @return string The content of the `database.js` file.
-     */
-    private function generateDatabaseJs()
-    {
-        return <<<JS
-const { Sequelize, DataTypes } = require('sequelize');
-
-const sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASS,
-    {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        dialect: process.env.DB_DIALECT,
-        dialectOptions: {
-            // Return date/time values as strings, not Date objects.
-            dateStrings: true
-        },
-        logging: false, // Set to console.log to see SQL queries
-        define: {
-            timestamps: false, // Assuming no `createdAt` and `updatedAt` fields
-            // This is important to prevent Sequelize from changing column names to camelCase
-            quoteIdentifiers: false,
-            freezeTableName: true // Prevent Sequelize from pluralizing table names
-        }
-    }
-);
-
-const models = {};
-
-// Dynamically import all models
-const fs = require('fs');
-const path = require('path');
-const modelsDir = path.join(__dirname, '../models');
-
-// Define the Session model explicitly for connect-session-sequelize
-models.Session = sequelize.define('Session', {
-    sid: {
-        type: Sequelize.STRING,
-        primaryKey: true,
-    },
-    expires: Sequelize.DATE,
-    data: Sequelize.TEXT,
-});
-
-
-const loadModels = (dir) => {
-    fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
-        const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-            // Recurse into subdirectory
-            loadModels(fullPath);
-        } else if (entry.isFile() && entry.name.indexOf('.') !== 0 && entry.name.slice(-3) === '.js') {
-            // Load the model file
-            const model = require(fullPath)(sequelize, DataTypes);
-            if (model && model.name) {
-                models[model.name] = model;
-            }
-        }
-    });
-};
-
-loadModels(modelsDir); // Start the recursive loading from the base models directory
-// Set up associations
-Object.keys(models).forEach(modelName => {
-    if (models[modelName].associate) {
-        models[modelName].associate(models);
-    }
-});
-
-console.log('Models loaded from config/database.js:', Object.keys(models));
-
-module.exports = { sequelize, models };
-JS;
-    }
     
     /**
      * Generates the model file for a specific table.
@@ -853,6 +774,62 @@ JS;
     }
 
     /**
+     * Generates the JavaScript code snippet used to update a primary key column 
+     * in a Sequelize-based GraphQL mutation handler.
+     *
+     * This method inspects the table metadata (`$tableInfo`) and builds the logic
+     * required to safely update a primary key value when the key is marked as
+     * "manual-all" (indicating that the primary key is fully user-managed rather
+     * than auto-incremented or immutable).
+     *
+     * For each primary key column with `primaryKeyValue = 'manual-all'`, the 
+     * generated code performs the following steps:
+     *
+     * 1. Checks whether the input provides a new primary key value (`args.input.<pk>`)
+     *    and verifies that it is different from the existing value (`args.id`).
+     *
+     * 2. Executes a raw SQL UPDATE query using Sequelize to modify the primary key
+     *    directly in the database. (Sequelize does not allow updating primary keys
+     *    through `instance.update()`, so manual SQL is required.)
+     *
+     * 3. Re-fetches the updated record using the new primary key value to ensure that
+     *    the returned object reflects the updated state.
+     *
+     * 4. Returns the formatted result (`formatItemDates(updated)`).
+     *
+     * This generated code is injected into the update mutation template for any table
+     * that uses a manually managed primary key.
+     *
+     * @param string $tableName     The name of the database table being processed.
+     * @param string $pascalName    The model name in PascalCase (e.g., "User", "Product").
+     * @param array  $tableInfo     Metadata describing the table, including its columns 
+     *                              and primary key configuration.
+     *
+     * @return string               A JavaScript code fragment containing the primary key
+     *                              update logic for GraphQL mutation generation.
+     */
+    private function primaryKeyUpdater($tableName, $pascalName, $tableInfo)
+    {
+        $primaryKeyUpdater = "";
+        foreach($tableInfo['columns'] as $colName => $col)
+        {
+            $inputColumns[] = $colName;
+            if($col['isPrimaryKey'] && $col['primaryKeyValue'] == 'manual-all')
+            {
+                $primaryKeyUpdater .= "                if(args.input.{$colName} && args.input.{$colName} != args.id) {\n";
+                $primaryKeyUpdater .= "                    await models.{$pascalName}.sequelize.query(\n";
+                $primaryKeyUpdater .= "                        \"UPDATE $tableName SET {$colName} = ? WHERE {$colName} = ?\",\n";
+                $primaryKeyUpdater .= "                        { replacements: [args.input.{$colName}, args.id] }\n";
+                $primaryKeyUpdater .= "                    );\n";
+                $primaryKeyUpdater .= "                    const updated = await models.Manufacturer.findByPk(args.input.{$colName});\n";
+                $primaryKeyUpdater .= "                    return formatItemDates(updated);\n";
+                $primaryKeyUpdater .= "                }\n";
+            }
+        }
+        return $primaryKeyUpdater;
+    }
+
+    /**
      * Generates the `resolvers.js` file for the Node.js project.
      * @return string The content of the `resolvers.js` file.
      */
@@ -865,7 +842,6 @@ JS;
             $camelName = $this->camelCase($tableName);
             $pascalName = $this->pascalCase($tableName);
             $pluralCamelName = $this->pluralize($camelName);
-            $primaryKey = $this->camelCase($tableInfo['primaryKey']);
             $hasActiveColumn = $tableInfo['hasActiveColumn'];
             $activeField = $this->activeField;
             $pkType = 'GraphQLString';
@@ -894,6 +870,7 @@ JS;
             }
 
             $auditTrail = $this->auditTrail($inputColumns, $skippedColumns);
+            $primaryKeyUpdater = $this->primaryKeyUpdater($tableName, $pascalName, $tableInfo);
 
             // --- Query Resolvers ---
             $queryFields .= "        $camelName: {\n";
@@ -999,6 +976,7 @@ JS;
             $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
             $mutationFields .= $auditTrail->auditTrailUpdate;
             $mutationFields .= "                await item.update(args.input);\n";
+            $mutationFields .= $primaryKeyUpdater;
             $mutationFields .= "                return formatItemDates(item);\n";
             $mutationFields .= "            }\n";
             $mutationFields .= "        },\n";
