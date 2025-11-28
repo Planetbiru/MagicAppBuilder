@@ -51,7 +51,7 @@ function formatDate(date, format = 'YYYY-MM-DD HH:mm:ss') {
     // Regex to find all format specifiers, ordered from longest to shortest
     const regex = /YYYY|YY|MMMM|MMM|MM|M|DDDD|DDD|DD|D|d|HH|H|hh|h|mm|m|ss|s|A|a/g;
 
-    return format.replace(regex, (match) => {
+    return format.replaceAll(regex, (match) => {
         switch (match) {
             case 'YYYY': return year;
             case 'YY': return String(year).slice(-2);

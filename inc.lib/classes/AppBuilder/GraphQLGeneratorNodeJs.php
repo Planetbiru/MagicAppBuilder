@@ -2,6 +2,8 @@
 
 namespace AppBuilder;
 
+use stdClass;
+
 /**
  * The `GraphQLGeneratorNodeJs` class is designed to automatically generate a complete Node.js GraphQL API
  * from a JSON file that defines database entities. It uses Express.js as the web server,
@@ -667,37 +669,50 @@ const {
 } = require('graphql');
 const { models } = require('../config/database');
 
-// Custom Scalar for generic Object
 const ObjectScalar = new GraphQLScalarType({
     name: 'Object',
     description: 'Arbitrary object',
-    parseValue: (value) => {
+    parseValue(value) {
         return value;
     },
-    serialize: (value) => {
+    serialize(value) {
         return value;
     },
-    parseLiteral: (ast) => {
-        switch (ast.kind) {
-            case Kind.STRING:
-                return ast.value;
-            case Kind.BOOLEAN:
-                return ast.value;
-            case Kind.INT:
-                return parseInt(ast.value, 10);
-            case Kind.FLOAT:
-                return parseFloat(ast.value);
-            case Kind.OBJECT:
-                const value = Object.create(null);
-                ast.fields.forEach(field => {
-                    value[field.name.value] = this.parseLiteral(field.value);
-                });
-                return value;
-            case Kind.LIST:
-                return ast.values.map(n => this.parseLiteral(n));
-            default:
-                return null;
-        }
+    parseLiteral(ast) {
+        const parseNode = (node) => {
+            switch (node.kind) {
+                case Kind.STRING:
+                case Kind.BOOLEAN:
+                    return node.value;
+
+                case Kind.INT:
+                    return Number.parseInt(node.value, 10);
+
+                case Kind.FLOAT:
+                    return Number.parseFloat(node.value);
+
+                case Kind.OBJECT: {
+                    const value = Object.create(null);
+                    for (const field of node.fields) {
+                        value[field.name.value] = parseNode(field.value);
+                    }
+                    return value;
+                }
+
+                case Kind.LIST: {
+                    const arr = [];
+                    for (const v of node.values) {
+                        arr.push(parseNode(v));
+                    }
+                    return arr;
+                }
+
+                default:
+                    return null;
+            }
+        };
+
+        return parseNode(ast);
     }
 });
 
@@ -752,6 +767,92 @@ JS;
     }
 
     /**
+     * Undocumented function
+     *
+     * @param string[] $inputColumns
+     * @param string[] $skippedColumns
+     * @return \stdClass
+     */
+    private function auditTrail($inputColumns, $skippedColumns)
+    {
+        $auditTrailInsert = "";
+        $auditTrailUpdate = "";
+        $auditTrailToggle = "";
+
+        $hasIpCreate = false;
+        $hasAdminCreate = false;
+        $hasTimeCreate = false;
+
+        $hasIpEdit = false;
+        $hasAdminEdit = false;
+        $hasTimeEdit = false;
+
+        foreach($this->backendHandledColumns as $key=>$col)
+        {
+            $colName = $col['columnName'];
+            if(in_array($colName, $inputColumns) || in_array($colName, $skippedColumns))
+            {
+                if($key == 'timeCreate')
+                {
+                    $auditTrailInsert .= "                args.input.$colName = now;\n";
+                    $hasTimeCreate = true;
+                }
+                if($key == 'adminCreate')
+                {
+                    $auditTrailInsert .= "                args.input.$colName = adminId;\n";
+                    $hasAdminCreate = true;
+                }
+                if($key == 'ipCreate')
+                {
+                    $auditTrailInsert .= "                args.input.$colName = ip;\n";
+                    $hasIpCreate = true;
+                }
+                
+                if($key == 'timeEdit')
+                {
+                    $auditTrailInsert .= "                args.input.$colName = now;\n";
+                    $auditTrailUpdate .= "                args.input.$colName = now;\n";
+                    $auditTrailToggle .= "                toggle.$colName = now;\n";
+                    $hasTimeEdit = true;
+                }
+                if($key == 'adminEdit')
+                {
+                    $auditTrailInsert .= "                args.input.$colName = adminId;\n";
+                    $auditTrailUpdate .= "                args.input.$colName = adminId;\n";
+                    $auditTrailToggle .= "                toggle.$colName = adminId;\n";
+                    $hasAdminEdit = true;
+                }
+                if($key == 'ipEdit')
+                {
+                    $auditTrailInsert .= "                args.input.$colName = ip;\n";
+                    $auditTrailUpdate .= "                args.input.$colName = ip;\n";
+                    $auditTrailToggle .= "                toggle.$colName = ip;\n";
+                    $hasIpEdit = true;
+                }
+
+            }
+        }
+        $result = new \stdClass;
+        $result->auditTrailInsert = $auditTrailInsert;
+        $result->auditTrailUpdate = $auditTrailUpdate;
+        $result->auditTrailToggle = $auditTrailToggle;
+
+        $result->hasTimeCreate = $hasTimeCreate;
+        $result->hasAdminCreate = $hasAdminCreate;
+        $result->hasIpCreate = $hasIpCreate;
+
+        $result->hasTimeEdit = $hasTimeEdit;
+        $result->hasAdminEdit = $hasAdminEdit;
+        $result->hasIpEdit = $hasIpEdit;
+
+        $result->hasTime = $hasTimeCreate || $hasTimeEdit;
+        $result->hasAdmin = $hasAdminCreate || $hasAdminEdit;
+        $result->hasIp = $hasIpCreate || $hasIpEdit;
+
+        return $result;
+    }
+
+    /**
      * Generates the `resolvers.js` file for the Node.js project.
      * @return string The content of the `resolvers.js` file.
      */
@@ -792,50 +893,7 @@ JS;
                 }
             }
 
-            $auditTrailInsert = "";
-            $auditTrailUpdate = "";
-            $auditTrailToggle = "";
-
-            foreach($this->backendHandledColumns as $key=>$col)
-            {
-                
-                $colName = $col['columnName'];
-                if(in_array($colName, $inputColumns) || in_array($colName, $skippedColumns))
-                {
-                    if($key == 'timeCreate')
-                    {
-                        $auditTrailInsert .= "                args.input.$colName = now;\n";
-                    }
-                    if($key == 'adminCreate')
-                    {
-                        $auditTrailInsert .= "                args.input.$colName = adminId;\n";
-                    }
-                    if($key == 'ipCreate')
-                    {
-                        $auditTrailInsert .= "                args.input.$colName = ip;\n";
-                    }
-                    
-                    if($key == 'timeEdit')
-                    {
-                        $auditTrailInsert .= "                args.input.$colName = now;\n";
-                        $auditTrailUpdate .= "                args.input.$colName = now;\n";
-                        $auditTrailToggle .= "                toggle.$colName = now;\n";
-                    }
-                    if($key == 'adminEdit')
-                    {
-                        $auditTrailInsert .= "                args.input.$colName = adminId;\n";
-                        $auditTrailUpdate .= "                args.input.$colName = adminId;\n";
-                        $auditTrailToggle .= "                toggle.$colName = adminId;\n";
-                    }
-                    if($key == 'ipEdit')
-                    {
-                        $auditTrailInsert .= "                args.input.$colName = ip;\n";
-                        $auditTrailUpdate .= "                args.input.$colName = ip;\n";
-                        $auditTrailToggle .= "                toggle.$colName = ip;\n";
-                    }
-
-                }
-            }
+            $auditTrail = $this->auditTrail($inputColumns, $skippedColumns);
 
             // --- Query Resolvers ---
             $queryFields .= "        $camelName: {\n";
@@ -867,7 +925,7 @@ JS;
             $queryFields .= "                    offset = (args.page - 1) * limit;\n";
             $queryFields .= "                }\n\n";
             $queryFields .= "                const order = args.orderBy ? args.orderBy.map(o => [o.field, o.direction || 'ASC']) : [];\n\n";
-            $queryFields .= "                const where = buildWhereClause(args.filter);\n\n";
+            $queryFields .= "                const where = buildWhereClause(args.filter, models.{$pascalName});\n\n";
             $queryFields .= "                const { count, rows } = await models.$pascalName.findAndCountAll({ where, limit, offset, order });\n\n";
             $queryFields .= "                return {\n";
             $queryFields .= "                    items: rows.map(formatItemDates),\n";
@@ -886,11 +944,19 @@ JS;
             $mutationFields .= "            type: types.{$pascalName}Type,\n";
             $mutationFields .= "            args: { input: { type: new GraphQLNonNull(types.{$pascalName}InputType) } },\n";
             $mutationFields .= "            async resolve(parent, args, context) {\n";
+            if(!empty($auditTrail->hasAdmin))
+            {
             $mutationFields .= "                const { session } = context.req;\n";
-            $mutationFields .= "                const ip = getIp(context.req);\n";
             $mutationFields .= "                const adminId = session.userId;\n";
+            }
+            if(!empty($auditTrail->hasIp))
+            {
+            $mutationFields .= "                const ip = getIp(context.req);\n";
+            }
+            if(!empty($auditTrail->hasTime))
+            {
             $mutationFields .= "                const now = toMySqlDateTime();\n";
-            
+            }
 
             if(isset($pkCol))
             {
@@ -900,7 +966,7 @@ JS;
                 }
             }
 
-            $mutationFields .= $auditTrailInsert;
+            $mutationFields .= $auditTrail->auditTrailInsert;
 
 
             $mutationFields .= "                let newItem = await models.$pascalName.create(args.input);\n";
@@ -916,13 +982,22 @@ JS;
             $mutationFields .= "            },\n";
             $mutationFields .= "            async resolve(parent, args, context) {\n";
             $mutationFields .= "                const t = getTranslator(context.req);\n";
+            if(!empty($auditTrail->hasAdminEdit))
+            {
             $mutationFields .= "                const { session } = context.req;\n";
-            $mutationFields .= "                const ip = getIp(context.req);\n";
             $mutationFields .= "                const adminId = session.userId;\n";
+            }
+            if(!empty($auditTrail->hasIpEdit))
+            {
+            $mutationFields .= "                const ip = getIp(context.req);\n";
+            }
+            if(!empty($auditTrail->hasTimeEdit))
+            {
             $mutationFields .= "                const now = toMySqlDateTime();\n";
+            }
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
             $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
-            $mutationFields .= $auditTrailUpdate;
+            $mutationFields .= $auditTrail->auditTrailUpdate;
             $mutationFields .= "                await item.update(args.input);\n";
             $mutationFields .= "                return formatItemDates(item);\n";
             $mutationFields .= "            }\n";
@@ -938,14 +1013,23 @@ JS;
             $mutationFields .= "            },\n";
             $mutationFields .= "            async resolve(parent, args, context) {\n";
             $mutationFields .= "                const t = getTranslator(context.req);\n";
+            if(!empty($auditTrail->hasAdminEdit))
+            {
             $mutationFields .= "                const { session } = context.req;\n";
-            $mutationFields .= "                const ip = getIp(context.req);\n";
             $mutationFields .= "                const adminId = session.userId;\n";
+            }
+            if(!empty($auditTrail->hasIpEdit))
+            {
+            $mutationFields .= "                const ip = getIp(context.req);\n";
+            }
+            if(!empty($auditTrail->hasTimeEdit))
+            {
             $mutationFields .= "                const now = toMySqlDateTime();\n";
+            }
             $mutationFields .= "                const item = await models.$pascalName.findByPk(args.id);\n";
             $mutationFields .= "                if (!item) throw new Error(t('item_not_found', '$pascalName'));\n";
             $mutationFields .= "                let toggle = { $activeField: args.$activeField };\n";
-            $mutationFields .= $auditTrailToggle;
+            $mutationFields .= $auditTrail->auditTrailToggle;
             $mutationFields .= "                await item.update(toggle);\n";
             $mutationFields .= "                return formatItemDates(item);\n";
             $mutationFields .= "            }\n";
@@ -966,7 +1050,7 @@ JS;
         }
 
         return <<<JS
-const { buildWhereClause } = require('./utils');
+const { buildWhereClause } = require('./query');
 const { GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt, GraphQLID, GraphQLBoolean } = require('graphql');
 const { getTranslator } = require('../utils/i18n');
 const { models } = require('../config/database');
