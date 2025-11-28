@@ -14,7 +14,7 @@ use MagicObject\Util\PicoStringUtil;
  * 
  * @package AppBuilder
  */
-class GraphQLGeneratorGo extends GraphQLGeneratorBase
+class GraphQLGeneratorGo extends GraphQLGeneratorBase // NOSONAR
 {
     /**
      * @var array<string, string> Project configuration for go.mod and package structure.
@@ -58,7 +58,7 @@ class GraphQLGeneratorGo extends GraphQLGeneratorBase
      * @param int|null $length The length of the column.
      * @return string The corresponding Go type string.
      */
-    private function mapDbTypeToGoType($dbType, $length = null)
+    private function mapDbTypeToGoType($dbType, $length = null) // NOSONAR
     {
         $dbType = strtolower($dbType);
         if (strpos($dbType, 'varchar') !== false || strpos($dbType, 'text') !== false) {
@@ -89,7 +89,7 @@ class GraphQLGeneratorGo extends GraphQLGeneratorBase
      * @param int|null $length The length of the column.
      * @return string The corresponding Go type string.
      */
-    private function mapDbTypeToGoTypeAsModel($dbType, $length = null)
+    private function mapDbTypeToGoTypeAsModel($dbType, $length = null) // NOSONAR
     {
         $dbType = strtolower($dbType);
         if (strpos($dbType, 'varchar') !== false || strpos($dbType, 'text') !== false) {
@@ -136,12 +136,6 @@ class GraphQLGeneratorGo extends GraphQLGeneratorBase
             $files[] = ['name' => 'model/' . $this->camelCaseToSnakeCase($tableName) . '.go', 'content' => $this->generateModelFile($tableName, $tableInfo)];
         }
 
-        //$files[] = ['name' => 'constant/constant.go', 'content' => $this->geterateConstant()];
-        //$files[] = ['name' => 'input/any_scalar.go', 'content' => $this->geterateAnyScalar()];
-        //$files[] = ['name' => 'input/input.go', 'content' => $this->geterateInput()];
-        //$files[] = ['name' => 'input/query_builder.go', 'content' => $this->geterateQueryBuilder()];
-        //$files[] = ['name' => 'config/config.go', 'content' => $this->geterateConfig()];
-
         // 5. Resolvers
         
         $resolvers = $this->generateResolvers();
@@ -157,289 +151,6 @@ class GraphQLGeneratorGo extends GraphQLGeneratorBase
         $files[] = ['name' => 'manual.md', 'content' => $this->generateManual()];
 
         return $files;
-    }
-
-    /**
-     * Generates the Go configuration file.
-     *
-     * This file initializes a global `IsPostgres` flag based on the `DB_DRIVER`
-     * environment variable. The flag allows other components (e.g., query
-     * builders or resolvers) to apply PostgreSQL-specific behavior such as
-     * using ILIKE instead of LIKE.
-     *
-     * @return string The generated Go source code for config/config.go
-     */
-    private function geterateConfig()
-    {
-        return <<<GO
-package config
-
-import (
-	"os"
-	"strings"
-)
-
-// IsPostgres is a flag that is true if the configured database driver is PostgreSQL.
-// It is initialized based on the DB_DRIVER environment variable.
-var IsPostgres bool
-
-func init() {
-	dbDriver := os.Getenv("DB_DRIVER")
-	dbDriver = strings.ToLower(dbDriver)
-	IsPostgres = strings.Contains(dbDriver, "postgre")
-}
-GO;
-    }
-
-    /**
-     * Generates the Go query builder utilities.
-     *
-     * This includes:
-     * - `BuildQuery`: Generates SQL WHERE and ORDER BY clauses based on
-     *   GraphQL-style filter and sort inputs. Supports dynamic operators,
-     *   PostgreSQL-specific LIKE/ILIKE rules, and safe parameter binding.
-     *
-     * - `PaginationArgs`: Represents incoming pagination-related fields.
-     *
-     * - `GetPagination`: Computes page, limit, and offset values based
-     *   on GraphQL pagination inputs, supporting default values and overrides.
-     *
-     * @return string The generated Go source code for input/query_builder.go
-     */
-    private function geterateQueryBuilder()
-    {
-        return <<<GO
-package input
-
-import (
-	"fmt"
-	"strings"
-)
-
-// BuildQuery constructs WHERE and ORDER BY clauses for SQL queries based on GraphQL inputs.
-// It returns the WHERE clause, ORDER BY clause, and a slice of parameters for safe querying.
-func BuildQuery(filter *[]*FilterInput, orderBy *[]*SortInput, isPostgres bool) (string, string, []interface{}) {
-	var whereClauses []string
-	var orderClauses []string
-	var params []interface{}
-
-	// Build WHERE clause from filter
-	// Build WHERE clause from filter
-	if filter != nil {
-		for _, f := range *filter {
-			if f == nil || f.Value == nil {
-				continue
-			}
-			// Default operator is EQUALS
-			op := "="
-			val := f.Value.Value()
-
-			if f.Operator != nil {
-				operator := fmt.Sprintf("%v", *f.Operator)
-				switch strings.ToUpper(operator) {
-				case "NOT_EQUALS":
-					op = "!="
-				case "CONTAINS":
-					// Use ILIKE for PostgreSQL for case-insensitive search, LIKE for others (e.g., MySQL).
-					if isPostgres {
-						op = "ILIKE"
-					} else {
-						op = "LIKE"
-					}
-					val = fmt.Sprintf("%%%v%%", val)
-				case "GREATER_THAN":
-					op = ">"
-				case "GREATER_THAN_OR_EQUALS":
-					op = ">="
-				case "LESS_THAN":
-					op = "<"
-				case "LESS_THAN_OR_EQUALS":
-					op = "<="
-				case "IN", "NOT_IN":
-					// For IN/NOT_IN, the value is a comma-separated string. We need to create placeholders.
-					valStr := fmt.Sprintf("%v", val)
-					values := strings.Split(valStr, ",")
-					if len(values) > 0 {
-						placeholders := strings.Repeat("?,", len(values))
-						placeholders = strings.TrimSuffix(placeholders, ",")
-						operator := fmt.Sprintf("%v", *f.Operator)
-						whereClauses = append(whereClauses, fmt.Sprintf("%s %s (%s)", f.Field, strings.ToUpper(operator), placeholders))
-						for _, v := range values {
-							params = append(params, strings.TrimSpace(v))
-						}
-					}
-					continue // Skip the generic param append at the end
-				}
-			}
-			whereClauses = append(whereClauses, fmt.Sprintf("%s %s ?", f.Field, op))
-			params = append(params, val)
-		}
-	}
-
-	// Build ORDER BY clause
-	if orderBy != nil {
-		for _, s := range *orderBy {
-			if s == nil || s.Field == "" {
-				continue
-			}
-			dir := "ASC" // Default direction
-			if s.Direction != nil && strings.ToUpper(*s.Direction) == "DESC" {
-				dir = "DESC"
-			}
-			orderClauses = append(orderClauses, fmt.Sprintf("%s %s", s.Field, dir))
-		}
-	}
-
-	whereSQL := ""
-	if len(whereClauses) > 0 {
-		whereSQL = "WHERE " + strings.Join(whereClauses, " AND ")
-	}
-
-	orderSQL := ""
-	if len(orderClauses) > 0 {
-		orderSQL = "ORDER BY " + strings.Join(orderClauses, ", ")
-	}
-
-	return whereSQL, orderSQL, params
-}
-
-// PaginationArgs holds common pagination arguments from GraphQL queries.
-type PaginationArgs struct {
-	Limit  *int32
-	Offset *int32
-	Page   *int32
-	Size   *int32
-}
-
-// GetPagination calculates limit, page, and offset from pagination arguments.
-// It sets default values and allows overriding them.
-func GetPagination(args PaginationArgs) (limit, page, offset int32) {
-	limit = 10 // Default limit
-	if args.Limit != nil {
-		limit = *args.Limit
-	}
-	// 'size' is an alias for 'limit'
-	if args.Size != nil {
-		limit = *args.Size
-	}
-
-	page = 1 // Default page
-	if args.Page != nil {
-		page = *args.Page
-	}
-
-	offset = (page - 1) * limit // Calculate offset from page and limit
-	if args.Offset != nil {
-		offset = *args.Offset // Allow direct offset override
-	}
-
-	return limit, page, offset
-}
-GO;
-    }
-    /**
-     * Generates Go structs that represent GraphQL input types.
-     *
-     * Includes:
-     * - `FilterInput`: Defines a filter rule with a field name, operator,
-     *   and dynamic value using the custom `Any` scalar.
-     * - `SortInput`: Defines sort order, including optional direction.
-     *
-     * These types are used when building dynamic filter and sorting queries.
-     *
-     * @return string The generated Go source code for input/input.go
-     */
-    private function geterateInput()
-    {
-        return <<<GO
-package input
-
-// FilterInput corresponds to the GraphQL FilterInput type.
-type FilterInput struct {
-	Field    string
-	Value    *Any // Must be a pointer for custom scalar unmarshalling
-	Operator *string
-}
-
-// SortInput corresponds to the GraphQL SortInput type.
-type SortInput struct {
-	Field     string
-	Direction *string
-}
-GO;
-    }
-
-    /**
-     * Generates the implementation of the custom `Any` GraphQL scalar.
-     *
-     * This scalar:
-     * - Accepts any JSON value from the client.
-     * - Stores it internally as an empty interface.
-     * - Implements GraphQL unmarshalling for incoming values.
-     * - Implements JSON marshaling when returning values.
-     *
-     * It is used primarily for dynamic filtering values.
-     *
-     * @return string The generated Go source code for input/any_scalar.go
-     */
-    private function geterateAnyScalar()
-    {
-return <<<GO
-package input
-
-import (
-	"fmt"
-)
-
-// Any is a custom scalar type that can represent any value.
-// It's used for the 'value' field in the FilterInput.
-type Any struct{ v interface{} }
-
-// ImplementsGraphQLType returns the name of the GraphQL type.
-func (Any) ImplementsGraphQLType(name string) bool { return name == "Any" }
-
-// UnmarshalGraphQL is called when a value is received from a client.
-func (a *Any) UnmarshalGraphQL(input interface{}) error {
-	a.v = input
-	return nil
-}
-
-// MarshalJSON is called when sending a value to a client.
-func (a Any) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.v)), nil
-}
-
-// Value returns the underlying value of the Any scalar.
-func (a *Any) Value() interface{} {
-	return a.v
-}
-GO;
-    }
-
-    /**
-     * Generates a Go file containing constant values used across the
-     * GraphQL application. These constants cover:
-     *
-     * - Standard datetime formatting
-     * - Keys used for storing and retrieving session values
-     * - Keys for retrieving contextual metadata such as the client IP
-     *
-     * @return string The generated Go source code for constant/constant.go
-     */
-    private function geterateConstant()
-    {
-        return <<<GO
-package constant
-
-const (
-	DateTimeFormat string  = "2006-01-02 15:04:05"
-    RemoteAddr string      = "RemoteAddr"
-	SessionKey string      = "SessionKey"
-	SessionUsername string = "SessionUsername"
-	SessionPassword string = "SessionPassword"
-	SessionAdminId string  = "SessionAdminId"
-)
-GO;
     }
 
     /**
@@ -459,7 +170,6 @@ GO;
      */
     private function generateResolverRoot()
     {
-        $packageName = $this->projectConfig['moduleName'];
         $types1 = [];
         $types2 = [];
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
@@ -552,7 +262,7 @@ GO;
         $contents[] = "package resolver";
         $contents[] = "";
         $contents[] = $this->generateResolverImport($tableInfo);
-        $contents[] = $this->generateResolverType($tableName, $tableInfo);
+        $contents[] = $this->generateResolverType($tableName);
         $contents[] = $this->generateResolverQuery($tableName, $tableInfo);
         $contents[] = $this->generateResolverMutation($tableName, $tableInfo);
 
@@ -613,13 +323,11 @@ GO;
      * - Page resolver struct for paginated list responses
      *
      * @param string $tableName The database table name.
-     * @param array $tableInfo  Metadata describing the table structure.
      *
      * @return string Resolver type definitions as Go source code.
      */
-    private function generateResolverType($tableName, $tableInfo)
+    private function generateResolverType($tableName)
     {
-        $pascalName = $this->pascalCase($tableName);
         $resolverName = $this->pascalCase($tableName);
         $resolverNamePlural = $this->pluralize($resolverName);
         $contents = [];
@@ -649,11 +357,35 @@ type {$resolverName}PageResolver struct {
     }
     
     /**
-     * Undocumented function
+     * Formats an array of method description strings by aligning the text
+     * that appears before the specified delimiter. This creates a neatly
+     * aligned column-style output for improved readability.
+     *
+     * Each element in the $methods array is expected to contain the $search
+     * delimiter. The part before the delimiter will be padded with spaces
+     * so that all delimiters align vertically.
+     *
+     * Example:
+     *     Input:
+     *         [
+     *             "getId => Get the ID",
+     *             "getFullName => Get full name"
+     *         ]
+     *
+     *     Output (aligned):
+     *         [
+     *             "getId       => Get the ID",
+     *             "getFullName => Get full name"
+     *         ]
      *
      * @param string[] $methods
+     *     The list of method strings to be formatted.
+     *
      * @param string $search
+     *     The delimiter used to split the method name and its description.
+     *
      * @return string[]
+     *     A new array of formatted strings with aligned delimiters.
      */
     private function prettifyMethods($methods, $search)
     {
@@ -702,7 +434,7 @@ type {$resolverName}PageResolver struct {
      *
      * @return string Query resolver implementations as Go source code.
      */
-    private function generateResolverQuery($tableName, $tableInfo)
+    private function generateResolverQuery($tableName, $tableInfo) // NOSONAR
     {
         $pascalName = $this->pascalCase($tableName);
         $pascalNamePlural = $this->pluralize($pascalName);
@@ -788,7 +520,7 @@ GO;
         $listMethodsArr = $this->prettifyMethods($listMethodsArr, "{ return");
         $listMethods = implode("\n", $listMethodsArr);
         
-        $queries = <<<GO
+        return <<<GO
 // New{$pascalName}QueryResolver creates a new resolver for {$pascalName} queries.
 func New{$pascalName}QueryResolver(root ResolverRoot) *{$pascalName}QueryResolver {
 	return &{$pascalName}QueryResolver{root: root}
@@ -892,7 +624,6 @@ $addresOfColumns2
 	}, nil
 }
 GO;
-        return $queries;
     }
 
     /**
@@ -936,7 +667,7 @@ GO;
      * @throws Exception
      *     Throws an exception if required metadata is missing or inconsistent.
      */
-    private function generateResolverMutation($tableName, $tableInfo)
+    private function generateResolverMutation($tableName, $tableInfo) // NOSONAR
     {
         $pascalName = $this->pascalCase($tableName);
         $activeField = $this->activeField;
@@ -1027,7 +758,6 @@ GO;
 
         foreach($this->backendHandledColumns as $k=>$v)
         {
-            $gn = $this->goName($this->pascalCase($v['columnName']));
             if(($k == 'timeCreate' || $k == 'timeEdit') && in_array($v['columnName'], $entityColumns))
             {
                 array_push($columnToInsert, $v['columnName']);
@@ -1158,7 +888,7 @@ GO;
 
         $activeField = $this->activeField;
 
-        $mutation = <<<GO
+        return <<<GO
 // --- Mutations ---
 
 type {$pascalName}Input struct {
@@ -1258,7 +988,6 @@ $toggleCodes
 	return r.{$pascalName}(ctx, struct{ ID $pkType }{ID: args.ID})
 }
 GO;
-        return $mutation;
     }
 
     /**
@@ -1296,7 +1025,7 @@ MOD;
      *
      * @return string The content of main.go.
      */
-    public function generateMainGo()
+    public function generateMainGo() // NOSONAR
     {
         $moduleName = $this->projectConfig['moduleName'];
         return <<<GO
@@ -1962,7 +1691,7 @@ GO;
      * @param string $goType The Go type.
      * @return string The corresponding GraphQL type.
      */
-    private function mapGoTypeToGqlType($goType)
+    private function mapGoTypeToGqlType($goType) // NOSONAR
     {
         switch ($goType) {
             case 'int':
@@ -2006,7 +1735,7 @@ GO;
         $manualContent .= "    SERVER_PORT=8080\n";
         $manualContent .= "    SESSION_SECRET=change-this-to-a-random-string\n";
         $manualContent .= "    REQUIRE_LOGIN=" . ($this->requireLogin ? 'true' : 'false') . "\n";
-        $manualContent .= "    ```\n\n";
+        $manualContent .= "    ```\n\n"; // NOSONAR
         $manualContent .= "3.  Install dependencies:\n\n";
         $manualContent .= "    ```bash\n";
         $manualContent .= "    go mod init $moduleName\n";

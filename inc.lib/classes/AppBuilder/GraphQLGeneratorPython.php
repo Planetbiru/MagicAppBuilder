@@ -33,18 +33,48 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
      * @param string $dbType The database column type (e.g., VARCHAR, INT, TIMESTAMP).
      * @return string The corresponding SQLAlchemy type string.
      */
-    private function mapDbTypeToSqlalchemyType($dbType, $length = null)
+    private function mapDbTypeToSqlalchemyType($dbType, $length = null) // NOSONAR
     {
         $dbType = strtolower($dbType);
-        if (strpos($dbType, 'varchar') !== false) return "String($length)";
-        if (strpos($dbType, 'text') !== false) return "Text";
-        if (strpos($dbType, 'timestamp') !== false) return "String";
-        if (strpos($dbType, 'date') !== false) return "String";
-        if (strpos($dbType, 'decimal') !== false || strpos($dbType, 'double') !== false) return "Float";
-        if (strpos($dbType, 'float') !== false) return "Float";
-        if ((strpos($dbType, 'tinyint') !== false && isset($length) && $length == '1') || strpos($dbType, 'bool') !== false || strpos($dbType, 'bit') !== false) return "Boolean";
-        if (strpos($dbType, 'int') !== false) return "Integer";
-        return "String"; // Default
+
+        if (strpos($dbType, 'varchar') !== false) {
+            return "String($length)";
+        }
+
+        if (strpos($dbType, 'text') !== false) {
+            return "Text";
+        }
+
+        if (strpos($dbType, 'timestamp') !== false) {
+            return "String";
+        }
+
+        if (strpos($dbType, 'date') !== false) {
+            return "String";
+        }
+
+        if (strpos($dbType, 'decimal') !== false || strpos($dbType, 'double') !== false) {
+            return "Float";
+        }
+
+        if (strpos($dbType, 'float') !== false) {
+            return "Float";
+        }
+
+        if (
+            (strpos($dbType, 'tinyint') !== false && isset($length) && $length == '1')
+            || strpos($dbType, 'bool') !== false
+            || strpos($dbType, 'bit') !== false
+        ) {
+            return "Boolean";
+        }
+
+        if (strpos($dbType, 'int') !== false) {
+            return "Integer";
+        }
+
+        // Default
+        return "String";
     }
 
     /** 
@@ -53,16 +83,44 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
      * @param string $dbType The database column type (e.g., VARCHAR, INT, TIMESTAMP).
      * @return string The corresponding Python type string.
      */
-    private function mapDbTypeToPythonType($dbType, $length = null)
+    private function mapDbTypeToPythonType($dbType, $length = null) // NOSONAR
     {
         $dbType = strtolower($dbType);
-        if (strpos($dbType, 'varchar') !== false || strpos($dbType, 'text') !== false) return "str";
-        if (strpos($dbType, 'timestamp') !== false) return "datetime";
-        if (strpos($dbType, 'date') !== false) return "date";
-        if (strpos($dbType, 'decimal') !== false || strpos($dbType, 'float') !== false || strpos($dbType, 'double') !== false) return "float";
-        if ((strpos($dbType, 'tinyint') !== false && isset($length) && $length == '1') || strpos($dbType, 'bool') !== false || strpos($dbType, 'bit') !== false) return "bool";
-        if (strpos($dbType, 'int') !== false) return "int";
-        return "str"; // Default
+
+        if (strpos($dbType, 'varchar') !== false || strpos($dbType, 'text') !== false) {
+            return "str";
+        }
+
+        if (strpos($dbType, 'timestamp') !== false) {
+            return "datetime";
+        }
+
+        if (strpos($dbType, 'date') !== false) {
+            return "date";
+        }
+
+        if (
+            strpos($dbType, 'decimal') !== false
+            || strpos($dbType, 'float') !== false
+            || strpos($dbType, 'double') !== false
+        ) {
+            return "float";
+        }
+
+        if (
+            (strpos($dbType, 'tinyint') !== false && isset($length) && $length == '1')
+            || strpos($dbType, 'bool') !== false
+            || strpos($dbType, 'bit') !== false
+        ) {
+            return "bool";
+        }
+
+        if (strpos($dbType, 'int') !== false) {
+            return "int";
+        }
+
+        // Default
+        return "str";
     }
 
     /** 
@@ -72,7 +130,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
      * @param int|null $length The length of the column.
      * @return string The corresponding GraphQL type string (e.g., 'String', 'Int').
      */
-    public function mapDbTypeToPythonGqlType($dbType, $length = null)
+    public function mapDbTypeToPythonGqlType($dbType, $length = null) // NOSONAR
     {
         $dbType = strtolower($dbType);
         if (strpos($dbType, 'varchar') !== false || strpos($dbType, 'text') !== false || strpos($dbType, 'date') !== false || strpos($dbType, 'timestamp') !== false) {
@@ -105,7 +163,6 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
 
         $allResolvers = [];
         foreach ($this->analyzedSchema as $tableName => $tableInfo) {
-            $pascalName = $this->pascalCase($tableName);
             $files[] = ['name' => "models/".$tableName.".py", 'content' => $this->generateModelFile($tableName, $tableInfo)];
             $resolverContent = $this->generateResolverFile($tableName, $tableInfo);
             $files[] = ['name' => "resolvers/".$tableName.".py", 'content' => $resolverContent['content']];
@@ -199,12 +256,9 @@ ENV;
      * @param array $tableInfo Information about the table's columns.
      * @return string The content of the model file.
      */
-    private function generateModelFile($tableName, $tableInfo)
+    private function generateModelFile($tableName, $tableInfo) // NOSONAR
     {
         $pascalName = $this->pascalCase($tableName);
-        $pk = $tableInfo['primaryKey'];
-
-        $pkType = $this->mapDbTypeToPythonType($tableInfo['columns'][$pk]['type'], $tableInfo['columns'][$pk]['length']);
 
         $imports = "from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Date, Text, ForeignKey, func\n";
         $imports .= "from sqlalchemy.orm import relationship, Mapped\n";
@@ -217,8 +271,8 @@ ENV;
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             $sqlalchemyType = $this->mapDbTypeToSqlalchemyType($colInfo['type'], $colInfo['length']);
             $pythonType = $this->mapDbTypeToPythonType($colInfo['type'], $colInfo['length']);
-            if ($pythonType == 'datetime') $has_datetime = true;
-            if ($pythonType == 'date') $has_date = true;
+            if ($pythonType == 'datetime') {$has_datetime = true;}
+            if ($pythonType == 'date') {$has_date = true;}
 
             $field_def = "    $colName = Column($sqlalchemyType";
             if ($colInfo['isPrimaryKey']) {
@@ -244,8 +298,8 @@ ENV;
 
         // Add back-population for tables that reference this one
         foreach ($this->analyzedSchema as $otherTable => $otherTableInfo) {
-            if ($otherTable === $tableName) continue;
-            foreach ($otherTableInfo['columns'] as $otherCol => $otherColInfo) {
+            if ($otherTable === $tableName) {continue;}
+            foreach ($otherTableInfo['columns'] as $otherColInfo) {
                 if ($otherColInfo['isForeignKey'] && $otherColInfo['references'] === $tableName) {
                     $otherPascalName = $this->pascalCase($otherTable);
                     $relationships .= "    " . $this->pluralize($otherTable) . " = relationship('$otherPascalName', back_populates='$tableName')\n";
@@ -273,7 +327,7 @@ PYTHON;
      *
      * @return string The content of schema.py.
      */
-    private function generateSchemaPy()
+    private function generateSchemaPy() // NOSONAR
     {
         $type_defs = "from ariadne import gql, QueryType, MutationType, make_executable_schema\n";
         $type_defs .= "from resolvers import query_resolvers, mutation_resolvers\n\n"; //NOSONAR
@@ -314,7 +368,7 @@ PYTHON;
             {
                 $pkType = 'String';
             }
-            $gql_schema .= "    }\n\n";
+            $gql_schema .= "    }\n\n"; // NOSONAR
 
             // Input Type
             $gql_schema .= "    input {$pascalName}Input {\n";
@@ -423,7 +477,7 @@ PYTHON;
      * @param array $tableInfo Information about the table's columns.
      * @return array An associative array with 'content' and 'resolvers' keys.
      */
-    private function generateResolverFile($tableName, $tableInfo)
+    private function generateResolverFile($tableName, $tableInfo) // NOSONAR
     {
         $pascalName = $this->pascalCase($tableName);
         $camelName = $this->camelCase($tableName);
@@ -657,7 +711,6 @@ PYTHON;
         foreach ($tableInfo['columns'] as $colName => $colInfo) {
             if ($colInfo['isForeignKey']) {
                 $refTableName = $colInfo['references'];
-                $refPascalName = $this->pascalCase($refTableName);
                 $resolver_name = "resolve_" . $refTableName;
                 $content .= "\nasync def $resolver_name(obj, info):\n";
                 $content .= "    # This is a relationship resolver. The parent 'obj' is an instance of $pascalName.\n";
