@@ -84,6 +84,7 @@ function getMetaValues() {
  * @param {string} databaseName - The name of the connected database.
  * @param {string} databaseSchema - The schema used within the database.
  * @param {string} databaseType - The database engine type (e.g., MySQL, PostgreSQL).
+ * @param {string} hash - The hash of the information.
  * @returns {void}
  */
 function setMetaValues(applicationId, databaseName, databaseSchema, databaseType, hash)
@@ -373,7 +374,7 @@ function init() {
 function onChangeDatabase(select) {
     let selectedOption = select.options[select.selectedIndex];
     let dataset = selectedOption.dataset; 
-    loadApplicationData(dataset.applicationId, dataset.databaseName, dataset.databaseSchema, dataset.databaseType)
+    loadApplicationData(dataset.applicationId, dataset.databaseName, dataset.databaseSchema, dataset.databaseType, dataset.hash)
 }
 
 function loadDatabaseIndex(applicationId, hash)
@@ -392,7 +393,7 @@ function loadDatabaseIndex(applicationId, hash)
                 {
                     let option = document.createElement('option');
                     option.value = index;
-                    option.textContent = data[index].databaseName;
+                    option.textContent = data[index].label;
                     if(index == hash)
                     {
                         option.setAttribute('selected', 'selected');
@@ -401,6 +402,7 @@ function loadDatabaseIndex(applicationId, hash)
                     option.dataset.databaseType = data[index].databaseType;
                     option.dataset.databaseName = data[index].databaseName;
                     option.dataset.databaseSchema = data[index].databaseSchema;
+                    option.dataset.hash = index;
                     
                     select.appendChild(option);
                 }
@@ -594,7 +596,6 @@ async function sendGraphQlEntityToServer(applicationId, databaseType, databaseNa
 
         // Optionally parse JSON response if needed
         const result = await response.json();
-        // console.log('GraphQL entity data saved successfully.', result);
         return result;
 
     } catch (error) {
@@ -806,11 +807,12 @@ function isEditableElement(element)
  * @param {string} databaseName - The name of the database to be accessed.
  * @param {string} databaseSchema - The schema within the database.
  * @param {string} databaseType - The type of database engine (e.g., MySQL, PostgreSQL).
+ * @param {string} hash - The hash of the information.
  * @returns {void}
  */
-function loadApplicationData(applicationId, databaseName, databaseSchema, databaseType)
+function loadApplicationData(applicationId, databaseName, databaseSchema, databaseType, hash)
 {
-    setMetaValues(applicationId, databaseName, databaseSchema, databaseType);
+    setMetaValues(applicationId, databaseName, databaseSchema, databaseType, hash);
     fetchEntityFromServer(applicationId, databaseType, databaseName, databaseSchema);
     fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema);
 }
@@ -1697,6 +1699,7 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
 
     xhr.open('POST', url, true); // Open a POST connection to the server
 
+
     // Set the header to send data in URL-encoded format
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -1705,6 +1708,8 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
         if (xhr.readyState === 4) {  // Check if the request is complete
             if (xhr.status === 200) {  // Check if the response is successful (status 200)
                 // Response received successfully
+                let { applicationId, databaseName, databaseSchema, databaseType, hash } = getMetaValues();
+                loadDatabaseIndex(applicationId, hash);
             } else {
                 console.error('An error occurred while sending data to the server'); // Log error if status is not 200
             }

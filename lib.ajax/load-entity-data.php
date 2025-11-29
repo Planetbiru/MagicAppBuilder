@@ -27,6 +27,7 @@ if ($inputPost->getDatabaseName() !== null) {
         $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
 
         $path = $basePath . "/$filename";
+        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
         if (!file_exists(dirname($path))) {
             mkdir(dirname($path), 0755, true);
         }
@@ -77,7 +78,7 @@ if ($inputPost->getDatabaseName() !== null) {
         {
             $index = [];
         }
-        if(!is_array($index[$hash]))
+        if(!isset($index[$hash]) || !is_array($index[$hash]))
         {
             $index[$hash] = array();
         }
@@ -87,6 +88,15 @@ if ($inputPost->getDatabaseName() !== null) {
         $index[$hash]['databaseSchema'] = $databaseSchema;
         $index[$hash]['entities'] = $entityCount;
         $index[$hash]['file'] = "data/$filename";
+        $index[$hash]['hash'] = $hash;
+        if(empty($index[$hash]['databaseName']))
+        {
+            $index[$hash]['label'] = basename($databaseBuilder->getDatabaseCredentials()->getDatabaseFilePath());
+        }
+        else
+        {
+            $index[$hash]['label'] = $index[$hash]['databaseName'];
+        }
 
         file_put_contents($indexPath, json_encode($index, JSON_PRETTY_PRINT));
     }

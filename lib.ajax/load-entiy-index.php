@@ -60,6 +60,7 @@ if ($inputPost->getDatabaseName() !== null) {
     {
         $selectedApplication->find($applicationId);
         $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
+
         if(file_exists($indexPath))
         {
             $indexRaw = file_get_contents($indexPath);
@@ -71,5 +72,6 @@ if ($inputPost->getDatabaseName() !== null) {
         // Do noting
     }
     ResponseUtil::sendJSON($json);
+            
     exit();
 }
