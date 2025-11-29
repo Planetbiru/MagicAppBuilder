@@ -4,12 +4,12 @@ let currentMode = null;
 
 /**
  * Initializes the file manager, sets up event listeners, and initializes the CodeMirror editor.
- * 
+ *
  * This function handles:
  * - Clicking on directories to load their contents.
  * - Toggling the visibility of subdirectories.
  * - Opening and saving files.
- * 
+ *
  * It sets up event listeners for directory clicks, file open/save buttons, and initializes the editor.
  */
 function initFileManager()
@@ -24,7 +24,7 @@ function initFileManager()
 
                 // Look for <ul> inside the <li> that contains subdirectories
                 let subDirUl = subDirLi.querySelector('ul');
-                
+
                 // If subdirectories have not been loaded yet (i.e., no <ul> exists)
                 if (!subDirUl) {
                     subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
@@ -43,30 +43,30 @@ function initFileManager()
             }
         }
     });
-    
+
     document.querySelector('.btn-save-file').addEventListener('click', function(e){
         let file = document.querySelector('.file-path').value;
         let content = fileManagerEditor.getValue();
         saveFile(file, content);
     });
-    
+
     document.querySelector('.btn-open-file').addEventListener('click', function(e){
         let file = document.querySelector('.file-path').value;
         let extension = getFileExtension(file);
         openTextFile(file, extension);
     });
-    
+
     const dirTree = document.getElementById("dir-tree");
     const contextMenu = document.getElementById("context-menu");
 
     dirTree.addEventListener("contextmenu", function (event) // NOSONAR
     {
         event.preventDefault();
-        
+
 
         // Find the closest li element
         const target = event.target.closest("li");
-        
+
         if (target && target.dataset && target.dataset.type) // NOSONAR
         {
           // Store the selected item for future use
@@ -94,7 +94,7 @@ function initFileManager()
           contextMenu.className = 'context-menu'; // Reset any previous state
           const menuList = contextMenu.querySelector("ul");
           menuList.innerHTML = ""; // Clear previous items
-          
+
           // Add appropriate menu options for file or directory
           if (itemType === 'file') {
               if(['svg'].includes(fileExtension))
@@ -120,7 +120,7 @@ function initFileManager()
               if (menuY + contextMenu.offsetHeight > window.innerHeight) {
                 menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
               }
-              
+
               contextMenu.style.left = `${menuX}px`;
               contextMenu.style.top = `${menuY}px`;
 
@@ -137,12 +137,12 @@ function initFileManager()
               <li data-type="dir" data-operation="compress" data-dir="${itemName}">Download Directory</li>
               <li data-type="dir" data-operation="delete" data-dir="${itemName}">Delete Directory</li>
               `;
-              
+
               // If contextMenu.style.top + contextMenu.style.height > window.innerHeight, adjust the position
               if (menuY + contextMenu.offsetHeight > window.innerHeight) {
                 menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
               }
-              
+
               contextMenu.style.left = `${menuX}px`;
               contextMenu.style.top = `${menuY}px`;
 
@@ -150,14 +150,14 @@ function initFileManager()
               contextMenu.style.display = "block";
           } else {
             showRootContextMenu(event, contextMenu);
-            event.preventDefault();  
+            event.preventDefault();
             event.stopPropagation();
           }
-          
-        
+
+
         } else {
           showRootContextMenu(event, contextMenu);
-          event.preventDefault();  
+          event.preventDefault();
           event.stopPropagation();
         }
     });
@@ -166,7 +166,7 @@ function initFileManager()
       showRootContextMenu(event, contextMenu);
       event.stopPropagation();
       event.preventDefault();
-    });     
+    });
 
     // Hide context menu on click outside
     document.addEventListener("click", function () {
@@ -189,7 +189,7 @@ function initFileManager()
         } else if (dataType === 'dir') {
             name = target.dataset.dir;
         }
-        
+
         // Action based on the clicked option
         switch (clickedOption) {
             case "view-image":
@@ -244,15 +244,15 @@ function initFileManager()
         }
       }
     });
-    
-    document.querySelector('.file-path').addEventListener('change', function(e){ 
+
+    document.querySelector('.file-path').addEventListener('change', function(e){
       let file = e.target.value;
       let extension = getFileExtension(file);
       if (extension) {
         changeMode(file, extension); // Call changeMode function with the file and extension
-      }  
+      }
     });
-    
+
     initCodeMirror();
     fileManagerEditor.refresh();
 }
@@ -272,14 +272,14 @@ function initFileManager()
 function showRootContextMenu(event, contextMenu) {
   event.preventDefault(); // Prevent the default context menu from appearing
   selectedItem = null; // Reset selected item
-  // Store the selected item for future use 
+  // Store the selected item for future use
   // Show the context menu at the cursor position
   let menuX = event.pageX;
   let menuY = event.pageY;
 
   // Position the context menu
-  
-  
+
+
 
   // Reset the context menu and set up the options
   contextMenu.className = 'context-menu'; // Reset any previous state
@@ -291,28 +291,28 @@ function showRootContextMenu(event, contextMenu) {
     <li data-type="dir" data-operation="reset" data-dir="">Reset Content</li>
     <li data-type="dir" data-operation="root-dowload" data-dir="">Download All</li>
     `;
-    
+
   // If contextMenu.style.top + contextMenu.style.height > window.innerHeight, adjust the position
   if (menuY + contextMenu.offsetHeight > window.innerHeight) {
     menuY = window.innerHeight - contextMenu.offsetHeight - 10; // Adjust the top position
   }
-  
+
   contextMenu.style.left = `${menuX}px`;
   contextMenu.style.top = `${menuY}px`;
-  
+
   contextMenu.style.display = "block";
 }
 
 /**
- * Uploads files to the server by creating an invisible file input element, 
+ * Uploads files to the server by creating an invisible file input element,
  * selecting files, and sending them to the server via a POST request.
- * 
+ *
  * This function handles the entire process of:
  * 1. Triggering a file input dialog to select files.
  * 2. Sending the selected files to the server.
  * 3. Updating the UI with the uploaded files if the upload is successful.
- * 
- * @param {string} dir - The directory path where the files should be uploaded. This directory is passed 
+ *
+ * @param {string} dir - The directory path where the files should be uploaded. This directory is passed
  *                       as a parameter to the server to store the uploaded files in the appropriate location.
  */
 function uploadFile(dir)
@@ -323,19 +323,19 @@ function uploadFile(dir)
   fileInput.accept = '*'; // Accept all file types
   fileInput.multiple = true; // Allow multiple file selection
   fileInput.style.display = 'none'; // Hide the input element
-  
+
   // Upload file when a file is selected
   fileInput.addEventListener('change', function(event) {
-    let file = event.target.files; 
+    let file = event.target.files;
     if (file) {
       let formData = new FormData(); // Create a FormData object
-      
-      
+
+
       for (let i = 0; i < file.length; i++) // NOSONAR
       {
         formData.append('files[]', file[i]); // Append each selected file to the FormData object
       }
-      
+
       formData.append('dir', dir); // Append the directory to the FormData object
 
       increaseAjaxPending();
@@ -347,7 +347,7 @@ function uploadFile(dir)
       .then(data => {
         decreaseAjaxPending();
         if (data.status == 'success') {
-          
+
           if(selectedItem != null)
           {
             let subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
@@ -355,7 +355,7 @@ function uploadFile(dir)
             if(subDirUl == null)
             {
               subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
-              subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory  
+              subDirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
             }
             if(subDirLi != null)
             {
@@ -377,14 +377,14 @@ function uploadFile(dir)
       });
     }
   });
-  
+
   fileInput.click(); // Trigger the file input click event to open the file dialog
 }
 
 /**
  * Creates a new file in the specified directory.
  * If no directory is provided, it creates the file in the default location.
- * 
+ *
  * @param {string} dir - The directory in which the new file will be created.
  * If an empty string is passed, the default location will be used.
  */
@@ -401,15 +401,15 @@ function createNewFile(dir)
 }
 
 /**
- * Creates a new directory in the file manager system. This function handles the 
- * process of prompting the user for a new directory name, then sending a request 
- * to the server to create the directory. It also updates the UI based on the 
- * server's response, either by adding the new directory to the current directory 
+ * Creates a new directory in the file manager system. This function handles the
+ * process of prompting the user for a new directory name, then sending a request
+ * to the server to create the directory. It also updates the UI based on the
+ * server's response, either by adding the new directory to the current directory
  * structure or resetting the file manager content.
- * 
- * @param {string} dir - The directory where the new directory should be created. 
- *                       If an empty string is passed, the new directory will be 
- *                       created at the root level. 
+ *
+ * @param {string} dir - The directory where the new directory should be created.
+ *                       If an empty string is passed, the new directory will be
+ *                       created at the root level.
  */
 function createNewDirectory(dir)
 {
@@ -428,12 +428,12 @@ function createNewDirectory(dir)
       {
         subDirLi = selectedItem.closest('li'); // Get the <li> that contains the subdirectory
         subDirUl = selectedItem.closest('li').querySelector('ul'); // Get the <ul> that contains subdirectories
-        dirToLoad = subDirLi ? subDirLi.querySelector('span').dataset.dir : '/'; // Get the directory path      
+        dirToLoad = subDirLi ? subDirLi.querySelector('span').dataset.dir : '/'; // Get the directory path
       }
       increaseAjaxPending();
-      
+
       fetch('lib.ajax/file-manager-create-directory.php', {
-        method: 'POST', 
+        method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -458,7 +458,7 @@ function createNewDirectory(dir)
             // Wait for a moment before reloading the directory content
             if(response.dirs)
             {
-              if(subDirLi != null && subDirUl != null) 
+              if(subDirLi != null && subDirUl != null)
               {
                 displayDirContent(response.dirs, subDirUl, true);
               }
@@ -475,8 +475,8 @@ function createNewDirectory(dir)
             {
               loadDirContent(dirToLoad, subDirUl, subDirLi, true); // Display the directory content
             }
-            
-          
+
+
         })
         .catch(error => {
           // Handle any errors
@@ -500,7 +500,7 @@ function createNewDirectory(dir)
 /**
  * Renames an existing file and updates the display accordingly.
  * Prompts the user to enter a new name and submits the change to the server.
- * 
+ *
  * @param {string} name - The current name of the file to be renamed.
  * @param {string} dataType - The type of the file (e.g., text, image, etc.).
  */
@@ -514,7 +514,7 @@ function renameFile(name, dataType) {
       increaseAjaxPending();
 
       fetch('lib.ajax/file-manager-rename.php', {
-        method: 'POST', 
+        method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded' // Atau 'application/json' jika Anda mengirim JSON
         },
@@ -569,7 +569,7 @@ function renameFile(name, dataType) {
 
 /**
  * Downloads a file from the server.
- * 
+ *
  * @param {string} name - The name of the file to download.
  * @param {string} dataType - The type of the file to download (e.g., text, image, etc.).
  */
@@ -590,7 +590,7 @@ function downloadFile(name, dataType) {
 /**
  * Deletes a file from the server and updates the display accordingly.
  * Prompts the user for confirmation before deleting.
- * 
+ *
  * @param {string} name - The name of the file to delete.
  * @param {string} dataType - The type of the file (e.g., text, image, etc.).
  */
@@ -606,7 +606,7 @@ function deleteFile(name, dataType) {
           increaseAjaxPending();
 
           fetch('lib.ajax/file-manager-delete.php', {
-            method: 'POST', 
+            method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -626,7 +626,7 @@ function deleteFile(name, dataType) {
               decreaseAjaxPending();
               if(subDirLi != null)
               {
-                subDirLi.parentNode.removeChild(subDirLi); // Remove the <li> element from the DOM                
+                subDirLi.parentNode.removeChild(subDirLi); // Remove the <li> element from the DOM
               }
             })
             .catch(error => {
@@ -652,8 +652,8 @@ function deleteFile(name, dataType) {
  * Prompts the user to confirm if they want to compress a given directory, and if confirmed,
  * triggers the download of the compressed directory.
  *
- * This function constructs a URL to send a GET request to the server to download the directory 
- * as a compressed file. It dynamically creates an anchor (`<a>`) element, sets its `href` to the 
+ * This function constructs a URL to send a GET request to the server to download the directory
+ * as a compressed file. It dynamically creates an anchor (`<a>`) element, sets its `href` to the
  * server's download URL, and programmatically clicks the link to initiate the download.
  *
  * @param {string} name - The name of the directory to compress and download.
@@ -686,7 +686,7 @@ function compressDirectory(name) {
 
 /**
  * This function returns the caller function's name using the stack trace.
- * 
+ *
  * @returns {string} - The name of the caller function, or an empty string if unavailable.
  */
 function getCaller() {
@@ -696,7 +696,7 @@ function getCaller() {
     } catch (e) {
         // Split the stack trace by line and extract the caller's function name
         const stackLines = e.stack.split('\n');
-        
+
         // For most browsers, the caller's function will be in line 3
         if (stackLines.length > 2) {
             // The third line usually contains the caller's information
@@ -711,7 +711,7 @@ function getCaller() {
 
 /**
  * Resets the file manager, clearing all contents and resetting the UI elements.
- * 
+ *
  * This function:
  * - Clears the directory tree.
  * - Clears the file editor.
@@ -719,7 +719,7 @@ function getCaller() {
  * - Reloads the directory content.
  */
 function resetFileManager()
-{    
+{
     let dirUl = document.querySelector('#dir-tree');
     if(fileManagerEditor)
     {
@@ -733,7 +733,7 @@ function resetFileManager()
 
 /**
  * This function returns the file extension from a given file name or file path.
- * 
+ *
  * @param {string} filename - The name or path of the file (e.g., 'example.txt', 'folder/image.jpg').
  * @returns {string} - The file extension, or an empty string if no extension is found.
  */
@@ -747,7 +747,7 @@ function getFileExtension(filename) {
 /**
  * This function returns the base name of a file without its extension
  * from a given file name or file path.
- * 
+ *
  * @param {string} filename - The name or path of the file (e.g., 'example.txt', 'folder/image.jpg').
  * @returns {string} - The file base name without extension (e.g., 'example', 'image').
  */
@@ -761,10 +761,10 @@ function getFileBaseName(filename) {
 
 /**
  * Formats the entire content of the CodeMirror editor.
- * 
- * This function automatically formats the content of the editor by adjusting the indentation 
+ *
+ * This function automatically formats the content of the editor by adjusting the indentation
  * and layout of the code. It formats all lines in the editor from the first line to the last.
- * 
+ *
  * It uses CodeMirror's `autoFormatRange` method to format the content.
  */
 function format() {
@@ -788,7 +788,7 @@ function refreshDirectory(name) {
   if(subDirUl == null)
   {
     subDirUl = document.createElement('ul');  // Create a new <ul> for subdirectories
-    subdirLi.appendChild(subDirUl); // Append it to the <li> for the current directory    
+    subdirLi.appendChild(subDirUl); // Append it to the <li> for the current directory
   }
   loadDirContent(name, subDirUl, subdirLi, true)
   if(subdirLi != null)
@@ -799,7 +799,7 @@ function refreshDirectory(name) {
 
 /**
  * This function loads the content of the specified directory and appends the content to the subdirectory list.
- * 
+ *
  * @param {string} dir - The directory path to load.
  * @param {HTMLElement} subDirUl - The <ul> element where the subdirectory content will be appended.
  * @param {HTMLElement} subdirLi - The <li> parent element of subdirUl
@@ -817,7 +817,7 @@ function loadDirContent(dir, subDirUl, subdirLi, reset) {
     $.ajax({
         url: 'lib.ajax/file-manager-load-dir.php',
         method: 'GET',
-        data: { dir: dir },  
+        data: { dir: dir },
         dataType: 'json',
         success: function(dirs) {
             decreaseAjaxPending();
@@ -839,7 +839,7 @@ function loadDirContent(dir, subDirUl, subdirLi, reset) {
 
 /**
  * This function processes the directory data and appends directories and files to the subdirectory list.
- * 
+ *
  * @param {Array} dirs - The list of directories and files to display.
  * @param {HTMLElement} subDirUl - The <ul> element where the directory content will be appended.
  * @param {boolean} reset - Reset content
@@ -873,7 +873,7 @@ function displayDirContent(dirs, subDirUl, reset) {
             fileLi.appendChild(fileSpan);
             subDirUl.appendChild(fileLi); // Append the file <li> to the subdirectory <ul>
         }
-      }); 
+      });
     }
 }
 
@@ -909,7 +909,7 @@ function getDirectoryName(path) {
 
 /**
  * Function to send file name and content to the server using a POST request.
- * 
+ *
  * @param {string} file - The name of the file to save.
  * @param {string} content - The content to save in the file.
  */
@@ -939,7 +939,7 @@ function saveFile(file, content) {
         if(dir.length > 0)
         {
           let dirSelector = `span[data-dir="${dir}"]`;
-          subDirLi = document.querySelector(dirSelector).closest('li'); 
+          subDirLi = document.querySelector(dirSelector).closest('li');
         }
 
         if(selectedItem != null)
@@ -999,16 +999,16 @@ function saveFile(file, content) {
 }
 
 /**
- * This function handles opening a file depending on its extension. 
+ * This function handles opening a file depending on its extension.
  * It checks if the file is a text file or a supported image type, and then displays it accordingly.
- * 
+ *
  * @param {string} file - The file path.
  * @param {string} extension - The file extension.
  */
 function openFile(file, extension) {
     if(!extension)
     {
-      extension = getFileExtension(file); // Get the file extension if not provided 
+      extension = getFileExtension(file); // Get the file extension if not provided
     }
     // List of non-text extensions (images, videos, audio, etc.)
 
@@ -1028,7 +1028,7 @@ function openFile(file, extension) {
     if (!nonTextExtensions.includes(lowerExtension)) {
         if(currentMode === null)
         {
-            changeMode(file, extension); 
+            changeMode(file, extension);
         }
         openTextFile(file, extension);
         setDisplayMode('text');
@@ -1042,21 +1042,21 @@ function openFile(file, extension) {
 
         initDatabaseOnce(file);
         setDisplayMode('database');
-        
+
     } else if (['pdf', 'xls', 'xlsx', 'csv', 'ods', 'docx'].includes(lowerExtension)) {
         // database-display
         initDocumentViewerOnce(file);
         setDisplayMode('document');
-        
+
     } else if (['ttf', 'otf', 'woff', 'woff2', 'eot'].includes(lowerExtension)) {
         // font-display
         initFontViewerOnce(file, 'font-frame');
         setDisplayMode('frame');
-    } else if(['mp4', 'ogg', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp'].includes(lowerExtension) ) { 
+    } else if(['mp4', 'ogg', 'webm', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp'].includes(lowerExtension) ) {
         // video-display
         initFrameViewerOnce(file, 'video-frame');
         setDisplayMode('frame');
-    } else if(['mp3', 'wav', 'flac', 'm4a'].includes(lowerExtension) ) { 
+    } else if(['mp3', 'wav', 'flac', 'm4a'].includes(lowerExtension) ) {
         // video-display
         initFrameViewerOnce(file, 'audio-frame');
         setDisplayMode('frame');
@@ -1064,7 +1064,7 @@ function openFile(file, extension) {
         // For unsupported file extensions, display an error message
         fileDiv.textContent = 'Cannot open this file.'; // Display error message for unsupported file types
     }
-    
+
 }
 
 /**
@@ -1103,7 +1103,7 @@ function viewImage(file) {
 
 /**
  * Initialize the frame viewer once with the given file.
- * 
+ *
  * Loads a file into the frame viewer element (#frame-viewer) by embedding
  * it in an iframe. The file will be rendered by the file manager loader.
  *
@@ -1118,7 +1118,7 @@ function initFrameViewerOnce(file, className) {
 
 /**
  * Initialize the font viewer once with the given font file.
- * 
+ *
  * Loads a font file into the frame viewer element (#frame-viewer) by embedding
  * it in an iframe. The file will be rendered by the font viewer handler.
  *
@@ -1319,13 +1319,13 @@ function runDocumentViewerInit(file) {
 
 /**
  * Opens a text file and loads its content into the editor.
- * 
- * This function fetches the content of the specified text file from the server using 
+ *
+ * This function fetches the content of the specified text file from the server using
  * a PHP script, then loads the content into the CodeMirror editor. The file's extension
  * is used to set the appropriate syntax highlighting mode for the editor.
- * 
+ *
  * It also manages UI elements, such as disabling the open/save buttons during the loading process.
- * 
+ *
  * @param {string} file - The path to the file to be opened.
  * @param {string} extension - The extension of the file to determine the mode for the editor (e.g., 'txt', 'js', 'html').
  */
@@ -1333,34 +1333,34 @@ function openTextFile(file, extension) {
     // Disable open/save buttons while loading
     document.querySelector('.btn-open-file').disabled = true;
     document.querySelector('.btn-save-file').disabled = true;
-    
+
     // Set display mode to 'text' and update the file path input
     setDisplayMode('text');
     document.querySelector('.file-path').value = file;
-    
+
     // Display a loading message in the editor
     fileManagerEditor.setValue('Loading...');
-    
+
     // Change the mode based on the file's extension
-    changeMode('any.txt', 'txt'); 
-    
+    changeMode('any.txt', 'txt');
+
     // Indicate that an AJAX request is pending
     increaseAjaxPending();
-    
+
     // Fetch the file content from the server
     fetch('lib.ajax/file-manager-load-file.php?file=' + encodeURIComponent(file))
         .then(response => response.text())  // Parse the response as text
         .then(text => {
             // Change the editor mode based on the file's extension
-            changeMode(file, extension);                
-            
+            changeMode(file, extension);
+
             // Set the file content in the editor
             fileManagerEditor.setValue(text);
-            
+
             // Enable the open/save buttons once loading is complete
             document.querySelector('.btn-open-file').disabled = false;
             document.querySelector('.btn-save-file').disabled = false;
-            
+
             // Indicate that the AJAX request has completed
             decreaseAjaxPending();
         })
@@ -1369,7 +1369,7 @@ function openTextFile(file, extension) {
             document.querySelector('.btn-open-file').disabled = false;
             document.querySelector('.btn-save-file').disabled = false;
             setDisplayMode('');
-            
+
             // Indicate that the AJAX request has completed
             decreaseAjaxPending();
         });
@@ -1377,10 +1377,10 @@ function openTextFile(file, extension) {
 
 /**
  * Sets the display mode for the file viewer (either 'text' or 'image').
- * 
+ *
  * This function toggles between the text and image modes by changing the visibility
  * of the corresponding HTML elements.
- * 
+ *
  * @param {string} mode - The mode to set ('text' or 'image').
  */
 function setDisplayMode(mode) {
@@ -1400,11 +1400,11 @@ function setDisplayMode(mode) {
 
 /**
  * Changes the mode of the CodeMirror editor based on the file's extension.
- * 
+ *
  * This function configures the syntax highlighting for the CodeMirror editor according
  * to the file extension or MIME type. It ensures that the editor uses the correct mode
  * for the opened file to provide proper syntax highlighting.
- * 
+ *
  * @param {string} filename - The name of the file, used to determine the mode.
  * @param {string} extension - The file extension, used to identify the correct mode.
  */
@@ -1414,7 +1414,7 @@ function changeMode(filename, extension) {
     let mode;
     let spec;
     let m = /.+\.([^.]+)$/.exec(val);
-    
+
     // Check if the file has a valid extension
     if (m) {
         let info = CodeMirror.findModeByExtension(m[1]);  // Find the mode based on the extension
@@ -1433,7 +1433,7 @@ function changeMode(filename, extension) {
     } else {
         mode = spec = val;
     }
-    
+
     // If a valid mode is found, set it in the editor
     if (mode) {
         fileManagerEditor.setOption("mode", spec);

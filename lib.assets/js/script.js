@@ -102,8 +102,8 @@ String.prototype.equalIgnoreCase = function (str)  //NOSONAR
 /**
  * Replaces all occurrences of a specified substring (str1) with another substring (str2) in the calling string.
  *
- * This function uses a regular expression to ensure that all matches are replaced. 
- * Special characters in the search string are escaped, and the replacement string is processed 
+ * This function uses a regular expression to ensure that all matches are replaced.
+ * Special characters in the search string are escaped, and the replacement string is processed
  * to handle any dollar signs correctly.
  *
  * @param {string} str1 - The substring to be replaced.
@@ -124,8 +124,8 @@ String.prototype.replaceAll = function (str1, str2, ignore)  //NOSONAR
 /**
  * Replaces all occurrences of a specified substring (str1) with another substring (str2) in the calling string.
  *
- * This function uses a regular expression to ensure that all matches are replaced. 
- * Special characters in the search string are escaped, and the replacement string is processed 
+ * This function uses a regular expression to ensure that all matches are replaced.
+ * Special characters in the search string are escaped, and the replacement string is processed
  * to handle any dollar signs correctly.
  *
  * @param {string} str1 - The substring to be replaced.
@@ -328,7 +328,7 @@ function hideWaitingScreen() {
 function setCheckingStatus(id, startTime)
 {
   $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {userAction:'check-status', applicationId: id},
     url: 'lib.ajax/application-status.php',
     dataType: 'json',
@@ -369,7 +369,7 @@ function updateApplicationInfo(id)
 {
   increaseAjaxPending();
   $.ajax({
-    type: 'POST', 
+    type: 'POST',
     data: {userAction:'update-info', applicationId: id},
     url: 'lib.ajax/application-status.php',
     dataType: 'json',
@@ -387,7 +387,7 @@ function updateApplicationInfo(id)
 /**
  * Populates the entity generator form with values derived from the selected table.
  *
- * This function extracts the table name, converts it to an entity name using the 
+ * This function extracts the table name, converts it to an entity name using the
  * `upperCamelize` function, and retrieves the primary key(s) from the selected table option.
  * It then updates the form fields for the entity name and primary key.
  *
@@ -449,14 +449,14 @@ function restoreFeatureForm() {
       if(typeof data.activate_deactivate == 'undefined')
       {
         asyncAlert(
-          'No cononfiguration found for the current application.',  
-          'Configuration Not Found',  
+          'No cononfiguration found for the current application.',
+          'Configuration Not Found',
           [
             {
-              'caption': 'Close',  
+              'caption': 'Close',
               'fn': () => {
-              },  
-              'class': 'btn-primary'  
+              },
+              'class': 'btn-primary'
             }
           ]
         );
@@ -479,14 +479,14 @@ function restoreFeatureForm() {
             $(this).prop('checked', true);
           }
         });
-        
+
         if(data.with_approval)
         {
           $('#approval_type1')[0].disabled = false;
-          $('#approval_type2')[0].disabled = false;  
+          $('#approval_type2')[0].disabled = false;
           $('#approval_position1')[0].disabled = false;
           $('#approval_position2')[0].disabled = false;
-          $('#approval_by_other_user')[0].disabled = false; 
+          $('#approval_by_other_user')[0].disabled = false;
           $('#approval_bulk')[0].disabled = false;
         }
         else
@@ -498,10 +498,10 @@ function restoreFeatureForm() {
           $('#approval_by_other_user')[0].disabled = true;
           $('#approval_bulk')[0].disabled = true;
         }
-        
+
         if(data.export_to_csv)
         {
-          $('#export_use_temporary')[0].disabled = false; 
+          $('#export_use_temporary')[0].disabled = false;
         }
         else
         {
@@ -537,9 +537,9 @@ function createValidator(elem)
     dataType: 'html',
     url: 'lib.ajax/validator-create.php',
     data: {
-      userAction: 'create', 
+      userAction: 'create',
       tableName: $('#validationMasterModal [name="tableName"]').val(),
-      validator: $('#validationMasterModal [name="validatorName"]').val(), 
+      validator: $('#validationMasterModal [name="validatorName"]').val(),
       definition: $('#validationMasterModal [name="validatorDefinition"]').val()
     },
     success: function(data)
@@ -588,7 +588,7 @@ function addValidatorForm()
       $('#validationMasterModal .modal-body').empty().append(data);
       $('#validationMasterModal .master-validation-modal-ok').text('Create Form');
       $('#validationMasterModal .master-validation-modal-ok').attr('onclick', "selectTableForNewValidator(this)");
-      
+
       $('#validationMasterModal').data('bs.modal', null);
       $('#validationMasterModal').modal({
         backdrop: 'static',
@@ -657,7 +657,7 @@ function testValidator(elem) {
     url: 'lib.ajax/validator-test.php?validator=' + encodeURIComponent(currentValidator),
     data: $(frm).serialize(), // Gathers all data from the form
     success: function(data) {
-      
+
       const modalBody = $('#genericModal .modal-body');
 
       // Clear validation states
@@ -669,7 +669,7 @@ function testValidator(elem) {
           '<div class="alert alert-success">' + data.message + '</div>'
         );
       } else {
-        
+
         let errorMessage = 'An error occurred.';
         if (data && data.message) // NOSONAR
         {
@@ -708,9 +708,9 @@ function updateValidatorForm()
     type: 'post',
     dataType: 'html',
     url: 'lib.ajax/validator-create-form.php',
-    data: {userAction: 'update-form', validator: currentValidator}, 
+    data: {userAction: 'update-form', validator: currentValidator},
     success: function(data) {
-      decreaseAjaxPending(); 
+      decreaseAjaxPending();
       $('#validationMasterModal .modal-body').append(data);
       if(!valBuilder)
       {
@@ -722,10 +722,10 @@ function updateValidatorForm()
     },
     error: function (jqXHR, textStatus, errorThrown) {
 
-      decreaseAjaxPending(); 
+      decreaseAjaxPending();
     }
   });
-  
+
   $('#validationMasterModal').data('bs.modal', null);
   $('#validationMasterModal').modal({
     backdrop: 'static',
@@ -817,12 +817,12 @@ function deleteValidatorFile()
 {
   asyncAlert(
     `Do you want to delete file ${currentValidator}.php?`,  // Message to display in the modal
-    'Confirmation',  
+    'Confirmation',
     [
       {
-        'caption': 'Yes',  
+        'caption': 'Yes',
         'fn': () => {
-          
+
           increaseAjaxPending();
           $.ajax({
             type: "POST",
@@ -843,18 +843,18 @@ function deleteValidatorFile()
                 $('#button_delete_validator_file').attr('disabled', 'disabled');
                 $('#button_update_validator_file').attr('disabled', 'disabled');
               }
-            }, 
+            },
             error: function (e){
               decreaseAjaxPending();
             },
           });
-        },  
-        'class': 'btn-primary'  
+        },
+        'class': 'btn-primary'
       },
       {
-        'caption': 'No',  
-        'fn': () => { },  
-        'class': 'btn-secondary'  
+        'caption': 'No',
+        'fn': () => { },
+        'class': 'btn-secondary'
       }
     ]
   );
@@ -935,16 +935,16 @@ function handleApplicationFileUpload(file, action, application_id, application_n
 
 /**
  * Generates a namespaced localStorage key based on the current URL path.
- * 
+ *
  * This function ensures that localStorage keys are unique per directory path
  * within the same domain. This avoids collisions when multiple applications
  * are hosted under different subpaths of the same domain.
- * 
+ *
  * Example:
  * - Current URL: https://example.com/admin/dashboard
  *   Original key: "userSettings"
  *   Resulting key: "admin__userSettings"
- * 
+ *
  * @param {string} key - The original localStorage key to namespace.
  * @returns {string} - A namespaced key based on the current path.
  */
@@ -1044,7 +1044,7 @@ function validateFromExisting() {
 
 /**
  * Initiates the application import process based on the currently active tab.
- * 
+ *
  * This function checks which tab is active within the import modal ('From Configuration'
  * or 'From Existing Application') and calls the corresponding import function.
  */
@@ -1066,9 +1066,9 @@ function importApplication()
 
 /**
  * Imports an application from a configuration file.
- * 
+ *
  * It retrieves the selected file from the file input, along with the application ID,
- * name, and base directory from the form fields. It then calls 
+ * name, and base directory from the form fields. It then calls
  * `handleApplicationFileUpload` to process the import.
  */
 function importApplicationFromConfig()
@@ -1084,9 +1084,9 @@ function importApplicationFromConfig()
 
 /**
  * Imports an application from an existing directory on the server.
- * 
+ *
  * This function sends an AJAX POST request to 'lib.ajax/application-recreate.php'
- * with the application ID, name, and base directory. On success, it reloads all 
+ * with the application ID, name, and base directory. On success, it reloads all
  * resources and hides the import modal. On failure, it displays an error message.
  */
 function importApplicationFromExisting()
@@ -1130,13 +1130,13 @@ let initAll = function () {
         let currId = $(e.target).attr("id");
         validateActiveTab();
   });
-  
+
   $('.button-clear-import').on('click', function(e){
     $('#tab-pane-from-existing .import-message').html('<div class="alert alert-info">Type existing application directory to import the application.</div>');
     $(this).closest('table').find('input[type="text"], input[type="hidden"]').val('');
     $(this).closest('table').find('.import-message').empty();
   });
-  
+
   $('#tab-pane-from-existing .button-check-application').on('click', function(e){
     e.preventDefault();
     let parent = $('#tab-pane-from-existing');
@@ -1227,7 +1227,7 @@ let initAll = function () {
       dataType: 'json',
       success: function(data)
       {
-        
+
         if(data.success)
         {
           parent.find('.import-message').html(`<div class="alert alert-success">${data.message}</div>`);
@@ -1319,7 +1319,7 @@ let initAll = function () {
     });
   });
   $(document).on('click', '.delete-trash-entity', function(e){
-    let applicationId = $(this).closest('form').find('[name="application_id"]').val();  
+    let applicationId = $(this).closest('form').find('[name="application_id"]').val();
     let tables = [];
     $(this).closest('form').find('.select-trash-table').each(function(e){
       if($(this)[0].checked)
@@ -1374,7 +1374,7 @@ let initAll = function () {
   $(document).on('click', '#button_delete_validator_file', function(e){
     deleteValidatorFile();
   });
-  
+
   $(document).on('click', '.button-load-string-format', function(e){
     increaseAjaxPending();
     $.ajax({
@@ -1485,13 +1485,13 @@ let initAll = function () {
       }
     })
   });
-  
+
   validatorBuilder = new ValidationBuilder('.field-validation-modal', '.validation-modal', '.json-output', '.main-table tbody tr');
   $(document).on('click', '#button-load-module-features', function (e) {
     e.preventDefault();
     restoreFeatureForm();
   });
-  
+
   $(document).on('click', '#button-save-module-features', function (e) {
     e.preventDefault();
     asyncAlert(
@@ -1513,12 +1513,12 @@ let initAll = function () {
       ]
     );
   });
-  
+
   $(document).on('click', '#button-clear-module-features', function (e) {
     e.preventDefault();
     resetFeatureForm();
   });
-  
+
   $(document).on('click', '.group-reference', function(e2){
     let value = $(this).val();
     $(this).closest('table').attr('data-group-source', value);
@@ -1550,10 +1550,10 @@ let initAll = function () {
 
     asyncAlert(
       'Are you sure you want to generate the entity and replace the existing file?',  // Message to display in the modal
-      'Entity Generation Confirmation',  
+      'Entity Generation Confirmation',
       [
         {
-          'caption': 'Yes', 
+          'caption': 'Yes',
           'fn': () => {
             $('#modal-entity-generator').modal('hide');
             increaseAjaxPending();
@@ -1580,7 +1580,7 @@ let initAll = function () {
                   }
                   let el = $(selector);
                   getEntityFile([fullEntityName], function() // NOSONAR
-                  { 
+                  {
                     $('.entity-container-file .entity-li').removeClass("selected-file");
                     el.closest('li').addClass("selected-file");
                   });
@@ -1590,27 +1590,27 @@ let initAll = function () {
                 updateEntityRelationshipDiagram();
               },
             });
-          },  
-          'class': 'btn-primary'  
+          },
+          'class': 'btn-primary'
         },
         {
-          'caption': 'No',  
-          'fn': () => { },  
-          'class': 'btn-secondary'  
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
         }
       ]
     );
   });
-  
+
   $(document).on('click', '#button_delete_module_file', function (e) {
     e.preventDefault();
     asyncAlert(
       `Do you want to delete file ${currentModule}.php?`,  // Message to display in the modal
-      'Confirmation',  
+      'Confirmation',
       [
         {
-          'caption': 'Yes',  
-          'fn': () => {            
+          'caption': 'Yes',
+          'fn': () => {
             increaseAjaxPending();
             $.ajax({
               type: "POST",
@@ -1631,18 +1631,18 @@ let initAll = function () {
                     cmEditorModule.refresh();
                   }, 1);
                 }
-              }, 
+              },
               error: function (e){
                 decreaseAjaxPending();
               },
             });
-          },  
-          'class': 'btn-primary'  
+          },
+          'class': 'btn-primary'
         },
         {
-          'caption': 'No',  
-          'fn': () => { },  
-          'class': 'btn-secondary'  
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
         }
       ]
     );
@@ -1652,12 +1652,12 @@ let initAll = function () {
     e.preventDefault();
     asyncAlert(
       `Do you want to delete file ${currentEntity}.php?`,  // Message to display in the modal
-      'Confirmation',  
+      'Confirmation',
       [
         {
-          'caption': 'Yes',  
+          'caption': 'Yes',
           'fn': () => {
-            
+
             increaseAjaxPending();
             $.ajax({
               type: "POST",
@@ -1678,18 +1678,18 @@ let initAll = function () {
                   $('#button_save_entity_file_as').attr('disabled', 'disabled');
                   $('#button_delete_entity_file').attr('disabled', 'disabled');
                 }
-              }, 
+              },
               error: function (e){
                 decreaseAjaxPending();
               },
             });
-          },  
-          'class': 'btn-primary'  
+          },
+          'class': 'btn-primary'
         },
         {
-          'caption': 'No',  
-          'fn': () => { },  
-          'class': 'btn-secondary'  
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
         }
       ]
     );
@@ -1710,7 +1710,7 @@ let initAll = function () {
     e.preventDefault();
     loadTable();
   });
-  
+
 
   $(document).on("click", "#load_column", function (e) {
     e.preventDefault();
@@ -1724,7 +1724,7 @@ let initAll = function () {
     {
       loadColumn(tableName, selector);
     }
-    
+
   });
 
   $(document).on("change", 'select[name="source_table"]', function (e) {
@@ -1744,10 +1744,10 @@ let initAll = function () {
 
   $(document).on("change", '[name="multi_level_menu"]', function(e) {
     e.preventDefault();
-    
+
     let isChecked = $(this).is(':checked');
     let $activeThemeSelect = $('[name="active_theme"]');
-    
+
     $activeThemeSelect.find('option').each(function() {
         const supportsMultiLevel = $(this).data('multi-level-menu');
         $(this).prop('disabled', isChecked ? !supportsMultiLevel : supportsMultiLevel);
@@ -1811,19 +1811,19 @@ let initAll = function () {
     e.preventDefault();
     asyncAlert(
       'Do you want to generate the module and entities and replace the existing files?',  // Message to display in the modal
-      'Confirmation',  
+      'Confirmation',
       [
         {
-          'caption': 'Yes',  
+          'caption': 'Yes',
           'fn': () => {
             generateScript($(".main-table tbody"));
-          },  
-          'class': 'btn-primary'  
+          },
+          'class': 'btn-primary'
         },
         {
-          'caption': 'No',  
-          'fn': () => { },  
-          'class': 'btn-secondary'  
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
         }
       ]
     );
@@ -1852,7 +1852,7 @@ let initAll = function () {
   $(document).on("change", ".input-element-type", function (e) {
     let checkedValue = $(this).val();  // Get the value of the selected radio button
     let name = $(this).attr('name');  // Get the name of the radio button group
-    
+
     // Remove 'checked' attribute from all radio buttons with the same 'name' in the same row
     $(this).closest('tr').find('input[type="radio"][name="'+name+'"]').each(function() {
         // Remove the checked status from all radio buttons
@@ -1921,7 +1921,7 @@ let initAll = function () {
       {
         referenceDialog.find('.input-with-checker').attr('data-valid', 'true');
       }
-      
+
     }
     referenceDialog.attr('data-type', 'reference');
     referenceDialog.modal("show");
@@ -1987,15 +1987,15 @@ let initAll = function () {
     let key = referenceDialog.attr("data-input-name");
     let value = JSON.stringify(serializeForm());
     $('[name="' + key + '"]').val(value);
-    
-    let valid = (referenceDialog.attr('data-type') == 'filter' && referenceDialog.find('.entity-section .input-with-checker[data-valid="true"]').length >= 4) || 
+
+    let valid = (referenceDialog.attr('data-type') == 'filter' && referenceDialog.find('.entity-section .input-with-checker[data-valid="true"]').length >= 4) ||
     (referenceDialog.attr('data-type') == 'reference' && referenceDialog.find('.entity-section .input-with-checker[data-valid="true"]').length >= 6);
-    
+
     $('[name="' + key + '"]').closest('td').attr('data-valid', valid ? 'true' : 'false');
-    
+
     referenceDialog.modal("hide");
-    
-    
+
+
   });
 
   $(document).on("click", "#save_to_cache", function (e) {
@@ -2092,7 +2092,7 @@ let initAll = function () {
           }
         ]
       );
-      
+
     }
   });
 
@@ -2133,7 +2133,7 @@ let initAll = function () {
       $('#ajax_support')[0].disabled = false;
     }
   });
-  
+
   $(document).on("change", ".entity-create-new", function (e) {
     let ents = getEntitySelection();
     let merged = $(".entity-merge")[0].checked;
@@ -2179,9 +2179,9 @@ let initAll = function () {
     if (name != "" && id != "" && directory != "" && author != "") {
       showWaitingScreen();
       increaseAjaxPending();
-      
+
       setCheckingStatus(id, (new Date()).getTime());
-      
+
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-create.php",
@@ -2311,7 +2311,7 @@ let initAll = function () {
       el.closest('li').addClass("selected-file");
     }, lineNumber);
   });
-  
+
   $(document).on("click", ".validator-container-file .validator-li a", function (e) {
     e.preventDefault();
     let validatorName = $(this).attr("data-validator-name");
@@ -2357,7 +2357,7 @@ let initAll = function () {
     e.preventDefault();
     saveEntityAs();
   });
-  
+
   $(document).on("click", "#button_save_validator_file", function (e) {
     e.preventDefault();
     saveValidator();
@@ -2375,13 +2375,13 @@ let initAll = function () {
 
   $("tbody.data-table-manual-sort").each(function () {
     let dataToSort = $(this)[0];
-  
+
     // Initialize Sortable for the table
     Sortable.create(dataToSort, {
       animation: 150,
       scroll: true,
       handle: ".data-sort-handler",
-  
+
       onStart: function (e1) {
         if (e1.item) {
           // Process checkboxes first
@@ -2395,11 +2395,11 @@ let initAll = function () {
               input.removeAttribute('checked');
             }
           });
-  
+
           // Process radios by group (name)
           let radioInputs = e1.item.querySelectorAll('input[type="radio"]');
           let radioNames = [...new Set([...radioInputs].map(r => r.name))]; // get unique names
-  
+
           radioNames.forEach(function (name) {
             let group = e1.item.querySelectorAll(`input[type="radio"][name="${name}"]`);
             group.forEach(function (input) // NOSONAR
@@ -2415,11 +2415,11 @@ let initAll = function () {
           });
         }
       },
-  
+
       onEnd: function (e1) {
         let checkboxes = e1.item.querySelectorAll('input[type="checkbox"]');
         let radios = e1.item.querySelectorAll('input[type="radio"]');
-  
+
         setTimeout(function () {
           // Restore checkbox state
           checkboxes.forEach(function (input) // NOSONAR
@@ -2433,10 +2433,10 @@ let initAll = function () {
             }
             input.removeAttribute('data-checked');
           });
-  
+
           // Restore radio state by group
           let radioNames = [...new Set([...radios].map(r => r.name))]; // NOSONAR
-  
+
           radioNames.forEach(function (name) // NOSONAR
           {
             let group = e1.item.querySelectorAll(`input[type="radio"][name="${name}"]`);
@@ -2456,7 +2456,7 @@ let initAll = function () {
     });
   });
 
-  
+
 
   $(document).on('click', '.add_suffix', function (e) {
     let entityName = $('.rd-entity-name').val();
@@ -2472,10 +2472,10 @@ let initAll = function () {
 
     asyncAlert(
       'Are you sure you want to generate the entity and replace the existing file?',  // Message to display in the modal
-      'Entity Generation Confirmation',  
+      'Entity Generation Confirmation',
       [
         {
-          'caption': 'Yes', 
+          'caption': 'Yes',
           'fn': () => {
             increaseAjaxPending();
             $.ajax({
@@ -2490,13 +2490,13 @@ let initAll = function () {
                 updateEntityRelationshipDiagram();
               },
             });
-          },  
-          'class': 'btn-primary'  
+          },
+          'class': 'btn-primary'
         },
         {
-          'caption': 'No',  
-          'fn': () => { },  
-          'class': 'btn-secondary'  
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
         }
       ]
     );
@@ -2595,19 +2595,19 @@ let initAll = function () {
       let row = $(this).closest('tr');
       asyncAlert(
         'Deleting this path will not remove the directory or its files. <br>Do you want to delete this path?',  // Message to display in the modal
-        'Deletion Confirmation',  
+        'Deletion Confirmation',
         [
           {
-            'caption': 'Yes',  
+            'caption': 'Yes',
             'fn': () => {
               row.remove();
-            },  
-            'class': 'btn-primary'  
+            },
+            'class': 'btn-primary'
           },
           {
-            'caption': 'No',  
-            'fn': () => { },  
-            'class': 'btn-secondary'  
+            'caption': 'No',
+            'fn': () => { },
+            'class': 'btn-secondary'
           }
         ]
       );
@@ -2660,7 +2660,7 @@ let initAll = function () {
       type: 'GET',
       url: 'lib.ajax/application-new.php',
       success: function (data) {
-        decreaseAjaxPending();       
+        decreaseAjaxPending();
         if (data.application_workspace.length == 0) {
           let alertDiv = $('<div />');
           alertDiv.addClass('alert alert-warning');
@@ -2791,14 +2791,14 @@ let initAll = function () {
     $('.target-language').val(val);
     reloadTranslate(translateFor);
   });
-  
+
   $(document).on('change', '.target-language-app', function (e) {
     let val = $(this).val();
     $('.target-language').val(val);
     loadAppTranslation();
   });
-  
-  $(document).on('click', '.reload-app-translation', function (e) {    
+
+  $(document).on('click', '.reload-app-translation', function (e) {
     loadAppTranslation();
   });
 
@@ -2874,16 +2874,16 @@ let initAll = function () {
         'Deletion Confirmation',  // Modal title
         [
           {
-            'caption': 'Yes',  
+            'caption': 'Yes',
             'fn': () => {
               row.remove();
-            },  
-            'class': 'btn-primary'  
+            },
+            'class': 'btn-primary'
           },
           {
-            'caption': 'No',  
-            'fn': () => { },  
-            'class': 'btn-secondary'  
+            'caption': 'No',
+            'fn': () => { },
+            'class': 'btn-secondary'
           }
         ]
       );
@@ -2935,7 +2935,7 @@ let initAll = function () {
     let select = $('.target-language');
     if (languages.length > 0) {
       increaseAjaxPending();
-      
+
       $.ajax({
         method: "POST",
         url: "lib.ajax/application-language.php",
@@ -2970,10 +2970,10 @@ let initAll = function () {
     let modal = $(this).closest('.modal');
     asyncAlert(
       'Do you want to execute the queries on the current database?',  // Message to display in the modal
-      'Query Execution Confirmation',  
+      'Query Execution Confirmation',
       [
         {
-          'caption': 'Yes', 
+          'caption': 'Yes',
           'fn': () => {
             let query = cmEditorSQLExecute.getDoc().getValue();
             $('.button-execute-query')[0].disabled = true;
@@ -2995,13 +2995,13 @@ let initAll = function () {
                 decreaseAjaxPending();
               }
             });
-          },  
-          'class': 'btn-primary'  
+          },
+          'class': 'btn-primary'
         },
         {
-          'caption': 'No',  
-          'fn': () => { },  
-          'class': 'btn-secondary'  
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
         }
       ]
     );
@@ -3128,12 +3128,12 @@ let initAll = function () {
 
     asyncAlert(
       'Are yo sure you want to rebuild the application?',  // Message to display in the modal
-      'Rebuild Application Confirmation',  
+      'Rebuild Application Confirmation',
       [
         {
-          'caption': 'Yes', 
+          'caption': 'Yes',
           'fn': () => {
-            
+
             rebuildButton.html('<i class="fas fa-spinner fa-spin"></i> Rebuilding...').prop('disabled', true);
 
             increaseAjaxPending();
@@ -3151,7 +3151,7 @@ let initAll = function () {
                   data: { applicationId: applicationId},
                   dataType: 'html',
                   success: function (data) {
-                    
+
                     decreaseAjaxPending();
                     $('#modal-application-option').attr('data-application-id', applicationId);
                     $('#modal-application-option .application-option').empty().append(data);
@@ -3177,20 +3177,20 @@ let initAll = function () {
                 decreaseAjaxPending();
               }
             });
-          },  
-          'class': 'btn-primary'  
+          },
+          'class': 'btn-primary'
         },
         {
-          'caption': 'No',  
-          'fn': () => { },  
-          'class': 'btn-secondary'  
+          'caption': 'No',
+          'fn': () => { },
+          'class': 'btn-secondary'
         }
       ]
     );
 
-    
-    
-    
+
+
+
   });
 
   $(document).on("click", ".button-check-application-valid", function (e) {
@@ -3231,7 +3231,7 @@ let initAll = function () {
       }
     });
   });
-  
+
   $(document).on('click', '.button-application-option', function (e) {
     e.preventDefault();
     let updateBtn = $('#modal-application-option .button-save-application-option');
@@ -3262,18 +3262,18 @@ let initAll = function () {
           updateBtn[0].disabled = false;
           updateBtn[0].style.display = '';
         }
-      
+
       },
       error: function (xhr, status, error) {
         decreaseAjaxPending();
       }
     });
   });
-  
+
   // When the "Import Application" button is clicked
   $(document).on('click', '.button-import-application', function (e) {
       e.preventDefault();
-      
+
       // Display initial info message in modal
       $('#tab-pane-from-config .import-message').html('<div class="alert alert-info">Select file to import the application.</div>');
       $('#tab-pane-from-existing .import-message').html('<div class="alert alert-info">Type existing application directory to import the application.</div>');
@@ -3301,7 +3301,7 @@ let initAll = function () {
       $('#tab-pane-from-config [name="application_id"]').val('');
       $('#tab-pane-from-config [name="file_name"]').val('');
   });
-  
+
   // Preview file (called first when user selects file)
   $(document).on('change', '#import-application-file', function () {
       if (this.files.length > 0) {
@@ -3313,20 +3313,20 @@ let initAll = function () {
   $(document).on('click', '.button-save-application-import', function () {
       importApplication();
   });
-  
-  
+
+
   $(document).on("click", ".button-save-application-option", function (e) {
     e.preventDefault();
     let form = $(this).closest(".modal").find('form');
     $.ajax({
       type: 'POST',
       url: 'lib.ajax/application-option.php',
-      data: { 
-        userAction: 'save', 
-        developmentMode: form.find('[name="development_mode"]:checked').val(), 
-        bypassRole: form.find('[name="bypass_role"]:checked').val(), 
+      data: {
+        userAction: 'save',
+        developmentMode: form.find('[name="development_mode"]:checked').val(),
+        bypassRole: form.find('[name="bypass_role"]:checked').val(),
         accessLocalhostOnly: form.find('[name="access_localhost_only"]:checked').val(),
-        applicationId: form.closest('.modal').attr('data-application-id') 
+        applicationId: form.closest('.modal').attr('data-application-id')
       },
       success: function (data) {
         let modal = form.closest('.modal');
@@ -3348,7 +3348,7 @@ let initAll = function () {
       }
     });
   });
-  
+
   $(document).on('click', '#create-user', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
@@ -3368,7 +3368,7 @@ let initAll = function () {
       }
     });
   });
-  
+
   $(document).on('click', '#reset-user-password', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
@@ -3393,7 +3393,7 @@ let initAll = function () {
       }
     });
   });
-  
+
   $(document).on('click', '#set-user-role', function (e) {
     e.preventDefault();
     let modal = $(this).closest('.modal');
@@ -3443,8 +3443,8 @@ let initAll = function () {
       }
     });
   });
-  
-  
+
+
   $(document).on('click', '.button-application-database', function (e) {
     e.preventDefault();
     let applicationId = $(this).closest('.application-item').attr('data-application-id');
@@ -3631,10 +3631,10 @@ let initAll = function () {
       }
     });
   });
-  
+
   $(document).on('click', '.button-application-export', function (e) {
     e.preventDefault();
-    
+
     let applicationId = $(this).closest('.application-item').attr('data-application-id') || '';
 
     // Create a temporary form
@@ -3662,7 +3662,7 @@ let initAll = function () {
 
   $(document).on('click', '.button-workspace-export', function (e) {
     e.preventDefault();
-    
+
     let workspaceId = $(this).closest('.workspace-item').attr('data-workspace-id') || '';
 
     // Create a temporary form
@@ -3990,7 +3990,7 @@ let initAll = function () {
 });
 
 
-  
+
   $(document).on('click', '.button-open-file', function(e1){
     let el = document.querySelector('#sqlFileInput');
     if(el)
@@ -3999,19 +3999,19 @@ let initAll = function () {
     }
     const inputFile = document.createElement('input');
     inputFile.type = 'file';
-    inputFile.accept = '.sql';  
+    inputFile.accept = '.sql';
     inputFile.id = 'sqlFileInput';
     inputFile.style.position = 'absolute';
     inputFile.style.left = '-1000000px';
     inputFile.style.top = '-1000000px';
     document.querySelector('body').appendChild(inputFile);
     inputFile.addEventListener('change', function handleFileSelect(event) {
-      const file = event.target.files[0]; 
-      if (file) 
+      const file = event.target.files[0];
+      if (file)
       {
         const reader = new FileReader();
         reader.onload = function(e2) {
-          const content = e2.target.result; 
+          const content = e2.target.result;
           inputFile.parentNode.removeChild(inputFile);
           cmEditorSQLExecute.getDoc().setValue(content);
           cmEditorSQLExecute.refresh();
@@ -4061,7 +4061,7 @@ let initAll = function () {
     }
     showDataFormatDialog(fieldName, dataType, currentFormat);
   });
-  
+
   $(document).on('change', '.input-element-type', function(e1){
     let tr = $(this).closest('tr');
     if($(this)[0].checked)
@@ -4083,7 +4083,7 @@ let initAll = function () {
       tr.attr('data-element-type', elementType);
     }
   });
-  
+
   $(document).on('change', '.input-field-filter', function(e1){
     let tr = $(this).closest('tr');
     if($(this)[0].checked)
@@ -4091,14 +4091,14 @@ let initAll = function () {
       if(isSupportMultiple($(this).val()))
       {
         tr.find('.input-multiple-filter')[0].disabled = false;
-        
+
         tr.find('.input-exact-filter')[0].disabled = false;
       }
       else
       {
         tr.find('.input-multiple-filter')[0].disabled = true;
         tr.find('.input-multiple-filter')[0].checked = false;
-        
+
         tr.find('.input-exact-filter')[0].disabled = true;
         tr.find('.input-exact-filter')[0].checked = false;
       }
@@ -4107,7 +4107,7 @@ let initAll = function () {
     {
       tr.find('.input-multiple-filter')[0].disabled = true;
       tr.find('.input-multiple-filter')[0].checked = false;
-      
+
       tr.find('.input-exact-filter')[0].disabled = true;
       tr.find('.input-exact-filter')[0].checked = false;
     }
@@ -4117,7 +4117,7 @@ let initAll = function () {
     e1.preventDefault();
     loadMenu();
   });
-  
+
   $(document).on('change', '.directory-container input[type="text"]', function(e1){
     let input = $(this);
     checkWriretableDirectory(input);
@@ -4134,15 +4134,15 @@ let initAll = function () {
   $(document).on('click', '#button-save-data-format', function(e1){
     saveDataFormat();
   });
-  
+
   $(document).on('change', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-object-name, .rd-reference-property-name', function(e){
     validateReference();
   });
-  
+
   $(document).on('change', '.rd-entity-name', function(e){
     validateEntityName();
   });
-  
+
   $(document).on('focus', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
     let value = $(this).val();
     let td = $(this).closest('td');
@@ -4153,10 +4153,10 @@ let initAll = function () {
   $(document).on('blur', '.rd-table-name, .rd-primary-key, .rd-value-column, .rd-reference-property-name', function(e){
     let td = $(this).closest('td');
     setTimeout(function(){
-      td.attr('data-focus', 'false');  
+      td.attr('data-focus', 'false');
     }, 240);
   });
-  
+
   $(document).on('click', '.primary-key-list a, .column-list a', function(e){
     e.preventDefault();
     let column = $(this).attr('data-column');
@@ -4166,7 +4166,7 @@ let initAll = function () {
     input.val(column);
     input.closest('.input-with-checker').attr('data-valid', 'true');
   });
-  
+
   $(document).on('click', '.table-list a', function(e){
     e.preventDefault();
     let table = $(this).attr('data-table');
@@ -4200,7 +4200,7 @@ let initAll = function () {
 };
 
 /**
- * Updates the current application menu by sending an AJAX request to the server. 
+ * Updates the current application menu by sending an AJAX request to the server.
  * @param {string} moduleMenu Current module menu.
  */
 function updateCurrentApplivationMenu(moduleMenu)
@@ -4222,24 +4222,24 @@ function updateCurrentApplivationMenu(moduleMenu)
 }
 
 /**
- * Validates the class name to ensure it starts with an uppercase letter and 
+ * Validates the class name to ensure it starts with an uppercase letter and
  * only contains alphanumeric characters.
- * 
+ *
  * @param {string} className - The class name to validate.
  * @returns {boolean} - Returns true if the class name is valid, false otherwise.
  */
 function validateClassName(className) {
-  // Regular expression to ensure class name starts with an uppercase letter 
+  // Regular expression to ensure class name starts with an uppercase letter
   // and only contains alphanumeric characters (letters and digits).
-  let regex = /^[A-Z][a-zA-Z0-9]*$/; 
+  let regex = /^[A-Z][a-zA-Z0-9]*$/;
   return regex.test(className);
 }
 
 /**
- * Validates the entity name input field by checking if the entered value is 
+ * Validates the entity name input field by checking if the entered value is
  * a valid class name.
- * 
- * This function updates the data-valid attribute of the entity name container 
+ *
+ * This function updates the data-valid attribute of the entity name container
  * based on whether the class name is valid or not.
  */
 function validateEntityName() {
@@ -4254,10 +4254,10 @@ function validateEntityName() {
 }
 
 /**
- * Validates the reference information by making an AJAX request to check 
+ * Validates the reference information by making an AJAX request to check
  * if the reference values (e.g., table name, primary key, etc.) are valid.
- * 
- * This function updates the data-valid attribute of various containers based 
+ *
+ * This function updates the data-valid attribute of various containers based
  * on the validation results from the server response.
  */
 function validateReference() {
@@ -4278,7 +4278,7 @@ function validateReference() {
   let valueColumnContainer = $('.rd-value-column-container');
   let referenceObjectNameContainer = $('.rd-reference-object-name-container');
   let referencePropertyNameContainer = $('.rd-reference-property-name-container');
-  
+
   // Set loading state to true for all containers
   tableContainer.attr('data-loading', 'true');
   primaryKeyContainer.attr('data-loading', 'true');
@@ -4306,14 +4306,14 @@ function validateReference() {
       valueColumnContainer.attr('data-loading', 'false');
       referenceObjectNameContainer.attr('data-loading', 'false');
       referencePropertyNameContainer.attr('data-loading', 'false');
-      
+
       // Update the data-valid attribute for each container based on the server response
       tableContainer.attr('data-valid', data.tableName ? 'true' : 'false');
       primaryKeyContainer.attr('data-valid', data.primaryKey ? 'true' : 'false');
       valueColumnContainer.attr('data-valid', data.valueColumn ? 'true' : 'false');
       referenceObjectNameContainer.attr('data-valid', data.referenceObjectName ? 'true' : 'false');
       referencePropertyNameContainer.attr('data-valid', data.referencePropertyName ? 'true' : 'false');
-      
+
       let ul1 = $('<ul />');
       for(let i in data.primaryKeys)
       {
@@ -4321,7 +4321,7 @@ function validateReference() {
         ul1.append(li1);
       }
       $('.primary-key-list').append(ul1);
-      
+
       let ul2 = $('<ul />');
       for(let i in data.columns)
       {
@@ -4336,7 +4336,7 @@ function validateReference() {
         );
       }
       $('.column-list').append(ul2);
-      
+
       if(!data.tableName)
       {
         let ul3 = $('<ul />');
@@ -4347,7 +4347,7 @@ function validateReference() {
         }
         $('.table-list').append(ul3);
       }
-      
+
     },
     error: function (e1, e2)
     {
@@ -4435,7 +4435,7 @@ function showDataFormatDialog(fieldName, dataType, currentFormat) {
   $('#input-control-decimal').val('');
   $('#input-control-decimal-separator').val('');
   $('#input-control-thousands-separator').val('');
-  
+
   if(formatType == 'stringFormat')
   {
     $('#input-control-string-format').val(currentFormat.stringFormat || '');
@@ -4474,7 +4474,7 @@ function showDataFormatDialog(fieldName, dataType, currentFormat) {
 
 /**
  * Initiates the download of a Markdown file for the entity-relationship diagram.
- * 
+ *
  * - Collects selected entities from checkboxes.
  * - Appends a random timestamp to avoid caching issues.
  * - Constructs a URL and triggers the download.
@@ -4498,7 +4498,7 @@ let checkTimeout = setTimeout('', 10000);
 
 /**
  * Updates the application namespace and application ID based on the provided application name.
- * 
+ *
  * @param {string} applicationName - The name of the application entered by the user.
  */
 function changeApplicationName(applicationName) {
@@ -4522,7 +4522,7 @@ function changeApplicationName(applicationName) {
 
 /**
  * Updates the application ID field and triggers an update for the application directory.
- * 
+ *
  * @param {string} applicationId - The formatted application ID.
  */
 function changeApplicationId(applicationId) {
@@ -4532,7 +4532,7 @@ function changeApplicationId(applicationId) {
 
 /**
  * Updates the application directory path based on the application ID.
- * 
+ *
  * @param {string} applicationId - The application ID used to rename the directory.
  */
 function changeApplicationDirectory(applicationId) {
@@ -4557,7 +4557,7 @@ function changeApplicationDirectory(applicationId) {
 
 /**
  * Replaces the basename of a directory path with a new name, keeping the original separator format.
- * 
+ *
  * @param {string} dirPath - The full directory path.
  * @param {string} newBasename - The new basename to replace the existing one.
  * @returns {string} The updated directory path.
@@ -4579,16 +4579,16 @@ function replaceBasename(dirPath, newBasename) {
 /**
  * Checks if the specified directory is writable and updates the UI accordingly.
  *
- * This function sends an AJAX request to the server to check if the given directory 
- * is writable. It updates the associated UI container with a loading state during 
- * the request and changes the state to indicate whether the directory is writable 
- * or not once the response is received. The result is reflected in the `data-valid` 
- * attribute of the closest `.directory-container` element. It also handles the case 
+ * This function sends an AJAX request to the server to check if the given directory
+ * is writable. It updates the associated UI container with a loading state during
+ * the request and changes the state to indicate whether the directory is writable
+ * or not once the response is received. The result is reflected in the `data-valid`
+ * attribute of the closest `.directory-container` element. It also handles the case
  * where the directory is being checked for being a file or directory.
  *
  * @param {HTMLElement} input - The input element that triggers the directory check.
  *                               This input element contains the directory path.
- * 
+ *
  * @returns {void}
  */
 function checkWriretableDirectory(input)
@@ -4598,7 +4598,7 @@ function checkWriretableDirectory(input)
     let failedIfExists = container.attr('data-failed-if-exists') || '';
     let directory = input.val() || '';
     directory = directory.trim();
-    
+
     if(directory != '' && directory != '/' && directory != '\\')
     {
       container.attr('data-loading', 'true');
@@ -4606,7 +4606,7 @@ function checkWriretableDirectory(input)
         method: 'POST',
         url: 'lib.ajax/directory-writeable-test.php',
         data: {
-          directory: directory, 
+          directory: directory,
           isfile: isFile,
           failedIfExists: failedIfExists
         },
@@ -4635,13 +4635,13 @@ function checkWriretableDirectory(input)
 /**
  * Resets the writable directory check by removing the `data-valid` and `data-loading` attributes.
  *
- * This function clears the results of the directory writable check by removing the 
- * `data-valid` and `data-loading` attributes from the closest `.directory-container` 
+ * This function clears the results of the directory writable check by removing the
+ * `data-valid` and `data-loading` attributes from the closest `.directory-container`
  * element, effectively resetting the UI state.
  *
  * @param {HTMLElement} input - The input element that triggers the reset of the directory check.
  *                               This input element is used to find the closest `.directory-container`.
- * 
+ *
  * @returns {void}
  */
 function resetCheckWriretableDirectory(input)
@@ -4653,17 +4653,17 @@ function resetCheckWriretableDirectory(input)
 
 /**
  * Updates the application form with dynamic data for workspace, installation method, and magic app versions.
- * 
- * This function populates the dropdown options in a form using the provided data object. It adds options to 
- * the "application_workspace_id" and "installation_method" fields, setting the selected and disabled attributes 
- * based on the data. It also populates the "magic_app_version" field with a list of versions and highlights 
+ *
+ * This function populates the dropdown options in a form using the provided data object. It adds options to
+ * the "application_workspace_id" and "installation_method" fields, setting the selected and disabled attributes
+ * based on the data. It also populates the "magic_app_version" field with a list of versions and highlights
  * the latest version.
- * 
+ *
  * @param {Object} data - The data object containing the information to update the form with.
  * @param {Array} data.application_workspace - A list of workspaces, each containing a label, value, and selected flag.
- * @param {Array} data.installation_method - A list of installation methods, each containing a label, value, 
+ * @param {Array} data.installation_method - A list of installation methods, each containing a label, value,
  *                                          selected flag, and disabled flag.
- * @param {Array} data.magic_app_versions - A list of magic app versions, each containing a value, key, 
+ * @param {Array} data.magic_app_versions - A list of magic app versions, each containing a value, key,
  *                                           and a flag indicating the latest version.
  */
 function updateNewApplicationForm(data) {
@@ -4729,7 +4729,7 @@ function showApplicationMenuDialog(applicationId) {
 
 /**
  * Loads reference resource content via an AJAX GET request.
- * 
+ *
  * - Increases the AJAX pending counter before making the request.
  * - Fetches the reference resource from 'lib.ajax/reference.min.html'.
  * - Stores the retrieved data in `referenceResource` on success.
@@ -4753,18 +4753,18 @@ function loadReferenceResource()
 }
 
 /**
- * Generates a favicon.ico by creating multiple icon sizes (16x16, 32x32, 48x48) 
+ * Generates a favicon.ico by creating multiple icon sizes (16x16, 32x32, 48x48)
  * and sending them to the server to create a single ICO file.
- * 
- * @param {string} applicationId - The unique identifier for the application. 
+ *
+ * @param {string} applicationId - The unique identifier for the application.
  *                                  This ID will be associated with the uploaded favicon.
- * @param {HTMLImageElement} image - The image to generate the favicon from. 
+ * @param {HTMLImageElement} image - The image to generate the favicon from.
  *                                    This image is used to create the different icon sizes.
  */
 function generateFaviconICO(applicationId, image) {
   const sizes = [
-    16, 
-    32, 
+    16,
+    32,
     48
   ];  // Favicon sizes for ICO (can include more if necessary)
   const canvas = document.createElement('canvas');
@@ -4776,7 +4776,7 @@ function generateFaviconICO(applicationId, image) {
       canvas.height = size;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
-      
+
       // Push the canvas data for each size
       const dataUrl = canvas.toDataURL('image/png');
       iconImages.push(dataUrl);
@@ -4847,10 +4847,10 @@ function resetCheckActiveWorkspace() {
 
 /**
  * Resets and initializes a periodic check for active application changes.
- * This function compares the current application ID stored in `localStorage` 
- * with the value in the `application-id` meta tag. If the IDs differ, it triggers 
+ * This function compares the current application ID stored in `localStorage`
+ * with the value in the `application-id` meta tag. If the IDs differ, it triggers
  * the `loadAllResource` function to reload all resources.
- * 
+ *
  * The check is performed every 22 seconds.
  */
 function resetCheckActiveApplication() {
@@ -4867,7 +4867,7 @@ function resetCheckActiveApplication() {
 /**
  * Loads the list of workspaces via an AJAX request and updates the UI.
  *
- * This function makes a GET request to fetch the list of workspaces from 
+ * This function makes a GET request to fetch the list of workspaces from
  * the server. The returned data is used to update the `.workspace-card` element.
  * It also identifies the currently selected workspace, updates the `workspace-id`
  * in `localStorage`, and sets the `workspace-id` meta tag with the selected value.
@@ -4890,7 +4890,7 @@ function loadWorkspaceList() {
 /**
  * Loads the list of applications via an AJAX request and updates the UI.
  *
- * This function makes a GET request to fetch the list of applications from 
+ * This function makes a GET request to fetch the list of applications from
  * the server. The returned data is used to update the `.application-card` element.
  * It also identifies the currently selected application, updates the `application-id`
  * in `localStorage`, and sets the `application-id` meta tag with the selected value.
@@ -4919,7 +4919,7 @@ function loadApplicationList(showHidden = false) {
 /**
  * Loads the list of applications via an AJAX request and updates the UI.
  *
- * This function makes a GET request to fetch the list of applications from 
+ * This function makes a GET request to fetch the list of applications from
  * the server. The returned data is used to update the `.application-card` element.
  * It identifies the currently selected application, updates the `application-id`
  * in `localStorage`, and sets the `application-id` meta tag with the selected value.
@@ -4955,8 +4955,8 @@ function loadLanguageList() {
 /**
  * Loads the list of application languages or paths via an AJAX request.
  *
- * This function makes a GET request to fetch data from 
- * `lib.ajax/application-language-list.php`. The response is expected to be in JSON format. 
+ * This function makes a GET request to fetch data from
+ * `lib.ajax/application-language-list.php`. The response is expected to be in JSON format.
  * The retrieved data is then passed to the `setLanguage` function for further processing.
  */
 function loadPathList() {
@@ -4975,8 +4975,8 @@ function loadPathList() {
 /**
  * Updates the SQL query editor by clearing its content and execution results.
  *
- * This function calls `clearEditorSQL` to clear the SQL editor's current content 
- * and `clearEditorSQLExecute` to clear the execution results of the SQL query. 
+ * This function calls `clearEditorSQL` to clear the SQL editor's current content
+ * and `clearEditorSQLExecute` to clear the execution results of the SQL query.
  * It ensures that the editor is reset to a clean state.
  */
 function updateQuery()
@@ -5003,18 +5003,18 @@ function loadAllResource(showHidden = false) {
   loadApplicationList(showHidden);
   loadPathList();
   loadLanguageList();
-  
+
   loadMenu();
   loadTable();
   updateEntityQuery(false);
-  
+
   updateEntityRelationshipDiagram();
   updateEntityFile();
   updateValidatorFile();
   updateModuleFile();
   resetFileManager();
   initTooltip();
-  
+
 }
 
 /**
@@ -5030,7 +5030,7 @@ function onSetDefaultWorkspace() {
 /**
  * Sets the default application and loads the necessary resources.
  *
- * This function reloads the application list, tables, and menus. It also updates 
+ * This function reloads the application list, tables, and menus. It also updates
  * entity queries, diagrams, files, and initializes tooltips for the default application.
  */
 function onSetDefaultApplication() {
@@ -5051,7 +5051,7 @@ function onSetDefaultApplication() {
 /**
  * Updates resources when a new module is created.
  *
- * This function updates entity queries, diagrams, and files, and reinitializes tooltips 
+ * This function updates entity queries, diagrams, and files, and reinitializes tooltips
  * to reflect the changes caused by the creation of a new module.
  */
 function onModuleCreated() {
@@ -5067,7 +5067,7 @@ function onModuleCreated() {
 /**
  * Clears the content of the entity relationship diagram (ERD).
  *
- * This function empties the `.erd-image` element and the `[name="erd-map"]` element 
+ * This function empties the `.erd-image` element and the `[name="erd-map"]` element
  * to reset the ERD display.
  */
 function updateErd()
@@ -5077,12 +5077,12 @@ function updateErd()
 }
 
 /**
- * Initializes tooltips for elements with the `data-toggle="tooltip"` attribute 
- * or areas inside an element with `name="erd-map"`. 
+ * Initializes tooltips for elements with the `data-toggle="tooltip"` attribute
+ * or areas inside an element with `name="erd-map"`.
  *
- * This function listens for `mouseenter` and `mouseleave` events to show and hide 
- * tooltips. It dynamically positions the tooltip based on mouse movement to ensure 
- * that the tooltip does not go off-screen. The tooltip's content is fetched from 
+ * This function listens for `mouseenter` and `mouseleave` events to show and hide
+ * tooltips. It dynamically positions the tooltip based on mouse movement to ensure
+ * that the tooltip does not go off-screen. The tooltip's content is fetched from
  * the `data-title` or `title` attribute of the element.
  */
 function initTooltip() {
@@ -5122,7 +5122,7 @@ function initTooltip() {
           mouseY = 16;
         }
       }
-      
+
       // Update the position of the tooltip based on the cursor position
       tooltip.css({
         left: mouseX,
@@ -5143,10 +5143,10 @@ function initTooltip() {
 /**
  * Displays a custom modal with dynamic buttons and message.
  *
- * This function creates and displays a modal with the specified message, title, 
- * and a set of dynamic buttons. Each button is associated with a caption, a class 
+ * This function creates and displays a modal with the specified message, title,
+ * and a set of dynamic buttons. Each button is associated with a caption, a class
  * (optional), and a callback function that is executed when the button is clicked.
- * The modal also listens for the `hidden.bs.modal` event to execute a provided callback 
+ * The modal also listens for the `hidden.bs.modal` event to execute a provided callback
  * when the modal is closed.
  *
  * @param {string} message The content/message to be displayed inside the modal.
@@ -5204,9 +5204,9 @@ function showModal(message, title, buttons, onHideCallback) {
 /**
  * Displays a prompt modal with a text input field and dynamic buttons.
  *
- * This function creates and displays a modal with a message, a title, a text input field, 
- * and a set of dynamic buttons. The user can enter a value into the input field and click one 
- * of the buttons to submit the value or cancel the action. The modal also listens for the 
+ * This function creates and displays a modal with a message, a title, a text input field,
+ * and a set of dynamic buttons. The user can enter a value into the input field and click one
+ * of the buttons to submit the value or cancel the action. The modal also listens for the
  * `hidden.bs.modal` event to execute a provided callback when the modal is closed.
  *
  * @param {string} message The content/message to be displayed inside the modal.
@@ -5218,7 +5218,7 @@ function showModal(message, title, buttons, onHideCallback) {
  * @param {string} initialValue The initial value to be displayed in the input field (optional).
  * @param {Function} [onHideCallback] (Optional) A callback function to be executed when the modal is hidden.
  *
- * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked, 
+ * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked,
  * or the caption of any other clicked button.
  */
 function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
@@ -5279,8 +5279,8 @@ function asyncPrompt(message, title, buttons, initialValue, onHideCallback) {
 
 /**
  * Displays an alert modal with dynamic buttons and waits for the user's interaction.
- * 
- * This function shows a modal with a message, title, and dynamically created buttons. It waits for the user to press one of the buttons and resolves the action. 
+ *
+ * This function shows a modal with a message, title, and dynamically created buttons. It waits for the user to press one of the buttons and resolves the action.
  * Once the modal is closed, it hides the overlay and restores the overflow styles of the modal.
  *
  * @param {string} message The content/message to display in the alert.
@@ -5308,9 +5308,9 @@ function asyncAlert(message, title, buttons) {
 /**
  * Prompts the user for input using the `asyncPrompt` function and returns the user's input.
  *
- * This function displays a prompt modal with a message, title, and initial input value. It also 
- * takes dynamic buttons and returns the value entered by the user when they click the 'OK' button, 
- * or the caption of the button clicked if other than 'OK'. Once the modal is closed, it hides the 
+ * This function displays a prompt modal with a message, title, and initial input value. It also
+ * takes dynamic buttons and returns the value entered by the user when they click the 'OK' button,
+ * or the caption of the button clicked if other than 'OK'. Once the modal is closed, it hides the
  * overlay and restores the overflow styles of the modal.
  *
  * @param {string} message The content/message to display in the prompt.
@@ -5321,7 +5321,7 @@ function asyncAlert(message, title, buttons) {
  * - fn: The callback function to execute when the button is clicked.
  * @param {string} initialValue The initial value to be displayed in the input field (optional).
  *
- * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked, 
+ * @returns {Promise} A promise that resolves with the value entered in the input field when the 'OK' button is clicked,
  * or the caption of any other clicked button.
  */
 function getUserInput(message, title, buttons, initialValue) {
@@ -5377,8 +5377,8 @@ function initMenu() {
 /**
  * Enables inline editing of a menu item by replacing its text with an input field.
  *
- * This function transforms the menu item's text into an editable input field. 
- * When invoked, it finds the text associated with the menu item, hides it, and replaces it with a text input field 
+ * This function transforms the menu item's text into an editable input field.
+ * When invoked, it finds the text associated with the menu item, hides it, and replaces it with a text input field
  * that contains the current text. The input field is automatically focused and selected for easy editing.
  * After the input field is populated with the menu's current text, the user can modify it.
  *
@@ -5408,15 +5408,15 @@ let draggedItem = null;
 /**
  * Handles the start of a drag event for sortable submenu items.
  *
- * This function is triggered when a drag operation begins on an element. It checks if the dragged element 
- * is a valid submenu item and sets up the `draggedItem` for the drag operation. It also ensures that the 
+ * This function is triggered when a drag operation begins on an element. It checks if the dragged element
+ * is a valid submenu item and sets up the `draggedItem` for the drag operation. It also ensures that the
  * drag operation is allowed and sets the `effectAllowed` to 'move', indicating that the item will be moved during the drag.
  *
- * The function also supports cases where the target element is a child of a valid draggable element, 
+ * The function also supports cases where the target element is a child of a valid draggable element,
  * by traversing the DOM to find the closest parent that is a valid sortable item.
  *
  * @param {DragEvent} e The drag event triggered by the user. It contains information about the element being dragged.
- * 
+ *
  * @returns {void} This function does not return any value. It sets up the dragged element and the drag effect.
  */
 function dragStart(e) {
@@ -5438,12 +5438,12 @@ function dragStart(e) {
 /**
  * Handles the dragover event to allow an element to be a valid drop target.
  *
- * This function is triggered during the drag operation when an element is being dragged over a potential drop target. 
- * The `e.preventDefault()` method is called to prevent the default behavior, allowing the drop event to be triggered 
+ * This function is triggered during the drag operation when an element is being dragged over a potential drop target.
+ * The `e.preventDefault()` method is called to prevent the default behavior, allowing the drop event to be triggered
  * later. Without this, the drop action will not be allowed.
  *
  * @param {DragEvent} e The drag event triggered when the dragged item is over a potential drop target.
- * 
+ *
  * @returns {void} This function does not return any value. It prevents the default action to allow the drop event.
  */
 function dragOver(e) {
@@ -5452,16 +5452,16 @@ function dragOver(e) {
 
 /**
  * Handles the drop event to place a dragged item into a menu or submenu.
- * 
- * This function is triggered when an item is dropped into a valid drop target. 
- * It first checks if there is an item being dragged, then determines the 
- * appropriate drop target based on its class and structure. It supports adding 
- * the dragged item to either a top-level menu item or a submenu, and handles 
+ *
+ * This function is triggered when an item is dropped into a valid drop target.
+ * It first checks if there is an item being dragged, then determines the
+ * appropriate drop target based on its class and structure. It supports adding
+ * the dragged item to either a top-level menu item or a submenu, and handles
  * the expansion of the target menu items.
- * 
+ *
  * @param {DragEvent} e The drop event triggered when an item is dropped onto a target.
- * 
- * @returns {void} This function does not return any value. It modifies the DOM 
+ *
+ * @returns {void} This function does not return any value. It modifies the DOM
  * by adding the dragged item to the target menu or submenu.
  */
 function dropToMenu(e) {
@@ -5554,13 +5554,13 @@ function serializeMenu() {
 
 /**
  * Moves the specified item up in the list (either a menu item or a submenu item).
- * 
- * This function moves the target item (either a menu or submenu item) up by one 
- * position in the DOM relative to its previous sibling. If the item is already at the 
+ *
+ * This function moves the target item (either a menu or submenu item) up by one
+ * position in the DOM relative to its previous sibling. If the item is already at the
  * top, it remains in place.
  *
  * @param {HTMLElement} element The DOM element that is clicked to trigger the move up.
- * 
+ *
  * @returns {void} This function modifies the DOM by moving the item up, it does not return any value.
  */
 function moveUp(element) {
@@ -5573,13 +5573,13 @@ function moveUp(element) {
 
 /**
  * Moves the specified item down in the list (either a menu item or a submenu item).
- * 
- * This function moves the target item (either a menu or submenu item) down by one 
- * position in the DOM relative to its next sibling. If the item is already at the 
+ *
+ * This function moves the target item (either a menu or submenu item) down by one
+ * position in the DOM relative to its next sibling. If the item is already at the
  * bottom, it remains in place.
  *
  * @param {HTMLElement} element The DOM element that is clicked to trigger the move down.
- * 
+ *
  * @returns {void} This function modifies the DOM by moving the item down, it does not return any value.
  */
 function moveDown(element) {
@@ -5595,7 +5595,7 @@ function moveDown(element) {
  *
  * This function determines the appropriate translation function to call
  * based on the provided `translateFor` argument. It supports two contexts:
- * 
+ *
  * - "module": Calls the `translateModule` function to handle module translations.
  * - "entity": Calls the `translateEntity` function to handle entity translations.
  *
@@ -5735,25 +5735,25 @@ function translateModule() {
 
 /**
  * Sends the generated icon to the server for storage.
- * 
+ *
  * @param {string} applicationId - The ID of the application associated with the icon.
  * @param {string} dataUrl - The base64 encoded image data of the icon.
  * @param {string} iconName - The name of the icon file (e.g., "favicon-16x16.png").
- * 
- * This function creates a FormData object, appends the application ID, base64 image data, and icon name to it, 
- * and sends it to the server using a POST request. The server endpoint is expected to handle the image upload 
+ *
+ * This function creates a FormData object, appends the application ID, base64 image data, and icon name to it,
+ * and sends it to the server using a POST request. The server endpoint is expected to handle the image upload
  * and return a success or error response.
  */
 function sendIconPngToServer(applicationId, dataUrl, iconName) {
   // Create a new FormData object to send to the server
   const formData = new FormData();
-  
+
   // Append the application ID to the FormData object
   formData.append('application_id', applicationId);
-  
+
   // Append the base64 encoded image data (icon) to the FormData object
   formData.append('image', dataUrl);  // base64 image data
-  
+
   // Append the icon name (e.g., "favicon-16x16.png") to the FormData object
   formData.append('icon_name', iconName);
 
@@ -5775,7 +5775,7 @@ function sendIconPngToServer(applicationId, dataUrl, iconName) {
 
 /**
  * Sends the generated icon data to the server.
- * 
+ *
  * @param {string} applicationId - The unique identifier for the application.
  * @param {Array} iconImages - An array of base64 PNG images for different icon sizes.
  * @param {string} iconName - The name of the icon file (e.g., 'favicon.ico').
@@ -5784,7 +5784,7 @@ function sendIconToServer(applicationId, iconImages, iconName) {
   const formData = new FormData();
   formData.append('application_id', applicationId);  // Add the application ID
   formData.append('icon_name', iconName);  // Add the icon file name
-  
+
   // Loop through each icon image and append it to the form data
   iconImages.forEach((imageData, index) => {
       formData.append('images[' + index + ']', imageData);  // Add each PNG image as a separate form data entry
@@ -6035,11 +6035,11 @@ function loadDiagramMultiple() {
 
 /**
  * Downloads the SVG image directly as a file.
- * 
+ *
  * This function retrieves the URL of the SVG image from the `src` attribute of the
- * `<img>` tag within the `.erd-image` container. It creates a temporary `<a>` element 
+ * `<img>` tag within the `.erd-image` container. It creates a temporary `<a>` element
  * with the `download` attribute, which triggers the download of the SVG file.
- * 
+ *
  * @returns {void} This function does not return any value.
  */
 function downloadSVG() {
@@ -6056,12 +6056,12 @@ function downloadSVG() {
 }
 /**
  * Downloads the SVG image as a PNG file by rendering it to a canvas and converting it to a PNG data URL.
- * 
- * This function retrieves the URL of the SVG image from the `src` attribute of the 
- * `<img>` tag within the `.erd-image` container, draws the image onto a canvas, 
- * and then converts the canvas to a PNG data URL. It triggers the download process 
+ *
+ * This function retrieves the URL of the SVG image from the `src` attribute of the
+ * `<img>` tag within the `.erd-image` container, draws the image onto a canvas,
+ * and then converts the canvas to a PNG data URL. It triggers the download process
  * so the user can save the image as a PNG file.
- * 
+ *
  * @returns {void} This function does not return any value.
  */
 function downloadPNG() {
@@ -6095,8 +6095,8 @@ function downloadPNG() {
  *
  * This function checks the value of the provided input element (obj).
  * If the value is 'label', 'value', or 'default' (case-insensitive),
- * it marks the input as invalid and updates its value to 'data-{value}' 
- * after a short delay. This process will repeat if the new value 
+ * it marks the input as invalid and updates its value to 'data-{value}'
+ * after a short delay. This process will repeat if the new value
  * is still invalid. If the input value is valid, any invalid class
  * is removed.
  *
@@ -6184,7 +6184,7 @@ function saveModule() {
  *
  * This function checks if an entity is currently open. If so, it disables the
  * save button and retrieves the content from the editor. It then sends an AJAX
- * POST request to update the entity's content on the server. Upon successful 
+ * POST request to update the entity's content on the server. Upon successful
  * completion, it re-enables the save button, updates various UI components,
  * and highlights any error lines. If no entity is open, it shows an alert to the user.
  *
@@ -6252,10 +6252,10 @@ function saveValidator() {
           removeHilightLineError(cmEditorValidator);
           addHilightLineError(cmEditorValidator, data.error_line - 1);
         });
-        
+
         removeHilightLineError(cmEditorValidator);
         addHilightLineError(cmEditorValidator, data.error_line - 1);
-        
+
         if (!data.success) {
           showAlertUI(data.title, data.message);
           setTimeout(function () { closeAlertUI() }, 5000);
@@ -6308,7 +6308,7 @@ function saveValidatorAs() {
                 addHilightLineError(cmEditorValidator, data.error_line - 1);
               });
               resetFileManager();
-              
+
               removeHilightLineError(cmEditorValidator);
               addHilightLineError(cmEditorValidator, data.error_line - 1)
               if (!data.success) {
@@ -6367,7 +6367,7 @@ function updateSelectedValidator()
  *
  * This function checks if an entity is currently open. If so, it disables the
  * save button and retrieves the content from the editor. It then sends an AJAX
- * POST request to update the entity's content on the server. Upon successful 
+ * POST request to update the entity's content on the server. Upon successful
  * completion, it re-enables the save button, updates various UI components,
  * and highlights any error lines. If no entity is open, it shows an alert to the user.
  *
@@ -7064,7 +7064,7 @@ function generateScript(selector) // NOSONAR
       let referenceFilter = parseJsonData(
         $(this).find("input.reference-filter").val()
       );
-      
+
       let multipleData = $(this).find("input.input-multiple-data")[0].checked;
       let multipleFilter = $(this).find("input.input-multiple-filter")[0].checked;
       let exactFilter = $(this).find("input.input-exact-filter")[0].checked;
@@ -7373,10 +7373,10 @@ function getSortableModule() {
  * @returns {Object|null} - The parsed JavaScript object if successful, or `null` if parsing fails.
  */
 function safeJsonParse(text) {
-  try 
+  try
   {
     return JSON.parse(text);
-  } 
+  }
   catch (e) // NOSONAR
   {
     return null;
@@ -7392,11 +7392,11 @@ function safeJsonParse(text) {
  *
  * @param {string} text - The JSON string to be parsed.
  * @returns {object|null} The parsed JavaScript object, or null if
- *                        the input is not a valid JSON string or 
+ *                        the input is not a valid JSON string or
  *                        if parsing fails.
  */
 function parseJsonData(text) {
-  if (typeof text !== "string") 
+  if (typeof text !== "string")
   {
     return null;
   }
@@ -7409,15 +7409,15 @@ function parseJsonData(text) {
  *
  * This function sends the provided data to a server endpoint for code generation.
  * Upon successful code generation, it updates the entity file, entity query,
- * and entity relationship diagram. Additionally, it displays a success message 
+ * and entity relationship diagram. Additionally, it displays a success message
  * through a toast notification, triggers further actions upon module creation,
- * and provides feedback on the process. If an error occurs, it handles the 
+ * and provides feedback on the process. If an error occurs, it handles the
  * failure gracefully.
  *
  * @param {Object} dataToPost - The data to send to the server for code generation.
- *                              This object contains the necessary information 
+ *                              This object contains the necessary information
  *                              to generate the code, such as entity details.
- * 
+ *
  * @returns {void}
  */
 function generateAllCode(dataToPost) {
@@ -7754,14 +7754,14 @@ function isExactFilter(value)
  * It handles fields related to columns, filters, sorting, and features.
  *
  * @param {Object} data - The data object containing the form values to restore.
- * @param {Array} data.fields - An array of field configurations, where each 
- *        configuration includes properties like fieldName, includeInsert, 
+ * @param {Array} data.fields - An array of field configurations, where each
+ *        configuration includes properties like fieldName, includeInsert,
  *        includeEdit, and more.
- * @param {Array} data.specification - An array of filter specifications 
+ * @param {Array} data.specification - An array of filter specifications
  *        for the modal filter data, containing column names and values.
- * @param {Array} data.sortable - An array of sorting specifications for the 
+ * @param {Array} data.sortable - An array of sorting specifications for the
  *        modal order data, containing sort columns and their order types.
- * @param {Object} data.features - An object containing feature flags for the 
+ * @param {Object} data.features - An object containing feature flags for the
  *        module, such as subquery, export options, and approval settings.
  *
  * This function:
@@ -7823,17 +7823,17 @@ function restoreForm(data)  //NOSONAR
             tr.find('.reference-filter').val(JSON.stringify(data.fields[i].referenceFilter));
             tr.find('.reference_button_filter').css('display', 'inline');
             tr.find('.input-field-filter[value="select"]')[0].checked = true;
-            
+
             tr.find('.input-multiple-filter')[0].disabled = false;
             tr.find('.input-exact-filter')[0].disabled = false;
           }
           if (data.fields[i].filterElementType == 'text') {
             tr.find('.input-field-filter[value="text"]')[0].checked = true;
-            
+
             tr.find('.input-multiple-filter')[0].disabled = false;
             tr.find('.input-exact-filter')[0].disabled = false;
           }
-          
+
           if(isSupportMultiple(data.fields[i].elementType))
           {
             tr.find('.input-multiple-data')[0].disabled = false;
@@ -7846,7 +7846,7 @@ function restoreForm(data)  //NOSONAR
           {
             tr.find('.input-multiple-data')[0].disabled = true;
           }
-          
+
           if(isSupportMultiple(data.fields[i].filterElementType))
           {
             tr.find('.input-multiple-filter')[0].disabled = false;
@@ -7856,7 +7856,7 @@ function restoreForm(data)  //NOSONAR
             }
           }
 
-          
+
           if(isExactFilter(data.fields[i].exactFilter))
           {
             tr.find('.input-exact-filter')[0].disabled = false;
@@ -7866,7 +7866,7 @@ function restoreForm(data)  //NOSONAR
             }
           }
 
-          
+
           tr.find('.input-field-data-type').val(data.fields[i].dataType);
           tr.find('.input-data-filter').val(data.fields[i].inputFilter);
         }
@@ -8017,7 +8017,7 @@ function restoreForm(data)  //NOSONAR
     for (let i in data.sortable) {
       if (data.sortable.hasOwnProperty(i)) {
         if (cnt > 0) {
-          let trHtml = $(selector).clone(true); 
+          let trHtml = $(selector).clone(true);
           $(selector).parent().append(trHtml);
         }
         $(selector).find('.data-order-column-name').val(data.sortable[i].sortBy);
@@ -8042,7 +8042,7 @@ function resetFeatureForm()
   $('#export_to_excel')[0].disabled = false;
   $('#export_use_temporary')[0].disabled = true;
   $('#user_activity_logger')[0].checked = false;
-  $('#with_approval')[0].checked = false;      
+  $('#with_approval')[0].checked = false;
   $('#approval_by_other_user')[0].disabled = true;
   $('#approval_type1')[0].disabled = true;
   $('#approval_type2')[0].disabled = true;
@@ -8063,9 +8063,9 @@ function resetFeatureForm()
 /**
  * Loads saved module data from a specified module file and restores it into the form.
  *
- * This function performs an AJAX GET request to retrieve the module data 
- * based on the provided module file and target. Upon successful retrieval, 
- * it calls the `restoreForm` function to populate the form with the data 
+ * This function performs an AJAX GET request to retrieve the module data
+ * based on the provided module file and target. Upon successful retrieval,
+ * it calls the `restoreForm` function to populate the form with the data
  * and then executes a callback function.
  *
  * @param {string} moduleFile - The name of the module file from which to load data.
@@ -8094,9 +8094,9 @@ function loadSavedModuleData(moduleFile, target, clbk) {
 /**
  * Generates a select dropdown for filter types based on the provided field and column type.
  *
- * This function creates a `<select>` element populated with various filter options. 
- * It determines the default filter type based on the provided column type and sanitization 
- * rules. The generated select element allows users to choose the appropriate filter type 
+ * This function creates a `<select>` element populated with various filter options.
+ * It determines the default filter type based on the provided column type and sanitization
+ * rules. The generated select element allows users to choose the appropriate filter type
  * for the specified field.
  *
  * @param {string} field - The name of the field for which the filter is being generated.
@@ -8202,7 +8202,7 @@ function generateSelectFilter(field, args)  //NOSONAR
 }
 
 /**
- * 
+ *
  * @param {string} field - Field name
  * @param {object} args - Additional arguments that may influence the row's configuration.
  * @returns {string} Button and hidden input containing data format
@@ -8215,8 +8215,8 @@ function generateDataFormat(field, args)
 /**
  * Generates a select dropdown for input types based on the provided field and data type.
  *
- * This function creates a `<select>` element populated with various input type options. 
- * It determines the default input type based on the provided data type and predefined mappings. 
+ * This function creates a `<select>` element populated with various input type options.
+ * It determines the default input type based on the provided data type and predefined mappings.
  * The generated select element allows users to choose the appropriate input type for the specified field.
  *
  * @param {string} field - The name of the field for which the input type is being generated.
@@ -8403,11 +8403,11 @@ function isKeyWord(str) {
 }
 
 /**
- * Generates an HTML table row for a specified field, including various input elements 
+ * Generates an HTML table row for a specified field, including various input elements
  * for configuration such as inclusion in inserts, edits, and lists, as well as type selection.
  *
- * The function takes into account whether the field is a reserved keyword and skips 
- * certain checkboxes if specified. It constructs the row with appropriate classes, 
+ * The function takes into account whether the field is a reserved keyword and skips
+ * certain checkboxes if specified. It constructs the row with appropriate classes,
  * input fields, and other HTML elements necessary for the configuration interface.
  *
  * @param {string} field - The name of the field for which the row is generated.
@@ -8485,8 +8485,8 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
         <input type="hidden" name="field" value="${field}">
       </td>
       <td>
-        <input type="hidden" class="input-field-name" name="caption_${field}" 
-          value="${field.replaceAll("_", " ").capitalize().prettify().trim()}" 
+        <input type="hidden" class="input-field-name" name="caption_${field}"
+          value="${field.replaceAll("_", " ").capitalize().prettify().trim()}"
           autocomplete="off" spellcheck="false">
         ${field.replaceAll("_", " ").capitalize().prettify().trim()}
       </td>
@@ -8558,8 +8558,8 @@ function generateRow(field, args, skippedOnInsertEdit)  //NOSONAR
 /**
  * Serializes form data into an object structure for processing or submission.
  *
- * The function retrieves the selected reference type, multiple selection values, 
- * and additional entity and mapping data. It then compiles this information into 
+ * The function retrieves the selected reference type, multiple selection values,
+ * and additional entity and mapping data. It then compiles this information into
  * an object which is returned for further use.
  *
  * @returns {Object} An object containing serialized form data including:
@@ -8596,8 +8596,8 @@ function serializeForm() {
 /**
  * Deserializes an object of data into a modal form for editing or viewing.
  *
- * The function empties the current modal body and populates it with the reference 
- * resource layout. It then selects the reference type and sets entity and mapping 
+ * The function empties the current modal body and populates it with the reference
+ * resource layout. It then selects the reference type and sets entity and mapping
  * data based on the provided data object.
  *
  * @param {Object} data - The object containing data to populate the modal form.
@@ -8709,7 +8709,7 @@ function removeLastColumn(table) {
 /**
  * Clears the input values of all elements with the class "rd-group" in the given table.
  * A confirmation prompt is shown to the user before clearing the values.
- * 
+ *
  * @param {jQuery} table - The jQuery object representing the table containing the groups.
  * @returns {void}
  */
@@ -9042,7 +9042,7 @@ function getGroupData() {
       let tr = $(this);
       let value = tr.find(".rd-map-value").val().trim();
       let label = tr.find(".rd-map-label").val().trim();
-      if (value.length > 0) { 
+      if (value.length > 0) {
         map.push({
           value: value,
           label: label,
@@ -9134,7 +9134,7 @@ function setMapData(data) // NOSONAR
     for (let i in map) {
       if (i > 0) {
         addRow(table);
-      }  
+      }
       let tr = table.find("tr:last-child");
       let row = map[i];
       tr.find(".rd-value").val(row.value);

@@ -576,7 +576,7 @@ label {
 }
 
 .entity-selector-container {
-  max-height: calc(100vh - 250px);
+  max-height: calc(100vh - 290px);
   overflow: auto;
 }
 
@@ -593,6 +593,28 @@ label {
   border-bottom: 1px solid #cccccc;
   padding: 0px 9px 4px 9px;
   margin-bottom: 4px;
-  height: 36px;
+  height: 76px;
   box-sizing: border-box;
+}
+.entity-type-selector div {
+  padding-bottom: 2px;
+}
+
+.profile-table {
+  border: none;
+}
+.profile-table tr td, .profile-table tr th {
+  padding: 3px 4px;
+  border: none;
+  vertical-align: top;
+}
+.profile-table tr td input[type=text], .profile-table tr th input[type=text] {
+  width: 100%;
+  height: calc(1.32em + 0.6rem + 1px);
+}
+.profile-table tr td:first-child, .profile-table tr th:first-child {
+  padding-left: 0px;
+}
+.profile-table tr td:last-child, .profile-table tr th:last-child {
+  padding-right: 0px;
 }/*# sourceMappingURL=entity-editor.css.map */

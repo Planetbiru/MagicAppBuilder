@@ -144,7 +144,7 @@ function init() {
     let modalEntityEditor = document.getElementById("entityEditorModal");
     let closeModalButton = document.querySelectorAll(".cancel-button");
     let openModalQuertTranslatorButton = document.querySelector(".import-structure");
-    let openModalEntityEditorButton = document.querySelector(".open-entity-editor"); 
+    let openModalEntityEditorButton = document.querySelector(".open-entity-editor");
     let openFileButton  = document.querySelector(".open-structure");
     let translateButton  = document.querySelector(".translate-structure");
     let importFromEntityButton = document.querySelector('.import-from-entity');
@@ -172,7 +172,7 @@ function init() {
 
         };
     }
-    
+
     if(closeModalButton)
     {
         closeModalButton.forEach(function(cancelButton) {
@@ -188,7 +188,7 @@ function init() {
             original.value = "";
         };
     }
-    
+
     if(translateButton)
     {
         translateButton.onclick = function()
@@ -208,12 +208,12 @@ function init() {
             document.querySelector('.structure-sql').click();
         }
     }
-    
+
     if(importFromEntityButton)
     {
         importFromEntityButton.onclick = function()
         {
-            let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');        
+            let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
             let sql = editor.generateSQL(dialect);
             document.querySelector('[name="query"]').value = sql.join("\r\n");
             modalEntityEditor.style.display = "none";
@@ -252,10 +252,10 @@ function init() {
     });
 
     document.getElementById("tableFilter").addEventListener("input", function(event) {
-        // Use event.target instead of 'this' for clarity in delegation context, 
+        // Use event.target instead of 'this' for clarity in delegation context,
         // though 'this' works here as well.
         const filter = event.target.value.toLowerCase().trim();
-        
+
         // Get the parent container of the list items
         const tableList = document.querySelector(".object-container .table-list");
 
@@ -265,10 +265,10 @@ function init() {
         items.forEach(li => {
             // Check if the <li> has a title attribute
             const title = li.getAttribute("title");
-            
+
             // Check for null/undefined before calling .toLowerCase()
             const text = title ? title.toLowerCase() : "";
-            
+
             li.style.display = text.includes(filter) ? "" : "none";
         });
     });
@@ -299,7 +299,7 @@ function init() {
     document.querySelector(".check-all-entity-data").addEventListener('change', (event) => {
         let checked = event.target.checked;
         let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-data");
-        
+
         if(allEntities)
         {
             allEntities.forEach(entity => {
@@ -308,7 +308,7 @@ function init() {
         }
         editor.exportToSQL();
     });
-    
+
     document.querySelector(".right-panel .table-list-for-export").addEventListener('change', (event) => {
         if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
             editor.exportToSQL();
@@ -365,15 +365,15 @@ function init() {
     let { applicationId, databaseName, databaseSchema, databaseType, hash } = getMetaValues();
 
     loadDatabaseIndex(applicationId, hash);
-        
-    loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, function(data){
+    let profile = document.querySelector('.graphql-app-profile').value;
+    loadGraphQlEntityFromServer(applicationId, databaseType, databaseName, databaseSchema, profile, function(data){
         editor.graphqlAppData = data;
-    }); 
+    });
 }
 
 function onChangeDatabase(select) {
     let selectedOption = select.options[select.selectedIndex];
-    let dataset = selectedOption.dataset; 
+    let dataset = selectedOption.dataset;
     loadApplicationData(dataset.applicationId, dataset.databaseName, dataset.databaseSchema, dataset.databaseType, dataset.hash)
 }
 
@@ -403,7 +403,7 @@ function loadDatabaseIndex(applicationId, hash)
                     option.dataset.databaseName = data[index].databaseName;
                     option.dataset.databaseSchema = data[index].databaseSchema;
                     option.dataset.hash = index;
-                    
+
                     select.appendChild(option);
                 }
             }
@@ -433,7 +433,9 @@ function saveFormState(frm)
     let entityTables = frm.querySelectorAll('.entity-table');
     let entitySelector = {};
     let entities = {};
-    
+
+    let profile = frm.querySelector('.graphql-app-profile').value;
+
     entitySelectorTables.forEach(table => {
         let input = table.querySelector('.entity-selector');
         entitySelector[input.value] = input.checked;
@@ -442,7 +444,7 @@ function saveFormState(frm)
     entityTables.forEach(table => {
         let entityName = table.dataset.entity;
         entities[entityName] = {};
-        
+
         table.querySelector('tbody').querySelectorAll('tr').forEach(tr => {
             let colName = tr.dataset.col;
             let columnInfo = {};
@@ -476,7 +478,29 @@ function saveFormState(frm)
     };
     editor.graphqlAppData = dataToSave;
     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-    sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave); 
+    sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave, profile);
+}
+
+/**
+ * Restores a form field’s value based on the given selector and input type.
+ *
+ * @param {HTMLFormElement} frm - The form element containing the target field.
+ * @param {string} selector - A CSS selector used to locate the field within the form.
+ * @param {*} value - The value to restore to the field. If undefined, the function does nothing.
+ * @param {string} [type='checkbox'] - The type of field to restore. Supported types: 'checkbox', 'select'.
+ * 
+ * @returns {void}
+ */
+function restoreField(frm, selector, value, type = 'checkbox') {
+    if (value === undefined) return;
+    const el = frm.querySelector(selector);
+    if (!el) return;
+
+    if (type === 'checkbox') {
+        el.checked = value;
+    } else if (type === 'select') {
+        el.value = value;
+    }
 }
 
 /**
@@ -490,37 +514,18 @@ function saveFormState(frm)
  * @param {object} data.entities - A nested object mapping entity and column names to their filter and primary key value settings.
  */
 function loadFormState(frm, data) {
-    
+
     if (!frm || !data) {
         return;
     }
 
-    // Restore the main entity type checkers (Custom/System)
-    if (typeof data.custom !== 'undefined') {
-        const customChecker = frm.querySelector('.entity-type-checker[data-entity-type="custom"]');
-        if (customChecker) {
-            customChecker.checked = data.custom;
-        }
-    }
-    if (typeof data.system !== 'undefined') {
-        const systemChecker = frm.querySelector('.entity-type-checker[data-entity-type="system"]');
-        if (systemChecker) {
-            systemChecker.checked = data.system;
-        }
-    }
-    if (typeof data.inMemoryCache !== 'undefined') {
-        const inMemoryCacheChecker = frm.querySelector('.in-memory-cache-checker');
-        if (inMemoryCacheChecker) {
-            inMemoryCacheChecker.checked = data.inMemoryCache;
-        }
-    }
+    // Restore the main entity type checkers (Custom/System/InMemoryCache)
+    restoreField(frm, '.entity-type-checker[data-entity-type="custom"]', data.custom, 'checkbox');
+    restoreField(frm, '.entity-type-checker[data-entity-type="system"]', data.system, 'checkbox');
+    restoreField(frm, '.in-memory-cache-checker', data.inMemoryCache, 'checkbox');
 
-    if (typeof data.programmingLanguage !== 'undefined') {
-        const programmingLanguageSelector = frm.querySelector('.programming-language-selector');
-        if (programmingLanguageSelector) {
-            programmingLanguageSelector.value = data.programmingLanguage;
-        }
-    }
+    // Restore programming language selector
+    restoreField(frm, '.programming-language-selector', data.programmingLanguage, 'select');
 
     // Restore the checked state for each entity selector
     if (data.entitySelector && typeof data.entitySelector === 'object') {
@@ -572,11 +577,12 @@ function loadFormState(frm, data) {
  * @param {string} databaseName - The name of the database to which the entity belongs.
  * @param {string} databaseSchema - The schema name of the database (if applicable).
  * @param {Object} dataToSave - The entity data to be sent to the server as JSON.
+ * @param {string} profile - The GraphQL application profile.
  * @returns {Promise<Object|null>} A promise that resolves to the JSON response from the server, or `null` if an error occurs.
  *
  */
-async function sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave) {
-    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
+async function sendGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, dataToSave, profile) {
+    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '', profile);
     const jsonData = JSON.stringify(dataToSave);
 
     try {
@@ -607,16 +613,17 @@ async function sendGraphQlEntityToServer(applicationId, databaseType, databaseNa
 /**
  * Loads GraphQL entity data from the server via a GET request.
  *
- * @function loadGraphQlEntityToServer
+ * @function loadGraphQlEntityFromServer
  * @param {string} applicationId - The unique identifier of the application.
  * @param {string} databaseType - The type of the database (e.g., mysql, postgresql, sqlite, sqlserver).
  * @param {string} databaseName - The name of the database to retrieve entities from.
  * @param {string} databaseSchema - The schema name of the database (if applicable).
+ * @param {string} profile - The GraphQL application profile.
  * @param {Function} callback - A callback function executed after data is successfully fetched.
  *                              Receives the parsed JSON data as its single argument.
  */
-function loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, callback) {
-    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '');
+function loadGraphQlEntityFromServer(applicationId, databaseType, databaseName, databaseSchema, profile, callback) {
+    const url = buildUrl('graphql-entity', applicationId, databaseType, databaseName, databaseSchema, '', profile);
 
     fetch(url, {
         method: 'GET',
@@ -645,7 +652,7 @@ function loadGraphQlEntityToServer(applicationId, databaseType, databaseName, da
  * Opens the structure of the provided file.
  * If the file is a SQLite database, it delegates to `openSQLiteStructure`.
  * Otherwise, it reads the file as text and displays the content in `.original`.
- * 
+ *
  * @param {File} file - The file to be read.
  */
 function openStructure(file) {
@@ -655,7 +662,7 @@ function openStructure(file) {
     reader.onload = function (e) {
         const buffer = new Uint8Array(e.target.result);
         if (looksLikeSQLite(buffer)) {
-            openSQLiteStructure(file); 
+            openSQLiteStructure(file);
         } else {
             readAsText(file);
         }
@@ -667,7 +674,7 @@ function openStructure(file) {
 
 /**
  * Reads a text file and displays its content in the .original textarea.
- * 
+ *
  * @param {File} file - The file to read as plain text.
  */
 function readAsText(file) {
@@ -702,11 +709,11 @@ function looksLikeSQLite(buffer) {
 
 /**
  * Reads a SQLite database file and exports its table structures as SQL CREATE TABLE statements.
- * 
+ *
  * This function uses SQL.js to load and parse a `.sqlite` or `.db` file in the browser.
  * It extracts all user-defined tables and generates the corresponding CREATE TABLE syntax using PRAGMA data.
  * The result is inserted into a <textarea> with class `.original`.
- * 
+ *
  * @param {File} file - The SQLite database file selected by the user.
  */
 function openSQLiteStructure(file) {
@@ -831,14 +838,14 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.closest('.collapsible').classList.toggle('open');
         });
     });
-    
+
     editor = new EntityEditor('.entity-editor',
         {
             defaultDataType: 'VARCHAR',
             defaultDataLength: 50,
             primaryKeyDataType: 'BIGINT',
             primaryKeyDataLength: 20,
-            
+
             callbackLoadEntity: function(){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 fetchEntityFromServer(applicationId, databaseType, databaseName, databaseSchema);
@@ -850,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             callbackSaveDiagram: function (diagrams){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams); 
+                sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);
             },
             callbackLoadTemplate: function(){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
@@ -871,7 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('paste', async function(event) {
         const target = event.target;
-        
+
         editor.clearBeforeImport = false;
 
         // Do not intercept paste if the target is an editable element
@@ -885,16 +892,16 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 // Use await to wait for the promise from clipboard.read() to resolve
                 const clipboardItems = await navigator.clipboard.read();
-                
+
                 for (const item of clipboardItems) {
                     if (item.types.includes('text/html')) {
                         const htmlBlob = await item.getType('text/html');
                         const htmlText = await htmlBlob.text();
-                        
+
                         const div = document.createElement('div');
                         div.innerHTML = htmlText;
                         let tables = div.querySelectorAll('table');
-                        
+
                         if (tables && tables.length > 0) {
                             parsed = editor.parseHtmlToJSON(tables[0]);
                             editor.importFromData(parsed);
@@ -909,15 +916,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (/create\s+table/i.test(text.trim()) || /insert\s+into/i.test(text.trim())) {
                     editor.parseCreateTable(text, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
                 });
                 } else if (/[\"']__magic_signature__[\"']\s*:\s*[\"']MAGICAPPBUILDER-DB-DESIGN-V1[\"']/.test(text)) {
                     // JSON
                     try {
                         editor.importJSONData(text, function(entities, diagrams){
                         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-                        sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);  
+                        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
+                        sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);
                     }); // Import the file if it's selected
                     } catch (jsonErr) {
                         console.error("Invalid JSON format despite having signature:", jsonErr);
@@ -937,7 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showConfirmationDialog('Are you sure you want to execute the query?', 'Execute Query Confirmation', 'Yes', 'No', function(isConfirmed) {
             if (isConfirmed) {
                 event.target.closest('form').submit();  // Submit the form containing the button
-            } 
+            }
         });
     });
 
@@ -970,15 +977,15 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             showConfirmationDialog('Are you sure you want to export the data from the table?', 'Export Confirmation', 'Yes', 'No', function(isConfirmed) {
                 if (isConfirmed) {
-                    
+
                     let hiddenInput = document.createElement('input');
                     hiddenInput.type = 'hidden';
                     hiddenInput.name = '___export_table___';
                     hiddenInput.value = tableName;
                     event.target.closest('form').appendChild(hiddenInput);
-                    event.target.closest('form').submit();  // Submit the form containing the button 
+                    event.target.closest('form').submit();  // Submit the form containing the button
                     event.target.closest('form').removeChild(hiddenInput);
-                } 
+                }
             });
         });
     }
@@ -991,10 +998,10 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             let selector = '#exportModal';
-            showExportDialog(selector, 
-                '<div class="loading-animation"></div>', 
+            showExportDialog(selector,
+                '<div class="loading-animation"></div>',
                 'Export Database', 'Yes', 'No', function(isOk) {
-                if (isOk) 
+                if (isOk)
                 {
                     let select = document.querySelector('[name="target_database_type"]');
                     disableOtherOptions(select);
@@ -1002,17 +1009,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         enableAllOptions(select);
                     });
                 }
-                else 
+                else
                 {
                     let select = document.querySelector('[name="target_database_type"]');
                     enableAllOptions(select);
-                    document.querySelector('#exportModal').style.display = 'none' 
-                } 
+                    document.querySelector('#exportModal').style.display = 'none'
+                }
             });
             listTableToExport(selector, tableName);
         });
     }
-    
+
     window.addEventListener('resize', function () {
         // Get the updated width of the SVG container
         editor.refreshEntities();
@@ -1053,12 +1060,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for changes in checkboxes within the table-list
     document.addEventListener('change', function (e) {
         if (e.target.closest('.table-list input[type="checkbox"]')) {
-            
+
             let diagram = document.querySelector('.diagram-container .diagram.active');
             let source = diagram.getAttribute('data-entities') || '';
             let currentSelection = source.split(',');
             let selectedEntities = new Set(); // Use a Set to store selected entities
-            
+
             // Iterate through checkboxes and add checked ones to the set
             e.target.closest('.table-list').querySelectorAll('input[type="checkbox"]').forEach(input => {
                 let entity = input.getAttribute('data-name');
@@ -1081,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', () => {
             diagram.setAttribute('data-entities', updatedEntities.join(','));
             editor.saveDiagram();
         }
-    
+
         editor.updateDiagram();
     });
 
@@ -1095,10 +1102,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (parentList) {
                 const checkboxes = parentList.querySelectorAll('input[type="checkbox"]');
                 const isChecked = target.checked;
-                
+
                 // Get the last element in the checkbox list
-                
-                
+
+
                 checkboxes.forEach((checkbox) => {
                     // Only change the state if necessary
                     if (checkbox.checked !== isChecked) {
@@ -1112,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         lastCheckbox = cb;
                     }
                 });
-                
+
                 // After all checkboxes have been changed, only trigger the 'change' event on the last element
                 if (lastCheckbox) {
                     // Create a custom event and flag it as a "simulated" event
@@ -1123,51 +1130,51 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
+
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
 
     tabsLinkContainer = document.querySelector('.tabs-link-container');
-    
+
 
     document.querySelector('.tab-mover li a.move-left').addEventListener('click', function(event) {
         event.preventDefault();
         updateMarginLeft(-30);
     });
-    
+
     document.querySelector('.tab-mover li a.move-right').addEventListener('click', function(event) {
         event.preventDefault();
         updateMarginLeft(30);
     });
-    
+
     tabsLinkContainer.addEventListener('wheel', (event) => {
         event.preventDefault();
         const delta = event.deltaY || event.detail || event.wheelDelta;
         const step = 30; // Adjust the step size as needed
-    
+
         updateMarginLeft(delta > 0 ? -step : step);
     });
-    
+
     document.querySelector('.export-data-entity').addEventListener('click', function(){
-        editor.exportData(); 
+        editor.exportData();
     });
-    
+
     document.querySelector('.import-data-entity').addEventListener('click', function(){
         document.querySelector('#importDataFileInput').click();
     });
-    
+
     document.querySelector('.add-data-entity').addEventListener('click', function(e){
-        editor.addData(true); 
+        editor.addData(true);
     });
-    
+
     document.querySelector('.clear-data-entity').addEventListener('click', function(){
-        editor.clearData(); 
+        editor.clearData();
     });
-    
+
     document.querySelector('.save-data-entity').addEventListener('click', function(){
-        editor.saveData(); 
+        editor.saveData();
     });
-    
+
     document.querySelector('#importDataFileInput').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -1328,13 +1335,13 @@ function checkAllDiagram(e1)
     e1.preventDefault();
     let checked = e1.target.checked;
     e1.target.closest('ul').querySelectorAll('input.diagram-to-export').forEach(cb =>{
-        cb.checked = checked; 
+        cb.checked = checked;
     });
 }
 /**
  * Initiates the database export process if no other export is currently running.
  *
- * @param {string} selector - A CSS selector targeting the HTML element(s) 
+ * @param {string} selector - A CSS selector targeting the HTML element(s)
  *                            to export data from (e.g., a table row).
  */
 function startExportDatabase(selector, onFinishCallback)
@@ -1361,7 +1368,7 @@ function exportDatabase(selector, onFinish) {
     // Clear timeout
     clearTimeout(timeoutDownload);
     tableIndex = 0;
-    
+
     // Generate a timestamped export filename
     fileName = (new Date()).getTime() + '.sql';
     if(applicationId != '')
@@ -1389,7 +1396,7 @@ function exportDatabase(selector, onFinish) {
     });
 
     maxTableIndex = exportTableList.length;
-    
+
     // Save export configuration
     exportConfig = {
         applicationId: applicationId,
@@ -1485,7 +1492,7 @@ function exportTable(selector, onFinish) {
 /**
  * Fetches the list of tables to export and displays them in the export modal.
  * Also sets up select-all checkboxes for structure and data.
- * 
+ *
  * @param {string} selector - The modal selector to inject the table list.
  * @param {string} tableName - Optional table name to preselect or focus on.
  */
@@ -1583,7 +1590,7 @@ function showExportDialog(selector, message, title, captionOk, captionCancel, ca
 
 /**
  * Updates the left margin of the tab list to scroll tabs horizontally.
- * 
+ *
  * @param {number} step - The number of pixels to move the margin left (negative to scroll right).
  */
 function updateMarginLeft(step) {
@@ -1619,13 +1626,13 @@ function downloadMD() {
 /**
  * Displays a confirmation dialog with OK and Cancel buttons.
  * Executes the provided callback with `true` if OK is clicked, or `false` if Cancel is clicked.
- * 
+ *
  * @param {string} message - The message to display in the dialog.
  * @param {string} title - The title of the dialog.
  * @param {string} captionOk - The label for the OK button.
  * @param {string} captionCancel - The label for the Cancel button.
  * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
- * 
+ *
  * @returns {void} - This function does not return a value.
  */
 function showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
@@ -1667,7 +1674,7 @@ function showConfirmationDialog(message, title, captionOk, captionCancel, callba
  * but without any event listeners attached.
  *
  * @param {HTMLElement} element - The DOM element from which event listeners will be removed.
- * 
+ *
  * @returns {HTMLElement} - The cloned element that is a replacement for the original element, without event listeners attached.
  */
 function removeAllEventListeners(element) {
@@ -1678,7 +1685,7 @@ function removeAllEventListeners(element) {
 
 /**
  * Sends data to the server using the POST method with URL-encoded format.
- * 
+ *
  * @param {string} applicationId - The application ID to be sent.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -1725,7 +1732,7 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
 
 /**
  * Sends data to the server using the POST method with URL-encoded format.
- * 
+ *
  * @param {string} applicationId - The application ID to be sent.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -1769,7 +1776,7 @@ function sendDiagramToServer(applicationId, databaseType, databaseName, database
 
 /**
  * Fetches data from the server using the GET method with the provided parameters.
- * 
+ *
  * @param {string} applicationId - The application ID being used.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -1853,7 +1860,7 @@ function sendTemplateToServer(applicationId, databaseType, databaseName, databas
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
-        template: JSON.stringify(template) 
+        template: JSON.stringify(template)
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -1885,7 +1892,7 @@ function sendTemplateToServer(applicationId, databaseType, databaseName, databas
 
 /**
  * Fetches data from the server using the GET method with the provided parameters.
- * 
+ *
  * @param {string} applicationId - The application ID being used.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -1894,7 +1901,7 @@ function sendTemplateToServer(applicationId, databaseType, databaseName, databas
  * @param {Function} callback - The callback function that will be called after the data is fetched.
  */
 function fetchTemplateFromServer(applicationId, databaseType, databaseName, databaseSchema, template, callback) {
-    
+
     if(applicationId != '')
     {
         const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -1931,7 +1938,7 @@ function fetchTemplateFromServer(applicationId, databaseType, databaseName, data
 
 /**
  * Sends data to the server using the POST method with URL-encoded format.
- * 
+ *
  * @param {string} applicationId - The application ID to be sent.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
@@ -1944,7 +1951,7 @@ function sendConfigToServer(applicationId, databaseType, databaseName, databaseS
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
-        config: JSON.stringify(config) 
+        config: JSON.stringify(config)
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -1985,7 +1992,7 @@ function sendConfigToServer(applicationId, databaseType, databaseName, databaseS
  * @param {Function} callback - The callback function that will be called after the data is fetched.
  */
 function fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema, config, callback) {
-    
+
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
     const url = buildUrl('config', applicationId, databaseType, databaseName, databaseSchema, '');
     // Construct the URL with query parameters
@@ -1998,11 +2005,11 @@ function fetchConfigFromServer(applicationId, databaseType, databaseName, databa
                 const response = xhr.responseText;  // Get the response from the server
                 try {
                     const parsedData = JSON.parse(response);  // Try to parse the JSON response
-                    
+
                     editor.defaultDataType = parsedData.defaultDataType + '';
                     editor.defaultDataLength = parsedData.defaultDataLength + '';
                     editor.primaryKeyDataType = parsedData.primaryKeyDataType + '';
-                    editor.primaryKeyDataLength = parsedData.primaryKeyDataLength + ''; 
+                    editor.primaryKeyDataLength = parsedData.primaryKeyDataLength + '';
                 } catch (err) {
                     console.error(err)
                 }
@@ -2018,17 +2025,18 @@ function fetchConfigFromServer(applicationId, databaseType, databaseName, databa
 
 /**
  * Builds the URL for the GET request by appending query parameters.
- * 
+ *
  * @param {string} type - 'entity', 'config' or 'template'
  * @param {string} applicationId - The application ID being used.
  * @param {string} databaseType - The type of database being used.
  * @param {string} databaseName - The name of the database being used.
  * @param {string} databaseSchema - The schema of the database being used.
  * @param {Array} entities - The list of entities to be included in the query string.
- * 
+ * @param {string} profile - The GraphQL application profile.
+ *
  * @returns {string} The URL with query parameters appended.
  */
-function buildUrl(type, applicationId, databaseType, databaseName, databaseSchema, entities) {
+function buildUrl(type, applicationId, databaseType, databaseName, databaseSchema, entities, profile) {
     if(type == 'template')
     {
         return `../lib.ajax/load-template-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
@@ -2036,10 +2044,10 @@ function buildUrl(type, applicationId, databaseType, databaseName, databaseSchem
     else if(type == 'config')
     {
         return `../lib.ajax/load-config-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
-    } 
+    }
     else if(type == 'graphql-entity')
     {
-        return `../lib.ajax/load-graphql-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}`;
+        return `../lib.ajax/load-graphql-entity-data.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}&entities=${encodeURIComponent(JSON.stringify(entities))}&profile=${profile}`;
     }
     else
     {

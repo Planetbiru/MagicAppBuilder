@@ -23,8 +23,7 @@ if ($inputPost->getDatabaseName() !== null) {
     try
     {
         $selectedApplication->find($applicationId);
-        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity";
-        $indexPath = $basePath."/index.json";
+        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/schema-list.json";
         if(!file_exists($indexPath))
         {
             $indexRaw = '{}';
@@ -59,7 +58,7 @@ if ($inputPost->getDatabaseName() !== null) {
     try
     {
         $selectedApplication->find($applicationId);
-        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
+        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/schema-list.json";
 
         if(file_exists($indexPath))
         {

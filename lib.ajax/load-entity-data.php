@@ -24,12 +24,15 @@ if ($inputPost->getDatabaseName() !== null) {
     try
     {
         $selectedApplication->find($applicationId);
-        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
-
-        $path = $basePath . "/$filename";
-        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
+        $path = $selectedApplication->getProjectDirectory()."/__data/entity/data/$filename";
         if (!file_exists(dirname($path))) {
             mkdir(dirname($path), 0755, true);
+        }
+        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
+        $dir = dirname($indexPath);
+        if(!file_exists($dir))
+        {
+            mkdir($dir, 0755, true);
         }
 
         if (file_exists($path)) {
@@ -64,7 +67,6 @@ if ($inputPost->getDatabaseName() !== null) {
             file_put_contents($path, json_encode($data));
         }
 
-        $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
         if(!file_exists($indexPath))
         {
             $indexRaw = '{}';
@@ -117,8 +119,7 @@ if ($inputPost->getDatabaseName() !== null) {
     try
     {
         $selectedApplication->find($applicationId);
-        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
-        $path = $basePath . "/$filename";
+        $path = $selectedApplication->getProjectDirectory()."/__data/entity/data/$filename";
         if (file_exists($path)) {
             $json = file_get_contents($path);
             $data = json_decode($json, true);

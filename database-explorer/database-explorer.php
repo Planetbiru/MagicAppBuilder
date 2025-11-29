@@ -373,21 +373,29 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-body">
                 <form>
                     <div class="entity-type-selector">
-                        <label>Programming Language</label>
-                        <select class="form-control programming-language-selector">
-                            <option value="php">PHP</option>
-                            <option value="java">Java (Commercial Use)</option>
-                            <option value="kotlin">Kotlin (Experimental)</option>
-                            <option value="nodejs">Node.js (Commercial Use)</option>
-                            <option value="python">Python (Commercial Use)</option>
-                            <option value="go">Go (Commercial Use)</option>
-                        </select>
-                        &nbsp;
-                        <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
-                        &nbsp;
-                        <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
-                        &nbsp;
-                        <label><input type="checkbox" class="in-memory-cache-checker" data-entity-type="in-memory-cache" onchange="editor.inMemoryCacheChange(this)"> In-Memory Cache</label>
+                        <div>
+                            <label>Profile</label>
+                            <select class="form-control graphql-app-profile" onchange="editor.gqlChangeProfile()">
+                            </select>
+                            <button type="button" class="btn btn-primary" onclick="editor.manageGraphQlAppProfile()">Manage</button>
+                        </div>
+                        <div>
+                            <label>Programming Language</label>
+                            <select class="form-control programming-language-selector">
+                                <option value="php">PHP</option>
+                                <option value="java">Java (Commercial Use)</option>
+                                <option value="kotlin">Kotlin (Commercial Use)</option>
+                                <option value="nodejs">Node.js (Commercial Use)</option>
+                                <option value="python">Python (Commercial Use)</option>
+                                <option value="go">Go (Commercial Use)</option>
+                            </select>
+                            &nbsp;
+                            <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
+                            &nbsp;
+                            <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
+                            &nbsp;
+                            <label><input type="checkbox" class="in-memory-cache-checker" data-entity-type="in-memory-cache" onchange="editor.inMemoryCacheChange(this)"> In-Memory Cache</label>
+                        </div>
                     </div>
                     <div class="entity-selector-container"></div>
                 </form>
@@ -429,6 +437,24 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             </div>       
             <div class="modal-body">
                 Confirmation
+            </div>
+            <div class="modal-footer">            
+                <button class="btn btn-primary confirm-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary confirm-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-sm" id="profileModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Title</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>       
+            <div class="modal-body">
+                Profile
             </div>
             <div class="modal-footer">            
                 <button class="btn btn-primary confirm-ok">OK</button>
