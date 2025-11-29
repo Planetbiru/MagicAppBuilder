@@ -98,6 +98,7 @@ type AdminChangePasswordPageData struct {
 // ListAdmins handles the request to display the list of admins.
 func (h *AdminHandler) ListAdmins(w http.ResponseWriter, r *http.Request, adminID string) {
 	// Parse query parameters
+	ctx := r.Context()
 	search := r.URL.Query().Get("search")
 	pageStr := r.URL.Query().Get("page")
 	page, err := strconv.Atoi(pageStr)
@@ -127,7 +128,7 @@ func (h *AdminHandler) ListAdmins(w http.ResponseWriter, r *http.Request, adminI
 	var totalAdmins int
 	err = h.DB.QueryRow(countQuery+whereClause, args...).Scan(&totalAdmins)
 	if err != nil && err != sql.ErrNoRows {
-		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_count_records", "Admin"), http.StatusInternalServerError)
 		return
 	}
 
@@ -139,7 +140,7 @@ func (h *AdminHandler) ListAdmins(w http.ResponseWriter, r *http.Request, adminI
 
 	rows, err := h.DB.Query(dataQuery, args...)
 	if err != nil {
-		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
@@ -148,7 +149,7 @@ func (h *AdminHandler) ListAdmins(w http.ResponseWriter, r *http.Request, adminI
 	for rows.Next() {
 		var admin systemmodel.AdminListItem
 		if err := rows.Scan(&admin.AdminID, &admin.Name, &admin.Username, &admin.Email, &admin.Active, &admin.AdminLevelName); err != nil {
-			http.Error(w, "Error scanning admin data: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, util.T(ctx, "failed_to_scan_item", "Admin"), http.StatusInternalServerError)
 			return
 		}
 		admins = append(admins, AdminTemplateItem{
@@ -207,9 +208,9 @@ func (h *AdminHandler) getDetailAdmin(w http.ResponseWriter, r *http.Request, ap
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			http.Error(w, util.T(ctx, "admin_not_found"), http.StatusNotFound)
+			http.Error(w, util.T(ctx, "item_not_found", "Admin"), http.StatusOK)
 		} else {
-			http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, util.T(ctx, "database_error"), http.StatusOK)
 		}
 		return
 	}
@@ -228,7 +229,7 @@ func (h *AdminHandler) getAdminForm(w http.ResponseWriter, r *http.Request, enti
 	// Fetch admin levels
 	levelRows, err := h.DB.QueryContext(ctx, "SELECT admin_level_id, name FROM admin_level WHERE active = 1 ORDER BY sort_order")
 	if err != nil {
-		http.Error(w, "Database error fetching admin levels: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_fetch_admin_levels", err.Error()), http.StatusOK)
 		return
 	}
 	defer levelRows.Close()
@@ -237,7 +238,7 @@ func (h *AdminHandler) getAdminForm(w http.ResponseWriter, r *http.Request, enti
 	for levelRows.Next() {
 		var level AdminLevel
 		if err := levelRows.Scan(&level.ID, &level.Name); err != nil {
-			http.Error(w, "Error scanning admin levels: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, util.T(ctx, "failed_to_scan_admin_levels", err.Error()), http.StatusOK)
 			return
 		}
 		adminLevels = append(adminLevels, level)
@@ -257,9 +258,9 @@ func (h *AdminHandler) getAdminForm(w http.ResponseWriter, r *http.Request, enti
 
 		if err != nil {
 			if err == sql.ErrNoRows {
-				http.Error(w, util.T(ctx, "admin_not_found"), http.StatusNotFound)
+				http.Error(w, util.T(ctx, "admin_not_found"), http.StatusOK)
 			} else {
-				http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+				http.Error(w, util.T(ctx, "database_error_details", err.Error()), http.StatusOK)
 			}
 			return
 		}
@@ -326,7 +327,7 @@ func (h *AdminHandler) handleGet(w http.ResponseWriter, r *http.Request, adminID
 	case "detail":
 		// If view is "detail", display the details of a specific admin.
 		if entityID == "" {
-			http.Error(w, util.T(ctx, "admin_id_required"), http.StatusBadRequest)
+			http.Error(w, util.T(ctx, "admin_id_required"), http.StatusOK)
 			return
 		}
 		h.getDetailAdmin(w, r, adminID, entityID)
@@ -336,14 +337,14 @@ func (h *AdminHandler) handleGet(w http.ResponseWriter, r *http.Request, adminID
 	case "edit":
 		// If view is "edit", display the form to edit an existing admin.
 		if entityID == "" {
-			http.Error(w, "Admin ID required for edit view", http.StatusBadRequest)
+			http.Error(w, util.T(ctx, "admin_id_required_for_edit"), http.StatusOK)
 			return
 		}
 		h.getAdminForm(w, r, entityID)
 	case "change-password":
 		// If view is "change-password", display the form to change an admin's password.
 		if entityID == "" {
-			http.Error(w, "Admin ID required for change password view", http.StatusBadRequest)
+			http.Error(w, util.T(ctx, "admin_id_required_for_change_password"), http.StatusOK)
 			return
 		}
 		h.getChangePasswordForm(w, r, entityID)
@@ -360,7 +361,7 @@ func (h *AdminHandler) handlePost(w http.ResponseWriter, r *http.Request, adminI
 	// Use ParseMultipartForm to handle both multipart/form-data and application/x-www-form-urlencoded
 	// 10 << 20 specifies a maximum of 10 MB for the in-memory part of the form.
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
-		http.Error(w, util.T(ctx, "failed_to_parse_form")+": "+err.Error(), http.StatusBadRequest)
+		http.Error(w, util.T(ctx, "failed_to_parse_form", err.Error()), http.StatusBadRequest)
 		return
 	}
 

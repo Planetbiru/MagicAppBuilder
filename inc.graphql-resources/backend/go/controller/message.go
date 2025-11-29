@@ -154,7 +154,7 @@ func (h *MessageHandler) getDetailMessage(w http.ResponseWriter, r *http.Request
 	)
 
 	if err != nil && err != sql.ErrNoRows {
-		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusOK)
 		return
 	}
 
@@ -194,7 +194,7 @@ func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, 
 	countQuery := "SELECT COUNT(*) FROM message m LEFT JOIN admin sender ON m.sender_id = sender.admin_id LEFT JOIN admin receiver ON m.receiver_id = receiver.admin_id " + whereClause
 	err := h.DB.QueryRow(countQuery, params...).Scan(&totalRecords)
 	if err != nil {
-		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_count_records", "Message"), http.StatusOK)
 		return
 	}
 
@@ -209,7 +209,7 @@ func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, 
 
 	rows, err := h.DB.Query(listQuery, append(params, pageSize, offset)...)
 	if err != nil {
-		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusOK)
 		return
 	}
 	defer rows.Close()
@@ -222,7 +222,7 @@ func (h *MessageHandler) getMessageList(w http.ResponseWriter, r *http.Request, 
 			&msg.ReceiverID, &msg.SenderName, &msg.ReceiverName,
 		)
 		if err != nil {
-			http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
+			http.Error(w, util.T(ctx, "failed_to_scan_item", "Message"), http.StatusOK)
 			return
 		}
 		messages = append(messages, msg)

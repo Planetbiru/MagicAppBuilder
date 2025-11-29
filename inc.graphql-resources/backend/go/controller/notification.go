@@ -56,9 +56,9 @@ func (h *NotificationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		// Log the specific error to help with debugging
 		log.Printf("Failed to fetch admin_level_id for admin_id %s: %v", adminID, err)
 		if err == sql.ErrNoRows {
-			http.Error(w, util.T(ctx, "admin_not_found"), http.StatusNotFound)
+			http.Error(w, util.T(ctx, "admin_not_found"), http.StatusOK)
 		} else {
-			http.Error(w, util.T(ctx, "failed_to_fetch_admin_details"), http.StatusInternalServerError)
+			http.Error(w, util.T(ctx, "failed_to_fetch_admin_details"), http.StatusOK)
 		}
 		return
 	}
@@ -203,7 +203,7 @@ func (h *NotificationHandler) getNotificationList(w http.ResponseWriter, r *http
 	countQuery := "SELECT COUNT(*) FROM notification " + whereClause
 	err := h.DB.QueryRow(countQuery, params...).Scan(&totalRecords)
 	if err != nil {
-		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_count_records", "Notification"), http.StatusOK)
 		return
 	}
 
@@ -213,7 +213,7 @@ func (h *NotificationHandler) getNotificationList(w http.ResponseWriter, r *http
 
 	rows, err := h.DB.Query(listQuery, append(params, pageSize, offset)...)
 	if err != nil {
-		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
+		http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusOK)
 		return
 	}
 	defer rows.Close()
@@ -225,8 +225,7 @@ func (h *NotificationHandler) getNotificationList(w http.ResponseWriter, r *http
 			&notif.NotificationID, &notif.Subject, &notif.Content, &notif.IsRead, &notif.TimeCreate, &notif.Link,
 		)
 		if err != nil {
-			log.Println("ERROR COUNT:", err)
-			http.Error(w, util.T(ctx, "failed_to_fetch_details"), http.StatusInternalServerError)
+			http.Error(w, util.T(ctx, "failed_to_scan_item", "Notification"), http.StatusOK)
 			return
 		}
 		notifications = append(notifications, notif)
