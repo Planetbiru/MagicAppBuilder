@@ -119,7 +119,7 @@ try {
         $zip = new ZipArchive();
         // Create a temporary file for the ZIP
         $zipFilePath = tempnam(sys_get_temp_dir(), 'graphql_');
-        if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+        if ($zip->open($zipFilePath, ZipArchive::CREATE) !== true) {
             throw new Exception("Could not create ZIP file.");
         }
 
@@ -128,7 +128,7 @@ try {
         foreach ($backendFiles as $file) {
             $zip->addFromString($file['name'], $file['content']);
         }
-        
+
         // Add manual content file
         $manualMd = $generator->generateManual();
         $zip->addFromString('manual.md', $manualMd);
@@ -137,7 +137,7 @@ try {
         $appName = $application->getName();
         $manualHtml = generateManualHtml($manualMd, $appName);
         $zip->addFromString('manual.html', $manualHtml);
-        
+
         // Add frontend config files
         $zip->addFromString('config/frontend-config.json', $generator->generateFrontendConfigJson());
 
@@ -158,21 +158,21 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/source.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/en.json", 'langs/i18n/en.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/langs/i18n/id.json", 'langs/i18n/id.json');
-        
+
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
-        
+
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-php.js", 'assets/app.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-php.min.js", 'assets/app.min.js');
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/I18n.php", 'inc/I18n.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/ObjectScalar.php", 'inc/ObjectScalar.php');
-        
+
         if($inMemoryCache)
         {
             $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/InMemoryCache.php", 'inc/InMemoryCache.php');
         }
-        
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/admin.php", 'admin.php');   
+
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/admin.php", 'admin.php');
 
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/composer.json", 'composer.json');
@@ -181,7 +181,7 @@ try {
 
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/backend/php/vendor";
         addDirectoryToZip($zip, $vendorPath, 'vendor');
-        
+
         $themePath = dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/themes";
         addDirectoryToZip($zip, $themePath, 'assets/themes');
 
@@ -203,7 +203,7 @@ try {
         $databaseConfiguration = setDatabaseConfiguration($application, $databaseConfiguration);
 
         $zip->addFromString('database.php', $databaseConfiguration);
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/sessions.php", 'sessions.php');  
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/sessions.php", 'sessions.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/auth.php", 'auth.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/login.php", 'login.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/logout.php", 'logout.php');
@@ -240,14 +240,14 @@ try {
     else
     {
         $generator = new GraphQLGeneratorPHP($schema, $reservedColumns);
-        
+
         $manualMd = $generator->generateManual();
 
         // Create ZIP file
         $zip = new ZipArchive();
         // Create a temporary file for the ZIP
         $zipFilePath = tempnam(sys_get_temp_dir(), 'graphql_');
-        if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+        if ($zip->open($zipFilePath, ZipArchive::CREATE) !== true) {
             throw new Exception("Could not create ZIP file.");
         }
 
@@ -258,7 +258,7 @@ try {
         $databaseConfiguration = setDatabaseConfiguration($application, $databaseConfiguration);
 
         $zip->addFromString('database.php', $databaseConfiguration);
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/sessions.php", 'sessions.php');  
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/sessions.php", 'sessions.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/auth.php", 'auth.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/login.php", 'login.php');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/logout.php", 'logout.php');
@@ -278,14 +278,14 @@ try {
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/composer.json", 'composer.json');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/composer.lock", 'composer.lock');
-        
+
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/inc/ObjectScalar.php", 'inc/ObjectScalar.php');
-        
+
         if($inMemoryCache)
         {
             $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/inc/InMemoryCache.php", 'inc/InMemoryCache.php');
         }
-        
+
         // Add all files under directory `vendor`
         $vendorPath = dirname(__DIR__) . "/inc.graphql-resources/backend/php/vendor";
         addDirectoryToZip($zip, $vendorPath, 'vendor');

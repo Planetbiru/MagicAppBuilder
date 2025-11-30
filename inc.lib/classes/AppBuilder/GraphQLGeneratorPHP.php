@@ -771,22 +771,29 @@ PHP;
     {
         return "
 /**
- * Generate a unique 20-byte ID.
+ * Generate a random UUID (Universally Unique Identifier) version 4.
  *
- * This method generates a unique ID by concatenating a 13-character string
- * from `uniqid()` with a 6-character random hexadecimal string, ensuring
- * the resulting string is 20 characters in length.
+ * This function creates a 128-bit UUID using random bytes and applies
+ * the proper version (4) and variant (RFC 4122) bits. The result is
+ * formatted as a canonical string representation:
+ *     xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
  *
- * @return string A unique 20-byte identifier.
+ * Example output:
+ *     ad271d69-6c5a-4002-b2d2-3e0f84f7dfa3
+ *
+ * @return string A UUID v4 string in standard format.
  */
-function generateNewId()
-{
-    \$uuid = uniqid();
-    if ((strlen(\$uuid) % 2) == 1) {
-        \$uuid = '0' . \$uuid;
-    }
-    \$random = sprintf('%06x', mt_rand(0, 16777215));
-    return sprintf('%s%s', \$uuid, \$random);
+function generateNewId() {
+    // Generate 16 bytes (128 bit) random data
+    \$data = random_bytes(16);
+
+    // Set versi ke 0100 (UUID v4)
+    \$data[6] = chr((ord(\$data[6]) & 0x0f) | 0x40);
+    // Set variant ke 10xxxxxx
+    \$data[8] = chr((ord(\$data[8]) & 0x3f) | 0x80);
+
+    // Format ke string UUID
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(\$data), 4));
 }
 ";
     }
