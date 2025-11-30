@@ -1,15 +1,15 @@
 /**
  * Class to manage the creation, editing, and deletion of database entities (tables),
  * as well as generating SQL statements for the entities.
- * 
+ *
  * The EntityEditor class allows users to create new database tables (entities),
- * add or remove columns, modify column properties, and export the generated SQL 
+ * add or remove columns, modify column properties, and export the generated SQL
  * statements for creating the tables in MySQL.
  */
 class EntityEditor {
     /**
      * Creates an instance of the EntityEditor class.
-     * 
+     *
      * @param {string} selector - The CSS selector that identifies the target element for the entity editor.
      * @param {Object} [options={}] - Optional configuration settings for the entity editor.
      */
@@ -71,19 +71,19 @@ class EntityEditor {
         this.currentEntityIndex = -1;
         this.mysqlDataTypes = [
             'BIGINT', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT',
-            'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT', 
+            'NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT',
             'BIT',
             'DATE', 'TIME', 'DATETIME', 'TIMESTAMP', 'YEAR',
             'LONGTEXT', 'MEDIUMTEXT', 'TEXT', 'TINYTEXT', 'VARCHAR', 'CHAR',
-            'ENUM', 'SET', 
+            'ENUM', 'SET',
             'LONGBLOB', 'MEDIUMBLOB', 'BLOB', 'TINYBLOB',
-            'UUID', 
+            'UUID',
             'VARBINARY', 'BINARY',
             'POLYGON', 'LINESTRING', 'POINT', 'GEOMETRY',
             'JSON',
         ];
         this.withLengthTypes = [
-            'VARCHAR', 'CHAR', 
+            'VARCHAR', 'CHAR',
             'VARBINARY', 'BINARY',
             'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT',
             'BIT'
@@ -150,14 +150,18 @@ class EntityEditor {
         this.graphqlAppData = {
             custom: true,
             system: false,
+            inMemoryCache: false,
             entities: [],
             entitySelector: []
         }
+        this.graphqlAppProfile = {
+
+        };
     }
 
     /**
      * Searches for an entity by name.
-     * 
+     *
      * @param {string} name - The name of the entity to find.
      * @returns {Object|null} - Returns the entity if found, otherwise returns null.
      */
@@ -217,7 +221,7 @@ class EntityEditor {
         {
             columnType = map[grapqlType];
         }
-        
+
         if(columnType == 'TEXT' && pk)
         {
             columnType = 'VARCHAR';
@@ -258,23 +262,23 @@ class EntityEditor {
         document.querySelector(".check-all-entity-structure").addEventListener('change', (event) => {
             let checked = event.target.checked;
             let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-structure");
-            
+
             if(allEntities)
             {
                 allEntities.forEach(entity => {
                     entity.checked = checked;
                 })
-            }       
+            }
             _this.exportToSQL();
         });
-        
+
         document.addEventListener('change', function (event) {
-            
+
             if (event.target.classList.contains('column-primary-key')) {
                 const isChecked = event.target.checked;
                 const tr = event.target.closest('tr');
                 if(isChecked)
-                {  
+                {
                     tr.querySelector('.column-type').value = _this.primaryKeyDataType;
                     _this.updateColumnLengthInput(tr.querySelector('.column-type'));
                     tr.querySelector('.column-length').value = _this.primaryKeyDataLength;
@@ -298,7 +302,7 @@ class EntityEditor {
                     tr.querySelector('.column-nullable').disabled = false;
                 }
             }
-            
+
         });
 
         document.querySelector(this.selector+" .import-file-json").addEventListener("change", function () {
@@ -306,8 +310,8 @@ class EntityEditor {
             if (file) {
                 editor.importJSON(file, function(entities, diagrams){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-                    sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);  
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
+                    sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);
                 }); // Import the file if it's selected
             } else {
                 console.error("Please select a JSON file first.");
@@ -319,7 +323,7 @@ class EntityEditor {
             if (file) {
                 editor.importSQLFile(file, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
                 }); // Import the file if it's selected
             } else {
                 console.error("Please select a JSON file first.");
@@ -344,7 +348,7 @@ class EntityEditor {
                         _this.currentEntityData = data;
                         _this.importFromSheet(columns, entityName);
                     }
-                }); 
+                });
             } else {
                 console.error("Please select a JSON file first.");
             }
@@ -355,16 +359,16 @@ class EntityEditor {
             if (file) {
                 editor.processGraphQLSchema(file, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-        
-                }); 
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
+
+                });
             } else {
                 console.error("Please select a GraphQL Schema file first.");
             }
         });
-        
+
         document.querySelector(this.selector).addEventListener('keypress', function(event){
-            if(event.key == 'Enter') 
+            if(event.key == 'Enter')
             {
                 if((event.target.closest('.entity-container .entity-name') || event.target.closest('.entity-container .column-name')))
                 {
@@ -376,7 +380,7 @@ class EntityEditor {
                 }
             }
         });
-        
+
         this.initIconEvent();
     }
 
@@ -389,10 +393,10 @@ class EntityEditor {
      */
     addColumnIfValid(element) {
         // Convert the input value to lowercase for case-insensitive comparison
-        const value = element.value.toLowerCase(); 
+        const value = element.value.toLowerCase();
 
         // Check if the value is included in the reserved keywords list (case-insensitive)
-        if (this.keyWords.some(keyword => keyword.toLowerCase() === value)) {  
+        if (this.keyWords.some(keyword => keyword.toLowerCase() === value)) {
             // Show an alert if the word is reserved
             this.showAlertDialog(`The word "${element.value}" is reserved and cannot be used. Please choose another one.`, `Reserved Word`, `Close`, function(){
                 // Select the input text for the user to correct it
@@ -413,10 +417,10 @@ class EntityEditor {
      */
     addColumnTemplateIfValid(element) {
         // Convert the input value to lowercase for case-insensitive comparison
-        const value = element.value.toLowerCase(); 
+        const value = element.value.toLowerCase();
 
         // Check if the value is included in the reserved keywords list (case-insensitive)
-        if (this.keyWords.some(keyword => keyword.toLowerCase() === value)) {  
+        if (this.keyWords.some(keyword => keyword.toLowerCase() === value)) {
             // Show an alert if the word is reserved
             this.showAlertDialog(`The word "${element.value}" is reserved and cannot be used. Please choose another one.`, `Reserved Word`, `Close`, function(){
                 // Select the input text for the user to correct it
@@ -428,12 +432,12 @@ class EntityEditor {
         }
     }
 
-    
+
     /**
      * Initializes the event listeners for click events on various icons within the SVG.
      * The event listener checks for specific icon classes within the SVG (e.g., move up, move down, edit, delete)
      * and triggers the corresponding methods based on the target element that was clicked.
-     * 
+     *
      * Event Listeners:
      * - `move-down-icon`: Calls `moveEntityUp()` with the index of the clicked entity.
      * - `move-up-icon`: Calls `moveEntityDown()` with the index of the clicked entity.
@@ -465,7 +469,7 @@ class EntityEditor {
     /**
      * Shows the entity editor with the columns of an existing entity or prepares
      * a new entity for editing.
-     * 
+     *
      * @param {number} entityIndex - The index of the entity to be edited. If not provided, a new entity is created.
      */
     showEditor(entityIndex = -1) {
@@ -554,7 +558,7 @@ class EntityEditor {
 
     /**
      * Adds a column to the columns table for editing.
-     * 
+     *
      * @param {Column} column - The column to add.
      * @param {boolean} [focus=false] - Whether to focus on the new column's name input.
      * @param {boolean} [newColumn=false] - Whether this is a new column being added.
@@ -591,15 +595,15 @@ class EntityEditor {
         {
             aiDisabled = '';
         }
-        
+
         let columnDescription = column.description ? column.description : '';
-        
+
         row.innerHTML = `
             <td class="drag-handle"></td>
             <td class="column-action">
                 <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
                 <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
-                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>    
+                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>
             </td>
             <td><input type="text" class="column-name" value="${column.name}" data-original-name="${originalName}" placeholder="Column Name"></td>
             <td>
@@ -746,17 +750,17 @@ class EntityEditor {
         // Determine the new column's name based on existing columns.
         const columnCount = document.querySelectorAll(this.selector + " .entity-container .column-name").length;
         const countSuffix = columnCount === 0 ? '' : columnCount + 1; // Use count + 1 for subsequent columns
-        
+
         // If it's the first column, name it `${entityName}_id`, otherwise `${entityName}_colX`.
         const columnName = columnCount === 0 ? `${entityName}_id` : `${entityName}_col${countSuffix}`;
-        
+
         // Create a new Column instance with default data type and length.
         const column = new Column(columnName, this.defaultDataType, this.defaultDataLength);
         column.nullable = true; // Set the new column as nullable by default.
 
         // Add the column to the table in the UI.
         this.addColumnToTable(column, focus, true);
-        
+
         // Scroll to the bottom of the table container to show the newly added column.
         const element = document.querySelector(this.selector + ' .entity-container .table-container');
         element.scrollTop = element.scrollHeight;
@@ -769,14 +773,14 @@ class EntityEditor {
      * @returns {boolean} - True if an entity with the name exists, false otherwise.
      */
     isEntityExists(entityName) {
-        for (const entity of this.entities) { 
-            if (entity.name === entityName) { 
+        for (const entity of this.entities) {
+            if (entity.name === entityName) {
                 return true;
             }
         }
         return false;
     }
-    
+
     /**
      * Checks whether any column in the entity editor is marked as a primary key.
      *
@@ -823,7 +827,7 @@ class EntityEditor {
         const selector = this.selector + " .entity-container .entity-name";
         const entityNameInput = document.querySelector(selector);
         const entityName = entityNameInput.value;
-        
+
         if (!this.hasPrimaryKey()) {
             this.showAlertDialog("A primary key is required before saving the entity.", "Primary Key Required", "OK");
             return;
@@ -837,7 +841,7 @@ class EntityEditor {
             });
             return;
         }
-        
+
         // Check if an entity with the same name already exists.
         if (this.operation == 'create' && this.isEntityExists(entityName)) {
             this.showConfirmationDialog(
@@ -856,10 +860,10 @@ class EntityEditor {
             );
             return; // Stop function execution if entity name is a duplicate.
         }
-        
+
         // Proceed to save the entity if no duplicate name issue or if resolved.
         this.doSaveEntity();
-        
+
         // Check for an active diagram tab and re-select it to refresh the diagram.
         const activeDiagram = document.querySelector('.tabs-link-container li.diagram-tab.active');
         if (activeDiagram) {
@@ -876,7 +880,7 @@ class EntityEditor {
      * - `index`: The index of the duplicate field.
      * - `name`: The duplicated column name.
      * - `element`: The DOM element of the duplicate field.
-     * 
+     *
      * If no duplicate is found, returns `null`.
      *
      * @returns {{ index: number, name: string, element: HTMLElement } | null}
@@ -961,7 +965,7 @@ class EntityEditor {
 
         modifiedColumnNames.forEach(modified => {
             // Update the column names in the current entity data
-            
+
             if(this.entities[this.currentEntityIndex] && this.entities[this.currentEntityIndex].data && this.entities[this.currentEntityIndex]) // NOSONAR
             {
                 this.entities[this.currentEntityIndex].data.forEach(row => {
@@ -971,7 +975,7 @@ class EntityEditor {
                     }
                 });
             }
-            
+
         });
 
         if (this.currentEntityIndex >= 0) {
@@ -985,7 +989,7 @@ class EntityEditor {
             // Add a new entity
             const newEntity = new Entity(entityName, this.entities.length);
             columns.forEach(col => newEntity.addColumn(col));
-            
+
             let entityData = this.snakeizeData(this.currentEntityData, originalColumnReference);
             modifiedColumnNames.forEach(modified => {
                 entityData.forEach(row => {
@@ -995,7 +999,7 @@ class EntityEditor {
                     }
                 });
             });
-            
+
             newEntity.setData(entityData);
             newEntity.modificationDate = (new Date()).getTime();
             newEntity.creationDate = newEntity.modificationDate;
@@ -1044,7 +1048,7 @@ class EntityEditor {
             _this.addDiagramEventListener(svg);
         });
     }
-    
+
     /**
      * Save diagram to server
      */
@@ -1080,7 +1084,7 @@ class EntityEditor {
 
     /**
      * Adds a new column template to the editor with default values.
-     * 
+     *
      * @param {boolean} focus - Whether to focus on the newly added column input field.
      */
     addColumnTemplate(focus) {
@@ -1099,7 +1103,7 @@ class EntityEditor {
 
     /**
      * Adds a new column to the template editor.
-     * 
+     *
      * @param {Object} column - The column data to add (name, type, length, nullable, default, values).
      * @param {boolean} focus - Whether to focus on the column input field after adding it.
      */
@@ -1115,7 +1119,7 @@ class EntityEditor {
             <td class="column-action">
                 <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
                 <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
-                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>    
+                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>
             </td>
             <td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
             <td>
@@ -1222,7 +1226,7 @@ class EntityEditor {
 
     /**
      * Removes the selected column from the entity.
-     * 
+     *
      * @param {HTMLElement} button - The button that was clicked to remove the column.
      */
     removeColumn(button) {
@@ -1232,7 +1236,7 @@ class EntityEditor {
 
     /**
      * Moves a column up in the columns table.
-     * 
+     *
      * @param {HTMLElement} button - The button that was clicked to move the column up.
      */
     moveUp(button) {
@@ -1246,7 +1250,7 @@ class EntityEditor {
 
     /**
      * Moves a column down in the columns table.
-     * 
+     *
      * @param {HTMLElement} button - The button that was clicked to move the column down.
      */
     moveDown(button) {
@@ -1260,7 +1264,7 @@ class EntityEditor {
 
     /**
      * Converts a JSON array to an array of Entity objects.
-     * 
+     *
      * @param {Array} jsonData - The JSON array containing entities and their columns.
      * @returns {Array} - An array of Entity objects.
      */
@@ -1271,7 +1275,7 @@ class EntityEditor {
         jsonData.entities.forEach(entityData => {
             // Create a new Entity instance
             const entity = new Entity(entityData.name, entityData.index);
-            
+
             // Iterate over each column in the entity's columns array
             entityData.columns.forEach(columnData => {
                 // Create a new Column instance
@@ -1286,10 +1290,10 @@ class EntityEditor {
                     columnData.values !== "null" ? columnData.values : "",
                     columnData.description
                 );
-                
+
                 // Add the column to the entity
                 entity.addColumn(column);
-                
+
             });
             entity.creationDate = entityData.creationDate || null;
             entity.modificationDate = entityData.modificationDate || null;
@@ -1308,7 +1312,7 @@ class EntityEditor {
 
     /**
      * Converts a JSON array to an array of Entity objects.
-     * 
+     *
      * @param {Array} jsonData - The JSON array containing entities and their columns.
      * @returns {Array} - An array of Entity objects.
      */
@@ -1335,13 +1339,13 @@ class EntityEditor {
 
     /**
      * Creates an array of Entity instances from the given SQL table data.
-     * 
-     * This method takes in an array of tables, each containing information about table columns, and converts that 
+     *
+     * This method takes in an array of tables, each containing information about table columns, and converts that
      * data into Entity and Column objects. It then returns an array of the created entities.
      *
      * @param {Array} tables - An array of tables (each table being an object) with column data to convert into entities.
      * Each table should contain a `tableName` and a `columns` array where each column object contains metadata about the column (e.g., Field, Type, Length, Nullable, etc.).
-     * 
+     *
      * @returns {Array} entities - An array of Entity objects, each containing Column objects based on the provided table data.
      */
     createEntitiesFromSQL(tables) {
@@ -1352,7 +1356,7 @@ class EntityEditor {
         tables.forEach((table, index) => {
             // Create a new Entity instance
             let entity = new Entity(_this.snakeize(table.tableName), index);
-            
+
             // Iterate over each column in the entity's columns array
             table.columns.forEach(columnData => {
                 // Create a new Column instance
@@ -1367,7 +1371,7 @@ class EntityEditor {
                     (columnData.EnumValues != null && typeof columnData.EnumValues == 'object') ? columnData.EnumValues.join(', ') : null,
                     null
                 );
-                
+
                 // Add the column to the entity
                 entity.addColumn(column);
             });
@@ -1386,7 +1390,7 @@ class EntityEditor {
 
     /**
      * Gets the checked (selected) entities for each diagram.
-     * 
+     *
      * @returns {Object} An object where each key is a diagram ID and the value is an array of selected entity names.
      */
     getCheckedEntities() {
@@ -1402,7 +1406,7 @@ class EntityEditor {
 
     /**
      * Sets the checked (selected) entities for each diagram.
-     * 
+     *
      * @param {Object} diagramEntities - An object where each key is a diagram ID and the value is an array of entity names to set as checked.
      */
     setCheckedEntities(diagramEntities) {
@@ -1425,7 +1429,7 @@ class EntityEditor {
         let li = document.querySelector('.tabs-link-container .diagram-tab.active');
         this.selectDiagram(li);
     }
-    
+
     /**
      * Restores checked (selected) entities in the UI for the currently active diagram.
      * Updates the checkboxes in the table list to match the entities of the active diagram.
@@ -1446,14 +1450,14 @@ class EntityEditor {
 
     /**
      * Renders the entities to the DOM.
-     * 
+     *
      * This method updates the UI by rendering two sections:
      * - Build table checkboxes grouped into "Custom Entities" and "System Entities".
      * - Table editor list (with edit/delete) shown as a flat list.
-     * 
+     *
      * Previously selected checkboxes will be preserved. This function also recalculates
      * the Entity Relationship Diagram (ERD) width and triggers a re-render.
-     * 
+     *
      * @returns {void}
      */
     renderEntities() {
@@ -1490,7 +1494,7 @@ class EntityEditor {
                 <td>[Custom Entities]</td>`;
             tabelListForExport.appendChild(sep);
         }
-        
+
         let entityIndex = 0;
 
         // Custom Entities First
@@ -1596,11 +1600,11 @@ class EntityEditor {
         `;
         tabelListForExport.appendChild(row);
     }
-    
-    
+
+
     /**
      * Refreshes the entities by re-rendering and restoring checked entities.
-     * This method temporarily stores the checked entities, re-renders the entities, 
+     * This method temporarily stores the checked entities, re-renders the entities,
      * updates the diagram, and then restores the checked entities.
      */
     refreshEntities() {
@@ -1620,21 +1624,26 @@ class EntityEditor {
      */
     prepareDiagram() {
         let _this = this;
+        let ul = document.querySelector('.tabs-link-container .diagram-list.tabs');
         if (this.diagrams.length > 0) {
             this.diagrams.forEach((diagram) => {
-                let ul = document.querySelector('.tabs-link-container .diagram-list.tabs');
+
                 _this.addDiagram(ul, diagram.name, diagram.id, diagram.entities, true);
             });
         }
+        let obj = document.querySelector('.diagram-list.tabs');
+        let maxScroll = ul.scrollWidth - obj.offsetWidth;
+        currentMarginLeft = -maxScroll;
+        ul.style.marginLeft = `${currentMarginLeft}px`;
     }
 
     /**
      * Selects a diagram and updates the UI accordingly.
-     * 
-     * This method highlights the selected diagram tab, deactivates all other tabs, 
+     *
+     * This method highlights the selected diagram tab, deactivates all other tabs,
      * and displays the corresponding diagram in the container while hiding others.
      * Additionally, it updates the entity checkboxes based on the selected diagram's entities.
-     * 
+     *
      * @param {HTMLElement} li - The selected list item (diagram tab) element.
      */
     selectDiagram(li) {
@@ -1676,7 +1685,7 @@ class EntityEditor {
             if (entities.length > 0 && value !== '') {
                 input.checked = entities.includes(value);
             }
-            
+
             input.disabled = false;
         });
 
@@ -1686,23 +1695,24 @@ class EntityEditor {
 
     /**
      * Adds a new diagram tab and its corresponding diagram content.
-     * 
+     *
      * @param {HTMLElement} ul - The parent <ul> element to append the new diagram tab.
      * @param {string} diagramName - The name of the diagram.
      * @param {string} id - Unique identifier for the diagram.
      * @param {Array} entities - List of entities associated with the diagram.
      * @param {boolean} [finish=false] - Whether the diagram is in edit mode.
+     * @param {boolean} [moveTab=false] - Wheter the editor should move the tabs
      */
-    addDiagram(ul, diagramName, id, entities, finish)
+    addDiagram(ul, diagramName, id, entities, finish, moveTab = false)
     {
         let _this = this;
         finish = finish || false;
         let template = `
         <input type="text" value="${diagramName}">
-        <a href="#tab1" class="tab-link select-diagram">${diagramName}</a> 
-        <a 
-            href="javascript:" class="update-diagram"><span class="icon-emoji icon-ok"></span></a><a 
-            href="javascript:" class="edit-diagram"><span class="icon-emoji icon-edit"></span></a><a 
+        <a href="#tab1" class="tab-link select-diagram">${diagramName}</a>
+        <a
+            href="javascript:" class="update-diagram"><span class="icon-emoji icon-ok"></span></a><a
+            href="javascript:" class="edit-diagram"><span class="icon-emoji icon-edit"></span></a><a
             href="javascript:" class="delete-diagram"><span class="icon-emoji icon-delete"></span></a>
         `;
 
@@ -1713,13 +1723,13 @@ class EntityEditor {
         newTab.querySelector('a.tab-link').setAttribute('href', '#'+diagramName);
         newTab.setAttribute('data-id', id);
         newTab.classList.add('diagram-tab');
-        
+
         let lastChild = ul.lastElementChild;
         ul.insertBefore(newTab, lastChild);
         newTab.querySelector('input').select();
 
         newTab.querySelector('input').addEventListener('keypress', function(e){
-            if(e.key == 'Enter') 
+            if(e.key == 'Enter')
             {
                 let value = e.target.value;
                 let label = newTab.querySelector('.tab-link');
@@ -1759,13 +1769,13 @@ class EntityEditor {
         diagram.appendChild(svg);
         diagramContainer.appendChild(diagram);
         diagramRenderer[id] = new EntityRenderer(`.diagram-container #${id} .erd-svg`);
-        
+
         ul.querySelectorAll('li.diagram-tab').forEach((li, index) => {
             li.setAttribute('data-index', index);
         });
         this.selectDiagram(newTab);
         this.updateDiagram();
-        
+
         newTab.querySelector('.select-diagram').addEventListener('click', function(e){
             e.preventDefault();
             let li = e.target.closest('li');
@@ -1815,11 +1825,11 @@ class EntityEditor {
                     });
                     _this.updateDiagram();
                     _this.saveDiagram();
-                } 
+                }
             });
-            
+
         });
-        
+
         if(tabDragger === null)
         {
             tabDragger = new TabDragger(ul, function(){
@@ -1828,28 +1838,32 @@ class EntityEditor {
             });
             tabDragger.initAll();
         }
-        
+
         tabDragger.makeDraggable(newTab);
-        
+
         let move = -10 - newTab.offsetWidth;
-        updateMarginLeft(move)
+
+        if(moveTab)
+        {
+            updateMarginLeft(move);
+        }
     }
 
     /**
      * Adds a click event listener to an SVG diagram.
-     * 
+     *
      * @param {SVGElement} svg - The SVG element to add the event listener to.
      */
     addDiagramEventListener(svg) {
         let _this = this;
-    
+
         // Simpan referensi fungsi dalam elemen
         if (!svg._clickHandler) {
             svg._clickHandler = function(e) {
                 _this.editEventListener(e);
             };
         }
-    
+
         svg.addEventListener('click', svg._clickHandler);
     }
 
@@ -1924,10 +1938,10 @@ class EntityEditor {
         });
         return diagrams;
     }
-    
+
     /**
      * Removes a click event listener from an SVG diagram.
-     * 
+     *
      * @param {SVGElement} svg - The SVG element to remove the event listener from.
      */
     removeDiagramEventListener(svg) {
@@ -1939,12 +1953,13 @@ class EntityEditor {
 
     /**
      * Clears all diagrams from the diagram list and diagram container.
-     * 
+     *
      * This method removes all diagram tabs and their corresponding content from the DOM,
      * and sets the "all-entities" tab as active.
      */
     clearDiagrams()
     {
+
         document.querySelector('.diagram-list.tabs .all-entities').classList.add('active');
 
         let diagramTab = document.querySelectorAll('.diagram-tab');
@@ -1963,11 +1978,17 @@ class EntityEditor {
             });
         }
         document.querySelector('.diagram-container #all-entities').classList.add('active');
+        let ul = document.querySelector('.diagram-list.tabs');
+        ul.style.marginLeft = '0px';
+        ul.scrollLeft = 0;
+        ul.width = 'auto';
+        ul.parentNode.scrollLeft = 0;
+        currentMarginLeft = 132;
     }
 
     /**
      * Clears all entities from the diagram container.
-     * 
+     *
      * This method removes all SVG elements from the "all-entities" diagram,
      * effectively clearing the diagram of all entities.
      */
@@ -1983,7 +2004,7 @@ class EntityEditor {
 
     /**
      * Handles click events inside a diagram SVG element.
-     * 
+     *
      * @param {Event} e - The event object.
      */
     editEventListener(e)
@@ -2026,7 +2047,7 @@ class EntityEditor {
 
     /**
      * Removes a specific target element from the array if it appears only once.
-     * 
+     *
      * @param {Array} arr - The array to filter.
      * @param {string} target - The element to remove if it is unique.
      * @returns {Array} - A new array with the target removed if it was unique.
@@ -2037,7 +2058,7 @@ class EntityEditor {
 
     /**
      * Moves an element up or down within an array.
-     * 
+     *
      * @param {string} haystack - Comma-separated string of elements.
      * @param {string} needle - The element to move.
      * @param {number} operation - 1 to move down, -1 to move up.
@@ -2046,21 +2067,21 @@ class EntityEditor {
     arrayElementOperation(haystack, needle, operation) {
         let array = haystack.split(',');
         let index = array.indexOf(needle);
-        
+
         // If the element is not found or already at the left/right boundary, return the original string
         if (index === -1 || (operation === -1 && index === 0) || (operation === 1 && index === array.length - 1)) {
             return haystack;
         }
-        
+
         // Determine the new index
         let newIndex = index + operation;
-        
+
         // Swap the element with the element at the new position
         [array[index], array[newIndex]] = [array[newIndex], array[index]];
-        
+
         return array.join(',');
     }
-    
+
     /**
      * Opens a dialog to view the data of a selected entity.
      *
@@ -2075,7 +2096,7 @@ class EntityEditor {
      *
      * The method does not persist any changes; it only opens the data in a dialog for viewing.
      *
-     * @param {number} [index=-1] - The index of the entity in the `entities` array to view. If omitted, 
+     * @param {number} [index=-1] - The index of the entity in the `entities` array to view. If omitted,
      *                               the current entity index is used.
      * @returns {void}
      */
@@ -2110,8 +2131,8 @@ class EntityEditor {
         else
         {
             _this.showAlertDialog(
-                "Entity data is only available after you save this entity.", 
-                "Information", 
+                "Entity data is only available after you save this entity.",
+                "Information",
                 "OK"
             );
         }
@@ -2120,7 +2141,7 @@ class EntityEditor {
     /**
      * Moves an entity up in the list of entities.
      * This method swaps the selected entity with the one before it in the array.
-     * 
+     *
      * @param {number} index - The index of the entity to move up.
      */
     moveEntityUp(index) {
@@ -2136,7 +2157,7 @@ class EntityEditor {
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
             this.exportToSQL();
-            
+
             if(typeof this.callbackSaveEntity == 'function')
             {
                 this.callbackSaveEntity(this.entities);
@@ -2147,7 +2168,7 @@ class EntityEditor {
     /**
      * Moves an entity down in the list of entities.
      * This method swaps the selected entity with the one after it in the array.
-     * 
+     *
      * @param {number} index - The index of the entity to move down.
      */
     moveEntityDown(index) {
@@ -2163,7 +2184,7 @@ class EntityEditor {
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
             this.exportToSQL();
-            
+
             if(typeof this.callbackSaveEntity == 'function')
             {
                 this.callbackSaveEntity(this.entities);
@@ -2173,7 +2194,7 @@ class EntityEditor {
 
     /**
      * Sorts the entities alphabetically based on the 'name' property.
-     * This method sorts the entities in ascending order (A-Z) and then calls 
+     * This method sorts the entities in ascending order (A-Z) and then calls
      * `renderEntities()` to re-render the sorted list of entities in the UI.
      */
     sortEntities() {
@@ -2251,7 +2272,7 @@ class EntityEditor {
 
     /**
      * Edits the specified entity based on its index in the entities array.
-     * 
+     *
      * @param {number} index - The index of the entity to edit.
      */
     editEntity(index) {
@@ -2261,7 +2282,7 @@ class EntityEditor {
 
     /**
      * Deletes the specified entity based on its index in the entities array.
-     * 
+     *
      * @param {number} index - The index of the entity to delete.
      */
     deleteEntity(index) {
@@ -2271,7 +2292,7 @@ class EntityEditor {
             if (isConfirmed) {
                 _this.entities.splice(index, 1);
                 // Update entity index
-                _this.updateEntityIndex();              
+                _this.updateEntityIndex();
                 _this.renderEntities();
                 _this.restoreCheckedEntitiesFromCurrentDiagram();
                 _this.exportToSQL();
@@ -2279,10 +2300,10 @@ class EntityEditor {
                 {
                     _this.callbackSaveEntity(_this.entities);
                 }
-            } 
+            }
         });
     }
-    
+
     /**
      * Cancels the entity editing process and hides the editor form.
      */
@@ -2293,7 +2314,7 @@ class EntityEditor {
 
     /**
      * Updates the length and enum fields based on the selected column type.
-     * 
+     *
      * @param {HTMLElement} selectElement - The select element for the column type.
      */
     updateColumnLengthInput(selectElement) {
@@ -2303,21 +2324,21 @@ class EntityEditor {
         const enumInput = tr.querySelector(".column-enum");
 
         // Show length input for specific types
-        if (this.withLengthTypes.includes(columnType)) 
+        if (this.withLengthTypes.includes(columnType))
         {
             lengthInput.style.display = "inline";
-        } 
-        else 
+        }
+        else
         {
             lengthInput.style.display = "none";
         }
 
         // Show enum input for ENUM type
-        if (this.withValueTypes.includes(columnType) || this.withRangeTypes.includes(columnType)) 
+        if (this.withValueTypes.includes(columnType) || this.withRangeTypes.includes(columnType))
         {
             enumInput.style.display = "inline";
-        } 
-        else 
+        }
+        else
         {
             enumInput.style.display = "none";
         }
@@ -2361,14 +2382,14 @@ class EntityEditor {
 
     /**
      * Exports the selected entities as a MySQL SQL statement for creating the tables.
-     * 
+     *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
      */
     exportToSQL(dialect = "mysql") {
         let sql = this.generateSQL(dialect);
         document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
     }
-    
+
     /**
      * Generates an array of SQL statements based on selected entities.
      *
@@ -2383,21 +2404,21 @@ class EntityEditor {
      */
     generateSQL(dialect)
     {
-        let sql = [];       
-        
-        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");  
+        let sql = [];
+
+        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");
         selectedEntities.forEach(checkbox => {
-            const entityIndex = parseInt(checkbox.value); 
-            const entity = this.entities[entityIndex]; 
+            const entityIndex = parseInt(checkbox.value);
+            const entity = this.entities[entityIndex];
             if (entity) {
                 sql.push(entity.toSQL(dialect));
             }
         });
-        
-        const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");  
+
+        const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");
         selectedEntitiesData.forEach(checkbox => {
-            const entityIndex = parseInt(checkbox.value); 
-            const entity = this.entities[entityIndex]; 
+            const entityIndex = parseInt(checkbox.value);
+            const entity = this.entities[entityIndex];
             if (entity) {
                 let query = entity.toSQLInsert(dialect);
                 if(query != '')
@@ -2407,6 +2428,16 @@ class EntityEditor {
             }
         });
         return sql;
+    }
+
+    /**
+     * Clear generated query
+     */
+    clearGeneratedQuery()
+    {
+        document.querySelector('.query-generated').value = '';
+        document.querySelector('.check-all-entity-structure').checked = false;
+        document.querySelector('.check-all-entity-data').checked = false;
     }
 
     /**
@@ -2433,6 +2464,35 @@ class EntityEditor {
         }
     }
 
+    inMemoryCacheChange(element)
+    {
+
+    }
+
+    /**
+     * Returns the base column name by removing the "_id" suffix if present.
+     *
+     * @param {string} name - The original column name.
+     * @returns {string} The base name without the "_id" suffix, or an empty string if the input is falsy.
+     *
+     * @example
+     * baseColumnName('user_id'); // "user"
+     * baseColumnName('email');   // "email"
+     * baseColumnName(null);      // ""
+     */
+    baseColumnName(name)
+    {
+        if(!name)
+        {
+            return '';
+        }
+        if(name.endsWith('_id'))
+        {
+            return name.substring(0, name.length - 3);
+        }
+        return name;
+    }
+
     /**
      * Gathers all entities and their selected columns from the UI, typically from a modal
      * for schema generation. It clones the selected entities and filters their columns
@@ -2454,7 +2514,7 @@ class EntityEditor {
         let _this = this;
         let selectedModel = {entities: []};
         let entities = this.entities;
-        
+
         const checkboxesBody = document.querySelectorAll('input[type="checkbox"].entity-selector');
         if(checkboxesBody.length)
         {
@@ -2465,7 +2525,7 @@ class EntityEditor {
                     selected.push(input.value);
                 }
             });
-            
+
             if(entities)
             {
                 entities.forEach(entity => {
@@ -2478,8 +2538,8 @@ class EntityEditor {
                         // Add filters
                         let filters = [];
                         let textareas = [];
-                        
-                        
+
+
                         newEntity.columns.forEach(col => {
 
                             if(col.primaryKey)
@@ -2499,12 +2559,22 @@ class EntityEditor {
                             if(filterVal != '')
                             {
                                 // { "name": "nama", "type": "string", "operator": "CONTAINS", "element": "text" }
-                                filters.push({
+                                let filter = {
                                     "name": col.name,
                                     "type": 'string',
                                     "operator": filterVal.indexOf('CONTAINS') !== -1 ? 'CONTAINS' : 'EQUALS',
                                     "element": filterVal.indexOf('select') !== -1 ? 'select' : 'text'
-                                })
+                                };
+                                let rel = _this.baseColumnName(filter.name);
+                                if(filter.element == 'select' && selected.includes(rel))
+                                {
+                                    filter.entity = rel;
+                                }
+                                else
+                                {
+                                    null;
+                                }
+                                filters.push(filter)
                             }
                             let textareaCheckbox = entitySelector.querySelector(`input.textarea-graphql[data-col="${col.name}"]`);
                             if(textareaCheckbox && textareaCheckbox.checked)
@@ -2517,12 +2587,13 @@ class EntityEditor {
                         {
                             newEntity.filters = filters;
                         }
+                        newEntity.filterEntities = filters.length == 0 ? 0 : newEntity.filters.filter(f=>f.entity != null).length;
                         if(textareas.length > 0)
                         {
                             newEntity.textareaColumns = textareas;
                         }
 
-                        selectedModel.entities.push(newEntity); 
+                        selectedModel.entities.push(newEntity);
                     }
                 });
             }
@@ -2569,7 +2640,7 @@ class EntityEditor {
      * @param {Object} request An object containing the entities to be included in the GraphQL schema.
      */
     exportGraphQLSchema(request) {
-        // send to server for processing
+        const programmingLanguage = request.programmingLanguage || 'php';
         fetch('../lib.ajax/graphql-generator.php', {
             method: 'POST',
             headers: {
@@ -2577,20 +2648,29 @@ class EntityEditor {
             },
             body: JSON.stringify(request)
         })
-        .then(response => response.blob())
-        .then(blob => {
-            // Create a link to download the file
-            let { applicationId} = getMetaValues();
-
-            if(applicationId == '')
-            {
-                applicationId = 'app';
+        .then(async response => {
+            // Try to extract filename from Content-Disposition
+            let filename = null;
+            const disposition = response.headers.get('Content-Disposition');
+            if (disposition && disposition.includes('filename=')) {
+                const match = disposition.match(/filename\*?=(?:UTF-8''|["']?)([^"';\n]+)/i);
+                if (match && match[1]) {
+                    filename = decodeURIComponent(match[1]);
+                }
             }
 
+            // Fallback filename
+            if (!filename) {
+                let { applicationId } = getMetaValues();
+                if (!applicationId) applicationId = 'app';
+                filename = `${applicationId}-graphql-${programmingLanguage}.zip`;
+            }
+
+            const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${applicationId}-graphql.zip`;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -2600,6 +2680,7 @@ class EntityEditor {
             console.error('Error generating GraphQL schema:', error);
         });
     }
+
 
     /**
      * Handles the confirmation action in the GraphQL generator modal.
@@ -2613,7 +2694,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": false,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2630,7 +2713,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": true,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content')
+            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
+            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": document.querySelector('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2661,21 +2746,71 @@ class EntityEditor {
 
         modal.querySelector('.modal-header h3').innerHTML = title;
 
+        this.loadGraphQlAppProfile();
+
         this.createEntitySelectorTables(wrapper);
-        
+
 
         let frm = wrapper.closest('form');
 
         loadFormState(frm, this.graphqlAppData);
 
-        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-        
-        loadGraphQlEntityToServer(applicationId, databaseType, databaseName, databaseSchema, function(data){
-            loadFormState(frm, data);
-            _this.graphqlAppData = data;
-        }); 
+        this.loadGraphQlAppConfiguration();
         modal.style.display = 'block';
 
+    }
+
+    loadGraphQlAppProfile()
+    {
+        const _this = this;
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+        let url = `../lib.ajax/load-graphql-entity-index.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}`;
+        fetch(url, {
+            method: "GET",
+        })
+        .then(resp => resp.json())
+        .then(result => {
+            _this.graphqlAppProfile = result;
+            let select = document.querySelector('.graphql-app-profile');
+            select.innerHTML = ''; // Clear all opti
+            let value = '';
+            for (const key in _this.graphqlAppProfile) {
+                const opt = _this.graphqlAppProfile[key];
+                let option = new Option(opt.profileLabel, opt.profileName);
+                if(opt.selected)
+                {
+                    value = opt.profileName;
+                }
+                select.add(option);
+            }
+            select.value = value;
+        })
+        .catch(err => {
+            console.error("Failed to fetch GraphQL profile data:", err);
+        });
+    }
+
+    /**
+     * Loads the GraphQL application configuration based on the selected profile.
+     *
+     * This function retrieves the selected profile from the DOM element
+     * with the class `.graphql-app-profile`, then requests the GraphQL
+     * application entity data from the server. Once the data is received,
+     * the form state is populated and the internal GraphQL application data
+     * is updated.
+     *
+     */
+    loadGraphQlAppConfiguration()
+    {
+        let _this = this;
+        let wrapper = document.querySelector('.entity-selector-container');
+        let frm = wrapper.closest('form');
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+        let profile = document.querySelector('.graphql-app-profile').value;
+        loadGraphQlEntityFromServer(applicationId, databaseType, databaseName, databaseSchema, profile, function(data){
+            loadFormState(frm, data);
+            _this.graphqlAppData = data;
+        });
     }
 
     /**
@@ -2730,6 +2865,21 @@ class EntityEditor {
         }
     }
 
+    /**
+     * Returns an HTML `<select>` element for choosing how a primary key value is handled.
+     *
+     * If the given column is marked as a primary key, this method generates a dropdown
+     * allowing the user to select the primary key handling mode:
+     * - `autogenerated` — Primary key is automatically generated.
+     * - `manual-insert` — Primary key is provided manually only during insert.
+     * - `manual-all` — Primary key is always provided manually (insert and update).
+     *
+     * @param {Object} col - The column metadata object.
+     * @param {boolean} col.primaryKey - Indicates whether the column is a primary key.
+     * @param {string} col.name - The column name, used for data attributes.
+     *
+     * @returns {string} The HTML string for the `<select>` element if the column is a primary key; otherwise an empty string.
+     */
     getPrimaryKeyValue(col)
     {
         if(col.primaryKey)
@@ -2759,7 +2909,7 @@ class EntityEditor {
         let container = document.createElement("div");
         container.classList.add("mb-4");
         container.classList.add("entity-selector-table-container");
-        
+
         if(this.systemEntities.includes(entity.name))
         {
             container.classList.add("system-entity");
@@ -2768,7 +2918,7 @@ class EntityEditor {
         {
             container.classList.add("custom-entity");
         }
-        
+
         let entitySelector = document.createElement("input");
         entitySelector.type = "checkbox";
         entitySelector.className = "entity-selector";
@@ -2779,7 +2929,7 @@ class EntityEditor {
         tdTitle.appendChild(entitySelector);
         tdTitle.appendChild(document.createTextNode(" "));
         tdTitle.appendChild(document.createTextNode(entity.name));
-        
+
         let tb = document.createElement("table");
         tb.classList.add('entity-selector-table');
         let tr = document.createElement("tr");
@@ -2825,9 +2975,10 @@ class EntityEditor {
             tr.dataset.col = col.name;
 
             let ta = '';
+            let taChecked = col.type.toLowerCase().indexOf('text') != -1 ? ' checked' : '';
             if(!col.primaryKey && !col.name.endsWith('_id'))
             {
-                ta = `<input type="checkbox" class="textarea-graphql" data-col="${col.name}">`;
+                ta = `<input type="checkbox" class="textarea-graphql" data-col="${col.name}"${taChecked}>`;
             }
 
             tr.innerHTML = `
@@ -2850,6 +3001,28 @@ class EntityEditor {
         wrapper.appendChild(container);
     }
 
+    /**
+     * Generates an HTML `<select>` element representing the default filter type
+     * for a given column in a GraphQL-based filtering UI.
+     *
+     * The filter logic is determined by the column properties:
+     * - Primary key columns do not receive a default filter.
+     * - If the column name matches the display field, the default filter is `text-CONTAINS`.
+     * - If the column name ends with `_id`, the default filter is `select-EQUALS`.
+     *
+     * The returned dropdown includes the following filter options:
+     * - `Not Applicable`
+     * - `Text Contains`
+     * - `Text Equals`
+     * - `Select Equals`
+     *
+     * @param {Object} col - The metadata object representing the column.
+     * @param {string} col.name - The name of the column.
+     * @param {boolean} col.primaryKey - Indicates whether the column is a primary key.
+     * @param {string} displayField - The name of the field used as the main display field.
+     *
+     * @returns {string} The HTML `<select>` element for the column’s filter type.
+     */
     getFilterType(col, displayField)
     {
         let value = "";
@@ -3098,7 +3271,7 @@ class EntityEditor {
             circle.remove();
         }, 400);
     }
-    
+
     /**
      * Display a visual downward SVG arrow animation at the cursor position.
      * Indicates successful download or action trigger.
@@ -3124,7 +3297,7 @@ class EntityEditor {
         }, 400); // Match animation duration
     }
 
-    
+
     /**
      * Generates a base filename based on the provided data object.
      * The priority for naming is:
@@ -3147,12 +3320,12 @@ class EntityEditor {
 
     /**
      * Exports the given data object as a JSON file.
-     * 
+     *
      * This function converts the provided JavaScript object into a JSON string, creates a Blob object from
      * the string, and then triggers a download of the Blob as a `.json` file using a temporary anchor element.
      * The filename will include a datetime suffix to avoid overwriting files, and the last underscore
      * will be removed from the datetime part of the filename.
-     * 
+     *
      * @param {Object} data - The JavaScript object to be exported as JSON.
      */
     exportJSON(data) {
@@ -3192,16 +3365,16 @@ class EntityEditor {
 
     /**
      * Downloads a SQL file containing database information.
-     * 
-     * This function collects metadata about the database from the document, constructs a data object, 
-     * and generates a `.sql` file for download. The filename will include a datetime suffix to avoid 
+     *
+     * This function collects metadata about the database from the document, constructs a data object,
+     * and generates a `.sql` file for download. The filename will include a datetime suffix to avoid
      * overwriting files.
-     * 
+     *
      * @returns {void} - This function does not return a value.
      */
     downloadSQL() {
         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-        
+
         const data = {
             applicationId: applicationId,
             databaseType: databaseType,
@@ -3244,13 +3417,13 @@ class EntityEditor {
 
     /**
      * Imports JSON data from a file and processes it.
-     * 
+     *
      * This function accepts a file object, reads its contents as text using a FileReader, then parses the JSON
      * content and updates the editor's entities with the parsed data. It also triggers a re-render of the entities.
      * After the import, a callback function is invoked with the imported entities, if provided.
-     * 
+     *
      * @param {File} file - The file object containing the JSON data to be imported.
-     * @param {Function} [callback] - Optional callback function to be executed after the entities are updated. 
+     * @param {Function} [callback] - Optional callback function to be executed after the entities are updated.
      *                                The callback will receive the updated entities as its argument.
      */
     importJSON(file, callback) {
@@ -3269,7 +3442,7 @@ class EntityEditor {
 
     /**
      * Mengimpor dan memproses data JSON untuk memperbarui status editor.
-     * 
+     *
      * Fungsi ini mengambil string JSON, mem-parsing-nya, dan menggunakan data tersebut untuk
      * membuat dan memuat entitas dan diagram ke dalam editor. Fungsi ini akan membersihkan
      * semua entitas dan diagram yang ada sebelum memuat data baru. Setelah memuat,
@@ -3300,13 +3473,13 @@ class EntityEditor {
 
     /**
      * Imports an SQL file and processes its content.
-     * 
-     * This function accepts an SQL file, reads its contents as text using a FileReader, then parses it 
-     * using a `TableParser` and updates the editor's entities with the parsed data. After the import, 
+     *
+     * This function accepts an SQL file, reads its contents as text using a FileReader, then parses it
+     * using a `TableParser` and updates the editor's entities with the parsed data. After the import,
      * a callback function is invoked with the updated entities, if provided.
-     * 
+     *
      * @param {File} file - The SQL file object to be imported.
-     * @param {Function} [callback] - Optional callback function to be executed after the entities are updated. 
+     * @param {Function} [callback] - Optional callback function to be executed after the entities are updated.
      *                                The callback will receive the updated entities as its argument.
      * @returns {void} - This function does not return a value.
      */
@@ -3368,7 +3541,7 @@ class EntityEditor {
 
                 const tableParser = new TableParser(translatedContents); // Parse translated SQL structure (CREATE TABLE)
                 tableParser.parseData(contents); // Parse original SQL content (INSERT INTO) to extract row data
-                
+
                 // Convert data to snake case
                 let snakeData = _this.snakeizeObjectKeys(tableParser.data);
 
@@ -3426,7 +3599,7 @@ class EntityEditor {
                             const existingEntity = _this.getEntityByName(tableName);
                             if (existingEntity) {
                                 // Append the new data, which is handled by the appendData function
-                                existingEntity.appendData(snakeData[tableName]);                             
+                                existingEntity.appendData(snakeData[tableName]);
                             }
                         }
                     }
@@ -3505,14 +3678,14 @@ class EntityEditor {
                     }
                     // --- End: Add data import capability ---
 
-                    let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info           
+                    let tableInfo = _this.db.exec(`PRAGMA table_info(${tableName});`); // Get table info
 
                     if (tableInfo.length > 0) {
                         let hasAutoIncrement = false;
                         const hasCompositePrimaryKey = tableInfo[0].values.filter(columnInfo => /*NOSONAR*/ columnInfo[5]).length > 1;
 
                         tableInfo[0].values.forEach(columnInfo => /*NOSONAR*/{
-                            
+
                             let isAutoIncrement = columnInfo[2].toUpperCase() == 'INTEGER' && columnInfo[5];
                             if(hasAutoIncrement || hasCompositePrimaryKey)
                             {
@@ -3587,7 +3760,7 @@ class EntityEditor {
     /**
      * Converts SQLite data type to MySQL equivalent without length or default values.
      * The mapping is done in order of priority using a predefined list of patterns.
-     * 
+     *
      * @param {string} sqliteType - The original SQLite column type.
      * @returns {string} - Corresponding MySQL data type.
      */
@@ -3620,7 +3793,7 @@ class EntityEditor {
 
     /**
      * Extracts size/length value from a SQLite column type.
-     * 
+     *
      * @param {string} sqliteType - The original SQLite column type.
      * @returns {number|null} - The size if available, otherwise null.
      */
@@ -3638,7 +3811,7 @@ class EntityEditor {
         }
         return null;
     }
-    
+
     /**
      * Converts a string (e.g., file or sheet name) into a valid entity/table name.
      *
@@ -3709,7 +3882,7 @@ class EntityEditor {
                                     <td>Sheet to Import</td>
                                     <td>
                                         <select id="sheet-index" class="form-control">
-                                            ${workbook.SheetNames.map((name, index) => 
+                                            ${workbook.SheetNames.map((name, index) =>
                                                 `<option value="${index}">${index + 1}. ${name}</option>`
                                             ).join('')}
                                         </select>
@@ -3770,7 +3943,7 @@ class EntityEditor {
      *     - inputs (object): The parsed and normalized GraphQL input type definitions.
      */
     processGraphQLSchema(file, callbackFunction)
-    {        
+    {
         const _this = this;
         const fileExtension = file.name.split('.').pop().toLowerCase();
         const reader = new FileReader();
@@ -3778,7 +3951,7 @@ class EntityEditor {
         reader.onload = function (e) {
             const contents = e.target.result;
 
-            if (fileExtension === 'graphql') {          
+            if (fileExtension === 'graphql') {
                 const schemaObject = GraphQLSchemaUtils.parseGraphQLSchema(contents);
                 const types = GraphQLSchemaUtils.normalizeEntity(schemaObject.types, "snake");
                 const inputs = GraphQLSchemaUtils.normalizeEntity(schemaObject.inputs, "snake");
@@ -3865,7 +4038,7 @@ class EntityEditor {
 
     /**
      * Fixes primary key column types and lengths for imported entities by checking other entities for the most common matching type and length.
-     * 
+     *
      * If a primary key column is a VARCHAR(255), it is assumed to be an ID type from a GraphQL schema import.
      * This method then looks at other entities to determine the most frequent type and length for the same column name
      * and updates the primary key column accordingly.
@@ -3884,22 +4057,22 @@ class EntityEditor {
                     // If the column is a VARCHAR with length 255,
                     if(col.type == 'VARCHAR' && col.length == '255')
                     {
-                        // If the column is a VARCHAR with length 255, 
+                        // If the column is a VARCHAR with length 255,
                         // indicate that column type is ID from GraphQL schema.
                         // Confirm real type from other entities.
                         let realTypeAndLength = _this.getRealTypeFromOtherEntities(importedEntities, entity.name, col.name);
                         col.type = realTypeAndLength.type;
                         col.length = realTypeAndLength.length;
-                    } 
+                    }
                 });
-            } 
+            }
         });
         return importedEntities; // Return the modified entities with fixed primary keys
     }
 
     /**
      * Determines the most frequent type and length for a given column name across all entities except the one being processed.
-     * 
+     *
      * Counts how often each type and length appears for the column in other entities, then returns the most frequent values.
      * Defaults to VARCHAR(255) if no matches are found.
      *
@@ -3978,22 +4151,22 @@ class EntityEditor {
                 }
             }
 
-            const text = await navigator.clipboard.readText();    
+            const text = await navigator.clipboard.readText();
 
             if (/create\s+table/i.test(text.trim()) || /insert\s+into/i.test(text.trim())) {
                 // SQL
                 this.parseCreateTable(text, function(entities){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
                 });
-                
+
             } else if (/[\"']__magic_signature__[\"']\s*:\s*[\"']MAGICAPPBUILDER-DB-DESIGN-V1[\"']/.test(text)) {
                 // JSON
                 try {
                     editor.importJSONData(text, function(entities, diagrams){
                     let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities); 
-                    sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);  
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
+                    sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);
                 }); // Import the file if it's selected
                 } catch (jsonErr) {
                     console.error("Invalid JSON format despite having signature:", jsonErr);
@@ -4008,7 +4181,7 @@ class EntityEditor {
             console.error('Failed to read clipboard: ', err);
         }
     }
-    
+
     /**
      * Parses SQL code from a CREATE TABLE statement, extracts table and column definitions,
      * and converts them into entities for the editor. It handles both replacing existing
@@ -4028,7 +4201,7 @@ class EntityEditor {
 
         const tableParser = new TableParser(translatedContents); // Parse translated SQL structure (CREATE TABLE)
         tableParser.parseData(contents); // Parse original SQL content (INSERT INTO) to extract row data
-        
+
         const importedEntities = editor.createEntitiesFromSQL(tableParser.tableInfo); // Convert table structures into editor entities
 
         if(importedEntities && importedEntities.length)
@@ -4077,22 +4250,22 @@ class EntityEditor {
                     const existingEntity = _this.getEntityByName(tableName);
                     if (existingEntity) {
                         // Append the new data, which is handled by the appendData function
-                        existingEntity.appendData(tableParser.data[tableName]);  
+                        existingEntity.appendData(tableParser.data[tableName]);
                     }
                 }
             }
         }
-        
+
         if (typeof callback === 'function') {
             callback(_this.entities); // Invoke callback with updated entity list
         }
-        
+
         _this.restoreCheckedEntitiesFromCurrentDiagram(); // Reapply previous diagram selections
     }
 
     /**
      * Imports data from a parsed source, such as a CSV or spreadsheet.
-     * 
+     *
      * This function first validates the data to ensure it meets minimum requirements
      * for columns and rows. It then generates column definitions based on the
      * parsed headers and data, creates a new table with a unique name, and
@@ -4197,7 +4370,7 @@ class EntityEditor {
             );
         }
     }
-    
+
     /**
      * Parses an HTML table element and converts its content into a structured JSON object.
      * * This function is designed to handle three scenarios:
@@ -4230,7 +4403,7 @@ class EntityEditor {
             const headerRow = table.tHead.querySelector('tr');
             headers = Array.from(headerRow.children).map(cell => toUcwords(cell.textContent.trim()));
             dataRows = Array.from(table.tBodies?.[0]?.rows || []);
-        } 
+        }
         // Scenarios 2 & 3: Table does not have a <thead>
         else {
             const allRows = Array.from(table.rows);
@@ -4251,12 +4424,12 @@ class EntityEditor {
         for (const row of dataRows) {
             const rowData = {};
             const cells = Array.from(row.cells);
-            
+
             // Iterate through each cell and map its content to the corresponding header.
             for (let i = 0; i < headers.length; i++) {
                 const header = headers[i];
                 const cell = cells[i];
-                
+
                 if (cell) {
                     rowData[header] = cell.textContent.trim();
                 } else {
@@ -4302,10 +4475,10 @@ class EntityEditor {
 
     /**
      * Converts the keys of each object in an array from camelCase to snake_case.
-     * 
+     *
      * This function iterates over an array of objects and transforms all keys in each object
      * to snake_case using the `this.snakeize()` method. The original values are preserved.
-     * 
+     *
      * @param {Object[]} rows - An array of objects with camelCase keys.
      * @returns {Object[]} - A new array of objects with snake_case keys.
      */
@@ -4324,7 +4497,7 @@ class EntityEditor {
         }
         return result;
     }
-    
+
     /**
      * Transforms all keys of an object to snake_case.
      *
@@ -4443,10 +4616,10 @@ class EntityEditor {
 
         return cols;
     }
-    
+
     /**
      * Converts a string to snake_case format by first transforming it to Ucwords,
-     * then applying snake_case rules. Trims leading/trailing underscores and 
+     * then applying snake_case rules. Trims leading/trailing underscores and
      * collapses multiple underscores.
      *
      * This function ensures that input like camelCase, PascalCase, or messy strings
@@ -4526,17 +4699,17 @@ class EntityEditor {
 
     /**
      * Downloads entity data as a JSON file from a dynamically constructed URL.
-     * 
+     *
      * This function retrieves application metadata such as `application-id`, `database-name`,
      * `database-schema`, and `database-type` from `<meta>` tags in the HTML document.
      * It then uses these values to construct an API URL via `buildUrl(...)` and fetches
      * the entity JSON data from that endpoint.
-     * 
+     *
      * The response is saved as a `.json` file named after the `application-id`, and the download
      * is triggered programmatically using a Blob and an anchor element.
-     * 
+     *
      * If the request fails, an error message is logged to the console and an alert is shown to the user.
-     * 
+     *
      * @async
      * @function
      * @returns {Promise<void>} - This function does not return a value but performs a download side-effect.
@@ -4589,7 +4762,7 @@ class EntityEditor {
      * @param {string} title - The title to display in the header of the dialog.
      * @param {string} captionOk - The label to display on the OK button.
      * @param {Function} callback - The callback function to be called when the OK button is clicked.
-     * 
+     *
      * @returns {void} - This function does not return a value.
      * @async
      */
@@ -4624,19 +4797,19 @@ class EntityEditor {
     /**
      * Displays a confirmation dialog with OK and Cancel buttons.
      * Executes the provided callback with `true` if OK is clicked, or `false` if Cancel is clicked.
-     * 
+     *
      * @param {string} message - The message to display in the dialog.
      * @param {string} title - The title of the dialog.
      * @param {string} captionOk - The label for the OK button.
      * @param {string} captionCancel - The label for the Cancel button.
      * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
-     * 
+     *
      * @returns {void} - This function does not return a value.
      */
     showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
         // Get modal and buttons
         const modal = document.querySelector('#asyncConfirm');
-        
+
         let okBtn = modal.querySelector('.confirm-ok');
         let cancelBtn = modal.querySelector('.confirm-cancel');
         okBtn = this.removeAllEventListeners(okBtn);
@@ -4674,7 +4847,7 @@ class EntityEditor {
      * allowing the user to enter or update the entity description.
      * When the user confirms (clicks 'Save'), the description is saved to the entity object
      * and `callbackSaveEntity` is triggered with the updated entities array.
-     * 
+     *
      * The modal is hidden whether the user clicks 'Save' or 'Cancel'.
      */
     showDescriptionDialog()
@@ -4684,19 +4857,19 @@ class EntityEditor {
         let description = _this.entities[_this.currentEntityIndex].description || '';
 
         let selector = '#exportModal';
-        showExportDialog(selector, 
-            '<textarea class="description-textarea" placeholder="Enter description here..." spellcheck="false" autocomplete="off"></textarea>', 
+        showExportDialog(selector,
+            '<textarea class="description-textarea" placeholder="Enter description here..." spellcheck="false" autocomplete="off"></textarea>',
             `Entity Description - ${entityName}`, 'Save', 'Cancel', function(isOk) {
-            if (isOk) 
+            if (isOk)
             {
                 _this.entities[_this.currentEntityIndex].description = document.querySelector(selector + ' .description-textarea').value;
                 _this.callbackSaveEntity(_this.entities);
-                document.querySelector(selector).style.display = 'none' 
+                document.querySelector(selector).style.display = 'none'
             }
-            else 
+            else
             {
-                document.querySelector(selector).style.display = 'none' 
-            } 
+                document.querySelector(selector).style.display = 'none'
+            }
         });
         document.querySelector(selector + ' .description-textarea').value = description;
     }
@@ -4707,7 +4880,7 @@ class EntityEditor {
      * but without any event listeners attached.
      *
      * @param {HTMLElement} element - The DOM element from which event listeners will be removed.
-     * 
+     *
      * @returns {HTMLElement} - The cloned element that is a replacement for the original element, without event listeners attached.
      */
     removeAllEventListeners(element) {
@@ -4718,10 +4891,10 @@ class EntityEditor {
 
     /**
      * Creates a dropdown (select) option with MySQL data types and binds it to the given name.
-     * 
+     *
      * @param {string} name - The name for the select input field.
      * @param {string} selectorLength - The selector for the length input field.
-     * 
+     *
      * @returns {string} - The HTML string for the dropdown (select) element.
      */
     createDataTypeOption(name, selectorLength)
@@ -4734,13 +4907,13 @@ class EntityEditor {
         html += `</select>`;
         return html;
     }
-    
+
     /**
      * Sets the default length for the selected data type in the given element.
-     * 
+     *
      * @param {HTMLElement} element - The select input element for the data type.
      * @param {string} selectorLength - The selector for the length input field.
-     * 
+     *
      * @returns {void} - This function does not return a value.
      */
     setDefaultLength(element, selectorLength)
@@ -4754,7 +4927,7 @@ class EntityEditor {
 
     /**
      * Displays the preference settings dialog and handles saving the user's preferences.
-     * 
+     *
      * @returns {void} - This function does not return a value.
      */
     preference()
@@ -4786,7 +4959,7 @@ class EntityEditor {
                 _this.primaryKeyDataType = document.querySelector('[name="primary_key_type"]').value;
                 _this.primaryKeyDataLength = document.querySelector('[name="primary_key_length"]').value;
                 _this.defaultDataType = document.querySelector('[name="column_type"]').value;
-                _this.defaultDataLength = document.querySelector('[name="column_length"]').value;    
+                _this.defaultDataLength = document.querySelector('[name="column_length"]').value;
                 if(typeof _this.callbackSaveConfig == 'function')
                 {
                     _this.callbackSaveConfig({
@@ -4796,7 +4969,7 @@ class EntityEditor {
                         defaultDataLength: _this.defaultDataLength,
                     });
                 }
-            } 
+            }
         });
 
         document.querySelector('[name="primary_key_type"]').value = _this.primaryKeyDataType;
@@ -4807,13 +4980,13 @@ class EntityEditor {
 
     /**
      * Displays a settings dialog for configuring various preferences.
-     * 
+     *
      * @param {string} message - The content (HTML) to be displayed inside the modal.
      * @param {string} title - The title of the dialog.
      * @param {string} captionOk - The label for the OK button.
      * @param {string} captionCancel - The label for the Cancel button.
      * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
-     * 
+     *
      * @returns {void} - This function does not return a value.
      */
     showSettingDialog(message, title, captionOk, captionCancel, callback) {
@@ -4850,7 +5023,7 @@ class EntityEditor {
         okBtn.addEventListener('click', handleOkConfig);
         cancelBtn.addEventListener('click', handleCancelConfig);
     }
-    
+
     /**
      * Displays a dialog showing editable tabular data for a given entity.
      *
@@ -4889,21 +5062,21 @@ class EntityEditor {
         const emptyTh = document.createElement('th'); // For delete button column
         emptyTh.classList.add('td-remover');
         headRow.appendChild(emptyTh);
-        
+
         // Create tbody
         const tbody = document.createElement('tbody');
-        
+
         table.appendChild(thead);
         table.appendChild(tbody);
         wrapper.appendChild(table);
         modalBody.appendChild(wrapper);
-        
-        
+
+
         let fixDateTimeWrapper = document.createElement('div');
-        
+
         fixDateTimeWrapper.innerHTML = `
         <div class="suggestions-container"><span class="suggestions"></span> &nbsp;</div>
-        Fix Date Time 
+        Fix Date Time
         <select id="selector-fix-date-time" class="form-control">
         </select>
         Format
@@ -4926,7 +5099,7 @@ class EntityEditor {
         selectOne.textContent = 'Select Column';
         fixDateTimeWrapper.classList.add('button-area');
         modalBody.appendChild(fixDateTimeWrapper);
-        
+
         fixDateTimeWrapper.querySelector('select').appendChild(selectOne);
 
         // Show modal
@@ -4938,7 +5111,7 @@ class EntityEditor {
             th.textContent = col.name;
             th.dataset.name = col.name;
             headRow.appendChild(th);
-            
+
             let select = document.createElement('option');
             select.value = col.name;
             select.textContent = col.name;
@@ -4957,7 +5130,7 @@ class EntityEditor {
             deleteLink.className = 'delete-row';
             deleteLink.href = 'javascript:';
             deleteLink.textContent = '❌';
-            
+
             deleteTd.appendChild(deleteLink);
             tr.appendChild(deleteTd);
 
@@ -4967,14 +5140,313 @@ class EntityEditor {
             });
 
             tbody.appendChild(tr);
-            
+
             deleteLink.addEventListener('click', function(e){
-               e.preventDefault();
-               tbody.removeChild(tr);
+                e.preventDefault();
+                tbody.removeChild(tr);
             });
         });
     }
-    
+
+    /**
+     * Opens the GraphQL Application Profile dialog and renders
+     * the editable table of profile options inside the modal.
+     */
+    manageGraphQlAppProfile()
+    {
+        const _this = this;
+        this.showProfileDialog(document.createElement('div'), 'GraphQl Application', 'OK', 'Cancel', function(confirm){
+            if(confirm)
+            {
+                // Update <select>
+                let select = document.querySelector('.graphql-app-profile');
+                let currentValue = select.value;
+                select.innerHTML = ''; // Remove all options
+                let firstValue = '';
+                for (const key in _this.graphqlAppProfile) {
+                    const opt = _this.graphqlAppProfile[key];
+                    let option = new Option(opt.profileLabel, opt.profileName);
+                    select.add(option);
+                    if(firstValue == '')
+                    {
+                        firstValue = opt.profileName;
+                    }
+                }
+                if(currentValue == '')
+                {
+                    currentValue = firstValue;
+                }
+                _this.gqlSetActiveProfile(currentValue);
+                // Save data to server
+
+                _this.gqlSaveProfile();
+            }
+        });
+        this.gqlRenderTable();
+    }
+
+    /**
+     * Sends the current GraphQL application profile to the server for saving.
+     *
+     * This method retrieves metadata values (application ID, database information),
+     * constructs the appropriate server endpoint URL, and performs a POST request
+     * to store the GraphQL profile configuration.
+     *
+     * The profile data (`this.graphqlAppProfile`) is sent as a JSON payload.
+     * Any server response is parsed as JSON. Errors during the request are logged
+     * to the console.
+     *
+     * @returns {void}
+     */
+    gqlSaveProfile()
+    {
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+        let url = `../lib.ajax/load-graphql-entity-index.php?applicationId=${encodeURIComponent(applicationId)}&databaseType=${encodeURIComponent(databaseType)}&databaseName=${encodeURIComponent(databaseName)}&databaseSchema=${encodeURIComponent(databaseSchema)}`;
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(this.graphqlAppProfile)
+        })
+        .then(resp => resp.json())
+        .then(result => {
+        })
+        .catch(err => {
+            console.error("Failed to send GraphQL profile data:", err);
+        });
+    }
+
+    /**
+     * Renders the profile option list into an editable table.
+     * Each <option> element inside the select .graphql-app-profile
+     * is converted into a table row with input fields and action buttons.
+     * Also adds an empty row at the bottom for creating new options.
+     */
+    gqlRenderTable(focus = false)
+    {
+        const tableContainer = document.querySelector('#profileModal .modal-body');
+        tableContainer.innerHTML = `
+    <table id="optionTable" class="table dialog-table profile-table">
+        <thead>
+            <tr>
+                <td width="30%">Value</td>
+                <td width="55%">Text</td>
+                <td width="15%">Action</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+        `
+        const tbody = document.createElement('tbody');
+
+        for (const key in this.graphqlAppProfile) {
+            if(this.graphqlAppProfile.hasOwnProperty(key))
+            {
+                const opt = this.graphqlAppProfile[key];
+                const row = document.createElement("tr");
+                row.dataset.key = key;
+                row.dataset.hasData = opt.hasData ? 'true' : 'false';
+
+                row.innerHTML = `
+                <td><input type="text" class="form-control profile-name" value="${opt.profileName}"></td>
+                <td><input type="text" class="form-control profile-label" value="${opt.profileLabel}"></td>
+                <td>
+                    <button class="btn btn-tn" onclick="editor.gqlDeleteRow(this)">Delete</button>
+                </td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // Add empty row for new option input
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+        <td><input type="text" class="form-control profile-name" placeholder="Value"></td>
+        <td><input type="text" class="form-control profile-label" placeholder="Text"></td>
+        <td><button class="btn btn-tn" onclick="editor.gqlAddRow(this)">Add</button></td>
+        `;
+        newRow.dataset.hasData = 'false';
+        tbody.appendChild(newRow);
+        tableContainer.querySelector('table').appendChild(tbody);
+        if(focus)
+        {
+            newRow.querySelector('.profile-name').focus();
+        }
+    }
+
+    /**
+     * Sets the active GraphQL application profile based on the given profile key.
+     *
+     * When a valid `currentValue` is provided and exists in `this.graphqlAppProfile`,
+     * this method marks that profile as selected while marking all other profiles
+     * as not selected. Only one profile can be active at a time.
+     *
+     * @param {string} currentValue - The key identifying the profile to activate.
+     * 
+     * @returns {void}
+     */
+    gqlSetActiveProfile(currentValue)
+    {
+        if(currentValue != '')
+        {
+            if(this.graphqlAppProfile[currentValue])
+            {
+                for (const key in this.graphqlAppProfile) {
+                    if(key == currentValue)
+                    {
+                        this.graphqlAppProfile[key].selected = true;
+                    }
+                    else
+                    {
+                        this.graphqlAppProfile[key].selected = false;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Saves the currently selected GraphQL profile and reloads the configuration.
+     *
+     * This method retrieves the selected profile from the `<select>` element,
+     * triggers a save operation to persist the selection, and then reloads
+     * the GraphQL application configuration.
+     *
+     * @returns {void}
+     */
+    gqlChangeProfile()
+    {
+        let select = document.querySelector('.graphql-app-profile');
+        this.gqlSaveProfile(select.value);
+        this.loadGraphQlAppConfiguration();
+    }
+
+    /**
+     * Adds a new option to the .graphql-app-profile select element.
+     * Reads the value and text from the table row, creates a new
+     * <option>, copies dataset attributes, inserts it into the select,
+     * and re-renders the table.
+     *
+     * @param {HTMLElement} btn - The button element that triggered the action.
+     */
+    gqlAddRow(btn) {
+        this.gqlUpdateRow(btn);
+    }
+
+    /**
+     * Updates an existing option based on the row index in the table.
+     * Only updates the value and text, not dataset attributes.
+     *
+     * @param {HTMLElement} btn - The button element inside the row being updated.
+     */
+    gqlUpdateRow(btn) {
+        const row = btn.closest("tr");
+        const value = row.querySelector("input.profile-name").value.trim();
+        const text = row.querySelector("input.profile-label").value.trim();
+        const hasData = row.dataset.hasData;
+
+        if (value && text) {
+            this.graphqlAppProfile[value] = {
+                profileName : value,
+                profileLabel : text,
+                hasData : hasData == 'true'
+            };
+            this.gqlRenderTable();
+        }
+    }
+
+    /**
+     * Deletes an option from the select element based on table row index,
+     * then re-renders the table.
+     *
+     * @param {HTMLElement} btn - The delete button clicked by the user.
+     */
+    gqlDeleteRow(btn) {
+        const _this = this;
+        const row = btn.closest("tr");
+        const value = row.querySelector("input.profile-name").value;
+        const text = row.querySelector("input.profile-label").value;
+
+        if (value) {
+            if(row.dataset.hasData == 'true')
+            {
+                this.showConfirmationDialog(`Deleting this profile file also delete data saved in the server.<br>Are you sure you want to detele "${text}"?`,
+                    'Delete Profile Confirmation',
+                    'OK',
+                    'Cancel',
+                    function(confirm) {
+                        if(confirm)
+                        {
+                            delete _this.graphqlAppProfile[value];
+                            _this.gqlRenderTable();
+                        }
+                    }
+                )
+            }
+            else
+            {
+                delete this.graphqlAppProfile[value];
+                this.gqlRenderTable();
+            }
+        }
+    }
+
+    /**
+     * Displays a profile dialog for configuring various preferences.
+     *
+     * @param {HTMLElement} content - The content to be displayed inside the modal.
+     * @param {string} title - The title of the dialog.
+     * @param {string} captionOk - The label for the OK button.
+     * @param {string} captionCancel - The label for the Cancel button.
+     * @param {Function} callback - The callback function to be called with the result (`true` or `false`).
+     *
+     * @returns {void} - This function does not return a value.
+     */
+    showProfileDialog(content, title, captionOk, captionCancel = '', callback = null) {
+        // Get modal and buttons
+        const modal = document.querySelector('#profileModal');
+        const okBtn = modal.querySelector('.confirm-ok');
+        const cancelBtn = modal.querySelector('.confirm-cancel');
+
+        modal.querySelector('.modal-header h3').innerHTML = title;
+        modal.querySelector('.modal-body').innerHTML = '';
+        modal.querySelector('.modal-body').appendChild(content);
+        okBtn.innerHTML = captionOk;
+        if(captionCancel.length > 0)
+        {
+            cancelBtn.innerHTML = captionCancel;
+            cancelBtn.style.display = ''; // Auto
+        }
+        else
+        {
+            cancelBtn.innerHTML = '';
+            cancelBtn.style.display = 'none';
+        }
+        // Show the modal
+        modal.style.display = 'block';
+
+        // Remove existing event listeners to prevent duplicates
+        okBtn.removeEventListener('click', handleOkConfig);
+        cancelBtn.removeEventListener('click', handleCancelConfig);
+
+        // Define the event listener for OK button
+        function handleOkConfig() {
+            modal.style.display = 'none';
+            callback(true);  // Execute callback with 'true' if OK is clicked
+        }
+
+        // Define the event listener for Cancel button
+        function handleCancelConfig() {
+            modal.style.display = 'none';
+            callback(false);  // Execute callback with 'false' if Cancel is clicked
+        }
+
+        // Add event listeners for OK and Cancel buttons
+        okBtn.addEventListener('click', handleOkConfig);
+        cancelBtn.addEventListener('click', handleCancelConfig);
+    }
+
     /**
      * Creates a <td> element containing an editable input for entity data.
      *
@@ -5018,13 +5490,12 @@ class EntityEditor {
                     info.textContent = ''; // Clear info if no match
                 }
             });
-
         }
 
         td.appendChild(input);
         return td;
     }
-    
+
     /**
      * Exports data from the Entity Editor table into a downloadable CSV file.
      *
@@ -5072,7 +5543,7 @@ class EntityEditor {
             let values = columns.map((col) => {
                 let val = row[col] || "";
                 // Escape double quotes by doubling them and wrap value in double quotes
-                return `"${val.replace(/"/g, '""')}"`;
+                return `"${val.replace(/"/g, '""')}"`; // NOSONAR
             });
             csvRows.push(values.join(','));
         });
@@ -5098,31 +5569,30 @@ class EntityEditor {
         URL.revokeObjectURL(url);
     }
 
-    
+
     /**
      * Collects the current entity data from the table and exports it as a downloadable JSON file.
      *
      * This function reads column headers from the `<thead>` and input values from the `<tbody>`,
      * then constructs a structured JSON object containing both column names and row data.
-     * 
+     *
      * The result is automatically downloaded as a `entity_data.json` file.
      * Useful for backing up, sharing, or re-importing entity definitions.
      */
     clearData()
     {
         this.showConfirmationDialog(
-                `Are you sure you want to delete all data?`, // Using single quotes for entity name for clarity
-                'Clear Entity Data Confirmation', // More descriptive title
-                'Yes',
-                'No',
-                (isOk) => {
-                    if(isOk)
-                    {
-                        document.querySelector('.data-preview-table tbody').innerHTML = '';
-                    }
+            `Are you sure you want to delete all data?`, // Using single quotes for entity name for clarity
+            'Clear Entity Data Confirmation', // More descriptive title
+            'Yes',
+            'No',
+            (isOk) => {
+                if(isOk)
+                {
+                    document.querySelector('.data-preview-table tbody').innerHTML = '';
                 }
-            );
-        
+            }
+        );
     }
 
     /**
@@ -5148,7 +5618,7 @@ class EntityEditor {
             let container = document.querySelector('.autocomplete-list-container');
             container.dataset.empty = 'false';
             container.innerHTML = '';
-            
+
             entity.columns.forEach(col => {
                 if(col.name.length > 3 && col.name.endsWith('_id'))
                 {
@@ -5251,11 +5721,11 @@ class EntityEditor {
 
         return row; // Return the created row for potential further manipulation
     }
-    
+
     /**
      * Saves the current editable data from the entity data table
      * into the corresponding entity's data structure.
-     * 
+     *
      * @returns {void}
      */
     saveData() {
@@ -5282,7 +5752,7 @@ class EntityEditor {
             .map(rowKey => rowDataMap[rowKey]);
         entity.setData(newData);
         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities); 
+        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities);
         this.exportToSQL();
         modal.style.display = 'none';
     }
@@ -5336,13 +5806,13 @@ class EntityEditor {
                 if (usePng) {
                     try {
                         let svg = svgCcontainer.querySelector('svg');
-                        const dataUrl = await convertSvgToPng(svg);  
+                        const dataUrl = await convertSvgToPng(svg);
                         const img = document.createElement('img');
                         img.src = dataUrl;
                         svgWrapper.appendChild(img);
                     } catch (err) {
                         console.error("❌ Failed to convert SVG to PNG", err);
-                        svgWrapper.appendChild(svgCcontainer); 
+                        svgWrapper.appendChild(svgCcontainer);
                     }
                 } else {
                     svgWrapper.appendChild(svgCcontainer);
@@ -5383,14 +5853,14 @@ class EntityEditor {
 
             container.appendChild(section);
         }
-        
+
         let div = document.createElement('div');
         div.classList.add('table-wrapper');
-        
+
         let h3 = document.createElement('h3');
         h3.textContent = 'Table: Entities Ordered by Dependency Depth';
         div.appendChild(h3);
-        
+
         let sortedEntities = this.sortEntitiesByDepth(this.calculateEntityDepth(this.entities));
         let table2 = document.createElement('table');
         let thead2 = document.createElement('thead');
@@ -5399,7 +5869,7 @@ class EntityEditor {
         table2.appendChild(thead2);
         table2.appendChild(tbody2);
         thead2.appendChild(tr21);
-        
+
         let th0 = document.createElement('th');
         th0.classList.add('column-number');
         th0.textContent = '#';
@@ -5410,7 +5880,7 @@ class EntityEditor {
         let th2 = document.createElement('th');
         th2.textContent = 'Dependency Depth';
         tr21.appendChild(th2);
-        
+
         sortedEntities.forEach((entity, index)=>{
             let depth = entity.depth - 1;
             if(depth < 0)
@@ -5419,12 +5889,12 @@ class EntityEditor {
             }
 
             let tr22 = document.createElement('tr');
-            
+
             let td0 = document.createElement('td');
             td0.classList.add('column-number');
             td0.textContent = `${index+1}`;
             tr22.appendChild(td0);
-            
+
             let td1 = document.createElement('td');
             td1.textContent = entity.name;
             tr22.appendChild(td1);
@@ -5433,13 +5903,13 @@ class EntityEditor {
             tr22.appendChild(td2);
             tbody2.appendChild(tr22);
         });
-        
+
         div.appendChild(table2);
-        
+
         container.appendChild(div);
 
         const now = new Date();
-        const generatedAt = now.toLocaleString(); // or .toISOString() 
+        const generatedAt = now.toLocaleString(); // or .toISOString()
 
         const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Exported Diagrams</title>
             <style>
@@ -5520,7 +5990,7 @@ class EntityEditor {
         // Create table header
         let thead = document.createElement('thead');
         let trHead = document.createElement('tr');
-        
+
         let widths = ['20%', '14%', '9%', '9%', '9%', '8%', '8%', '23%'];
         let headers = ['columnName', 'type', 'length', 'nullable', 'default', 'primaryKey', 'autoIncrement', 'description'];
         let labels  = ['Column Name', 'Type', 'Length', 'Nullable', 'Default', 'PK', 'Serial', 'Description'];
@@ -5583,12 +6053,12 @@ class EntityEditor {
 
     /**
      * Displays a dialog for exporting diagrams to an HTML document.
-     * 
+     *
      * The dialog allows the user to:
      * - Select individual diagrams to export
      * - Select all diagrams at once
      * - Choose whether to export diagram images as PNG instead of SVG
-     * 
+     *
      * Once the user confirms, it calls `editor.exportHTMLDocument` with
      * the selected diagrams and the image format preference.
      */
@@ -5613,7 +6083,7 @@ class EntityEditor {
             li.appendChild(checkboxAll);
             li.appendChild(document.createTextNode(' '));
             li.appendChild(label);
-            ul.appendChild(li);  
+            ul.appendChild(li);
             let li2 = document.createElement('li');
             let ul2 = document.createElement('ul');
             ul.appendChild(li2);
@@ -5673,7 +6143,7 @@ class EntityEditor {
             }
         });
     }
-    
+
     /**
      * Calculates the module creation order based on dependencies (fields ending with `_id`).
      *
@@ -5902,7 +6372,7 @@ class EntityEditor {
 
         return null;
     }
-    
+
     /**
      * Formats a JavaScript Date object to a MySQL-compatible string.
      *

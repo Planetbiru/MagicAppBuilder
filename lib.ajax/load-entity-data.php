@@ -18,16 +18,21 @@ if ($inputPost->getDatabaseName() !== null) {
     $entities = $inputPost->getEntities();
     $diagrams = $inputPost->getDiagrams();
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
+    $hash = md5("$applicationId-$databaseType-$databaseName-$databaseSchema");
 
     $selectedApplication = new EntityApplication(null, $databaseBuilder);
     try
     {
         $selectedApplication->find($applicationId);
-        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
-
-        $path = $basePath . "/$filename";
+        $path = $selectedApplication->getProjectDirectory()."/__data/entity/data/$filename";
         if (!file_exists(dirname($path))) {
             mkdir(dirname($path), 0755, true);
+        }
+        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
+        $dir = dirname($indexPath);
+        if(!file_exists($dir))
+        {
+            mkdir($dir, 0755, true);
         }
 
         if (file_exists($path)) {
@@ -44,6 +49,7 @@ if ($inputPost->getDatabaseName() !== null) {
             $data['diagrams'] = json_decode($diagrams);
             file_put_contents($path, json_encode($data));
         }
+        $entityCount = 0;
         if (strlen($entities) > 0) {
             $data['entities'] = json_decode($entities, true);
 
@@ -55,10 +61,46 @@ if ($inputPost->getDatabaseName() !== null) {
                 if (isset($entity['modifier']) && $entity['modifier'] == '{{userName}}') {
                     $data['entities'][$index]['modifier'] = $entityAdmin->getName();
                 }
+                $entityCount++;
             }
             
             file_put_contents($path, json_encode($data));
         }
+
+        if(!file_exists($indexPath))
+        {
+            $indexRaw = '{}';
+        }
+        else
+        {
+            $indexRaw = file_get_contents($indexPath);
+        }
+        $index = json_decode($indexRaw, true);
+        if(!is_array($index))
+        {
+            $index = [];
+        }
+        if(!isset($index[$hash]) || !is_array($index[$hash]))
+        {
+            $index[$hash] = array();
+        }
+        $index[$hash]['applicationId'] = $applicationId;
+        $index[$hash]['databaseType'] = $databaseType;
+        $index[$hash]['databaseName'] = $databaseName;
+        $index[$hash]['databaseSchema'] = $databaseSchema;
+        $index[$hash]['entities'] = $entityCount;
+        $index[$hash]['file'] = "data/$filename";
+        $index[$hash]['hash'] = $hash;
+        if(empty($index[$hash]['databaseName']))
+        {
+            $index[$hash]['label'] = basename($databaseBuilder->getDatabaseCredentials()->getDatabaseFilePath());
+        }
+        else
+        {
+            $index[$hash]['label'] = $index[$hash]['databaseName'];
+        }
+
+        file_put_contents($indexPath, json_encode($index, JSON_PRETTY_PRINT));
     }
     catch(Exception $e)
     {
@@ -77,8 +119,7 @@ if ($inputPost->getDatabaseName() !== null) {
     try
     {
         $selectedApplication->find($applicationId);
-        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
-        $path = $basePath . "/$filename";
+        $path = $selectedApplication->getProjectDirectory()."/__data/entity/data/$filename";
         if (file_exists($path)) {
             $json = file_get_contents($path);
             $data = json_decode($json, true);

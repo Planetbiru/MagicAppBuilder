@@ -14,20 +14,77 @@ if ($inputGet->getDatabaseName() !== null) {
     $databaseType = $inputGet->getDatabaseType();
     $databaseName = $inputGet->getDatabaseName();
     $databaseSchema = $inputGet->getDatabaseSchema();
-    $filename = sprintf("%s-%s-%s-%s-data-graphql.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
+    $profile = $inputGet->getProfile();
+
     $selectedApplication = new EntityApplication(null, $databaseBuilder);
     try
     {
         $selectedApplication->find($applicationId);
-        $basePath = $selectedApplication->getProjectDirectory()."/__data/entity/data";
-        $path = $basePath . "/$filename";
+
+        if($profile == '')
+        {
+            $indexPath2 = $selectedApplication->getProjectDirectory()."/__data/graphql-app/index.json";
+            if(file_exists($indexPath2))
+            {
+                $index2 = json_decode(file_get_contents($indexPath2), true);
+                foreach($index2 as $key=>$value)
+                {
+                    if($value['selected'])
+                    {
+                        $profile = $key;
+                    }
+                }
+            }
+        }
+
+        if(empty($profile))
+        {
+            ResponseUtil::sendJSON([]);
+            exit();
+        }
+
+
+        $filename = sprintf("%s.json", $profile);
+        $hash = $profile;
+
+        $path = $selectedApplication->getProjectDirectory()."/__data/graphql-app/data/$filename";
+        $dir = dirname($path);
+        if(!file_exists($dir))
+        {
+            mkdir($dir, 0755, true);
+        }
+        $indexPath = $selectedApplication->getProjectDirectory()."/__data/graphql-app/index.json";
+
         if(!empty($data))
         {
             if (!file_exists(dirname($path))) {
                 mkdir(dirname($path), 0755, true);
             }
             file_put_contents($path, $data);
+            if(!file_exists($indexPath))
+            {
+                $indexRaw = '{}';
+            }
+            else
+            {
+                $indexRaw = file_get_contents($indexPath);
+            }
+            $index = json_decode($indexRaw, true);
+            if(!is_array($index))
+            {
+                $index = [];
+            }
+            if(!isset($index[$hash]) || !is_array($index[$hash]))
+            {
+                $index[$hash] = array();
+            }
+            $index[$hash]['applicationId'] = $applicationId;
+            $index[$hash]['hash'] = $hash;
+            
+            file_put_contents($indexPath, json_encode($index, JSON_PRETTY_PRINT));
+
             ResponseUtil::sendJSON([]);
+            exit();
         }
         else
         {
@@ -55,4 +112,4 @@ if ($inputGet->getDatabaseName() !== null) {
         // Do noting
     }
     exit();
-} 
+}

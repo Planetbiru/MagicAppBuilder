@@ -1,0 +1,118 @@
+{{if .IsUpdateMode}}
+    <!-- Tampilan Form Edit -->
+    <div class="table-container detail-view">
+        <form id="profile-update-form" class="form-group" onsubmit="handleProfileUpdate(event); return false;">
+            <table class="table table-borderless">
+                <tr>
+                    <td>{{T "admin_id"}}</td>
+                    <td><input type="text" name="admin_id" class="form-control" value="{{.Profile.AdminID}}" autocomplete="off" readonly></td>
+                </tr>
+                <tr>
+                    <td>{{T "name"}}</td>
+                    <td><input type="text" name="name" class="form-control" value="{{.Profile.Name.String}}"></td>
+                </tr>
+                <tr>
+                    <td>{{T "username"}}</td>
+                    <td><input type="text" name="username" class="form-control" value="{{.Profile.Username.String}}" autocomplete="off" readonly></td>
+                </tr>
+                <tr>
+                    <td>{{T "gender"}}</td>
+                    <td>
+                        <select name="gender" class="form-control">
+                            <option value="M" {{if eq .Profile.Gender.String "M"}}selected{{end}}>{{T "male"}}</option>
+                            <option value="F" {{if eq .Profile.Gender.String "F"}}selected{{end}}>{{T "female"}}</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{T "birthday"}}</td>
+                    <td><input type="date" name="birth_day" class="form-control" value="{{.Profile.BirthDay.String}}" autocomplete="off"></td>
+                </tr>
+                <tr>
+                    <td>{{T "phone"}}</td>
+                    <td><input type="text" name="phone" class="form-control" value="{{.Profile.Phone.String}}" autocomplete="off"></td>
+                </tr>
+                <tr>
+                    <td>{{T "email"}}</td>
+                    <td><input type="email" name="email" class="form-control" value="{{.Profile.Email.String}}" autocomplete="off"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button type="submit" class="btn btn-success">{{T "update"}}</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location='#user-profile'">{{T "cancel"}}</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{{else}}
+    <!-- Tampilan Detail Profil -->
+    <div class="table-container detail-view">
+        <form action="" class="form-group">
+            <table class="table table-borderless">
+                <tr>
+                    <td>{{T "admin_id"}}</td>
+                    <td>{{.Profile.AdminID}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "name"}}</td>
+                    <td>{{.Profile.Name.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "username"}}</td>
+                    <td>{{.Profile.Username.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "gender"}}</td>
+                    <td>
+                        {{if eq .Profile.Gender.String "M"}}
+                            {{T "male"}}
+                        {{else if eq .Profile.Gender.String "F"}}
+                            {{T "female"}}
+                        {{end}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{T "birthday"}}</td>
+                    <td>{{.Profile.BirthDay.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "phone"}}</td>
+                    <td>{{.Profile.Phone.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "email"}}</td>
+                    <td>{{.Profile.Email.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "admin_level"}}</td>
+                    <td>{{.Profile.AdminLevelName.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "language_id"}}</td>
+                    <td>{{.Profile.LanguageID.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "last_reset_password"}}</td>
+                    <td>{{.Profile.LastResetPassword.String}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "blocked"}}</td>
+                    <td>{{if .Profile.Blocked.Bool}}{{T "yes"}}{{else}}{{T "no"}}{{end}}</td>
+                </tr>
+                <tr>
+                    <td>{{T "active"}}</td>
+                    <td>{{if .Profile.Active.Bool}}{{T "yes"}}{{else}}{{T "no"}}{{end}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button type="button" class="btn btn-primary" onclick="window.location='#user-profile?action=update'">{{T "edit"}}</button>
+                        <button type="button" class="btn btn-warning" onclick="window.location='#update-password'">{{T "update_password"}}</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{{end}}

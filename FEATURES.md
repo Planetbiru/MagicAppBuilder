@@ -100,6 +100,7 @@
   - **Full CRUD Operations**: Automatically generates queries and mutations.
   - **Advanced Querying**: Built-in support for filtering, sorting, and pagination.
   - **Automatic Relationship Handling** and **Soft-Delete Support**.
+  - **Suport Multiple Language**: Support PHP, Java, Kotlin, Node.js and Python.
   - **Generates API documentation** (`MANUAL.md`) and a ready-to-use endpoint.
 - **Built-in application updater** for seamless upgrades.
 - **Live application reload** to apply configuration changes without a full page refresh.

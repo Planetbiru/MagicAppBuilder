@@ -17,7 +17,7 @@ if(!isset($databaseName))
 {
     $databaseName = "";
 }
-
+$hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schemaName");
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +27,7 @@ if(!isset($databaseName))
     <meta name="database-name" content="<?php echo $databaseConfig->getDatabaseName();?>">
     <meta name="database-schema" content="<?php echo $schemaName;?>">
     <meta name="application-id" content="<?php echo $applicationId;?>">
+    <meta name="hash" content="<?php echo $hash;?>">
     <title>Database Explorer</title>
     <link rel="icon" type="image/x-icon" href="../favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
@@ -38,10 +39,10 @@ if(!isset($databaseName))
     <script src="../lib.assets/js/Column.min.js"></script>
     <script src="../lib.assets/js/Entity.min.js"></script>
     <script src="../lib.assets/js/Diagram.min.js"></script>
-    <script src="../lib.assets/js/EntityEditor.min.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
+    <script src="../lib.assets/js/EntityEditor.js"></script>
     <script src="../lib.assets/js/EntityRenderer.min.js"></script>
     <script src="../lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
     <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
     <script src="../lib.assets/js/SVGtoPNG.min.js"></script>
@@ -107,7 +108,7 @@ if(!isset($databaseName))
         echo $queryResult;
         ?>
     </div>
-    
+
     <div class="modal" id="queryTranslatorModal">
         <div class="modal-backdrop"></div>
 
@@ -116,14 +117,14 @@ if(!isset($databaseName))
                 <h3>Import Database Structure</h3>
                 <span class="close-btn cancel-button">&times;</span>
             </div>
-            
+
             <div class="modal-body">
                 <textarea name="original" id="original" class="original" spellcheck="false" autocomplete="off"></textarea>
             </div>
 
             <div class="modal-footer">
                 <button class="btn btn-primary open-structure">Open File</button>
-                &nbsp;            
+                &nbsp;
                 <button class="btn btn-success translate-structure">Import</button>
                 &nbsp;
                 <button class="btn btn-warning clear">Clear</button>
@@ -133,7 +134,7 @@ if(!isset($databaseName))
             </div>
         </div>
     </div>
-    
+
     <div class="modal" id="entityEditorModal">
         <div class="modal-backdrop"></div>
 
@@ -142,12 +143,16 @@ if(!isset($databaseName))
                 <h3>Entity Editor</h3>
                 <span class="close-btn cancel-button">&times;</span>
             </div>
-            
+
             <div class="modal-body">
                 <div class="entity-editor">
                     <div class="container">
                         <div class="left-panel">
                             <div class="object-container">
+                                <div class="schema-container">
+                                    <select class="schema-selector" onchange="onChangeDatabase(this)">
+                                    </select>
+                                </div>
                                 <div class="entity-filter">
                                     <input type="text" id="tableFilter" placeholder="Type entity name">
                                 </div>
@@ -173,7 +178,7 @@ if(!isset($databaseName))
                                         <svg class="erd-svg" width="600" height="800"></svg>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="resize-bar"></div>
@@ -183,7 +188,7 @@ if(!isset($databaseName))
                                 <thead>
                                     <tr>
                                         <td>
-                                            <label><input type="checkbox" class="check-all-entity-structure"> S</label> 
+                                            <label><input type="checkbox" class="check-all-entity-structure"> S</label>
                                         </td>
                                         <td>
                                             <label><input type="checkbox" class="check-all-entity-data"> D</label>
@@ -203,7 +208,7 @@ if(!isset($databaseName))
                     </div>
                     <div class="editor-container">
                         <div class="button-container">
-                            
+
 
                             <span class="btn-group">
                                 <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
@@ -234,11 +239,11 @@ if(!isset($databaseName))
                                 <button class="btn" onclick="editor.downloadSQL()">SQL</button>
                                 <button class="btn" onclick="editor.showEntitySelector()">GraphQL</button>
                             </span>
-                            
+
                             <span class="btn-group">
-                                <button class="btn" onclick="editor.sortEntities()">Sort</button>    
-                                <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>              
-                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Relationship</label>  
+                                <button class="btn" onclick="editor.sortEntities()">Sort</button>
+                                <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>
+                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Relationship</label>
                             </span>
                         </div>
 
@@ -248,7 +253,7 @@ if(!isset($databaseName))
                                 <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
                                 <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
                                 <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
-                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>                    
+                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
                                 <button class="btn" onclick="editor.preference()">Preferences</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
@@ -306,7 +311,7 @@ if(!isset($databaseName))
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary import-from-entity">Import</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
@@ -320,17 +325,17 @@ if(!isset($databaseName))
             <div class="modal-header">
                 <h3>Export Database</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary button-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary button-cancel">Cancel</button>
             </div>
         </div>
     </div>
-    
+
     <div class="modal modal-xxl" id="entityDataEditorModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
@@ -339,7 +344,7 @@ if(!isset($databaseName))
                 <span class="close-btn cancel-button">&times;</span>
             </div>
             <div class="modal-body">
-                
+
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger clear-data-entity">Clear</button>
@@ -364,18 +369,38 @@ if(!isset($databaseName))
             <div class="modal-header">
                 <h3>GraphQL Generator</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 <form>
                     <div class="entity-type-selector">
-                        <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
-                        &nbsp;
-                        <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
+                        <div>
+                            <label>Profile</label>
+                            <select class="form-control graphql-app-profile" onchange="editor.gqlChangeProfile()">
+                            </select>
+                            <button type="button" class="btn btn-primary" onclick="editor.manageGraphQlAppProfile()">Manage</button>
+                        </div>
+                        <div>
+                            <label>Programming Language</label>
+                            <select class="form-control programming-language-selector">
+                                <option value="php">PHP</option>
+                                <option value="java">Java (Commercial Use)</option>
+                                <option value="kotlin">Kotlin (Commercial Use)</option>
+                                <option value="nodejs">Node.js (Commercial Use)</option>
+                                <option value="python">Python (Commercial Use)</option>
+                                <option value="go">Go (Commercial Use)</option>
+                            </select>
+                            &nbsp;
+                            <label><input type="checkbox" class="entity-type-checker" data-entity-type="custom" onchange="editor.checkEntityTypes(this)" checked> Custom Entities</label>
+                            &nbsp;
+                            <label><input type="checkbox" class="entity-type-checker" data-entity-type="system" onchange="editor.checkEntityTypes(this)"> System Entities</label>
+                            &nbsp;
+                            <label><input type="checkbox" class="in-memory-cache-checker" data-entity-type="in-memory-cache" onchange="editor.inMemoryCacheChange(this)"> In-Memory Cache</label>
+                        </div>
                     </div>
                     <div class="entity-selector-container"></div>
                 </form>
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerate()">Generate GraphQL</button>
                 &nbsp;
                 <button class="btn btn-primary generate-graphql-ok" onclick="editor.handleOkGenerateWithFrontend()">Generate GraphQL with Frontend</button>
@@ -391,11 +416,11 @@ if(!isset($databaseName))
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 <textarea class="description-textarea" placeholder="Enter description here..." spellcheck="false" autocomplete="off"></textarea>
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary description-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary description-cancel">Cancel</button>
@@ -409,11 +434,29 @@ if(!isset($databaseName))
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 Confirmation
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
+                <button class="btn btn-primary confirm-ok">OK</button>
+                &nbsp;
+                <button class="btn btn-secondary confirm-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-sm" id="profileModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Title</h3>
+                <span class="close-btn cancel-button">×</span>
+            </div>
+            <div class="modal-body">
+                Profile
+            </div>
+            <div class="modal-footer">
                 <button class="btn btn-primary confirm-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary confirm-cancel">Cancel</button>
@@ -427,11 +470,11 @@ if(!isset($databaseName))
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 Message
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary confirm-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary confirm-cancel">Cancel</button>
@@ -445,11 +488,11 @@ if(!isset($databaseName))
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 Message
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary alert-ok">OK</button>
             </div>
         </div>

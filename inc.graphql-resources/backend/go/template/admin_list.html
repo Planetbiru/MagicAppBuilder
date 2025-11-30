@@ -1,0 +1,101 @@
+<div id="filter-container" class="filter-container" style="display: block;">
+    <form id="admin-search-form" class="search-form" onsubmit="handleAdminSearch(event)">
+        <div class="filter-controls">
+            <div class="form-group">
+                <label for="username">{{ T "name" }}</label>
+                <input type="text" name="search" id="username" placeholder='{{ T "name" }}' value="{{ .Search }}">
+            </div>
+            <button type="submit" class="btn btn-primary">{{ T "search" }}</button>
+            <a href="#admin?view=create" class="btn btn-primary">{{ T "add_new_admin" }}</a>
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>{{ T "name" }}</th>
+                <th>{{ T "username" }}</th>
+                <th>{{ T "email" }}</th>
+                <th>{{ T "admin_level" }}</th>
+                <th>{{ T "status" }}</th>
+                <th>{{ T "actions" }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ if .Admins }}
+                {{ range .Admins }}
+                    <tr class="{{ if not .Active }}inactive{{ end }}">
+                        <td>{{ .Name }}</td>
+                        <td>{{ .Username }}</td>
+                        <td>{{ .Email }}</td>
+                        <td>{{ .AdminLevelName }}</td>
+                        <td>{{ if .Active }}{{ T "active" }}{{ else }}{{ T "inactive" }}{{ end }}</td>
+                        <td class="actions">
+                            <a href="#admin?view=detail&adminId={{ .AdminID }}" class="btn btn-sm btn-info">{{ T "view" }}</a>
+                            <a href="#admin?view=edit&adminId={{ .AdminID }}" class="btn btn-sm btn-primary">{{ T "edit" }}</a>
+                            {{ if ne .AdminID $.AppAdminID }}
+                                <a href="#admin?view=change-password&adminId={{ .AdminID }}" class="btn btn-sm btn-warning">{{ T "change_password" }}</a>
+                                <button class="btn btn-sm {{ if .Active }}btn-warning{{ else }}btn-success{{ end }}" onclick="handleAdminToggleActive('{{ .AdminID }}', {{ .Active }})">
+                                    {{ if .Active }}{{ T "deactivate" }}{{ else }}{{ T "activate" }}{{ end }}
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="handleAdminDelete('{{ .AdminID }}')">{{ T "delete" }}</button>
+                            {{ end }}
+                        </td>
+                    </tr>
+                {{ end }}
+            {{ else }}
+                <tr>
+                    <td colspan="6">{{ T "no_admins_found" }}</td>
+                </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination-container">
+    {{ if gt .TotalPages 1 }}
+        <span>{{ T "page_of" .Page .TotalPages .TotalAdmins }}</span>
+        <div>
+        {{ if .HasPrev }}
+            <a href="#admin?page={{ .PrevPage }}{{ if .Search }}&search={{ .Search }}{{ end }}" class="btn btn-secondary">{{ T "previous" }}</a>
+        {{ end }}
+
+        {{ if gt .StartPage 1 }}
+            <a href="#admin?page=1{{ if .Search }}&search={{ .Search }}{{ end }}" class="btn btn-secondary">1</a>
+            {{ if .ShowStartEllipsis }}
+                <span class="pagination-ellipsis">...</span>
+            {{ end }}
+        {{ end }}
+
+        {{ $currentPage := .Page }}
+        {{ $search := .Search }}
+        {{ range $i := seq .StartPage .EndPage }}
+            <a href="#admin?page={{ $i }}{{ if $search }}&search={{ $search }}{{ end }}" class="btn {{ if eq $i $currentPage }}btn-primary{{ else }}btn-secondary{{ end }}">{{ $i }}</a>
+        {{ end }}
+
+        {{ if lt .EndPage .TotalPages }}
+            {{ if .ShowEndEllipsis }}
+                <span class="pagination-ellipsis">...</span>
+            {{ end }}
+            <a href="#admin?page={{ .TotalPages }}{{ if .Search }}&search={{ .Search }}{{ end }}" class="btn btn-secondary">{{ .TotalPages }}</a>
+        {{ end }}
+
+        {{ if .HasNext }}
+            <a href="#admin?page={{ .NextPage }}{{ if .Search }}&search={{ .Search }}{{ end }}" class="btn btn-secondary">{{ T "next" }}</a>
+        {{ end }}
+        </div>
+    {{ end }}
+</div>
+
+{{ define "seq" }}
+    {{- $start := . -}}
+    {{- $end := . -}}
+    {{- if ge (len .) 2 }}{{ $start = index . 0 }}{{ $end = index . 1 }}{{ end -}}
+    {{- if ge $end $start -}}
+        {{- range $i := seq $start $end -}}
+            {{- . }}
+        {{- end -}}
+    {{- end -}}
+{{ end }}

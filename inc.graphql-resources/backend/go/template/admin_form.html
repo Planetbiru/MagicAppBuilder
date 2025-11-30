@@ -1,0 +1,56 @@
+<div class="back-controls">
+    <a href="#admin" class="btn btn-secondary">{{ T "back_to_list" }}</a>
+</div>
+<div class="table-container detail-view">
+    <h3>{{ if .IsCreateMode }}{{ T "add_new_admin" }}{{ else }}{{ T "edit_admin" }}{{ end }}</h3>
+    <form id="admin-form" class="form-group" onsubmit="handleAdminSave(event, '{{ .Admin.AdminID }}'); return false;">
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <td>{{ T "name" }}</td>
+                    <td><input type="text" name="name" value="{{ .Admin.Name.String }}" required autocomplete="off"></td>
+                </tr>
+                <tr>
+                    <td>{{ T "username" }}</td>
+                    <td><input type="text" name="username" value="{{ .Admin.Username.String }}" required autocomplete="off"></td>
+                </tr>
+                <tr>
+                    <td>{{ T "email" }}</td>
+                    <td><input type="email" name="email" value="{{ .Admin.Email.String }}" required autocomplete="off"></td>
+                </tr>
+                {{ if .IsCreateMode }}
+                <tr>
+                    <td>{{ T "password" }}</td>
+                    <td><input type="password" name="password" required autocomplete="new-password"></td>
+                </tr>
+                {{ end }}
+                <tr>
+                    <td>{{ T "admin_level" }}</td>
+                    <td>
+                        <select name="admin_level_id" required>
+                            <option value="">{{ T "select_option" }}</option>
+                            {{ range .AdminLevels }}
+                                <option value="{{ .ID }}" {{ if eq .ID $.Admin.AdminLevelID }}selected{{ end }}>
+                                    {{ .Name }}
+                                </option>
+                            {{ end }}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ T "active" }}</td>
+                    <td><input type="checkbox" name="active" {{ if .Admin.Active }}checked{{ end }}></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button type="submit" class="btn btn-success">{{ T "save" }}</button>
+                        <a href="#admin" class="btn btn-secondary">{{ T "cancel" }}</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+{{/* Anda perlu menambahkan fungsi JavaScript handleAdminSave(event, adminId) */}}

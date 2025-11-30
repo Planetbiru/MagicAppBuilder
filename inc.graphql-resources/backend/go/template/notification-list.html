@@ -1,0 +1,71 @@
+<div id="filter-container" class="filter-container" style="display: block;">
+    <form id="notification-search-form" class="search-form" onsubmit="handleNotificationSearch(event)">
+        <div class="filter-controls">
+            <div class="form-group">
+                <label for="search_notification">{{ T "search" }}</label>
+                <input type="text" name="search" id="search_notification" placeholder="{{ T "search" }}" value="{{ .SearchQuery }}">
+            </div>
+            <button type="submit" class="btn btn-primary">{{ T "search" }}</button>
+        </div>
+    </form>
+</div>
+
+<div class="message-list-container">
+    {{if not .Notifications}}
+        <p>{{ T "no_notifications_found" }}</p>
+    {{end}}
+    {{range .Notifications}}
+    <div class="message-item {{if .IsRead.Bool}}read{{else}}unread{{end}}">
+        <span class="message-status-indicator"></span>
+        <div class="notification-header">
+            <div class="message-link-wrapper">
+                <a href="#notification?notificationId={{.NotificationID}}" class="message-link">
+                    <span class="message-subject">{{.Subject.String}}</span>
+                </a>
+                <span class="message-time">{{.TimeCreate.String}}</span>
+                {{if .IsRead.Bool}}
+                    <button class="btn btn-sm btn-secondary" onclick="markNotificationAsUnread('{{.NotificationID}}', 'list')">{{ T "mark_as_unread" }}</button>
+                    <button class="btn btn-sm btn-danger" onclick="handleNotificationDelete('{{.NotificationID}}')">{{ T "delete" }}</button>
+                {{end}}
+            </div>
+        </div>
+        <div class="message-content">
+            {{ truncate .Content.String 150 }}
+        </div>
+    </div>
+    {{end}}
+</div>
+
+<div class="pagination-container">
+    {{if gt .TotalPages 1}}
+        {{$searchQuery := .SearchQuery}}
+        <span>{{ T "page_of" .CurrentPage .TotalPages .TotalRecords }}</span>
+        
+        {{if gt .CurrentPage 1}}
+            <a href="#notification?page={{sub .CurrentPage 1}}{{if $searchQuery}}&search={{$searchQuery}}{{end}}" class="btn btn-secondary">{{ T "previous" }}</a>
+        {{end}}
+
+        {{ $startPage := sub .CurrentPage 1 }}
+        {{ if lt $startPage 1 }}{{ $startPage = 1 }}{{ end }}
+        {{ $endPage := add .CurrentPage 1 }}
+        {{ if gt $endPage .TotalPages }}{{ $endPage = .TotalPages }}{{ end }}
+
+        {{ if gt $startPage 1 }}
+            <a href="#notification?page=1{{if $searchQuery}}&search={{$searchQuery}}{{end}}" class="btn btn-secondary">1</a>
+            {{ if gt $startPage 2 }}<span class="pagination-ellipsis">...</span>{{ end }}
+        {{ end }}
+
+        {{ range seq $startPage $endPage }}
+            <a href="#notification?page={{.}}{{if $searchQuery}}&search={{$searchQuery}}{{end}}" class="btn {{if eq . $.CurrentPage}}btn-primary{{else}}btn-secondary{{end}}">{{.}}</a>
+        {{ end }}
+
+        {{ if lt $endPage .TotalPages }}
+            {{ if lt $endPage (sub .TotalPages 1) }}<span class="pagination-ellipsis">...</span>{{ end }}
+            <a href="#notification?page={{.TotalPages}}{{if $searchQuery}}&search={{$searchQuery}}{{end}}" class="btn btn-secondary">{{.TotalPages}}</a>
+        {{ end }}
+
+        {{if lt .CurrentPage .TotalPages}}
+            <a href="#notification?page={{add .CurrentPage 1}}{{if $searchQuery}}&search={{$searchQuery}}{{end}}" class="btn btn-secondary">{{ T "next" }}</a>
+        {{end}}
+    {{end}}
+</div>

@@ -5,7 +5,7 @@ class Diagram {
 
     /**
      * Creates a new Diagram instance.
-     * 
+     *
      * @param {string} name - The name of the diagram.
      * @param {number} sortOrder - The sort order index of the diagram.
      * @param {Entity[]} originalEntities - The full list of entities available for selection.

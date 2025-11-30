@@ -1,0 +1,54 @@
+<div class="back-controls">
+    <a href="#admin" class="btn btn-secondary">{{ T "back_to_list" }}</a>
+    <a href="#admin?view=edit&adminId={{ .Admin.AdminID }}" class="btn btn-primary">{{ T "edit" }}</a>
+    {{/* Tombol aksi tambahan hanya muncul jika admin yang dilihat bukan admin yang sedang login */}}
+    {{if ne .Admin.AdminID .AppAdminID}}
+        <a href="#admin?view=change-password&adminId={{ .Admin.AdminID }}" class="btn btn-warning">{{ T "change_password" }}</a>
+        
+        {{if .Admin.Active}}
+            <button class="btn btn-warning" onclick="handleAdminToggleActive('{{ .Admin.AdminID }}', true)">
+                {{ T "deactivate" }}
+            </button>
+        {{else}}
+            <button class="btn btn-success" onclick="handleAdminToggleActive('{{ .Admin.AdminID }}', false)">
+                {{ T "activate" }}
+            </button>
+        {{end}}
+
+        <button class="btn btn-danger" onclick="handleAdminDelete('{{ .Admin.AdminID }}')">{{ T "delete" }}</button>
+    {{end}}
+</div>
+
+<div class="table-container detail-view">
+    <table class="table">
+        <tbody>
+            <tr><td><strong>{{ T "admin_id" }}</strong></td><td>{{ .Admin.AdminID }}</td></tr>
+            <tr><td><strong>{{ T "name" }}</strong></td><td>{{ .Admin.Name.String }}</td></tr>
+            <tr><td><strong>{{ T "username" }}</strong></td><td>{{ .Admin.Username.String }}</td></tr>
+            <tr><td><strong>{{ T "email" }}</strong></td><td>{{ .Admin.Email.String }}</td></tr>
+            <tr><td><strong>{{ T "admin_level" }}</strong></td><td>{{ .Admin.AdminLevelName.String }}</td></tr>
+            <tr>
+                <td><strong>{{ T "status" }}</strong></td>
+                <td>
+                    {{if .Admin.Active}}
+                        {{ T "active" }}
+                    {{else}}
+                        {{ T "inactive" }}
+                    {{end}}
+                </td>
+            </tr>
+            <tr><td><strong>{{ T "time_create" }}</strong></td><td>{{ .Admin.TimeCreate }}</td></tr>
+            <tr><td><strong>{{ T "admin_create" }}</strong></td><td>{{ .Admin.AdminCreate.String }}</td></tr>
+            <tr><td><strong>{{ T "time_edit" }}</strong></td><td>{{ .Admin.TimeEdit.String }}</td></tr>
+            <tr><td><strong>{{ T "admin_edit" }}</strong></td><td>{{ .Admin.AdminEdit.String }}</td></tr>
+        </tbody>
+    </table>
+</div>
+
+{{/* Anda perlu menambahkan fungsi JavaScript ini di file JS utama Anda */}}
+<script>
+    // Placeholder untuk fungsi-fungsi yang dipanggil oleh tombol di atas.
+    // Implementasi fungsi ini akan melakukan request AJAX ke backend.
+    function handleAdminToggleActive(adminId, isActive) { console.log('Toggling active for', adminId, !isActive); /* AJAX call here */ }
+    function handleAdminDelete(adminId) { console.log('Deleting admin', adminId); /* AJAX call here */ }
+</script>

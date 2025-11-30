@@ -76,7 +76,7 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
 {
     $maxRecord = 200;
     $maxQuerySize = 524288;
-    
+
     $tables = [];
     if(isset($_POST['___export_table___']) && trim($_POST['___export_table___']) != "")
     {
@@ -93,7 +93,7 @@ if(isset($_POST['___export_database___']) || isset($_POST['___export_table___'])
     header("Content-disposition: attachment; filename=\"$filename\"");
     $exporter = new DatabaseExporter("", $pdo, $databaseConfig->getDatabaseName());
     $exporter->exportData($tables, $schemaName, $maxRecord, $maxQuerySize);
-    
+
     echo $exporter->getExportData();
     exit();
 }
@@ -102,7 +102,7 @@ if(isset($_POST['___export_database_structure___']) || isset($_POST['___export_t
 {
     $maxRecord = 200;
     $maxQuerySize = 524288;
-    
+
     $tables = [];
     if(isset($_POST['___export_table_structure___']) && trim($_POST['___export_table_structure___']) != "")
     {
@@ -119,7 +119,7 @@ if(isset($_POST['___export_database_structure___']) || isset($_POST['___export_t
     header("Content-disposition: attachment; filename=\"$filename\"");
     $exporter = new DatabaseExporter("", $pdo, $databaseConfig->getDatabaseName());
     $exporter->exportStructure($tables, $schemaName);
-    
+
     echo $exporter->getExportData();
     exit();
 }

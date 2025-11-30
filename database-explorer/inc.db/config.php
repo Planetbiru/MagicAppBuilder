@@ -33,7 +33,7 @@ $databaseConfig = new SecretObject();
 $appConfigPath = $activeWorkspace->getDirectory() . "/applications/$appId/default.yml";
 
 if (file_exists($appConfigPath)) {
-    
+
     $appConfig->loadYamlFile($appConfigPath, false, true, true);
     $databaseConfig = $appConfig->getDatabase();
     if (!isset($databaseConfig)) {
@@ -59,7 +59,7 @@ if (file_exists($appConfigPath)) {
     try {
         // Connect to the database and set schema for PostgreSQL
         $database->connect();
-        
+
         $dbType = $database->getDatabaseType();
         if ($dbType == PicoDatabaseType::DATABASE_TYPE_PGSQL) {
             $database->query("SET search_path TO $schemaName;");
