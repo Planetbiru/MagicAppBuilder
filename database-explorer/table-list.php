@@ -34,7 +34,7 @@ $selected =' selected';
 ?>
 
 <div class="input-label">
-    Target Database Type 
+    Target Database Type
     <select class="form-control" name="target_database_type">
         <option value="mysql"<?php echo $dbType == 'mysql' ? $selected : '';?>>MySQL</option>
         <option value="mariadb"<?php echo $dbType == 'mariadb' ? $selected : '';?>>MariaDB</option>

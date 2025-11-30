@@ -108,7 +108,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
         echo $queryResult;
         ?>
     </div>
-    
+
     <div class="modal" id="queryTranslatorModal">
         <div class="modal-backdrop"></div>
 
@@ -117,7 +117,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                 <h3>Import Database Structure</h3>
                 <span class="close-btn cancel-button">&times;</span>
             </div>
-            
+
             <div class="modal-body">
                 <textarea name="original" id="original" class="original" spellcheck="false" autocomplete="off"></textarea>
             </div>
@@ -134,7 +134,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             </div>
         </div>
     </div>
-    
+
     <div class="modal" id="entityEditorModal">
         <div class="modal-backdrop"></div>
 
@@ -143,7 +143,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                 <h3>Entity Editor</h3>
                 <span class="close-btn cancel-button">&times;</span>
             </div>
-            
+
             <div class="modal-body">
                 <div class="entity-editor">
                     <div class="container">
@@ -178,7 +178,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                         <svg class="erd-svg" width="600" height="800"></svg>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="resize-bar"></div>
@@ -188,7 +188,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <thead>
                                     <tr>
                                         <td>
-                                            <label><input type="checkbox" class="check-all-entity-structure"> S</label> 
+                                            <label><input type="checkbox" class="check-all-entity-structure"> S</label>
                                         </td>
                                         <td>
                                             <label><input type="checkbox" class="check-all-entity-data"> D</label>
@@ -208,7 +208,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                     </div>
                     <div class="editor-container">
                         <div class="button-container">
-                            
+
 
                             <span class="btn-group">
                                 <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
@@ -239,11 +239,11 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <button class="btn" onclick="editor.downloadSQL()">SQL</button>
                                 <button class="btn" onclick="editor.showEntitySelector()">GraphQL</button>
                             </span>
-                            
+
                             <span class="btn-group">
-                                <button class="btn" onclick="editor.sortEntities()">Sort</button>    
-                                <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>              
-                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Relationship</label>  
+                                <button class="btn" onclick="editor.sortEntities()">Sort</button>
+                                <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>
+                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Relationship</label>
                             </span>
                         </div>
 
@@ -253,7 +253,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
                                 <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
                                 <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
-                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>                    
+                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
                                 <button class="btn" onclick="editor.preference()">Preferences</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
@@ -311,7 +311,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary import-from-entity">Import</button>
                 &nbsp;
                 <button class="btn btn-secondary cancel-button">Cancel</button>
@@ -325,17 +325,17 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-header">
                 <h3>Export Database</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary button-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary button-cancel">Cancel</button>
             </div>
         </div>
     </div>
-    
+
     <div class="modal modal-xxl" id="entityDataEditorModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
@@ -344,7 +344,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                 <span class="close-btn cancel-button">&times;</span>
             </div>
             <div class="modal-body">
-                
+
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger clear-data-entity">Clear</button>
@@ -369,7 +369,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-header">
                 <h3>GraphQL Generator</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 <form>
                     <div class="entity-type-selector">
@@ -416,11 +416,11 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 <textarea class="description-textarea" placeholder="Enter description here..." spellcheck="false" autocomplete="off"></textarea>
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary description-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary description-cancel">Cancel</button>
@@ -434,11 +434,11 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 Confirmation
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary confirm-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary confirm-cancel">Cancel</button>
@@ -452,11 +452,11 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 Profile
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary confirm-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary confirm-cancel">Cancel</button>
@@ -470,11 +470,11 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 Message
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary confirm-ok">OK</button>
                 &nbsp;
                 <button class="btn btn-secondary confirm-cancel">Cancel</button>
@@ -488,11 +488,11 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-header">
                 <h3>Title</h3>
                 <span class="close-btn cancel-button">×</span>
-            </div>       
+            </div>
             <div class="modal-body">
                 Message
             </div>
-            <div class="modal-footer">            
+            <div class="modal-footer">
                 <button class="btn btn-primary alert-ok">OK</button>
             </div>
         </div>

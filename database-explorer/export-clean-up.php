@@ -5,7 +5,7 @@ if(!$userLoggedIn)
 {
     exit();
 }
-$baseDirectory = realpath(dirname(__DIR__) . '/.tmp'); 
+$baseDirectory = realpath(dirname(__DIR__) . '/.tmp');
 
 $exportFileMaxAge = $builderConfig->getExportFileMaxAge();
 
@@ -18,7 +18,7 @@ else
     $exportFileMaxAge = intval($exportFileMaxAge);
 }
 
-$maxAge = time() - $exportFileMaxAge; 
+$maxAge = time() - $exportFileMaxAge;
 
 if (!is_dir($baseDirectory)) {
     exit;
@@ -33,7 +33,7 @@ foreach ($files as $file) {
         $fileMTime = filemtime($filePath);
 
         if ($fileMTime !== false && $fileMTime < $maxAge) {
-            unlink($filePath); 
+            unlink($filePath);
         }
     }
 }
