@@ -1,7 +1,5 @@
 <?php
 
-// TODO: Your code here
-
 // Please relpace all codes bellow
 
 $cfgDbDriver         = '{DB_DRIVER}';
@@ -38,15 +36,15 @@ if(stripos($cfgDbDriver, 'mysql') !== false || stripos($cfgDbDriver, 'mariadb') 
           $db = new PDO($cfgDbDsn, $cfgDbUser, $cfgDbPass, $options);
           if(isset($cfgDbTimeZone) && !empty($cfgDbTimeZone))
           {
-              $tz = new DateTimeZone($cfgDbTimeZone);
-              $offset = (new DateTime('now', $tz))->format('P');
-              $db->exec("SET time_zone = '" . $offset . "'");
+               $tz = new DateTimeZone($cfgDbTimeZone);
+               $offset = (new DateTime('now', $tz))->format('P');
+               $db->exec("SET time_zone = '" . $offset . "'");
           }
      } catch (\PDOException $e) {
           throw new \PDOException($e->getMessage(), (int)$e->getCode());
      }
-} 
-else if(stripos($cfgDbDriver, 'sqlite') !== false) 
+}
+else if(stripos($cfgDbDriver, 'sqlite') !== false)
 {
      try {
           $db = new PDO("sqlite:" . $cfgDbDatabaseFile);
@@ -54,8 +52,8 @@ else if(stripos($cfgDbDriver, 'sqlite') !== false)
      } catch (\PDOException $e) {
           throw new \PDOException($e->getMessage(), (int)$e->getCode());
      }
-} 
-else if(stripos($cfgDbDriver, 'sqlsrv') !== false) 
+}
+else if(stripos($cfgDbDriver, 'sqlsrv') !== false)
 {
      $cfgDbDsn = "sqlsrv:Server=$cfgDbHost,$cfgDbPort;Database=$cfgDbDatabaseName";
      $options = array(
@@ -67,8 +65,8 @@ else if(stripos($cfgDbDriver, 'sqlsrv') !== false)
      } catch (\PDOException $e) {
           throw new \PDOException($e->getMessage(), (int)$e->getCode());
      }
-} 
-else if(stripos($cfgDbDriver, 'pgsql') !== false) 
+}
+else if(stripos($cfgDbDriver, 'pgsql') !== false)
 {
      $cfgDbDsn = "pgsql:host=$cfgDbHost;port=$cfgDbPort;dbname=$cfgDbDatabaseName";
      $options = array(

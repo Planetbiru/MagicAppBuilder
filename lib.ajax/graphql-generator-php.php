@@ -197,7 +197,7 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/available-theme.php", 'available-theme.php');
 
         // Get template from file
-        $databaseConfiguration = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/php/database.php");
+        $databaseConfiguration = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/backend/php/database.php");
 
         // Replace database configuration placeholders with actual values
         $databaseConfiguration = setDatabaseConfiguration($application, $databaseConfiguration);

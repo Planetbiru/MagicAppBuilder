@@ -36,7 +36,10 @@ class InMemoryCache
      */
     public static function set($key, $value, $ttl = 300)
     {
-        if (!self::$enabled) return;
+        if (!self::$enabled)
+        {
+            return;
+        }
 
         self::$cache[$key] = array(
             'value'  => $value,
@@ -49,10 +52,7 @@ class InMemoryCache
      */
     public static function get($key)
     {
-        if (!self::$enabled) return null;
-
-        if (!isset(self::$cache[$key]))
-        {
+        if (!self::$enabled || !isset(self::$cache[$key])) {
             return null;
         }
 
@@ -72,9 +72,9 @@ class InMemoryCache
      */
     public static function has($key)
     {
-        if (!self::$enabled) return false;
-
-        if (!isset(self::$cache[$key])) return false;
+        if (!self::$enabled || !isset(self::$cache[$key])) {
+            return false;
+        }
 
         if (self::$cache[$key]['expire'] < time()) {
             unset(self::$cache[$key]);

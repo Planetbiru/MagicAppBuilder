@@ -23,12 +23,10 @@ class I18n
     public function snakeCaseToTitleCase($text)
     {
         $words = explode('_', $text);
-        $titleCaseText = '';
         foreach ($words as $key=>$word) {
             $words[$key] = ucfirst($word) . ' ';
         }
-        $titleCaseText = implode(' ', $words);
-        return $titleCaseText;
+        return implode(' ', $words);
     }
 }
 
