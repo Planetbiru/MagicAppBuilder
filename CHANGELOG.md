@@ -3903,11 +3903,11 @@ In version 2.0.0, users can now define a default sort order for each entity usin
 
 ```json
 "defaultSort": [
-                {
-                    "field": "buku_id",
-                    "direction": "ASC"
-                }
-            ]
+  {
+    "field": "buku_id",
+    "direction": "ASC"
+  }
+]
 ```
 
 This configuration is set in the `frontend-config.json` file, which can be edited by the user. When generated, MagicAppBuilder will default to using the primary key with an `ASC` direction.
