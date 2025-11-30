@@ -401,7 +401,13 @@ class GraphQLGeneratorBase
                 'listColumns' => $this->getListColumns($tableName, $tableInfo, $backendHandledColumnNames),
                 'insertColumns' => $this->getInsertColumns($tableName, $tableInfo, $backendHandledColumnNames),
                 'updateColumns' => $this->getEditColumns($tableName, $tableInfo, $backendHandledColumnNames),
-                'detailColumns' => $this->getDetailColumns($tableName, $tableInfo, $backendHandledColumnNames)
+                'detailColumns' => $this->getDetailColumns($tableName, $tableInfo, $backendHandledColumnNames),
+                'defaultSort' => [
+                    [
+                        'field' => $tableInfo['primaryKey'],
+                        'direction' => 'ASC'
+                    ]
+                ]
             );
         }
         

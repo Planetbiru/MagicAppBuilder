@@ -3893,6 +3893,27 @@ With this feature:
 
 This feature is particularly useful for developers who iterate on database schemas or manage multiple environments, as it decouples the entity design from the live database configuration.
 
+## New Feature: Default Sort Order for Data Lists
+
+In previous versions, if a user did not specify a sort order when viewing a data list, the ordering was left to the database. Some databases might default to sorting by the primary key in ascending order, while others might sort based on when the data was created rather than any column value. This could lead to inconsistent user experiences across different database systems.
+
+In version 2.0.0, users can now define a default sort order for each entity using the `defaultSort` property. This allows for multi-level sorting instead of relying on just a single column.
+
+**Example:**
+
+```json
+"defaultSort": [
+                {
+                    "field": "buku_id",
+                    "direction": "ASC"
+                }
+            ]
+```
+
+This configuration is set in the `frontend-config.json` file, which can be edited by the user. When generated, MagicAppBuilder will default to using the primary key with an `ASC` direction.
+
+This allows users to define a default data order in the list for each entity with specific columns and directions, ensuring a consistent and predictable user experience.
+
 ## Enhancements
 
 ### Consistent Boolean Handling Across All Databases

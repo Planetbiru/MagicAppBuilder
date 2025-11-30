@@ -1139,15 +1139,20 @@ class GraphQLClientApp {
     }
 
     /**
-     * Fetches data based on the current state (filters, pagination) and updates
-     * the table and pagination sections of the view.
-     * @returns {Promise<void>} Resolves when the view is updated.
+     * Builds an array of filter objects to be used in a query operation.
+     *
+     * This method inspects the current entity's filter definitions and the
+     * component's internal filter state. For each filter that has a value
+     * and a corresponding filter configuration, a filter object is added 
+     * to the result containing:
+     * - `field`: the field name being filtered,
+     * - `value`: the filter value provided by the user,
+     * - `operator`: the operator defined in the filter configuration (defaults to `EQUALS`).
+     *
+     * @returns {Array<Object>} A list of filter objects compatible with query operations.
      */
-    async updateTableView() {
-        const fields = this.getFieldsForQuery(this.currentEntity, 1, 1, false, true); // depth 1, maxDepth 1 (only fetch primary key and displaField if entity has displayField)
-        const offset = (this.state.page - 1) * this.state.limit;
-
-        // Construct filter array for GQL query from state object
+    getFilterForQuery()
+    {
         const filterForQuery = [];
         if (this.currentEntity.filters) {
             Object.entries(this.state.filters).forEach(([field, value]) => {
@@ -1157,13 +1162,56 @@ class GraphQLClientApp {
                 }
             });
         }
+        return filterForQuery;
+    }
 
-        // Construct orderBy array for GQL query
+    /**
+     * Builds an array of sorting instructions to be used in a query operation.
+     *
+     * This method checks whether the component state contains a selected
+     * `orderBy` field. If it exists, that value is returned as the sorting rule.
+     * Otherwise, if the current entity defines a `defaultSort` list, the method
+     * iterates through that list and constructs sorting objects using:
+     * - `field`: the field to sort by,
+     * - `direction`: the defined sorting direction (defaults to `ASC`).
+     *
+     * @returns {Array<Object>} A list of sorting rules for ordering query results.
+     */
+    getOrderByForQuery()
+    {
         const orderByForQuery = [];
-        if (this.state.orderBy && this.state.orderBy.field) {
+        if (this.state.orderBy?.field) {
             orderByForQuery.push(this.state.orderBy);
         }
+        else if (this.currentEntity.defaultSort && this.currentEntity.defaultSort.length > 0) {
+            for (let i in this.currentEntity.defaultSort) {
+                let sort = this.currentEntity.defaultSort[i];
+                if (sort.field) {
+                    let direction = sort.direction || 'ASC';
+                    orderByForQuery.push({
+                        field: sort.field,
+                        direction: direction
+                    });
+                }
+            }
+        }
+        return orderByForQuery;
+    }
 
+    /**
+     * Fetches data based on the current state (filters, pagination) and updates
+     * the table and pagination sections of the view.
+     * @returns {Promise<void>} Resolves when the view is updated.
+     */
+    async updateTableView() {
+        const fields = this.getFieldsForQuery(this.currentEntity, 1, 1, false, true); // depth 1, maxDepth 1 (only fetch primary key and displaField if entity has displayField)
+        const offset = (this.state.page - 1) * this.state.limit;
+
+        // Construct filter array for GQL query from state object
+        const filterForQuery = this.getFilterForQuery()
+
+        // Construct orderBy array for GQL query
+        const orderByForQuery = this.getOrderByForQuery();
 
         const query = `
             query Get${this.ucFirst(this.currentEntity.pluralName)}($limit: Int, $offset: Int, $orderBy: [SortInput], $filter: [FilterInput]) {
@@ -1196,7 +1244,7 @@ class GraphQLClientApp {
                 result = data && data[this.currentEntity.pluralName] ? data[this.currentEntity.pluralName] : {};
             }
 
-            if(result && result.items && result.items.length > 0)
+            if(result?.items?.length > 0)
             {
                 this.renderTable(result.items); // Renders into tableDataContainer
             }
@@ -1205,7 +1253,7 @@ class GraphQLClientApp {
                 this.dom.tableDataContainer.innerHTML = `<p style="color: red;">Data not found</p>`;
             }
             this.renderPagination(result);
-            if(result.errors && result.errors.length > 0)
+            if(result?.errors?.length > 0)
             {
                 console.error(result.errors);
             }
@@ -1280,7 +1328,7 @@ class GraphQLClientApp {
                         }
                     }
 
-                    tableHtml += `<td>${value !== null ? value : 'N/A'}</td>`;
+                    tableHtml += `<td>${value === null ? 'N/A' : value}</td>`;
                 });
                 tableHtml += this.renderActionButtons(item);
                 tableHtml += `</tr>`;
@@ -1318,7 +1366,7 @@ class GraphQLClientApp {
      * @returns {Array<object>} An array of items for the entity, or an empty array if not found.
      */
     getPrefetchedDataForEntity(entity, prefetchedData) {
-        if (prefetchedData && entity && entity.pluralName && prefetchedData[entity.pluralName] && prefetchedData[entity.pluralName].items) {
+        if (prefetchedData && entity && entity.pluralName && prefetchedData[entity.pluralName]?.items) {
             return prefetchedData[entity.pluralName].items;
         }
         return [];
@@ -1338,6 +1386,41 @@ class GraphQLClientApp {
     }
 
     /**
+     * Builds a list of related entity queries that need to be merged into
+     * the main GraphQL request.
+     *
+     * This method scans all filters of the current entity that use a
+     * `<select>` element. For each such filter, if the underlying column
+     * represents a foreign key, the method identifies the related entity
+     * and generates a GraphQL sub-query to fetch items from that entity.
+     *
+     * The generated queries follow the pattern:
+     *   `pluralName(limit: 1000) { items { <fields> } }`
+     *
+     * The `<fields>` placeholder is generated using `getFieldsForQuery()`,
+     * which extracts the appropriate fields from the related entity.
+     *
+     * @returns {Array<string>} An array of GraphQL query fragments to be merged into the main query.
+     */
+    getQueriesToMerge()
+    {
+        const queriesToMerge = [];
+        const selectFilters = this.currentEntity.filters.filter(f => f.element === 'select');
+        for (const filter of selectFilters) {
+            const col = this.currentEntity.columns[filter.name];
+            if (col?.isForeignKey) {
+                const relatedEntity = this.config.entities[this.camelCase(col.references)];
+                if (relatedEntity) {
+                    const fields = this.getFieldsForQuery(relatedEntity, 0, 1);
+                    // Add each entity query to the list, using its pluralName as the key
+                    queriesToMerge.push(`${relatedEntity.pluralName}(limit: 1000) { items { ${fields} } }`);
+                }
+            }
+        }
+        return queriesToMerge;
+    }
+
+    /**
      * Renders filter controls by pre-fetching data for all select elements in a single merged GraphQL query.
      * This is an optimized version of `renderFilters` that reduces network requests. It first identifies
      * all filters that require data from related entities, constructs a single GraphQL query to fetch them all,
@@ -1352,20 +1435,7 @@ class GraphQLClientApp {
 
         if (hasFilters) {
             // Phase 1: Aggregate and pre-fetch all data for select filters
-            const queriesToMerge = [];
-            const selectFilters = this.currentEntity.filters.filter(f => f.element === 'select');
-
-            for (const filter of selectFilters) {
-                const col = this.currentEntity.columns[filter.name];
-                if (col && col.isForeignKey) {
-                    const relatedEntity = this.config.entities[this.camelCase(col.references)];
-                    if (relatedEntity) {
-                        const fields = this.getFieldsForQuery(relatedEntity, 0, 1);
-                        // Add each entity query to the list, using its pluralName as the key
-                        queriesToMerge.push(`${relatedEntity.pluralName}(limit: 1000) { items { ${fields} } }`);
-                    }
-                }
-            }
+            const queriesToMerge = this.getQueriesToMerge();
 
             if (queriesToMerge.length > 0) {
                 const mergedQuery = `query FetchAllFilterData { ${queriesToMerge.join('\n')} }`;
