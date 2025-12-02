@@ -2363,24 +2363,6 @@ class EntityEditor {
     }
 
     /**
-     * Exports the current entities into a GraphQL schema definition file (.graphqls)
-     * with automatic relationship detection.
-     *
-     * @param {string} [filename="schema.graphqls"] - The output filename.
-     * @param {boolean} [removeIdFields=true] - If true, removes scalar fields ending in `_id` and only keeps the relationship fields.
-     */
-    exportToGraphQL(filename = "schema.graphqls") {
-        const schema = GraphQLSchemaUtils.buildGraphQLSchema(this.entities);
-        const blob = new Blob([schema], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    /**
      * Exports the selected entities as a MySQL SQL statement for creating the tables.
      *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
@@ -5283,7 +5265,7 @@ class EntityEditor {
      * as not selected. Only one profile can be active at a time.
      *
      * @param {string} currentValue - The key identifying the profile to activate.
-     * 
+     *
      * @returns {void}
      */
     gqlSetActiveProfile(currentValue)

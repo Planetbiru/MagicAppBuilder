@@ -6,6 +6,7 @@ let db;
 let currentSqliteTableName = null; // To hold the name of the currently selected table
 let curretDatabaseName = null;
 let exportType = '';
+
 /**
  * Load an SQLite database file from a given URL and initialize the UI.
  *

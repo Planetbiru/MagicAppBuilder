@@ -63,11 +63,11 @@ const DIALECT_TYPE_MAP = {
 
 /**
  * Represents a column in a database table.
- * 
- * The Column class is used to define the properties of a column in a database table. 
- * This includes the column's name, type, length, nullable status, default value, 
+ *
+ * The Column class is used to define the properties of a column in a database table.
+ * This includes the column's name, type, length, nullable status, default value,
  * primary key status, auto-increment behavior, and valid values for ENUM or SET types.
- * 
+ *
  * @class
  */
 class Column {
@@ -125,7 +125,7 @@ class Column {
         this.values = values;
         this.description = description;
     }
-    
+
     /**
      * Normalizes SQL column type by removing length parameter for BOOLEAN types only.
      *
@@ -156,9 +156,9 @@ class Column {
     /**
      * Converts the column definition into a valid SQL column definition string
      * for the specified SQL dialect.
-     * 
+     *
      * This method builds a complete column declaration based on the column's properties:
-     * 
+     *
      * - Data type (e.g., VARCHAR, INT, ENUM, etc.), mapped to the appropriate SQL dialect.
      * - Length or precision/scale for applicable types (e.g., VARCHAR(255), DECIMAL(10,2)).
      * - Nullable (`NULL` or `NOT NULL`) depending on `nullable` and `primaryKey` status.
@@ -166,7 +166,7 @@ class Column {
      * - Auto-increment/identity column behavior (`AUTO_INCREMENT`, `SERIAL`, `IDENTITY`, etc.).
      * - Default value handling (for boolean, numeric, or string types).
      * - ENUM or SET values for MySQL-specific declarations.
-     * 
+     *
      * @param {string} dialect - Target SQL dialect. Supported values: "mysql", "postgresql", "sqlite", "sqlserver".
      * @param {boolean} [separatePrimaryKey=false] - If true, skips `PRIMARY KEY` inline in favor of separate definition.
      * @returns {string} The full SQL column definition string based on the column's metadata.
@@ -256,7 +256,7 @@ class Column {
 
     /**
      * Converts a string with quotes into a numeric string without quotes.
-     * 
+     *
      * This function removes leading and trailing quotes from the input string.
      * If the resulting string is empty, it returns the string '0'.
      *
@@ -350,7 +350,7 @@ class Column {
             }
             // Case 10: Handle string literals (e.g., 'some text')
             else if (this.isInQuotes(defaultValue)) {
-                defaultValue = "'"+defaultValue.slice(1, -1)+"'"; 
+                defaultValue = "'"+defaultValue.slice(1, -1)+"'";
             }
         } else {
             defaultValue = null; // If no default value, set it to null
@@ -360,7 +360,7 @@ class Column {
 
     /**
      * Checks if the given string is enclosed in single quotes.
-     * 
+     *
      * @param {string} defaultValue - The string to check.
      * @returns {boolean} - Returns true if the string starts and ends with single quotes, otherwise false.
      */
@@ -371,7 +371,7 @@ class Column {
 
     /**
      * Checks if the given value is a valid number.
-     * 
+     *
      * @param {string|any} defaultValue - The value to check.
      * @returns {boolean} - Returns true if the value is a number (not NaN) and not an empty string, otherwise false.
      */
@@ -382,7 +382,7 @@ class Column {
 
     /**
      * Converts a given value to a boolean-like string representation based on SQL dialect.
-     * 
+     *
      * - For "mysql" and "postgresql": returns "TRUE" or "FALSE".
      * - For "sqlite" and "sql server": returns "1" or "0".
      *
@@ -395,7 +395,7 @@ class Column {
         const isTrue = val === 'true' || val === '1';
 
         const useNumeric = ['sqlite', 'sqlserver'].includes(dialect.toLowerCase());
-        
+
         if (useNumeric) {
             return isTrue ? '1' : '0';
         } else {
@@ -406,12 +406,12 @@ class Column {
 
     /**
      * Fixes the default value based on the column's type and length.
-     * 
+     *
      * This method adjusts the default value depending on the column's data type:
      * - For BOOLEAN types, converts values to 'true' or 'false'.
      * - For text types, escapes single quotes.
      * - For numeric types (INTEGER and FLOAT), parses the value accordingly.
-     * 
+     *
      * @param {string} defaultValue - The default value to fix.
      * @param {string} type - The type of the column.
      * @param {string} length - The length of the column.
@@ -419,7 +419,7 @@ class Column {
      */
     fixDefaultValue(defaultValue, type, length) {
         let result = defaultValue;
-    
+
         if (this.isTypeBoolean(type, length)) {
             result = (defaultValue != 0 && defaultValue.toString().toLowerCase() === 'true') ? 'true' : 'false';
         } else if (this.isNativeValue(defaultValue)) {
@@ -431,13 +431,13 @@ class Column {
         } else if (this.isTypeFloat(type)) {
             result = parseFloat(defaultValue.replace(/[^\d.]/g, ''));
         }
-    
+
         return result;
     }
-    
+
     /**
      * Checks if the given type is a boolean type in MySQL.
-     * 
+     *
      * @param {string} type - The type to check.
      * @param {string} length - The length of the column (used for TINYINT with length 1).
      * @returns {boolean} True if the type is BOOLEAN, BIT, or TINYINT(1), false otherwise.
@@ -445,7 +445,7 @@ class Column {
     isTypeBoolean(type, length) {
         return type.toLowerCase() === 'boolean' || type.toLowerCase() === 'bool' || type.toLowerCase() === 'bit' || (type.toLowerCase() === 'tinyint' && length == 1);
     }
-    
+
     /**
      * Checks if the given value is a native value (true, false, or null).
      *
@@ -521,7 +521,7 @@ class Column {
 
     /**
      * Checks if the column type is one of the range types like NUMERIC, DECIMAL, DOUBLE, FLOAT, and has a value.
-     * 
+     *
      * @param {Array} withRangeTypes - The list of types that support range values (e.g., NUMERIC, DECIMAL, etc.).
      * @returns {boolean} True if the column type is one of the range types and has a value.
      */
@@ -531,7 +531,7 @@ class Column {
 
     /**
      * Checks if the column type is one of the value types like ENUM or SET, and has a value.
-     * 
+     *
      * @param {Array} withValueTypes - The list of types that support specific values (e.g., ENUM, SET).
      * @returns {boolean} True if the column type is one of the value types and has a value.
      */
@@ -541,7 +541,7 @@ class Column {
 
     /**
      * Checks if the column type supports length (e.g., VARCHAR, CHAR, etc.) and has a defined length.
-     * 
+     *
      * @param {Array} withLengthTypes - The list of types that support length (e.g., VARCHAR, CHAR).
      * @returns {boolean} True if the column type supports length and a length is defined.
      */
@@ -551,7 +551,7 @@ class Column {
 
     /**
      * Checks if the column has a valid default value.
-     * 
+     *
      * @returns {boolean} True if the column has a default value that is not 'null'.
      */
     hasDefault() {

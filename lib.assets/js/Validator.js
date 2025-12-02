@@ -1,13 +1,13 @@
 /**
  * EnumEditor handles the creation and management of a list of enumerated values.
- * 
+ *
  * This component provides a simple UI for users to input multiple enum values
  * which are rendered as input fields and outputted as a string in the format: {"A", "B", "C"}.
  */
 class EnumEditor {
     /**
      * Constructs the EnumEditor instance.
-     * 
+     *
      * @param {HTMLElement} parentElement - The parent element where the enum editor will be rendered.
      */
     constructor(parentElement) {
@@ -34,7 +34,7 @@ class EnumEditor {
 
     /**
      * Sanitizes a string by removing double and single quotes.
-     * 
+     *
      * @param {string} value - The input string to sanitize.
      * @returns {string} - The sanitized string.
      */
@@ -44,7 +44,7 @@ class EnumEditor {
 
     /**
      * Adds a new input field for an enum item.
-     * 
+     *
      * @param {string} [value=''] - Optional initial value for the new item.
      */
     addItem(value = '') {
@@ -92,7 +92,7 @@ class EnumEditor {
 
     /**
      * Updates the output string based on current input values.
-     * 
+     *
      * The output is formatted like: {"Value1", "Value2"} or empty string if no valid items.
      */
     updateOutput() {
@@ -142,14 +142,14 @@ class EnumEditor {
      * @returns {string[]} An array of enum values as strings. Returns an empty array if input is empty or '{}'.
      */
     parseEnumString(str) {
-        if (!str || str.trim() === '{}') 
+        if (!str || str.trim() === '{}')
         {
             return [];
         }
         return str
             .replace(/^\{|\}$/g, '') // NOSONAR
             .split(',')
-            .map(s => s.trim().replace(/^"(.*)"$/, '$1'));  
+            .map(s => s.trim().replace(/^"(.*)"$/, '$1'));
     }
 }
 
@@ -192,7 +192,7 @@ class ValidationBuilder {
 
     /**
      * Closes the main validation modal.
-     * 
+     *
      * @returns {ValidationBuilder} The current instance for chaining.
      */
     closeValidationModal()
@@ -319,7 +319,7 @@ class ValidationBuilder {
     }
 
     /**
-     * Updates the validation type dropdown in the modal by disabling 
+     * Updates the validation type dropdown in the modal by disabling
      * already-used validation types for the current field,
      * except the specified mandatory one (e.g., "Required").
      *
@@ -417,7 +417,7 @@ class ValidationBuilder {
             {
                 div.innerHTML = `<label class="form-label">${prop}</label><input type="text" class="form-control" data-prop="${prop}" placeholder="${prop}" value="${validation[prop] || ''}">`;
             }
-            
+
             this.propsContainer.appendChild(div);
 
             if(en)
@@ -464,7 +464,7 @@ class ValidationBuilder {
         if((selected == 'Size' || selected == 'Length') && _this.currentMaximumLength)
         {
             this.propsContainer.querySelector('input[data-prop="min"]').value = 0;
-            this.propsContainer.querySelector('input[data-prop="max"]').value = _this.currentMaximumLength;    
+            this.propsContainer.querySelector('input[data-prop="max"]').value = _this.currentMaximumLength;
         }
         else if(selected == 'MaxLength' && _this.currentMaximumLength)
         {
@@ -510,7 +510,7 @@ class ValidationBuilder {
 
         const container = this.baseElement.querySelector(".field-validations-list");
         let data = this.validationsPerField[this.currentField] || [];
-        
+
         this.renderFieldValidations(container, this.currentField, data)
         $(this.modalSelector).modal('hide');
         return this;
@@ -574,12 +574,12 @@ class ValidationBuilder {
             let data = this.validationsPerField[fieldName] || [];
             _this.renderFieldValidationsMerged(field.querySelector('.field-validations-list'), fieldName, data);
         })
-        
+
     }
 
     /**
      * Saves validation status for all fields in the table.
-     * 
+     *
      * This method collects validated fields from the current `validationsPerField`
      * object and iterates over each row in the table body. It updates the
      * `data-has-validation` attribute of each row based on whether the field
@@ -594,11 +594,11 @@ class ValidationBuilder {
 
     /**
      * Marks each table row with a validation status.
-     * 
+     *
      * This method iterates through all rows in the table body, compares each row's
      * associated field name with the list of validated fields, and updates the
      * `data-has-validation` attribute accordingly.
-     * 
+     *
      * This can be used to visually or logically differentiate which fields
      * have validation rules defined in `validationsPerField`.
      *
@@ -730,7 +730,7 @@ class ValidationBuilder {
      */
     deleteValidation(field, index) {
         this.validationsPerField[field].splice(index, 1);
-        if (this.validationsPerField[field].length === 0) 
+        if (this.validationsPerField[field].length === 0)
         {
             delete this.validationsPerField[field];
         }
@@ -747,7 +747,7 @@ class ValidationBuilder {
      */
     deleteValidationMerged(field, index) {
         this.validationsPerField[field].splice(index, 1);
-        if (this.validationsPerField[field].length === 0) 
+        if (this.validationsPerField[field].length === 0)
         {
             delete this.validationsPerField[field];
         }
@@ -773,7 +773,7 @@ class ValidationBuilder {
         this.updateDropDown(validation.type);
         $(this.modalSelector).modal('show');
     }
-    
+
 
     /**
      * Retrieves the validation data for all fields.
