@@ -62,10 +62,16 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            window.addEventListener("storage", function(event) {
+                if (event.key === "login" && event.newValue === "true") {
+                    window.location = './';
+                }
+            });
+
             window.localStorage.setItem('lougout', 'true');
             setTimeout(function(){
                 window.localStorage.setItem('lougout', 'false');
-            }, 400)
+            }, 400);
         });
     </script>
 </body>

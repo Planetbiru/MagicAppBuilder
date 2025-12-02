@@ -1261,10 +1261,18 @@ let initAll = function () {
       headers: {
         'X-Requested-With': 'xmlhttprequest'
       },
-      dataType: 'json', // pastikan respons diparsing sebagai JSON
+      dataType: 'json',
       success: function (response) {
         if (response.loggedIn) {
+          hideSessionExpiredNotice();
           $('#loginModal').modal('hide');
+
+          window.localStorage.setItem('login', 'true');
+          setTimeout(function(){
+              window.localStorage.setItem('login', 'false');
+          }, 400);
+
+
           hideLoginError(); // Hide invalid login message
           $('.session-expired-alert').remove();
         } else {

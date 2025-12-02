@@ -3916,6 +3916,18 @@ This allows users to define a default data order in the list for each entity wit
 
 ## Enhancements
 
+### Cross-Tab Login & Logout Synchronization
+
+To improve session consistency, MagicAppBuilder 2.0 now synchronizes login and logout events across all open tabs and windows in the same browser.
+
+*   **Problem:** Previously, logging in or out on one tab did not affect other open tabs, leading to inconsistent session states and user confusion.
+*   **Solution:**
+    *   **Login Sync:** When a user logs in on one tab, other tabs are automatically logged in.
+    *   **Logout Sync:** When a user logs out, other active tabs will display a login prompt, ensuring the user is aware their session has ended.
+    *   **Session Recovery:** If a user re-authenticates on any tab, login prompts on other tabs are automatically dismissed, restoring a seamless user experience.
+
+This enhancement ensures a consistent and predictable session state, preventing users from unknowingly working with an expired session.
+
 ### Consistent Boolean Handling Across All Databases
 
 To improve portability and avoid driver inconsistencies, boolean values are now standardized:
