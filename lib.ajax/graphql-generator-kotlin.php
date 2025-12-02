@@ -47,7 +47,7 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
                 $driverClass = 'com.mysql.cj.jdbc.Driver';
                 $dialect = 'org.hibernate.dialect.MySQLDialect';
             } else if ($driver == 'pgsql') {
-                $url = "jdbc:postgresql://$host:$port/$dbName?zeroDateTimeBehavior=convertToNull";
+                $url = "jdbc:postgresql://$host:$port/$dbName";
                 $driverClass = 'org.postgresql.Driver';
                 $dialect = 'org.hibernate.dialect.PostgreSQLDialect';
             } else if ($driver == 'sqlite') {
