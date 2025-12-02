@@ -103,7 +103,7 @@ try {
         $zip->addFromString('manual.md', $manualMd);
 
         $appName = $application->getName();
-        $manualHtml = generateManualHtml($manualMd, $appName);
+        $manualHtml = $generator->generateManualHtml($manualMd, $appName);
         $zip->addFromString('manual.html', $manualHtml);
 
         // Add frontend config files
@@ -240,7 +240,7 @@ try {
         $zip->addFromString('manual.md', $manualMd);
 
         $appName = $application->getName();
-        $manualHtml = generateManualHtml($manualMd, $appName);
+        $manualHtml = $generator->generateManualHtml($manualMd, $appName);
         $zip->addFromString('manual.html', $manualHtml);
 
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/php/composer.json", 'composer.json');

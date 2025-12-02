@@ -174,7 +174,7 @@ try {
         $manualMd = $generator->generateManual();
         $zip->addFromString('manual.md', $manualMd);
         $appName = $application->getName();
-        $manualHtml = generateManualHtml($manualMd, $appName);
+        $manualHtml = $generator->generateManualHtml($manualMd, $appName);
         $zip->addFromString('manual.html', $manualHtml);
         $zip->addFromString('README.md', generateReadmeNodeJs($appName, $withFrontend));
 
@@ -237,7 +237,7 @@ try {
         $manualMd = $generator->generateManual();
         $mainZip->addFromString('manual.md', $manualMd);
         $appName = $application->getName();
-        $manualHtml = generateManualHtml($manualMd, $appName);
+        $manualHtml = $generator->generateManualHtml($manualMd, $appName);
         $mainZip->addFromString('manual.html', $manualHtml);
         $mainZip->addFromString('README.md', generateReadmeNodeJs($appName, $withFrontend));
         $mainZip->close();
