@@ -881,3 +881,61 @@ input[type=number]::-webkit-outer-spin-button {
     margin-left: 2px;
   }
 }
+
+/* Alert Styles */
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.alert-primary {
+  color: #ffffff;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color-hover);
+}
+
+.alert-secondary {
+  color: #374151;
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+  [data-theme="dark"] & {
+    color: #e5e7eb;
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+}
+
+.alert-success {
+  color: #064e3b;
+  background-color: #d1fae5;
+  border-color: #a7f3d0;
+  [data-theme="dark"] & {
+    color: #d1fae5;
+    background-color: #064e3b;
+    border-color: #10b981;
+  }
+}
+
+.alert-danger {
+  color: #991b1b;
+  background-color: #fee2e2;
+  border-color: #fecaca;
+  [data-theme="dark"] & {
+    color: #fee2e2;
+    background-color: #991b1b;
+    border-color: #ef4444;
+  }
+}
+
+.alert-warning, .alert-info {
+  color: #9a3412;
+  background-color: #ffedd5;
+  border-color: #fed7aa;
+  [data-theme="dark"] & {
+    color: #ffedd5;
+    background-color: #9a3412;
+    border-color: #f97316;
+  }
+}
