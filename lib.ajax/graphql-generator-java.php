@@ -43,11 +43,11 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
             $dialect = '';
 
             if ($driver == 'mysql' || $driver == 'mariadb') {
-                $url = "jdbc:mysql://$host:$port/$dbName";
+                $url = "jdbc:mysql://$host:$port/$dbName?zeroDateTimeBehavior=convertToNull";
                 $driverClass = 'com.mysql.cj.jdbc.Driver';
                 $dialect = 'org.hibernate.dialect.MySQLDialect';
             } else if ($driver == 'pgsql') {
-                $url = "jdbc:postgresql://$host:$port/$dbName";
+                $url = "jdbc:postgresql://$host:$port/$dbName?zeroDateTimeBehavior=convertToNull";
                 $driverClass = 'org.postgresql.Driver';
                 $dialect = 'org.hibernate.dialect.PostgreSQLDialect';
             } else if ($driver == 'sqlite') {
