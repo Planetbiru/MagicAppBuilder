@@ -66,7 +66,7 @@ class Entity {
         }
 
         const primaryKeyColumns = this.getPrimaryKeyColumns();
-        
+
         // If there are no primary keys, all data is appended.
         if (primaryKeyColumns.length === 0) {
             this.data.push(...newData);
@@ -82,7 +82,7 @@ class Entity {
         let appendedCount = 0;
         newData.forEach(newRow => {
             const newKey = primaryKeyColumns.map(pk => newRow[pk]).join('__');
-            
+
             if (!existingKeys.has(newKey)) {
                 this.data.push(newRow);
                 existingKeys.add(newKey);
@@ -101,7 +101,7 @@ class Entity {
     {
         return this.data;
     }
-    
+
     /**
      * Counts the number of columns marked as primary keys.
      *
@@ -110,7 +110,7 @@ class Entity {
     countPrimaryKey() {
         return this.columns.filter(col => col.primaryKey).length;
     }
-    
+
     /**
      * Returns an array of column names that are marked as primary keys.
      *
@@ -121,14 +121,14 @@ class Entity {
             .filter(col => col.primaryKey)
             .map(col => col.name);
     }
-    
+
     /**
      * Returns a comma-separated string of primary key column names,
      * formatted according to the SQL dialect.
-     * 
+     *
      * - For MySQL: backticks are added (e.g., `id`, `user_id`)
      * - For other dialects: plain comma-separated list (e.g., id, user_id)
-     * 
+     *
      * @param {string} dialect - SQL dialect (e.g., "mysql", "postgresql", etc.)
      * @returns {string} The formatted primary key columns as a string.
      */
@@ -248,7 +248,7 @@ class Entity {
         const isInteger = column.isTypeInteger(type);
         const isFloat = column.isTypeFloat(type);
         const isBoolean = column.isTypeBoolean(type, length);
-        
+
 
 
         const isNullLike = (
@@ -352,7 +352,7 @@ class Entity {
      * @returns {string} - Escaped and quoted string.
      */
     quoteString(value, dialect = 'mysql') {
-        let str = String(value);        
+        let str = String(value);
 
         // Escape single quotes
         str = str.replace(/'/g, "''");

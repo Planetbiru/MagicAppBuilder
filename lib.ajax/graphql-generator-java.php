@@ -1,8 +1,20 @@
 <?php
 
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\GraphQLGeneratorJava;
 use MagicObject\SecretObject;
 
+/**
+ * Sets the database configuration for the Java application.
+ *
+ * This function reads the database settings from the application's YAML configuration file,
+ * constructs the appropriate JDBC URL, driver class, and Hibernate dialect, and then
+ * replaces placeholders in the provided configuration template with these values.
+ *
+ * @param EntityApplication $application The application entity.
+ * @param string $databaseConfiguration The configuration template string.
+ * @return string The populated database configuration string.
+ */
 function setDatabaseConfiguration($application, $databaseConfiguration)
 {
     $appConfig = new SecretObject(null);
@@ -23,6 +35,8 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
             $port = $databaseConfig->getPort();
             $dbName = $databaseConfig->getDatabaseName();
             $dbFile = $databaseConfig->getDatabaseFilePath();
+
+            $driver = strtolower($driver);
 
             $url = '';
             $driverClass = '';
@@ -57,6 +71,13 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
     return $databaseConfiguration;
 }
 
+/**
+ * Generates the README.md content for the generated Java project.
+ *
+ * @param string $appName The name of the application.
+ * @param GraphQLGeneratorJava $generator The GraphQL generator instance.
+ * @return string The generated README.md content.
+ */
 function generateReadmeJava($appName, $generator)
 {
     return "# " . $appName . "\n\n" .
@@ -74,7 +95,7 @@ function generateReadmeJava($appName, $generator)
         "```bash\nchmod +x mvnw\n./mvnw spring-boot:run\n```\n\n" .
         "On Windows:\n" .
         "```bash\nmvnw.cmd spring-boot:run\n```\n\n" .
-        "The GraphQL endpoint will be available at `http://localhost:8080/graphql` and the GraphiQL UI at `http://localhost:8080/graphiql`.\n\n" .
+        "The GraphQL endpoint will be available at `http://localhost:8080/graphql` and the GraphiQL UI at `http://localhost:8080`.\n\n" .
         "### Frontend\n\n" .
         "1.  Extract `frontend.zip`.\n" .
         "2.  Serve the files using any local web server (e.g., `python -m http.server`, `npx serve`, or Apache/Nginx).\n" .
@@ -85,64 +106,16 @@ $reservedColumnMap = createReservedColumnMap($reservedColumns['columns']);
 
 $groupId = $builderConfig->issetGroupId() ? $builderConfig->getGroupId() : 'com.planetbiru';
 
-$backendHandledColumns = [];
-
-if(isset($reservedColumnMap['time_create']))
-{
-    $backendHandledColumns['timeCreate'] = [
-        'columnName' => $reservedColumnMap['time_create'],
-        'type' => 'datetime'
-    ];
-}
-
-if(isset($reservedColumnMap['time_edit']))
-{
-    $backendHandledColumns['timeEdit'] = [
-        'columnName' => $reservedColumnMap['time_edit'],
-        'type' => 'datetime'
-    ];
-}
-
-if(isset($reservedColumnMap['admin_create']))
-{
-    $backendHandledColumns['adminCreate'] = [
-        'columnName' => $reservedColumnMap['admin_create'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['admin_edit']))
-{
-    $backendHandledColumns['adminEdit'] = [
-        'columnName' => $reservedColumnMap['admin_edit'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['ip_create']))
-{
-    $backendHandledColumns['ipCreate'] = [
-        'columnName' => $reservedColumnMap['ip_create'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['ip_edit']))
-{
-    $backendHandledColumns['ipEdit'] = [
-        'columnName' => $reservedColumnMap['ip_edit'],
-        'type' => 'string'
-    ];
-}
+$backendHandledColumns = getBackendHandledColumns($reservedColumnMap);
 
 try {
     /** @var \MagicObject\Database\PicoDatabase $databaseBuilder */
     $app = getApplication($databaseBuilder, $applicationId);
 
     $generator = new GraphQLGeneratorJava(
-        $schema, 
-        $reservedColumns, 
-        $backendHandledColumns, 
+        $schema,
+        $reservedColumns,
+        $backendHandledColumns,
         $inMemoryCache,
         array(
             'groupId' => $groupId,
@@ -210,7 +183,7 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'src/main/resources/static/assets/graphql.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'src/main/resources/static/assets/graphql.min.js');
 
-        
+
         // Add index.html
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
         $indexFileContent = str_replace('{APP_NAME}', $app->getName(), $indexFileContent);
@@ -270,7 +243,7 @@ try {
         $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/mvnw", 'mvnw');
         $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/mvnw.cmd", 'mvnw.cmd');
         $backendZip->addFile(dirname(__DIR__) . "/inc.graphql-resources/backend/java/.mvn/wrapper/maven-wrapper.properties", '.mvn/wrapper/maven-wrapper.properties');
-        
+
         $backendZip->close();
 
         // --- Create Frontend ZIP ---

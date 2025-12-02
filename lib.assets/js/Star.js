@@ -53,7 +53,7 @@ jQuery(function($) {
         const card = clickedElement.closest('.application-item');
         const applicationId = card.attr('data-application-id');
 
-        const isHidden = clickedElement.hasClass('mark-unhidden'); 
+        const isHidden = clickedElement.hasClass('mark-unhidden');
         // mark-unhidden = currently visible (eye), next action = hide
         // mark-hidden   = currently hidden (eye-slash), next action = unhide
         const newHiddenStatus = !isHidden;

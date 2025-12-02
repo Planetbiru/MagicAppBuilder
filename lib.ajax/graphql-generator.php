@@ -5,6 +5,13 @@ use MagicObject\Util\Parsedown;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+/**
+ * Gets an application entity by its ID.
+ *
+ * @param mixed $databaseBuilder The database builder.
+ * @param string $applicationId The ID of the application.
+ * @return EntityApplication An instance of EntityApplication.
+ */
 function getApplication($databaseBuilder, $applicationId)
 {
     $application = new EntityApplication(null, $databaseBuilder);
@@ -159,10 +166,10 @@ function addDirectoryToZip($zip, $sourcePath, $zipPath, $callback = null) {
         foreach ($files as $file) {
             $filePath = $file->getRealPath();
             $relativePath = ltrim($zipPath . '/' . substr($filePath, strlen($sourcePath) + 1), '/');
-            if($file->isDir()) 
+            if($file->isDir())
             {
                 $zip->addEmptyDir($relativePath);
-            } 
+            }
             else
             {
                 if(is_callable($callback))
@@ -206,6 +213,15 @@ function addFilesWithPrefixToZip($zip, $sourcePath, $zipPath, $prefix) { //NOSON
     }
 }
 
+/**
+ * Creates a map of reserved columns from a given array.
+ *
+ * This function transforms an array of reserved column definitions into an
+ * associative array where the key is the column's logical key and the value
+ * is the actual column name.
+ * @param array|null $reservedColumns An array of reserved column definitions.
+ * @return array A map of reserved column keys to their names.
+ */
 function createReservedColumnMap($reservedColumns)
 {
     $reservedColumnMap = array();
@@ -216,6 +232,48 @@ function createReservedColumnMap($reservedColumns)
         }
     }
     return $reservedColumnMap;
+}
+
+/**
+ * Retrieve a list of columns that are automatically handled by the backend.
+ *
+ * This function checks a mapping of reserved column names and returns
+ * a normalized array describing which fields should be populated by
+ * backend logic (such as timestamps, admin identifiers, or IP addresses).
+ *
+ * Each returned item contains:
+ * - `columnName`: The actual database column name from the reserved map.
+ * - `type`: The expected data type used by the backend to populate the value.
+ *
+ * @param array $reservedColumnMap An associative array containing reserved column names
+ *                                 (e.g., time_create, admin_edit, ip_create).
+ *
+ * @return array An associative array where keys represent logical backend fields
+ *               (e.g., timeCreate, adminEdit), and values contain metadata such as
+ *               the actual column name and expected data type.
+ */
+function getBackendHandledColumns($reservedColumnMap)
+{
+    $backendHandledColumns = [];
+    if (isset($reservedColumnMap['time_create'])) {
+        $backendHandledColumns['timeCreate'] = ['columnName' => $reservedColumnMap['time_create'], 'type' => 'datetime'];
+    }
+    if (isset($reservedColumnMap['time_edit'])) {
+        $backendHandledColumns['timeEdit'] = ['columnName' => $reservedColumnMap['time_edit'], 'type' => 'datetime'];
+    }
+    if (isset($reservedColumnMap['admin_create'])) {
+        $backendHandledColumns['adminCreate'] = ['columnName' => $reservedColumnMap['admin_create'], 'type' => 'string'];
+    }
+    if (isset($reservedColumnMap['admin_edit'])) {
+        $backendHandledColumns['adminEdit'] = ['columnName' => $reservedColumnMap['admin_edit'], 'type' => 'string'];
+    }
+    if (isset($reservedColumnMap['ip_create'])) {
+        $backendHandledColumns['ipCreate'] = ['columnName' => $reservedColumnMap['ip_create'], 'type' => 'string'];
+    }
+    if (isset($reservedColumnMap['ip_edit'])) {
+        $backendHandledColumns['ipEdit'] = ['columnName' => $reservedColumnMap['ip_edit'], 'type' => 'string'];
+    }
+    return $backendHandledColumns;
 }
 
 $request = file_get_contents("php://input");

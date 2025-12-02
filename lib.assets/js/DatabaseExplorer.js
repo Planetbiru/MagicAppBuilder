@@ -489,7 +489,7 @@ function saveFormState(frm)
  * @param {string} selector - A CSS selector used to locate the field within the form.
  * @param {*} value - The value to restore to the field. If undefined, the function does nothing.
  * @param {string} [type='checkbox'] - The type of field to restore. Supported types: 'checkbox', 'select'.
- * 
+ *
  * @returns {void}
  */
 function restoreField(frm, selector, value, type = 'checkbox') {

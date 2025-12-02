@@ -749,7 +749,7 @@ function focusOnLine(editor, lineNumber) {
     if (lineNumber < 0 || lineNumber >= editor.lineCount()) {
         return;
     }
-    
+
     try {
         editor.setCursor(lineNumber, 0); // Move the cursor to the beginning of the specified line.
         editor.scrollIntoView({line: lineNumber, ch: 0}, 20); // Scroll the view to make the line visible with a 20px margin.

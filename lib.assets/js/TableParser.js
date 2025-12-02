@@ -81,7 +81,7 @@ class TableParser {
      * @param {string} valueSection The part of the query after `VALUES`.
      * @returns {string[]} An array of strings, where each string represents the content of one row (without the outer parentheses).
      */
-    extractRowStrings(valueSection) // NOSONAR 
+    extractRowStrings(valueSection) // NOSONAR
     {
         const rows = [];
         let buffer = ''; // Accumulates characters for the current row.
@@ -170,7 +170,7 @@ class TableParser {
      * @param {string} rowContent The string content of a single row (e.g., "1, 'Alice', NULL").
      * @returns {(string|number|boolean|null)[]} An array of parsed values for the row.
      */
-    parseRow(rowContent) // NOSONAR 
+    parseRow(rowContent) // NOSONAR
     {
         const values = [];
         let current = ''; // Accumulates characters for the current value.
@@ -239,7 +239,7 @@ class TableParser {
                 // Handle single quotes, respecting double quotes.
                 current += char;
                 if (inSingle && next === "'") {
-                    current += next; 
+                    current += next;
                     i++; // NOSONAR // Consume the second single quote for escape.
                 } else {
                     inSingle = !inSingle; // Toggle single quote state.
@@ -248,7 +248,7 @@ class TableParser {
                 // Handle double quotes, respecting single quotes.
                 current += char;
                 if (inDouble && next === '"') {
-                    current += next; 
+                    current += next;
                     i++; // NOSONAR // Consume the second double quote for escape.
                 } else {
                     inDouble = !inDouble; // Toggle double quote state.
@@ -288,7 +288,7 @@ class TableParser {
 
     /**
      * Checks if a field is auto-incremented.
-     * 
+     *
      * @param {string} line The field definition.
      * @returns {boolean} True if the field is auto-incremented, otherwise false.
      */
@@ -297,14 +297,14 @@ class TableParser {
         let ai = false;
         // Check for MySQL/MariaDB's AUTO_INCREMENT
         ai = f.includes('AUTO_INCREMENT') || f.includes('AUTOINCREMENT');
-        
+
         // Check for PostgreSQL's SERIAL, BIGSERIAL, or nextval() function
         if(!ai)
         {
             ai = f.includes('SERIAL') || f.includes('BIGSERIAL') || f.includes('NEXTVAL');
         }
 
-        return ai; 
+        return ai;
     }
 
     /**
@@ -330,25 +330,25 @@ class TableParser {
         let rg_fld_comment = /COMMENT\s*'([^']*)'/i; // NOSONAR
         let rg_pk2 = /(PRIMARY|UNIQUE) KEY[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/gi; // NOSONAR
         let rg_pk_composite = /primary\s+key\s*\(([^)]+)\)/i;
-    
+
         let result = rg_tb.exec(sql);
         let tableName = result.groups.tb;
-    
+
         let fieldList = [];
         let primaryKey = null;
         let columnList = [];
         let primaryKeyList = [];
-    
+
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
             let line = f;
 
             line = line.replace(/[\r\n]+/g, ' ');
-    
+
             // Reset regex for field parsing
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
-            
+
             let dataType = fld_def[2]; // NOSONAR
             let dataTypeOriginal = dataType;
             let isPk = false;
@@ -360,7 +360,7 @@ class TableParser {
                 enumValues = rg_enum.exec(line)[1];
                 enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
             }
-            
+
             if (enumArray == null && rg_set.test(line)) {
                 enumValues = rg_set.exec(line)[1];
                 enumArray = enumValues.split(',').map(val => val.trim().replace(/['"]/g, ''));
@@ -377,14 +377,14 @@ class TableParser {
             }
 
             if (this.isValidType(dataType.toString()) || this.isValidType(dataTypeOriginal.toString())) {
-                
+
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
                 let nullable = !rg_not_null.test(attr);
                 let attr2 = attr.replace(rg_not_null, '');
-    
+
                 isPk = rg_pk.test(attr2) || this.isPrimaryKey(line);
                 let isAi = this.isAutoIncrement(line);
-    
+
                 let def = rg_fld_def.exec(attr2);
                 let defaultValue = def && def[1] ? def[1].trim() : null; // NOSONAR
                 let length = this.getLength(attr);
@@ -395,13 +395,13 @@ class TableParser {
                 }
 
                 defaultValue = this.fixDefaultValue(defaultValue, dataType, length);
-    
+
                 let cmn = rg_fld_comment.exec(attr2);
                 let comment = cmn && cmn[1] ? cmn[1].trim() : null; // NOSONAR
 
                 dataType = dataType.trim();
-                
-                if (isPk) 
+
+                if (isPk)
                 {
                     primaryKeyList.push(columnName);
                 }
@@ -433,7 +433,7 @@ class TableParser {
                     primaryKey = matched ? matched[1] : null;
                 }
             }
-    
+
             if (primaryKey != null) {
                 primaryKey = primaryKey.split('(').join('').split(')').join('');
                 for (let i in fieldList) {
@@ -442,7 +442,7 @@ class TableParser {
                     }
                 }
             }
-    
+
             if (rg_pk2.test(f) && rg_pk.test(f)) {
                 let x = f.replace(f.match(rg_pk)[0], ''); // NOSONAR
                 x = x.replace('(', '').replace(')', '');
@@ -467,7 +467,7 @@ class TableParser {
                 }
             }
         }
-    
+
         if (primaryKey == null && primaryKeyList.length > 0) {
             primaryKey = primaryKeyList[0];
         }
@@ -477,17 +477,17 @@ class TableParser {
             fieldList = this.updatePrimaryKey(fieldList, primaryKey);
         }
 
-    
+
         return { tableName: tableName, columns: fieldList, primaryKey: primaryKey };
     }
 
     /**
      * Updates the primary key flag for a specified field in a list of fields.
-     * 
+     *
      * This function iterates over a list of field objects, compares the 'Field' property
-     * of each object to the given primaryKey, and sets the 'Key' property to true 
+     * of each object to the given primaryKey, and sets the 'Key' property to true
      * for the matching field. If no match is found, the field remains unchanged.
-     * 
+     *
      * @param {Array} fieldList - An array of field objects, each containing a 'Field' and 'Key' property.
      * @param {string} primaryKey - The field name to be set as the primary key.
      * @returns {Array} The updated fieldList with the 'Key' property set to true for the matched field.
@@ -549,7 +549,7 @@ class TableParser {
             // Case 8: Handle boolean values (TRUE/FALSE) in any part of the string
             else if (/^TRUE/i.test(defaultValue)) {
                 defaultValue = 'TRUE'; // Normalize to 'TRUE' if it starts with 'TRUE'
-            } 
+            }
             else if (/^FALSE/i.test(defaultValue)) {
                 defaultValue = 'FALSE'; // Normalize to 'FALSE' if it starts with 'FALSE'
             }
@@ -569,9 +569,9 @@ class TableParser {
 
     /**
      * Converts a given value to a boolean string ('TRUE' or 'FALSE') based on its content.
-     * This function checks if the value contains the string 'TRUE' (case-insensitive) or 
-     * if it contains the character '1'. If either condition is met, it returns 'TRUE'; 
-     * otherwise, it returns 'FALSE'. This is useful for normalizing boolean-like values 
+     * This function checks if the value contains the string 'TRUE' (case-insensitive) or
+     * if it contains the character '1'. If either condition is met, it returns 'TRUE';
+     * otherwise, it returns 'FALSE'. This is useful for normalizing boolean-like values
      * (e.g., strings such as '1', 'TRUE', 'true', etc.) into a standardized 'TRUE'/'FALSE' format.
      *
      * @param {string} defaultValue - The input value to be converted to a boolean string.
@@ -584,9 +584,9 @@ class TableParser {
 
     /**
      * Creates a properly quoted date string from the given input.
-     * This function removes any surrounding quotes (both single and double) from the input 
-     * and ensures the final value is enclosed within single quotes. If the input is null, 
-     * it returns null. Additionally, it handles trimming and possible variations in 
+     * This function removes any surrounding quotes (both single and double) from the input
+     * and ensures the final value is enclosed within single quotes. If the input is null,
+     * it returns null. Additionally, it handles trimming and possible variations in
      * quoting style.
      *
      * @param {string|null} defaultValue - The input value to be formatted as a date string.
@@ -600,7 +600,7 @@ class TableParser {
         }
         defaultValue = defaultValue.trim();
         if (this.isInQuotes(defaultValue)) {
-            defaultValue = defaultValue.slice(1, -1); 
+            defaultValue = defaultValue.slice(1, -1);
         }
         else if(defaultValue.startsWith("'"))
         {
@@ -628,13 +628,13 @@ class TableParser {
     isDateTime(defaultValue) {
         // Check for datetime with microseconds (e.g., '2025-01-01 12:30:45.123456')
         const dateTimeWithMicroseconds = /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{6}/;
-        
+
         // Check for datetime (e.g., '2025-01-01 12:30:45')
         const dateTime = /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/;
-        
+
         // Check for date (e.g., '2025-01-01')
         const date = /\d{4}-\d{2}-\d{2}/;
-        
+
         // Check for time (e.g., '01:23:45')
         const time = /\d{2}:\d{2}:\d{2}/;
 
@@ -644,7 +644,7 @@ class TableParser {
 
     /**
      * Checks if the given data type is a boolean type or a small integer type (such as TINYINT(1)).
-     * This function returns true if the data type is a boolean (e.g., BOOL) or a TINYINT with a length of 1 
+     * This function returns true if the data type is a boolean (e.g., BOOL) or a TINYINT with a length of 1
      * (which is commonly used to represent boolean values in databases).
      *
      * @param {string} dataType - The data type of the column, typically from a database schema.
@@ -657,7 +657,7 @@ class TableParser {
 
     /**
      * Checks if the given string is enclosed in single quotes.
-     * 
+     *
      * @param {string} defaultValue - The string to check.
      * @returns {boolean} - Returns true if the string starts and ends with single quotes, otherwise false.
      */
@@ -668,7 +668,7 @@ class TableParser {
 
     /**
      * Checks if the given value is a valid number.
-     * 
+     *
      * @param {string|any} defaultValue - The value to check.
      * @returns {boolean} - Returns true if the value is a number (not NaN) and not an empty string, otherwise false.
      */
@@ -718,17 +718,17 @@ class TableParser {
             catch(e) // NOSONAR
             {
                 // If parsing fails, log the error and continue.
-            }   
+            }
         }
         this.tableInfo = inf;
     }
 
     /**
      * Parses INSERT INTO statements from a SQL string and extracts row data into a structured object.
-     * 
+     *
      * The extracted data is stored in the `this.data` property, where each key is the table name,
      * and the value is an array of row objects inserted into that table.
-     * 
+     *
      * @param {string} sql - The SQL string containing one or more INSERT INTO statements.
      */
     parseData(sql) {
@@ -752,7 +752,7 @@ class TableParser {
             }
         }
     }
-    
+
     /**
      * Formats an SQL string to ensure consistent indentation and spacing.
      * Specifically, it ensures that:
@@ -794,28 +794,28 @@ class TableParser {
     }
 
     /**
-     * Parses a SQL script by splitting it into individual queries, handling comments, 
-     * whitespace, and custom delimiters. It returns an array of query objects with 
+     * Parses a SQL script by splitting it into individual queries, handling comments,
+     * whitespace, and custom delimiters. It returns an array of query objects with
      * each SQL query and its associated delimiter.
      *
      * @param {string} sql - The SQL script as a string.
-     * @returns {Array} - An array of objects, where each object contains a `query` (the SQL statement) 
+     * @returns {Array} - An array of objects, where each object contains a `query` (the SQL statement)
      *                    and `delimiter` (the delimiter used for the query).
      */
     parseSQL(sql) {
         sql = sql.replace(/\n/g, "\r\n");
         sql = sql.replace(/\r\r\n/g, "\r\n");
-    
+
         let arr = sql.split("\r\n");
         let arr2 = [];
-    
+
         arr.forEach((val) => {
             val = val.trim();
             if (!val.startsWith("-- ") && val !== "--" && val !== "") {
                 arr2.push(val);
             }
         });
-    
+
         arr = arr2;
         let append = 0;
         let skip = 0;
@@ -824,14 +824,14 @@ class TableParser {
         let delimiter = ";";
         let queryArray = [];
         let delimiterArray = [];
-    
+
         arr.forEach((text) => {
             if (text === "") {
                 if (append === 1) {
                     queryArray[nquery] += "\r\n";
                 }
             }
-    
+
             if (append === 0) {
                 if (text.trim().startsWith("--")) {
                     skip = 1;
@@ -842,7 +842,7 @@ class TableParser {
                     skip = 0;
                 }
             }
-    
+
             if (skip === 0) {
                 if (start === 1) {
                     nquery++;
@@ -850,12 +850,12 @@ class TableParser {
                     delimiterArray[nquery] = delimiter;
                     start = 0;
                 }
-    
+
                 queryArray[nquery] += text + "\r\n";
                 delimiterArray[nquery] = delimiter;
                 text = text.trim();
                 start = text.length - delimiter.length - 1;
-    
+
                 if (text.substring(start).includes(delimiter) || text === delimiter) {
                     nquery++;
                     start = 1;
@@ -864,9 +864,9 @@ class TableParser {
                     start = 0;
                     append = 1;
                 }
-    
+
                 delimiterArray[nquery] = delimiter;
-    
+
                 if (text.toLowerCase().startsWith("delimiter ")) {
                     text = text.trim().replace(/\s+/g, " ");
                     let arr2 = text.split(" ");
@@ -878,7 +878,7 @@ class TableParser {
                 }
             }
         });
-    
+
         let result = [];
         queryArray.forEach((sql, line) => {
             let delimiter = delimiterArray[line];
@@ -888,7 +888,7 @@ class TableParser {
                 result.push({ query: sql, delimiter: delimiter });
             }
         });
-    
+
         return result;
     }
 

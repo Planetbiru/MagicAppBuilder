@@ -2,7 +2,7 @@
  * Class representing an Entity-Relationship Diagram (ERD) generator.
  * This class generates a visual representation of database tables and their relationships
  * using SVG elements, based on the provided data structure.
- * 
+ *
  * The data structure includes entities (tables), columns, and foreign key relationships.
  * The class positions tables on an SVG canvas, draws them, and connects them with lines to show relationships.
  */
@@ -10,7 +10,7 @@ class EntityRenderer {
 
     /**
      * Creates an instance of the ERDGenerator, initializing properties for rendering an Entity-Relationship Diagram (ERD).
-     * 
+     *
      * @param {string} selector - The SVG element selector to which the generated ERD (tables and relationships) will be appended.
      */
     constructor(selector) {
@@ -53,8 +53,8 @@ class EntityRenderer {
 
     /**
      * Method to generate the Entity-Relationship Diagram (ERD).
-     * This method creates tables on the SVG canvas, sets their positions, 
-     * and calculates the SVG canvas's height based on the number of tables. 
+     * This method creates tables on the SVG canvas, sets their positions,
+     * and calculates the SVG canvas's height based on the number of tables.
      * It also supports drawing relationships between tables if specified.
      *
      * @param {Object} data - The data structure containing entities (tables), columns, and relationships. It should include:
@@ -62,8 +62,8 @@ class EntityRenderer {
      *   - {Array} relationships - An array of relationship objects between the entities, describing how they are related.
      *
      * @param {number} width - The width of the SVG canvas, used to set the `width` attribute for the SVG element.
-     * 
-     * @param {boolean} drawRelationship - A flag to indicate whether to draw relationships between tables. 
+     *
+     * @param {boolean} drawRelationship - A flag to indicate whether to draw relationships between tables.
      *   If `true`, the method will create relationship lines between the tables after placing them.
      */
     createERD(data, width, drawRelationship) {
@@ -83,10 +83,10 @@ class EntityRenderer {
         // Loop through each entity (table) and create it
         this.data.entities.forEach(entity => {
             const tableGroup = this.createTable(entity, entity.index, xPos, yPos);
-            this.tables[entity.name] = { 
-                table: tableGroup, 
-                xPos: xPos, 
-                yPos: yPos 
+            this.tables[entity.name] = {
+                table: tableGroup,
+                xPos: xPos,
+                yPos: yPos
             };
 
             // Update the maximum column count for wrapping the tables in rows
@@ -158,10 +158,10 @@ class EntityRenderer {
 
     /**
      * Calculates the offset position for a button based on its index.
-     * The offset is determined by the index, multiplied by the space between buttons, 
-     * and adjusted by the button margin. This is useful for positioning buttons or 
+     * The offset is determined by the index, multiplied by the space between buttons,
+     * and adjusted by the button margin. This is useful for positioning buttons or
      * UI elements in a sequence.
-     * 
+     *
      * @param {number} index - The index of the button or element to calculate the offset for.
      * @returns {number} The calculated offset value, used for positioning.
      */
@@ -394,7 +394,7 @@ class EntityRenderer {
     /**
      * Method to create a relationship line between two tables.
      * The line connects the foreign key in one table to the corresponding primary key in the referenced table.
-     * 
+     *
      * @param {Object} entity - The entity representing the table with the foreign key.
      * @param {Object} col - The column representing the foreign key.
      * @param {number} index - The index of the foreign key column in the entity's columns.
@@ -402,10 +402,10 @@ class EntityRenderer {
     createRelationship(entity, col, index) {
         // Determine the name of the referenced table by removing '_id' from the foreign key column name
         let refEntityName = col.name.replace("_id", "");
-        
+
         // Get the referenced entity using the reference entity's name
         let referenceEntity = this.getEntityByName(refEntityName);
-        
+
         // If the reference entity exists
         if (referenceEntity != null) {
             // Get the index of the column in the referenced entity (primary key)
@@ -430,7 +430,7 @@ class EntityRenderer {
             // Define the x-coordinates for the relationship line based on the positions of the tables
             let x2;
             let x3;
-            
+
             // Adjust positions
 
             if (x1 == x4) {
@@ -489,7 +489,7 @@ class EntityRenderer {
 
     /**
      * Helper method to get an entity by its name.
-     * 
+     *
      * @param {string} entityName - The name of the entity to retrieve.
      * @returns {Object} The entity object that matches the given name.
      */
@@ -499,11 +499,11 @@ class EntityRenderer {
 
     /**
      * Helper method to get the index of a column by its name in an entity.
-     * 
+     *
      * This function searches through the columns of the provided entity and returns
      * the index of the column with the specified name.
      * If the column is not found, it returns -1.
-     * 
+     *
      * @param {Object} entity - The entity containing the columns array.
      * @param {string} columnName - The name of the column to find in the entity.
      * @returns {number} The index of the column in the entity's columns array, or -1 if not found.
@@ -514,8 +514,8 @@ class EntityRenderer {
 
     /**
      * Exports the current SVG content to a file and triggers a download.
-     * 
-     * This method calls the `exportToSVG` function, passing the current SVG data 
+     *
+     * This method calls the `exportToSVG` function, passing the current SVG data
      * for export. It handles the process of downloading the SVG file.
      */
     downloadSVG() {
@@ -525,8 +525,8 @@ class EntityRenderer {
 
     /**
      * Exports the current SVG content to a PNG file and triggers a download.
-     * 
-     * This method calls the `exportToPNG` function, passing the current SVG data 
+     *
+     * This method calls the `exportToPNG` function, passing the current SVG data
      * for export. It handles the process of downloading the PNG file.
      */
     downloadPNG() {
@@ -616,7 +616,7 @@ class EntityRenderer {
         const svgWithFont = this.generateSVGString(svgElement);
         const blob = new Blob([svgWithFont], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
-        
+
         const link = document.createElement("a");
         link.href = url;
         link.download = fileName;
@@ -641,12 +641,12 @@ class EntityRenderer {
 
         const svgWithFont = this.generateSVGString(svgElement);
         const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgWithFont);
-        
+
         const img = new Image();
         img.onload = function () {
             context.drawImage(img, 0, 0);
             const pngDataUrl = canvas.toDataURL("image/png");
-            
+
             const link = document.createElement("a");
             link.href = pngDataUrl;
             link.download = fileName;
@@ -757,7 +757,7 @@ class EntityRenderer {
         URL.revokeObjectURL(url);
     }
 
-    
+
     /**
      * Formats a given timestamp into a localized date-time string.
      *
@@ -770,13 +770,13 @@ class EntityRenderer {
      */
     formatDate(timestamp) {
         const date = new Date(timestamp);
-        const options = { 
-            year: 'numeric', 
-            month: '2-digit', 
-            day: '2-digit', 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit' 
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
         };
         return date.toLocaleDateString('en-US', options).replace(',', '');
     }
