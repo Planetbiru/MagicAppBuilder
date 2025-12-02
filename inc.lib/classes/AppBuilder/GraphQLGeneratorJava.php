@@ -75,6 +75,9 @@ class GraphQLGeneratorJava extends GraphQLGeneratorBase
         if (strpos($dbType, 'timestamp') !== false) {
             return 'java.time.LocalDateTime';
         }
+        if (strpos($dbType, 'datetime') !== false) {
+            return 'java.time.LocalDateTime';
+        }
         if (strpos($dbType, 'date') !== false) {
             return 'java.time.LocalDate';
         }
