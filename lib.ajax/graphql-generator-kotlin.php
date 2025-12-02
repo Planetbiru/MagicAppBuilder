@@ -43,11 +43,11 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
             $dialect = '';
 
             if ($driver == 'mysql' || $driver == 'mariadb') {
-                $url = "jdbc:mysql://$host:$port/$dbName";
+                $url = "jdbc:mysql://$host:$port/$dbName?zeroDateTimeBehavior=convertToNull";
                 $driverClass = 'com.mysql.cj.jdbc.Driver';
                 $dialect = 'org.hibernate.dialect.MySQLDialect';
             } else if ($driver == 'pgsql') {
-                $url = "jdbc:postgresql://$host:$port/$dbName";
+                $url = "jdbc:postgresql://$host:$port/$dbName?zeroDateTimeBehavior=convertToNull";
                 $driverClass = 'org.postgresql.Driver';
                 $dialect = 'org.hibernate.dialect.PostgreSQLDialect';
             } else if ($driver == 'sqlite') {
@@ -166,8 +166,8 @@ try {
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css", 'src/main/resources/static/assets/style.css');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.css.map", 'src/main/resources/static/assets/style.css.map');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/style.min.css", 'src/main/resources/static/assets/style.min.css');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.js", 'src/main/resources/static/assets/app.js');
-        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-mvn.min.js", 'src/main/resources/static/assets/app.min.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-kotlin.js", 'src/main/resources/static/assets/app.js');
+        $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-kotlin.min.js", 'src/main/resources/static/assets/app.min.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.js", 'src/main/resources/static/assets/graphql.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/graphql.min.js", 'src/main/resources/static/assets/graphql.min.js');
 

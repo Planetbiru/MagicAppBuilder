@@ -76,6 +76,9 @@ class GraphQLGeneratorKotlin extends GraphQLGeneratorBase
         if (strpos($dbType, 'timestamp') !== false) {
             return 'java.time.LocalDateTime';
         }
+        if (strpos($dbType, 'datetime') !== false) {
+            return 'java.time.LocalDateTime';
+        }
         if (strpos($dbType, 'date') !== false) {
             return 'java.time.LocalDate';
         }
@@ -1635,8 +1638,14 @@ type {$ucCamelName}Page {
     hasPrevious: Boolean
 }
 GQL;
-        $pkType = $this->mapKotlinTypeToGqlType($this->mapDbTypeToKotlinType($tableInfo['columns'][$tableInfo['primaryKey']]['type'], $tableInfo['columns'][$tableInfo['primaryKey']]['length']));
-
+        if(isset($tableInfo['columns'][$tableInfo['primaryKey']]))
+        {
+            $pkType = $this->mapKotlinTypeToGqlType($this->mapDbTypeToKotlinType($tableInfo['columns'][$tableInfo['primaryKey']]['type'], $tableInfo['columns'][$tableInfo['primaryKey']]['length']));
+        }
+        else
+        {
+            $pkType = "String";
+        }
         $queries = "    {$camelName}(id: {$pkType}!): $ucCamelName\n";
         $queries .= "    {$pluralCamelName}(limit: Int, offset: Int, page: Int, size: Int, orderBy: [SortInput], filter: [FilterInput]): {$ucCamelName}Page\n";
 

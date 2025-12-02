@@ -27,7 +27,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
 
 
 
-    /** 
+    /**
      * Maps database column types to SQLAlchemy column types.
      *
      * @param string $dbType The database column type (e.g., VARCHAR, INT, TIMESTAMP).
@@ -77,7 +77,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         return "String";
     }
 
-    /** 
+    /**
      * Maps database column types to Python native types.
      *
      * @param string $dbType The database column type (e.g., VARCHAR, INT, TIMESTAMP).
@@ -123,7 +123,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         return "str";
     }
 
-    /** 
+    /**
      * Maps database column types to GraphQL types for the schema.
      *
      * @param string $dbType The database column type (e.g., VARCHAR, INT, TIMESTAMP).
@@ -148,7 +148,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         return 'String'; // Default fallback
     }
 
-    /** 
+    /**
      * Generates the complete set of files for the Python GraphQL API.
      *
      * @return array An array of files, each represented as an associative array with 'name' and 'content' keys.
@@ -166,7 +166,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
             $files[] = ['name' => "models/".$tableName.".py", 'content' => $this->generateModelFile($tableName, $tableInfo)];
             $resolverContent = $this->generateResolverFile($tableName, $tableInfo);
             $files[] = ['name' => "resolvers/".$tableName.".py", 'content' => $resolverContent['content']];
-            
+
             if (!isset($allResolvers['query'])) {
                 $allResolvers['query'] = [];
             }
@@ -183,7 +183,7 @@ class GraphQLGeneratorPython extends GraphQLGeneratorBase
         return $files;
     }
 
-    /** 
+    /**
      * Generates the content for requirements.txt.
      *
      * @return string The content of requirements.txt.
@@ -205,7 +205,7 @@ python-jose[cryptography]
 TXT;
     }
 
-    /** 
+    /**
      * Generates the content for the .env file.
      *
      * @return string The content of the .env file.
@@ -249,7 +249,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 ENV;
     }
 
-    /** 
+    /**
      * Generates the content for models/$tableName.py.
      *
      * @param string $tableName The name of the table.
@@ -322,7 +322,7 @@ $relationships
 PYTHON;
     }
 
-    /** 
+    /**
      * Generates the content for schema.py.
      *
      * @return string The content of schema.py.
@@ -331,7 +331,7 @@ PYTHON;
     {
         $type_defs = "from ariadne import gql, QueryType, MutationType, make_executable_schema\n";
         $type_defs .= "from resolvers import query_resolvers, mutation_resolvers\n\n"; //NOSONAR
-        
+
         $gql_schema = "type_defs = gql(\"\"\"\n";
         $gql_schema .= "    scalar Object\n\n";
         $gql_schema .= "    enum SortDirection {\n        ASC\n        DESC\n    }\n\n";
@@ -470,7 +470,7 @@ PYTHON;
         return $primaryKeyUpdater;
     }
 
-    /** 
+    /**
      * Generates the content for resolvers/$tableName.py.
      *
      * @param string $tableName The name of the table.
@@ -521,13 +521,13 @@ async def $single_query_resolver_name(obj, info, id):
 
 async def $query_resolver_name(obj, info, limit=20, offset=0, page=None, orderBy=None, filter=None):
     db = await anext(get_db())
-    
+
     if page is not None:
         offset = (page - 1) * limit
 
     stmt = select($pascalName)
     count_stmt = select(func.count()).select_from($pascalName)
-    
+
     # Eagerly load relationships to prevent async errors
     load_options = []
 
@@ -545,11 +545,11 @@ PYTHON;
 
         foreach($this->backendHandledColumns as $key=>$col)
         {
-            
+
             $colName = $col['columnName'];
             if(in_array($colName, $inputColumns) || in_array($colName, $skippedColumns))
             {
-                
+
                 if($key == 'timeCreate')
                 {
                     $mappingCodeCreate .= "    new_entity.$colName = datetime.now().strftime(DATETIME_FORMAT)\n";
@@ -562,7 +562,7 @@ PYTHON;
                 {
                     $mappingCodeCreate .= "    new_entity.$colName = request.client.host\n";
                 }
-                
+
                 if($key == 'timeEdit')
                 {
                     $mappingCodeCreate .= "    new_entity.$colName = datetime.now().strftime(DATETIME_FORMAT)\n";
@@ -596,9 +596,9 @@ PYTHON;
     stmt = apply_ordering(stmt, $pascalName, orderBy)
 
     total = (await db.execute(count_stmt)).scalar_one()
-    
+
     stmt = stmt.limit(limit).offset(offset)
-    
+
     result = await db.execute(stmt)
     items = result.scalars().all()
 
@@ -648,10 +648,10 @@ async def $update_mutation_name(obj, info, id, input):
         setattr(entity, key, value)
 
 $mappingCodeUpdate
-    
+
     await db.commit()
     await db.refresh(entity)
-$updatePrimaryKey    
+$updatePrimaryKey
     return entity
 
 async def $delete_mutation_name(obj, info, id):
@@ -742,7 +742,7 @@ PYTHON;
         ];
     }
 
-    /** 
+    /**
      * Generates the content for resolvers/__init__.py.
      *
      * @param array $allResolvers An associative array of all resolvers.
@@ -783,7 +783,7 @@ PYTHON;
         return $imports . "\n" . $query_bindings . "\n" . $mutation_bindings;
     }
 
-    /** 
+    /**
      * Generates the content for models/__init__.py.
      *
      * @return string The content of models/__init__.py.
@@ -798,7 +798,7 @@ PYTHON;
         return $content;
     }
 
-    /** 
+    /**
      * Generates the content for manual.md.
      *
      * @return string The content of manual.md.
@@ -901,5 +901,5 @@ Your server is now running at `http://127.0.0.1:8000`. You can access the Graphi
 
         return $manualContent;
     }
-    
+
 }
