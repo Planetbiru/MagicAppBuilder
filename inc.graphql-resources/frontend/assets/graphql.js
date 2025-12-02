@@ -328,7 +328,7 @@ class GraphQLClientApp {
             window.addEventListener('popstate', () => this.handleRouteChange());
             this.handleRouteChange(); // Handle initial route
         } catch (error) {
-            this.dom.body.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            this.dom.body.innerHTML = this.formatAlert(error.message, 'danger');
         }
     }
 
@@ -1250,7 +1250,7 @@ class GraphQLClientApp {
             }
             else
             {
-                this.dom.tableDataContainer.innerHTML = `<p style="color: red;">Data not found</p>`;
+                this.dom.tableDataContainer.innerHTML = this.formatAlert(this.t('no_items_found'), 'warning');
             }
             this.renderPagination(result);
             if(result?.errors?.length > 0)
@@ -1258,7 +1258,7 @@ class GraphQLClientApp {
                 console.error(result.errors);
             }
         } catch (error) {
-            this.dom.tableDataContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            this.dom.tableDataContainer.innerHTML = this.formatAlert(error.message, 'danger');
         }
     }
 
@@ -1848,7 +1848,7 @@ class GraphQLClientApp {
                 let detailHtml = `<div class="back-controls">
                                     <button id="back-to-list" class="btn btn-secondary">${this.t('back_to_list')}</button>
                                 </div>
-                                <p style="color: red;">${this.escapeHtml(errorMessage)}</p>
+                                ${this.formatAlert(this.escapeHtml(errorMessage), 'danger')}</p>
                                 `
                 this.dom.tableDataContainer.innerHTML = detailHtml;
             }
@@ -1907,8 +1907,13 @@ class GraphQLClientApp {
                 }
             };
         } catch (error) {
-            this.dom.tableDataContainer.innerHTML = `<p style="color: red;">${this.t('failed_to_fetch_details')}</p>`;
+            this.dom.tableDataContainer.innerHTML = this.formatAlert(this.t('failed_to_fetch_details'), 'danger');
         }
+    }
+
+    formatAlert(message, type = 'info')
+    {
+        return `<div class="alert alert-${type}">${message}</div>`;
     }
 
     /**
