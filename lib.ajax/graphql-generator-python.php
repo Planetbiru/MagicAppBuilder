@@ -1,8 +1,16 @@
 <?php
 
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\GraphQLGeneratorPython;
 use MagicObject\SecretObject;
 
+/**
+ * Generates the README.md content for the Python project.
+ *
+ * @param string $appName The name of the application.
+ * @param bool $withFrontend A flag indicating whether to include frontend instructions.
+ * @return string The generated README.md content.
+ */
 function generateReadmePython($appName, $withFrontend)
 {
     $readme = "# " . $appName . "\n\n" .
@@ -37,6 +45,13 @@ function generateReadmePython($appName, $withFrontend)
     return $readme;
 }
 
+/**
+ * Sets the database configuration for the Python application.
+ *
+ * @param EntityApplication $application The application object.
+ * @param string $databaseConfiguration The database configuration template.
+ * @return string The populated database configuration.
+ */
 function setDatabaseConfigurationPython($application, $databaseConfiguration)
 {
     $appConfig = new SecretObject(null);
@@ -58,14 +73,14 @@ function setDatabaseConfigurationPython($application, $databaseConfiguration)
             $url = '';
             if ($driver == 'mysql' || $driver == 'mariadb') {
                 // Requires `mysql-connector-python`
-                
+
             } else if ($driver == 'pgsql') {
                 // Requires `asyncpg`
-                
+
             } else if ($driver == 'sqlite') {
                 // Requires `aiosqlite`
             }
-            
+
             $databaseConfiguration = str_replace('{DB_DRIVER}', $driver, $databaseConfiguration);
             $databaseConfiguration = str_replace('{DB_HOST}', $host, $databaseConfiguration);
             $databaseConfiguration = str_replace('{DB_PORT}', $port, $databaseConfiguration);
@@ -78,6 +93,13 @@ function setDatabaseConfigurationPython($application, $databaseConfiguration)
     }
     return $databaseConfiguration;
 }
+
+/**
+ * Sets an example database configuration for the Python application.
+ *
+ * @param string $databaseConfiguration The database configuration template.
+ * @return string The populated example database configuration.
+ */
 function setDatabaseConfigurationPythonExample($databaseConfiguration)
 {
     $driver = 'mysql';
@@ -101,55 +123,8 @@ function setDatabaseConfigurationPythonExample($databaseConfiguration)
 }
 
 $reservedColumnMap = createReservedColumnMap(isset($reservedColumns['columns']) ? $reservedColumns['columns'] : []);
-$backendHandledColumns = []; 
 
-if(isset($reservedColumnMap['time_create']))
-{
-    $backendHandledColumns['timeCreate'] = [
-        'columnName' => $reservedColumnMap['time_create'],
-        'type' => 'datetime'
-    ];
-}
-
-if(isset($reservedColumnMap['time_edit']))
-{
-    $backendHandledColumns['timeEdit'] = [
-        'columnName' => $reservedColumnMap['time_edit'],
-        'type' => 'datetime'
-    ];
-}
-
-if(isset($reservedColumnMap['admin_create']))
-{
-    $backendHandledColumns['adminCreate'] = [
-        'columnName' => $reservedColumnMap['admin_create'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['admin_edit']))
-{
-    $backendHandledColumns['adminEdit'] = [
-        'columnName' => $reservedColumnMap['admin_edit'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['ip_create']))
-{
-    $backendHandledColumns['ipCreate'] = [
-        'columnName' => $reservedColumnMap['ip_create'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['ip_edit']))
-{
-    $backendHandledColumns['ipEdit'] = [
-        'columnName' => $reservedColumnMap['ip_edit'],
-        'type' => 'string'
-    ];
-}
+$backendHandledColumns = getBackendHandledColumns($reservedColumnMap);
 
 try {
     $application = getApplication($databaseBuilder, $applicationId);
@@ -198,7 +173,7 @@ try {
 
 
         addDirectoryToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'static/assets');
-        
+
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
         $indexFileContent = str_replace('{APP_NAME}', $application->getName(), $indexFileContent);
         $zip->addFromString('static/index.html', $indexFileContent);
@@ -206,7 +181,7 @@ try {
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'static', 'android-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'static', 'apple-icon-');
         addFilesWithPrefixToZip($zip, dirname(__DIR__) . "/inc.graphql-resources/frontend", 'static', 'favicon');
-        
+
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-python.js", 'static/assets/app.js');
         $zip->addFile(dirname(__DIR__) . "/inc.graphql-resources/frontend/assets/app-python.min.js", 'static/assets/app.min.js');
 
@@ -263,7 +238,7 @@ try {
 
         // Add assets (using a generic app.js, you might need a specific one for Python)
         addDirectoryToZip($frontendZip, dirname(__DIR__) . "/inc.graphql-resources/frontend/assets", 'assets');
-        
+
         // Add index.html
         $indexFileContent = file_get_contents(dirname(__DIR__) . "/inc.graphql-resources/frontend/index.html");
         $indexFileContent = str_replace('{APP_NAME}', $application->getName(), $indexFileContent);

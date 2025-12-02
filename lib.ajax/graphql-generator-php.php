@@ -1,9 +1,19 @@
 <?php
 
+use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\GraphQLGeneratorPHP;
 use MagicObject\SecretObject;
-use MagicObject\Util\Parsedown;
 
+/**
+ * Sets the database configuration for the PHP application.
+ *
+ * This function reads the database settings from the application's YAML configuration file
+ * and replaces placeholders in the provided database configuration template with these values.
+ *
+ * @param EntityApplication $application The application entity.
+ * @param string $databaseConfiguration The configuration template string.
+ * @return string The populated database configuration string.
+ */
 function setDatabaseConfiguration($application, $databaseConfiguration)
 {
     $appConfig = new SecretObject(null);
@@ -33,6 +43,13 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
     return $databaseConfiguration;
 }
 
+/**
+ * Generates the README.md content for the generated PHP project.
+ *
+ * @param string $appName The name of the application.
+ * @param bool $withFrontend A flag indicating if the frontend is bundled with the backend.
+ * @return string The generated README.md content.
+ */
 function generateReadmePhp($appName, $withFrontend)
 {
     $readmeContent = "# " . $appName . "\n\n" .
@@ -58,55 +75,7 @@ function generateReadmePhp($appName, $withFrontend)
 
 $reservedColumnMap = createReservedColumnMap($reservedColumns['columns']);
 
-$backendHandledColumns = [];
-
-if(isset($reservedColumnMap['time_create']))
-{
-    $backendHandledColumns['timeCreate'] = [
-        'columnName' => $reservedColumnMap['time_create'],
-        'type' => 'datetime'
-    ];
-}
-
-if(isset($reservedColumnMap['time_edit']))
-{
-    $backendHandledColumns['timeEdit'] = [
-        'columnName' => $reservedColumnMap['time_edit'],
-        'type' => 'datetime'
-    ];
-}
-
-if(isset($reservedColumnMap['admin_create']))
-{
-    $backendHandledColumns['adminCreate'] = [
-        'columnName' => $reservedColumnMap['admin_create'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['admin_edit']))
-{
-    $backendHandledColumns['adminEdit'] = [
-        'columnName' => $reservedColumnMap['admin_edit'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['ip_create']))
-{
-    $backendHandledColumns['ipCreate'] = [
-        'columnName' => $reservedColumnMap['ip_create'],
-        'type' => 'string'
-    ];
-}
-
-if(isset($reservedColumnMap['ip_edit']))
-{
-    $backendHandledColumns['ipEdit'] = [
-        'columnName' => $reservedColumnMap['ip_edit'],
-        'type' => 'string'
-    ];
-}
+$backendHandledColumns = getBackendHandledColumns($reservedColumnMap);
 
 try {
     $application = getApplication($databaseBuilder, $applicationId);
@@ -133,7 +102,6 @@ try {
         $manualMd = $generator->generateManual();
         $zip->addFromString('manual.md', $manualMd);
 
-        $parsedown = new Parsedown();
         $appName = $application->getName();
         $manualHtml = generateManualHtml($manualMd, $appName);
         $zip->addFromString('manual.html', $manualHtml);
@@ -271,7 +239,6 @@ try {
         // Add manual content file
         $zip->addFromString('manual.md', $manualMd);
 
-        $parsedown = new Parsedown();
         $appName = $application->getName();
         $manualHtml = generateManualHtml($manualMd, $appName);
         $zip->addFromString('manual.html', $manualHtml);
