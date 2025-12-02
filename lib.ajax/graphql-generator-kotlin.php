@@ -196,7 +196,7 @@ try {
         $manualMd = $generator->generateManual();
         $zip->addFromString('manual.md', $manualMd);
         $appName = $app->getName();
-        $manualHtml = generateManualHtml($manualMd, $appName);
+        $manualHtml = $generator->generateManualHtml($manualMd, $appName);
         $zip->addFromString('manual.html', $manualHtml);
 
         $readmeContent = generateReadmeKotlin($appName, $generator); // Panggil fungsi README yang baru
@@ -305,7 +305,7 @@ try {
         $manualMd = $generator->generateManual();
         $mainZip->addFromString('manual.md', $manualMd);
         $appName = $app->getName();
-        $manualHtml = generateManualHtml($manualMd, $appName);
+        $manualHtml = $generator->generateManualHtml($manualMd, $appName);
         $mainZip->addFromString('manual.html', $manualHtml);
 
         $readmeContent = generateReadmeKotlin($appName, $generator);
