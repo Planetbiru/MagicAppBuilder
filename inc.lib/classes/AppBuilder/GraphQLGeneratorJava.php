@@ -3383,7 +3383,14 @@ type {$ucCamelName}Page {
     hasPrevious: Boolean
 }
 GQL;
-        $pkType = $this->mapJavaTypeToGqlType($this->mapDbTypeToJavaType($tableInfo['columns'][$tableInfo['primaryKey']]['type'], $tableInfo['columns'][$tableInfo['primaryKey']]['length']));
+        if(isset($tableInfo['columns'][$tableInfo['primaryKey']]))
+        {
+            $pkType = $this->mapJavaTypeToGqlType($this->mapDbTypeToJavaType($tableInfo['columns'][$tableInfo['primaryKey']]['type'], $tableInfo['columns'][$tableInfo['primaryKey']]['length']));
+        }
+        else
+        {
+            $pkType = "String";
+        }
 
         $queries = "    {$camelName}(id: {$pkType}!): $ucCamelName\n";
         $queries .= "    {$pluralCamelName}(limit: Int, offset: Int, page: Int, size: Int, orderBy: [SortInput], filter: [FilterInput]): {$ucCamelName}Page\n";
