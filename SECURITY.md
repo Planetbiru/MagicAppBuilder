@@ -6,14 +6,14 @@ The following versions of this project are currently supported with security upd
 
 | Version    | Supported          |
 | ---------- | ------------------ |
-| >= 1.26.1  | :white_check_mark: |
-| < 1.26.1   | :x:                |
+| >= 2.0.0  | :white_check_mark: |
+| < 2.0.0   | :x:                |
 
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability, please report it **privately** using one of the following methods:
 
-- Email us at [kamshory@gmail.com] 
+- Email us at [kamshory@gmail.com]
 - Do **not** create public issues, as this may expose the vulnerability to others before it is fixed.
 
 We aim to respond to all reports within **14 business days**. If the vulnerability is confirmed, we will:
