@@ -38,18 +38,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     window.addEventListener("storage", function(event) {
-        if (event.key === "lougout" && event.newValue === "true") {
+        if (event.key === 'MagicAppBuilder.lougout' && event.newValue === 'true') {
             showSessionExpiredNotice();
         }
-        if (event.key === "login" && event.newValue === "true") {
+        if (event.key === 'MagicAppBuilder.login' && event.newValue === 'true') {
             hideSessionExpiredNotice();
         }
     });
 
-    window.localStorage.setItem('login', 'true');
+    window.localStorage.setItem('MagicAppBuilder.login', 'true');
     setTimeout(function(){
-        window.localStorage.setItem('login', 'false');
-    }, 400)
+        window.localStorage.setItem('MagicAppBuilder.login', 'false');
+    }, 400);
 
 });
 

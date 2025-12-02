@@ -70,6 +70,20 @@ else
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            window.addEventListener("storage", function(event) {
+                if (event.key === 'MagicAppBuilder.login' && event.newValue === 'true') {
+                    window.location = './';
+                }
+            });
+
+            window.localStorage.setItem('MagicAppBuilder.lougout', 'true');
+            setTimeout(function(){
+                window.localStorage.setItem('MagicAppBuilder.lougout', 'false');
+            }, 400);
+        });
+    </script>
 </body>
 </html>
 <?php
