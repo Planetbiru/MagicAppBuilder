@@ -1199,5 +1199,16 @@ document.addEventListener('DOMContentLoaded', () => {
   initOrderUrl(window.location.search);
 
   // Initializes the search functionality for the sidebar menu.
-  initSearchMenu()
+  initSearchMenu();
+
+  window.addEventListener("storage", function(event) {
+      if (event.key === 'MagicAppBuilder.lougout' && event.newValue === 'true') {
+          window.location = './';
+      }
+  });
+
+  window.localStorage.setItem('MagicAppBuilder.login', 'true');
+  setTimeout(function(){
+      window.localStorage.setItem('MagicAppBuilder.login', 'false');
+  }, 400);
 });

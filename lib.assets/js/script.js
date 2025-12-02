@@ -1267,9 +1267,9 @@ let initAll = function () {
           hideSessionExpiredNotice();
           $('#loginModal').modal('hide');
 
-          window.localStorage.setItem('login', 'true');
+          window.localStorage.setItem('MagicAppBuilder.login', 'true');
           setTimeout(function(){
-              window.localStorage.setItem('login', 'false');
+              window.localStorage.setItem('MagicAppBuilder.login', 'false');
           }, 400);
 
 

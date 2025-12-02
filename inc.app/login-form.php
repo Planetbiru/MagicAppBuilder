@@ -63,14 +63,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             window.addEventListener("storage", function(event) {
-                if (event.key === "login" && event.newValue === "true") {
+                if (event.key === 'MagicAppBuilder.login' && event.newValue === 'true') {
                     window.location = './';
                 }
             });
 
-            window.localStorage.setItem('lougout', 'true');
+            window.localStorage.setItem('MagicAppBuilder.lougout', 'true');
             setTimeout(function(){
-                window.localStorage.setItem('lougout', 'false');
+                window.localStorage.setItem('MagicAppBuilder.lougout', 'false');
             }, 400);
         });
     </script>
