@@ -108,9 +108,17 @@ function checkSessionStatus() {
                     showLoginAlert = false;
                 }
                 $('#loginModal').modal('hide');
+                window.localStorage.setItem('MagicAppBuilder.login', 'true');
+                setTimeout(function(){
+                    window.localStorage.setItem('MagicAppBuilder.login', 'false');
+                }, 400);
             }
             else {
                 showSessionExpiredNotice();
+                window.localStorage.setItem('MagicAppBuilder.logout', 'true');
+                setTimeout(function(){
+                    window.localStorage.setItem('MagicAppBuilder.logout', 'false');
+                }, 400);
             }
         })
         .catch(err => {
