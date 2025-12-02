@@ -60,5 +60,13 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            window.localStorage.setItem('lougout', 'true');
+            setTimeout(function(){
+                window.localStorage.setItem('lougout', 'false');
+            }, 400)
+        });
+    </script>
 </body>
 </html>
