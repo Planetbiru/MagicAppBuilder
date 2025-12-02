@@ -225,10 +225,11 @@ function init() {
         deleteCells.forEach(function(cell) {
             cell.addEventListener('click', function(event) {
                 event.preventDefault();
-                let schema = event.target.getAttribute('data-schema');
-                let table = event.target.getAttribute('data-table');
-                let primaryKey = event.target.getAttribute('data-primary-key');
-                let value = event.target.getAttribute('data-value');
+                const el = event.target;
+                let schema     = el.dataset.schema;
+                let table      = el.dataset.table;
+                let primaryKey = el.dataset.primaryKey;
+                let value      = el.dataset.value;
                 let queryString = "";
                 let tableName = schema != "" ? `${schema}.${table}` : table;
                 queryString = `DELETE FROM ${tableName} WHERE ${primaryKey} = '${value}';\r\n`;
@@ -1062,13 +1063,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.closest('.table-list input[type="checkbox"]')) {
 
             let diagram = document.querySelector('.diagram-container .diagram.active');
-            let source = diagram.getAttribute('data-entities') || '';
+            let source = diagram.dataset.entities || '';
             let currentSelection = source.split(',');
             let selectedEntities = new Set(); // Use a Set to store selected entities
 
             // Iterate through checkboxes and add checked ones to the set
             e.target.closest('.table-list').querySelectorAll('input[type="checkbox"]').forEach(input => {
-                let entity = input.getAttribute('data-name');
+                let entity = input.dataset.name;
                 if (input.checked) {
                     selectedEntities.add(entity);
                 }

@@ -34,9 +34,23 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 lastActiveTime = now;
             }
-        } 
+        }
     });
-    
+
+    window.addEventListener("storage", function(event) {
+        if (event.key === "lougout" && event.newValue === "true") {
+            showSessionExpiredNotice();
+        }
+        if (event.key === "login" && event.newValue === "true") {
+            hideSessionExpiredNotice();
+        }
+    });
+
+    window.localStorage.setItem('login', 'true');
+    setTimeout(function(){
+        window.localStorage.setItem('login', 'false');
+    }, 400)
+
 });
 
 /**
@@ -66,8 +80,7 @@ for (const evtName of userEvents) {
     });
 }
 
-function getIddleDuration()
-{
+function getIddleDuration() {
     const meta = document.querySelector('meta[name="iddle-duration"]');
     const value = meta?.getAttribute('content');
     const interval = parseInt(value, 10) * 1000;
@@ -90,15 +103,13 @@ function checkSessionStatus() {
         .then(data => {
             if (data.loggedIn) {
                 let alrt = document.getElementById('session-expired-alert');
-                if(alrt)
-                {
+                if (alrt) {
                     alrt.parentNode.removeChild(alrt);
                     showLoginAlert = false;
                 }
                 $('#loginModal').modal('hide');
             }
-            else
-            {
+            else {
                 showSessionExpiredNotice();
             }
         })
@@ -116,8 +127,7 @@ function checkSessionStatus() {
  * @returns {void}
  */
 function showSessionExpiredNotice() {
-    if (document.getElementById('session-expired-alert')) 
-    {
+    if (document.getElementById('session-expired-alert')) {
         return;
     }
 
@@ -129,15 +139,22 @@ function showSessionExpiredNotice() {
     alert.innerHTML = `
     <strong>Session expired!</strong> Please log in to continue.
     <button type="button" class="btn btn-sm btn-outline-dark ml-3" onclick="$('#loginModal').modal('show')">
-      Log In
+        Log In
     </button>
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true">&times;</span>
     </button>
-  `;
+`;
 
     document.body.appendChild(alert);
     showLoginAlert = true;
+}
+
+function hideSessionExpiredNotice()
+{
+    $('#loginModal').modal('hide');
+    let node = document.querySelector('#session-expired-alert');
+    node.parentNode.removeChild(node);
 }
 
 /**
@@ -151,12 +168,12 @@ function refreshSession() {
         method: 'GET',
         credentials: 'include',
     })
-    .then(res => {
-        if (!res.ok) throw new Error('Session refresh failed');
-    })
-    .catch(err => {
-        console.error('Failed to update session:', err);
-    });
+        .then(res => {
+            if (!res.ok) throw new Error('Session refresh failed');
+        })
+        .catch(err => {
+            console.error('Failed to update session:', err);
+        });
 }
 
 /**

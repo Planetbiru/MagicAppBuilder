@@ -1250,7 +1250,6 @@ let initAll = function () {
   $('#loginForm').on('submit', function (e) {
     e.preventDefault();
 
-    const $form = $(this);
     const formData = new FormData(this);
 
     $.ajax({
@@ -2388,7 +2387,7 @@ let initAll = function () {
           let checkboxes = e1.item.querySelectorAll('input[type="checkbox"]');
           checkboxes.forEach(function (input) {
             const isChecked = input.checked;
-            input.setAttribute('data-checked', isChecked ? 'true' : 'false');
+            input.dataset.checked = isChecked ? 'true' : 'false';
             if (isChecked) {
               input.setAttribute('checked', 'checked');
             } else {
@@ -2405,7 +2404,7 @@ let initAll = function () {
             group.forEach(function (input) // NOSONAR
             {
               const isChecked = input.checked || input.getAttribute('checked');
-              input.setAttribute('data-checked', isChecked ? 'true' : 'false');
+              input.dataset.checked = isChecked ? 'true' : 'false';
               if (isChecked) {
                 input.setAttribute('checked', 'checked');
               } else {
@@ -2424,14 +2423,14 @@ let initAll = function () {
           // Restore checkbox state
           checkboxes.forEach(function (input) // NOSONAR
           {
-            const isChecked = input.getAttribute('data-checked') === 'true';
+            const isChecked = input.dataset.checked === 'true';
             input.checked = isChecked;
             if (isChecked) {
               input.setAttribute('checked', 'checked');
             } else {
               input.removeAttribute('checked');
             }
-            input.removeAttribute('data-checked');
+            delete input.dataset.checked;
           });
 
           // Restore radio state by group
@@ -2441,14 +2440,14 @@ let initAll = function () {
           {
             let group = e1.item.querySelectorAll(`input[type="radio"][name="${name}"]`);
             group.forEach(function (input) {
-              const isChecked = input.getAttribute('data-checked') === 'true';
+              const isChecked = input.dataset.checked === 'true';
               input.checked = isChecked;
               if (isChecked) {
                 input.setAttribute('checked', 'checked');
               } else {
                 input.removeAttribute('checked');
               }
-              input.removeAttribute('data-checked');
+              delete input.dataset.checked;
             });
           });
         }, 155);
