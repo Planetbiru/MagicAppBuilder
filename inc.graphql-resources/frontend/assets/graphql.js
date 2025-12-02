@@ -294,7 +294,7 @@ class GraphQLClientApp {
             this.showPageWrapper();
             this.buildMenu();
             this.initPage();
-            
+
             window.onclick = (event) => {
             };
             // Add event listener for data-dismiss="modal"
@@ -321,7 +321,7 @@ class GraphQLClientApp {
                 }
             });
 
-            
+
 
 
             // Handle initial page load and back/forward button clicks
@@ -360,10 +360,10 @@ class GraphQLClientApp {
     async initializeLanguage() {
         try { // NOSONAR
             const response = await fetch(this.languageConfigUrl, {
-                headers: { 
+                headers: {
                     'X-Requested-With': 'xmlhttprequest',
                     'X-Language-Id': this.languageId,
-                    'Accept-Language': this.languageId, 
+                    'Accept-Language': this.languageId,
                 }
             });
             if (!response.ok) throw new Error(`Could not fetch ${this.languageConfigUrl}`);
@@ -440,10 +440,10 @@ class GraphQLClientApp {
     async initializeTheme() {
         try {
             const response = await fetch(this.themeConfigUrl, {
-                headers: { 
+                headers: {
                     'X-Requested-With': 'xmlhttprequest',
                     'X-Language-Id': this.languageId,
-                    'Accept-Language': this.languageId, 
+                    'Accept-Language': this.languageId,
                 }
             });
             if (!response.ok) throw new Error(`Could not fetch ${this.themeConfigUrl}`);
@@ -471,10 +471,10 @@ class GraphQLClientApp {
      */
     async loadConfig() {
         const response = await fetch(this.configUrl, {
-            headers: { 
+            headers: {
                 'X-Requested-With': 'xmlhttprequest',
                 'X-Language-Id': this.languageId,
-                'Accept-Language': this.languageId, 
+                'Accept-Language': this.languageId,
             }
         });
         if (response.status === 401) {
@@ -668,7 +668,7 @@ class GraphQLClientApp {
     changeTheme(themeName) {
         let currentTheme = localStorage.getItem('themeName');
         if (currentTheme === themeName) return;
-        
+
         localStorage.setItem('themeName', themeName);
         this.applyTheme(themeName);
 
@@ -759,7 +759,7 @@ class GraphQLClientApp {
             return this.snakeCaseToTitleCase(key);
         }
     }
-    
+
     /**
      * Gets the translated display name for an entire entity.
      * It looks for the entity's `displayName` in the loaded language pack.
@@ -779,7 +779,7 @@ class GraphQLClientApp {
             return this.camelCaseToTitleCase(entity.displayName);
         }
     }
-    
+
     /**
      * Gets the user's preferred languages from the browser's navigator settings.
      * @private
@@ -1053,9 +1053,9 @@ class GraphQLClientApp {
 
         this.currentEntity = entity;
         let title = this.applicationTitle;
-        
+
         this.currentEntityDisplayName = this.getTranslatedEntityName(entity);
-        
+
         document.title = `${this.currentEntityDisplayName} - ${title}`;
 
         const filters = {};
@@ -1143,7 +1143,7 @@ class GraphQLClientApp {
      *
      * This method inspects the current entity's filter definitions and the
      * component's internal filter state. For each filter that has a value
-     * and a corresponding filter configuration, a filter object is added 
+     * and a corresponding filter configuration, a filter object is added
      * to the result containing:
      * - `field`: the field name being filtered,
      * - `value`: the filter value provided by the user,
@@ -1285,7 +1285,7 @@ class GraphQLClientApp {
             return `<th class="${isSortable ? 'sortable' : ''}" data-sort-key="${h}" data-sort-direction="${isCurrentSort ? (this.state.orderBy.direction === 'ASC' ? 'asc' : 'desc') : ''}">
                                             ${this.getEntityLabel(this.currentEntity, h)}
                                         </th>`;
-        }).join('')} 
+        }).join('')}
                             <th>${this.t('actions')}</th>
                         </tr>
                     </thead>
@@ -1651,7 +1651,7 @@ class GraphQLClientApp {
     renderActionButtons(item) {
         const entityName = this.currentEntity.name;
         const id = item[this.currentEntity.primaryKey]; // NOSONAR
-        
+
         // Encode the current list view URL to be passed as a parameter
         const fromUrl = encodeURIComponent(window.location.hash);
         let detailLink = `${window.location.pathname}#${entityName}/detail/${id}?from=${fromUrl}`;
@@ -1700,7 +1700,7 @@ class GraphQLClientApp {
                 if (value) {
                     existingParams.set(key, value);
                 } else {
-                    existingParams.delete(key); 
+                    existingParams.delete(key);
                 }
             });
 
@@ -1784,7 +1784,7 @@ class GraphQLClientApp {
     {
         this.dom.pageWrapper.style.display = 'none';
     }
-    
+
     /**
      * Escapes special HTML characters in a string to prevent HTML injection.
      *
@@ -1838,7 +1838,7 @@ class GraphQLClientApp {
             const queryResult = await this.gqlQuery(query, { id });
             const data = queryResult.data;
             this.showPageWrapper();
-            
+
             const detailColumns = this.currentEntity.detailColumns || [];
 
             const item = data[this.currentEntity.name];
@@ -1885,7 +1885,7 @@ class GraphQLClientApp {
                 detailHtml += `</tbody></table></div>`; // NOSONAR
                 this.dom.tableDataContainer.innerHTML = detailHtml;
 
-                
+
             }
             document.getElementById('back-to-list').onclick = () => {
                 // Priority 1: Use history.back() if it's a safe intra-app navigation.
@@ -1943,8 +1943,8 @@ class GraphQLClientApp {
         let formHtml = '';
         for (const colName in this.currentEntity.columns) {
             // Exclude primary key
-            
-            if (colName === this.currentEntity.primaryKey && 
+
+            if (colName === this.currentEntity.primaryKey &&
                 (
                     (action === 'insert' && this.currentEntity.columns[colName].primaryKeyValue === 'autogenerated') ||
                     (action === 'update' && this.currentEntity.columns[colName].primaryKeyValue != 'manual-all')
@@ -1958,13 +1958,13 @@ class GraphQLClientApp {
             if (this.currentEntity.backendHandledColumns && this.currentEntity.backendHandledColumns.includes(colName)) {
                 continue;
             }
-            
+
             let filteredColumns = action === 'insert' ? this.currentEntity.insertColumns : this.currentEntity.updateColumns;
             if(!filteredColumns)
             {
                 filteredColumns = [];
             }
-            
+
             if(filteredColumns.length > 0 && !filteredColumns.includes(colName))
             {
                 continue;
@@ -1978,7 +1978,7 @@ class GraphQLClientApp {
                 value = item[colName];
             }
 
-            
+
             let formElement = '';
             let formElementType = 'text';
             formElement += `<label for="${colName}">${this.getEntityLabel(this.currentEntity, colName)}</label>`;
@@ -2034,7 +2034,7 @@ class GraphQLClientApp {
                     formElement += `<input type="${inputType}" id="${colName}" name="${colName}" value="${value}" autocomplete="off">`;
                     formElementType = 'text';
                 }
-                
+
             }
             formHtml += `<div class="form-group form-element-${formElementType}">${formElement}</div>`;
         }
@@ -2045,7 +2045,7 @@ class GraphQLClientApp {
         this.dom.form.innerHTML = formHtml;
 
         this.dom.form.closest('.modal').querySelector('.modal-footer').innerHTML = `
-        <button type="submit" class="btn btn-primary">${this.t('save')}</button> 
+        <button type="submit" class="btn btn-primary">${this.t('save')}</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">${this.t('close')}</button> `;
 
         this.dom.form.closest('.modal').querySelector('.modal-footer').querySelector('[type="submit"]').addEventListener('click', () => this.handleSave(id));
@@ -2088,11 +2088,11 @@ class GraphQLClientApp {
         const formData = new FormData(this.dom.form);
         const input = {};
         for (const colName in this.currentEntity.columns) {
-            if (colName === this.currentEntity.primaryKey && this.currentEntity.columns[colName].primaryKeyValue === 'autogenerated') 
+            if (colName === this.currentEntity.primaryKey && this.currentEntity.columns[colName].primaryKeyValue === 'autogenerated')
             {
                 continue;
             } // NOSONAR
-            if (action == 'update' && colName === this.currentEntity.primaryKey && this.currentEntity.columns[colName].primaryKeyValue === 'manual-insert') 
+            if (action == 'update' && colName === this.currentEntity.primaryKey && this.currentEntity.columns[colName].primaryKeyValue === 'manual-insert')
             {
                 // User cannot update this value.
                 input[colName] = id;
@@ -2231,7 +2231,7 @@ class GraphQLClientApp {
 
         const confirmed = await this.customConfirm({
             title: this.t('confirmation_title', ''),
-            message: this.t('confirm_toggle_active', this.t(action)),
+            message: this.t('confirm_toggle_active', this.t(action).toLowerCase()),
             okText: this.t('yes'),
             cancelText: this.t('no')
         });
@@ -2488,7 +2488,7 @@ class GraphQLClientApp {
         }
         return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
     }
-    
+
     /**
      * Converts a string to UpperCamelCase.
      * @private
@@ -2673,7 +2673,7 @@ class GraphQLClientApp {
 GraphQLClientApp.prototype._generateLabelFromKey = function (key) {
     return key
         .replace(/_/g, ' ')
-        .replace(/\w\S*/g, (w) => 
+        .replace(/\w\S*/g, (w) =>
             w.charAt(0).toUpperCase() + w.substring(1).toLowerCase()
         );
 };
