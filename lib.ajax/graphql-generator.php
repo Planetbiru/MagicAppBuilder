@@ -131,10 +131,10 @@ function getBackendHandledColumns($reservedColumnMap)
 {
     $backendHandledColumns = [];
     if (isset($reservedColumnMap['time_create'])) {
-        $backendHandledColumns['timeCreate'] = ['columnName' => $reservedColumnMap['time_create'], 'type' => 'datetime'];
+        $backendHandledColumns['timeCreate'] = ['columnName' => $reservedColumnMap['time_create'], 'type' => 'timestamp'];
     }
     if (isset($reservedColumnMap['time_edit'])) {
-        $backendHandledColumns['timeEdit'] = ['columnName' => $reservedColumnMap['time_edit'], 'type' => 'datetime'];
+        $backendHandledColumns['timeEdit'] = ['columnName' => $reservedColumnMap['time_edit'], 'type' => 'timestamp'];
     }
     if (isset($reservedColumnMap['admin_create'])) {
         $backendHandledColumns['adminCreate'] = ['columnName' => $reservedColumnMap['admin_create'], 'type' => 'string'];
