@@ -3928,6 +3928,14 @@ To improve session consistency, MagicAppBuilder 2.0 now synchronizes login and l
 
 This enhancement ensures a consistent and predictable session state, preventing users from unknowingly working with an expired session.
 
+### Cross-Tab Active Workspace and Active Application Synchronization
+
+In version 2.0, we've introduced a major enhancement: synchronization of the active workspace and application across all open tabs and windows.
+
+Previously, if a user switched the active workspace or application in one tab, other tabs would remain on the old workspace, leading to confusion and potential data conflicts—where data for one application could overwrite another.
+
+Now, when a user changes the active workspace or application, all open tabs and windows will automatically update to reflect the change, including all data displayed on each page. This ensures a consistent and seamless user experience, preventing data mismatches and application chaos.
+
 ### Consistent Boolean Handling Across All Databases
 
 To improve portability and avoid driver inconsistencies, boolean values are now standardized:

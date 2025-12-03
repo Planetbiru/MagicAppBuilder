@@ -3612,7 +3612,6 @@ let initAll = function () {
         onSetDefaultWorkspace();
         $('meta[name="workspace-id"]').attr('content', workspaceId);
         window.localStorage.setItem(getLocalStorageKey('workspace-id'), workspaceId);
-        resetCheckActiveWorkspace();
       }
     });
   });
@@ -3631,7 +3630,6 @@ let initAll = function () {
         onSetDefaultApplication();
         $('meta[name="application-id"]').attr('content', applicationId);
         window.localStorage.setItem(getLocalStorageKey('application-id'), applicationId);
-        resetCheckActiveApplication();
       },
       error: function (xhr, status, error) {
         decreaseAjaxPending();
@@ -4201,8 +4199,6 @@ let initAll = function () {
   window.localStorage.setItem(getLocalStorageKey('workspace-id'), val1);
   window.localStorage.setItem(getLocalStorageKey('application-id'), val2);
   loadAllResource();
-  resetCheckActiveWorkspace();
-  resetCheckActiveApplication();
   loadReferenceResource();
 };
 
@@ -4829,46 +4825,6 @@ function doFilterApplication(elem)
           .includes(searchValue)
       );
     });
-}
-
-let toCheckActiveWorkspace = setInterval('', 10000000);
-let toCheckActiveApplication = setInterval('', 10000000);
-let checkIntervalWorkspace = 10000;
-let checkIntervalApplication = 12000;
-
-/**
- * Resets and initializes a periodic check for active workspace changes.
- * Compares the current workspace ID in localStorage with the meta tag value,
- * and reloads resources if they differ.
- */
-function resetCheckActiveWorkspace() {
-  clearInterval(toCheckActiveWorkspace);
-  toCheckActiveWorkspace = setInterval(function () {
-    let val1 = window.localStorage.getItem(getLocalStorageKey('workspace-id')) || '';
-    let val2 = $('meta[name="workspace-id"]').attr('content');
-    if (val1 != '' && val2 != '' && val2 != val1) {
-      loadAllResource();
-    }
-  }, checkIntervalWorkspace);
-}
-
-/**
- * Resets and initializes a periodic check for active application changes.
- * This function compares the current application ID stored in `localStorage`
- * with the value in the `application-id` meta tag. If the IDs differ, it triggers
- * the `loadAllResource` function to reload all resources.
- *
- * The check is performed every 22 seconds.
- */
-function resetCheckActiveApplication() {
-  clearInterval(toCheckActiveApplication);
-  toCheckActiveApplication = setInterval(function () {
-    let val1 = window.localStorage.getItem(getLocalStorageKey('application-id')) || '';
-    let val2 = $('meta[name="application-id"]').attr('content');
-    if (val1 != '' && val2 != '' && val2 != val1) {
-      loadAllResource();
-    }
-  }, checkIntervalApplication);
 }
 
 /**
