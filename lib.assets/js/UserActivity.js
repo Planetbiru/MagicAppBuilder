@@ -44,6 +44,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.key === 'MagicAppBuilder.login' && event.newValue === 'true') {
             hideSessionExpiredNotice();
         }
+        if (event.key === getLocalStorageKey('workspace-id') && event.newValue !== null)
+        {
+            loadAllResource();
+        }
+        if (event.key === getLocalStorageKey('application-id') && event.newValue !== null)
+        {
+            onSetDefaultApplication();
+        }
     });
 
     window.localStorage.setItem('MagicAppBuilder.login', 'true');
