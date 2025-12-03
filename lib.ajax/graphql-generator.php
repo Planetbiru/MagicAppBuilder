@@ -1,7 +1,6 @@
 <?php
 
 use AppBuilder\EntityInstaller\EntityApplication;
-use MagicObject\Util\Parsedown;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
