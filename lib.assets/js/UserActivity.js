@@ -166,11 +166,25 @@ function showSessionExpiredNotice() {
     showLoginAlert = true;
 }
 
+/**
+ * Hides the session-expired notification from the user interface.
+ *
+ * This function performs two actions:
+ * 1. Closes the login modal dialog (typically shown when a session expires).
+ * 2. Removes the DOM element that displays the session-expired alert message,
+ *    if it exists in the document.
+ *
+ * It ensures that any UI elements related to session expiration are fully
+ * cleared, restoring the interface to its normal state.
+ */
 function hideSessionExpiredNotice()
 {
     $('#loginModal').modal('hide');
     let node = document.querySelector('#session-expired-alert');
-    node.parentNode.removeChild(node);
+    if(node && node.parentNode)
+    {
+        node.parentNode.removeChild(node);
+    }
 }
 
 /**
