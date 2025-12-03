@@ -4,11 +4,54 @@ use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
+use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputPost = new InputPost();
 $inputGet = new InputGet();
+
+/**
+ * Retrieve a list of columns that are automatically handled by the backend.
+ *
+ * This function checks a mapping of reserved column names and returns
+ * a normalized array describing which fields should be populated by
+ * backend logic (such as timestamps, admin identifiers, or IP addresses).
+ *
+ * Each returned item contains:
+ * - `columnName`: The actual database column name from the reserved map.
+ * - `type`: The expected data type used by the backend to populate the value.
+ *
+ * @param array $reservedColumnMap An associative array containing reserved column names
+ *                                 (e.g., time_create, admin_edit, ip_create).
+ *
+ * @return array An associative array where keys represent logical backend fields
+ *               (e.g., timeCreate, adminEdit), and values contain metadata such as
+ *               the actual column name and expected data type.
+ */
+function getBackendHandledColumns($reservedColumnMap)
+{
+    $backendHandledColumns = [];
+    if (isset($reservedColumnMap['timeCreate'])) {
+        $backendHandledColumns['timeCreate'] = ['columnName' => $reservedColumnMap['timeCreate'], 'type' => 'timestamp'];
+    }
+    if (isset($reservedColumnMap['timeEdit'])) {
+        $backendHandledColumns['timeEdit'] = ['columnName' => $reservedColumnMap['timeEdit'], 'type' => 'timestamp'];
+    }
+    if (isset($reservedColumnMap['adminCreate'])) {
+        $backendHandledColumns['adminCreate'] = ['columnName' => $reservedColumnMap['adminCreate'], 'type' => 'string'];
+    }
+    if (isset($reservedColumnMap['adminEdit'])) {
+        $backendHandledColumns['adminEdit'] = ['columnName' => $reservedColumnMap['adminEdit'], 'type' => 'string'];
+    }
+    if (isset($reservedColumnMap['ipCreate'])) {
+        $backendHandledColumns['ipCreate'] = ['columnName' => $reservedColumnMap['ipCreate'], 'type' => 'string'];
+    }
+    if (isset($reservedColumnMap['ipEdit'])) {
+        $backendHandledColumns['ipEdit'] = ['columnName' => $reservedColumnMap['ipEdit'], 'type' => 'string'];
+    }
+    return $backendHandledColumns;
+}
 
 if ($inputPost->getDatabaseName() !== null) {
     $applicationId = $inputPost->getApplicationId();
@@ -29,6 +72,12 @@ if ($inputPost->getDatabaseName() !== null) {
             mkdir(dirname($path), 0755, true);
         }
         $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
+        $configPath = $selectedApplication->getProjectDirectory()."/default.yml";
+
+        $applicationConfig = new SecretObject();
+        $applicationConfig->loadYamlFile($configPath, false, true, false);
+        
+
         $dir = dirname($indexPath);
         if(!file_exists($dir))
         {
@@ -44,6 +93,9 @@ if ($inputPost->getDatabaseName() !== null) {
         } else {
             $data = array('entities' => array(), 'diagrams' => array());
         }
+
+        $data['reservedColumns'] = $applicationConfig->getEntityInfo();
+        $data['backendHandledColumns'] = getBackendHandledColumns($data['reservedColumns']);
 
         if (strlen($diagrams) > 0) {
             $data['diagrams'] = json_decode($diagrams);
