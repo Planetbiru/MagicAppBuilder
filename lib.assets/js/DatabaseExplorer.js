@@ -408,6 +408,10 @@ function loadDatabaseIndex(applicationId, hash)
                     select.appendChild(option);
                 }
             }
+        },
+        error: function(err)
+        {
+            console.error(err);
         }
     })
 }

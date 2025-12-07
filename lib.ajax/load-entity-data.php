@@ -4,6 +4,7 @@ use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
+use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -93,7 +94,13 @@ if ($inputPost->getDatabaseName() !== null) {
         $index[$hash]['hash'] = $hash;
         if(empty($index[$hash]['databaseName']))
         {
-            $index[$hash]['label'] = basename($databaseBuilder->getDatabaseCredentials()->getDatabaseFilePath());
+            $appConfigPath = $selectedApplication->getProjectDirectory()."/default.yml";
+            $appConfig = new SecretObject();
+            if(file_exists($appConfigPath))
+            {
+                $appConfig->loadYamlFile($appConfigPath, false, true, true);
+                $index[$hash]['label'] = basename($appConfig->getDatabase()->getDatabaseFilePath());
+            }
         }
         else
         {

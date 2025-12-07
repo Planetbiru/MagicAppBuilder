@@ -4,6 +4,7 @@ use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
+use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -58,12 +59,43 @@ if ($inputPost->getDatabaseName() !== null) {
     try
     {
         $selectedApplication->find($applicationId);
-        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/schema-list.json";
-
+        $indexPath = $selectedApplication->getProjectDirectory()."/__data/entity/index.json";
         if(file_exists($indexPath))
         {
             $indexRaw = file_get_contents($indexPath);
-            $json = json_decode($indexRaw);
+            $json = json_decode($indexRaw, true);
+
+            $appConfigPath = $selectedApplication->getProjectDirectory()."/default.yml";
+            $appConfig = new SecretObject();
+            if(file_exists($appConfigPath))
+            {
+                $appConfig->loadYamlFile($appConfigPath, false, true, true);
+                $databaseConfig = $appConfig->getDatabase();
+                $databaseType = $databaseConfig->getDriver();
+                $databaseName = $databaseConfig->getDatabaseName();
+                $databaseSchema = $databaseConfig->getDatabaseSchema();
+                $hash = md5("$applicationId-$databaseType-$databaseName-$databaseSchema");
+                if(!isset($json[$hash]))
+                {
+                    // Add to index
+                    $json[$hash] = array();
+                    $json[$hash]['applicationId'] = $applicationId;
+                    $json[$hash]['databaseType'] = $databaseType;
+                    $json[$hash]['databaseName'] = $databaseName;
+                    $json[$hash]['databaseSchema'] = $databaseSchema;
+                    $json[$hash]['entities'] = 0;
+                    $json[$hash]['file'] = "";
+                    $json[$hash]['hash'] = $hash;
+                    if(empty($json[$hash]['databaseName']))
+                    {
+                        $json[$hash]['label'] = basename($databaseConfig->getDatabaseFilePath());
+                    }
+                    else
+                    {
+                        $json[$hash]['label'] = $json[$hash]['databaseName'];
+                    }
+                }
+            }
         }
     }
     catch(Exception $e)
