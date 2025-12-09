@@ -11,7 +11,7 @@
     "require": {
         "meyfa/php-svg": "0.9",
         "phpmailer/phpmailer": "^6.10",
-        "planetbiru/magic-app": "^3.16",
-        "planetbiru/magic-math": "^0.0.0"
+        "planetbiru/magic-math": "^0.0.0",
+        "planetbiru/magic-app": "^3.20"
     }
 }

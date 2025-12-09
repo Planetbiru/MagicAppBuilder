@@ -1287,6 +1287,54 @@ class SecretObject extends stdClass // NOSONAR
     }
 
     /**
+     * Retrieves a value from a nested object using a series of keys.
+     *
+     * This method allows you to access deeply nested properties of an object by specifying
+     * the keys either as multiple arguments or as a single string using dot (`.`) or arrow (`->`) notation.
+     * Each key will be automatically converted to camelCase before property access.
+     *
+     * Supported usage examples:
+     * - $obj->retrieve('user', 'profile', 'name')
+     * - $obj->retrieve('user.profile.name')
+     * - $obj->retrieve('user->profile->name')
+     *
+     * If all keys exist and the values are properly set, the final nested value is returned.
+     * If any key is missing or the chain is broken at any point, the method returns `null`.
+     *
+     * @param string ...$keys One or more keys, either as multiple arguments or a single string with separators.
+     * @return mixed|null The final nested value, or `null` if any key is not found.
+     */
+    public function retrieve(...$keys)
+    {
+        $currentData = $this;
+        $normalizedKeys = [];
+
+        foreach ($keys as $key) {
+            if ($key === null) {
+                continue;
+            }
+
+            // Split string by common delimiters and add to normalized list
+            $parts = preg_split('/->|\./', $key);
+            foreach ($parts as $part) {
+                if (strlen(trim($part)) > 0) {
+                    $normalizedKeys[] = PicoStringUtil::camelize($part);
+                }
+            }
+        }
+
+        foreach ($normalizedKeys as $key) {
+            if (isset($currentData) && $currentData instanceof self && $currentData->hasValue($key)) {
+                $currentData = $currentData->get($key);
+            } else {
+                return null;
+            }
+        }
+
+        return $currentData;
+    }
+
+    /**
      * Magic method to convert the object to a string.
      *
      * This method returns a JSON representation of the object.
