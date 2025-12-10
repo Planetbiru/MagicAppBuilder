@@ -11,7 +11,7 @@ use MagicObject\SecretObject;
  * @param string $envTemplate The template for the .env file.
  * @return string The populated .env file content.
  */
-function setGoEnvConfiguration($application, $envTemplate)
+function setDatabaseConfiguration($application, $envTemplate)
 {
     $appConfig = new SecretObject(null);
     $projectDirectory = $application->getProjectDirectory();
@@ -137,7 +137,7 @@ try {
 
     $envTemplate = getEnvTemplate();
 
-    $envContent = setGoEnvConfiguration($app, $envTemplate);
+    $envContent = setDatabaseConfiguration($app, $envTemplate);
     $backendFiles[] = ['name' => '.env.example', 'content' => $envTemplate];
     $backendFiles[] = ['name' => '.env', 'content' => $envContent];
 

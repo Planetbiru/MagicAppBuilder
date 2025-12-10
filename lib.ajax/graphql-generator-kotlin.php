@@ -128,7 +128,7 @@ try {
         // Add frontend generation to one zip file
         $zip = new ZipArchive();
         $zipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
-        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create backend ZIP file.");
         }
 
@@ -211,7 +211,7 @@ try {
         // --- Create Backend ZIP ---
         $backendZip = new ZipArchive();
         $backendZipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
-        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create backend ZIP file.");
         }
 
@@ -238,7 +238,7 @@ try {
         // --- Create Frontend ZIP ---
         $frontendZip = new ZipArchive();
         $frontendZipFilePath = tempnam(sys_get_temp_dir(), 'frontend_');
-        if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create frontend ZIP file.");
         }
 
@@ -285,7 +285,7 @@ try {
         // --- Create Main ZIP ---
         $mainZip = new ZipArchive();
         $mainZipFilePath = tempnam(sys_get_temp_dir(), 'main_zip_');
-        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create main ZIP file.");
         }
 
