@@ -124,13 +124,13 @@ JSON;
         return <<<ENV
 # Database Configuration
 # Supported dialects: 'mysql', 'postgres', 'sqlite', 'mariadb', 'mssql'
-DB_DIALECT={DB_DIALECT}
-DB_HOST={DB_HOST}
-DB_PORT={DB_PORT}
-DB_USER={DB_USER}
-DB_PASS={DB_PASS}
-DB_NAME={DB_NAME}
-DB_FILE={DB_FILE}
+DB_DIALECT=\${DB_DIALECT}
+DB_HOST=\${DB_HOST}
+DB_PORT=\${DB_PORT}
+DB_USER=\${DB_USER}
+DB_PASS=\${DB_PASS}
+DB_NAME=\${DB_NAME}
+DB_FILE=\${DB_FILE}
 
 # Server Configuration
 PORT=4000
@@ -1143,12 +1143,12 @@ npm run dev
         $manualContent .= "# Supported dialects: 'mysql', 'postgres', 'sqlite', 'mariadb', 'mssql'\r\n";
         $manualContent .= "# Database Configuration
 # Supported dialects: 'mysql', 'postgres', 'sqlite', 'mariadb', 'mssql'
-DB_DIALECT={DB_DIALECT}
-DB_HOST={DB_HOST}
-DB_PORT={DB_PORT}
-DB_USER={DB_USER}
-DB_PASS={DB_PASS}
-DB_NAME={DB_NAME}
+DB_DIALECT=\${DB_DIALECT}
+DB_HOST=\${DB_HOST}
+DB_PORT=\${DB_PORT}
+DB_USER=\${DB_USER}
+DB_PASS=\${DB_PASS}
+DB_NAME=\${DB_NAME}
 
 # Server Configuration
 PORT=4000

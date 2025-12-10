@@ -1287,6 +1287,20 @@ class SecretObject extends stdClass // NOSONAR
     }
 
     /**
+     * Check if a property has a value set.
+     *
+     * This method checks if the specified property is set (exists and has a value). It returns true if the property exists and has a value, and false otherwise.
+     *
+     * @param string $propertyName The name of the property to check.
+     * @return bool true if the property is set, false otherwise.
+     */
+    public function hasValue($propertyName)
+    {
+        $var = PicoStringUtil::camelize($propertyName);
+        return isset($this->{$var});
+    }
+
+    /**
      * Retrieves a value from a nested object using a series of keys.
      *
      * This method allows you to access deeply nested properties of an object by specifying

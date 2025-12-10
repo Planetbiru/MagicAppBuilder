@@ -67,14 +67,14 @@ function setDatabaseConfigurationPython($application, $databaseConfiguration)
                 // Requires `aiosqlite`
             }
 
-            $databaseConfiguration = str_replace('{DB_DRIVER}', $driver, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_HOST}', $host, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PORT}', $port, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_DATABASE}', $dbName, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_FILE}', $dbFile, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_USERNAME}', $user, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PASSWORD}', $pass, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_ECHO}', 'True', $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DRIVER}', $driver, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_HOST}', $host, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PORT}', $port, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DATABASE}', $dbName, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_FILE}', $dbFile, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_USERNAME}', $user, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PASSWORD}', $pass, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_ECHO}', 'True', $databaseConfiguration);
         }
     }
     return $databaseConfiguration;

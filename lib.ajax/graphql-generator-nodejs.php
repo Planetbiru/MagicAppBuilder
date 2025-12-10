@@ -85,16 +85,16 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
         $databaseConfig = $appConfig->getDatabase();
         if($databaseConfig != null)
         {
-            $databaseConfiguration = str_replace('{DB_DRIVER}', str_replace("'", "\\'", $databaseConfig->getDriver()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_HOST}', str_replace("'", "\\'", $databaseConfig->getHost()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_NAME}', str_replace("'", "\\'", $databaseConfig->getDatabaseName()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_FILE}', str_replace("'", "\\'", $databaseConfig->getDatabaseFilePath()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_USER}', str_replace("'", "\\'", $databaseConfig->getUsername()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PASS}', str_replace("'", "\\'", $databaseConfig->getPassword()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_CHARSET}', str_replace("'", "\\'", $databaseConfig->getCharset()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PORT}', str_replace("'", "\\'", $databaseConfig->getPort()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_TIMEZONE}', str_replace("'", "\\'", $databaseConfig->getTimeZone()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_DIALECT}', getDatabaseDialect($databaseConfig->getDriver()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DRIVER}', str_replace("'", "\\'", $databaseConfig->getDriver()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_HOST}', str_replace("'", "\\'", $databaseConfig->getHost()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_NAME}', str_replace("'", "\\'", $databaseConfig->getDatabaseName()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_FILE}', str_replace("'", "\\'", $databaseConfig->getDatabaseFilePath()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_USER}', str_replace("'", "\\'", $databaseConfig->getUsername()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PASS}', str_replace("'", "\\'", $databaseConfig->getPassword()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_CHARSET}', str_replace("'", "\\'", $databaseConfig->getCharset()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PORT}', str_replace("'", "\\'", $databaseConfig->getPort()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_TIMEZONE}', str_replace("'", "\\'", $databaseConfig->getTimeZone()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DIALECT}', getDatabaseDialect($databaseConfig->getDriver()), $databaseConfiguration);
         }
     }
     return $databaseConfiguration;

@@ -60,12 +60,12 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
                 $dialect = 'org.hibernate.dialect.SQLServerDialect';
             }
 
-            $databaseConfiguration = str_replace('{DB_URL}', $url, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_DRIVER_CLASS}', $driverClass, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_DIALECT}', $dialect, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_URL}', $url, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DRIVER_CLASS}', $driverClass, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DIALECT}', $dialect, $databaseConfiguration);
 
-            $databaseConfiguration = str_replace('{DB_USER}', str_replace("'", "\\'", $databaseConfig->getUsername()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PASS}', str_replace("'", "\\'", $databaseConfig->getPassword()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_USER}', str_replace("'", "\\'", $databaseConfig->getUsername()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PASS}', str_replace("'", "\\'", $databaseConfig->getPassword()), $databaseConfiguration);
         }
     }
     return $databaseConfiguration;
