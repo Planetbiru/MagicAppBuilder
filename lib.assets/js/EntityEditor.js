@@ -4972,7 +4972,6 @@ class EntityEditor {
      * @returns {void} - This function does not return a value.
      */
     showSettingDialog(message, title, captionOk, captionCancel, callback) {
-        // Get modal and buttons
         const modal = document.querySelector('#settingModal');
         const okBtn = modal.querySelector('.confirm-ok');
         const cancelBtn = modal.querySelector('.confirm-cancel');
@@ -4982,26 +4981,32 @@ class EntityEditor {
         okBtn.innerHTML = captionOk;
         cancelBtn.innerHTML = captionCancel;
 
-        // Show the modal
         modal.style.display = 'block';
 
-        // Remove existing event listeners to prevent duplicates
-        okBtn.removeEventListener('click', handleOkConfig);
-        cancelBtn.removeEventListener('click', handleCancelConfig);
-
-        // Define the event listener for OK button
-        function handleOkConfig() {
-            modal.style.display = 'none';
-            callback(true);  // Execute callback with 'true' if OK is clicked
+        // Remove previous event listeners if any
+        if (okBtn._handler) {
+            okBtn.removeEventListener('click', okBtn._handler);
+        }
+        if (cancelBtn._handler) {
+            cancelBtn.removeEventListener('click', cancelBtn._handler);
         }
 
-        // Define the event listener for Cancel button
-        function handleCancelConfig() {
+        // Create new handlers
+        const handleOkConfig = () => {
             modal.style.display = 'none';
-            callback(false);  // Execute callback with 'false' if Cancel is clicked
-        }
+            callback(true);
+        };
 
-        // Add event listeners for OK and Cancel buttons
+        const handleCancelConfig = () => {
+            modal.style.display = 'none';
+            callback(false);
+        };
+
+        // Store handler references for later removal
+        okBtn._handler = handleOkConfig;
+        cancelBtn._handler = handleCancelConfig;
+
+        // Add event listeners
         okBtn.addEventListener('click', handleOkConfig);
         cancelBtn.addEventListener('click', handleCancelConfig);
     }
