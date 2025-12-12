@@ -26,10 +26,11 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use ReflectionProperty;
+use stdClass;
 
 /**
  * Database persistence
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -48,7 +49,7 @@ class PicoDatabasePersistence // NOSONAR
     const ANNOTATION_JSON_FORMAT = "JsonFormat";
     const ANNOTATION_PACKAGE = "package";
     const SQL_DATE_TIME_FORMAT = "SqlDateTimeFormat";
-    
+
     const KEY_NAME = "name";
     const KEY_REFERENCE_COLUMN_NAME = "referenceColumnName";
     const KEY_NULL = "null";
@@ -63,7 +64,7 @@ class PicoDatabasePersistence // NOSONAR
     const KEY_TYPE = "type";
     const KEY_ENABLE = "enable";
     const KEY_ENTITY_OBJECT = "entityObject";
-    
+
     const VALUE_TRUE = "true";
     const VALUE_FALSE = "false";
 
@@ -75,7 +76,7 @@ class PicoDatabasePersistence // NOSONAR
     const MESSAGE_INVALID_FILTER = "Invalid filter";
     const SQL_DATETIME_FORMAT = "Y-m-d H:i:s";
     const DATE_TIME_FORMAT = "datetimeformat";
-    
+
     const NAMESPACE_SEPARATOR = "\\";
     const JOIN_TABLE_SUBFIX = "__jn__";
     const MAX_LINE_LENGTH = 80;
@@ -84,7 +85,7 @@ class PicoDatabasePersistence // NOSONAR
     const COMMA_RETURN = ", \r\n";
     const INLINE_TRIM = " \r\n\t ";
     const ALWAYS_TRUE = "(1=1)";
-    
+
     /**
      * Database connection
      *
@@ -114,25 +115,25 @@ class PicoDatabasePersistence // NOSONAR
 
     /**
      * Imported class list
-     * 
+     *
      * @var array
      */
     private $importedClassList = array();
 
     /**
      * Flag that class list has been processed or not
-     * 
+     *
      * @var bool
      */
     private $processClassList = false;
 
     /**
      * Get namespace of class
-     * 
+     *
      * @var string
      */
     private $namespaceName = "";
-    
+
     /**
      * Flag that generated value has been added
      *
@@ -153,21 +154,21 @@ class PicoDatabasePersistence // NOSONAR
      * @var bool
      */
     private $dbAutoinrementCompleted = false;
-    
+
     /**
      * Table Info
      *
      * @var PicoTableInfo
      */
     private $tableInfoProp = null;
-    
+
     /**
      * Entity table cache
      *
      * @var array
      */
     private $entityTable = array();
-    
+
     /**
      * Join map
      *
@@ -216,7 +217,7 @@ class PicoDatabasePersistence // NOSONAR
      * @var array
      */
     private $joinCache = array();
-    
+
     /**
      * The timezone offset for the current session, in the format '+hh:mm' or '-hh:mm'.
      * This offset represents the time difference between the current session's timezone and UTC.
@@ -226,7 +227,7 @@ class PicoDatabasePersistence // NOSONAR
     private $timeZoneOffset;
 
     /**
-     * The system's timezone offset, representing the offset used by the system's configuration, 
+     * The system's timezone offset, representing the offset used by the system's configuration,
      * in the format '+hh:mm' or '-hh:mm'.
      * This offset is typically used when interacting with the system's time settings.
      *
@@ -243,7 +244,7 @@ class PicoDatabasePersistence // NOSONAR
     private $timeZone;
 
     /**
-     * The system's timezone identifier, representing the timezone used by the system, 
+     * The system's timezone identifier, representing the timezone used by the system,
      * e.g., 'Europe/London'.
      * This timezone is typically used for system-level time settings.
      *
@@ -278,7 +279,7 @@ class PicoDatabasePersistence // NOSONAR
         $this->timeZoneOffset = PicoDatabase::getTimeZoneOffsetFromString($currentTimeZone);
         $this->timeZoneOffsetSystem = PicoDatabase::getTimeZoneOffsetFromString($timeZoneSystem);
     }
-    
+
     /**
      * Check if a given string is null or empty.
      *
@@ -289,7 +290,7 @@ class PicoDatabasePersistence // NOSONAR
     {
         return $string == null || empty($string);
     }
-    
+
     /**
      * Check if a given string is not null and not empty.
      *
@@ -300,7 +301,7 @@ class PicoDatabasePersistence // NOSONAR
     {
         return $string != null && !empty($string);
     }
-    
+
     /**
      * Apply results from a subquery to master data.
      *
@@ -312,7 +313,7 @@ class PicoDatabasePersistence // NOSONAR
     public static function applySubqueryResult($data, $row, $subqueryMap)
     {
         if(isset($subqueryMap) && is_array($subqueryMap))
-        {      
+        {
             foreach($subqueryMap as $info)
             {
                 $objectName = $info['objectName'];
@@ -332,7 +333,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $data;
     }
-    
+
     /**
      * Set a flag to include or skip null columns in the operation.
      *
@@ -363,9 +364,9 @@ class PicoDatabasePersistence // NOSONAR
         catch(InvalidAnnotationException $e)
         {
             throw new InvalidAnnotationException("Invalid annotation @".$parameter);
-        } 
+        }
     }
-    
+
     /**
      * Add column name to the columns array based on provided parameters.
      *
@@ -395,7 +396,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $columns;
     }
-    
+
     /**
      * Add column type information to the columns array.
      *
@@ -425,7 +426,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $columns;
     }
-    
+
     /**
      * Add a join column name to the join columns array.
      *
@@ -450,7 +451,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $joinColumns;
     }
-    
+
     /**
      * Add a join column type to the join columns array.
      *
@@ -469,10 +470,10 @@ class PicoDatabasePersistence // NOSONAR
                 $joinColumns[$prop->name][self::KEY_PROPERTY_TYPE] = $type;
                 $joinColumns[$prop->name][self::KEY_ENTITY_OBJECT] = true;
             }
-        }  
+        }
         return $joinColumns;
     }
-    
+
     /**
      * Add primary key information to the primary keys array.
      *
@@ -493,7 +494,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $primaryKeys;
     }
-    
+
     /**
      * Add autogenerated key information to the auto-increment keys array.
      *
@@ -520,7 +521,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $autoIncrementKeys;
     }
-    
+
     /**
      * Add default value information to the default values array.
      *
@@ -550,7 +551,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $defaultValue;
     }
-    
+
     /**
      * Add not-null column information to the not-null columns array.
      *
@@ -591,7 +592,7 @@ class PicoDatabasePersistence // NOSONAR
             {
                 throw new EntityException($this->className . " is not valid entity");
             }
-            
+
             if(isset($cache))
             {
                 $noCache = isset($cache[self::KEY_ENABLE]) && self::VALUE_FALSE == strtolower($cache[self::KEY_ENABLE]);
@@ -602,7 +603,7 @@ class PicoDatabasePersistence // NOSONAR
             }
 
             $values = $this->parseKeyValue($reflexClass, $table, self::ANNOTATION_TABLE);
-    
+
             $picoTableName = isset($values[self::KEY_NAME]) ? $values[self::KEY_NAME] : "";
             $columns = array();
             $joinColumns = array();
@@ -619,28 +620,28 @@ class PicoDatabasePersistence // NOSONAR
                 $parameters = $reflexProp->getParameters();
 
                 // get column name of each parameters
-                $columns = $this->addColumnName($columns, $reflexProp, $prop, $parameters);                
-                
+                $columns = $this->addColumnName($columns, $reflexProp, $prop, $parameters);
+
                 // set column type
-                $columns = $this->addColumnType($columns, $reflexProp, $prop, $parameters);               
-                
+                $columns = $this->addColumnType($columns, $reflexProp, $prop, $parameters);
+
                 // get join column name of each parameters
-                $joinColumns = $this->addJoinColumnName($joinColumns, $reflexProp, $prop, $parameters);               
-                
+                $joinColumns = $this->addJoinColumnName($joinColumns, $reflexProp, $prop, $parameters);
+
                 // set join column type
-                $joinColumns = $this->addJoinColumnType($joinColumns, $prop, $parameters);                       
+                $joinColumns = $this->addJoinColumnType($joinColumns, $prop, $parameters);
 
                 // list primary key
-                $primaryKeys = $this->addPrimaryKey($primaryKeys, $columns, $prop, $parameters);              
+                $primaryKeys = $this->addPrimaryKey($primaryKeys, $columns, $prop, $parameters);
 
                 // list autogenerated column
-                $autoIncrementKeys = $this->addAutogenerated($autoIncrementKeys, $columns, $reflexClass, $prop, $parameters);               
-                
+                $autoIncrementKeys = $this->addAutogenerated($autoIncrementKeys, $columns, $reflexClass, $prop, $parameters);
+
                 // define default column value
-                $defaultValue = $this->addDefaultValue($defaultValue, $columns, $reflexClass, $prop, $parameters);             
+                $defaultValue = $this->addDefaultValue($defaultValue, $columns, $reflexClass, $prop, $parameters);
 
                 // list not null column
-                $notNullColumns = $this->addNotNull($notNullColumns, $columns, $prop, $parameters);              
+                $notNullColumns = $this->addNotNull($notNullColumns, $columns, $prop, $parameters);
             }
             // bring it together
             $this->tableInfoProp = new PicoTableInfo($picoTableName, $columns, $joinColumns, $primaryKeys, $autoIncrementKeys, $defaultValue, $notNullColumns, $noCache, $package);
@@ -668,7 +669,7 @@ class PicoDatabasePersistence // NOSONAR
         $rowCount = $stmt->rowCount();
         return $rowCount != null && $rowCount > 0;
     }
-    
+
     /**
      * Save the current object to the database.
      *
@@ -710,7 +711,7 @@ class PicoDatabasePersistence // NOSONAR
         catch(Exception $e)
         {
             $stmt = $this->_insert($info, $queryBuilder);
-        }     
+        }
         return $stmt;
     }
 
@@ -756,7 +757,7 @@ class PicoDatabasePersistence // NOSONAR
         catch(Exception $e)
         {
             $query = $this->_insertQuery($info, $queryBuilder);
-        }     
+        }
         return $query;
     }
 
@@ -807,7 +808,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $nullCols;
     }
-    
+
     /**
      * Retrieve a list of columns that are not insertable.
      *
@@ -819,9 +820,9 @@ class PicoDatabasePersistence // NOSONAR
         $nonInsertableCols = array();
         foreach($info->getColumns() as $params)
         {
-            if(isset($params) 
+            if(isset($params)
                 && isset($params[self::KEY_INSERTABLE])
-                && strcasecmp($params[self::KEY_INSERTABLE], self::VALUE_FALSE) == 0              
+                && strcasecmp($params[self::KEY_INSERTABLE], self::VALUE_FALSE) == 0
                 )
             {
                 $columnName = $params[self::KEY_NAME];
@@ -830,7 +831,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $nonInsertableCols;
     }
-    
+
     /**
      * Retrieve a list of columns that are not updatable.
      *
@@ -842,9 +843,9 @@ class PicoDatabasePersistence // NOSONAR
         $nonUpdatableCols = array();
         foreach($info->getColumns() as $params)
         {
-            if(isset($params) 
+            if(isset($params)
                 && isset($params[self::KEY_UPDATABLE])
-                && strcasecmp($params[self::KEY_UPDATABLE], self::VALUE_FALSE) == 0              
+                && strcasecmp($params[self::KEY_UPDATABLE], self::VALUE_FALSE) == 0
                 )
             {
                 $columnName = $params[self::KEY_NAME];
@@ -855,15 +856,25 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
-     * Construct the SET statement for an SQL update operation.
+     * Construct the SET clause for an SQL UPDATE operation.
+     *
+     * Iterates over the table columns, applies value escaping, and builds
+     * the assignment expressions for the update statement. Columns that
+     * are marked as non-updatable or explicitly skipped will be excluded.
+     * Null columns are explicitly set to NULL.
      *
      * @param PicoTableInfo $info Table information containing column definitions.
-     * @param PicoDatabaseQueryBuilder $queryBuilder Query builder for escaping values.
-     * @return string The constructed SET clause for the update statement.
+     * @param PicoDatabaseQueryBuilder $queryBuilder Query builder used to escape values safely.
+     * @param string[]|null $skippedColumns Columns to skip from being updated (optional).
+     * @return string The constructed SET clause for the UPDATE statement.
      * @throws NoUpdatableColumnException If no updatable columns are found.
      */
-    private function getSet($info, $queryBuilder)
+    private function getSet($info, $queryBuilder, $skippedColumns = null)
     {
+        if(!isset($skippedColumns))
+        {
+            $skippedColumns = array();
+        }
         $sets = array();
         $nullCols = $this->getNullCols($info);
         $nonUpdatableCols = $this->getNonUpdatableCols($info);
@@ -872,11 +883,15 @@ class PicoDatabasePersistence // NOSONAR
             $columnName = $column[self::KEY_NAME];
             $value = $this->object->get($property);
             $value = $this->fixInput($value, $column);
-            if(($this->flagIncludeNull || $value !== null) 
-                && !in_array($columnName, $nullCols) 
+            if(($this->flagIncludeNull || $value !== null)
+                && !in_array($columnName, $nullCols)
                 && !in_array($columnName, $nonUpdatableCols)
                 )
             {
+                if(in_array($columnName, $skippedColumns))
+                {
+                    continue;
+                }
                 $value = $queryBuilder->escapeValue($value);
                 $sets[] = $columnName . " = " . $value;
             }
@@ -926,6 +941,59 @@ class PicoDatabasePersistence // NOSONAR
             throw new NoPrimaryKeyDefinedException("No primary key defined");
         }
         return implode(" and ", $wheres);
+    }
+
+    /**
+     * Builds a WHERE clause based on the table's primary key columns.
+     *
+     * This method constructs a WHERE clause for an SQL query using the primary keys
+     * defined in the provided table information. It retrieves the values from the
+     * current object, escapes them using the query builder, and generates conditions
+     * for each primary key. If a value is null, the condition will use "IS NULL".
+     *
+     * @param PicoTableInfo $info Table information containing primary key definitions.
+     * @param PicoDatabaseQueryBuilder $queryBuilder Query builder used to escape values safely.
+     * @return stdClass An object containing:
+     *                  - columns: associative array of column names and their values
+     *                  - whereClause: the constructed WHERE clause string
+     * @throws NoPrimaryKeyDefinedException If no primary keys are defined in the table.
+     */
+    private function getWhereWithColumns($info, $queryBuilder)
+    {
+        $result = new stdClass;
+        if($this->whereIsDefinedFirst && !empty($this->whereStr))
+        {
+            $result->columns = array();
+            $result->whereClause = $this->whereStr;
+            return $result;
+        }
+        
+        $wheres = array();
+        $columns = array();
+        foreach($info->getPrimaryKeys() as $property=>$column)
+        {
+            $columnName = $column[self::KEY_NAME];
+            $value = $this->object->get($property);
+            $escapedValue = $queryBuilder->escapeValue($value);
+            if(strcasecmp($escapedValue, self::KEY_NULL) == 0)
+            {
+                $wheres[] = $columnName . " is null";
+                $columns[$columnName] = null;
+            }
+            else
+            {
+                $wheres[] = $columnName . " = " . $escapedValue;
+                $columns[$columnName] = $value;
+            }
+        }
+        if(empty($wheres))
+        {
+            throw new NoPrimaryKeyDefinedException("No primary key defined");
+        }
+        
+        $result->columns = $columns;
+        $result->whereClause = implode(" and ", $wheres);
+        return $result;
     }
 
     /**
@@ -1025,7 +1093,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $aiKeys;
     }
-    
+
     /**
      * Add generated values for auto-increment or UUID fields.
      *
@@ -1052,7 +1120,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $this;
     }
-    
+
     /**
      * Set a generated value for a specified property based on its generation strategy.
      *
@@ -1083,7 +1151,7 @@ class PicoDatabasePersistence // NOSONAR
                 $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
                 $this->object->set($prop, $generatedValue);
                 $this->dbAutoinrementCompleted = true;
-            }         
+            }
         }
         return $this;
     }
@@ -1155,8 +1223,8 @@ class PicoDatabasePersistence // NOSONAR
         }
         $this->addGeneratedValue($info, true);
         $values = $this->getValues($info, $queryBuilder);
-        $fixValues = $this->fixInsertableValues($values, $info);       
-        
+        $fixValues = $this->fixInsertableValues($values, $info);
+
         return $queryBuilder
             ->newQuery()
             ->insert()
@@ -1164,7 +1232,7 @@ class PicoDatabasePersistence // NOSONAR
             ->fields($this->createStatementFields($fixValues))
             ->values($this->createStatementValues($fixValues));
     }
-    
+
     /**
      * Filter the values to only include those that are insertable based on table info.
      *
@@ -1187,21 +1255,21 @@ class PicoDatabasePersistence // NOSONAR
                     $insertableCols[$key] = $value;
                 }
             }
-            $fixedValues = $insertableCols;        
+            $fixedValues = $insertableCols;
         }
         else
         {
             $fixedValues = $values;
-        }       
-        
+        }
+
         /**
          * 1. TABLE - Indicates that the persistence provider must assign primary keys for the entity using an underlying database table to ensure uniqueness.
          * 2. SEQUENCE - Indicates that the persistence provider must assign primary keys for the entity using a database sequence.
          * 3. IDENTITY - Indicates that the persistence provider must assign primary keys for the entity using a database identity column.
          * 4. AUTO - Indicates that the persistence provider should pick an appropriate strategy for the particular database. The AUTO generation strategy may expect a database resource to exist, or it may attempt to create one. A vendor may provide documentation on how to create such resources in the event that it does not support schema generation or cannot create the schema resource at runtime.
          * 5. UUID - Indicates that the persistence provider must assign primary keys for the entity with a UUID value.
-         */ 
-        
+         */
+
         if($info->getAutoIncrementKeys() != null)
         {
             foreach($info->getAutoIncrementKeys() as $propertyName=>$col)
@@ -1214,14 +1282,14 @@ class PicoDatabasePersistence // NOSONAR
                     $this->generatedValue = true;
                 }
             }
-        }        
+        }
         if(empty($fixedValues))
         {
             throw new NoInsertableColumnException("No insertable column");
         }
         return $fixedValues;
     }
-    
+
     /**
      * Check if a generated value is required based on the strategy and property name.
      *
@@ -1231,8 +1299,8 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function isRequireGenerateValue($strategy, $propertyName)
     {
-        return stripos($strategy, "UUID") !== false 
-                && ($this->object->get($propertyName) == null || $this->object->get($propertyName) == "") 
+        return stripos($strategy, "UUID") !== false
+                && ($this->object->get($propertyName) == null || $this->object->get($propertyName) == "")
                 && !$this->generatedValue;
     }
 
@@ -1254,7 +1322,7 @@ class PicoDatabasePersistence // NOSONAR
      * @return string A string representation of the values.
      */
     public function createStatementValues($values)
-    {      
+    {
         return "(".implode(self::COMMA, array_values($values)).")";
     }
 
@@ -1276,9 +1344,9 @@ class PicoDatabasePersistence // NOSONAR
 
         $sourcex = str_replace("#And#", "@", $source);
         $sourcex = str_replace("#Or#", "@", $sourcex);
-        
+
         $sourcex = trim($sourcex, "#");
-        
+
         $arrSource = explode("@", $sourcex);
         foreach($arrSource as $idx=>$val)
         {
@@ -1396,7 +1464,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $this->joinStringArray($wheres, self::MAX_LINE_LENGTH);
     }
-    
+
     /**
      * Get table name of the entity
      *
@@ -1418,7 +1486,7 @@ class PicoDatabasePersistence // NOSONAR
         $tableName = $entityName;
         try
         {
-            $className = $this->getRealClassName($entityName, $info);          
+            $className = $this->getRealClassName($entityName, $info);
             $annotationParser = new PicoAnnotationParser($className);
             $parameters = $annotationParser->getParametersAsObject();
             if($parameters->getTable() != null)
@@ -1438,7 +1506,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $tableName;
     }
-    
+
     /**
      * Get entity primary key of the entity
      *
@@ -1472,7 +1540,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $columns;
     }
-    
+
     /**
      * Get column maps of the entity
      *
@@ -1503,7 +1571,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $columns;
     }
-    
+
     /**
      * Get join source
      *
@@ -1531,7 +1599,7 @@ class PicoDatabasePersistence // NOSONAR
             }
         }
         return $result;
-    } 
+    }
 
     /**
      * Create WHERE clause from specification
@@ -1543,14 +1611,14 @@ class PicoDatabasePersistence // NOSONAR
      */
     protected function createWhereFromSpecification($sqlQuery, $specification, $info)
     {
-        $masterColumnMaps = $this->getColumnMap($info);   
+        $masterColumnMaps = $this->getColumnMap($info);
         $arr = array();
         $arr[] = self::ALWAYS_TRUE;
         if($specification != null && !$specification->isEmpty())
         {
             $specifications = $specification->getSpecifications();
             foreach($specifications as $spec)
-            {           
+            {
                 $arr = $this->addWhere($arr, $masterColumnMaps, $sqlQuery, $spec, $info);
             }
         }
@@ -1589,7 +1657,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return implode($maxSplit, $arr3);
     }
-    
+
     /**
      * Split array into chunks based on maximum length
      *
@@ -1622,11 +1690,11 @@ class PicoDatabasePersistence // NOSONAR
                 {
                     $arr2[$idx][] = $value;
                 }
-            }         
+            }
         }
         return $arr2;
     }
-    
+
     /**
      * Add WHERE statement to the query
      *
@@ -1652,14 +1720,14 @@ class PicoDatabasePersistence // NOSONAR
             $entityName = $entityField->getEntity();
             $parentName = $entityField->getParentField();
             $functionFormat = $entityField->getFunctionFormat();
-            
+
             if($entityName != null)
             {
                 $entityTable = $this->getTableOf($entityName, $info);
-                
+
                 if($entityTable != null)
                 {
-                    $joinColumnmaps = $this->getColumnMapOf($entityName, $info);                           
+                    $joinColumnmaps = $this->getColumnMapOf($entityName, $info);
                     $maps = $joinColumnmaps;
                 }
                 else
@@ -1672,8 +1740,8 @@ class PicoDatabasePersistence // NOSONAR
                 $entityTable = null;
                 $maps = $masterColumnMaps;
             }
-            
-            $columnNames = array_values($maps);          
+
+            $columnNames = array_values($maps);
             // flat
             if(isset($maps[$field]))
             {
@@ -1705,9 +1773,9 @@ class PicoDatabasePersistence // NOSONAR
 
     /**
      * Constructs an SQL query fragment based on the given predicate.
-     * 
+     *
      * This method generates an SQL condition using a `PicoPredicate` instance or a raw SQL string.
-     * If the predicate specifies a "BETWEEN" comparison with an array of values, it constructs 
+     * If the predicate specifies a "BETWEEN" comparison with an array of values, it constructs
      * a range-based condition. Otherwise, it applies a standard comparison operation.
      *
      * @param PicoDatabaseQueryBuilder $sqlQuery The query builder instance used for SQL operations.
@@ -1728,7 +1796,7 @@ class PicoDatabasePersistence // NOSONAR
                 $values = $spec->getValue();
                 $min = $values[0];
                 $max = end($values);
-                $str = $spec->getFilterLogic() . " ( " 
+                $str = $spec->getFilterLogic() . " ( "
                 . $columnFinal . " >= " . $sqlQuery->escapeValue($min)
                 . " AND "
                 . $columnFinal . " <= " . $sqlQuery->escapeValue($max)
@@ -1746,7 +1814,7 @@ class PicoDatabasePersistence // NOSONAR
             return $spec;
         }
     }
-    
+
     /**
      * Construct comparison value for predicates
      *
@@ -1768,7 +1836,7 @@ class PicoDatabasePersistence // NOSONAR
         else
         {
             return $sqlQuery->escapeValue($predicate->getValue());
-        } 
+        }
     }
 
     /**
@@ -1819,7 +1887,7 @@ class PicoDatabasePersistence // NOSONAR
             return null;
         }
     }
-    
+
     /**
      * Create sorting SQL query
      *
@@ -1836,16 +1904,16 @@ class PicoDatabasePersistence // NOSONAR
         $ret = null;
         if($info == null)
         {
-            $ret = $this->createSortWithoutMapping($order, $info);     
+            $ret = $this->createSortWithoutMapping($order, $info);
         }
         else
         {
             $ret = $this->createSortWithMapping($order, $info);
         }
-        
+
         return $ret;
     }
-    
+
     /**
      * Create sorting without mapping
      *
@@ -1862,7 +1930,7 @@ class PicoDatabasePersistence // NOSONAR
             if($sort instanceof PicoSort)
             {
                 $columnName = $sort->getSortBy();
-                $sortType = $sort->getSortType();             
+                $sortType = $sort->getSortType();
                 $sortBy = $columnName;
                 $entityField = new PicoEntityField($sortBy, $info);
                 if($entityField->getEntity() != null)
@@ -1870,8 +1938,8 @@ class PicoDatabasePersistence // NOSONAR
                     $tableName = $this->getTableOf($entityField->getEntity(), $info);
                     $sortBy = $tableName.".".$sortBy;
                 }
-                $sorts[] = $sortBy . " " . $sortType;     
-            }    
+                $sorts[] = $sortBy . " " . $sortType;
+            }
             else if(is_string($sort))
             {
                 $sorts[] = $sort;
@@ -1883,7 +1951,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $ret;
     }
-    
+
     /**
      * Create sorting with mapping
      *
@@ -1895,24 +1963,24 @@ class PicoDatabasePersistence // NOSONAR
     {
         $masterColumnMaps = $this->getColumnMap($info);
         $masterTable = $info->getTableName();
-        
+
         $arr = array();
-    
+
         foreach($order->getSortable() as $sort)
         {
             if($sort instanceof PicoSort)
-            {           
+            {
                 $entityField = new PicoEntityField($sort->getSortBy(), $info);
                 $field = $entityField->getField();
                 $entityName = $entityField->getEntity();
                 $parentName = $entityField->getParentField();
-                
+
                 if($entityName != null)
                 {
                     $entityTable = $this->getTableOf($entityName, $info);
                     if($entityTable != null)
                     {
-                        $joinColumnmaps = $this->getColumnMapOf($entityName, $info);                           
+                        $joinColumnmaps = $this->getColumnMapOf($entityName, $info);
                         $maps = $joinColumnmaps;
                     }
                     else
@@ -1927,12 +1995,12 @@ class PicoDatabasePersistence // NOSONAR
                     $maps = $masterColumnMaps;
                     $columnNames = array_values($maps);
                 }
-                
+
                 if(isset($maps[$field]))
                 {
                     // get from map
                     $column = $this->getJoinSource($parentName, $masterTable, $entityTable, $maps[$field], $masterTable == $entityTable);
-                    
+
                     $arr[] = $column . " " . $sort->getSortType();
                 }
                 else if(in_array($field, $columnNames))
@@ -1949,7 +2017,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $this->joinStringArray($arr, self::MAX_LINE_LENGTH, self::COMMA, self::COMMA_RETURN);
     }
-    
+
     /**
      * Check if primary keys have valid values
      *
@@ -1976,7 +2044,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $propertyValues;
     }
-    
+
     /**
      * Get all columns of the entity
      *
@@ -1993,12 +2061,12 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $this->joinStringArray($result, self::MAX_LINE_LENGTH, self::COMMA, self::COMMA_RETURN);
     }
-    
+
     /**
      * Finds a single record by its primary key value(s).
      *
      * This method retrieves a single record from the database that matches the specified primary key value(s).
-     * It returns the found record as an object. If no record is found or if the filter is invalid, appropriate 
+     * It returns the found record as an object. If no record is found or if the filter is invalid, appropriate
      * exceptions will be thrown.
      *
      * @param mixed $propertyValues The primary key value(s) used to find the record.
@@ -2012,9 +2080,9 @@ class PicoDatabasePersistence // NOSONAR
         $propertyValues = $this->toArray($propertyValues);
         $data = null;
         $info = $this->getTableInfo();
-        
+
         $primaryKeys = $info->getPrimaryKeys();
-        
+
         if($this->isValidPrimaryKeyValues($primaryKeys, $propertyValues))
         {
             $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
@@ -2039,7 +2107,7 @@ class PicoDatabasePersistence // NOSONAR
                     }
                     else
                     {
-                        $data = $this->fixDataType($row, $info); 
+                        $data = $this->fixDataType($row, $info);
                         $data = $this->join($data, $row, $info);
                     }
                     return $data;
@@ -2059,7 +2127,7 @@ class PicoDatabasePersistence // NOSONAR
             throw new NoRecordFoundException("No primary key set");
         }
     }
-    
+
     /**
      * Creates the WHERE clause for the query based on the primary keys and their values.
      *
@@ -2140,7 +2208,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $sqlQuery;
     }
-        
+
     /**
      * Add sortable to query builder
      *
@@ -2152,7 +2220,7 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function setSortable($sqlQuery, $pageable, $sortable, $info)
     {
-        
+
         if($sortable != null)
         {
             if($sortable instanceof PicoSortable)
@@ -2165,7 +2233,7 @@ class PicoDatabasePersistence // NOSONAR
                 $sortOrder = $this->createOrderBy($info, $sortable);
                 $sqlQuery = $this->setOrdeBy($sqlQuery, $sortOrder);
             }
-        } 
+        }
         else if($pageable != null && $pageable instanceof PicoPageable)
         {
             $sortOrder = $pageable->createOrderBy($info);
@@ -2210,7 +2278,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $sqlQuery;
     }
-    
+
     /**
      * Add JOIN query to the query builder
      *
@@ -2221,10 +2289,10 @@ class PicoDatabasePersistence // NOSONAR
     protected function addJoinQuery($sqlQuery, $info)
     {
         $joinColumns = $info->getJoinColumns();
-        
+
         $masterTable = $info->getTableName();
         $tableAlias = array();
-        
+
         foreach($joinColumns as $propertyName=>$joinColumn)
         {
             $entity = $joinColumn[self::KEY_PROPERTY_TYPE];
@@ -2235,11 +2303,11 @@ class PicoDatabasePersistence // NOSONAR
                 $tableAlias[$joinTable] = 0;
             }
             $tableAlias[$joinTable]++;
-            
+
             $joinTableAlias = $joinTable.self::JOIN_TABLE_SUBFIX.$tableAlias[$joinTable];
-            
+
             $this->joinColumMaps[$propertyName] = new PicoJoinMap($propertyName, $columnName, $entity, $joinTable, $joinTableAlias);
-            
+
             $joinColumn = $this->getPrimaryKeyOf($entity, $info);
 
             $joinPrimaryKeys = array_values($this->getPrimaryKeyOf($entity, $info));
@@ -2256,12 +2324,12 @@ class PicoDatabasePersistence // NOSONAR
             {
                 $referenceColumName = $joinColumn[self::KEY_NAME];
             }
-            
+
             $sqlQuery->leftJoin($joinTable." ".$joinTableAlias)->on($joinTableAlias.".".$referenceColumName." = ".$masterTable.".".$columnName);
         }
         return $sqlQuery;
     }
-    
+
     /**
      * Check if JOIN query is required based on specification, pageable, and sortable
      *
@@ -2305,7 +2373,7 @@ class PicoDatabasePersistence // NOSONAR
             {
                 $result = strpos($sortable, ".") !== false;
             }
-        } 
+        }
         else if($pageable != null && $pageable instanceof PicoPageable)
         {
             $result = strpos($pageable->createOrderBy($info), ".") !== false;
@@ -2371,7 +2439,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $this->findSpecificQuery($this->getAllColumns($info), $specification, $pageable, $sortable, $info);
     }
-    
+
     /**
      * Get findSpecific query builder
      *
@@ -2389,30 +2457,30 @@ class PicoDatabasePersistence // NOSONAR
             $info = $this->getTableInfo();
         }
         $sqlQuery = new PicoDatabaseQueryBuilder($this->database);
-        
+
         $sqlQuery
             ->newQuery()
             ->select($selected)
             ->from($info->getTableName());
-        
+
         if($this->isRequireJoin($specification, $pageable, $sortable, $info))
         {
             $sqlQuery = $this->addJoinQuery($sqlQuery, $info);
         }
-            
+
         if($specification != null)
         {
             $sqlQuery = $this->setSpecification($sqlQuery, $specification, $info);
         }
-        
+
         if($pageable != null)
         {
-            $sqlQuery = $this->setPageable($sqlQuery, $pageable);      
+            $sqlQuery = $this->setPageable($sqlQuery, $pageable);
         }
-        
+
         if($pageable != null || $sortable != null)
         {
-            $sqlQuery = $this->setSortable($sqlQuery, $pageable, $sortable, $info);        
+            $sqlQuery = $this->setSortable($sqlQuery, $pageable, $sortable, $info);
         }
         return $sqlQuery;
     }
@@ -2430,9 +2498,9 @@ class PicoDatabasePersistence // NOSONAR
      */
     public function findOne($specification, $sortable = null, $subqueryMap = null)
     {
-        $info = $this->getTableInfo(); 
+        $info = $this->getTableInfo();
         $pageable = new PicoPageable(array(1, 1));
-        if($subqueryMap == null)    
+        if($subqueryMap == null)
         {
             return $this->findSpecific($this->getAllColumns($info), $specification, $pageable, $sortable);
         }
@@ -2455,8 +2523,8 @@ class PicoDatabasePersistence // NOSONAR
      */
     public function findAll($specification, $pageable = null, $sortable = null, $subqueryMap = null)
     {
-        $info = $this->getTableInfo(); 
-        if($subqueryMap == null)    
+        $info = $this->getTableInfo();
+        if($subqueryMap == null)
         {
             return $this->findSpecific($this->getAllColumns($info), $specification, $pageable, $sortable);
         }
@@ -2465,7 +2533,7 @@ class PicoDatabasePersistence // NOSONAR
             return $this->findSpecificWithSubquery($this->getAllColumns($info), $specification, $pageable, $sortable, $subqueryMap);
         }
     }
-    
+
     /**
      * Find a record by its primary key value
      *
@@ -2495,7 +2563,7 @@ class PicoDatabasePersistence // NOSONAR
             {
                 throw new NoPrimaryKeyDefinedException(self::MESSAGE_NO_PRIMARY_KEY_DEFINED);
             }
-            
+
             $sqlQuery = new PicoDatabaseQueryBuilder($this->database);
             $sqlQuery
                 ->select($selected)
@@ -2514,7 +2582,7 @@ class PicoDatabasePersistence // NOSONAR
                 }
                 else
                 {
-                    $data = $this->fixDataType($row, $info); 
+                    $data = $this->fixDataType($row, $info);
                     $data = self::applySubqueryResult($data, $row, $subqueryMap);
                 }
             }
@@ -2529,7 +2597,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $data;
     }
-    
+
     /**
      * Retrieve records from the database with optional subqueries
      *
@@ -2551,15 +2619,15 @@ class PicoDatabasePersistence // NOSONAR
             $selected = $this->joinString($selected, $this->subquery($info, $subqueryMap), self::COMMA_RETURN);
         }
         $sqlQuery = $this->findSpecificQuery($selected, $specification, $pageable, $sortable, $info);
-    
+
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
             if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))                
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
                 {
-                    $data = $this->fixDataType($row, $info); 
+                    $data = $this->fixDataType($row, $info);
                     if($subqueryMap == null)
                     {
                         $data = $this->join($data, $row, $info);
@@ -2578,7 +2646,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $result;
     }
-    
+
     /**
      * Create a subquery based on the provided mapping
      *
@@ -2596,12 +2664,12 @@ class PicoDatabasePersistence // NOSONAR
             foreach($subqueryMap as $info)
             {
                 $joinTableName = $info['tableName'];
-                $columnName = $info['columnName'];                
+                $columnName = $info['columnName'];
                 $primaryKey = $info['primaryKey'];
                 $objectNameSub = $info['objectName'];
                 $propertyName = $info['propertyName'];
                 $joinName = $info['tableName']."_".$idx;
-                $selection = $info['tableName']."_".$idx.".".$propertyName; 
+                $selection = $info['tableName']."_".$idx.".".$propertyName;
                 $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
                 $queryBuilder
                     ->select($selection)
@@ -2615,7 +2683,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return implode(self::COMMA_RETURN, $subquery);
     }
-    
+
     /**
      * Concatenate two strings with a separator
      *
@@ -2652,15 +2720,15 @@ class PicoDatabasePersistence // NOSONAR
         $result = array();
         $info = $this->getTableInfo();
         $sqlQuery = $this->findSpecificQuery($selected, $specification, $pageable, $sortable, $info);
-    
+
         try
         {
             $stmt = $this->database->executeQuery($sqlQuery);
             if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))                
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
                 {
-                    $data = $this->fixDataType($row, $info); 
+                    $data = $this->fixDataType($row, $info);
                     $data = $this->join($data, $row, $info);
                     $result[] = $data;
                 }
@@ -2705,11 +2773,11 @@ class PicoDatabasePersistence // NOSONAR
             ->where($where);
         if($pageable != null)
         {
-            $sqlQuery = $this->setPageable($sqlQuery, $pageable);        
+            $sqlQuery = $this->setPageable($sqlQuery, $pageable);
         }
         if($pageable != null || $sortable != null)
         {
-            $sqlQuery = $this->setSortable($sqlQuery, $pageable, $sortable, $info);        
+            $sqlQuery = $this->setSortable($sqlQuery, $pageable, $sortable, $info);
         }
 
         return $sqlQuery;
@@ -2737,9 +2805,9 @@ class PicoDatabasePersistence // NOSONAR
             $stmt = $this->database->executeQuery($sqlQuery);
             if($this->matchRow($stmt, $this->database->getDatabaseType()))
             {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))               
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
                 {
-                    $data = $this->fixDataType($row, $info); 
+                    $data = $this->fixDataType($row, $info);
                     $data = $this->join($data, $row, $info);
                     $result[] = $data;
                 }
@@ -2759,7 +2827,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $result;
     }
-    
+
     /**
      * Check if a record exists based on property criteria
      *
@@ -2811,7 +2879,7 @@ class PicoDatabasePersistence // NOSONAR
             $stmt = $this->database->executeQuery($sqlQuery);
             $result = $stmt->fetch();
 
-            // Return the count. 
+            // Return the count.
             // return 0 if the result is empty.
             return (int) (isset($result['total']) ? $result['total'] : 0);
 
@@ -2820,7 +2888,7 @@ class PicoDatabasePersistence // NOSONAR
             throw new DataRetrievalException("Failed to count records: " . $e->getMessage(), 0, $e);
         }
     }
-    
+
     /**
      * Count records based on specified criteria.
      *
@@ -2833,7 +2901,7 @@ class PicoDatabasePersistence // NOSONAR
     {
         try {
             $info = $this->getTableInfo();
-            
+
             $where = $this->createWhereFromArgs($info, $propertyName, $propertyValue);
 
             if (!$this->isValidFilter($where)) {
@@ -2841,7 +2909,7 @@ class PicoDatabasePersistence // NOSONAR
             }
 
             $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
-            
+
             // Use a standard COUNT query that is compatible with all supported databases.
             $sqlQuery = $queryBuilder
                 ->newQuery()
@@ -2853,16 +2921,16 @@ class PicoDatabasePersistence // NOSONAR
             $stmt = $this->database->executeQuery($sqlQuery);
             $result = $stmt->fetch();
 
-            // Return the count. 
+            // Return the count.
             // return 0 if the result is empty.
             return (int) (isset($result['total']) ? $result['total'] : 0);
-            
+
         } catch (Exception $e) {
             // Wrap the original exception with a more descriptive message.
             throw new DataRetrievalException("Failed to count records by property: " . $e->getMessage(), 0, $e);
         }
     }
-    
+
     /**
      * Delete records based on specified criteria without reading them first
      *
@@ -2907,7 +2975,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Deletes a database record based on its primary key value(s).
      *
-     * This method constructs and executes a DELETE SQL query to remove a record 
+     * This method constructs and executes a DELETE SQL query to remove a record
      * that matches the given primary key value(s). It returns the number of affected rows.
      * If an exception occurs during execution, the method returns 0.
      *
@@ -2962,7 +3030,7 @@ class PicoDatabasePersistence // NOSONAR
 
         throw new InvalidParameterException("Invalid or missing primary key values.");
     }
-    
+
     /**
      * Retrieves a single matched record from the database based on the specified property name and value.
      *
@@ -2992,7 +3060,7 @@ class PicoDatabasePersistence // NOSONAR
             ->select($this->getAllColumns($info))
             ->from($info->getTableName())
             ->where($where);
-        $sqlQuery = $this->setSortable($sqlQuery, null, $sortable, $info);  
+        $sqlQuery = $this->setSortable($sqlQuery, null, $sortable, $info);
         $sqlQuery->limit(1)->offset(0);
         try
         {
@@ -3007,7 +3075,7 @@ class PicoDatabasePersistence // NOSONAR
                 }
                 else
                 {
-                    $data = $this->fixDataType($row, $info);               
+                    $data = $this->fixDataType($row, $info);
                     $data = $this->join($data, $row, $info);
                 }
             }
@@ -3020,14 +3088,14 @@ class PicoDatabasePersistence // NOSONAR
         {
             throw new DataRetrievalException($e->getMessage());
         }
-        return $data;   
+        return $data;
     }
 
     /**
      * Retrieves the fully qualified class name based on the given class name and table information.
      *
      * If the class name does not include a namespace, it constructs the full class name using
-     * the package information from the provided PicoTableInfo. If the package is not defined, 
+     * the package information from the provided PicoTableInfo. If the package is not defined,
      * it attempts to resolve the class name from the current namespace or imported classes.
      *
      * @param string $classNameJoin The class name to join.
@@ -3054,7 +3122,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $result;
     }
-    
+
     /**
      * Resolves the fully qualified class name when no package is defined.
      *
@@ -3071,7 +3139,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             // Process the class list only once.
             $reflect = new ExtendedReflectionClass($this->className);
-            $useStatements = $reflect->getUseStatements(); 
+            $useStatements = $reflect->getUseStatements();
             $this->namespaceName = $reflect->getNamespaceName();
             if(self::isArray($useStatements))
             {
@@ -3095,7 +3163,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $result;
     }
-    
+
     /**
      * Retrieves the reference column name from the provided join information.
      *
@@ -3181,12 +3249,12 @@ class PicoDatabasePersistence // NOSONAR
         $persist = new self(null, new $className());
         $info = $persist->getTableInfo();
         $noCache = isset($info) ? $info->getNoCache() : false;
-        
+
         // Check if caching is disabled or if the data is not already cached
         if($noCache || !isset($this->joinCache[$classNameJoin]) || !isset($this->joinCache[$classNameJoin][$joinKeyValue]))
-        {       
-            $obj = new $className(null);      
-            
+        {
+            $obj = new $className(null);
+
             $dbEnt = $this->object->databaseEntity();
             // Determine the database connection to use
             if($dbEnt != null)
@@ -3200,13 +3268,13 @@ class PicoDatabasePersistence // NOSONAR
                 // Using master database connection
                 $obj->currentDatabase($this->object->currentDatabase());
             }
-            
+
             // Dynamically call the method to find the object by the join key
             $method = 'findOneBy' . ucfirst($referenceColumName);
-            $obj->{$method}($joinKeyValue);   
-            
+            $obj->{$method}($joinKeyValue);
+
             // Cache the result for future retrievals if caching is enabled
-            if(!$noCache)        
+            if(!$noCache)
             {
                 $this->joinCache[$classNameJoin][$joinKeyValue] = $obj;
             }
@@ -3221,11 +3289,11 @@ class PicoDatabasePersistence // NOSONAR
             return null; // Return null if no data is found
         }
     }
-    
+
     /**
      * Joins data based on the specified join columns from the provided row.
      *
-     * This method retrieves related data by following the join definitions specified in the 
+     * This method retrieves related data by following the join definitions specified in the
      * `PicoTableInfo` object. It populates the given data object with the joined entities
      * based on the annotations defined in the join columns.
      *
@@ -3280,7 +3348,7 @@ class PicoDatabasePersistence // NOSONAR
     private function addProperty($data, $propName, $value)
     {
         if(is_array($data))
-        {                       
+        {
             $data[$propName] = $value;
         }
         else
@@ -3289,7 +3357,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $data;
     }
-    
+
     /**
      * Validates whether the given filter is acceptable.
      *
@@ -3306,7 +3374,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Checks if the provided value is not null, not empty, and not just whitespace.
      *
-     * This method trims the input value and performs checks to determine if it is 
+     * This method trims the input value and performs checks to determine if it is
      * a valid, non-empty string.
      *
      * @param string $value The value to check.
@@ -3320,8 +3388,8 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Fixes the data types of the input data based on the table information.
      *
-     * This method maps the input data to the appropriate types as defined in the 
-     * provided `PicoTableInfo`. It ensures that the data types are correct according to 
+     * This method maps the input data to the appropriate types as defined in the
+     * provided `PicoTableInfo`. It ensures that the data types are correct according to
      * the column definitions.
      *
      * @param array $data The input data to be fixed.
@@ -3337,7 +3405,7 @@ class PicoDatabasePersistence // NOSONAR
             $columnName = $column[self::KEY_NAME];
             $value = $data[$columnName];
             $value = $this->fixTimeZone($value, $column, $this->timeZoneSystem, $this->timeZone);
-            
+
             if(isset($typeMap[$columnName]))
             {
                 $result[$prop] = $this->fixData($value, $typeMap[$columnName]);
@@ -3373,16 +3441,16 @@ class PicoDatabasePersistence // NOSONAR
         "tinytext"=>"string",
         "mediumtext"=>"string",
         "longtext"=>"string",
-        "text"=>"string",   
-        "enum"=>"string",   
+        "text"=>"string",
+        "enum"=>"string",
         "bool"=>"boolean",
         "boolean"=>"boolean",
         "timestamp"=>"string",
         "datetime"=>"string",
         "date"=>"string",
         "time"=>"string"
-        */     
-        
+        */
+
         if($type == 'DateTime')
         {
             $v = strlen($value) > 19 ? substr($value, 0, 19) : $value;
@@ -3410,7 +3478,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $ret;
     }
-    
+
     /**
      * Converts the input value to a boolean.
      *
@@ -3424,7 +3492,7 @@ class PicoDatabasePersistence // NOSONAR
     {
         return $value == 1 || $value == '1';
     }
-    
+
     /**
      * Converts the input value to an integer.
      *
@@ -3446,7 +3514,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $ret;
     }
-    
+
     /**
      * Converts the input value to a double.
      *
@@ -3472,9 +3540,9 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Fixes the input value based on its type and applies timezone adjustments if necessary.
      *
-     * If the input value is an instance of DateTime, it adjusts the timezone and formats the date 
-     * according to the specified column format. If the input value is not a DateTime, it simply 
-     * adjusts the timezone without formatting the value. If a date format is specified in the column, 
+     * If the input value is an instance of DateTime, it adjusts the timezone and formats the date
+     * according to the specified column format. If the input value is not a DateTime, it simply
+     * adjusts the timezone without formatting the value. If a date format is specified in the column,
      * it will format the DateTime accordingly.
      *
      * @param mixed $value The input value to fix, which can be a DateTime object, string, or other types.
@@ -3517,8 +3585,8 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function fixTimeZone($value, $column, $timeZoneFrom, $timeZoneTo)
     {
-        if(isset($column[self::KEY_PROPERTY_TYPE]) 
-        && stripos($column[self::KEY_PROPERTY_TYPE], "timestamp") !== false 
+        if(isset($column[self::KEY_PROPERTY_TYPE])
+        && stripos($column[self::KEY_PROPERTY_TYPE], "timestamp") !== false
         && $timeZoneFrom != $timeZoneTo
         && $this->database->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
         {
@@ -3526,7 +3594,7 @@ class PicoDatabasePersistence // NOSONAR
         }
         return $value;
     }
-    
+
     /**
      * Checks if the given datetime value represents a null or empty datetime.
      *
@@ -3546,8 +3614,8 @@ class PicoDatabasePersistence // NOSONAR
         {
             $value = substr($value, 0, 26);
         }
-        return $value == '0000-00-00 00:00:00.000000' 
-            || $value == '0000-00-00 00:00:00.000' 
+        return $value == '0000-00-00 00:00:00.000000'
+            || $value == '0000-00-00 00:00:00.000'
             || $value == '0000-00-00 00:00:00'
             || $value == '0000-00-00'
             ;
@@ -3560,7 +3628,7 @@ class PicoDatabasePersistence // NOSONAR
      * are their associated property types based on the provided PicoTableInfo.
      *
      * @param PicoTableInfo $info The table information containing column metadata.
-     * 
+     *
      * @return array An associative array mapping column names to property types.
      */
     private function createTypeMap($info)
@@ -3596,7 +3664,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Selects all records from the database.
      *
-     * This method constructs and executes a query to retrieve all records from the 
+     * This method constructs and executes a query to retrieve all records from the
      * specified table in the database.
      *
      * @return array The result set containing all records.
@@ -3613,7 +3681,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Builds a query to select data without executing it.
      *
-     * This method prepares a select query using the specified table information and 
+     * This method prepares a select query using the specified table information and
      * filtering criteria but does not execute the query.
      *
      * @return PicoDatabaseQueryBuilder The query builder with the select query prepared.
@@ -3706,7 +3774,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Selects all matching records from the database.
      *
-     * This method constructs and executes a select query to retrieve all records that match 
+     * This method constructs and executes a select query to retrieve all records that match
      * the specified filtering criteria. It returns an array of results.
      *
      * @param PicoTableInfo|null $info The table information. If null, fetched internally.
@@ -3777,7 +3845,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Prepares a query to select data without executing it.
      *
-     * This method constructs a select query using the specified table information and 
+     * This method constructs a select query using the specified table information and
      * filtering criteria without executing it, allowing for further modifications if needed.
      *
      * @param PicoTableInfo|null $info The table information. If null, fetched internally.
@@ -3816,20 +3884,26 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Updates records in the database.
      *
-     * This method constructs and executes an update query to modify records in the 
-     * specified table. It accepts an optional flag to include null values in the update.
+     * This method constructs and executes an UPDATE query to modify records in the
+     * specified table. It accepts an optional flag to include null values in the update,
+     * and automatically skips columns used in the WHERE clause.
      *
      * @param bool $includeNull Optional. If true, null values are included in the update.
-     * @return PDOStatement The executed update statement.
+     * @return PDOStatement The executed UPDATE statement.
      * @throws EntityException If an error occurs during the update process.
+     * @throws InvalidFilterException If the provided filter is invalid.
      */
     public function update($includeNull = false)
     {
         $this->flagIncludeNull = $includeNull;
         $queryBuilder = new PicoDatabaseQueryBuilder($this->database);
         $info = $this->getTableInfo();
-        $where = $this->getWhere($info, $queryBuilder);
-        return $this->_update($info, $queryBuilder, $where);
+
+        $whereObject = $this->getWhereWithColumns($info, $queryBuilder);
+        $where = $whereObject->whereClause;
+        $skippedColumns = array_keys($whereObject->columns);
+
+        return $this->_update($info, $queryBuilder, $where, $skippedColumns);
     }
 
     /**
@@ -3854,35 +3928,38 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Updates a record in the database based on primary keys.
      *
-     * This method constructs and executes an update query using the provided table information 
-     * and filtering criteria.
+     * This method constructs and executes an UPDATE query using the provided table information,
+     * filtering criteria, and optional skipped columns.
      *
-     * @param PicoTableInfo|null $info The table information. If null, fetched internally.
-     * @param PicoDatabaseQueryBuilder|null $queryBuilder The query builder. If null, created internally.
-     * @param string|null $where The where clause for the query. If null, fetched internally.
-     * @return PDOStatement The executed update statement.
+     * @param PicoTableInfo|null $info The table information. If null, it is fetched internally.
+     * @param PicoDatabaseQueryBuilder|null $queryBuilder The query builder. If null, it is created internally.
+     * @param string|null $where The WHERE clause for the query. If null, it is generated internally.
+     * @param string[]|null $skippedColumns Columns to skip from being updated. If null, determined internally.
+     * @return PDOStatement The executed UPDATE statement.
      * @throws InvalidFilterException If the provided filter is invalid.
      */
-    private function _update($info = null, $queryBuilder = null, $where = null)
+    private function _update($info = null, $queryBuilder = null, $where = null, $skippedColumns = null)
     {
-        $sqlQuery = $this->_updateQuery($info, $queryBuilder, $where);
+        $sqlQuery = $this->_updateQuery($info, $queryBuilder, $where, $skippedColumns);
         return $this->database->executeUpdate($sqlQuery);
     }
 
     /**
-     * Prepares an update query without executing it.
+     * Prepares an SQL UPDATE query without executing it.
      *
-     * This method constructs an update query using the specified table information and filtering criteria,
-     * returning the query builder for further modifications.
+     * This method constructs an UPDATE query using the specified table information,
+     * filtering criteria, and optional skipped columns. It returns the query builder
+     * for further modifications before execution.
      *
-     * @param PicoTableInfo|null $info The table information. If null, fetched internally.
-     * @param PicoDatabaseQueryBuilder|null $queryBuilder The query builder. If null, created internally.
-     * @param string|null $where The where clause for the query. If null, fetched internally.
-     * @return PicoDatabaseQueryBuilder The query builder with the update query prepared.
+     * @param PicoTableInfo|null $info The table information. If null, it is fetched internally.
+     * @param PicoDatabaseQueryBuilder|null $queryBuilder The query builder. If null, it is created internally.
+     * @param string|null $where The WHERE clause for the query. If null, it is generated internally.
+     * @param string[]|null $skippedColumns Columns to skip from being updated. If null, determined internally.
+     * @return PicoDatabaseQueryBuilder The query builder with the UPDATE query prepared.
      * @throws InvalidFilterException If the provided filter is invalid.
      * @throws EntityException If an error occurs while preparing the query.
      */
-    private function _updateQuery($info = null, $queryBuilder = null, $where = null)
+    private function _updateQuery($info = null, $queryBuilder = null, $where = null, $skippedColumns = null)
     {
         if($queryBuilder == null)
         {
@@ -3894,13 +3971,15 @@ class PicoDatabasePersistence // NOSONAR
         }
         if($where == null)
         {
-            $where = $this->getWhere($info, $queryBuilder);
+            $whereObject = $this->getWhereWithColumns($info, $queryBuilder);
+            $where = $whereObject->whereClause;
+            $skippedColumns = array_keys($whereObject->columns);
         }
         if(!$this->isValidFilter($where))
         {
             throw new InvalidFilterException(self::MESSAGE_INVALID_FILTER);
         }
-        $set = $this->getSet($info, $queryBuilder);
+        $set = $this->getSet($info, $queryBuilder, $skippedColumns);
         return $queryBuilder
             ->newQuery()
             ->update($info->getTableName())
@@ -3929,7 +4008,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Prepares a delete query without executing it.
      *
-     * This method constructs a delete query using the specified table information 
+     * This method constructs a delete query using the specified table information
      * and filtering criteria without executing it, allowing for further modifications.
      *
      * @return PicoDatabaseQueryBuilder The query builder with the delete query prepared.
@@ -3946,7 +4025,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Deletes a record from the database based on primary keys.
      *
-     * This method constructs and executes a delete query using the provided table 
+     * This method constructs and executes a delete query using the provided table
      * information and filtering criteria.
      *
      * @param PicoTableInfo|null $info The table information. If null, fetched internally.
@@ -3963,7 +4042,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Prepares a delete query without executing it.
      *
-     * This method constructs a delete query using the specified table information and 
+     * This method constructs a delete query using the specified table information and
      * filtering criteria, returning the query builder for further modifications.
      *
      * @param PicoTableInfo|null $info The table information. If null, fetched internally.
@@ -3990,7 +4069,7 @@ class PicoDatabasePersistence // NOSONAR
         if(!$this->isValidFilter($where))
         {
             throw new InvalidFilterException(self::MESSAGE_INVALID_FILTER);
-        }              
+        }
         return $queryBuilder
             ->newQuery()
             ->delete()
@@ -4014,7 +4093,7 @@ class PicoDatabasePersistence // NOSONAR
         $persist->specification = $specification;
 
         $sqlQuery = new PicoDatabaseQueryBuilder($this->database);
-        $info = $persist->getTableInfo();  
+        $info = $persist->getTableInfo();
         try
         {
             if($persist->isRequireJoin($specification, null, null, $info))
@@ -4043,7 +4122,7 @@ class PicoDatabasePersistence // NOSONAR
     {
         return isset($value) && is_array($value);
     }
-    
+
     /**
      * Check if the given input is not empty.
      *
@@ -4062,7 +4141,7 @@ class PicoDatabasePersistence // NOSONAR
      * Get the timezone offset for the current session, represented in the format '+hh:mm' or '-hh:mm'.
      *
      * @return  string
-     */ 
+     */
     public function getTimeZoneOffset()
     {
         return $this->timeZoneOffset;
@@ -4074,7 +4153,7 @@ class PicoDatabasePersistence // NOSONAR
      * @param  string  $timeZoneOffset  The timezone offset for the current session, represented in the format '+hh:mm' or '-hh:mm'.
      *
      * @return  self
-     */ 
+     */
     public function setTimeZoneOffset($timeZoneOffset)
     {
         $this->timeZoneOffset = $timeZoneOffset;
@@ -4085,7 +4164,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Get the system's timezone offset in the format '+hh:mm' or '-hh:mm'.
      *
-     * This method returns the system's timezone offset, which is stored as a string in the format 
+     * This method returns the system's timezone offset, which is stored as a string in the format
      * of hours and minutes (e.g., '+07:00', '-03:00').
      *
      * @return string The system's timezone offset.
@@ -4098,7 +4177,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Set the system's timezone offset in the format '+hh:mm' or '-hh:mm'.
      *
-     * This method sets the system's timezone offset, which should be provided as a string 
+     * This method sets the system's timezone offset, which should be provided as a string
      * in the format of hours and minutes (e.g., '+07:00', '-03:00').
      *
      * @param string $timeZoneOffsetSystem The timezone offset to set for the system.
@@ -4117,7 +4196,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Get the timezone used for time-related operations within the session.
      *
-     * This method returns the timezone identifier (e.g., 'Asia/Jakarta') that is set for the current session 
+     * This method returns the timezone identifier (e.g., 'Asia/Jakarta') that is set for the current session
      * and is used for all time-related operations.
      *
      * @return string The timezone identifier for the current session (e.g., 'Asia/Jakarta').
@@ -4130,7 +4209,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Set the timezone used for time-related operations within the session.
      *
-     * This method sets the timezone identifier (e.g., 'Asia/Jakarta') to be used for all time-related operations 
+     * This method sets the timezone identifier (e.g., 'Asia/Jakarta') to be used for all time-related operations
      * in the current session.
      *
      * @param string $timeZone The timezone identifier to be used for time-related operations (e.g., 'Asia/Jakarta').
@@ -4147,7 +4226,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Get the timezone typically used for system-level time settings.
      *
-     * This method returns the system's timezone identifier (e.g., 'Europe/London') which is generally used for 
+     * This method returns the system's timezone identifier (e.g., 'Europe/London') which is generally used for
      * system-level time settings and configurations.
      *
      * @return string The system's timezone identifier (e.g., 'Europe/London').
@@ -4160,7 +4239,7 @@ class PicoDatabasePersistence // NOSONAR
     /**
      * Set the timezone typically used for system-level time settings.
      *
-     * This method sets the system's timezone identifier (e.g., 'Europe/London') that is typically used for system 
+     * This method sets the system's timezone identifier (e.g., 'Europe/London') that is typically used for system
      * configurations and time settings.
      *
      * @param string $timeZoneSystem The timezone identifier to be used for system-level time settings (e.g., 'Europe/London').

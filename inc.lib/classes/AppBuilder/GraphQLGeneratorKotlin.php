@@ -1115,16 +1115,16 @@ server.servlet.session.cookie.max-age=30m
 ############################################
 
 # JDBC connection URL for the MySQL database.
-spring.datasource.url={DB_URL}
+spring.datasource.url=\${DB_URL}
 
 # Database username.
-spring.datasource.username={DB_USER}
+spring.datasource.username=\${DB_USER}
 
 # Database password. Should be moved to environment variables for security.
-spring.datasource.password={DB_PASS}
+spring.datasource.password=\${DB_PASS}
 
 # MySQL JDBC driver class name.
-spring.datasource.driver-class-name={DB_DRIVER_CLASS}
+spring.datasource.driver-class-name=\${DB_DRIVER_CLASS}
 
 
 ############################################
@@ -1135,7 +1135,7 @@ spring.datasource.driver-class-name={DB_DRIVER_CLASS}
 spring.jpa.show-sql=false
 
 # Hibernate SQL dialect for MySQL.
-spring.jpa.properties.hibernate.dialect={DB_DIALECT}
+spring.jpa.properties.hibernate.dialect=\${DB_DIALECT}
 
 # Uses the same column names as in the database without name conversion.
 spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl

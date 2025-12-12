@@ -4,6 +4,7 @@ use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
 use MagicObject\Request\InputPost;
 use MagicObject\Request\InputGet;
+use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -93,7 +94,13 @@ if ($inputPost->getDatabaseName() !== null) {
         $index[$hash]['hash'] = $hash;
         if(empty($index[$hash]['databaseName']))
         {
-            $index[$hash]['label'] = basename($databaseBuilder->getDatabaseCredentials()->getDatabaseFilePath());
+            $appConfigPath = $selectedApplication->getProjectDirectory()."/default.yml";
+            $appConfig = new SecretObject();
+            if(file_exists($appConfigPath))
+            {
+                $appConfig->loadYamlFile($appConfigPath, false, true, true);
+                $index[$hash]['label'] = basename($appConfig->getDatabase()->getDatabaseFilePath());
+            }
         }
         else
         {
@@ -123,6 +130,34 @@ if ($inputPost->getDatabaseName() !== null) {
         if (file_exists($path)) {
             $json = file_get_contents($path);
             $data = json_decode($json, true);
+
+            $appConfigPath = $activeWorkspace->getDirectory()."/applications/".$applicationId."/default.yml";
+            if(file_exists($appConfigPath))
+            {
+                $appConfig->loadYamlFile($appConfigPath, false, true, true);
+            }
+
+            $entityInfo = null;
+            if(isset($appConfig) && $appConfig->getEntityInfo() != null)
+            {
+                $entityInfo = $appConfig->entityInfo;
+            }
+            else
+            {
+                $entityInfo = new SecretObject(array(
+                    'name' => 'name',
+                    'sortOrder' => 'sort_order',
+                    'adminCreate' => 'admin_create',
+                    'adminEdit' => 'admin_edit',
+                    'timeCreate' => 'time_create',
+                    'timeEdit' => 'time_edit',
+                    'ipCreate' => 'ip_create',
+                    'ipEdit' => 'ip_edit',
+                    'active' => 'active'
+                ));
+            }
+
+            $data['reservedColumns'] = $entityInfo;
             $data['__magic_signature__'] = 'MAGICAPPBUILDER-DB-DESIGN-V1';
             $json = json_encode($data);
         } else {

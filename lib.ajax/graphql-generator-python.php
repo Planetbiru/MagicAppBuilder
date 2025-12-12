@@ -38,7 +38,7 @@ function generateReadmePython($appName, $withFrontend)
  * @param string $databaseConfiguration The database configuration template.
  * @return string The populated database configuration.
  */
-function setDatabaseConfigurationPython($application, $databaseConfiguration)
+function setDatabaseConfiguration($application, $databaseConfiguration)
 {
     $appConfig = new SecretObject(null);
     $projectDirectory = $application->getProjectDirectory();
@@ -67,14 +67,14 @@ function setDatabaseConfigurationPython($application, $databaseConfiguration)
                 // Requires `aiosqlite`
             }
 
-            $databaseConfiguration = str_replace('{DB_DRIVER}', $driver, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_HOST}', $host, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PORT}', $port, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_DATABASE}', $dbName, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_FILE}', $dbFile, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_USERNAME}', $user, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PASSWORD}', $pass, $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_ECHO}', 'True', $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DRIVER}', $driver, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_HOST}', $host, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PORT}', $port, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DATABASE}', $dbName, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_FILE}', $dbFile, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_USERNAME}', $user, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PASSWORD}', $pass, $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_ECHO}', 'True', $databaseConfiguration);
         }
     }
     return $databaseConfiguration;
@@ -86,7 +86,7 @@ function setDatabaseConfigurationPython($application, $databaseConfiguration)
  * @param string $databaseConfiguration The database configuration template.
  * @return string The populated example database configuration.
  */
-function setDatabaseConfigurationPythonExample($databaseConfiguration)
+function setDatabaseConfigurationExample($databaseConfiguration)
 {
     $driver = 'mysql';
     $host = 'localhost';
@@ -127,7 +127,7 @@ try {
         // --- Create a single ZIP with integrated frontend ---
         $zip = new ZipArchive();
         $zipFilePath = tempnam(sys_get_temp_dir(), 'py_integrated_');
-        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create integrated ZIP file.");
         }
 
@@ -139,10 +139,10 @@ try {
 
         foreach ($backendFiles as $file) {
             if ($file['name'] == '.env') {
-                $file['content'] = setDatabaseConfigurationPython($application, $file['content']);
+                $file['content'] = setDatabaseConfiguration($application, $file['content']);
             }
             if ($file['name'] == '.env.example') {
-                $file['content'] = setDatabaseConfigurationPythonExample($file['content']);
+                $file['content'] = setDatabaseConfigurationExample($file['content']);
             }
             $zip->addFromString($file['name'], $file['content']);
         }
@@ -187,7 +187,7 @@ try {
         // --- Create Backend ZIP ---
         $backendZip = new ZipArchive();
         $backendZipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
-        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create backend ZIP file.");
         }
 
@@ -195,7 +195,7 @@ try {
 
         foreach ($backendFiles as $file) {
             if ($file['name'] == '.env') {
-                $file['content'] = setDatabaseConfigurationPython($application, $file['content']);
+                $file['content'] = setDatabaseConfiguration($application, $file['content']);
             }
             $backendZip->addFromString($file['name'], $file['content']);
         }
@@ -204,7 +204,7 @@ try {
         // --- Create Frontend ZIP ---
         $frontendZip = new ZipArchive();
         $frontendZipFilePath = tempnam(sys_get_temp_dir(), 'frontend_');
-        if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create frontend ZIP file.");
         }
 
@@ -241,7 +241,7 @@ try {
         // --- Create Main ZIP ---
         $mainZip = new ZipArchive();
         $mainZipFilePath = tempnam(sys_get_temp_dir(), 'main_zip_');
-        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create main ZIP file.");
         }
 

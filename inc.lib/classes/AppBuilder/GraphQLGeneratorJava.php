@@ -433,14 +433,14 @@ server.servlet.session.cookie.max-age=30m
 app.security.cors.enabled=true
 app.security.cors.allowed-origins=http://localhost,http://127.0.0.1,http://localhost:3000,http://localhost:4000,http://127.0.0.1:4000,http://127.0.0.1:3000,http://localhost:8080
 
-spring.datasource.url={DB_URL}
-spring.datasource.username={DB_USER}
-spring.datasource.password={DB_PASS}
-spring.datasource.driver-class-name={DB_DRIVER_CLASS}
+spring.datasource.url=\${DB_URL}
+spring.datasource.username=\${DB_USER}
+spring.datasource.password=\${DB_PASS}
+spring.datasource.driver-class-name=\${DB_DRIVER_CLASS}
 
 # JPA/Hibernate Configuration
 spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect={DB_DIALECT}
+spring.jpa.properties.hibernate.dialect=\${DB_DIALECT}
 
 # Use database column names directly without converting to camelCase
 spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl

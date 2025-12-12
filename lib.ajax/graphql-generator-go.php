@@ -11,7 +11,7 @@ use MagicObject\SecretObject;
  * @param string $envTemplate The template for the .env file.
  * @return string The populated .env file content.
  */
-function setGoEnvConfiguration($application, $envTemplate)
+function setDatabaseConfiguration($application, $envTemplate)
 {
     $appConfig = new SecretObject(null);
     $projectDirectory = $application->getProjectDirectory();
@@ -26,13 +26,13 @@ function setGoEnvConfiguration($application, $envTemplate)
                 $driver = 'postgres';
             }
 
-            $envTemplate = str_replace('{DB_DRIVER}', $driver, $envTemplate);
-            $envTemplate = str_replace('{DB_HOST}', $databaseConfig->getHost(), $envTemplate);
-            $envTemplate = str_replace('{DB_PORT}', $databaseConfig->getPort(), $envTemplate);
-            $envTemplate = str_replace('{DB_NAME}', $databaseConfig->getDatabaseName(), $envTemplate);
-            $envTemplate = str_replace('{DB_FILE}', $databaseConfig->getDatabaseFilePath(), $envTemplate);
-            $envTemplate = str_replace('{DB_USER}', $databaseConfig->getUsername(), $envTemplate);
-            $envTemplate = str_replace('{DB_PASS}', $databaseConfig->getPassword(), $envTemplate);
+            $envTemplate = str_replace('${DB_DRIVER}', $driver, $envTemplate);
+            $envTemplate = str_replace('${DB_HOST}', $databaseConfig->getHost(), $envTemplate);
+            $envTemplate = str_replace('${DB_PORT}', $databaseConfig->getPort(), $envTemplate);
+            $envTemplate = str_replace('${DB_NAME}', $databaseConfig->getDatabaseName(), $envTemplate);
+            $envTemplate = str_replace('${DB_FILE}', $databaseConfig->getDatabaseFilePath(), $envTemplate);
+            $envTemplate = str_replace('${DB_USER}', $databaseConfig->getUsername(), $envTemplate);
+            $envTemplate = str_replace('${DB_PASS}', $databaseConfig->getPassword(), $envTemplate);
         }
     }
     return $envTemplate;
@@ -81,13 +81,13 @@ function getEnvTemplate()
 {
         // Generate .env file content
     return <<<ENV
-DB_DRIVER={DB_DRIVER}
-DB_HOST={DB_HOST}
-DB_PORT={DB_PORT}
-DB_NAME={DB_NAME}
-DB_FILE={DB_FILE}
-DB_USER={DB_USER}
-DB_PASS={DB_PASS}
+DB_DRIVER=\${DB_DRIVER}
+DB_HOST=\${DB_HOST}
+DB_PORT=\${DB_PORT}
+DB_NAME=\${DB_NAME}
+DB_FILE=\${DB_FILE}
+DB_USER=\${DB_USER}
+DB_PASS=\${DB_PASS}
 
 SERVER_PORT=8080
 SESSION_SECRET=a-very-secret-key-that-you-should-change
@@ -137,7 +137,7 @@ try {
 
     $envTemplate = getEnvTemplate();
 
-    $envContent = setGoEnvConfiguration($app, $envTemplate);
+    $envContent = setDatabaseConfiguration($app, $envTemplate);
     $backendFiles[] = ['name' => '.env.example', 'content' => $envTemplate];
     $backendFiles[] = ['name' => '.env', 'content' => $envContent];
 

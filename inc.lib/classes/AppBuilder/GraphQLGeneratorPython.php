@@ -222,18 +222,18 @@ APP_PORT=8000
 
 # --- Database Configuration ---
 # Choose one: sqlite, mysql, mariadb, postgresql, sqlserver
-DB_DRIVER={DB_DRIVER}
+DB_DRIVER=\${DB_DRIVER}
 
 # For other databases, configure host, port, etc.
-DB_HOST={DB_HOST}
-DB_PORT={DB_PORT}
-DB_DATABASE={DB_DATABASE}
-DB_FILE={DB_FILE}
-DB_USERNAME={DB_USERNAME}
-DB_PASSWORD={DB_PASSWORD}
+DB_HOST=\${DB_HOST}
+DB_PORT=\${DB_PORT}
+DB_DATABASE=\${DB_DATABASE}
+DB_FILE=\${DB_FILE}
+DB_USERNAME=\${DB_USERNAME}
+DB_PASSWORD=\${DB_PASSWORD}
 
 # Set to True to log all SQL statements to the console
-DB_ECHO={DB_ECHO}
+DB_ECHO=\${DB_ECHO}
 
 # --- GraphQL Configuration ---
 # Set to True to enable Ariadne's debug mode for detailed logging

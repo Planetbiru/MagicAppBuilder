@@ -85,16 +85,16 @@ function setDatabaseConfiguration($application, $databaseConfiguration)
         $databaseConfig = $appConfig->getDatabase();
         if($databaseConfig != null)
         {
-            $databaseConfiguration = str_replace('{DB_DRIVER}', str_replace("'", "\\'", $databaseConfig->getDriver()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_HOST}', str_replace("'", "\\'", $databaseConfig->getHost()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_NAME}', str_replace("'", "\\'", $databaseConfig->getDatabaseName()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_FILE}', str_replace("'", "\\'", $databaseConfig->getDatabaseFilePath()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_USER}', str_replace("'", "\\'", $databaseConfig->getUsername()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PASS}', str_replace("'", "\\'", $databaseConfig->getPassword()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_CHARSET}', str_replace("'", "\\'", $databaseConfig->getCharset()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_PORT}', str_replace("'", "\\'", $databaseConfig->getPort()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_TIMEZONE}', str_replace("'", "\\'", $databaseConfig->getTimeZone()), $databaseConfiguration);
-            $databaseConfiguration = str_replace('{DB_DIALECT}', getDatabaseDialect($databaseConfig->getDriver()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DRIVER}', str_replace("'", "\\'", $databaseConfig->getDriver()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_HOST}', str_replace("'", "\\'", $databaseConfig->getHost()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_NAME}', str_replace("'", "\\'", $databaseConfig->getDatabaseName()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_FILE}', str_replace("'", "\\'", $databaseConfig->getDatabaseFilePath()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_USER}', str_replace("'", "\\'", $databaseConfig->getUsername()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PASS}', str_replace("'", "\\'", $databaseConfig->getPassword()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_CHARSET}', str_replace("'", "\\'", $databaseConfig->getCharset()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_PORT}', str_replace("'", "\\'", $databaseConfig->getPort()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_TIMEZONE}', str_replace("'", "\\'", $databaseConfig->getTimeZone()), $databaseConfiguration);
+            $databaseConfiguration = str_replace('${DB_DIALECT}', getDatabaseDialect($databaseConfig->getDriver()), $databaseConfiguration);
         }
     }
     return $databaseConfiguration;
@@ -120,7 +120,7 @@ try {
         // --- Create a single ZIP with integrated frontend ---
         $zip = new ZipArchive();
         $zipFilePath = tempnam(sys_get_temp_dir(), 'nodejs_integrated_');
-        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create integrated ZIP file.");
         }
 
@@ -178,7 +178,7 @@ try {
         // --- Create Backend ZIP ---
         $backendZip = new ZipArchive();
         $backendZipFilePath = tempnam(sys_get_temp_dir(), 'backend_');
-        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($backendZip->open($backendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create backend ZIP file.");
         }
 
@@ -195,7 +195,7 @@ try {
         // --- Create Frontend ZIP ---
         $frontendZip = new ZipArchive();
         $frontendZipFilePath = tempnam(sys_get_temp_dir(), 'frontend_');
-        if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($frontendZip->open($frontendZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create frontend ZIP file.");
         }
 
@@ -220,7 +220,7 @@ try {
         // --- Create Main ZIP ---
         $mainZip = new ZipArchive();
         $mainZipFilePath = tempnam(sys_get_temp_dir(), 'main_zip_');
-        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        if ($mainZip->open($mainZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception("Could not create main ZIP file.");
         }
 

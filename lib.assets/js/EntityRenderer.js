@@ -15,7 +15,7 @@ class EntityRenderer {
      */
     constructor(selector) {
         this.selector = selector;
-        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
+        this.svg = qs(this.selector); // The SVG element to render the ERD
         this.tables = {}; // Store the SVG elements for the tables
 
         this.xPadding = 5;
@@ -67,7 +67,7 @@ class EntityRenderer {
      *   If `true`, the method will create relationship lines between the tables after placing them.
      */
     createERD(data, width, drawRelationship) {
-        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
+        this.svg = qs(this.selector); // The SVG element to render the ERD
         this.lastMaxCol = 0;
         this.maxCol = 0;
         this.svg.innerHTML = '';
@@ -134,7 +134,7 @@ class EntityRenderer {
         {
             this.createRelationships();
         }
-        this.svg = document.querySelector(this.selector); // The SVG element to render the ERD
+        this.svg = qs(this.selector); // The SVG element to render the ERD
     }
 
     /**
@@ -550,7 +550,7 @@ class EntityRenderer {
      */
     getFileName()
     {
-        let ul = document.querySelector('.diagram-list.tabs');
+        let ul = qs('.diagram-list.tabs');
         let input = ul.querySelector('.diagram-tab.active input[type="text"]');
         let { applicationId, databaseName } = getMetaValues();
         let fileName = '';

@@ -27,9 +27,9 @@ Several bugs and issues from previous versions have been addressed in **MagicObj
 ## Additional Features
 
 -   **Improved Error Handling**: We've introduced enhanced mechanisms for detecting and handling errors. The error messages are now more informative, helping developers to troubleshoot and resolve issues faster. This improvement also includes better stack trace information and more specific error types.
-    
+
 -   **Performance Optimizations**: Internally, **MagicObject Version 2** has been optimized to improve overall performance. Key database interaction operations have been streamlined, leading to faster query execution times and better resource utilization.
-    
+
 -   **Backward Compatibility**: **MagicObject Version 2** maintains **backward compatibility** with **Version 1**, ensuring that existing users can upgrade smoothly without having to make significant changes to their codebase. This allows for an easy transition to the new version while still maintaining compatibility with legacy systems.
 
 
@@ -137,20 +137,20 @@ These methods are designed to work seamlessly with an active database connection
 
 1.  **Dynamic Query Template for Native Queries**
     MagicObject now supports dynamic query templates for native SQL queries. This feature allows developers to build SQL queries dynamically, providing flexibility and improving code reusability. The dynamic query template can be customized to suit specific use cases, making it easier to construct complex queries while maintaining cleaner and more maintainable code.
-    
-2.  **Added `DROP TABLE IF EXISTS` and `CREATE TABLE IF NOT EXISTS` to SQL Code Generation**  
+
+2.  **Added `DROP TABLE IF EXISTS` and `CREATE TABLE IF NOT EXISTS` to SQL Code Generation**
     MagicObject now generates SQL code with `DROP TABLE IF EXISTS` and `CREATE TABLE IF NOT EXISTS` statements when creating tables from entities. This ensures that the table creation process is more robust, preventing errors when a table already exists.
 
-3.  **Standardization of Annotation Attribute Naming with Camel Case Strategy**  
+3.  **Standardization of Annotation Attribute Naming with Camel Case Strategy**
     The annotation attributes in MagicObject have been standardized to follow the camel case naming convention, ensuring consistency and better readability throughout the codebase.
-    
-4.  **Refactoring of Methods with Constant Usage**  
+
+4.  **Refactoring of Methods with Constant Usage**
     To prevent duplication and errors in the code, several methods have been refactored to utilize constants. This improves maintainability and reduces the chances of mistakes during development.
 
-5.  **Option to Prettify Serialize for `SecretObject`**  
+5.  **Option to Prettify Serialize for `SecretObject`**
     A new option has been added to allow `SecretObject` to be serialized with pretty formatting. This makes it easier to read and inspect serialized `SecretObject` data, especially useful during development or debugging. The `prettify` flag can be enabled when serializing the object, ensuring the output is more human-readable with proper indentation.
 
-6.  **Updated Documentation**  
+6.  **Updated Documentation**
     The documentation has been updated to reflect the latest changes in MagicObject. This includes clarifications, examples, and explanations to assist developers in understanding and utilizing the library effectively.
 
 
@@ -158,18 +158,18 @@ These methods are designed to work seamlessly with an active database connection
 
 ## What's New
 
-1.  **SQL Server Database Support**  
+1.  **SQL Server Database Support**
     This feature expands user options by providing support for SQL Server, offering more flexibility in choosing DBMS.
-    
-2.  **Time Zone Conversion for SQLite and SQL Server Databases**  
+
+2.  **Time Zone Conversion for SQLite and SQL Server Databases**
     This feature automatically converts time in databases that do not natively support time zone conversion, such as SQLite and SQL Server.
-    
-3.  **Database Time Zone Change After Object Construction**  
+
+3.  **Database Time Zone Change After Object Construction**
     Users can now change the database's time zone at any time as needed. This provides greater flexibility when handling data across multiple time zones, especially when the application is used by users from different time zones, all without the need to modify the application configuration.
 
-4.  **Yaml Parser and Dumper**  
+4.  **Yaml Parser and Dumper**
     MagicObject version 3.0 no longer depends on external libraries. The Yaml parsing and dumping functions are now fully handled by a class that is part of MagicObject itself, reducing its overall complexity.
-5.  **Added `BETWEEN` Filter for Predicate Queries**  
+5.  **Added `BETWEEN` Filter for Predicate Queries**
     MagicObject now supports `BETWEEN` filters for predicate-based queries, allowing users to perform range-based filtering efficiently. This improves query performance and simplifies conditions when working with numerical or date ranges.
 
 
@@ -263,8 +263,8 @@ Now, MagicObject can **extract and clean up SQL queries** written in the `@query
 
 ####  **Key Features:**
 
-- **Extract SQL Queries from Docblocks** – Automatically retrieves queries from the `@query` annotation.  
-- **Supports Trim Parameter** – Removes `*` and leading spaces from each line.  
+- **Extract SQL Queries from Docblocks** – Automatically retrieves queries from the `@query` annotation.
+- **Supports Trim Parameter** – Removes `*` and leading spaces from each line.
 - **Flexible Processing** – Ensures queries remain readable even when written in a multiline format within docblocks.
 
 ####  **Usage Example:**
@@ -335,7 +335,7 @@ A new feature, `maskPropertyName`, allows you to **mask specific property values
 
 #### **Key Features:**
 
-- **Mask Specific Property Values** – Easily mask specific parts of any property value.  
+- **Mask Specific Property Values** – Easily mask specific parts of any property value.
 - **Customizable Masking** – Supports various positions for masking: `start`, `center`, or `end`.
 - **Customizable Mask Character** – Choose your own masking character (defaults to `*`).
 
@@ -363,20 +363,20 @@ echo $object->maskEmail(-10, 6, '*')."\r\n"; // Output: john.******ample.com
 
 ## What's New
 
-- **dateFormat**: Added a function to format a date value into a specified format.  
-  - **Example Usage:**  
+- **dateFormat**: Added a function to format a date value into a specified format.
+  - **Example Usage:**
     ```php
     $formattedDate = $object->dateFormatDate("j F Y H:i:s");
     ```
-  
-- **numberFormat**: Added a function to format a number with grouped thousands.  
-  - **Example Usage:**  
+
+- **numberFormat**: Added a function to format a number with grouped thousands.
+  - **Example Usage:**
     ```php
     $numberFormat = $object->numberFormatData(6, ".", ",");
     ```
 
-- **format**: Added a function to format a value using a specified format string.  
-  - **Example Usage:**  
+- **format**: Added a function to format a value using a specified format string.
+  - **Example Usage:**
     ```php
     $formattedData = $object->formatData("%7.3f");
     ```
@@ -389,38 +389,38 @@ With the addition of this formatting function, users can easily format object pr
 
 - **Add Magic Methods**
 
-    -  **trim**: A function to retrieves the property value and trims any leading and trailing whitespace.  
-       
-       **Example Usage:**  
+    -  **trim**: A function to retrieves the property value and trims any leading and trailing whitespace.
+
+       **Example Usage:**
         ```php
         $object = new MagicObject();
         $name = $object->trimName();
         ```
-    -  **upper**: A function to retrieves the property value and transform it to uppercase.  
-       
-       **Example Usage:**  
-       
+    -  **upper**: A function to retrieves the property value and transform it to uppercase.
+
+       **Example Usage:**
+
         ```php
         $object = new MagicObject();
         $code = $object->upperCode();
         ```
-    -  **lower**: A function to retrieves the property value and transform it to lowercase.  
-       
-       **Example Usage:**  
+    -  **lower**: A function to retrieves the property value and transform it to lowercase.
+
+       **Example Usage:**
         ```php
         $object = new MagicObject();
         $username = $object->lowerUsername();
         ```
-    -  **dms**: A function to retrieves the property value and convert it to DMS (Degrees, Minutes, Seconds) format.  
-       
-       **Example Usage:**  
+    -  **dms**: A function to retrieves the property value and convert it to DMS (Degrees, Minutes, Seconds) format.
+
+       **Example Usage:**
         ```php
         $object = new MagicObject();
         $dms = $object->dmsDuration(true, ":", 2, true, 2, true);
         ```
-        
+
         **move**: A function to move uploaded file via callback function.
-        
+
         **Example Usage**
         ```php
         $inputFiles = new PicoUploadFile();
@@ -433,10 +433,10 @@ With the addition of this formatting function, users can easily format object pr
         ```
 - **Add PicoFileRenderer Class**
   MagicObject add utility class to render various file types (images, audio, video, files, links, text) into corresponding HTML elements from plain strings or JSON-encoded arrays.
-  
+
 - **Update documentation**
   The documentation has been updated to reflect the new magic methods added in this version, ensuring clarity on how to use them in your code.
-  
+
 This version introduces essential new functions for better handling of data transformations such as trimming, converting to uppercase or lowercase, and formatting data into DMS (Degrees, Minutes, Seconds). These enhancements streamline property value manipulation and provide additional flexibility when interacting with data.
 
 # MagicObject version 3.10
@@ -469,7 +469,7 @@ echo  $object->retrieve('prop1', 'prop2', 'prop3');
 
 In this example:
 -   The method will first check `prop1`, then move to `prop2`, and finally `prop3`.
--   If any of these keys do not exist, it will return `null`.    
+-   If any of these keys do not exist, it will return `null`.
 
 ### **New Feature: `mergeWith()` Method**
 
@@ -514,7 +514,7 @@ This method simplifies combining nested objects and ensures consistency in struc
 
 -   Various small bug fixes related to edge cases.
 -   Optimizations made to improve performance when accessing deeply nested data within MagicObject.
-    
+
 
 ### **Other Changes**
 
@@ -527,11 +527,11 @@ This method simplifies combining nested objects and ensures consistency in struc
 ## What's New
 
 ### Added: Matrix Calculation Class
-A new `MatrixCalculator` class has been introduced to perform basic matrix operations such as addition, subtraction, multiplication, and element-wise division.  
+A new `MatrixCalculator` class has been introduced to perform basic matrix operations such as addition, subtraction, multiplication, and element-wise division.
 This class is useful for numerical or scientific processing involving 2D arrays of real numbers.
 
 ### Added: `toFixed` Magic Method in MagicObject
-A new `toFixed` magic method has been added to the core `MagicObject` class.  
+A new `toFixed` magic method has been added to the core `MagicObject` class.
 This allows any numeric property to be formatted as a string with a fixed number of decimal places using dynamic method access.
 
 **Example usage:**
@@ -558,7 +558,7 @@ echo $object->toFixedData(4)."\r\n"; // Outputs 100.1235
 
 ## What's New
 
-- **Removed Exception Throwing for Empty Results in Multi-Record Finders**  
+- **Removed Exception Throwing for Empty Results in Multi-Record Finders**
   In this version, `EmptyResultException` and `NoRecordFoundException` are no longer thrown when methods for finding multiple records return an empty result. Instead, these methods will simply return an empty array or collection. This change improves developer experience by making it easier to handle cases where no records are found, without the need for additional exception handling.
 
 
@@ -568,7 +568,7 @@ echo $object->toFixedData(4)."\r\n"; // Outputs 100.1235
 
 ### Added: `alwaysTrue()`  Specification Method
 
-A new static method `PicoSpecification::alwaysTrue()` has been added.  
+A new static method `PicoSpecification::alwaysTrue()` has been added.
 This method returns a specification that always evaluates to `TRUE` (`WHERE 1 = 1`  in SQL). It is especially useful for scenarios where developers need to update, delete, or retrieve **all records**  from a table without any filtering.
 
 **Example usage:**
@@ -675,15 +675,15 @@ $mySqlConverted = $converter->translateCreateTable($postgreSql, PicoDatabaseType
 echo $mySqlConverted . "\n\n";
 
 echo "Now, let convert PostgreSQL to SQLite:\n";
-$sqliteConverted = $converter->translateCreateTable($postgreSql, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL, PicoDatabaseType::DATABASE_TYPE_SQLITE);   
+$sqliteConverted = $converter->translateCreateTable($postgreSql, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL, PicoDatabaseType::DATABASE_TYPE_SQLITE);
 echo $sqliteConverted . "\n\n";
 
 echo "Now, let convert SQLite to MySQL:\n";
-$mysqlConverted2 = $converter->translateCreateTable($sqliteConverted, PicoDatabaseType::DATABASE_TYPE_SQLITE, PicoDatabaseType::DATABASE_TYPE_MYSQL);   
+$mysqlConverted2 = $converter->translateCreateTable($sqliteConverted, PicoDatabaseType::DATABASE_TYPE_SQLITE, PicoDatabaseType::DATABASE_TYPE_MYSQL);
 echo $mysqlConverted2 . "\n\n";
 
 echo "Now, let convert SQLite to PostgreSQL:\n";
-$postgresqlConverted2 = $converter->translateCreateTable($sqliteConverted, PicoDatabaseType::DATABASE_TYPE_SQLITE, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL);   
+$postgresqlConverted2 = $converter->translateCreateTable($sqliteConverted, PicoDatabaseType::DATABASE_TYPE_SQLITE, PicoDatabaseType::DATABASE_TYPE_POSTGRESQL);
 echo $postgresqlConverted2 . "\n\n";
 ```
 
@@ -865,7 +865,7 @@ try {
     $user->setBirthDate(new DateTime('1995-01-15'));
     $user->setGender("Male");
     $user->setStatus("active");
-    
+
     $address = new Address();
     $address->setStreet("123 Main St");
     $address->setCity("Anytown");
@@ -950,7 +950,7 @@ Users can perform validation on objects that extend from the following base clas
 - **InputPost**
 - **InputGet**
 
-This means that property validation is supported not only for entities derived from `MagicObject`, but also for data transfer objects (`MagicDto`) and HTTP input wrappers (`InputPost`, `InputGet`).  
+This means that property validation is supported not only for entities derived from `MagicObject`, but also for data transfer objects (`MagicDto`) and HTTP input wrappers (`InputPost`, `InputGet`).
 You can annotate properties in any of these classes with validation annotations, and the validation mechanism will recursively check all nested properties, ensuring robust data integrity across your application's data models and input layers.
 
 
@@ -1000,20 +1000,20 @@ In version 3.14.2, the **validator class generator** has been enhanced to suppor
 When the `tableName` parameter is provided to the `PicoEntityGenerator::generateValidatorClass()` method:
 
 -   The generated validator class will include the following additional class-level annotations:
-    
+
     -   `@Validator`
-        
+
     -   `@Table(name="your_table_name")`
-        
+
 
 #### Benefits:
 
 -   Enables clearer association between the validator class and the underlying database table.
-    
+
 -   Improves compatibility with tools or frameworks that rely on metadata annotations for mapping or validation contexts.
-    
+
 -   Provides a better foundation for auto-documentation or introspection tools.
-    
+
 
 #### Example Output:
 
@@ -1048,7 +1048,7 @@ The `retrieve(...$keys)` method now supports multiple input formats for accessin
 - Arrow notation: `$obj->retrieve('user->profile->name')`
 - Multiple arguments: `$obj->retrieve('user', 'profile', 'name')`
 
-Each key is automatically camelized for consistent property access.  
+Each key is automatically camelized for consistent property access.
 If any key in the chain does not exist or returns `null`, the method will return `null`.
 
 This enhancement improves developer ergonomics when working with deeply nested data structures.
@@ -1399,9 +1399,9 @@ In this release, several math-related classes have been **removed** from MagicOb
 
 ### Removed Modules
 
-1. Complex Numbers  
-2. Matrix Operations  
-3. Geometry Utilities  
+1. Complex Numbers
+2. Matrix Operations
+3. Geometry Utilities
 
 ### Migration
 
@@ -1435,32 +1435,50 @@ $dsn = $pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS);
 
 ## Enhancement: Improved `getDatabaseCredentialsFromPdo` Handling
 
-The method **`getDatabaseCredentialsFromPdo`** has been updated to better handle 
+The method **`getDatabaseCredentialsFromPdo`** has been updated to better handle
 PDO drivers that do not support certain attributes (e.g., `PDO::ATTR_CONNECTION_STATUS`).
 
 ### Key Improvements
 
-* **Warning Suppression**  
-  Suppresses warnings when `PDO::getAttribute(PDO::ATTR_CONNECTION_STATUS)` 
+* **Warning Suppression**
+  Suppresses warnings when `PDO::getAttribute(PDO::ATTR_CONNECTION_STATUS)`
   is not supported by the active PDO driver (e.g., SQLite).
 
-* **Graceful Fallback**  
-  Introduced an optional `$databaseCredentials` parameter, which is used as a 
-  fallback source for host, port, and database name if they cannot be extracted 
+* **Graceful Fallback**
+  Introduced an optional `$databaseCredentials` parameter, which is used as a
+  fallback source for host, port, and database name if they cannot be extracted
   from the PDO connection.
 
-* **Driver-Agnostic Behavior**  
-  Ensures compatibility across multiple database drivers (MySQL, PostgreSQL, SQLite, etc.) 
+* **Driver-Agnostic Behavior**
+  Ensures compatibility across multiple database drivers (MySQL, PostgreSQL, SQLite, etc.)
   without causing runtime warnings.
 
-* **Consistent Output**  
-  Always returns a populated `SecretObject` with connection details.  
-  If extraction fails, either the provided `$databaseCredentials` is returned, 
+* **Consistent Output**
+  Always returns a populated `SecretObject` with connection details.
+  If extraction fails, either the provided `$databaseCredentials` is returned,
   or a new empty `SecretObject` is created.
 
 ### Why It Matters?
 
-* Prevents noisy **PHP warnings** in environments where PDO drivers expose limited attributes.  
-* Provides a **more reliable and consistent mechanism** for retrieving database credentials.  
+* Prevents noisy **PHP warnings** in environments where PDO drivers expose limited attributes.
+* Provides a **more reliable and consistent mechanism** for retrieving database credentials.
 * Ensures **backward compatibility** while making the method more robust in multi-database environments.
 
+
+# MagicObject Version 3.21.0
+
+## What's New
+
+### Enhancement: Smarter Update Logic
+
+MagicObject now automatically prevents columns used in a `WHERE` clause from being included in the `SET` part of an `UPDATE` statement. This avoids redundant updates (e.g., `UPDATE users SET user_id = ?, name = ? WHERE user_id = ?`) and improves query efficiency.
+
+### Enhancement: `retrieve()` Method on `SecretObject`
+
+The powerful `retrieve()` method, which allows for easy access to nested properties, is now also available on `SecretObject`. This simplifies reading nested configurations from secure objects.
+
+**Example Usage:**
+
+```php
+$secretConfig->retrieve('database', 'credentials', 'username');
+```

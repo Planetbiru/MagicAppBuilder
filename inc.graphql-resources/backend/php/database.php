@@ -2,17 +2,16 @@
 
 // Please relpace all codes bellow
 
-$cfgDbDriver         = '{DB_DRIVER}';
-$cfgDbHost           = '{DB_HOST}';
-$cfgDbDatabaseName   = '{DB_NAME}';
-$cfgDbDatabaseSchema = '{DB_NAME}';
-$cfgDbDatabaseFile   = '{DB_FILE}';
-$cfgDbUser           = '{DB_USER}';
-$cfgDbPass           = '{DB_PASS}';
-$cfgDbCharset        = '{DB_CHARSET}';
-$cfgDbPort           = '{DB_PORT}';
-$cfgDbTimeZone       = '{DB_TIMEZONE}';
-
+$cfgDbDriver         = '${DB_DRIVER}';
+$cfgDbHost           = '${DB_HOST}';
+$cfgDbDatabaseName   = '${DB_NAME}';
+$cfgDbDatabaseSchema = '${DB_NAME}';
+$cfgDbDatabaseFile   = '${DB_FILE}';
+$cfgDbUser           = '${DB_USER}';
+$cfgDbPass           = '${DB_PASS}';
+$cfgDbCharset        = '${DB_CHARSET}';
+$cfgDbPort           = '${DB_PORT}';
+$cfgDbTimeZone       = '${DB_TIMEZONE}';
 if(empty($cfgDbCharset))
 {
      $cfgDbCharset = 'utf8mb4'; // Set default charset
