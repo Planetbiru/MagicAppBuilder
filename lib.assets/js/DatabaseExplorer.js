@@ -419,7 +419,6 @@ function loadDatabaseIndex(applicationId, hash)
 /**
  * Selects all DOM elements that match the given CSS selector.
  *
- * @function qsa
  * @param {string} selector - CSS selector string used to query elements.
  * @returns {NodeListOf<Element>} A NodeList containing all matched elements.
  *
@@ -435,7 +434,6 @@ function qsa(selector) {
 /**
  * Selects the first DOM element that matches the given CSS selector.
  *
- * @function qs
  * @param {string} selector - CSS selector string used to query an element.
  * @returns {Element|null} The first matched element, or null if no match is found.
  *
@@ -608,7 +606,6 @@ function loadFormState(frm, data) {
  * Sends GraphQL entity data to the server via a POST request.
  *
  * @async
- * @function sendGraphQlEntityToServer
  * @param {string} applicationId - The unique identifier of the application.
  * @param {string} databaseType - The type of the database (e.g., mysql, postgresql, sqlite, sqlserver).
  * @param {string} databaseName - The name of the database to which the entity belongs.
@@ -650,7 +647,6 @@ async function sendGraphQlEntityToServer(applicationId, databaseType, databaseNa
 /**
  * Loads GraphQL entity data from the server via a GET request.
  *
- * @function loadGraphQlEntityFromServer
  * @param {string} applicationId - The unique identifier of the application.
  * @param {string} databaseType - The type of the database (e.g., mysql, postgresql, sqlite, sqlserver).
  * @param {string} databaseName - The name of the database to retrieve entities from.
@@ -819,7 +815,6 @@ function openSQLiteStructure(file) {
  * such as an <input>, <textarea>, or any element with the
  * `contenteditable` attribute set to true.
  *
- * @function isEditableElement
  * @param {HTMLElement} element - The DOM element to check.
  * @returns {boolean} True if the element is editable, false otherwise.
  *
@@ -1266,6 +1261,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initAllEntitiesContextMenu(document.querySelector('#all-entities .erd-svg'));
 });
 
+/**
+ * Displays the export HTML dialog in the editor.
+ *
+ * This function calls the `showExportHTMLDialog()` method of the `editor`
+ * object to open a dialog window that allows the user to export the
+ * editor's content in HTML format.
+ *
+ * @returns {void} Does not return a value; only triggers the export dialog.
+ */
 function downloadHTML()
 {
     editor.showExportHTMLDialog();
@@ -1367,6 +1371,17 @@ function parseCSVLine(line) {
     return result;
 }
 
+/**
+ * Toggles the checked state of all diagram export checkboxes within a list.
+ *
+ * This function prevents the default event behavior and uses the checked state
+ * of the triggering checkbox (`e1.target`) to update all checkboxes with the
+ * class `diagram-to-export` inside the closest `<ul>` element.
+ *
+ * @param {Event} e1 - The event object triggered by the checkbox interaction.
+ * @returns {void} Does not return a value; updates the checked state of related checkboxes.
+ *
+ */
 function checkAllDiagram(e1)
 {
     e1.preventDefault();
@@ -1375,6 +1390,7 @@ function checkAllDiagram(e1)
         cb.checked = checked;
     });
 }
+
 /**
  * Initiates the database export process if no other export is currently running.
  *

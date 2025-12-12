@@ -2746,6 +2746,22 @@ class EntityEditor {
 
     }
 
+    /**
+     * Loads and populates the GraphQL application profile selector.
+     *
+     * This method retrieves metadata values (applicationId, databaseName, databaseSchema, databaseType)
+     * and sends a GET request to `load-graphql-entity-index.php` to fetch available GraphQL profiles.
+     * The returned JSON is stored in `this.graphqlAppProfile` and used to populate the
+     * `<select>` element with the class `.graphql-app-profile`.
+     *
+     * - Clears existing options in the selector.
+     * - Iterates through the fetched profiles and creates new `<option>` elements.
+     * - Sets the selector's value to the profile marked as `selected`.
+     * - Logs an error message if the fetch request fails.
+     *
+     * @method loadGraphQlAppProfile
+     * @returns {void} Does not return a value; updates the DOM with GraphQL profile options.
+     */
     loadGraphQlAppProfile()
     {
         const _this = this;
@@ -4940,27 +4956,27 @@ class EntityEditor {
     {
         let _this = this;
         _this.showSettingDialog(`
-            <table class="two-side-table">
-                <tbody>
-                    <tr>
-                        <td>Primary Key Type</td>
-                        <td>${_this.createDataTypeOption('primary_key_type', '#primary_key_length')}</td>
-                    </tr>
-                    <tr>
-                        <td>Primary Key Length</td>
-                        <td><input type="text" name="primary_key_length" id="primary_key_length" value=""></td>
-                    </tr>
-                    <tr>
-                        <td>Column Type</td>
-                        <td>${_this.createDataTypeOption('column_type', '#column_length')}</td>
-                    </tr>
-                    <tr>
-                        <td>Column Length</td>
-                        <td><input type="text" name="column_length" id="column_length" value=""></td>
-                    </tr>
-                </tbody>
-            </table>
-            `, 'Preferences', 'OK', 'Cancel', function(isConfirmed) {
+<table class="two-side-table">
+    <tbody>
+        <tr>
+            <td>Primary Key Type</td>
+            <td>${_this.createDataTypeOption('primary_key_type', '#primary_key_length')}</td>
+        </tr>
+        <tr>
+            <td>Primary Key Length</td>
+            <td><input type="text" name="primary_key_length" id="primary_key_length" value=""></td>
+        </tr>
+        <tr>
+            <td>Column Type</td>
+            <td>${_this.createDataTypeOption('column_type', '#column_length')}</td>
+        </tr>
+        <tr>
+            <td>Column Length</td>
+            <td><input type="text" name="column_length" id="column_length" value=""></td>
+        </tr>
+    </tbody>
+</table>
+`, 'Preferences', 'OK', 'Cancel', function(isConfirmed) {
             if (isConfirmed) {
                 _this.primaryKeyDataType = qs('[name="primary_key_type"]').value;
                 _this.primaryKeyDataLength = qs('[name="primary_key_length"]').value;
