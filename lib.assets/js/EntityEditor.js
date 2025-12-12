@@ -259,7 +259,7 @@ class EntityEditor {
      */
     addDomListeners() {
         let _this = this;
-        document.querySelector(".check-all-entity-structure").addEventListener('change', (event) => {
+        qs(".check-all-entity-structure").addEventListener('change', (event) => {
             let checked = event.target.checked;
             let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-structure");
 
@@ -305,7 +305,7 @@ class EntityEditor {
 
         });
 
-        document.querySelector(this.selector+" .import-file-json").addEventListener("change", function () {
+        qs(this.selector+" .import-file-json").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importJSON(file, function(entities, diagrams){
@@ -318,7 +318,7 @@ class EntityEditor {
             }
         });
 
-        document.querySelector(this.selector+" .import-file-sql").addEventListener("change", function () {
+        qs(this.selector+" .import-file-sql").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importSQLFile(file, function(entities){
@@ -330,7 +330,7 @@ class EntityEditor {
             }
         });
 
-        document.querySelector(this.selector+" .import-file-sheet").addEventListener("change", function () {
+        qs(this.selector+" .import-file-sheet").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.importSheetFile(file, function(fileExtension, fileName, sheetName, headers, data){
@@ -354,7 +354,7 @@ class EntityEditor {
             }
         });
 
-        document.querySelector(this.selector+" .import-file-graphql").addEventListener("change", function () {
+        qs(this.selector+" .import-file-graphql").addEventListener("change", function () {
             const file = this.files[0]; // Get the selected file
             if (file) {
                 editor.processGraphQLSchema(file, function(entities){
@@ -367,7 +367,7 @@ class EntityEditor {
             }
         });
 
-        document.querySelector(this.selector).addEventListener('keypress', function(event){
+        qs(this.selector).addEventListener('keypress', function(event){
             if(event.key == 'Enter')
             {
                 if((event.target.closest('.entity-container .entity-name') || event.target.closest('.entity-container .column-name')))
@@ -477,25 +477,25 @@ class EntityEditor {
             this.operation = 'update';
             this.currentEntityIndex = entityIndex;
             const entity = this.entities[entityIndex];
-            document.querySelector(this.selector).dataset.state = 'update';
-            document.querySelector(this.selector+" .entity-name").value = entity.name;
-            document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
+            qs(this.selector).dataset.state = 'update';
+            qs(this.selector+" .entity-name").value = entity.name;
+            qs(this.selector+" .entity-columns-table-body").innerHTML = '';
             entity.columns.forEach(col => this.addColumnToTable(col, false, false));
         } else {
             this.operation = 'create';
             this.currentEntityIndex = -1;
             let newTableName = this.getNewTableName();
-            document.querySelector(this.selector).dataset.state = 'create';
-            document.querySelector(this.selector+" .entity-name").value = newTableName;
-            document.querySelector(this.selector+" .entity-columns-table-body").innerHTML = '';
+            qs(this.selector).dataset.state = 'create';
+            qs(this.selector+" .entity-name").value = newTableName;
+            qs(this.selector+" .entity-columns-table-body").innerHTML = '';
         }
-        document.querySelector(this.selector+" .button-container").style.display = "none";
-        document.querySelector(this.selector+" .entity-container").style.display = "block";
-        document.querySelector(this.selector+" .template-container").style.display = "none";
-        document.querySelector(this.selector+" .editor-form").style.display = "block";
+        qs(this.selector+" .button-container").style.display = "none";
+        qs(this.selector+" .entity-container").style.display = "block";
+        qs(this.selector+" .template-container").style.display = "none";
+        qs(this.selector+" .editor-form").style.display = "block";
         if(entityIndex == -1)
         {
-            document.querySelector(this.selector+" .entity-name").select();
+            qs(this.selector+" .entity-name").select();
         }
     }
 
@@ -542,18 +542,18 @@ class EntityEditor {
         this.currentEntityIndex = -1;
 
         tableName = tableName || this.getNewTableName();
-        document.querySelector(this.selector + " .entity-name").value = tableName;
-        document.querySelector(this.selector + " .entity-columns-table-body").innerHTML = '';
+        qs(this.selector + " .entity-name").value = tableName;
+        qs(this.selector + " .entity-columns-table-body").innerHTML = '';
 
         columns.forEach(column => {
             this.addColumnToTable(column, false, true);
         });
 
-        document.querySelector(this.selector + " .button-container").style.display = "none";
-        document.querySelector(this.selector + " .entity-container").style.display = "block";
-        document.querySelector(this.selector + " .template-container").style.display = "none";
-        document.querySelector(this.selector + " .editor-form").style.display = "block";
-        document.querySelector(this.selector + " .entity-name").select();
+        qs(this.selector + " .button-container").style.display = "none";
+        qs(this.selector + " .entity-container").style.display = "block";
+        qs(this.selector + " .template-container").style.display = "none";
+        qs(this.selector + " .editor-form").style.display = "block";
+        qs(this.selector + " .entity-name").select();
     }
 
     /**
@@ -565,7 +565,7 @@ class EntityEditor {
      */
     addColumnToTable(column, focus = false, newColumn = false) // NOSONAR
     {
-        const tableBody = document.querySelector(this.selector+" .entity-columns-table-body");
+        const tableBody = qs(this.selector+" .entity-columns-table-body");
         const row = document.createElement("tr");
         let columnLength = column.length == null ? '' : column.length.toString().replace(/\D/g,'');
         let columnValue = column.values == null ? '' : column.values;
@@ -725,7 +725,7 @@ class EntityEditor {
      */
     addColumn(focus = false) {
         const selector = this.selector + " .entity-container .entity-name";
-        const entityNameInput = document.querySelector(selector);
+        const entityNameInput = qs(selector);
         const entityName = entityNameInput.value;
 
         // Check if an entity with the same name already exists.
@@ -748,7 +748,7 @@ class EntityEditor {
         }
 
         // Determine the new column's name based on existing columns.
-        const columnCount = document.querySelectorAll(this.selector + " .entity-container .column-name").length;
+        const columnCount = qsa(this.selector + " .entity-container .column-name").length;
         const countSuffix = columnCount === 0 ? '' : columnCount + 1; // Use count + 1 for subsequent columns
 
         // If it's the first column, name it `${entityName}_id`, otherwise `${entityName}_colX`.
@@ -762,7 +762,7 @@ class EntityEditor {
         this.addColumnToTable(column, focus, true);
 
         // Scroll to the bottom of the table container to show the newly added column.
-        const element = document.querySelector(this.selector + ' .entity-container .table-container');
+        const element = qs(this.selector + ' .entity-container .table-container');
         element.scrollTop = element.scrollHeight;
     }
 
@@ -791,7 +791,7 @@ class EntityEditor {
      * @returns {boolean} True if a primary key exists; otherwise, false.
      */
     hasPrimaryKey() {
-        const columnPrimaryKeys = document.querySelectorAll(this.selector + " #table-entity-editor .column-primary-key");
+        const columnPrimaryKeys = qsa(this.selector + " #table-entity-editor .column-primary-key");
         for (const pkCheck of columnPrimaryKeys) {
             if (pkCheck.checked) {
                 return true;
@@ -825,7 +825,7 @@ class EntityEditor {
      */
     saveEntity() {
         const selector = this.selector + " .entity-container .entity-name";
-        const entityNameInput = document.querySelector(selector);
+        const entityNameInput = qs(selector);
         const entityName = entityNameInput.value;
 
         if (!this.hasPrimaryKey()) {
@@ -865,7 +865,7 @@ class EntityEditor {
         this.doSaveEntity();
 
         // Check for an active diagram tab and re-select it to refresh the diagram.
-        const activeDiagram = document.querySelector('.tabs-link-container li.diagram-tab.active');
+        const activeDiagram = qs('.tabs-link-container li.diagram-tab.active');
         if (activeDiagram) {
             this.selectDiagram(activeDiagram);
         }
@@ -887,7 +887,7 @@ class EntityEditor {
      */
     checkDuplicatedColumn() {
         let columns = [];
-        const columnNames = document.querySelectorAll(this.selector + " #table-entity-editor .column-name");
+        const columnNames = qsa(this.selector + " #table-entity-editor .column-name");
 
         for (let i = 0; i < columnNames.length; i++) {
             let columnName = columnNames[i].value;
@@ -910,18 +910,18 @@ class EntityEditor {
      * Saves the current entity, either updating an existing one or creating a new one.
      */
     doSaveEntity() {
-        const entityName = document.querySelector(this.selector+" .entity-name").value;
+        const entityName = qs(this.selector+" .entity-name").value;
         const columns = [];
         const originalColumnReference = [];
-        const columnNames = document.querySelectorAll(this.selector+" #table-entity-editor .column-name");
-        const columnTypes = document.querySelectorAll(this.selector+" #table-entity-editor .column-type");
-        const columnNullables = document.querySelectorAll(this.selector+" #table-entity-editor .column-nullable");
-        const columnDefaults = document.querySelectorAll(this.selector+" #table-entity-editor .column-default");
-        const columnPrimaryKeys = document.querySelectorAll(this.selector+" #table-entity-editor .column-primary-key");
-        const columnAutoIncrements = document.querySelectorAll(this.selector+" #table-entity-editor .column-autoIncrement");
-        const columnLengths = document.querySelectorAll(this.selector+" #table-entity-editor .column-length");
-        const columnEnums = document.querySelectorAll(this.selector+" #table-entity-editor .column-enum");
-        const columnDescriptions = document.querySelectorAll(this.selector+" #table-entity-editor .column-description");
+        const columnNames = qsa(this.selector+" #table-entity-editor .column-name");
+        const columnTypes = qsa(this.selector+" #table-entity-editor .column-type");
+        const columnNullables = qsa(this.selector+" #table-entity-editor .column-nullable");
+        const columnDefaults = qsa(this.selector+" #table-entity-editor .column-default");
+        const columnPrimaryKeys = qsa(this.selector+" #table-entity-editor .column-primary-key");
+        const columnAutoIncrements = qsa(this.selector+" #table-entity-editor .column-autoIncrement");
+        const columnLengths = qsa(this.selector+" #table-entity-editor .column-length");
+        const columnEnums = qsa(this.selector+" #table-entity-editor .column-enum");
+        const columnDescriptions = qsa(this.selector+" #table-entity-editor .column-description");
 
         let modifiedColumnNames = [];
 
@@ -1024,7 +1024,7 @@ class EntityEditor {
     updateDiagram()
     {
         let _this = this;
-        let diagramContainer = document.querySelector('.diagram-container');
+        let diagramContainer = qs('.diagram-container');
         diagramContainer.querySelectorAll('.diagram-entity').forEach(diagram => {
             let id = diagram.getAttribute('id');
             let updatedWidth = diagram.closest('.left-panel').offsetWidth;
@@ -1042,7 +1042,7 @@ class EntityEditor {
             {
                 updatedWidth = 240;
             }
-            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, document.querySelector('#draw-relationship').checked);
+            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, qs('#draw-relationship').checked);
             let svg = diagram.querySelector('svg');
             _this.removeDiagramEventListener(svg);
             _this.addDiagramEventListener(svg);
@@ -1058,7 +1058,7 @@ class EntityEditor {
         let diagrams = [];
         let sortOrder = 0;
         Object.entries(selection).forEach(([id, entities], index) => {
-            let name = document.querySelector(`.tabs-link-container [data-id="${id}"] input`).value;
+            let name = qs(`.tabs-link-container [data-id="${id}"] input`).value;
             diagrams.push({id: id, name: name, sortOrder: sortOrder, entities: entities});
             sortOrder++;
         });
@@ -1074,12 +1074,12 @@ class EntityEditor {
      */
     showEditorTemplate() {
         this.currentEntityIndex = -2;
-        document.querySelector(this.selector + " .template-columns-table-body").innerHTML = '';
+        qs(this.selector + " .template-columns-table-body").innerHTML = '';
         this.template.columns.forEach(col => this.addColumnToTemplate(col));
-        document.querySelector(this.selector + " .button-container").style.display = "none";
-        document.querySelector(this.selector + " .entity-container").style.display = "none";
-        document.querySelector(this.selector + " .template-container").style.display = "block";
-        document.querySelector(this.selector + " .editor-form").style.display = "block";
+        qs(this.selector + " .button-container").style.display = "none";
+        qs(this.selector + " .entity-container").style.display = "none";
+        qs(this.selector + " .template-container").style.display = "block";
+        qs(this.selector + " .editor-form").style.display = "block";
     }
 
     /**
@@ -1097,7 +1097,7 @@ class EntityEditor {
             "values": ""
         }
         this.addColumnToTemplate(column, focus);
-        const element = document.querySelector(this.selector + ' .template-container .table-container');
+        const element = qs(this.selector + ' .template-container .table-container');
         element.scrollTop = element.scrollHeight;
     }
 
@@ -1108,7 +1108,7 @@ class EntityEditor {
      * @param {boolean} focus - Whether to focus on the column input field after adding it.
      */
     addColumnToTemplate(column, focus) {
-        const tableBody = document.querySelector(this.selector + " .template-columns-table-body");
+        const tableBody = qs(this.selector + " .template-columns-table-body");
         const row = document.createElement("tr");
         let columnLength = column.length == null ? '' : column.length.replace(/\D/g, '');
         let columnDefault = column.default == null ? '' : column.default;
@@ -1145,13 +1145,13 @@ class EntityEditor {
      */
     saveTemplate() {
         const columns = [];
-        const columnNames = document.querySelectorAll(this.selector + " .table-template-editor .column-name");
-        const columnTypes = document.querySelectorAll(this.selector + " .table-template-editor .column-type");
-        const columnNullables = document.querySelectorAll(this.selector + " .table-template-editor .column-nullable");
-        const columnDefaults = document.querySelectorAll(this.selector + " .table-template-editor .column-default");
-        const columnLengths = document.querySelectorAll(this.selector + " .table-template-editor .column-length");
-        const columnEnums = document.querySelectorAll(this.selector + " .table-template-editor .column-enum");
-        const columnDescriptions = document.querySelectorAll(this.selector + " .table-template-editor .column-description");
+        const columnNames = qsa(this.selector + " .table-template-editor .column-name");
+        const columnTypes = qsa(this.selector + " .table-template-editor .column-type");
+        const columnNullables = qsa(this.selector + " .table-template-editor .column-nullable");
+        const columnDefaults = qsa(this.selector + " .table-template-editor .column-default");
+        const columnLengths = qsa(this.selector + " .table-template-editor .column-length");
+        const columnEnums = qsa(this.selector + " .table-template-editor .column-enum");
+        const columnDescriptions = qsa(this.selector + " .table-template-editor .column-description");
 
         for (let i = 0; i < columnNames.length; i++) {
             let column = new Column(
@@ -1168,8 +1168,8 @@ class EntityEditor {
             columns.push(column);
         }
         this.template.columns = columns;
-        document.querySelector(this.selector + " .entity-container").style.display = "block";
-        document.querySelector(this.selector + " .template-container").style.display = "none";
+        qs(this.selector + " .entity-container").style.display = "block";
+        qs(this.selector + " .template-container").style.display = "none";
         if(typeof this.callbackSaveTemplate == 'function')
         {
             this.callbackSaveTemplate(this.template)
@@ -1180,8 +1180,8 @@ class EntityEditor {
      * Cancels the template editing process and reverts to the entity editor view.
      */
     cancelEditTemplate() {
-        document.querySelector(this.selector + " .entity-container").style.display = "block";
-        document.querySelector(this.selector + " .template-container").style.display = "none";
+        qs(this.selector + " .entity-container").style.display = "block";
+        qs(this.selector + " .template-container").style.display = "none";
     }
 
     /**
@@ -1189,7 +1189,7 @@ class EntityEditor {
      */
     addColumnFromTemplate() {
         const selector = this.selector + " .entity-container .entity-name";
-        const entityNameInput = document.querySelector(selector);
+        const entityNameInput = qs(selector);
         const entityName = entityNameInput.value;
 
         // Check if an entity with the same name already exists.
@@ -1211,7 +1211,7 @@ class EntityEditor {
             return; // Stop function execution if entity name is a duplicate.
         }
         const existingColumnNames = [];
-        const columnNames = document.querySelectorAll(this.selector + " #table-entity-editor .column-name");
+        const columnNames = qsa(this.selector + " #table-entity-editor .column-name");
         for (const columnName of columnNames) {
             existingColumnNames.push(columnName.value);
         }
@@ -1220,7 +1220,7 @@ class EntityEditor {
                 this.addColumnToTable(column, focus, true);
             }
         });
-        const element = document.querySelector(this.selector+' .entity-container .table-container');
+        const element = qs(this.selector+' .entity-container .table-container');
         element.scrollTop = element.scrollHeight;
     }
 
@@ -1395,7 +1395,7 @@ class EntityEditor {
      */
     getCheckedEntities() {
         let diagramEntities = {};
-        let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
+        let diagrams = qsa('.diagram-entity.tab-content');
         diagrams.forEach((diagram) => {
             let id = diagram.getAttribute('id');
             let entities = diagram.dataset.entities;
@@ -1410,7 +1410,7 @@ class EntityEditor {
      * @param {Object} diagramEntities - An object where each key is a diagram ID and the value is an array of entity names to set as checked.
      */
     setCheckedEntities(diagramEntities) {
-        let diagrams = document.querySelectorAll('.diagram-entity.tab-content');
+        let diagrams = qsa('.diagram-entity.tab-content');
         diagrams.forEach((diagram) => {
             let id = diagram.getAttribute('id');
             let entities = diagramEntities[id];
@@ -1426,7 +1426,7 @@ class EntityEditor {
      */
     restoreCheckedEntitiesFromCurrentDiagram()
     {
-        let li = document.querySelector('.tabs-link-container .diagram-tab.active');
+        let li = qs('.tabs-link-container .diagram-tab.active');
         this.selectDiagram(li);
     }
 
@@ -1436,12 +1436,12 @@ class EntityEditor {
      */
     restoreCheckedEntities()
     {
-        let diagram = document.querySelector('.diagram-entity.tab-content.active');
+        let diagram = qs('.diagram-entity.tab-content.active');
         if(diagram)
         {
             let entities = diagram.dataset.entities;
             let checked = entities ? entities.split(',') : [];
-            document.querySelectorAll('.left-panel .table-list [type="checkbox"]').forEach((input) => {
+            qsa('.left-panel .table-list [type="checkbox"]').forEach((input) => {
                 input.checked = checked.includes(input.dataset.name);
                 input.disabled = false;
             });
@@ -1463,19 +1463,19 @@ class EntityEditor {
     renderEntities() {
         let _this = this;
 
-        const container = document.querySelector(this.selector + " .entities-container");
+        const container = qs(this.selector + " .entities-container");
         const selectedEntityStructure = [];
         const selectedEntityData = [];
 
-        const selectedEntitiesStructure = document.querySelectorAll(this.selector + " .right-panel .selected-entity-structure:checked");
-        const selectedEntitiesData = document.querySelectorAll(this.selector + " .right-panel .selected-entity-data:checked");
+        const selectedEntitiesStructure = qsa(this.selector + " .right-panel .selected-entity-structure:checked");
+        const selectedEntitiesData = qsa(this.selector + " .right-panel .selected-entity-data:checked");
 
         selectedEntitiesStructure.forEach(checkbox => selectedEntityStructure.push(checkbox.dataset.name));
         selectedEntitiesData.forEach(checkbox => selectedEntityData.push(checkbox.dataset.name));
 
-        const tabelListForExport = document.querySelector(this.selector + " .table-list-for-export");
-        const tabelListMain = document.querySelector(this.selector + " .left-panel .table-list");
-        let drawRelationship = document.querySelector(this.selector + " .draw-relationship").checked;
+        const tabelListForExport = qs(this.selector + " .table-list-for-export");
+        const tabelListMain = qs(this.selector + " .left-panel .table-list");
+        let drawRelationship = qs(this.selector + " .draw-relationship").checked;
 
         tabelListMain.innerHTML = '';
         tabelListForExport.innerHTML = '';
@@ -1549,15 +1549,15 @@ class EntityEditor {
 
         // Update entity count
         const count = this.entities.length;
-        document.querySelector(this.selector + " .entity-count").textContent = count > 0 ? `(${count})` : ``;
+        qs(this.selector + " .entity-count").textContent = count > 0 ? `(${count})` : ``;
 
         // Restore previously selected checkboxes
         selectedEntityStructure.forEach(name => {
-            const cb = document.querySelector(`.right-panel input[data-name="${name}"].selected-entity-structure`);
+            const cb = qs(`.right-panel input[data-name="${name}"].selected-entity-structure`);
             if (cb) cb.checked = true;
         });
         selectedEntityData.forEach(name => {
-            const cb = document.querySelector(`.right-panel input[data-name="${name}"].selected-entity-data`);
+            const cb = qs(`.right-panel input[data-name="${name}"].selected-entity-data`);
             if (cb) cb.checked = true;
         });
 
@@ -1624,14 +1624,14 @@ class EntityEditor {
      */
     prepareDiagram() {
         let _this = this;
-        let ul = document.querySelector('.tabs-link-container .diagram-list.tabs');
+        let ul = qs('.tabs-link-container .diagram-list.tabs');
         if (this.diagrams.length > 0) {
             this.diagrams.forEach((diagram) => {
 
                 _this.addDiagram(ul, diagram.name, diagram.id, diagram.entities, true);
             });
         }
-        let obj = document.querySelector('.diagram-list.tabs');
+        let obj = qs('.diagram-list.tabs');
         let maxScroll = ul.scrollWidth - obj.offsetWidth;
         currentMarginLeft = -maxScroll;
         ul.style.marginLeft = `${currentMarginLeft}px`;
@@ -1647,7 +1647,7 @@ class EntityEditor {
      * @param {HTMLElement} li - The selected list item (diagram tab) element.
      */
     selectDiagram(li) {
-        let diagramContainer = document.querySelector('.diagram-container');
+        let diagramContainer = qs('.diagram-container');
         let entities = [];
         if(li)
         {
@@ -1678,7 +1678,7 @@ class EntityEditor {
         }
 
         // Update entity checkboxes based on selected diagram's entities
-        document.querySelector('.entity-editor .table-list').querySelectorAll('li').forEach((li2) => {
+        qs('.entity-editor .table-list').querySelectorAll('li').forEach((li2) => {
             let input = li2.querySelector('input[type="checkbox"]');
             let value = input.dataset.name;
 
@@ -1745,7 +1745,7 @@ class EntityEditor {
         });
         newTab.classList.add('active');
 
-        let diagramContainer = document.querySelector('.diagram-container');
+        let diagramContainer = qs('.diagram-container');
 
         diagramContainer.querySelectorAll('.diagram').forEach(tab => {
             tab.classList.remove('active');
@@ -1928,12 +1928,12 @@ class EntityEditor {
     getDiagrams()
     {
         let diagrams = [];
-        document.querySelector('.diagram-list.tabs').querySelectorAll('li.diagram-tab').forEach((tab, index) => {
+        qs('.diagram-list.tabs').querySelectorAll('li.diagram-tab').forEach((tab, index) => {
             diagrams.push({
                 id: tab.dataset.id,
                 name: tab.querySelector('input').value,
                 sortOrder: index,
-                entities: document.querySelector('.diagram-container').querySelector(`#${tab.dataset.id}`).dataset.entities.split(',')
+                entities: qs('.diagram-container').querySelector(`#${tab.dataset.id}`).dataset.entities.split(',')
             })
         });
         return diagrams;
@@ -1960,9 +1960,9 @@ class EntityEditor {
     clearDiagrams()
     {
 
-        document.querySelector('.diagram-list.tabs .all-entities').classList.add('active');
+        qs('.diagram-list.tabs .all-entities').classList.add('active');
 
-        let diagramTab = document.querySelectorAll('.diagram-tab');
+        let diagramTab = qsa('.diagram-tab');
         if(diagramTab)
         {
             diagramTab.forEach((tab) => {
@@ -1970,15 +1970,15 @@ class EntityEditor {
             });
         }
         //
-        let diagramPages = document.querySelectorAll('.diagram-entity.tab-content');
+        let diagramPages = qsa('.diagram-entity.tab-content');
         if(diagramPages)
         {
             diagramPages.forEach((page) => {
                 page.parentNode.removeChild(page);
             });
         }
-        document.querySelector('.diagram-container #all-entities').classList.add('active');
-        let ul = document.querySelector('.diagram-list.tabs');
+        qs('.diagram-container #all-entities').classList.add('active');
+        let ul = qs('.diagram-list.tabs');
         ul.style.marginLeft = '0px';
         ul.scrollLeft = 0;
         ul.width = 'auto';
@@ -1994,7 +1994,7 @@ class EntityEditor {
      */
     clearEntities()
     {
-        let allDiagramContainer = document.querySelector('.diagram-container .all-entities');
+        let allDiagramContainer = qs('.diagram-container .all-entities');
         if(allDiagramContainer)
         {
             let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -2038,7 +2038,7 @@ class EntityEditor {
             let haystack = e.target.closest('.diagram-entity').dataset.entities;
             let needle = e.target.closest('.svg-entity').dataset.entity;
             let newEntities = _this.removeUniqueElements(haystack.split(','), needle).join(',');
-            document.querySelector(`.selected-entity[data-name="${needle}"]`).checked = false;
+            qs(`.selected-entity[data-name="${needle}"]`).checked = false;
             e.target.closest('.diagram-entity').setAttribute('data-entities', newEntities);
             _this.updateDiagram();
             _this.saveDiagram();
@@ -2308,8 +2308,8 @@ class EntityEditor {
      * Cancels the entity editing process and hides the editor form.
      */
     cancelEdit() {
-        document.querySelector(this.selector+" .editor-form").style.display = "none";
-        document.querySelector(this.selector+" .button-container").style.display = "block";
+        qs(this.selector+" .editor-form").style.display = "none";
+        qs(this.selector+" .button-container").style.display = "block";
     }
 
     /**
@@ -2369,7 +2369,7 @@ class EntityEditor {
      */
     exportToSQL(dialect = "mysql") {
         let sql = this.generateSQL(dialect);
-        document.querySelector(this.selector+" .query-generated").value = sql.join("\r\n");
+        qs(this.selector+" .query-generated").value = sql.join("\r\n");
     }
 
     /**
@@ -2388,7 +2388,7 @@ class EntityEditor {
     {
         let sql = [];
 
-        const selectedEntities = document.querySelectorAll(this.selector+" .right-panel .selected-entity-structure:checked");
+        const selectedEntities = qsa(this.selector+" .right-panel .selected-entity-structure:checked");
         selectedEntities.forEach(checkbox => {
             const entityIndex = parseInt(checkbox.value);
             const entity = this.entities[entityIndex];
@@ -2397,7 +2397,7 @@ class EntityEditor {
             }
         });
 
-        const selectedEntitiesData = document.querySelectorAll(this.selector+" .right-panel .selected-entity-data:checked");
+        const selectedEntitiesData = qsa(this.selector+" .right-panel .selected-entity-data:checked");
         selectedEntitiesData.forEach(checkbox => {
             const entityIndex = parseInt(checkbox.value);
             const entity = this.entities[entityIndex];
@@ -2417,9 +2417,9 @@ class EntityEditor {
      */
     clearGeneratedQuery()
     {
-        document.querySelector('.query-generated').value = '';
-        document.querySelector('.check-all-entity-structure').checked = false;
-        document.querySelector('.check-all-entity-data').checked = false;
+        qs('.query-generated').value = '';
+        qs('.check-all-entity-structure').checked = false;
+        qs('.check-all-entity-data').checked = false;
     }
 
     /**
@@ -2435,12 +2435,12 @@ class EntityEditor {
     {
         if(element.dataset.entityType == 'custom')
         {
-            document.querySelectorAll('.entity-selector-table-container.custom-entity .entity-selector').forEach(checkbox => {
+            qsa('.entity-selector-table-container.custom-entity .entity-selector').forEach(checkbox => {
                 checkbox.checked = element.checked;
             });
         } else if(element.dataset.entityType == 'system')
         {
-            document.querySelectorAll('.entity-selector-table-container.system-entity .entity-selector').forEach(checkbox => {
+            qsa('.entity-selector-table-container.system-entity .entity-selector').forEach(checkbox => {
                 checkbox.checked = element.checked;
             });
         }
@@ -2497,7 +2497,7 @@ class EntityEditor {
         let selectedModel = {entities: []};
         let entities = this.entities;
 
-        const checkboxesBody = document.querySelectorAll('input[type="checkbox"].entity-selector');
+        const checkboxesBody = qsa('input[type="checkbox"].entity-selector');
         if(checkboxesBody.length)
         {
             let selected = [];
@@ -2513,7 +2513,7 @@ class EntityEditor {
                 entities.forEach(entity => {
                     if(selected.includes(entity.name))
                     {
-                        let entitySelector = document.querySelector(`table[data-entity="${entity.name}"]`);
+                        let entitySelector = qs(`table[data-entity="${entity.name}"]`);
                         let newEntity = this.cloneEntity(entity, entitySelector);
                         newEntity.data = []; // clear data to reduce payload
 
@@ -2676,9 +2676,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": false,
-            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
-            "programmingLanguage": document.querySelector('.programming-language-selector').value
+            "inMemoryCache": qs('.in-memory-cache-checker').checked,
+            "applicationId": qs('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": qs('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2695,9 +2695,9 @@ class EntityEditor {
             "schema": this.getSelectedEntities(),
             "reservedColumns": reservedColumns,
             "withFrontend": true,
-            "inMemoryCache": document.querySelector('.in-memory-cache-checker').checked,
-            "applicationId": document.querySelector('meta[name="application-id"]').getAttribute('content'),
-            "programmingLanguage": document.querySelector('.programming-language-selector').value
+            "inMemoryCache": qs('.in-memory-cache-checker').checked,
+            "applicationId": qs('meta[name="application-id"]').getAttribute('content'),
+            "programmingLanguage": qs('.programming-language-selector').value
         };
         this.exportGraphQLSchema(data);
     }
@@ -2709,7 +2709,7 @@ class EntityEditor {
      * @returns {void}
      */
     handleCancelGenerate() {
-        document.querySelector('#graphqlGeneratorModal').style.display = 'none';
+        qs('#graphqlGeneratorModal').style.display = 'none';
     }
 
     /**
@@ -2720,11 +2720,11 @@ class EntityEditor {
     {
         let _this = this;
         let title = 'GraphQL Generator';
-        let wrapper = document.querySelector('.entity-selector-container');
+        let wrapper = qs('.entity-selector-container');
         wrapper.innerHTML = ''; // Clear existing content
 
         // Get modal and buttons
-        const modal = document.querySelector('#graphqlGeneratorModal');
+        const modal = qs('#graphqlGeneratorModal');
 
         modal.querySelector('.modal-header h3').innerHTML = title;
 
@@ -2753,7 +2753,7 @@ class EntityEditor {
         .then(resp => resp.json())
         .then(result => {
             _this.graphqlAppProfile = result;
-            let select = document.querySelector('.graphql-app-profile');
+            let select = qs('.graphql-app-profile');
             select.innerHTML = ''; // Clear all opti
             let value = '';
             for (const key in _this.graphqlAppProfile) {
@@ -2785,10 +2785,10 @@ class EntityEditor {
     loadGraphQlAppConfiguration()
     {
         let _this = this;
-        let wrapper = document.querySelector('.entity-selector-container');
+        let wrapper = qs('.entity-selector-container');
         let frm = wrapper.closest('form');
         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
-        let profile = document.querySelector('.graphql-app-profile').value;
+        let profile = qs('.graphql-app-profile').value;
         loadGraphQlEntityFromServer(applicationId, databaseType, databaseName, databaseSchema, profile, function(data){
             loadFormState(frm, data);
             _this.graphqlAppData = data;
@@ -3036,7 +3036,7 @@ class EntityEditor {
     copyTableStructure(e) {
         let _this = this;
         // Get the SQL dialect from the <meta> tag
-        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let dialect = qs('meta[name="database-type"]').getAttribute('content');
         let sql = [];
 
         // Get the entity from the selected SVG element
@@ -3061,7 +3061,7 @@ class EntityEditor {
      */
     copyTableData(e) {
         let _this = this;
-        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let dialect = qs('meta[name="database-type"]').getAttribute('content');
         let sql = [];
 
         let entity = this.getEntityByName(selectedElement.dataset.entity);
@@ -3083,7 +3083,7 @@ class EntityEditor {
      */
     copyTableStructureAndData(e) {
         let _this = this;
-        let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
+        let dialect = qs('meta[name="database-type"]').getAttribute('content');
         let sql = [];
 
         let entity = this.getEntityByName(selectedElement.dataset.entity);
@@ -3158,7 +3158,7 @@ class EntityEditor {
      * Uses either the global entityRenderer or a specific diagramRenderer depending on the diagram ID.
      */
     downloadSVG() {
-        let diagramContainer = document.querySelector('.diagram-container');
+        let diagramContainer = qs('.diagram-container');
         let diagram = diagramContainer.querySelector('.diagram.active');
         if (diagram) {
             let id = diagram.getAttribute('id');
@@ -3185,7 +3185,7 @@ class EntityEditor {
      * Uses either the global entityRenderer or a specific diagramRenderer depending on the diagram ID.
      */
     downloadPNG() {
-        let diagramContainer = document.querySelector('.diagram-container');
+        let diagramContainer = qs('.diagram-container');
         let diagram = diagramContainer.querySelector('.diagram.active');
         if (diagram) {
             let id = diagram.getAttribute('id');
@@ -3212,7 +3212,7 @@ class EntityEditor {
      * Uses either the global entityRenderer or a specific diagramRenderer depending on the diagram ID.
      */
     downloadMD() {
-        let diagramContainer = document.querySelector('.diagram-container');
+        let diagramContainer = qs('.diagram-container');
         let diagram = diagramContainer.querySelector('.diagram.active');
         if (diagram) {
             let id = diagram.getAttribute('id');
@@ -3382,7 +3382,7 @@ class EntityEditor {
         // Convert the object to a JSON string
 
         // Create a Blob object from the JSON string
-        const blob = new Blob([document.querySelector(this.selector+' .query-generated').value], { type: "text/plain" });
+        const blob = new Blob([qs(this.selector+' .query-generated').value], { type: "text/plain" });
 
         // Create a URL for the Blob
         const url = URL.createObjectURL(blob);
@@ -3875,7 +3875,7 @@ class EntityEditor {
                     `;
                     _this.showConfirmationDialog(message, 'Select Sheet', 'OK', 'Cancel', function(isOk){
                         if (isOk) {
-                            let sheetIndex = parseInt(document.querySelector('#sheet-index').value);
+                            let sheetIndex = parseInt(qs('#sheet-index').value);
                             selectSheetAndImport(sheetIndex);
                         }
                     });
@@ -3908,7 +3908,7 @@ class EntityEditor {
     importGraphQLSchema()
     {
         this.clearBeforeImport = false;
-        document.querySelector(this.selector + " .import-file-graphql").click();
+        qs(this.selector + " .import-file-graphql").click();
     }
 
     /**
@@ -4649,7 +4649,7 @@ class EntityEditor {
      */
     uploadEntities() {
         this.clearBeforeImport = true;
-        document.querySelector(this.selector + " .import-file-json").click();
+        qs(this.selector + " .import-file-json").click();
     }
 
     /**
@@ -4662,7 +4662,7 @@ class EntityEditor {
      */
     importSQL() {
         this.clearBeforeImport = false;
-        document.querySelector(this.selector + " .import-file-sql").click();
+        qs(this.selector + " .import-file-sql").click();
     }
 
     /**
@@ -4676,7 +4676,7 @@ class EntityEditor {
      */
     importSheet() {
         this.clearBeforeImport = false;
-        document.querySelector(this.selector + " .import-file-sheet").click();
+        qs(this.selector + " .import-file-sheet").click();
     }
 
     /**
@@ -4751,7 +4751,7 @@ class EntityEditor {
     showAlertDialog(message, title, captionOk, callback)
     {
         // Get modal and buttons
-        const modal = document.querySelector('#asyncAlert');
+        const modal = qs('#asyncAlert');
         let okBtn = modal.querySelector('.alert-ok');
         okBtn = this.removeAllEventListeners(okBtn);
 
@@ -4770,6 +4770,13 @@ class EntityEditor {
                 callback();
             }
         }
+
+        // Remove previous event listeners
+        if (okBtn._handler) {
+            okBtn.removeEventListener('click', okBtn._handler);
+        }
+
+        okBtn._handler = handleOkClick;
 
         // Add event listeners for OK and Cancel buttons
         okBtn.addEventListener('click', handleOkClick);
@@ -4790,7 +4797,7 @@ class EntityEditor {
      */
     showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
         // Get modal and buttons
-        const modal = document.querySelector('#asyncConfirm');
+        const modal = qs('#asyncConfirm');
 
         let okBtn = modal.querySelector('.confirm-ok');
         let cancelBtn = modal.querySelector('.confirm-cancel');
@@ -4816,6 +4823,17 @@ class EntityEditor {
             modal.style.display = 'none';
             callback(false);  // Execute callback with 'false' if Cancel is clicked
         }
+
+        // Remove previous event listeners
+        if (okBtn._handler) {
+            okBtn.removeEventListener('click', okBtn._handler);
+        }
+        if (cancelBtn._handler) {
+            cancelBtn.removeEventListener('click', cancelBtn._handler);
+        }
+
+        okBtn._handler = handleOkClick;
+        cancelBtn._handler = handleCancelClick;
 
         // Add event listeners for OK and Cancel buttons
         okBtn.addEventListener('click', handleOkClick);
@@ -4844,16 +4862,16 @@ class EntityEditor {
             `Entity Description - ${entityName}`, 'Save', 'Cancel', function(isOk) {
             if (isOk)
             {
-                _this.entities[_this.currentEntityIndex].description = document.querySelector(selector + ' .description-textarea').value;
+                _this.entities[_this.currentEntityIndex].description = qs(selector + ' .description-textarea').value;
                 _this.callbackSaveEntity(_this.entities);
-                document.querySelector(selector).style.display = 'none'
+                qs(selector).style.display = 'none'
             }
             else
             {
-                document.querySelector(selector).style.display = 'none'
+                qs(selector).style.display = 'none'
             }
         });
-        document.querySelector(selector + ' .description-textarea').value = description;
+        qs(selector + ' .description-textarea').value = description;
     }
 
     /**
@@ -4903,7 +4921,7 @@ class EntityEditor {
         let type = element.value;
         if(typeof this.defaultLength[type] != 'undefined')
         {
-            document.querySelector(selectorLength).value = this.defaultLength[type];
+            qs(selectorLength).value = this.defaultLength[type];
         }
     }
 
@@ -4938,10 +4956,10 @@ class EntityEditor {
             </table>
             `, 'Preferences', 'OK', 'Cancel', function(isConfirmed) {
             if (isConfirmed) {
-                _this.primaryKeyDataType = document.querySelector('[name="primary_key_type"]').value;
-                _this.primaryKeyDataLength = document.querySelector('[name="primary_key_length"]').value;
-                _this.defaultDataType = document.querySelector('[name="column_type"]').value;
-                _this.defaultDataLength = document.querySelector('[name="column_length"]').value;
+                _this.primaryKeyDataType = qs('[name="primary_key_type"]').value;
+                _this.primaryKeyDataLength = qs('[name="primary_key_length"]').value;
+                _this.defaultDataType = qs('[name="column_type"]').value;
+                _this.defaultDataLength = qs('[name="column_length"]').value;
                 if(typeof _this.callbackSaveConfig == 'function')
                 {
                     _this.callbackSaveConfig({
@@ -4954,10 +4972,10 @@ class EntityEditor {
             }
         });
 
-        document.querySelector('[name="primary_key_type"]').value = _this.primaryKeyDataType;
-        document.querySelector('[name="primary_key_length"]').value = _this.primaryKeyDataLength;
-        document.querySelector('[name="column_type"]').value = _this.defaultDataType;
-        document.querySelector('[name="column_length"]').value = _this.defaultDataLength;
+        qs('[name="primary_key_type"]').value = _this.primaryKeyDataType;
+        qs('[name="primary_key_length"]').value = _this.primaryKeyDataLength;
+        qs('[name="column_type"]').value = _this.defaultDataType;
+        qs('[name="column_length"]').value = _this.defaultDataLength;
     }
 
     /**
@@ -4972,7 +4990,7 @@ class EntityEditor {
      * @returns {void} - This function does not return a value.
      */
     showSettingDialog(message, title, captionOk, captionCancel, callback) {
-        const modal = document.querySelector('#settingModal');
+        const modal = qs('#settingModal');
         const okBtn = modal.querySelector('.confirm-ok');
         const cancelBtn = modal.querySelector('.confirm-cancel');
 
@@ -5021,7 +5039,7 @@ class EntityEditor {
      * @returns {void}
      */
     showEntityDataDialog(entity, index, title) {
-        const modal = document.querySelector('#entityDataEditorModal');
+        const modal = qs('#entityDataEditorModal');
         const modalHeader = modal.querySelector('.modal-header h3');
         const modalBody = modal.querySelector('.modal-body');
         const data = entity.data || [];
@@ -5146,7 +5164,7 @@ class EntityEditor {
             if(confirm)
             {
                 // Update <select>
-                let select = document.querySelector('.graphql-app-profile');
+                let select = qs('.graphql-app-profile');
                 let currentValue = select.value;
                 select.innerHTML = ''; // Remove all options
                 let firstValue = '';
@@ -5212,7 +5230,7 @@ class EntityEditor {
      */
     gqlRenderTable(focus = false)
     {
-        const tableContainer = document.querySelector('#profileModal .modal-body');
+        const tableContainer = qs('#profileModal .modal-body');
         tableContainer.innerHTML = `
     <table id="optionTable" class="table dialog-table profile-table">
         <thead>
@@ -5304,7 +5322,7 @@ class EntityEditor {
      */
     gqlChangeProfile()
     {
-        let select = document.querySelector('.graphql-app-profile');
+        let select = qs('.graphql-app-profile');
         this.gqlSaveProfile(select.value);
         this.loadGraphQlAppConfiguration();
     }
@@ -5392,7 +5410,7 @@ class EntityEditor {
      */
     showProfileDialog(content, title, captionOk, captionCancel = '', callback = null) {
         // Get modal and buttons
-        const modal = document.querySelector('#profileModal');
+        const modal = qs('#profileModal');
         const okBtn = modal.querySelector('.confirm-ok');
         const cancelBtn = modal.querySelector('.confirm-cancel');
 
@@ -5413,10 +5431,6 @@ class EntityEditor {
         // Show the modal
         modal.style.display = 'block';
 
-        // Remove existing event listeners to prevent duplicates
-        okBtn.removeEventListener('click', handleOkConfig);
-        cancelBtn.removeEventListener('click', handleCancelConfig);
-
         // Define the event listener for OK button
         function handleOkConfig() {
             modal.style.display = 'none';
@@ -5428,6 +5442,17 @@ class EntityEditor {
             modal.style.display = 'none';
             callback(false);  // Execute callback with 'false' if Cancel is clicked
         }
+
+        // Remove previous event listeners
+        if (okBtn._handler) {
+            okBtn.removeEventListener('click', okBtn._handler);
+        }
+        if (cancelBtn._handler) {
+            cancelBtn.removeEventListener('click', cancelBtn._handler);
+        }
+
+        okBtn._handler = handleOkConfig;
+        cancelBtn._handler = handleCancelConfig;
 
         // Add event listeners for OK and Cancel buttons
         okBtn.addEventListener('click', handleOkConfig);
@@ -5460,11 +5485,11 @@ class EntityEditor {
         input.style.boxSizing = 'border-box';
         if(withList)
         {
-            let info = document.querySelector('.suggestions');
+            let info = qs('.suggestions');
             input.setAttribute('list', listId);
             input.addEventListener('input', () => { // Use 'input' for better handling of value changes
                 const val = input.value;
-                const options = document.querySelectorAll('#' + listId + ' option');
+                const options = qsa('#' + listId + ' option');
                 let found = false;
                 for (let option of options) {
                     if (option.value === val) {
@@ -5494,7 +5519,7 @@ class EntityEditor {
         let data = [];
 
         // Get column names from thead
-        document.querySelector('.data-preview-table')
+        qs('.data-preview-table')
             .querySelector('thead')
             .querySelectorAll('th.entity-column')
             .forEach((th) => {
@@ -5502,7 +5527,7 @@ class EntityEditor {
             });
 
         // Get data from tbody rows
-        let trs = document.querySelector('.data-preview-table')
+        let trs = qs('.data-preview-table')
             .querySelector('tbody')
             .querySelectorAll('tr');
 
@@ -5576,7 +5601,7 @@ class EntityEditor {
             (isOk) => {
                 if(isOk)
                 {
-                    document.querySelector('.data-preview-table tbody').innerHTML = '';
+                    qs('.data-preview-table tbody').innerHTML = '';
                 }
             }
         );
@@ -5589,7 +5614,7 @@ class EntityEditor {
      * @returns {boolean} True if the `data-empty` attribute is 'true', false otherwise.
      */
     isAutocompleteListEmpty() {
-        return document.querySelector('.autocomplete-list-container').dataset.empty == 'true';
+        return qs('.autocomplete-list-container').dataset.empty == 'true';
     }
 
     /**
@@ -5602,7 +5627,7 @@ class EntityEditor {
     addAutocompleteList(entity) {
         if (this.isAutocompleteListEmpty())
         {
-            let container = document.querySelector('.autocomplete-list-container');
+            let container = qs('.autocomplete-list-container');
             container.dataset.empty = 'false';
             container.innerHTML = '';
 
@@ -5650,7 +5675,7 @@ class EntityEditor {
      * table body could not be found.
      */
     addData(withList = false) {
-        const modal = document.querySelector('#entityDataEditorModal');
+        const modal = qs('#entityDataEditorModal');
         let index = parseInt(modal.dataset.index);
         const entity = this.entities[index];
 
@@ -5716,7 +5741,7 @@ class EntityEditor {
      * @returns {void}
      */
     saveData() {
-        const modal = document.querySelector('#entityDataEditorModal');
+        const modal = qs('#entityDataEditorModal');
         let index = parseInt(modal.dataset.index);
         const entity = this.entities[index];
         const inputs = modal.querySelectorAll('.data-preview-table input');
@@ -5766,7 +5791,7 @@ class EntityEditor {
                 });
             }
 
-            const svgEl = document.querySelector(`#${diagram.id}`);
+            const svgEl = qs(`#${diagram.id}`);
             if (svgEl) {
                 svgEl.dataset.name = diagram.name;
                 const cloned = svgEl.cloneNode(true);
@@ -6055,7 +6080,7 @@ class EntityEditor {
         div.classList.add('diagram-export-selector');
         let ul = document.createElement('ul');
 
-        let diagrams = document.querySelectorAll('.diagram-tab');
+        let diagrams = qsa('.diagram-tab');
         if (diagrams) {
             // Checkbox "Select All"
             let checkboxAll = document.createElement('input');
@@ -6115,7 +6140,7 @@ class EntityEditor {
 
         editor.showConfirmationDialog(div.outerHTML, 'Export Document', 'Export', 'Cancel', function(isOk){
             if (isOk) {
-                let toBeExport = document.querySelectorAll('.diagram-to-export');
+                let toBeExport = qsa('.diagram-to-export');
                 let diagramToExport = [];
                 toBeExport.forEach(cb => {
                     if (cb.checked) {
@@ -6405,7 +6430,7 @@ class EntityEditor {
      */
     fixDateTime(column, formatPreference = 'ymd', mode = 'datetime') {
         let _this = this;
-        let tbody = document.querySelector('.data-preview-table tbody');
+        let tbody = qs('.data-preview-table tbody');
         let cells = tbody.querySelectorAll(`[data-col="${column}"]`);
         if (cells && cells.length > 0) {
             cells.forEach(cell => {
@@ -6495,8 +6520,8 @@ class EntityEditor {
      */
     destroyAllDiagram()
     {
-        let tabs = document.querySelectorAll('.entities-container .diagram-list.tabs .diagram-tab');
-        let diagrams = document.querySelectorAll('.entities-container .diagram-container .diagram-entity');
+        let tabs = qsa('.entities-container .diagram-list.tabs .diagram-tab');
+        let diagrams = qsa('.entities-container .diagram-container .diagram-entity');
 
         if (tabs?.length)
         {

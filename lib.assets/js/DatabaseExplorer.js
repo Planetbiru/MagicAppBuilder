@@ -417,6 +417,38 @@ function loadDatabaseIndex(applicationId, hash)
 }
 
 /**
+ * Selects all DOM elements that match the given CSS selector.
+ *
+ * @function qsa
+ * @param {string} selector - CSS selector string used to query elements.
+ * @returns {NodeListOf<Element>} A NodeList containing all matched elements.
+ *
+ * @example
+ * // Ambil semua elemen dengan class "item"
+ * const items = qsa('.item');
+ * items.forEach(el => console.log(el.textContent));
+ */
+function qsa(selector) {
+    return document.querySelectorAll(selector);
+}
+
+/**
+ * Selects the first DOM element that matches the given CSS selector.
+ *
+ * @function qs
+ * @param {string} selector - CSS selector string used to query an element.
+ * @returns {Element|null} The first matched element, or null if no match is found.
+ *
+ * @example
+ * // Ambil elemen pertama dengan id "header"
+ * const header = qs('#header');
+ * console.log(header?.textContent);
+ */
+function qs(selector) {
+    return document.querySelector(selector);
+}
+
+/**
  * Saves the current state of the GraphQL entity selector form to the server.
  *
  * This function reads the values of various form controls within the provided form element,
