@@ -599,24 +599,24 @@ class EntityEditor {
         let columnDescription = column.description ? column.description : '';
 
         row.innerHTML = `
-            <td class="drag-handle"></td>
-            <td class="column-action">
-                <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
-                <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
-                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>
-            </td>
-            <td><input type="text" class="column-name" value="${column.name}" data-original-name="${originalName}" placeholder="Column Name"></td>
-            <td>
-                <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
-                    ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
-                </select>
-            </td>
-            <td><input type="text" class="column-length" value="${columnLength}" max="${maxLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline-block' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${columnValue}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
-            <td class="column-nl"><input type="checkbox" class="column-nullable"${nullable}></td>
-            <td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
-            <td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${aiDisabled}></td>
+<td class="drag-handle"></td>
+<td class="column-action">
+    <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
+    <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
+    <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>
+</td>
+<td><input type="text" class="column-name" value="${column.name}" data-original-name="${originalName}" placeholder="Column Name"></td>
+<td>
+    <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
+        ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
+    </select>
+</td>
+<td><input type="text" class="column-length" value="${columnLength}" max="${maxLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline-block' : 'none'};"></td>
+<td><input type="text" class="column-enum" value="${columnValue}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+<td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
+<td class="column-nl"><input type="checkbox" class="column-nullable"${nullable}></td>
+<td class="column-pk"><input type="checkbox" class="column-primary-key" ${column.primaryKey ? 'checked' : ''}></td>
+<td class="column-ai"><input type="checkbox" class="column-autoIncrement" ${column.autoIncrement ? 'checked' : ''} ${aiDisabled}></td>
             <td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
         `;
         tableBody.appendChild(row);
@@ -1115,23 +1115,23 @@ class EntityEditor {
         let typeSimple = column.type.split('(')[0].trim();
         let columnDescription = column.description ? column.description : '';
         row.innerHTML = `
-            <td class="drag-handle"></td>
-            <td class="column-action">
-                <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
-                <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
-                <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>
-            </td>
-            <td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
-            <td>
-                <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
-                    ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
-                </select>
-            </td>
-            <td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
-            <td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
-            <td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
-            <td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
+<td class="drag-handle"></td>
+<td class="column-action">
+    <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
+    <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
+    <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>
+</td>
+<td><input type="text" class="column-name" value="${column.name}" placeholder="Column Name"></td>
+<td>
+    <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
+        ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
+    </select>
+</td>
+<td><input type="text" class="column-length" value="${columnLength}" placeholder="Length" style="display: ${this.withLengthTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+<td><input type="text" class="column-enum" value="${column.values}" placeholder="Values (comma separated)" style="display: ${this.withValueTypes.includes(typeSimple) || this.withRangeTypes.includes(typeSimple) ? 'inline' : 'none'};"></td>
+<td><input type="text" class="column-default" value="${columnDefault}" placeholder="Default Value"></td>
+<td class="column-nl"><input type="checkbox" class="column-nullable" ${column.nullable ? 'checked' : ''}></td>
+<td><input type="text" class="column-description" value="${columnDescription}" placeholder="Description"></td>
         `;
         tableBody.appendChild(row);
         this.initDraggableRow(row);
@@ -1485,13 +1485,15 @@ class EntityEditor {
         if (this.entities.some(e => !_this.systemEntities.includes(e.name.toLowerCase()))) {
             const sep = document.createElement('tr');
             sep.classList.add('group-header');
-            sep.innerHTML = `<td>
-                    <label><input type="checkbox" class="export-structure-custom" /> S</label>
-                </td>
-                <td>
-                    <label><input type="checkbox" class="export-data-custom"/> D</label>
-                </td>
-                <td>[Custom Entities]</td>`;
+            sep.innerHTML = `
+<td>
+        <label><input type="checkbox" class="export-structure-custom" /> S</label>
+</td>
+<td>
+    <label><input type="checkbox" class="export-data-custom"/> D</label>
+</td>
+<td>[Custom Entities]</td>
+            `;
             tabelListForExport.appendChild(sep);
         }
 
@@ -1509,13 +1511,15 @@ class EntityEditor {
         if (this.entities.some(e => _this.systemEntities.includes(e.name.toLowerCase()))) {
             const sep = document.createElement('tr');
             sep.classList.add('group-header');
-            sep.innerHTML = `<td>
-                    <label><input type="checkbox" class="export-structure-system" /> S</label>
-                </td>
-                <td>
-                    <label><input type="checkbox" class="export-data-system"/> D</label>
-                </td>
-                <td>[Systen Entities]</td>`;
+            sep.innerHTML = `
+<td>
+    <label><input type="checkbox" class="export-structure-system" /> S</label>
+</td>
+<td>
+    <label><input type="checkbox" class="export-data-system"/> D</label>
+</td>
+<td>[Systen Entities]</td>
+                `;
             tabelListForExport.appendChild(sep);
         }
 
@@ -1531,9 +1535,9 @@ class EntityEditor {
         this.entities.forEach((entity, index) => {
             let entityCbMain = document.createElement('li');
             entityCbMain.innerHTML = `
-                <input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />
-                <a class="edit-table" href="javascript:">✏️</a>
-                <a class="delete-table" href="javascript:">❌</a> ${entity.name}
+<input type="checkbox" class="selected-entity" data-name="${entity.name}" value="${index}" />
+<a class="edit-table" href="javascript:">✏️</a>
+<a class="delete-table" href="javascript:">❌</a> ${entity.name}
             `;
             entityCbMain.setAttribute('data-index', index);
             entityCbMain.setAttribute('title', entity.name);
@@ -1590,13 +1594,13 @@ class EntityEditor {
     appendBuildTableRow(tabelListForExport, entity, index, group) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>
-                <label><input type="checkbox" class="selected-entity-structure entity-structure-${group}" data-name="${entity.name}" value="${index}" /> S</label>
-            </td>
-            <td>
-                <label><input type="checkbox" class="selected-entity-data entity-data-${group}" data-name="${entity.name}" value="${index}" /> D</label>
-            </td>
-            <td>${entity.name}</td>
+<td>
+    <label><input type="checkbox" class="selected-entity-structure entity-structure-${group}" data-name="${entity.name}" value="${index}" /> S</label>
+</td>
+<td>
+    <label><input type="checkbox" class="selected-entity-data entity-data-${group}" data-name="${entity.name}" value="${index}" /> D</label>
+</td>
+<td>${entity.name}</td>
         `;
         tabelListForExport.appendChild(row);
     }
@@ -1708,12 +1712,12 @@ class EntityEditor {
         let _this = this;
         finish = finish || false;
         let template = `
-        <input type="text" value="${diagramName}">
-        <a href="#tab1" class="tab-link select-diagram">${diagramName}</a>
-        <a
-            href="javascript:" class="update-diagram"><span class="icon-emoji icon-ok"></span></a><a
-            href="javascript:" class="edit-diagram"><span class="icon-emoji icon-edit"></span></a><a
-            href="javascript:" class="delete-diagram"><span class="icon-emoji icon-delete"></span></a>
+<input type="text" value="${diagramName}">
+<a href="#tab1" class="tab-link select-diagram">${diagramName}</a>
+<a
+    href="javascript:" class="update-diagram"><span class="icon-emoji icon-ok"></span></a><a
+    href="javascript:" class="edit-diagram"><span class="icon-emoji icon-edit"></span></a><a
+    href="javascript:" class="delete-diagram"><span class="icon-emoji icon-delete"></span></a>
         `;
 
 
@@ -2265,9 +2269,9 @@ class EntityEditor {
      * after sorting or reordering operations.
      */
     updateEntityIndex() {
-         this.entities.forEach((entity, index) => {
+        this.entities.forEach((entity, index) => {
             entity.index = index;
-         });
+        });
     }
 
     /**
@@ -2742,6 +2746,22 @@ class EntityEditor {
 
     }
 
+    /**
+     * Loads and populates the GraphQL application profile selector.
+     *
+     * This method retrieves metadata values (applicationId, databaseName, databaseSchema, databaseType)
+     * and sends a GET request to `load-graphql-entity-index.php` to fetch available GraphQL profiles.
+     * The returned JSON is stored in `this.graphqlAppProfile` and used to populate the
+     * `<select>` element with the class `.graphql-app-profile`.
+     *
+     * - Clears existing options in the selector.
+     * - Iterates through the fetched profiles and creates new `<option>` elements.
+     * - Sets the selector's value to the profile marked as `selected`.
+     * - Logs an error message if the fetch request fails.
+     *
+     * @method loadGraphQlAppProfile
+     * @returns {void} Does not return a value; updates the DOM with GraphQL profile options.
+     */
     loadGraphQlAppProfile()
     {
         const _this = this;
@@ -2929,17 +2949,17 @@ class EntityEditor {
 
         let thead = document.createElement("thead");
         thead.innerHTML = `
-            <tr>
-                <th style="width: 30px;"><input type="checkbox" class="check-all" onchange="editor.checkAllColumns(this)" checked=""></th>
-                <th style="width: 22%;">Column</th>
-                <th style="width: 14%;">Type</th>
-                <th style="width: 8%;">PK</th>
-                <th style="width: 8%;">Serial</th>
-                <th style="width: 8%;">Null</th>
-                <th style="width: 35px;">TA</th>
-                <th style="width: 16%;">Filter</th>
-                <th>PK Value</th>
-            </tr>
+<tr>
+    <th style="width: 30px;"><input type="checkbox" class="check-all" onchange="editor.checkAllColumns(this)" checked=""></th>
+    <th style="width: 22%;">Column</th>
+    <th style="width: 14%;">Type</th>
+    <th style="width: 8%;">PK</th>
+    <th style="width: 8%;">Serial</th>
+    <th style="width: 8%;">Null</th>
+    <th style="width: 35px;">TA</th>
+    <th style="width: 16%;">Filter</th>
+    <th>PK Value</th>
+</tr>
         `;
 
         table.appendChild(thead);
@@ -2964,16 +2984,16 @@ class EntityEditor {
             }
 
             tr.innerHTML = `
-                <td><input type="checkbox" class="check-column" value="${col.name || ''}" checked></td>
-                <td>${col.name || ""}</td>
-                <td>${typeDisplay}</td>
-                <td style="text-align: center;">${col.primaryKey ? "YES" : "NO"}</td>
-                <td style="text-align: center;">${col.autoIncrement ? "YES" : "NO"}</td>
-                <td style="text-align: center;">${col.nullable ? "YES" : "NO"}</td>
-                <td style="text-align: center;">${ta}</td>
-                <td>${this.getFilterType(col, displayField)}</td>
-                <td>${this.getPrimaryKeyValue(col)}</td>
-            `;
+<td><input type="checkbox" class="check-column" value="${col.name || ''}" checked></td>
+<td>${col.name || ""}</td>
+<td>${typeDisplay}</td>
+<td style="text-align: center;">${col.primaryKey ? "YES" : "NO"}</td>
+<td style="text-align: center;">${col.autoIncrement ? "YES" : "NO"}</td>
+<td style="text-align: center;">${col.nullable ? "YES" : "NO"}</td>
+<td style="text-align: center;">${ta}</td>
+<td>${this.getFilterType(col, displayField)}</td>
+<td>${this.getPrimaryKeyValue(col)}</td>
+`;
             tbody.appendChild(tr);
         });
 
@@ -3020,12 +3040,14 @@ class EntityEditor {
         {
             value = "select-EQUALS";
         }
-        let filter = `<select class="form-control filter-graphql" data-col="${col.name}">
-        <option value="">Not Applicable</option>
-        <option value="text-CONTAINS"${value == "text-CONTAINS" ? " selected" : ""}>Text Contains</option>
-        <option value="text-EQUALS"${value == "text-EQUALS" ? " selected" : ""}>Text Equals</option>
-        <option value="select-EQUALS"${value == "select-EQUALS" ? " selected" : ""}>Select Equals</option>
-        </select>`;
+        let filter = `
+<select class="form-control filter-graphql" data-col="${col.name}">
+    <option value="">Not Applicable</option>
+    <option value="text-CONTAINS"${value == "text-CONTAINS" ? " selected" : ""}>Text Contains</option>
+    <option value="text-EQUALS"${value == "text-EQUALS" ? " selected" : ""}>Text Equals</option>
+    <option value="select-EQUALS"${value == "select-EQUALS" ? " selected" : ""}>Select Equals</option>
+</select>
+`;
         return filter;
     }
 
@@ -3267,7 +3289,7 @@ class EntityEditor {
         arrow.setAttribute("height", "64");
         arrow.setAttribute("viewBox", "0 0 64 64");
         arrow.innerHTML = `
-        <svg height="64px" width="64px" version="1.1" id="DownloadArrow" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 166.356 166.356" xml:space="preserve" fill="#4CAF50"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path style="fill:#4CAF50;" d="M83.172,164.348L0,81.188h48.606V2.008h69.144v79.18h48.606L83.172,164.348z M14.404,87.155 l68.768,68.756l68.774-68.756h-40.163V7.975h-57.21v79.18H14.404z"></path> </g> </g> </g></svg>
+<svg height="64px" width="64px" version="1.1" id="DownloadArrow" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 166.356 166.356" xml:space="preserve" fill="#4CAF50"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path style="fill:#4CAF50;" d="M83.172,164.348L0,81.188h48.606V2.008h69.144v79.18h48.606L83.172,164.348z M14.404,87.155 l68.768,68.756l68.774-68.756h-40.163V7.975h-57.21v79.18H14.404z"></path> </g> </g> </g></svg>
         `;
 
         arrow.style.left = `${x - 32}px`; // Center horizontally
@@ -3858,20 +3880,20 @@ class EntityEditor {
 
                 if (workbook.SheetNames.length > 1) {
                     let message = `
-                        <table class="two-side-table">
-                            <tbody>
-                                <tr>
-                                    <td>Sheet to Import</td>
-                                    <td>
-                                        <select id="sheet-index" class="form-control">
-                                            ${workbook.SheetNames.map((name, index) =>
-                                                `<option value="${index}">${index + 1}. ${name}</option>`
-                                            ).join('')}
-                                        </select>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+<table class="two-side-table">
+    <tbody>
+        <tr>
+            <td>Sheet to Import</td>
+            <td>
+                <select id="sheet-index" class="form-control">
+                    ${workbook.SheetNames.map((name, index) =>
+                        `<option value="${index}">${index + 1}. ${name}</option>`
+                    ).join('')}
+                </select>
+            </td>
+        </tr>
+    </tbody>
+</table>
                     `;
                     _this.showConfirmationDialog(message, 'Select Sheet', 'OK', 'Cancel', function(isOk){
                         if (isOk) {
@@ -4934,27 +4956,27 @@ class EntityEditor {
     {
         let _this = this;
         _this.showSettingDialog(`
-            <table class="two-side-table">
-                <tbody>
-                    <tr>
-                        <td>Primary Key Type</td>
-                        <td>${_this.createDataTypeOption('primary_key_type', '#primary_key_length')}</td>
-                    </tr>
-                    <tr>
-                        <td>Primary Key Length</td>
-                        <td><input type="text" name="primary_key_length" id="primary_key_length" value=""></td>
-                    </tr>
-                    <tr>
-                        <td>Column Type</td>
-                        <td>${_this.createDataTypeOption('column_type', '#column_length')}</td>
-                    </tr>
-                    <tr>
-                        <td>Column Length</td>
-                        <td><input type="text" name="column_length" id="column_length" value=""></td>
-                    </tr>
-                </tbody>
-            </table>
-            `, 'Preferences', 'OK', 'Cancel', function(isConfirmed) {
+<table class="two-side-table">
+    <tbody>
+        <tr>
+            <td>Primary Key Type</td>
+            <td>${_this.createDataTypeOption('primary_key_type', '#primary_key_length')}</td>
+        </tr>
+        <tr>
+            <td>Primary Key Length</td>
+            <td><input type="text" name="primary_key_length" id="primary_key_length" value=""></td>
+        </tr>
+        <tr>
+            <td>Column Type</td>
+            <td>${_this.createDataTypeOption('column_type', '#column_length')}</td>
+        </tr>
+        <tr>
+            <td>Column Length</td>
+            <td><input type="text" name="column_length" id="column_length" value=""></td>
+        </tr>
+    </tbody>
+</table>
+`, 'Preferences', 'OK', 'Cancel', function(isConfirmed) {
             if (isConfirmed) {
                 _this.primaryKeyDataType = qs('[name="primary_key_type"]').value;
                 _this.primaryKeyDataLength = qs('[name="primary_key_length"]').value;
@@ -5080,24 +5102,24 @@ class EntityEditor {
         let fixDateTimeWrapper = document.createElement('div');
 
         fixDateTimeWrapper.innerHTML = `
-        <div class="suggestions-container"><span class="suggestions"></span> &nbsp;</div>
-        Fix Date Time
-        <select id="selector-fix-date-time" class="form-control">
-        </select>
-        Format
-        <select id="format-preference" class="form-control">
-            <option value="mdy">mdy</option>
-            <option value="dmy">dmy</option>
-            <option value="ymd">ymd</option>
-        </select>
-        Mode
-        <select id="date-time-mode" class="form-control">
-            <option value="datetime">datetime</option>
-            <option value="date">date</option>
-            <option value="time">time</option>
-        </select>
-        <button ="button-fix-date-time" class="btn btn-primary" onclick="editor.fixDateTime(this.closest('div').querySelector('#selector-fix-date-time').value, this.closest('div').querySelector('#format-preference').value, this.closest('div').querySelector('#date-time-mode').value)">Fix Data</button>
-        <span class="autocomplete-list-container" data-empty="true"></span>
+<div class="suggestions-container"><span class="suggestions"></span> &nbsp;</div>
+Fix Date Time
+<select id="selector-fix-date-time" class="form-control">
+</select>
+Format
+<select id="format-preference" class="form-control">
+    <option value="mdy">mdy</option>
+    <option value="dmy">dmy</option>
+    <option value="ymd">ymd</option>
+</select>
+Mode
+<select id="date-time-mode" class="form-control">
+    <option value="datetime">datetime</option>
+    <option value="date">date</option>
+    <option value="time">time</option>
+</select>
+<button ="button-fix-date-time" class="btn btn-primary" onclick="editor.fixDateTime(this.closest('div').querySelector('#selector-fix-date-time').value, this.closest('div').querySelector('#format-preference').value, this.closest('div').querySelector('#date-time-mode').value)">Fix Data</button>
+<span class="autocomplete-list-container" data-empty="true"></span>
         `;
         let selectOne = document.createElement('option');
         selectOne.value = '';
@@ -5232,16 +5254,16 @@ class EntityEditor {
     {
         const tableContainer = qs('#profileModal .modal-body');
         tableContainer.innerHTML = `
-    <table id="optionTable" class="table dialog-table profile-table">
-        <thead>
-            <tr>
-                <td width="30%">Value</td>
-                <td width="55%">Text</td>
-                <td width="15%">Action</td>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<table id="optionTable" class="table dialog-table profile-table">
+    <thead>
+        <tr>
+            <td width="30%">Value</td>
+            <td width="55%">Text</td>
+            <td width="15%">Action</td>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
         `
         const tbody = document.createElement('tbody');
 
@@ -5254,11 +5276,11 @@ class EntityEditor {
                 row.dataset.hasData = opt.hasData ? 'true' : 'false';
 
                 row.innerHTML = `
-                <td><input type="text" class="form-control profile-name" value="${opt.profileName}"></td>
-                <td><input type="text" class="form-control profile-label" value="${opt.profileLabel}"></td>
-                <td>
-                    <button class="btn btn-tn" onclick="editor.gqlDeleteRow(this)">Delete</button>
-                </td>
+<td><input type="text" class="form-control profile-name" value="${opt.profileName}"></td>
+<td><input type="text" class="form-control profile-label" value="${opt.profileLabel}"></td>
+<td>
+    <button class="btn btn-tn" onclick="editor.gqlDeleteRow(this)">Delete</button>
+</td>
                 `;
                 tbody.appendChild(row);
             }
@@ -5267,9 +5289,9 @@ class EntityEditor {
         // Add empty row for new option input
         const newRow = document.createElement("tr");
         newRow.innerHTML = `
-        <td><input type="text" class="form-control profile-name" placeholder="Value"></td>
-        <td><input type="text" class="form-control profile-label" placeholder="Text"></td>
-        <td><button class="btn btn-tn" onclick="editor.gqlAddRow(this)">Add</button></td>
+<td><input type="text" class="form-control profile-name" placeholder="Value"></td>
+<td><input type="text" class="form-control profile-label" placeholder="Text"></td>
+<td><button class="btn btn-tn" onclick="editor.gqlAddRow(this)">Add</button></td>
         `;
         newRow.dataset.hasData = 'false';
         tbody.appendChild(newRow);
@@ -5924,59 +5946,60 @@ class EntityEditor {
         const generatedAt = now.toLocaleString(); // or .toISOString()
 
         const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Exported Diagrams</title>
-            <style>
-                body { font-family: Arial; font-size: 12px; margin: 20px; }
-                .document-center { text-align: center; }
-                .generated-info { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; }
+<style>
+    body { font-family: Arial; font-size: 12px; margin: 20px; }
+    .document-center { text-align: center; }
+    .generated-info { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; }
 
-                .diagram-section {
-                    margin-bottom: 30px;
-                    border-radius: 8px;
-                    padding: 10px;
-                    page-break-after: always;
-                }
+    .diagram-section {
+        margin-bottom: 30px;
+        border-radius: 8px;
+        padding: 10px;
+        page-break-after: always;
+    }
 
-                @media screen {
-                    .diagram-section {
-                        border: 1px solid #ccc;
-                        border-radius: 8px;
-                    }
-                }
+    @media screen {
+        .diagram-section {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+    }
 
-                @media print {
-                    .diagram-section {
-                        border: none !important;
-                        border-radius: 0 !important;
-                    }
-                }
+    @media print {
+        .diagram-section {
+            border: none !important;
+            border-radius: 0 !important;
+        }
+    }
 
-                .svg-wrapper { text-align: center; margin-bottom: 10px; }
-                .svg-wrapper svg { max-width: 100%; height: auto; }
-                .table-wrapper { overflow-x: auto; }
-                table { border-collapse: collapse; width: 100%; font-size: 11px; }
-                th, td { border: 1px solid #999; padding: 6px; text-align: left; }
-                th { background-color: #eee; }
+    .svg-wrapper { text-align: center; margin-bottom: 10px; }
+    .svg-wrapper svg { max-width: 100%; height: auto; }
+    .table-wrapper { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 11px; }
+    th, td { border: 1px solid #999; padding: 6px; text-align: left; }
+    th { background-color: #eee; }
 
-                @media print {
-                    body { font-size: 10px; margin: 10mm; }
-                    h3 { font-size: 14px; margin-bottom: 5px; }
-                    .svg-wrapper svg, .table-wrapper table { page-break-inside: avoid; }
-                }
-                .column-number{
-                    width: 16px;
-                }
-                th.column-number{
-                    text-align: center;
-                }
-                td.column-number{
-                    text-align: right;
-                }
-            </style></head>
-            <body>
-                <h1 class="document-center">Entity Relationship Diagram</h1>
-                <div class="generated-info">Generated at: ${generatedAt}</div>
-                ${container.innerHTML}
-            </body></html>`;
+    @media print {
+        body { font-size: 10px; margin: 10mm; }
+        h3 { font-size: 14px; margin-bottom: 5px; }
+        .svg-wrapper svg, .table-wrapper table { page-break-inside: avoid; }
+    }
+    .column-number{
+        width: 16px;
+    }
+    th.column-number{
+        text-align: center;
+    }
+    td.column-number{
+        text-align: right;
+    }
+</style></head>
+<body>
+    <h1 class="document-center">Entity Relationship Diagram</h1>
+    <div class="generated-info">Generated at: ${generatedAt}</div>
+    ${container.innerHTML}
+</body></html>
+`;
 
 
         const blob = new Blob([htmlContent], { type: 'text/html' });

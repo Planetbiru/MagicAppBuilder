@@ -586,24 +586,24 @@ class EntityRenderer {
         const svgData = new XMLSerializer().serializeToString(svgElement);
 
         return `
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}">
-            <defs>
-                <style type="text/css">
-                    <![CDATA[
-                        text {
-                            font-family: 'Arial', sans-serif;
-                        }
-                        .move-up-icon, .move-down-icon, .edit-icon, .delete-icon {
-                            display: none;
-                            visibility: hidden;
-                            opacity: 0;
-                            pointer-events: none;
-                        }
-                    ]]>
-                </style>
-            </defs>
-            ${svgData}
-        </svg>`;
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}">
+    <defs>
+        <style type="text/css">
+            <![CDATA[
+                text {
+                    font-family: 'Arial', sans-serif;
+                }
+                .move-up-icon, .move-down-icon, .edit-icon, .delete-icon {
+                    display: none;
+                    visibility: hidden;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+            ]]>
+        </style>
+    </defs>
+    ${svgData}
+</svg>`;
     }
 
     /**
