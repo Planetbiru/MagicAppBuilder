@@ -1168,15 +1168,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tabsLinkContainer = document.querySelector('.tabs-link-container');
 
+    qs('.tab-mover li a.move-first').addEventListener('click', function(event) {
+        event.preventDefault();
+        moveTabToFirst();
+    });
+
+    qs('.tab-mover li a.move-last').addEventListener('click', function(event) {
+        event.preventDefault();
+        moveTabToLast();
+    });
 
     document.querySelector('.tab-mover li a.move-left').addEventListener('click', function(event) {
         event.preventDefault();
-        updateMarginLeft(-30);
+        updateMarginLeft(30);
     });
 
     document.querySelector('.tab-mover li a.move-right').addEventListener('click', function(event) {
         event.preventDefault();
-        updateMarginLeft(30);
+        updateMarginLeft(-30);
     });
 
     tabsLinkContainer.addEventListener('wheel', (event) => {
@@ -1652,6 +1661,39 @@ function updateMarginLeft(step) {
     let ulElement = tabsLinkContainer.querySelector('ul');
     let maxScroll = ulElement.scrollWidth - tabsLinkContainer.offsetWidth;
     currentMarginLeft = Math.max(Math.min(currentMarginLeft, 0), -maxScroll);
+    ulElement.style.marginLeft = `${currentMarginLeft}px`;
+}
+
+/**
+ * Move the tab list to the first position (far left).
+ *
+ * This function resets the margin-left of the <ul> inside tabsLinkContainer
+ * so that the tab list scrolls back to the very beginning.
+ * It ensures the margin-left value does not exceed the container's width
+ * by clamping it between 0 and -maxScroll.
+ */
+function moveTabToFirst() {
+    currentMarginLeft = 0;
+    // Ensure the margin-left does not exceed the container's width
+    let ulElement = tabsLinkContainer.querySelector('ul');
+    let maxScroll = ulElement.scrollWidth - tabsLinkContainer.offsetWidth;
+    currentMarginLeft = Math.max(Math.min(currentMarginLeft, 0), -maxScroll);
+    ulElement.style.marginLeft = `${currentMarginLeft}px`;
+}
+
+/**
+ * Move the tab list to the last position (far right).
+ *
+ * This function sets the margin-left of the <ul> inside tabsLinkContainer
+ * so that the tab list scrolls to the very end.
+ * It calculates the maximum scroll offset by subtracting the ul width
+ * from the container width, then applies it as margin-left.
+ */
+function moveTabToLast() {
+    // Ensure the margin-left does not exceed the container's width
+    let ulElement = tabsLinkContainer.querySelector('ul');
+    let maxScroll = tabsLinkContainer.offsetWidth - ulElement.scrollWidth;
+    currentMarginLeft = maxScroll;
     ulElement.style.marginLeft = `${currentMarginLeft}px`;
 }
 
