@@ -494,7 +494,7 @@ body {
 
 .tabs-link-container {
     position: relative;
-    width: calc(100% - 44px);
+    width: calc(100% - 82px);
     border-bottom: 1px solid #EEEEEE;
     overflow: hidden;
 }
@@ -662,6 +662,13 @@ body {
 
 .icon-move-right::before {
     content: "➡️";
+}
+.icon-move-first::before {
+    content: "⏮️";
+}
+
+.icon-move-last::before {
+    content: "⏭️";
 }
 .icon-export::before {
     content: "🗃️";

@@ -162,8 +162,10 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <!-- Entities will be rendered here -->
                                 <div class="panel-title">
                                     <ul class="tab-mover">
+                                        <li><a class="move-first" href="javascript:"><span class="icon-move-first"></span></a></li>
                                         <li><a class="move-left" href="javascript:"><span class="icon-move-left"></span></a></li>
                                         <li><a class="move-right" href="javascript:"><span class="icon-move-right"></span></a></li>
+                                        <li><a class="move-last" href="javascript:"><span class="icon-move-last"></span></a></li>
                                     </ul>
                                     <div class="tabs-link-container">
                                         <ul class="diagram-list tabs">

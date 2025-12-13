@@ -4017,6 +4017,39 @@ The generated PHP GraphQL resolver (`graphql.php`) has been significantly refact
 *   **Cleaner Codebase**: This change makes the resolver code cleaner, more maintainable, and easier to debug.
 *   **Consistent Behavior**: Ensures that common operations behave consistently across all entities.
 
+### Quick Navigation Controls for Diagram Tabs in Entity Editor
+
+The **Entity Editor** has been enhanced with **quick navigation controls** that allow users to instantly move the diagram tab list to the **far left** or **far right** using dedicated icons located on the **right side of the tab bar**.
+
+#### Previous Behavior
+
+Previously, navigating diagram tabs was inefficient:
+
+* Users had to scroll the tab list **30 pixels at a time** to the left or right.
+* Alternatively, users could use the mouse wheel (scroll up/down) to move tabs horizontally.
+* When:
+
+  * **Adding a new diagram**, users needed to scroll all the way to the **end**.
+  * **Viewing all entities (outside diagrams)** or **deleting all entities**, users needed to scroll back to the **beginning**.
+
+This process was time-consuming and inconvenient, especially when working with many diagrams.
+
+#### New Improvement
+
+With the introduction of **two navigation icons**:
+
+* **Jump to Start** — Instantly moves the tab list to the far left.
+* **Jump to End** — Instantly moves the tab list to the far right.
+
+#### Benefits
+
+* **Faster navigation** across large numbers of diagram tabs
+* **Reduced scrolling effort**
+* **Improved usability** when adding diagrams or managing entities
+* **More intuitive workflow** for complex database designs
+
+This enhancement significantly improves productivity and makes managing large diagram collections faster, easier, and more user-friendly.
+
 ## UI Fix: Reserved Columns Modal
 
 Fixed UI overflow issue:
@@ -4042,3 +4075,4 @@ With **MagicAppBuilder 2.0**, all filter-related queries are now **merged into a
 ### Example Scenario
 
 A filter that previously required **8 separate queries** for 8 related entities now needs only **1 merged query**, provided that the total filter size is within the defined safe limit.
+
