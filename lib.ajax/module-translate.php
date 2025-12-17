@@ -64,6 +64,8 @@ function fixValue($original)
         'Label Option Show All' => 'Show All',
         'Label Option Root Menu' => 'Root Menu',
         'Label Option Show Waiting Approval Only' => 'Show Waiting Approval Only',
+        'Label Option Yes' => 'Yes',
+        'Label Option No' => 'No',
         'Label Select All' => 'Select All',
         'Label Select All Items' => 'Select All Items',
         'Label Select Items' => 'Select Items',
@@ -129,13 +131,13 @@ function fixValue($original)
         'Session Expired Message' => 'Your session has expired. Please log in again.',
         'Invalid Credentials' => 'Invalid username or password.',
         'Label Username' => 'Username',
-        'Label Password' => 'Password',        
+        'Label Password' => 'Password',
     );
 
 
     return str_replace(
-        array_keys($labels), 
-        array_values($labels), 
+        array_keys($labels),
+        array_values($labels),
         $original
     );
 }
@@ -254,6 +256,8 @@ if($inputPost->getUserAction() == 'get')
         'label_select_items',
         'label_select_none',
         'label_select_all_items',
+        'label_option_yes',
+        'label_option_no',
         'placeholder_search',
         'placeholder_search_by',
         'placeholder_search_by_name',
@@ -300,32 +304,32 @@ if($inputPost->getUserAction() == 'get')
             foreach($inputPost->getModules() as $module)
             {
                 $module = trim($module);
-                $path = $baseDir."/".$module;               
+                $path = $baseDir."/".$module;
                 if(file_exists($path))
-                {  
-                    $keys = getKeys($path); 
+                {
+                    $keys = getKeys($path);
                     $allKeys = array_merge($allKeys, $keys);
                 }
             }
-        
-            $allKeys = array_unique($allKeys);        
+
+            $allKeys = array_unique($allKeys);
             $parsed = array();
             foreach($allKeys as $key)
             {
                 $camel = PicoStringUtil::camelize($key);
                 $parsed[$camel] = PicoStringUtil::camelToTitle($camel);
             }
-            
-            $parsedLanguage = new MagicObject($parsed);   
+
+            $parsedLanguage = new MagicObject($parsed);
             $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
             $langs = new MagicObject();
             if(file_exists($pathTrans))
             {
                 $langs->loadData(PicoIniUtil::parseIniFile($pathTrans));
             }
-            
+
             $keys = array_merge(array_keys($parsed));
-            
+
             if(!$langs->empty())
             {
                 foreach($keys as $key)
@@ -337,16 +341,16 @@ if($inputPost->getUserAction() == 'get')
                     {
                         $translated = $original;
                         $response[] = array(
-                            'original' => $original, 
-                            'translated' => $translated, 
+                            'original' => $original,
+                            'translated' => $translated,
                             'propertyName' => $key
                         );
-                    }  
-                    else if($filter == 'all') 
+                    }
+                    else if($filter == 'all')
                     {
                         $response[] = array(
-                            'original' => $original, 
-                            'translated' => $translated, 
+                            'original' => $original,
+                            'translated' => $translated,
                             'propertyName' => $key
                         );
                     }
@@ -366,26 +370,26 @@ else if($inputPost->getUserAction() == 'set')
 {
     $allKeys = array();
     $response = array();
-    
+
     $translated = $inputPost->getTranslated();
     $propertyNames = $inputPost->getPropertyNames();
     $targetLanguage = $inputPost->getTargetLanguage();
     $keys = explode("|", $propertyNames);
     $values = explode("\n", str_replace("\r", "", $translated));
     $keysLength = count($keys);
-    
+
     while(count($values) > $keysLength)
     {
         unset($values[count($values) - 1]);
     }
 
     $valuesLength = count($values);
-    
+
     while(count($keys) > $valuesLength)
     {
         unset($keys[count($keys) - 1]);
     }
-    
+
     $values = array_map('trim', $values);
     $translatedLabel = array_combine($keys, $values);
 
@@ -393,13 +397,13 @@ else if($inputPost->getUserAction() == 'set')
     {
         $keys[$i] = PicoStringUtil::snakeize($key);
     }
-    
+
     $baseDir = $activeApplication->getBaseApplicationDirectory();
     $targetLanguage = $inputPost->getTargetLanguage();
     $pathTrans = $appConfig->getApplication()->getBaseLanguageDirectory()."/$targetLanguage/app.ini";
     $dirname = dirname($pathTrans);
-    if (!file_exists($dirname)) { 
-        mkdir($dirname, 0755, true); 
+    if (!file_exists($dirname)) {
+        mkdir($dirname, 0755, true);
     }
     if(file_exists($pathTrans))
     {
@@ -411,7 +415,7 @@ else if($inputPost->getUserAction() == 'set')
     }
     $storedTranslatedLabel = array_merge($storedTranslatedLabel, $translatedLabel);
     $storedTranslatedLabel = PicoArrayUtil::snakeize($storedTranslatedLabel);
-    
+
     PicoIniUtil::writeIniFile($storedTranslatedLabel, $pathTrans);
     ResponseUtil::sendJSON(new stdClass);
 }
