@@ -713,6 +713,10 @@ tr[data-active=false] td {
   background-color: #312e2e;
 }
 
+#menuSearchResults {
+  overflow: auto;
+  max-height: calc(100vh - 106px);
+}
 #menuSearchResults .list-group-item {
   padding: 0;
 }

@@ -873,6 +873,8 @@ tr[data-active="false"] td{
       background-color: #eaeaea;
     }
   }
+  overflow: auto;
+  max-height: calc(100vh - 106px);
 }
 .dark-mode{
   #menuSearchResults
