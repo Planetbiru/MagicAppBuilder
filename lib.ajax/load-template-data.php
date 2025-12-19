@@ -2,13 +2,13 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
-use MagicObject\Request\InputPost;
+use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-$inputPost = new InputPost();
+$inputPost = new MagicObject(file_get_contents('php://input'));
 $inputGet = new InputGet();
 
 if($inputPost->getDatabaseType() != null || $inputPost->getDatabaseName() !== null)

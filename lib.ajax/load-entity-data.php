@@ -2,13 +2,13 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
-use MagicObject\Request\InputPost;
+use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\SecretObject;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-$inputPost = new InputPost();
+$inputPost = new MagicObject(json_decode(file_get_contents('php://input')));
 $inputGet = new InputGet();
 
 if ($inputPost->getDatabaseName() !== null) {
@@ -46,21 +46,21 @@ if ($inputPost->getDatabaseName() !== null) {
             $data = array('entities' => array(), 'diagrams' => array());
         }
 
-        if (strlen($diagrams) > 0) {
-            $data['diagrams'] = json_decode($diagrams);
+        if (!empty($diagrams)) {
+            $data['diagrams'] = $diagrams;
             file_put_contents($path, json_encode($data));
         }
         $entityCount = 0;
-        if (strlen($entities) > 0) {
-            $data['entities'] = json_decode($entities, true);
+        if (!empty($entities)) {
+            $data['entities'] = $entities;
 
             // Update entity->creator and entity->modifier
             foreach($data['entities'] as $index => $entity) {
-                if (isset($entity['creator']) && $entity['creator'] == '{{userName}}') {
-                    $data['entities'][$index]['creator'] = $entityAdmin->getName();
+                if (isset($entity->creator) && $entity->creator == '{{userName}}') {
+                    $data['entities'][$index]->creator = $entityAdmin->getName();
                 }
-                if (isset($entity['modifier']) && $entity['modifier'] == '{{userName}}') {
-                    $data['entities'][$index]['modifier'] = $entityAdmin->getName();
+                if (isset($entity->modifier) && $entity->modifier == '{{userName}}') {
+                    $data['entities'][$index]->modifier = $entityAdmin->getName();
                 }
                 $entityCount++;
             }
