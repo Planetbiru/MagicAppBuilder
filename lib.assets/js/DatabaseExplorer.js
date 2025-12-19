@@ -1793,7 +1793,7 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
-        entities: JSON.stringify(entities)  // Converting the entities array into a JSON string
+        entities: entities
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -1803,7 +1803,7 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
 
 
     // Set the header to send data in URL-encoded format
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Content-Type', 'application/json');
 
     // Handle the server response
     xhr.onreadystatechange = function () {
@@ -1818,11 +1818,7 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
         }
     };
 
-    // Prepare data in URL-encoded format
-    const urlEncodedData = new URLSearchParams(data).toString();
-
-    // Send the data in URL-encoded format
-    xhr.send(urlEncodedData);
+    xhr.send(JSON.stringify(data));
 }
 
 /**
@@ -1840,7 +1836,7 @@ function sendDiagramToServer(applicationId, databaseType, databaseName, database
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
-        diagrams: JSON.stringify(diagrams)  // Converting the entities array into a JSON string
+        diagrams: diagrams
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -1849,7 +1845,7 @@ function sendDiagramToServer(applicationId, databaseType, databaseName, database
     xhr.open('POST', url, true); // Open a POST connection to the server
 
     // Set the header to send data in URL-encoded format
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Content-Type', 'application/json');
 
     // Handle the server response
     xhr.onreadystatechange = function () {
@@ -1862,11 +1858,7 @@ function sendDiagramToServer(applicationId, databaseType, databaseName, database
         }
     };
 
-    // Prepare data in URL-encoded format
-    const urlEncodedData = new URLSearchParams(data).toString();
-
-    // Send the data in URL-encoded format
-    xhr.send(urlEncodedData);
+    xhr.send(JSON.stringify(data));
 }
 
 /**
@@ -1964,7 +1956,7 @@ function sendTemplateToServer(applicationId, databaseType, databaseName, databas
     xhr.open('POST', url, true); // Open a POST connection to the server
 
     // Set the header to send data in URL-encoded format
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Content-Type', 'application/json');
 
     // Handle the server response
     xhr.onreadystatechange = function () {
@@ -1977,12 +1969,7 @@ function sendTemplateToServer(applicationId, databaseType, databaseName, databas
         }
     };
 
-
-    // Prepare data in URL-encoded format
-    const urlEncodedData = new URLSearchParams(data).toString();
-
-    // Send the data in URL-encoded format
-    xhr.send(urlEncodedData);
+    xhr.send(JSON.stringify(data));
 }
 
 /**
@@ -2030,7 +2017,6 @@ function fetchTemplateFromServer(applicationId, databaseType, databaseName, data
     }
 }
 
-
 /**
  * Sends data to the server using the POST method with URL-encoded format.
  *
@@ -2046,7 +2032,7 @@ function sendConfigToServer(applicationId, databaseType, databaseName, databaseS
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
-        config: JSON.stringify(config)
+        config: config
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -2055,7 +2041,7 @@ function sendConfigToServer(applicationId, databaseType, databaseName, databaseS
     xhr.open('POST', url, true); // Open a POST connection to the server
 
     // Set the header to send data in URL-encoded format
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Content-Type', 'application/json');
 
     // Handle the server response
     xhr.onreadystatechange = function () {
@@ -2068,12 +2054,7 @@ function sendConfigToServer(applicationId, databaseType, databaseName, databaseS
         }
     };
 
-
-    // Prepare data in URL-encoded format
-    const urlEncodedData = new URLSearchParams(data).toString();
-
-    // Send the data in URL-encoded format
-    xhr.send(urlEncodedData);
+    xhr.send(JSON.stringify(data));
 }
 
 /**
