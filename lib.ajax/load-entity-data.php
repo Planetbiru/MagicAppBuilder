@@ -5,10 +5,11 @@ use AppBuilder\Util\ResponseUtil;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\SecretObject;
+use MagicObject\Util\ClassUtil\PicoObjectParser;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
-$inputPost = new MagicObject(json_decode(file_get_contents('php://input')));
+$inputPost = new MagicObject(PicoObjectParser::parseRecursiveObject(json_decode(file_get_contents("php://input"))));
 $inputGet = new InputGet();
 
 if ($inputPost->getDatabaseName() !== null) {
