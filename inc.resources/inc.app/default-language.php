@@ -28,7 +28,7 @@ if ($defaultLanguage == null || empty($defaultLanguage)) {
 }
 
 // get from Accept-Language header
-$acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+$acceptLanguage = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '';
 $chosenLanguage = $defaultLanguage;
 
 if (!empty($acceptLanguage)) {
