@@ -370,6 +370,17 @@ function init() {
     loadGraphQlEntityFromServer(applicationId, databaseType, databaseName, databaseSchema, profile, function(data){
         editor.graphqlAppData = data;
     });
+    window.addEventListener('storage', function (e) {
+        if(e.key == 'graphql-app-profile')
+        {
+            let dataset = JSON.parse(e.newValue);
+            let { applicationId, databaseName, databaseSchema, databaseType, hash } = getMetaValues();
+            if(applicationId == dataset.applicationId && databaseName == dataset.databaseName && databaseSchema == dataset.databaseSchema && databaseType == dataset.databaseType && hash == dataset.hash)
+            {
+                loadApplicationData(dataset.applicationId, dataset.databaseName, dataset.databaseSchema, dataset.databaseType, dataset.hash);
+            }
+        }
+    });
 }
 
 function onChangeDatabase(select) {
@@ -856,6 +867,14 @@ function loadApplicationData(applicationId, databaseName, databaseSchema, databa
     fetchConfigFromServer(applicationId, databaseType, databaseName, databaseSchema);
 }
 
+function syncDatabaseSchema()
+{
+    let {applicationId, databaseName, databaseSchema, databaseType, hash} = getMetaValues();
+    let dataset = {applicationId:applicationId, databaseName:databaseName, databaseSchema:databaseSchema, databaseType:databaseType, hash:hash};
+    dataset.time = new Date().getTime();
+    window.localStorage.setItem('graphql-app-profile', JSON.stringify(dataset));
+}
+
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -886,10 +905,12 @@ document.addEventListener('DOMContentLoaded', () => {
             callbackSaveEntity: function (entities){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
+                syncDatabaseSchema();
             },
             callbackSaveDiagram: function (diagrams){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
                 sendDiagramToServer(applicationId, databaseType, databaseName, databaseSchema, diagrams);
+                syncDatabaseSchema();
             },
             callbackLoadTemplate: function(){
                 let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
