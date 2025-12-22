@@ -44,8 +44,6 @@ jQuery(function($) {
         }
     );
 
-
-
     $(document).on('click', '.application-item .card-body .mark-hidden, .application-item .card-body .mark-unhidden', function(event) {
         event.preventDefault();
 

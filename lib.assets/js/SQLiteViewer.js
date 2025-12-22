@@ -39,70 +39,67 @@ let exportType = '';
  * @requires displayTableStructure - Function to display schema for a given table.
  * @requires hilightTable - Function to highlight the selected table in the UI.
  */
-function loadDatabaseFromUrl(sqliteDatabaseUrl)
-{
-  // Fetch the database from the server
-  fetch(sqliteDatabaseUrl)
-      .then(response => {
-          if (!response.ok) {
-              throw new Error("Failed to load database. Please check the URL.");
-          }
-          return response.arrayBuffer();  // Convert the response to ArrayBuffer
-      })
-      .then(arrayBuffer => {
-          const uint8Array = new Uint8Array(arrayBuffer);
+function loadDatabaseFromUrl(sqliteDatabaseUrl) {
+    // Fetch the database from the server
+    fetch(sqliteDatabaseUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load database. Please check the URL.");
+            }
+            return response.arrayBuffer();  // Convert the response to ArrayBuffer
+        })
+        .then(arrayBuffer => {
+            const uint8Array = new Uint8Array(arrayBuffer);
 
-          // Initialize SQL.js and load the database
-          initSqlJs({ locateFile: file => `lib.assets/wasm/sql-wasm.wasm` }).then(SQL => {
-              db = new SQL.Database(uint8Array);  // Create a new database instance
+            // Initialize SQL.js and load the database
+            initSqlJs({ locateFile: file => `lib.assets/wasm/sql-wasm.wasm` }).then(SQL => {
+                db = new SQL.Database(uint8Array);  // Create a new database instance
 
-              // Get the names of all tables in the database
-              let res1 = db.exec("SELECT name FROM sqlite_master WHERE type='table';");
+                // Get the names of all tables in the database
+                let res1 = db.exec("SELECT name FROM sqlite_master WHERE type='table';");
 
-              let tableList = document.querySelector('#sqlite-table-sidebar #sqlite-table-list'); // Get sidebar element
-              tableList.innerHTML = ''; // Clear previous table names
+                let tableList = document.querySelector('#sqlite-table-sidebar #sqlite-table-list'); // Get sidebar element
+                tableList.innerHTML = ''; // Clear previous table names
 
-              if(res1?.[0]?.values?.length)
-              {
-                res1[0].values.forEach(row => {
-                  let tableListItem = document.createElement('li');
-                  let tableName = row[0]; // Extract table name
-                  let tableContentLink = document.createElement('a'); // Create a link for the table
-                  tableContentLink.href = '#';
-                  tableContentLink.innerText = tableName; // Set link text to table name
-                  tableContentLink.classList.add('sqlite-table-content');
-                  tableContentLink.addEventListener('click', function (e) { //NOSONAR
-                      e.preventDefault(); // Prevent default link behavior
-                      displayTableData(db, tableName); // Display table data on click
-                      hilightTable(e);
-                  });
-                  let tableStructureLink = document.createElement('a'); // Create a link for the table
-                  tableStructureLink.href = '#';
-                  tableStructureLink.innerText = '☰'; // Symbol link for structure
-                  tableStructureLink.classList.add('sqlite-table-structure');
-                  tableStructureLink.addEventListener('click', function (e) { //NOSONAR
-                      e.preventDefault(); // Prevent default link behavior
-                      displayTableStructure(db, tableName); // Display schema on click
-                      hilightTable(e);
-                  });
+                if (res1?.[0]?.values?.length) {
+                    res1[0].values.forEach(row => {
+                        let tableListItem = document.createElement('li');
+                        let tableName = row[0]; // Extract table name
+                        let tableContentLink = document.createElement('a'); // Create a link for the table
+                        tableContentLink.href = '#';
+                        tableContentLink.innerText = tableName; // Set link text to table name
+                        tableContentLink.classList.add('sqlite-table-content');
+                        tableContentLink.addEventListener('click', function (e) { //NOSONAR
+                            e.preventDefault(); // Prevent default link behavior
+                            displayTableData(db, tableName); // Display table data on click
+                            hilightTable(e);
+                        });
+                        let tableStructureLink = document.createElement('a'); // Create a link for the table
+                        tableStructureLink.href = '#';
+                        tableStructureLink.innerText = '☰'; // Symbol link for structure
+                        tableStructureLink.classList.add('sqlite-table-structure');
+                        tableStructureLink.addEventListener('click', function (e) { //NOSONAR
+                            e.preventDefault(); // Prevent default link behavior
+                            displayTableStructure(db, tableName); // Display schema on click
+                            hilightTable(e);
+                        });
 
-                  tableListItem.appendChild(tableStructureLink);
-                  tableListItem.appendChild(document.createTextNode(' '));
-                  tableListItem.appendChild(tableContentLink);
-                  tableList.appendChild(tableListItem); // Add link to sidebar
-                });
+                        tableListItem.appendChild(tableStructureLink);
+                        tableListItem.appendChild(document.createTextNode(' '));
+                        tableListItem.appendChild(tableContentLink);
+                        tableList.appendChild(tableListItem); // Add link to sidebar
+                    });
 
-                document.getElementById('sqliteDownloadAllSqlButton').disabled = false; // Enable download button for all tables
-              }
-              else
-              {
-                db = null;
-              }
-          });
-      })
-      .catch(error => {
-          alert(`Error loading database from server: ${error.message}`);
-      });
+                    document.getElementById('sqliteDownloadAllSqlButton').disabled = false; // Enable download button for all tables
+                }
+                else {
+                    db = null;
+                }
+            });
+        })
+        .catch(error => {
+            alert(`Error loading database from server: ${error.message}`);
+        });
 }
 
 
@@ -123,17 +120,17 @@ function displayTableStructure(db, tableName) {
     if (res.length > 0) {
         // Build an HTML table containing column details
         let tableString = `<h3>Table Structure: ${tableName}</h3>
-                           <table class="sqlite-table-data">
-                               <thead>
-                                   <tr>
-                                       <th>Column Name</th>
-                                       <th>Data Type</th>
-                                       <th>Not Null</th>
-                                       <th>Default</th>
-                                       <th>Primary Key</th>
-                                   </tr>
-                               </thead>
-                               <tbody>`;
+<table class="sqlite-table-data">
+    <thead>
+        <tr>
+            <th>Column Name</th>
+            <th>Data Type</th>
+            <th>Not Null</th>
+            <th>Default</th>
+            <th>Primary Key</th>
+        </tr>
+    </thead>
+    <tbody>`;
 
         // Iterate through column definitions and append rows
         res[0].values.forEach(column => {
@@ -243,75 +240,75 @@ const SQLITE_EXPORT_BATCH_SIZE = 50; // configurable batch size
  * Supports batching of INSERT statements (default 50 rows per batch).
  */
 function sqliteDownloadAllSql() {
-  const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
-  if (res.length === 0 || res[0].values.length === 0) {
-      return;
-  }
+    const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
+    if (res.length === 0 || res[0].values.length === 0) {
+        return;
+    }
 
-  const tableNames = res[0].values.map(row => row[0]);
-  let sqlContent = "-- SQL Export for All Tables\r\n\r\n";
+    const tableNames = res[0].values.map(row => row[0]);
+    let sqlContent = "-- SQL Export for All Tables\r\n\r\n";
 
-  tableNames.forEach(tableName => {
-      // --- Struktur tabel ---
-      const tableStructureRes = db.exec(`PRAGMA table_info(${tableName});`);
-      let columnTypes = {};
-      if (tableStructureRes.length > 0) {
-          const columns = tableStructureRes[0].values.map(col => {
-              const columnName = col[1];
-              const dataType = col[2];
-              columnTypes[columnName] = dataType.toUpperCase();
-              const isNotNull = col[3] === 1 ? "NOT NULL" : "";
-              const defaultValue = col[4] ? `DEFAULT ${col[4]}` : "";
-              const primaryKey = col[5] === 1 ? "PRIMARY KEY" : "";
-              return `${columnName} ${dataType} ${isNotNull} ${defaultValue} ${primaryKey}`.trim();
-          }).join(",\r\n  ");
+    tableNames.forEach(tableName => {
+        // --- Struktur tabel ---
+        const tableStructureRes = db.exec(`PRAGMA table_info(${tableName});`);
+        let columnTypes = {};
+        if (tableStructureRes.length > 0) {
+            const columns = tableStructureRes[0].values.map(col => {
+                const columnName = col[1];
+                const dataType = col[2];
+                columnTypes[columnName] = dataType.toUpperCase();
+                const isNotNull = col[3] === 1 ? "NOT NULL" : "";
+                const defaultValue = col[4] ? `DEFAULT ${col[4]}` : "";
+                const primaryKey = col[5] === 1 ? "PRIMARY KEY" : "";
+                return `${columnName} ${dataType} ${isNotNull} ${defaultValue} ${primaryKey}`.trim();
+            }).join(",\r\n  ");
 
-          sqlContent += `-- Table: ${tableName}\r\n`;
-          sqlContent += `CREATE TABLE ${tableName} (\r\n  ${columns}\r\n);\r\n\r\n`;
-      }
+            sqlContent += `-- Table: ${tableName}\r\n`;
+            sqlContent += `CREATE TABLE ${tableName} (\r\n  ${columns}\r\n);\r\n\r\n`;
+        }
 
-      // --- Data tabel ---
-      const tableDataRes = db.exec(`SELECT * FROM ${tableName};`);
-      if (tableDataRes.length > 0) {
-          const columns = tableDataRes[0].columns;
-          const rows = tableDataRes[0].values;
+        // --- Data tabel ---
+        const tableDataRes = db.exec(`SELECT * FROM ${tableName};`);
+        if (tableDataRes.length > 0) {
+            const columns = tableDataRes[0].columns;
+            const rows = tableDataRes[0].values;
 
-          for (let i = 0; i < rows.length; i += SQLITE_EXPORT_BATCH_SIZE) {
-              const batch = rows.slice(i, i + SQLITE_EXPORT_BATCH_SIZE);
+            for (let i = 0; i < rows.length; i += SQLITE_EXPORT_BATCH_SIZE) {
+                const batch = rows.slice(i, i + SQLITE_EXPORT_BATCH_SIZE);
 
-              const valuesList = batch.map(row => {
-                  const values = row.map((value, idx) => {
-                      if (value === null) return "NULL";
+                const valuesList = batch.map(row => {
+                    const values = row.map((value, idx) => {
+                        if (value === null) return "NULL";
 
-                      const colName = columns[idx];
-                      const type = columnTypes[colName] || "";
+                        const colName = columns[idx];
+                        const type = columnTypes[colName] || "";
 
-                      if (/(INT|REAL|NUM|DECIMAL|DOUBLE|FLOAT|BOOL)/.test(type)) {
-                          return value;
-                      }
-                      return `'${value.toString().replace(/'/g, "''")}'`;
-                  });
-                  return `(${values.join(", ")})`;
-              });
+                        if (/(INT|REAL|NUM|DECIMAL|DOUBLE|FLOAT|BOOL)/.test(type)) {
+                            return value;
+                        }
+                        return `'${value.toString().replace(/'/g, "''")}'`;
+                    });
+                    return `(${values.join(", ")})`;
+                });
 
-              sqlContent += `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES\r\n${valuesList.join(",\r\n")}\r\n;\r\n`;
-          }
+                sqlContent += `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES\r\n${valuesList.join(",\r\n")}\r\n;\r\n`;
+            }
 
-          sqlContent += "\r\n";
-      }
-  });
+            sqlContent += "\r\n";
+        }
+    });
 
-  const blob = new Blob([sqlContent], { type: "text/sql" });
-  const url = URL.createObjectURL(blob);
+    const blob = new Blob([sqlContent], { type: "text/sql" });
+    const url = URL.createObjectURL(blob);
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${curretDatabaseName}.sql`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${curretDatabaseName}.sql`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
-  URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
 }
 
 /**
@@ -319,80 +316,78 @@ function sqliteDownloadAllSql() {
  * Supports batching of INSERT statements (default 50 rows per batch).
  */
 function sqliteDownloadSql() {
-  const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
-  if (res.length === 0 || res[0].values.length === 0) {
-      return;
-  }
-
-  let tableName = currentSqliteTableName;
-  if (!tableName) {
-      return;
-  }
-  let sqlContent = `-- SQL Export for Table ${tableName}\r\n\r\n`;
-
-  const tableStructureRes = db.exec(`PRAGMA table_info(${tableName});`);
-  let columnTypes = {};
-
-  if(exportType.indexOf('structure') != -1)
-  {
-    if (tableStructureRes.length > 0) {
-        const columns = tableStructureRes[0].values.map(col => {
-            const columnName = col[1];
-            const dataType = col[2];
-            columnTypes[columnName] = dataType.toUpperCase();
-            const isNotNull = col[3] === 1 ? "NOT NULL" : "";
-            const defaultValue = col[4] ? `DEFAULT ${col[4]}` : "";
-            const primaryKey = col[5] === 1 ? "PRIMARY KEY" : "";
-            return `${columnName} ${dataType} ${isNotNull} ${defaultValue} ${primaryKey}`.trim();
-        }).join(",\r\n  ");
-
-        sqlContent += `-- Table: ${tableName}\r\n`;
-        sqlContent += `CREATE TABLE ${tableName} (\r\n  ${columns}\r\n);\r\n\r\n`;
+    const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
+    if (res.length === 0 || res[0].values.length === 0) {
+        return;
     }
-  }
-  if(exportType.indexOf('data') != -1)
-  {
-    const tableDataRes = db.exec(`SELECT * FROM ${tableName};`);
-    if (tableDataRes.length > 0) {
-        const columns = tableDataRes[0].columns;
-        const rows = tableDataRes[0].values;
 
-        for (let i = 0; i < rows.length; i += SQLITE_EXPORT_BATCH_SIZE) {
-            const batch = rows.slice(i, i + SQLITE_EXPORT_BATCH_SIZE);
+    let tableName = currentSqliteTableName;
+    if (!tableName) {
+        return;
+    }
+    let sqlContent = `-- SQL Export for Table ${tableName}\r\n\r\n`;
 
-            const valuesList = batch.map(row => {
-                const values = row.map((value, idx) => {
-                    if (value === null) return "NULL";
+    const tableStructureRes = db.exec(`PRAGMA table_info(${tableName});`);
+    let columnTypes = {};
 
-                    const colName = columns[idx];
-                    const colType = columnTypes[colName] || "";
+    if (exportType.indexOf('structure') != -1) {
+        if (tableStructureRes.length > 0) {
+            const columns = tableStructureRes[0].values.map(col => {
+                const columnName = col[1];
+                const dataType = col[2];
+                columnTypes[columnName] = dataType.toUpperCase();
+                const isNotNull = col[3] === 1 ? "NOT NULL" : "";
+                const defaultValue = col[4] ? `DEFAULT ${col[4]}` : "";
+                const primaryKey = col[5] === 1 ? "PRIMARY KEY" : "";
+                return `${columnName} ${dataType} ${isNotNull} ${defaultValue} ${primaryKey}`.trim();
+            }).join(",\r\n  ");
 
-                    if (/(INT|REAL|NUM|DECIMAL|DOUBLE|FLOAT|BOOL)/.test(colType)) {
-                        return value;
-                    }
-                    return `'${value.toString().replace(/'/g, "''")}'`;
-                });
-                return `(${values.join(", ")})`;
-            });
-
-            sqlContent += `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES\r\n${valuesList.join(",\r\n")}\r\n;\r\n`;
+            sqlContent += `-- Table: ${tableName}\r\n`;
+            sqlContent += `CREATE TABLE ${tableName} (\r\n  ${columns}\r\n);\r\n\r\n`;
         }
-
-        sqlContent += "\r\n";
     }
-  }
+    if (exportType.indexOf('data') != -1) {
+        const tableDataRes = db.exec(`SELECT * FROM ${tableName};`);
+        if (tableDataRes.length > 0) {
+            const columns = tableDataRes[0].columns;
+            const rows = tableDataRes[0].values;
 
-  const blob = new Blob([sqlContent], { type: "text/sql" });
-  const url = URL.createObjectURL(blob);
+            for (let i = 0; i < rows.length; i += SQLITE_EXPORT_BATCH_SIZE) {
+                const batch = rows.slice(i, i + SQLITE_EXPORT_BATCH_SIZE);
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${tableName}.sql`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+                const valuesList = batch.map(row => {
+                    const values = row.map((value, idx) => {
+                        if (value === null) return "NULL";
 
-  URL.revokeObjectURL(url);
+                        const colName = columns[idx];
+                        const colType = columnTypes[colName] || "";
+
+                        if (/(INT|REAL|NUM|DECIMAL|DOUBLE|FLOAT|BOOL)/.test(colType)) {
+                            return value;
+                        }
+                        return `'${value.toString().replace(/'/g, "''")}'`;
+                    });
+                    return `(${values.join(", ")})`;
+                });
+
+                sqlContent += `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES\r\n${valuesList.join(",\r\n")}\r\n;\r\n`;
+            }
+
+            sqlContent += "\r\n";
+        }
+    }
+
+    const blob = new Blob([sqlContent], { type: "text/sql" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${tableName}.sql`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
 }
 
 
@@ -415,23 +410,23 @@ function sqliteDownloadSql() {
  * @returns {string} HTML string representing the database resource UI layout.
  */
 function createDatabaseResource(path) {
-  return `
-    <div id="sqlite-app-container">
-      <aside id="sqlite-table-sidebar" class="sqlite-sidebar">
-        <div class="sqlite-header-section">Tables</div>
-        <div id="sqlite-table-container">
-          <ul id="sqlite-table-list"></ul>
-        </div>
-      </aside>
-
-      <main id="sqlite-table-main" class="sqlite-main">
-        <div class="sqlite-input-area sqlite-header-section">
-          <button class="btn btn-primary" id="sqliteDownloadSqlButton" onclick="sqliteDownloadSql()" disabled>Export Table to SQL</button>
-          <button class="btn btn-primary" id="sqliteDownloadAllSqlButton" onclick="sqliteDownloadAllSql()" disabled>Export Database to SQL</button>
-          <span class="sql-file-source btn btn-secondary" data-path="${encodeURIComponent(path)}"><span class="sqlite-file-path"></span></span>
-        </div>
-        <div id="sqlite-output"></div>
-      </main>
+    return `
+<div id="sqlite-app-container">
+    <aside id="sqlite-table-sidebar" class="sqlite-sidebar">
+    <div class="sqlite-header-section">Tables</div>
+    <div id="sqlite-table-container">
+        <ul id="sqlite-table-list"></ul>
     </div>
-  `;
+    </aside>
+
+    <main id="sqlite-table-main" class="sqlite-main">
+    <div class="sqlite-input-area sqlite-header-section">
+        <button class="btn btn-primary" id="sqliteDownloadSqlButton" onclick="sqliteDownloadSql()" disabled>Export Table to SQL</button>
+        <button class="btn btn-primary" id="sqliteDownloadAllSqlButton" onclick="sqliteDownloadAllSql()" disabled>Export Database to SQL</button>
+        <span class="sql-file-source btn btn-secondary" data-path="${encodeURIComponent(path)}"><span class="sqlite-file-path"></span></span>
+    </div>
+    <div id="sqlite-output"></div>
+    </main>
+</div>
+`;
 }

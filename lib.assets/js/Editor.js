@@ -146,6 +146,12 @@ function clearTtransEd4() {
     }, 1);
 }
 
+/**
+ * Clears the content of the transEd5 editor.
+ *
+ * This function resets the value of the editor's document to an empty string
+ * and then triggers a refresh after a short delay to ensure the UI updates properly.
+ */
 function clearTtransEd5() {
     transEd5.getDoc().setValue('');
     setTimeout(function () {
@@ -153,6 +159,12 @@ function clearTtransEd5() {
     }, 1);
 }
 
+/**
+ * Clears the content of the transEd6 editor.
+ *
+ * Similar to clearTtransEd5, this function resets the editor's document value
+ * to an empty string and refreshes the editor after a short delay to update the UI.
+ */
 function clearTtransEd6() {
     transEd6.getDoc().setValue('');
     setTimeout(function () {

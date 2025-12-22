@@ -279,8 +279,6 @@ function showRootContextMenu(event, contextMenu) {
 
   // Position the context menu
 
-
-
   // Reset the context menu and set up the options
   contextMenu.className = 'context-menu'; // Reset any previous state
   const menuList = contextMenu.querySelector("ul");
@@ -1500,6 +1498,31 @@ const editorModeMap = {
     'csv': { mode: "text/plain", indentUnit: 2 },
 };
 
+/**
+ * Initialize the CodeMirror editor for file content editing.
+ *
+ * This function:
+ * - Ensures the CodeMirror library is available
+ * - Creates a CodeMirror instance from a textarea
+ * - Configures editor defaults (line numbers, wrapping, indentation)
+ * - Dynamically sets editor mode and indentation based on file extension
+ * - Automatically loads required CodeMirror modes
+ * - Adjusts editor size responsively on window resize
+ *
+ * It also exposes `setEditorModeByFilename(filename)` globally
+ * to update syntax highlighting and indentation rules when
+ * the edited file changes.
+ *
+ * Dependencies:
+ * - CodeMirror library and addons (autoload, modes)
+ * - Global `editorModeMap` for custom extension-to-mode mapping
+ * - DOM elements:
+ *   - #code (textarea)
+ *   - #filename (input)
+ *   - #file-content (container for size calculation)
+ *
+ * @returns {void}
+ */
 function initCodeMirror() {
     // Ensure CodeMirror library is loaded
     if (typeof CodeMirror === 'undefined') {

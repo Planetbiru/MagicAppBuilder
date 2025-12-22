@@ -383,12 +383,34 @@ function init() {
     });
 }
 
+/**
+ * Handle change event on database/schema selector.
+ *
+ * Reads metadata stored in the selected <option> dataset
+ * and triggers application data loading based on the selected database.
+ *
+ * @param {HTMLSelectElement} select
+ *        The select element containing database/schema options.
+ */
 function onChangeDatabase(select) {
     let selectedOption = select.options[select.selectedIndex];
     let dataset = selectedOption.dataset;
     loadApplicationData(dataset.applicationId, dataset.databaseName, dataset.databaseSchema, dataset.databaseType, dataset.hash)
 }
 
+/**
+ * Load database/schema index for a specific application
+ * and populate the schema selector dropdown.
+ *
+ * The returned data is expected to be a JSON object where
+ * each key represents a schema hash and the value contains
+ * database metadata (label, type, name, schema).
+ *
+ * @param {string} applicationId
+ *        Application identifier used to load schema index.
+ * @param {string} hash
+ *        Currently selected schema hash (used to mark option as selected).
+ */
 function loadDatabaseIndex(applicationId, hash)
 {
     $.ajax({

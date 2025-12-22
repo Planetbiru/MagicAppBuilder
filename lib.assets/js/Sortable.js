@@ -1260,9 +1260,9 @@
     }
 
     function _closest(
-      /**HTMLElement*/ el,
-      /**String*/ selector,
-      /**HTMLElement*/ ctx
+        /**HTMLElement*/ el,
+        /**String*/ selector,
+        /**HTMLElement*/ ctx
     ) {
         if (el) {
             ctx = ctx || document;

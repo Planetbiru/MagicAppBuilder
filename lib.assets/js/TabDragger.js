@@ -62,7 +62,7 @@ class TabDragger {
       this.onEnd = onEnd;
     } else {
       // Default no-operation function if no callback is provided
-      this.onEnd = function() {
+      this.onEnd = function () {
         // No-op default
       }
     }
@@ -142,20 +142,20 @@ class TabDragger {
    * @returns {void}
    */
   initAll() {
-      let _this = this;
+    let _this = this;
 
-      // Select all tab elements within the list that should be draggable
-      const tabs = this.list.querySelectorAll(".diagram-tab");
+    // Select all tab elements within the list that should be draggable
+    const tabs = this.list.querySelectorAll(".diagram-tab");
 
-      // Make each tab draggable and attach necessary drag/drop listeners
-      tabs.forEach(tab => this.makeDraggable(tab));
+    // Make each tab draggable and attach necessary drag/drop listeners
+    tabs.forEach(tab => this.makeDraggable(tab));
 
-      // Listen for 'drop' event on the entire list to call the onEnd callback
-      this.list.addEventListener("drop", () => {
-          setTimeout(function() {
-              _this.onEnd(); // Execute the callback after a small delay to allow DOM updates
-          }, 60);
-      });
+    // Listen for 'drop' event on the entire list to call the onEnd callback
+    this.list.addEventListener("drop", () => {
+      setTimeout(function () {
+        _this.onEnd(); // Execute the callback after a small delay to allow DOM updates
+      }, 60);
+    });
   }
 
 }
