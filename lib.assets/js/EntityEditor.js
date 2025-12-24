@@ -1150,7 +1150,6 @@ class EntityEditor {
         const columnNullables = qsa(this.selector + " .table-template-editor .column-nullable");
         const columnDefaults = qsa(this.selector + " .table-template-editor .column-default");
         const columnLengths = qsa(this.selector + " .table-template-editor .column-length");
-        const columnEnums = qsa(this.selector + " .table-template-editor .column-enum");
         const columnDescriptions = qsa(this.selector + " .table-template-editor .column-description");
 
         for (let i = 0; i < columnNames.length; i++) {
@@ -1160,7 +1159,7 @@ class EntityEditor {
                 columnLengths[i].value || null,
                 columnNullables[i].checked,
                 columnDefaults[i].value || null,
-                columnEnums[i].value || null,
+                false,
                 null,
                 null,
                 columnDescriptions[i].value || null,
