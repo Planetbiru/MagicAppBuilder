@@ -2,23 +2,28 @@
 
 use AppBuilder\EntityInstaller\EntityApplication;
 use AppBuilder\Util\ResponseUtil;
-use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\SecretObject;
-use MagicObject\Util\ClassUtil\PicoObjectParser;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
-
-$inputPost = new MagicObject(PicoObjectParser::parseRecursiveObject(json_decode(file_get_contents("php://input"))));
+$payload = file_get_contents("php://input");
+if(!empty($payload))
+{
+    $inputPost = json_decode($payload, true);
+}
+else
+{
+    $inputPost = null;
+}
 $inputGet = new InputGet();
 
-if ($inputPost->getDatabaseName() !== null) {
-    $applicationId = $inputPost->getApplicationId();
-    $databaseType = $inputPost->getDatabaseType();
-    $databaseName = $inputPost->getDatabaseName();
-    $databaseSchema = $inputPost->getDatabaseSchema();
-    $entities = $inputPost->getEntities();
-    $diagrams = $inputPost->getDiagrams();
+if (isset($inputPost) && $inputPost['databaseName'] !== null) {
+    $applicationId = $inputPost['applicationId'];
+    $databaseType = $inputPost['databaseType'];
+    $databaseName = $inputPost['databaseName'];
+    $databaseSchema = $inputPost['databaseSchema'];
+    $entities = $inputPost['entities'];
+    $diagrams = $inputPost['diagrams'];
     $filename = sprintf("%s-%s-%s-%s-data.json", $applicationId, $databaseType, $databaseName, $databaseSchema);
     $hash = md5("$applicationId-$databaseType-$databaseName-$databaseSchema");
 
