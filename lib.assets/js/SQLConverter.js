@@ -33,7 +33,7 @@ class SQLConverter {
             "mediumtext": "TEXT",
             "longtext": "TEXT",
             "text": "TEXT",
-            "datetime2": "TIMESTAMP", 
+            "datetime2": "TIMESTAMP",
             "datetime": "DATETIME", // SQLite stores datetime as DATETIME in ISO 8601 format
             "timestamp": "TIMESTAMP", // Same as datetime for SQLite
             "date": "DATE",  // SQLite stores dates as DATE in ISO 8601 format
@@ -87,7 +87,7 @@ class SQLConverter {
             "set": "SET",
             "char": "CHAR"
         };
-        
+
         this.dbToPostgreSQL = {
             // SQLite types to PostgreSQL mapping
             "bigint": "BIGINT",
@@ -117,7 +117,7 @@ class SQLConverter {
             "time": "TIME",
             "json": "JSONB"
         };
-        
+
     }
 
     /**
@@ -157,7 +157,7 @@ class SQLConverter {
         value = this.replaceAll(value, ' character varying', ' varchar');
         value = this.replaceAll(value, ' COLLATE pg_catalog."default"', '');
         value = this.replaceAll(value, ' TINYINT(1)', ' boolean');
-        
+
         let tableParser = new TableParser();
         tableParser.parseAll(value);
         let tables = tableParser.getResult();
@@ -210,7 +210,7 @@ class SQLConverter {
             })
         };
         return this.toSqliteTable(sqliteTable, targetType);
-    }    
+    }
 
     /**
      * Converts a table schema to MySQL format.
@@ -229,7 +229,7 @@ class SQLConverter {
             })
         };
         return this.toMySQLTable(mysqlTable, targetType);
-    }    
+    }
 
     /**
      * Converts a table schema to PostgreSQL format.
@@ -248,8 +248,8 @@ class SQLConverter {
             })
         };
         return this.toPostgreSQLTable(pgTable, targetType);
-    }    
-    
+    }
+
     /**
      * Converts a table schema to SQLite format.
      * @param {Object} sqliteTable The table object in SQLite format.
@@ -288,7 +288,7 @@ class SQLConverter {
      */
     isMySQL(targetType)
     {
-        return targetType === 'mysql' 
+        return targetType === 'mysql'
             || targetType === 'mariadb';
     }
 
@@ -300,7 +300,7 @@ class SQLConverter {
      */
     isPGSQL(targetType)
     {
-        return targetType === 'pgsql' 
+        return targetType === 'pgsql'
             || targetType === 'postgresql';
     }
 
@@ -323,9 +323,9 @@ class SQLConverter {
      */
     isReal(columnType)
     {
-        return columnType.toUpperCase().indexOf('FLOAT') != -1 
-            || columnType.toUpperCase().indexOf('DOUBLE') != -1 
-            || columnType.toUpperCase().indexOf('REAL') != -1 
+        return columnType.toUpperCase().indexOf('FLOAT') != -1
+            || columnType.toUpperCase().indexOf('DOUBLE') != -1
+            || columnType.toUpperCase().indexOf('REAL') != -1
             || columnType.toUpperCase().indexOf('DECIMAL') != -1;
     }
 
@@ -337,8 +337,8 @@ class SQLConverter {
      */
     isBoolean(columnType)
     {
-        return columnType.toUpperCase() == 'BOOLEAN' 
-            || columnType.toUpperCase() == 'BOOL' 
+        return columnType.toUpperCase() == 'BOOLEAN'
+            || columnType.toUpperCase() == 'BOOL'
             || columnType.toUpperCase() == 'TINYINT(1)';
     }
 
@@ -410,7 +410,7 @@ class SQLConverter {
 
     /**
      * Fixes the table name according to the target database type.
-     * 
+     *
      * This method adjusts the table name by removing any database prefix and applying
      * the appropriate syntax for the target database (e.g., quoting for MySQL or PostgreSQL).
      *
@@ -434,7 +434,7 @@ class SQLConverter {
 
     /**
      * Fixes the column name according to the target database type.
-     * 
+     *
      * This method applies proper quoting for column names based on the target database
      * (e.g., MySQL uses backticks for column names).
      *
@@ -452,7 +452,7 @@ class SQLConverter {
 
     /**
      * Generates the default value SQL for a column based on its type.
-     * 
+     *
      * This method returns the appropriate default value syntax for the column's type,
      * handling different types such as BOOLEAN, INTEGER, and REAL.
      *
@@ -494,21 +494,21 @@ class SQLConverter {
      */
     toTable(table, targetType) {
         let tableName = table.tableName;
-        
+
         let lines = [];
 
         tableName = this.fixTableName(tableName, targetType);
-        
+
         lines.push(`CREATE TABLE IF NOT EXISTS ${tableName} (`);
         let linesCol = [];
         for (let i in table.columns) {
             let columnName = this.fixColumnName(table.columns[i].Field, targetType);
-            
+
             let columnType = table.columns[i].Type;
             let primaryKey = table.columns[i].Key || table.columns[i].Field === table.primaryKey;
             let colDef = '\t' + columnName + ' ' + columnType;
             if (primaryKey) {
-                colDef += ' PRIMARY KEY';             
+                colDef += ' PRIMARY KEY';
                 if (this.isAutoIncrement(table.columns[i].AutoIncrement, targetType)) {
                     colDef += ' AUTO_INCREMENT';
                 }
@@ -519,7 +519,7 @@ class SQLConverter {
             } else {
                 colDef += ' NOT NULL';
             }
-            
+
             let defaultValue = table.columns[i].Default;
             if (this.hasDefaultValue(primaryKey, defaultValue)) {
                 defaultValue = this.replaceAll(defaultValue, '::character varying', '');
@@ -528,7 +528,7 @@ class SQLConverter {
                     colDef += this.getDefaultData(defaultValue, columnType);
                 }
             }
-            
+
             if(table.columns[i].Comment != null)
             {
                 colDef += ` COMMENT '${this.addslashes(table.columns[i].Comment)}'`;
@@ -571,7 +571,7 @@ class SQLConverter {
     convertToInteger(value) {
         // Remove single quotes if they exist
         let trimmedValue = value.replace(/^'|'$/g, ''); // NOSONAR
-        
+
         // If the string is empty, return 0, else convert to integer
         return trimmedValue === '' ? 0 : parseInt(trimmedValue, 10);
     }
@@ -586,22 +586,22 @@ class SQLConverter {
     convertToReal(value) {
         // Remove single quotes if they exist
         let trimmedValue = value.replace(/^'|'$/g, ''); // NOSONAR
-        
+
         // If the string is empty, return 0
         if (trimmedValue === '') {
             return 0;
         }
-        
+
         // Convert to a floating-point number
         let result = parseFloat(trimmedValue);
-        
+
         // If conversion failed (NaN), return 0
         return isNaN(result) ? 0 : result;
     }
 
     /**
      * Converts a given string to a boolean-like string ('TRUE' or 'FALSE').
-     * 
+     *
      * This function checks if the input string contains the character '1' or the string 'TRUE' (case-insensitive).
      * If either condition is met, it returns the string 'TRUE', otherwise, it returns the string 'FALSE'.
      *
@@ -731,7 +731,7 @@ class SQLConverter {
         else if ((pgType === 'CHARACTER VARYING' || pgType === 'CHARACTER' || pgType === 'CHAR') && length > 0) {
             pgType = pgType + '(' + length + ')';
         }
-        
+
         return pgType;
     }
 
@@ -758,7 +758,7 @@ class SQLConverter {
 
         return { resultArray, maxLength };
     }
-    
+
     /**
      * Parses a numeric type value like DECIMAL(6,3), NUMERIC(10,2), etc.
      * @param {string} inputString The numeric value in string format, like 'DECIMAL(6, 3)'.
@@ -785,7 +785,7 @@ class SQLConverter {
 
     /**
      * Extracts the DROP TABLE IF EXISTS queries from the provided SQL string.
-     * 
+     *
      * @param {string} sql - The SQL string to be processed.
      * @param {string} targetType - The type of database ('pgsql', 'mysql', or 'mariadb') to format the table names accordingly.
      * @returns {Array} - An array of objects, each containing the name of a table to be dropped.
@@ -793,18 +793,18 @@ class SQLConverter {
     extractDropTableQueries(sql, targetType) {
         // Remove backticks (`) from the entire SQL string before processing
         const sqlWithoutBackticks = sql.replace(/`/g, '');
-    
+
         // Regular expression to capture DROP TABLE IF EXISTS command
         const regex = /DROP TABLE IF EXISTS ([^\s]+)/gi;
         let match;
         const result = [];
-    
+
         // Loop through all matches found
         while ((match = regex.exec(sqlWithoutBackticks)) !== null) {
             // Store the result in the desired format
 
             let tableName = this.extractTableName(match[1]);
-            
+
             // Format the table name based on the target database type
             if(this.isPGSQL(targetType)) {
                 tableName = '"' + tableName + '"';
@@ -815,13 +815,13 @@ class SQLConverter {
                 table: tableName    // Table name
             });
         }
-    
+
         return result;
     }
 
     /**
      * Extracts the table name from the input string, removing schema if present.
-     * 
+     *
      * @param {string} input - The input string (may contain schema.table or just table).
      * @returns {string} - The extracted table name without schema.
      */

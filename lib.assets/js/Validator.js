@@ -408,9 +408,9 @@ class ValidationBuilder {
             else if(cs)
             {
                 div.innerHTML = `<label class="form-label">${prop}</label><select class="form-control" data-prop="${prop}">
-                <option value="true"${validation[prop] == 'true' || validation[prop] === true ? ' selected' : ''}>true</option>
-                <option value="false"${validation[prop] == 'false' || validation[prop] === false ? ' selected' : ''}>false</option>
-                </select>
+    <option value="true"${validation[prop] == 'true' || validation[prop] === true ? ' selected' : ''}>true</option>
+    <option value="false"${validation[prop] == 'false' || validation[prop] === false ? ' selected' : ''}>false</option>
+</select>
                 `;
             }
             else
@@ -663,14 +663,14 @@ class ValidationBuilder {
             const div = document.createElement("div");
             div.className = "field-validations d-flex justify-content-between align-items-center mb-2";
             div.innerHTML = `
-            <div style="width: calc(100% - 90px)">
-              <span>@${val.type}(${propsStr})</span>
-              ${applyCheckboxes}
-            </div>
-            <div style="width: 90px; text-align: right;">
-              <button type="button" class="btn btn-sm btn-primary me-1" onclick="validatorBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
-              <button type="button" class="btn btn-sm btn-danger" onclick="validatorBuilder.deleteValidation('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
-            </div>`;
+<div style="width: calc(100% - 90px)">
+    <span>@${val.type}(${propsStr})</span>
+    ${applyCheckboxes}
+</div>
+<div style="width: 90px; text-align: right;">
+    <button type="button" class="btn btn-sm btn-primary me-1" onclick="validatorBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
+    <button type="button" class="btn btn-sm btn-danger" onclick="validatorBuilder.deleteValidation('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
+</div>`;
             container.appendChild(div);
         });
         document.querySelector(this.jsonOutputSelector).textContent = JSON.stringify(this.validationsPerField, null, 2);
@@ -707,14 +707,14 @@ class ValidationBuilder {
             const div = document.createElement("div");
             div.className = "field-validations d-flex justify-content-between align-items-center mb-2";
             div.innerHTML = `
-                <div style="width: calc(100% - 90px)">
-                <span>@${val.type}(${propsStr})</span>
-                ${applyCheckboxes}
-                </div>
-                <div style="width: 90px; text-align: right;">
-                <button type="button" class="btn btn-sm btn-primary me-1" onclick="valBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
-                <button type="button" class="btn btn-sm btn-danger" onclick="valBuilder.deleteValidationMerged('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
-                </div>`;
+<div style="width: calc(100% - 90px)">
+    <span>@${val.type}(${propsStr})</span>
+    ${applyCheckboxes}
+</div>
+<div style="width: 90px; text-align: right;">
+    <button type="button" class="btn btn-sm btn-primary me-1" onclick="valBuilder.editValidation('${field}', ${idx})"><i class="fa-solid fa-pencil"></i></button>
+    <button type="button" class="btn btn-sm btn-danger" onclick="valBuilder.deleteValidationMerged('${field}', ${idx})"><i class="fa-solid fa-trash-can"></i></button>
+</div>`;
             container.appendChild(div);
         });
         document.querySelector(this.jsonOutputSelector).value = JSON.stringify(this.validationsPerField, null, 2);

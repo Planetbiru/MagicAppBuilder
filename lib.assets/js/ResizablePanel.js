@@ -44,7 +44,7 @@ class ResizablePanels {
      * @param {MouseEvent} e - The mouse move event.
      */
     handleMouseMove(e) {
-       if (this.isResizing) {
+        if (this.isResizing) {
             let offset = e.clientX - this.lastDownX;
             if (offset !== 0) {
                 this.hasResized = true; // Set flag jika ada pergerakan
