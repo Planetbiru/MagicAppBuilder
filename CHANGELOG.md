@@ -4050,6 +4050,17 @@ With the introduction of **two navigation icons**:
 
 This enhancement significantly improves productivity and makes managing large diagram collections faster, easier, and more user-friendly.
 
+### PostgreSQL INSERT Query Parsing
+
+MagicAppBuilder version 2.0 includes an enhancement to the SQL parser for PostgreSQL. The parser now explicitly handles `INSERT` statements that use the PostgreSQL-specific escaped string syntax, prefixed with `E'` or `e'`.
+
+**Example:**
+```sql
+INSERT INTO my_table (my_column) VALUES (E'a string with a backslash \\ and a newline \n');
+```
+
+This improvement ensures that complex string literals from PostgreSQL `INSERT` queries are correctly parsed and imported, particularly when dealing with data that includes backslashes or other escaped characters. While basic support for this was present in earlier versions, this update formalizes and strengthens the parsing logic for better reliability.
+
 ## UI Fix: Reserved Columns Modal
 
 Fixed UI overflow issue:

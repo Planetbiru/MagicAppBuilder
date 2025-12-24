@@ -201,6 +201,23 @@ class TableParser {
             } else if (/^false$/i.test(trimmed)) {
                 // Parse FALSE boolean literal.
                 parsed = false;
+            } else if ((trimmed.startsWith("E'") || trimmed.startsWith("e'")) && trimmed.endsWith("'")) {
+                // Handle PostgreSQL E'...' strings
+                let str = trimmed.slice(2, -1); // remove E' or e' and closing '
+                
+                // First, handle C-style backslash escapes.
+                let s = str.replace(/\\(.)/g, (match, char) => {
+                    switch (char) {
+                        case 'b': return '\b';
+                        case 'f': return '\f';
+                        case 'n': return '\n';
+                        case 'r': return '\r';
+                        case 't': return '\t';
+                        default: return char; // Any other escaped character is the character itself, including ' " and \
+                    }
+                });
+                // Then, handle '' escape for single quote, which is also valid in E'' strings.
+                parsed = s.replace(/''/g, "'");
             } else if (trimmed.startsWith("'") && trimmed.endsWith("'")) {
                 // Handle SQL-style single-quoted string.
                 parsed = trimmed.slice(1, -1) // Remove outer quotes.
