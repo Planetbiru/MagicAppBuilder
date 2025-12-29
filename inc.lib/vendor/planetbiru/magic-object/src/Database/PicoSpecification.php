@@ -10,7 +10,7 @@ use MagicObject\Util\Database\PicoDatabaseUtil;
  *
  * This class is responsible for building complex database query specifications,
  * allowing for the combination of predicates using logical operators (AND, OR).
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -47,7 +47,7 @@ class PicoSpecification // NOSONAR
      * @var string
      */
     private $defaultLogic = self::LOGIC_AND;
-    
+
     /**
      * Gets an instance of PicoSpecification.
      *
@@ -61,13 +61,13 @@ class PicoSpecification // NOSONAR
     /**
      * Creates and returns an instance of the class with an optional PicoPredicate condition.
      *
-     * This static method creates a new instance of the class and, if the provided parameters 
+     * This static method creates a new instance of the class and, if the provided parameters
      * are set, adds a PicoPredicate condition using the given field and value.
      *
-     * @param string|null $field The name of the field to be used in the predicate. 
+     * @param string|null $field The name of the field to be used in the predicate.
      *                           If null, no predicate is added.
-     * @param mixed|null  $value The value to compare against the field in the predicate. 
-     * 
+     * @param mixed|null  $value The value to compare against the field in the predicate.
+     *
      * @return self A new instance of the class with the optionally added predicate.
      */
     public static function getInstanceOf($field = null, $value = null)
@@ -289,7 +289,7 @@ class PicoSpecification // NOSONAR
     {
         return empty($this->specifications);
     }
-    
+
     /**
      * Check if the given input is an array.
      *
@@ -309,6 +309,10 @@ class PicoSpecification // NOSONAR
      */
     public static function isValueEmpty($value)
     {
+        if($value === false)
+        {
+            return false;
+        }
         return !isset($value) || (is_string($value) && empty(trim($value)));
     }
 
@@ -373,15 +377,15 @@ class PicoSpecification // NOSONAR
         }
         return $arr;
     }
-    
+
     /**
      * Retrieves the full column name, including any parent field.
-     * 
+     *
      * This method returns the column name formatted as "parentField.field" if the parent field is provided; otherwise, it returns just the field name.
-     * 
+     *
      * @param string $field The field name of the entity.
      * @param string|null $parentField The parent field name, if applicable.
-     * 
+     *
      * @return string The full column name, either just the field name or the parent field concatenated with the field.
      */
     private function getColumnName($field, $parentField)
@@ -438,7 +442,7 @@ class PicoSpecification // NOSONAR
      *
      * Supported dynamic method:
      *
-     * - `set<FieldName>(value)`: 
+     * - `set<FieldName>(value)`:
      *   Sets a predicate for the specified field.
      *   For example, calling `$obj->setAge(30)` would:
      *   - Extract the field name `age` from the method name.
@@ -549,7 +553,7 @@ class PicoSpecification // NOSONAR
         }
         return $specification;
     }
-    
+
     /**
      * Validates whether a given filter value and filter object are usable.
      *
@@ -583,8 +587,8 @@ class PicoSpecification // NOSONAR
      * Adjusts the filter value based on the filter's configuration.
      *
      * This method ensures that the input value aligns with the filter type.
-     * If the filter does not expect an array but the input is an array, 
-     * the first value in the array is selected. If no adjustment is needed, 
+     * If the filter does not expect an array but the input is an array,
+     * the first value in the array is selected. If no adjustment is needed,
      * the input value is returned as-is.
      *
      * @param mixed $filterValue The raw user input value.
@@ -596,7 +600,68 @@ class PicoSpecification // NOSONAR
         if(!$filter->isArray() && is_array($filterValue) && !empty($filterValue)) {
             $filterValue = array_values($filterValue)[0];
         }
+        if($filter->isArrayBoolean() && is_array($filterValue)) {
+            foreach($filterValue as $key => $value)
+            {
+                // Parameter is array
+                // Result is array
+                $filterValue[$key] = self::fixInputArrayBoolean($value);
+            }
+        }
+        else if($filter->isBoolean()) {
+            // Parameter is boolean
+            // Result is boolean
+            $filterValue = self::fixInputBoolean($filterValue);
+        }
+        
         return $filterValue;
+    }
+
+    /**
+     * Normalizes boolean values within an array.
+     *
+     * This method iterates through the array and converts each element
+     * into a proper boolean value if possible. If the input is a string,
+     * it is also normalized into a boolean.
+     *
+     * @param array|string $value The array or string containing raw boolean-like values.
+     * @return array|bool The normalized array of booleans, or a single boolean if input was a string.
+     */
+    private static function fixInputArrayBoolean($value)
+    {
+        if(is_array($value)) {
+            foreach($value as $key => $val)
+            {
+                $value[$key] = self::fixInputBoolean($val);
+            }
+        }
+        else if(is_string($value)) {
+            $value = self::fixInputBoolean($value);
+        }
+        return $value;
+    }
+
+    /**
+     * Converts a raw input into a boolean value.
+     *
+     * This method interprets common string representations of boolean values
+     * such as "true", "false", "yes", "no", "1", and "0". If the input
+     * matches one of these values, it is converted into a boolean.
+     * Otherwise, the original value is returned unchanged.
+     *
+     * @param mixed $value The raw input value to be normalized.
+     * @return bool|mixed A boolean value if conversion is possible, otherwise the original input.
+     */
+    private static function fixInputBoolean($value)
+    {
+        if(is_string($value)) {
+            if(strtolower($value) === "true" || strtolower($value) === "yes" || strtolower($value) === "1"){
+                return true;
+            } else if(strtolower($value) === "false" || strtolower($value) === "no" || strtolower($value) === "0"){
+                return false;
+            }
+        }
+        return $value;
     }
 
     /**
@@ -710,7 +775,7 @@ class PicoSpecification // NOSONAR
      * Checks if a real join table is required based on the specifications.
      *
      * @return bool true if a join is required, false otherwise.
-     */ 
+     */
     public function getRequireJoin()
     {
         return $this->requireJoin;
