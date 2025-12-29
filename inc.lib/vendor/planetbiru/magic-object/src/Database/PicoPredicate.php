@@ -6,10 +6,10 @@ namespace MagicObject\Database;
  * Class PicoPredicate
  *
  * A predicate for building query conditions in database queries.
- * This class allows you to define various query conditions 
+ * This class allows you to define various query conditions
  * (e.g., equality, inequality, inclusion, pattern matching, etc.)
  * to be used when constructing database queries.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -42,7 +42,7 @@ class PicoPredicate // NOSONAR
     /**
      * Constructor. Initializes the predicate with a field and value.
      *
-     * If a field is provided, it sets the equality condition or 
+     * If a field is provided, it sets the equality condition or
      * an IN condition based on the value type.
      *
      * @param string|null $field The name of the field.
@@ -373,7 +373,7 @@ class PicoPredicate // NOSONAR
      * - `set<PropertyName>(value)`: Checks if the property value equals the provided value.
      *   - For example, calling `$obj->setFoo($value)` checks if the property `foo`
      *     is equal to `$value` using the `equals` method.
-     * 
+     *
      * If the method name does not start with "set" or if no value is provided,
      * the method returns null.
      *
@@ -451,7 +451,7 @@ class PicoPredicate // NOSONAR
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.

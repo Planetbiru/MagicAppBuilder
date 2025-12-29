@@ -17,18 +17,18 @@ use stdClass;
 
 /**
  * PicoDatabase provides an interface for database interactions using PDO.
- * 
+ *
  * This class manages database connections, query execution, and transactions.
- * It supports callbacks for query execution and debugging, allowing developers 
+ * It supports callbacks for query execution and debugging, allowing developers
  * to handle SQL commands and responses effectively.
- * 
+ *
  * Features include:
  * - Establishing and managing a database connection.
  * - Executing various SQL commands (INSERT, UPDATE, DELETE, etc.).
  * - Transaction management with commit and rollback functionality.
  * - Fetching results in different formats (array, object, etc.).
  * - Generating unique IDs and retrieving the last inserted ID.
- * 
+ *
  * **Example:**
  * ```php
  * <?php
@@ -36,7 +36,7 @@ use stdClass;
  * $db->connect();
  * $result = $db->fetch("SELECT * FROM users WHERE id = ?", 123);
  * ```
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -102,21 +102,21 @@ class PicoDatabase // NOSONAR
      * Creates a PicoDatabase instance from an existing PDO connection.
      *
      * This static method accepts a PDO connection object and attempts to extract
-     * database credentials (such as host, port, schema, and timezone) directly 
-     * from the connection. If certain details cannot be retrieved from the PDO 
-     * object (for example, if the driver does not support a specific attribute), 
-     * the method will use the optional $databaseCredentials parameter as a 
+     * database credentials (such as host, port, schema, and timezone) directly
+     * from the connection. If certain details cannot be retrieved from the PDO
+     * object (for example, if the driver does not support a specific attribute),
+     * the method will use the optional $databaseCredentials parameter as a
      * fallback source.
      *
-     * The resulting PicoDatabase instance will contain the PDO connection, 
+     * The resulting PicoDatabase instance will contain the PDO connection,
      * resolved database type, and credentials, and will be marked as connected.
      *
-     * @param PDO $pdo The PDO connection object representing an active 
+     * @param PDO $pdo The PDO connection object representing an active
      *                 connection to the database.
-     * @param SecretObject|null $databaseCredentials Optional fallback credentials 
+     * @param SecretObject|null $databaseCredentials Optional fallback credentials
      *                 to use if details cannot be extracted from the PDO object.
-     * @return PicoDatabase Returns a new instance of the PicoDatabase class, 
-     *                      configured with the PDO connection, database type, 
+     * @return PicoDatabase Returns a new instance of the PicoDatabase class,
+     *                      configured with the PDO connection, database type,
      *                      and credentials.
      */
     public static function fromPdo($pdo, $databaseCredentials = null)
@@ -296,8 +296,8 @@ class PicoDatabase // NOSONAR
      * Converts a timezone offset string to a corresponding PHP timezone name.
      *
      * This method takes a timezone offset string (e.g., "+08:00" or "-05:30") and computes
-     * the total offset in seconds. It then attempts to map the offset to a standard PHP 
-     * timezone name. If no matching timezone is found, it falls back to returning a 
+     * the total offset in seconds. It then attempts to map the offset to a standard PHP
+     * timezone name. If no matching timezone is found, it falls back to returning a
      * UTC-based timezone string in the same offset format.
      *
      * Examples:
@@ -312,12 +312,12 @@ class PicoDatabase // NOSONAR
         try {
             // Extract the sign ('+' or '-') from the offset
             $sign = substr($offset, 0, 1); // Get the first character ('+' or '-')
-            
+
             // Split the offset into hours and minutes (e.g., "+08:00" -> [8, 0])
             $parts = explode(':', substr($offset, 1)); // Remove the sign and split
             $hours = (int)$parts[0]; // Parse the hours
             $minutes = isset($parts[1]) ? (int)$parts[1] : 0; // Parse the minutes if available
-            
+
             // Calculate the total offset in seconds
             $totalOffsetSeconds = ($hours * 3600) + ($minutes * 60);
             if ($sign === '-') {
@@ -359,7 +359,7 @@ class PicoDatabase // NOSONAR
     /**
      * Connect to the database.
      *
-     * Establishes a connection to the specified database type. Optionally selects a database if the 
+     * Establishes a connection to the specified database type. Optionally selects a database if the
      * connection is to an RDMS and the flag is set.
      *
      * @param int $timeout Connection timeout in seconds.
@@ -369,7 +369,7 @@ class PicoDatabase // NOSONAR
     public function connect($withDatabase = true)
     {
         $timeout = $this->databaseCredentials->issetConnectionTimeout() ? $this->databaseCredentials->getConnectionTimeout() : 0;
-        $databaseTimeZone = $this->databaseCredentials->getTimeZone();      
+        $databaseTimeZone = $this->databaseCredentials->getTimeZone();
         if ($databaseTimeZone !== null && !empty($databaseTimeZone)) {
             date_default_timezone_set($this->databaseCredentials->getTimeZone());
         }
@@ -383,7 +383,7 @@ class PicoDatabase // NOSONAR
             return $this->connectRDMS($withDatabase, $timeout);
         }
     }
-    
+
     /**
      * Connect to SQLite database.
      *
@@ -403,7 +403,11 @@ class PicoDatabase // NOSONAR
             throw new InvalidDatabaseConfiguration("Database path may not be empty. Please check your database configuration on {database_file_path}!");
         }
         try {
-            $this->databaseConnection = new PDO("sqlite:" . $path);
+            if(stripos($path, 'sqlite:') === false)
+            {
+                $path = 'sqlite:' . $path;
+            }
+            $this->databaseConnection = new PDO($path);
             $this->databaseConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $connected = true;
             $this->connected = true;
@@ -412,16 +416,16 @@ class PicoDatabase // NOSONAR
         }
         return $connected;
     }
-    
+
     /**
      * Connect to the RDMS (Relational Database Management System).
      *
-     * Establishes a connection to an RDMS database using the provided credentials. Optionally, a specific 
-     * database is selected based on the provided flag. This method also configures the time zone, character set, 
+     * Establishes a connection to an RDMS database using the provided credentials. Optionally, a specific
+     * database is selected based on the provided flag. This method also configures the time zone, character set,
      * and schema settings (for PostgreSQL) after the connection is established.
      *
      * - The time zone is set based on the current offset (`date("P")`), or a configured value.
-     * - For PostgreSQL, the client encoding (charset) is set using `SET CLIENT_ENCODING`, and the schema is set 
+     * - For PostgreSQL, the client encoding (charset) is set using `SET CLIENT_ENCODING`, and the schema is set
      *   using `SET search_path`.
      * - For MySQL, the time zone and charset are set using `SET time_zone` and `SET NAMES`.
      *
@@ -479,7 +483,7 @@ class PicoDatabase // NOSONAR
      * Establish a connection to a MySQL or MariaDB database.
      *
      * This method sets up a connection to a MySQL or MariaDB database, configuring the time zone
-     * and character set (charset) as needed. It runs initial queries to set the correct time zone 
+     * and character set (charset) as needed. It runs initial queries to set the correct time zone
      * and charset, and then establishes a PDO connection to the database.
      *
      * @param string $connectionString The connection string used to connect to the database.
@@ -496,7 +500,7 @@ class PicoDatabase // NOSONAR
         $initialQueries = array();
         // Set time zone for MySQL
         $initialQueries[] = "SET time_zone='$timeZoneOffset';";
-                        
+
         // Add charset to the initial queries for MySQL
         if ($charset) {
             $initialQueries[] = "SET NAMES '$charset';";  // Set charset for MySQL
@@ -530,8 +534,8 @@ class PicoDatabase // NOSONAR
      * Establish a connection to a PostgreSQL database.
      *
      * This method sets up a connection to a PostgreSQL database, configuring the time zone,
-     * character set (charset), and schema (search path) as needed. It runs initial queries 
-     * to set the correct time zone, charset, and schema for the session, and then establishes 
+     * character set (charset), and schema (search path) as needed. It runs initial queries
+     * to set the correct time zone, charset, and schema for the session, and then establishes
      * a PDO connection to the database.
      *
      * @param string $connectionString The connection string used to connect to the PostgreSQL database.
@@ -571,7 +575,7 @@ class PicoDatabase // NOSONAR
             $connectionString,
             $this->databaseCredentials->getUsername(),
             $this->databaseCredentials->getPassword(),
-            $options 
+            $options
         );
 
         // Execute the initial queries (timezone, charset, schema) in PostgreSQL
@@ -582,7 +586,7 @@ class PicoDatabase // NOSONAR
             }
         }
     }
-    
+
     /**
      * Establish a connection to a SQL Server database.
      *
@@ -623,11 +627,11 @@ class PicoDatabase // NOSONAR
         }
     }
 
-    
+
     /**
      * Determine the database type from a string.
      *
-     * This method evaluates the provided string to identify common database types such as SQLite, PostgreSQL, 
+     * This method evaluates the provided string to identify common database types such as SQLite, PostgreSQL,
      * MariaDB, MySQL, and SQL Server. It returns the corresponding constant from the `PicoDatabaseType` class.
      * If the provided database type is not supported, it throws an `UnsupportedDatabaseException`.
      *
@@ -671,12 +675,12 @@ class PicoDatabase // NOSONAR
     /**
      * Determines the database driver based on the provided database type.
      *
-     * This function takes a string representing the database type and returns 
+     * This function takes a string representing the database type and returns
      * the corresponding database driver constant from the `PicoDatabaseType` class.
      * It supports SQLite, PostgreSQL, MySQL/MariaDB, and SQL Server types.
      *
      * @param string $databaseType The type of the database (e.g., 'sqlite', 'postgres', 'pgsql', 'mysql', 'mariadb', 'sqlsrv').
-     * 
+     *
      * @return string The corresponding database driver constant, one of:
      *                - `PicoDatabaseType::DATABASE_TYPE_SQLITE`
      *                - `PicoDatabaseType::DATABASE_TYPE_PGSQL`
@@ -735,7 +739,7 @@ class PicoDatabase // NOSONAR
                     $this->databaseCredentials->getHost(),
                     $this->databaseCredentials->getDatabaseName()
                 );
-            } 
+            }
             else
             {
                 return sprintf(
@@ -803,14 +807,14 @@ class PicoDatabase // NOSONAR
             $sql = "SET time_zone='$timeZoneOffset'";
             $this->execute($sql);
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Set the time zone offset for the database session.
      *
-     * This method sets the time zone offset for the current database session. This is useful for ensuring that 
+     * This method sets the time zone offset for the current database session. This is useful for ensuring that
      * any time-related operations (such as querying and storing timestamps) are adjusted to the correct time zone.
      * The method generates the appropriate SQL command based on the type of the database (e.g., PostgreSQL, MySQL, etc.)
      * and executes it to apply the time zone setting.
@@ -823,7 +827,7 @@ class PicoDatabase // NOSONAR
     {
         return $this->setTimeZoneOffset(self::getTimeZoneOffsetFromString($timezone));
     }
-    
+
     /**
      * Converts a timezone name (e.g., 'Asia/Jakarta') to its corresponding UTC offset (e.g., '+07:00' or '-03:00').
      *
@@ -836,10 +840,10 @@ class PicoDatabase // NOSONAR
     {
         // Create a DateTimeZone object for the provided timezone
         $zone = new DateTimeZone($timezone);
-        
+
         // Get the current time in the given timezone
         $now = new DateTime("now", $zone);
-        
+
         // Get the offset in seconds from UTC
         $offsetInSeconds = $zone->getOffset($now);
 
@@ -941,7 +945,7 @@ class PicoDatabase // NOSONAR
      *
      * @param string $sql The SQL query to execute.
      * @param array|null $params Optional parameters to bind to the query.
-     * @return PDOStatement|false Returns a `PDOStatement` object if the query was executed successfully, 
+     * @return PDOStatement|false Returns a `PDOStatement` object if the query was executed successfully,
      *                             or `false` if the execution failed.
      * @throws PDOException If an error occurs while executing the query.
      */
@@ -966,11 +970,11 @@ class PicoDatabase // NOSONAR
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
-        
+
         $result = array();
         $this->executeDebug($sql);
         $stmt = $this->databaseConnection->prepare($sql);
-        
+
         try {
             $stmt->execute($params);
             if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
@@ -988,7 +992,7 @@ class PicoDatabase // NOSONAR
         } catch (PDOException $e) {
             $result = $defaultValue;
         }
-        
+
         return $result;
     }
 
@@ -1007,10 +1011,10 @@ class PicoDatabase // NOSONAR
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
-        
+
         $this->executeDebug($sql);
         $stmt = $this->databaseConnection->prepare($sql);
-        
+
         try {
             $stmt->execute($params);
             if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
@@ -1043,11 +1047,11 @@ class PicoDatabase // NOSONAR
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
-        
+
         $result = array();
         $this->executeDebug($sql);
         $stmt = $this->databaseConnection->prepare($sql);
-        
+
         try {
             $stmt->execute($params);
             if($this->getDatabaseType() == PicoDatabaseType::DATABASE_TYPE_SQLITE)
@@ -1065,7 +1069,7 @@ class PicoDatabase // NOSONAR
         } catch (PDOException $e) {
             $result = $defaultValue;
         }
-        
+
         return $result;
     }
 
@@ -1101,16 +1105,16 @@ class PicoDatabase // NOSONAR
         if ($this->databaseConnection == null) {
             throw new NullPointerException(self::DATABASE_NONECTION_IS_NULL);
         }
-        
+
         $this->executeDebug($sql, $params);
         $stmt = $this->databaseConnection->prepare($sql);
-        
+
         try {
             $stmt->execute($params);
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), intval($e->getCode()));
         }
-        
+
         return $stmt;
     }
 
@@ -1230,7 +1234,7 @@ class PicoDatabase // NOSONAR
             else
             {
                 call_user_func($this->callbackDebugQuery, $query);
-            }           
+            }
         }
     }
 
@@ -1341,7 +1345,7 @@ class PicoDatabase // NOSONAR
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.
@@ -1359,7 +1363,7 @@ class PicoDatabase // NOSONAR
     /**
      * Get the callback function to be executed when modifying data with queries.
      *
-     * This function returns the callback that is invoked when executing queries 
+     * This function returns the callback that is invoked when executing queries
      * that modify data (e.g., `INSERT`, `UPDATE`, `DELETE`).
      *
      * @return callable|null The callback function, or null if no callback is set.
@@ -1372,12 +1376,12 @@ class PicoDatabase // NOSONAR
     /**
      * Set the callback function to be executed when modifying data with queries.
      *
-     * This method sets the callback to be invoked when executing queries 
+     * This method sets the callback to be invoked when executing queries
      * that modify data (e.g., `INSERT`, `UPDATE`, `DELETE`).
      *
      * @param callable|null $callbackExecuteQuery The callback function to set, or null to unset the callback.
      * @return self Returns the current instance for method chaining.
-     */ 
+     */
     public function setCallbackExecuteQuery($callbackExecuteQuery)
     {
         $this->callbackExecuteQuery = $callbackExecuteQuery;
@@ -1388,7 +1392,7 @@ class PicoDatabase // NOSONAR
     /**
      * Get the callback function to be executed when executing any query.
      *
-     * This function returns the callback that is invoked for any type of query, 
+     * This function returns the callback that is invoked for any type of query,
      * whether it's a read (`SELECT`) or modify (`INSERT`, `UPDATE`, `DELETE`).
      *
      * @return callable|null The callback function, or null if no callback is set.
@@ -1401,7 +1405,7 @@ class PicoDatabase // NOSONAR
     /**
      * Set the callback function to be executed when executing any query.
      *
-     * This method sets the callback to be invoked for any type of query, 
+     * This method sets the callback to be invoked for any type of query,
      * whether it's a read (`SELECT`) or modify (`INSERT`, `UPDATE`, `DELETE`).
      *
      * @param callable|null $callbackDebugQuery The callback function to set, or null to unset the callback.
@@ -1417,9 +1421,9 @@ class PicoDatabase // NOSONAR
     /**
      * Checks whether the PDO connection is fully active and able to execute queries.
      *
-     * This method not only verifies that a TCP connection to the database exists, 
-     * but also ensures that PHP can successfully execute a simple SQL statement 
-     * on the target database. By running `SELECT 1 + 1 AS two`, it validates 
+     * This method not only verifies that a TCP connection to the database exists,
+     * but also ensures that PHP can successfully execute a simple SQL statement
+     * on the target database. By running `SELECT 1 + 1 AS two`, it validates
      * both the connection and query execution capability.
      *
      * @return bool True if the connection and query execution are successful, false otherwise.

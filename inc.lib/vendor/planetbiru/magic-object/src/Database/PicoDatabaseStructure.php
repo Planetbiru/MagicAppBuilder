@@ -12,7 +12,7 @@ use MagicObject\Util\ClassUtil\PicoAnnotationParser;
  * This class is used to manage and generate the structure of a database table based on annotations
  * defined in a MagicObject class. It provides functionality to create SQL `CREATE TABLE` statements
  * and retrieve metadata about the table, including its columns, primary keys, and nullable fields.
- * 
+ *
  * It uses annotations such as `@Table` to specify the table name and `@Column` to define column properties
  * in a class. The class can automatically generate SQL statements for creating a table and its columns
  * based on this metadata.
@@ -95,7 +95,7 @@ class PicoDatabaseStructure
     {
         $createStrArr = array();
         $pk = array();
-        
+
         if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL || $databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB) {
             foreach ($info->getColumns() as $column) {
                 $createStrArr[] = $column[self::KEY_NAME] . " " . $column[self::KEY_TYPE] . " " . $this->nullable($column[self::KEY_NULLABLE]);

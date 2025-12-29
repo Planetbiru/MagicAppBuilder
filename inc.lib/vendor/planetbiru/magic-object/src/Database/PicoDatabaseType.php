@@ -56,7 +56,7 @@ class PicoDatabaseType
      * @var string
      */
     const DATABASE_TYPE_SQLITE = "sqlite";
-    
+
     /**
      * Constant for SQL Server database type.
      *

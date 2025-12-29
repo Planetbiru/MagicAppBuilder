@@ -8,7 +8,7 @@ use MagicObject\MagicObject;
  * Class PicoDatabaseEntity
  *
  * Represents a database entity that manages multiple database connections.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -17,23 +17,23 @@ class PicoDatabaseEntity
 {
     /**
      * An associative array of databases indexed by entity class name.
-     * 
-     * @var PicoDatabase[] 
+     *
+     * @var PicoDatabase[]
      */
     private $databases = array();
-    
+
     /**
      * Default database connection
      *
      * @var PicoDatabase
      */
     private $defaultDatabase;
-    
+
     /**
      * Adds an entity to the database.
      *
      * @param MagicObject $entity The entity to add.
-     * @param PicoDatabase|null $database The database to associate with the entity. If null, 
+     * @param PicoDatabase|null $database The database to associate with the entity. If null,
      *                                    the current database of the entity will be used.
      * @return self Returns the current instance for method chaining.
      */
@@ -51,7 +51,7 @@ class PicoDatabaseEntity
         }
         return $this;
     }
-    
+
     /**
      * Gets the database associated with an entity.
      *
@@ -71,7 +71,7 @@ class PicoDatabaseEntity
      * Get default database connection
      *
      * @return PicoDatabase Default database connection
-     */ 
+     */
     public function getDefaultDatabase()
     {
         return $this->defaultDatabase;
@@ -83,7 +83,7 @@ class PicoDatabaseEntity
      * @param PicoDatabase $defaultDatabase Default database connection
      *
      * @return self Returns the current instance for method chaining.
-     */ 
+     */
     public function setDefaultDatabase($defaultDatabase)
     {
         $this->defaultDatabase = $defaultDatabase;

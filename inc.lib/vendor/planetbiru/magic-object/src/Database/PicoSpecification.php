@@ -390,7 +390,7 @@ class PicoSpecification // NOSONAR
      */
     private function getColumnName($field, $parentField)
     {
-       return ($parentField === null) ? $field : $parentField . "." . $field;
+        return ($parentField === null) ? $field : $parentField . "." . $field;
     }
 
     /**
@@ -613,7 +613,7 @@ class PicoSpecification // NOSONAR
             // Result is boolean
             $filterValue = self::fixInputBoolean($filterValue);
         }
-        
+
         return $filterValue;
     }
 

@@ -6,7 +6,7 @@ namespace MagicObject\Database;
  * Class representing a join mapping in a database.
  *
  * Contains information about how an entity is joined with another table.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -119,7 +119,7 @@ class PicoJoinMap
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.

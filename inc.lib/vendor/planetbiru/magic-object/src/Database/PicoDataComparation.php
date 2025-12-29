@@ -6,12 +6,12 @@ namespace MagicObject\Database;
  * Class PicoDataComparation
  *
  * This class provides various comparison operations for use in database queries.
- * It allows the creation of comparison objects that can be utilized to 
- * compare values against specified criteria, facilitating flexible and 
+ * It allows the creation of comparison objects that can be utilized to
+ * compare values against specified criteria, facilitating flexible and
  * expressive database querying.
  *
- * The class supports a variety of comparison operators such as equality, 
- * inequality, inclusion, and range comparisons. Each operator can be 
+ * The class supports a variety of comparison operators such as equality,
+ * inequality, inclusion, and range comparisons. Each operator can be
  * applied to values of various types, including strings, booleans, and numbers.
  *
  * @author Kamshory
@@ -214,7 +214,7 @@ class PicoDataComparation // NOSONAR
     /**
      * Returns the appropriate equals operator based on the value's state.
      *
-     * If the value is null or of type null, returns the IS operator; 
+     * If the value is null or of type null, returns the IS operator;
      * otherwise, returns the standard equals operator.
      *
      * @return string The equals operator.
@@ -227,7 +227,7 @@ class PicoDataComparation // NOSONAR
     /**
      * Returns the appropriate not equals operator based on the value's state.
      *
-     * If the value is null or of type null, returns the IS NOT operator; 
+     * If the value is null or of type null, returns the IS NOT operator;
      * otherwise, returns the standard not equals operator.
      *
      * @return string The not equals operator.

@@ -4,11 +4,11 @@ namespace MagicObject\Database;
 
 /**
  * Class PicoDatabaseQueryTemplate
- * 
+ *
  * This class represents a query template or builder that can either hold a
  * pre-defined query template (as a string) or an instance of a query builder
  * (PicoDatabaseQueryBuilder). It is designed to facilitate the construction
- * and conversion of queries to a string format, either directly or through 
+ * and conversion of queries to a string format, either directly or through
  * a query builder.
  *
  * @author Kamshory
@@ -19,7 +19,7 @@ class PicoDatabaseQueryTemplate
 {
     /**
      * The query template as a string.
-     * 
+     *
      * This property holds the template for a database query in string format,
      * or null if no template is provided.
      *
@@ -29,7 +29,7 @@ class PicoDatabaseQueryTemplate
 
     /**
      * The query builder instance.
-     * 
+     *
      * This property holds an instance of PicoDatabaseQueryBuilder, which is used
      * to build and manipulate database queries programmatically.
      *

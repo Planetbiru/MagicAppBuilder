@@ -6,11 +6,11 @@ use PDO;
 
 /**
  * Class PicoDatabaseQueryBuilder
- * 
- * A query builder for constructing SQL statements programmatically. This class 
- * facilitates the creation of various SQL commands including SELECT, INSERT, 
+ *
+ * A query builder for constructing SQL statements programmatically. This class
+ * facilitates the creation of various SQL commands including SELECT, INSERT,
  * UPDATE, and DELETE, while managing database-specific nuances.
- * 
+ *
  * **Example:**
  * ```php
  * <?php
@@ -25,7 +25,7 @@ use PDO;
  * ;
  * $data = $db->fetch($query);
  * echo $data['client_id']."\r\n"; // Client ID
- * echo $data['name']."\r\n"; // Client name 
+ * echo $data['name']."\r\n"; // Client name
  * ```
  *
  * @author Kamshory
@@ -115,7 +115,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
      */
     public function isMySql()
     {
-        return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) == 0 || 
+        return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) == 0 ||
                strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) == 0;
     }
 
@@ -138,7 +138,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
     {
         return strcasecmp($this->databaseType, PicoDatabaseType::DATABASE_TYPE_SQLITE) == 0;
     }
-	
+
 	/**
      * Check if the database type is SQL Server.
      *
@@ -438,8 +438,8 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	/**
      * Binds SQL parameters by replacing placeholders with actual values.
      *
-     * This function accepts multiple arguments, where the first argument 
-     * is expected to be a SQL string containing `?` placeholders, and 
+     * This function accepts multiple arguments, where the first argument
+     * is expected to be a SQL string containing `?` placeholders, and
      * subsequent arguments are the values to replace them.
      *
      * @return string The formatted SQL query with values replaced.
@@ -647,7 +647,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	 *
 	 * @return string|null The START TRANSACTION statement or null if not supported.
 	 */
-	public function startTransaction() 
+	public function startTransaction()
 	{
 		if ($this->isMySql() || $this->isPgSql()) {
 			return "START TRANSACTION";
@@ -689,7 +689,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Escapes a raw SQL query string to be safely used in an SQL statement,
 	 * including handling of single quotes, backslashes, and line breaks,
@@ -714,7 +714,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		// Escape carriage return and newline for all
 		$query = str_replace(["\r", "\n"], ["\\r", "\\n"], $query);
 
-		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) !== false 
+		if (stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MYSQL) !== false
 			|| stripos($this->databaseType, PicoDatabaseType::DATABASE_TYPE_MARIADB) !== false) {
 			// MySQL/MariaDB: escape both backslash and single quote
 			return str_replace(
@@ -751,19 +751,19 @@ class PicoDatabaseQueryBuilder // NOSONAR
 		);
 	}
 
-	
+
 	/**
 	 * Escape a value for SQL queries.
 	 *
-	 * This method safely escapes different types of values (null, strings, booleans, 
-	 * numeric values, arrays, and objects) to ensure that they can be safely used in 
-	 * SQL queries. It prevents SQL injection by escaping potentially dangerous 
-	 * characters in string values and converts arrays or objects to their JSON 
+	 * This method safely escapes different types of values (null, strings, booleans,
+	 * numeric values, arrays, and objects) to ensure that they can be safely used in
+	 * SQL queries. It prevents SQL injection by escaping potentially dangerous
+	 * characters in string values and converts arrays or objects to their JSON
 	 * representation.
 	 *
-	 * @param mixed $value The value to be escaped. Can be null, string, boolean, 
+	 * @param mixed $value The value to be escaped. Can be null, string, boolean,
 	 *                     numeric, array, or object.
-	 * @return string The escaped value. This will be a string representation 
+	 * @return string The escaped value. This will be a string representation
 	 *                of the value, properly formatted for SQL usage.
 	 */
 	public function escapeValue($value)
@@ -805,7 +805,7 @@ class PicoDatabaseQueryBuilder // NOSONAR
 	{
 		return $this->escapeValue(json_encode($values));
 	}
-	
+
 	/**
 	 * Convert a value to its boolean representation for SQL.
 	 *
@@ -1005,16 +1005,16 @@ class PicoDatabaseQueryBuilder // NOSONAR
 
 	/**
 	 * Adds pagination and sorting clauses to a native query string.
-	 * 
+	 *
 	 * This function appends the appropriate `ORDER BY` and `LIMIT $limit OFFSET $offset` or `LIMIT $offset, $limit`
 	 * clauses to the provided SQL query string based on the given pagination and sorting parameters.
-	 * It supports various database management systems (DBMS) and adjusts the query syntax 
+	 * It supports various database management systems (DBMS) and adjusts the query syntax
 	 * accordingly (e.g., for PostgreSQL, SQLite, MySQL, MariaDB, etc.).
 	 *
 	 * @param string $queryString The original SQL query string to which pagination and sorting will be added.
 	 * @param PicoPageable|null $pageable The pagination parameters, or `null` if pagination is not required.
 	 * @param PicoSortable|null $sortable The sorting parameters, or `null` if sorting is not required.
-	 * 
+	 *
 	 * @return string The modified SQL query string with added pagination and sorting clauses.
 	 */
 	public function addPaginationAndSorting($queryString, $pageable, $sortable)
@@ -1031,8 +1031,8 @@ class PicoDatabaseQueryBuilder // NOSONAR
 			foreach($sortable->getSortable() as $sort)
 			{
 				$columnName = $sort->getSortBy();
-				$sortType = $sort->getSortType();             				
-				$sorts[] = $columnName . " " . $sortType;           
+				$sortType = $sort->getSortType();
+				$sorts[] = $columnName . " " . $sortType;
 			}
 			if(!empty($sorts))
 			{
@@ -1060,10 +1060,10 @@ class PicoDatabaseQueryBuilder // NOSONAR
 				$queryString .= "\r\nOFFSET $offset ROWS FETCH NEXT $limit ROWS ONLY";
 			}
 		}
-		
+
 		return $queryString;
 	}
-	
+
 	/**
 	 * Converts the current object to a string representation.
 	 *

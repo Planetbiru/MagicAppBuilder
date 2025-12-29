@@ -8,10 +8,10 @@ use stdClass;
 /**
  * Class representing information about a database table.
  *
- * This class contains details such as the table name, columns, 
- * primary keys, and other related metadata necessary for managing 
+ * This class contains details such as the table name, columns,
+ * primary keys, and other related metadata necessary for managing
  * database interactions.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -73,7 +73,7 @@ class PicoTableInfo // NOSONAR
      * @var string
      */
     protected $columnType;
-    
+
     /**
      * Flag to disable cache when any entities join with this entity
      *
@@ -358,7 +358,7 @@ class PicoTableInfo // NOSONAR
      * Get flag to disable cache when any entities join with this entity
      *
      * @return boolean Flag to disable cache when any entities join with this entity
-     */ 
+     */
     public function getNoCache()
     {
         return $this->noCache;
@@ -370,7 +370,7 @@ class PicoTableInfo // NOSONAR
      * @param boolean  $noCache  Flag to disable cache when any entities join with this entity
      *
      * @return self Returns the current instance for method chaining.
-     */ 
+     */
     public function setNoCache($noCache)
     {
         $this->noCache = $noCache;
@@ -382,7 +382,7 @@ class PicoTableInfo // NOSONAR
      * Get the package name or namespace.
      *
      * @return string The package name or namespace.
-     */ 
+     */
     public function getPackage()
     {
         return $this->package;
@@ -394,7 +394,7 @@ class PicoTableInfo // NOSONAR
      * @param string  $package  The package name or namespace.
      *
      * @return self Returns the current instance for method chaining.
-     */ 
+     */
     public function setPackage($package)
     {
         $this->package = $package;

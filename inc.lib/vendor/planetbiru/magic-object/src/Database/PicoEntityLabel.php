@@ -9,9 +9,9 @@ use stdClass;
 
 /**
  * Class to manage entity labels and their annotations.
- * 
+ *
  * Provides methods to retrieve and filter entity metadata, including labels, columns, and other attributes.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -235,15 +235,15 @@ class PicoEntityLabel
                     // Ensure the column exists before proceeding
                     // Parse the key-value pair for additional details
                     $vals = $this->parseKeyValue($reflexProp, $val, $param);
-        
+
                     // Store the parsed values in the auto-increment keys array
                     $autoIncrementKeys[$prop->name] = array(
                         self::KEY_NAME => isset($columns[$prop->name][self::KEY_NAME]) ? $columns[$prop->name][self::KEY_NAME] : null,
                         self::KEY_STRATEGY => isset($vals[self::KEY_STRATEGY]) ? $vals[self::KEY_STRATEGY] : null,
                         self::KEY_GENERATOR => isset($vals[self::KEY_GENERATOR]) ? $vals[self::KEY_GENERATOR] : null,
                     );
-                }  
-            } 
+                }
+            }
 
             // Define default column values
             foreach ($parameters as $param => $val) {
@@ -257,7 +257,7 @@ class PicoEntityLabel
                         );
                     }
                 }
-            }            
+            }
 
             // List not null columns
             foreach ($parameters as $param => $val) {
