@@ -7,7 +7,7 @@ use stdClass;
 
 /**
  * Pageable
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -37,55 +37,55 @@ class PicoPageable
 
     /**
      * Constructor for the Pageable class.
-     * 
+     *
      * This constructor allows initializing a Pageable object with pagination and sorting options.
      * It supports different formats for both page and sortable parameters.
-     * 
+     *
      * Example 1: Using `PicoPage` and `PicoSortable`
-     * 
+     *
      * ```php
      * <?php
      * $pageable = new Pageable(new PicoPage(1, 100), new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));
      * ?>
      * ```
-     * 
+     *
      * Example 2: Using `PicoLimit` and `PicoSortable`
-     * 
+     *
      * ```php
      * <?php
      * $pageable = new Pageable(new PicoLimit(0, 100), new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));
      * ?>
      * ```
-     * 
+     *
      * Example 3: Using an array for page and `PicoSortable`
-     * 
+     *
      * ```php
      * <?php
      * $pageable = new Pageable([1, 100], new PicoSortable('userName', 'asc', 'email', 'desc', 'phone', 'asc'));
      * ?>
      * ```
-     * 
+     *
      * Example 4: Using an array for both page and sortable
-     * 
+     *
      * ```php
      * <?php
      * $pageable = new Pageable([1, 100], ['userName', 'asc', 'email', 'desc', 'phone', 'asc']);
      * ?>
      * ```
-     * 
+     *
      * Example 5: Using `PicoPage` and an array for sortable
-     * 
+     *
      * ```php
      * <?php
      * $pageable = new Pageable(new PicoPage(1, 100), ['userName', 'asc', 'email', 'desc', 'phone', 'asc']);
      * ?>
      * ```
-     * 
+     *
      * @param PicoPage|PicoLimit|array|null $page The page or limit configuration. Can be:
      * - `PicoPage` instance (for page number and size),
      * - `PicoLimit` instance (for offset and limit),
      * - array with two elements representing page and size (e.g., `[1, 100]`).
-     * 
+     *
      * @param PicoSortable|array|null $sortable The sorting configuration. Can be:
      * - `PicoSortable` instance (for sorting by multiple fields),
      * - array of field-direction pairs (e.g., `['userName', 'asc', 'email', 'desc']`).
@@ -237,7 +237,7 @@ class PicoPageable
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.

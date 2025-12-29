@@ -967,7 +967,7 @@ class PicoDatabasePersistence // NOSONAR
             $result->whereClause = $this->whereStr;
             return $result;
         }
-        
+
         $wheres = array();
         $columns = array();
         foreach($info->getPrimaryKeys() as $property=>$column)
@@ -990,7 +990,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             throw new NoPrimaryKeyDefinedException("No primary key defined");
         }
-        
+
         $result->columns = $columns;
         $result->whereClause = implode(" and ", $wheres);
         return $result;

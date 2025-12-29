@@ -5,9 +5,9 @@ namespace MagicObject\Database;
 /**
  * Class representing a specification filter.
  *
- * This class defines filters for columns, specifying the data type 
+ * This class defines filters for columns, specifying the data type
  * and providing methods to convert values based on the defined type.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -54,7 +54,7 @@ class PicoSpecificationFilter
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.
@@ -93,7 +93,7 @@ class PicoSpecificationFilter
     /**
      * Checks if the data type represents an array.
      *
-     * This method determines whether the data type contains 
+     * This method determines whether the data type contains
      * an array-like structure based on the presence of square brackets (`[]`).
      *
      * @return bool true if the data type represents an array, false otherwise.
@@ -239,7 +239,7 @@ class PicoSpecificationFilter
     {
         return $this->dataType === self::DATA_TYPE_FULLTEXT;
     }
-    
+
     /**
      * Checks if the data type is a text equality match (exact match).
      *

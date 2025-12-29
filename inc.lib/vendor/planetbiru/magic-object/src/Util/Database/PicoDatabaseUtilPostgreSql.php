@@ -124,6 +124,8 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         }
 
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
+        $primaryKeys = $this->getPrimaryKeyNames($tableInfo->getPrimaryKeys());
+        $multiplePk = count($primaryKeys) > 1;
 
         $query[] = "$createStatement \"$tableName\" (";
 
@@ -134,56 +136,19 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         {
             if(isset($cols[$columnName]))
             {
-                $columns[] = $this->createColumnPostgre($cols[$columnName], $autoIncrementKeys, $tableInfo->getPrimaryKeys());
+                $columns[] = $this->createColumn($cols[$columnName], $autoIncrementKeys, $primaryKeys);
             }
         }
-
+        if($multiplePk)
+        {
+            $columns[] = "\tPRIMARY KEY(".implode(", ", $primaryKeys).")";
+        }
         $query[] = implode(",\r\n", $columns);
         $query[] = ");";
 
         return implode("\r\n", $query);
     }
 
-    /**
-     * Creates a column definition for a SQL statement.
-     *
-     * This method constructs a SQL column definition based on the provided column details,
-     * including the column name, data type, nullability, and default value. The resulting 
-     * definition is formatted for use in a CREATE TABLE statement.
-     *
-     * @param array $column An associative array containing details about the column:
-     *                      - string name: The name of the column.
-     *                      - string type: The data type of the column (e.g., VARCHAR, INT).
-     *                      - bool|string nullable: Indicates if the column allows NULL values (true or 'true' for NULL; otherwise, NOT NULL).
-     *                      - mixed defaultValue: The default value for the column (optional).
-     *
-     * @return string The SQL column definition formatted as a string, suitable for inclusion in a CREATE TABLE statement.
-     */
-    public function createColumn($column, $autoIncrementKeys = null)
-    {
-        $col = array();
-        $col[] = "\t";
-        $col[] = "\"" . $column[MagicObject::KEY_NAME] . "\"";
-        
-        $type = $this->fixAutoIncrementType($column, $column[MagicObject::KEY_TYPE], $autoIncrementKeys);
-        
-        $col[] = strtoupper($type);
-
-        if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
-            $col[] = "NULL";
-        } else {
-            $col[] = "NOT NULL";
-        }
-
-        if (isset($column[MagicObject::KEY_DEFAULT_VALUE])) {
-            $defaultValue = $column[MagicObject::KEY_DEFAULT_VALUE];
-            $defaultValue = $this->fixDefaultValue($defaultValue, $column[MagicObject::KEY_TYPE]);
-            $col[] = "DEFAULT $defaultValue";
-        }
-
-        return implode(" ", $col);
-    }
-    
     /**
      * Adjusts the SQL data type for auto-increment columns.
      *
@@ -248,12 +213,10 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
      * @return string The SQL column definition formatted as a string, suitable for inclusion 
      *                in a CREATE TABLE statement.
      */
-    public function createColumnPostgre($column, $autoIncrementKeys, $primaryKeys)
+    public function createColumn($column, $autoIncrementKeys, $primaryKeys)
     {
-        $pkCols = array();
-        foreach ($primaryKeys as $col) {
-            $pkCols[] = $col['name']; // Collect primary key column names.
-        }
+        
+        $multiplePk = count($primaryKeys) > 1;
 
         $col = array();
         $columnName = $column[MagicObject::KEY_NAME]; // Get the column name.
@@ -270,17 +233,16 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
             $columnType = $this->getColumnType($column[MagicObject::KEY_TYPE]); // Use the specified type if not auto-incrementing.
         }
 
-        $col[] = "\t";  // Add tab indentation for readability.
         $col[] = $columnName;  // Add the column name.
         $col[] = strtoupper($columnType);  // Add the column type (SERIAL or BIGSERIAL, or custom type).
 
         // Add PRIMARY KEY constraint if the column is part of the primary keys.
-        if (in_array($columnName, $pkCols)) {
+        if (in_array($columnName, $primaryKeys) && !$multiplePk) {
             $col[] = 'PRIMARY KEY';
         }
 
         // Determine nullability and add it to the definition.
-        if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
+        if (parent::isNullable($column)) {
             $col[] = "NULL"; // Allow NULL values.
         } else {
             $col[] = "NOT NULL"; // Disallow NULL values.
@@ -294,7 +256,7 @@ class PicoDatabaseUtilPostgreSql extends PicoDatabaseUtilBase implements PicoDat
         }
 
         // Join all parts into a single string to form the complete column definition.
-        return implode(" ", $col);
+        return "\t".implode(" ", $col);
     }
 
     /**

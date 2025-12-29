@@ -87,7 +87,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
             $columnName = $column[MagicObject::KEY_NAME];
             $columnType = $column[MagicObject::KEY_TYPE];
             $length = isset($column[MagicObject::KEY_LENGTH]) ? $column[MagicObject::KEY_LENGTH] : null;
-            $nullable = (isset($column[self::KEY_NULLABLE]) && $column[self::KEY_NULLABLE] === 'true') ? ' NULL' : ' NOT NULL';
+            $nullable = parent::isNullable($column) ? ' NULL' : ' NOT NULL';
             $defaultValue = isset($column[MagicObject::KEY_DEFAULT_VALUE]) ? " DEFAULT ".$column[MagicObject::KEY_DEFAULT_VALUE] : '';
 
             // Convert column type for SQL
@@ -257,7 +257,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * @param string|null   $charset           The character set to use for the table (optional, default is null).
      * @return string                          The SQL statement to create the table, including column definitions and primary keys.
      */
-    public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
+    public function dumpStructure($tableInfo, $tableName, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4') // NOSONAR
     {
         $query = array();
         $columns = array();
@@ -288,22 +288,31 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         }
 
         $autoIncrementKeys = $this->getAutoIncrementKey($tableInfo);
+        $primaryKeys = array();
         foreach($tableInfo->getColumns() as $k=>$column)
         {
             if(self::isArray($autoIncrementKeys) && in_array($column[MagicObject::KEY_NAME], $autoIncrementKeys))
             {
                 $cols[$k]['auto_increment'] = true;
             }
+            if(isset($column[self::KEY_PRIMARY_KEY]) && $column[self::KEY_PRIMARY_KEY])
+            {
+                $primaryKeys[] = $column['name'];
+            }
         }
+        $multiplePk = count($primaryKeys) > 1;
 
         foreach($tableInfo->getSortedColumnName() as $columnName)
         {
             if(isset($cols[$columnName]))
             {
-                $columns[] = $this->createColumn($cols[$columnName]);
+                $columns[] = $this->createColumn($cols[$columnName], $autoIncrementKeys, $primaryKeys);
             }
         }
-
+        if($multiplePk)
+        {
+            $columns[] = "\tPRIMARY KEY(".implode(", ", $primaryKeys).")";
+        }
         $query[] = implode(",\r\n", $columns);
         $query[] = "); ";
         
@@ -457,41 +466,52 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * Creates a column definition for a SQL statement (SQLite).
      *
      * This method constructs a SQL column definition based on the provided column details,
-     * including the column name, data type, nullability, default value, and primary key constraints.
-     * The resulting definition is formatted for use in a CREATE TABLE statement, suitable for SQLite.
-     * 
-     * If the column is specified as a primary key with auto-increment, the column type is set to INTEGER,
-     * and the PRIMARY KEY constraint is added with auto-increment behavior (SQLite uses INTEGER PRIMARY KEY AUTOINCREMENT).
-     * 
-     * @param array $column An associative array containing details about the column:
-     *                      - string 'name': The name of the column.
-     *                      - string 'type': The data type of the column (e.g., VARCHAR, INT).
-     *                      - bool|string 'nullable': Indicates if the column allows NULL values
-     *                        ('true' or true for NULL; otherwise, NOT NULL).
-     *                      - mixed 'defaultValue': The default value for the column (optional).
-     *                      - bool 'primary_key': Whether the column is a primary key (optional).
-     *                      - bool 'auto_increment': Whether the column is auto-incrementing (optional).
-     * 
-     * @return string The SQL column definition formatted as a string, suitable for inclusion 
-     *                in a CREATE TABLE statement.
+     * including the name, data type, nullability, default value, and primary key constraints.
+     * The resulting string is formatted specifically for SQLite CREATE TABLE statements.
+     * * Special SQLite handling:
+     * - If the column is a primary key with auto-increment, the type is forced to INTEGER 
+     * to trigger SQLite's internal rowid behavior.
+     * - If the table uses composite primary keys (multiple columns), the PRIMARY KEY 
+     * constraint is omitted from the individual column definition and should be 
+     * defined at the table level instead.
+     *
+     * @param array $column An associative array containing column details:
+     * - string 'name': The column identifier.
+     * - string 'type': The source data type (e.g., from MySQL).
+     * - bool|string 'nullable': 'true' or true for NULL; otherwise NOT NULL.
+     * - mixed 'defaultValue': The default value (optional).
+     * - bool 'primary_key': Primary key flag.
+     * - bool 'auto_increment': Auto-increment flag.
+     * @param array $autoIncrementKeys List of keys designated as auto-incrementing.
+     * @param array $primaryKeys List of all primary key columns to determine if a 
+     * composite key (multiple PKs) exists.
+     * * @return string The formatted SQL column definition string.
      */
-    public function createColumn($column)
+    public function createColumn($column, $autoIncrementKeys, $primaryKeys)
     {
+        
+        $multiplePk = count($primaryKeys) > 1;
+        
         $columnType = $this->mysqlToSqliteType($column[MagicObject::KEY_TYPE]);  // Convert MySQL type to SQLite type
         $col = array();
-        $col[] = "\t";  // Indentation for readability
         $col[] = "" . $column[MagicObject::KEY_NAME] . "";  // Column name
         
         // Handle primary key and auto-increment columns
         if (isset($column[self::KEY_PRIMARY_KEY]) && isset($column[self::KEY_AUTO_INCREMENT]) && $column[self::KEY_PRIMARY_KEY] && $column[self::KEY_AUTO_INCREMENT]) {
             $columnType = 'INTEGER';  // Use INTEGER for auto-incrementing primary keys in SQLite
             $col[] = $columnType;
-            $col[] = 'PRIMARY KEY';
+            if(!$multiplePk)
+            {
+                $col[] = 'PRIMARY KEY';
+            }
         }
         // Handle primary key only
         else if (isset($column[self::KEY_PRIMARY_KEY]) && $column[self::KEY_PRIMARY_KEY]) {
             $col[] = $columnType;
-            $col[] = 'PRIMARY KEY';
+            if(!$multiplePk)
+            {
+                $col[] = 'PRIMARY KEY';
+            }
         }
         // Handle regular column (non-primary key)
         else {
@@ -499,7 +519,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         }
 
         // Handle nullability
-        if (isset($column[self::KEY_NULLABLE]) && strtolower(trim($column[self::KEY_NULLABLE])) == 'true') {
+        if (parent::isNullable($column)) {
             $col[] = "NULL";  // Allow NULL values
         } else {
             $col[] = "NOT NULL";  // Disallow NULL values
@@ -513,7 +533,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         }
 
         // Join all parts into a single string for the final SQL column definition
-        return implode(" ", $col);
+        return "\t".implode(" ", $col);
     }
 
     /**

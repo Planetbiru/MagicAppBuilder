@@ -9,9 +9,9 @@ use stdClass;
  * Class PicoSort
  *
  * A class for defining sorting criteria for database queries.
- * This class allows you to specify the field to sort by and the 
+ * This class allows you to specify the field to sort by and the
  * direction of sorting (ascending or descending).
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -95,12 +95,12 @@ class PicoSort
         /**
      * Handles dynamic method calls for setting sorting criteria.
      *
-     * This magic method allows dynamic sorting by intercepting method calls 
-     * prefixed with "sortBy". It extracts the sorting field from the method name 
+     * This magic method allows dynamic sorting by intercepting method calls
+     * prefixed with "sortBy". It extracts the sorting field from the method name
      * and applies the specified sorting type.
      *
      * ### Supported Dynamic Method:
-     * - `sortBy<FieldName>(sortType)`: 
+     * - `sortBy<FieldName>(sortType)`:
      *   - Example: `$obj->sortByName('asc')`
      *   - Sets the sorting field to `name`
      *   - Sets the sorting type to `'asc'`
@@ -108,7 +108,7 @@ class PicoSort
      * ### Behavior:
      * - The method name must start with "sortBy".
      * - The first parameter must be provided, defining the sorting type.
-     * - If these conditions are met, the sorting field and type are set, and the 
+     * - If these conditions are met, the sorting field and type are set, and the
      *   current instance is returned for method chaining.
      * - If the method does not match the expected format, `null` is returned.
      *
@@ -161,7 +161,7 @@ class PicoSort
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.

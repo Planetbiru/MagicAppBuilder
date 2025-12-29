@@ -11,7 +11,7 @@ use MagicObject\Util\PicoStringUtil;
  *
  * This class provides functionality to manage sorting criteria,
  * allowing the specification of fields to sort by and their sort types.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -27,7 +27,7 @@ class PicoSortable
 
     /**
      * Constructor to initialize sortable criteria based on provided arguments.
-     * 
+     *
      * **Example:**
      * ```php
      * <?php
@@ -120,7 +120,7 @@ class PicoSortable
                     $sortable = $this->createSortable($sort[0], $sort[1]);
                     $this->sortable[count($this->sortable)] = $sortable;
                 }
-                
+
             } else if (is_string($sort)) {
                 // No mapping
                 $this->sortable[count($this->sortable)] = $sort;

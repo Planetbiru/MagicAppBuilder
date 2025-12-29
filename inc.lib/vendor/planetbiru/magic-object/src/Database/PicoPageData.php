@@ -20,7 +20,7 @@ use stdClass;
  * - Supports execution time tracking for performance monitoring.
  * - Provides easy access to pagination controls and metadata.
  * - Facilitates fetching and processing of data with subquery mapping.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -305,48 +305,64 @@ class PicoPageData // NOSONAR
      */
     protected function magicObjectToArray($data)
     {
-        // Null or scalar -> return directly
+        // Null or scalar
         if (is_null($data) || is_scalar($data)) {
             return $data;
         }
 
-        // Array -> recursive
+        // Array
         if (is_array($data)) {
-            return array_map(function ($item) {
-                return $this->magicObjectToArray($item);
-            }, $data);
+            $out = array();
+            foreach ($data as $k => $v) {
+                $out[$k] = $this->magicObjectToArray($v);
+            }
+            return $out;
         }
 
         // Object
         if (is_object($data)) {
-            // If there is a toArray method in MagicObject
+
+            // Prefer toArray() if exists
             if (method_exists($data, 'toArray')) {
                 return $this->magicObjectToArray($data->toArray());
             }
 
-            // Get public properties
+            // Public properties first
             $vars = get_object_vars($data);
 
-            // If empty, try using Reflection (for protected/private properties)
+            // Fallback: reflection (protected/private)
             if (empty($vars)) {
                 $reflect = new \ReflectionClass($data);
+                $vars = array();
                 foreach ($reflect->getProperties() as $prop) {
-                    $prop->setAccessible(true);
+                    // Skip non-public if we cannot safely access
+                    if (!$prop->isPublic()) {
+                        // setAccessible may not exist or may be restricted
+                        if (!method_exists($prop, 'setAccessible')) {
+                            continue;
+                        }
+
+                        try {
+                            $prop->setAccessible(true);
+                        } catch (\Exception $e) {
+                            continue;
+                        }
+                    }
                     $vars[$prop->getName()] = $prop->getValue($data);
                 }
             }
 
-            // Convert property values recursively
             $obj = new \stdClass();
             foreach ($vars as $k => $v) {
                 $obj->$k = $this->magicObjectToArray($v);
             }
+
             return $obj;
         }
 
-        // Default fallback
         return $data;
     }
+
 
 
     /**
@@ -382,7 +398,7 @@ class PicoPageData // NOSONAR
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.
@@ -402,7 +418,7 @@ class PicoPageData // NOSONAR
             "executionTime",
             "pagination"
         );
-        
+
         foreach ($exposedProps as $key) {
             if (property_exists($this, $key)) {
                 $obj->{$key} = $this->{$key};
@@ -504,7 +520,7 @@ class PicoPageData // NOSONAR
         if ($this->stmt === null) {
             throw new FindOptionException("Statement is null. See MagicObject::FIND_OPTION_NO_FETCH_DATA option.");
         }
-        
+
         $result = $this->stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
         return $result !== false ? $this->applySubqueryResult($result) : false;
     }

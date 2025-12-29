@@ -7,12 +7,12 @@ use MagicObject\SecretObject;
 /**
  * Class PicoPageControl
  *
- * This class manages pagination controls for displaying pages of data. 
- * It generates navigation elements such as previous, next, first, and last 
- * page buttons, allowing users to navigate through pages seamlessly. 
- * The pagination links are generated based on the provided page data and 
+ * This class manages pagination controls for displaying pages of data.
+ * It generates navigation elements such as previous, next, first, and last
+ * page buttons, allowing users to navigate through pages seamlessly.
+ * The pagination links are generated based on the provided page data and
  * can be customized with parameter names and paths.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -112,7 +112,7 @@ class PicoPageControl
         $this->prev = '<i class="fa-solid fa-angle-left"></i>';
         $this->next = '<i class="fa-solid fa-angle-right"></i>';
         $this->first = '<i class="fa-solid fa-angles-left"></i>';
-        $this->last = '<i class="fa-solid fa-angles-right"></i>';  
+        $this->last = '<i class="fa-solid fa-angles-right"></i>';
     }
 
     /**
@@ -218,7 +218,7 @@ class PicoPageControl
      *
      * This format is used to generate the HTML for individual page numbers in the pagination.
      * It includes a span with the `page-selector-number` class and a link (`<a>`) to the page.
-     * 
+     *
      * Placeholders:
      * - `%s`: Additional CSS classes, e.g., `page-selected`.
      * - `%d`: Page number for the `data-page-number` attribute.
@@ -235,7 +235,7 @@ class PicoPageControl
      *   <a href="/path?page=3">3</a>
      * </span>
      * ```
-     * 
+     *
      * @param string $formatPageNumber The new format for rendering page numbers.
      * @return self Returns the current instance for method chaining.
      */
@@ -263,7 +263,7 @@ class PicoPageControl
      *
      * This format generates the HTML for step navigation buttons, such as "previous" or "next."
      * It includes a span with the `page-selector-step-one` class and a link (`<a>`) to the target page.
-     * 
+     *
      * Placeholders:
      * - `%s`: Additional CSS classes (e.g., active state).
      * - `%d`: Page number for the `data-page-number` attribute.
@@ -309,7 +309,7 @@ class PicoPageControl
      *
      * This format generates the HTML for step navigation buttons, such as "previous" or "next."
      * It includes a span with the `page-selector-step-one` class and a link (`<a>`) to the target page.
-     * 
+     *
      * Placeholders:
      * - `%s`: Additional CSS classes (e.g., active state).
      * - `%d`: Page number for the `data-page-number` attribute.
@@ -342,23 +342,23 @@ class PicoPageControl
     /**
      * Sets the button format templates for pagination controls.
      *
-     * This method allows you to set custom templates for page numbers, step buttons 
+     * This method allows you to set custom templates for page numbers, step buttons
      * and start/end buttons.
      *
      * @param string $pageNumberFormat The format template for rendering page numbers.
-     * 
+     *
      * **Example:**
      * ```html
      * <span class="page-selector page-selector-number%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```
      * @param string $stepOneFormat The format template for rendering step buttons.
-     * 
+     *
      * **Example:**
      * ```html
      * <span class="page-selector page-selector-step-one%s" data-page-number="%d"><a href="%s">%s</a></span>
      * ```
      * @param string $startEndFormat The format template for rendering start and end buttons.
-     * 
+     *
      * **Example:**
      * ```html
      * <span class="page-selector page-selector-end%s" data-page-number="%d"><a href="%s">%s</a></span>
@@ -376,7 +376,7 @@ class PicoPageControl
     /**
      * Applies the pagination configuration to the current instance.
      *
-     * This method accepts a configuration object, typically sourced from a Yaml file, 
+     * This method accepts a configuration object, typically sourced from a Yaml file,
      * and applies its settings to the pagination control. The object contains the following properties:
      *
      * @param SecretObject $paginationConfig The configuration object containing pagination settings.

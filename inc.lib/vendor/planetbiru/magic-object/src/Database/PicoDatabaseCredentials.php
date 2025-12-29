@@ -7,13 +7,13 @@ use MagicObject\SecretObject;
 
 /**
  * PicoDatabaseCredentials class
- * 
+ *
  * This class encapsulates database credentials and utilizes the SecretObject to encrypt all attributes,
  * ensuring the security of database configuration details from unauthorized access.
- * 
+ *
  * It provides getter methods to retrieve database connection parameters such as driver, host, port,
  * username, password, database name, schema, and application time zone.
- * 
+ *
  * Example usage:
  * ```php
  * <?php
@@ -25,10 +25,10 @@ use MagicObject\SecretObject;
  * $credentials->setPassword('password');
  * $credentials->setDatabaseName('app');
  * ```
- * 
+ *
  * The attributes are automatically encrypted when set, providing a secure way to handle sensitive
  * information within your application.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -59,7 +59,7 @@ class PicoDatabaseCredentials extends SecretObject
      * @var string
      */
     protected $host;
-    
+
     /**
      * Database server port.
      *
@@ -101,7 +101,7 @@ class PicoDatabaseCredentials extends SecretObject
      * @DecryptOut
      * @var string
      */
-    protected $databaseSchema; 
+    protected $databaseSchema;
 
     /**
      * Application time zone.
@@ -131,7 +131,7 @@ class PicoDatabaseCredentials extends SecretObject
     public function importFromUrl($url, $username = null, $password = null) // NOSONAR
     {
         $parts = parse_url($url);
-        
+
         if (!$parts) {
             throw new InvalidArgumentException("Invalid database URL");
         }

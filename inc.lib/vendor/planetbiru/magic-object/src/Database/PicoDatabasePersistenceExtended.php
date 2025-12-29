@@ -13,7 +13,7 @@ use MagicObject\Util\ValidationUtil;
  * This class extends the functionality of the PicoDatabasePersistence
  * by adding dynamic property setting through magic methods and enhanced
  * record selection capabilities.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -43,7 +43,7 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     /**
      * Sets a property value and adds it to the internal map.
      *
-     * This method sets a value to a property of the associated object and adds the property name and value 
+     * This method sets a value to a property of the associated object and adds the property name and value
      * to an internal map for further processing.
      *
      * @param string $propertyName The name of the property to set.
@@ -69,7 +69,7 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     private function addToMap($propertyName, $propertyValue)
     {
         $this->map[] = array(
-            'property' => $propertyName, 
+            'property' => $propertyName,
             'value' => $propertyValue
         );
         return $this;
@@ -155,16 +155,16 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
             // Call the main validation utility only once
             ValidationUtil::getInstance($messageTemplate)->validate($objectToValidate, $parentPropertyName);
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Get the current database for the specified entity.
      *
-     * This method retrieves the database connection associated with the 
-     * provided entity. If the entity does not have an associated database 
-     * or if the connection is not valid, it defaults to the object's 
+     * This method retrieves the database connection associated with the
+     * provided entity. If the entity does not have an associated database
+     * or if the connection is not valid, it defaults to the object's
      * primary database connection.
      *
      * @param MagicObject $entity The entity for which to get the database.
@@ -249,7 +249,7 @@ class PicoDatabasePersistenceExtended extends PicoDatabasePersistence
     public function __toString()
     {
         return json_encode(array(
-            'where' => (string) $this->specification, 
+            'where' => (string) $this->specification,
             'set' => $this->map
         ), JSON_PRETTY_PRINT);
     }

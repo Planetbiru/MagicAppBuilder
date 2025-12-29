@@ -5,9 +5,9 @@ namespace MagicObject\Database;
 /**
  * Class PicoLimit
  *
- * This class provides functionality to manage pagination in database queries 
+ * This class provides functionality to manage pagination in database queries
  * by setting limits and offsets for record retrieval.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -43,7 +43,7 @@ class PicoLimit
     /**
      * Increment the offset to retrieve the next page of records.
      *
-     * This method adjusts the offset based on the current limit, allowing 
+     * This method adjusts the offset based on the current limit, allowing
      * for the retrieval of the next set of records in a paginated result.
      *
      * @return self Returns the current instance for method chaining.
@@ -57,7 +57,7 @@ class PicoLimit
     /**
      * Decrement the offset to retrieve the previous page of records.
      *
-     * This method adjusts the offset back, ensuring it does not fall below 
+     * This method adjusts the offset back, ensuring it does not fall below
      * zero, thus allowing navigation to the previous set of records.
      *
      * @return self Returns the current instance for method chaining.
@@ -119,7 +119,7 @@ class PicoLimit
     /**
      * Get information about the current page based on the offset and limit.
      *
-     * This method calculates the current page number and returns a 
+     * This method calculates the current page number and returns a
      * PicoPage object containing the page number and limit.
      *
      * @return PicoPage The current page information.
@@ -128,14 +128,14 @@ class PicoLimit
     {
         $limit = $this->limit > 0 ? $this->limit : 1;
         $pageNumber = max(1, round(($this->offset + $limit) / $limit));
-        
+
         return new PicoPage($pageNumber, $limit);
     }
 
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.

@@ -7,7 +7,7 @@ namespace MagicObject\Database;
  *
  * This class provides functionality to manage page numbers and sizes,
  * and to calculate offsets for database queries.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -109,11 +109,11 @@ class PicoPage
         $this->pageSize = max(1, intval($pageSize));
         return $this;
     }
-    
+
     /**
      * Calculates and retrieves the offset for database queries.
      *
-     * The offset is used to determine the starting point for fetching data 
+     * The offset is used to determine the starting point for fetching data
      * in paginated queries, based on the current page number and page size.
      *
      * @return int The calculated offset for database queries.
@@ -134,14 +134,14 @@ class PicoPage
     {
         $limit = $this->getPageSize();
         $offset = ($this->getPageNumber() - 1) * $limit;
-        
+
         return new PicoLimit(max(0, $offset), $limit);
     }
 
     /**
      * Convert the object to a JSON string representation for debugging.
      *
-     * This method is intended for debugging purposes only and provides 
+     * This method is intended for debugging purposes only and provides
      * a JSON representation of the object's state.
      *
      * @return string The JSON representation of the object.

@@ -8,7 +8,7 @@ namespace MagicObject\Database;
  * This class extends the functionality of PicoTableInfo by providing methods
  * for managing unique columns, join columns, primary keys, auto-increment keys,
  * default values, and not-null columns.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
