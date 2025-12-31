@@ -131,10 +131,7 @@ try
         foreach($keys as $key)
         {
             $camelKey = PicoStringUtil::camelize($key);
-            if($accountSecurity->get($key) != "" || $camelKey != "salt")
-            {
-                $existingAccountSecurity->set($key, $accountSecurity->get($key));
-            }
+            $existingAccountSecurity->set($key, $accountSecurity->get($key));
         }
     }
 
