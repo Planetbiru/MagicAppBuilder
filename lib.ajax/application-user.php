@@ -502,7 +502,6 @@ if($applicationId != null)
             echo "</tbody>";
             echo "</table>";
         }
-           
     }
     catch(Exception $e)
     {
