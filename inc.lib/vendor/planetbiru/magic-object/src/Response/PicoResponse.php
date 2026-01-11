@@ -140,39 +140,42 @@ class PicoResponse
      */
     public static function sendBody($body, $async = false)
     {
+        $content = ($body !== null) ? $body : "";
+        $contentLength = strlen($content);
+
         if ($async) {
+            // Allow script to continue running after connection is closed
             if (function_exists('ignore_user_abort')) {
                 ignore_user_abort(true);
             }
-            ob_start(); // Mulai output buffering
+            
+            // Start buffering to control when data is sent
+            ob_start();
         }
+
+        // 1. Set Headers (Must be sent before any body content)
         header("Connection: close");
+        header("Content-Length: " . $contentLength);
 
-        // Jika body tidak null, kirimkan
-        if ($body !== null && $async) {
-            echo $body; // Tampilkan body
-        }
+        // 2. Output the content
+        echo $content;
 
-        // Mengatur header koneksi
-        
-
-        // Jika dalam mode asinkron, lakukan flush
         if ($async) {
-            ob_end_flush(); // Selesaikan buffer
-            header("Content-Length: " . strlen($body)); // Tentukan panjang konten
-            flush(); // Kirim output ke klien
+            // 3. Flush all buffers to the client
+            $size = ob_get_length();
+            header("Content-Length: " . $size); // Optional: Re-confirm size
+            
+            ob_end_flush();
+            flush();
+
+            // 4. Specifically for FastCGI (Nginx/PHP-FPM)
+            // This closes the connection to the user but keeps the script alive
             if (function_exists('fastcgi_finish_request')) {
-                fastcgi_finish_request(); // Selesaikan permintaan FastCGI
-            }
-        } else {
-            // Jika tidak asinkron, atur Content-Length
-            if ($body !== null) {
-                header("Content-Length: " . strlen($body)); // Tentukan panjang konten
-                echo $body; // Tampilkan body
+                fastcgi_finish_request();
             }
         }
     }
-
+    
     /**
      * Get default content type based on the provided content type.
      *

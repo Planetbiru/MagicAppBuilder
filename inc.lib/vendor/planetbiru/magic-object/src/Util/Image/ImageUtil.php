@@ -290,7 +290,6 @@ class ImageUtil
                     imagecopy($imgdest, $rowBuffer, 0, $y, 0, 0, $width, 1);
                 }
 
-                imagedestroy($rowBuffer);
                 break;
         }
 
@@ -344,7 +343,7 @@ class ImageUtil
      * @return ImageUtil
      * @throws ImageUtilException If an error occurs during resizing.
      */
-    public function resizeSquare($newSize, ImageColor $color = null)
+    public function resizeSquare($newSize, $color = null)
     {
         return $this->resizeAspectRatio($newSize, $newSize, $color);
     }
@@ -358,7 +357,7 @@ class ImageUtil
      * @return self Returns the current instance for method chaining.
      * @throws ImageUtilException If an error occurs during resizing.
      */
-    public function resizeAspectRatio($newX, $newY, ImageColor $color = null)
+    public function resizeAspectRatio($newX, $newY, $color = null)
     {
         if (empty($color)) {
             $color = new ImageColorAlpha(255, 255, 255, 127);
@@ -606,7 +605,7 @@ class ImageUtil
      * @param GdImage|null $image The image resource to modify. If null, uses the current image.
      * @return $this|GdImage The modified image or the current instance.
      */
-    public function makeTransparent(ImageColor $color = null, $image = null)
+    public function makeTransparent($color = null, $image = null)
     {
         if (empty($color)) {
             $color = new ImageColor(255, 255, 255);
@@ -655,8 +654,6 @@ class ImageUtil
     public function __destruct()
     {
         if (!is_null($this->image)) {
-            imagedestroy($this->image);
-            imagedestroy($this->orgImage);
             unset($this->image);
             unset($this->orgImage);
         }

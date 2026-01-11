@@ -304,7 +304,7 @@ class PicoDatabaseUtilMySql extends PicoDatabaseUtilBase implements PicoDatabase
         }
         catch(Exception $e)
         {
-            error_log($e->getMessage());
+            // Do nothing
         }
         return $config;
     }

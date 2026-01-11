@@ -22,7 +22,7 @@ use ReflectionProperty;
  *
  * The `PicoAnnotationParser` is particularly useful in frameworks or libraries
  * that rely on annotations for configuration, routing, or metadata purposes.
- * 
+ *
  * @author Kamshory
  * @package MagicObject\Util\ClassUtil
  * @link https://github.com/Planetbiru/MagicObject
@@ -348,8 +348,8 @@ class PicoAnnotationParser
      * Get the first parameter for a given key from the parsed annotations.
      *
      * This method retrieves the first value associated with the specified key.
-     * If the parameter does not exist or is null, it returns null. 
-     * If the parameter is an array, it returns the first string element. 
+     * If the parameter does not exist or is null, it returns null.
+     * If the parameter is an array, it returns the first string element.
      * Otherwise, it returns the value directly.
      *
      * @param string $key The key for which to retrieve the first parameter.
@@ -375,7 +375,7 @@ class PicoAnnotationParser
     /**
      * Combine and merge two arrays, where the first array contains keys and the second contains values.
      *
-     * This method checks if both arrays are set and are of the correct type. 
+     * This method checks if both arrays are set and are of the correct type.
      * It combines them into a new associative array and returns the merged result.
      *
      * @param array $matches An array of matched keys and values.
@@ -399,8 +399,8 @@ class PicoAnnotationParser
     /**
      * Parse key-value pairs from parameters string.
      *
-     * This method extracts key-value pairs from parameters string, which may contain 
-     * attributes with or without quotes. Numeric attributes will have an underscore 
+     * This method extracts key-value pairs from parameters string, which may contain
+     * attributes with or without quotes. Numeric attributes will have an underscore
      * prefix. Throws an exception if the input is invalid.
      *
      * @param string $parametersString The parameters string to parse.
@@ -419,8 +419,8 @@ class PicoAnnotationParser
         }
 
         // For every modification, please test regular expression with https://regex101.com/
-
         // parse attributes with quotes
+
         $pattern1 = '/([_\-\w+]+)\=\"([a-zA-Z0-9\-\+ _,.\(\)\{\}\`\~\!\@\#\$\%\^\*\\\|\<\>\[\]\/&%?=:;\'\t\r\n|\r|\n]+)\"/m'; // NOSONAR
         preg_match_all($pattern1, $parametersString, $matches1);
         $pair1 = array_combine($matches1[1], $matches1[2]);
@@ -432,8 +432,12 @@ class PicoAnnotationParser
         $pair3 = $this->combineAndMerge($matches2, $pair1);
 
         // parse attributes without any value
-        $pattern3 = '/([\w\=\-\_"]+)/m'; // NOSONAR
-        preg_match_all($pattern3, $parametersString, $matches3);
+        // 🔴 FIX: remove quoted values before parsing boolean attributes
+        $cleaned = preg_replace($pattern1, '', $parametersString);
+
+        // parse attributes without any value (boolean flags)
+        $pattern3 = '/\b([A-Za-z_][A-Za-z0-9_\-]*)\b/m'; // NOSONAR
+        preg_match_all($pattern3, $cleaned, $matches3);
 
         $pair4 = array();
         if(isset($matches3) && isset($matches3[0]) && is_array($matches3[0]))
@@ -474,13 +478,13 @@ class PicoAnnotationParser
     {
         return stripos($val, '=') === false && stripos($val, '"') === false && stripos($val, "'") === false && !in_array($val, $keys);
     }
-    
+
     /**
      * Parse parameters from parameters string and return them as a PicoGenericObject.
      *
      * This method transforms the key-value pairs parsed from the parameters string
-     * into an instance of PicoGenericObject. All numeric attributes will be 
-     * prefixed with an underscore. 
+     * into an instance of PicoGenericObject. All numeric attributes will be
+     * prefixed with an underscore.
      *
      * @param string $parametersString The parameters string to parse.
      * @return PicoGenericObject An object containing the parsed key-value pairs.

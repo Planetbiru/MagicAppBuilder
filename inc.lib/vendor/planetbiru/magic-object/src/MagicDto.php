@@ -395,10 +395,13 @@ class MagicDto extends stdClass // NOSONAR
      */
     private function isMagicObjectInstance($objectTest)
     {
-        return isset($objectTest) && ($objectTest instanceof MagicObject || 
+        return isset($objectTest) && 
+        (
+            $objectTest instanceof MagicObject || 
             $objectTest instanceof SetterGetter || 
             $objectTest instanceof SecretObject || 
-            $objectTest instanceof PicoGenericObject);
+            $objectTest instanceof PicoGenericObject
+        );
     }
 
     /**

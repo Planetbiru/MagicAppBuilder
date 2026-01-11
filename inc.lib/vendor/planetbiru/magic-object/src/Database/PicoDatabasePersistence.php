@@ -85,6 +85,9 @@ class PicoDatabasePersistence // NOSONAR
     const COMMA_RETURN = ", \r\n";
     const INLINE_TRIM = " \r\n\t ";
     const ALWAYS_TRUE = "(1=1)";
+    
+    const IS_NULL = " is null";
+    const CLAUSE_AND = " and ";
 
     /**
      * Database connection
@@ -929,7 +932,7 @@ class PicoDatabasePersistence // NOSONAR
             $value = $queryBuilder->escapeValue($value);
             if(strcasecmp($value, self::KEY_NULL) == 0)
             {
-                $wheres[] = $columnName . " is null";
+                $wheres[] = $columnName . self::IS_NULL;
             }
             else
             {
@@ -940,7 +943,7 @@ class PicoDatabasePersistence // NOSONAR
         {
             throw new NoPrimaryKeyDefinedException("No primary key defined");
         }
-        return implode(" and ", $wheres);
+        return implode(self::CLAUSE_AND, $wheres);
     }
 
     /**
@@ -977,7 +980,7 @@ class PicoDatabasePersistence // NOSONAR
             $escapedValue = $queryBuilder->escapeValue($value);
             if(strcasecmp($escapedValue, self::KEY_NULL) == 0)
             {
-                $wheres[] = $columnName . " is null";
+                $wheres[] = $columnName . self::IS_NULL;
                 $columns[$columnName] = null;
             }
             else
@@ -992,7 +995,7 @@ class PicoDatabasePersistence // NOSONAR
         }
 
         $result->columns = $columns;
-        $result->whereClause = implode(" and ", $wheres);
+        $result->whereClause = implode(self::CLAUSE_AND, $wheres);
         return $result;
     }
 
@@ -2150,14 +2153,14 @@ class PicoDatabasePersistence // NOSONAR
             $columnValue = $propertyValues[$index];
             if($columnValue === null)
             {
-                $wheres[] = $columnName . " is null";
+                $wheres[] = $columnName . self::IS_NULL;
             }
             else
             {
                 $wheres[] = $columnName . " = " . $queryBuilder->escapeValue($propertyValues[$index]);
             }
         }
-        $where = implode(" and ", $wheres);
+        $where = implode(self::CLAUSE_AND, $wheres);
         if(!$this->isValidFilter($where))
         {
             throw new InvalidFilterException(self::MESSAGE_INVALID_FILTER);

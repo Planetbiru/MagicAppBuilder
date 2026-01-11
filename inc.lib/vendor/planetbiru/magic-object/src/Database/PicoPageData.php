@@ -303,7 +303,7 @@ class PicoPageData // NOSONAR
      * @param mixed $data The data to convert. Can be a MagicObject, an array, an object, or a scalar value.
      * @return mixed The converted data as a plain PHP array, stdClass object, or scalar value.
      */
-    protected function magicObjectToArray($data)
+    protected function magicObjectToArray($data) // NOSONAR
     {
         // Null or scalar
         if (is_null($data) || is_scalar($data)) {
@@ -362,8 +362,6 @@ class PicoPageData // NOSONAR
 
         return $data;
     }
-
-
 
     /**
      * Get the current page number in the pagination context.

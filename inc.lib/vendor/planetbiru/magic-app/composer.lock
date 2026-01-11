@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "planetbiru/magic-object",
-            "version": "3.21.0",
+            "version": "3.21.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "1540d7eb3f1cf1005194d331e2b31b18fad5eca3"
+                "reference": "b6150841120ebd5b92e1b184627408f51f8c8775"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/1540d7eb3f1cf1005194d331e2b31b18fad5eca3",
-                "reference": "1540d7eb3f1cf1005194d331e2b31b18fad5eca3",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/b6150841120ebd5b92e1b184627408f51f8c8775",
+                "reference": "b6150841120ebd5b92e1b184627408f51f8c8775",
                 "shasum": ""
             },
             "require": {
@@ -41,9 +41,9 @@
             "description": "MagicObject",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/3.21.0"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/3.21.3"
             },
-            "time": "2025-12-09T15:22:28+00:00"
+            "time": "2026-01-11T10:00:40+00:00"
         }
     ],
     "packages-dev": [],

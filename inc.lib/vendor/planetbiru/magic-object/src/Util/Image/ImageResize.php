@@ -27,8 +27,6 @@ class ImageResize
         $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
         imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
         imagejpeg($resizedImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($resizedImage);
     }
 
     /**
@@ -62,9 +60,6 @@ class ImageResize
         imagecopy($finalImage, $resizedImage, $x, $y, 0, 0, $newWidth, $newHeight);
     
         imagejpeg($finalImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($resizedImage);
-        imagedestroy($finalImage);
     }
     
     /**
@@ -98,8 +93,6 @@ class ImageResize
         imagecopyresampled($finalImage, $image, $x, $y, 0, 0, $newWidth, $newHeight, $width, $height);
     
         imagejpeg($finalImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($finalImage);
     }
     
     /**
@@ -131,9 +124,6 @@ class ImageResize
         imagecopy($finalImage, $resizedImage, 0, 0, 0, 0, $targetWidth, $targetHeight);
     
         imagejpeg($finalImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($resizedImage);
-        imagedestroy($finalImage);
     }
     
     /**
@@ -167,8 +157,6 @@ class ImageResize
         imagecopyresampled($finalImage, $image, $x, $y, 0, 0, $newWidth, $newHeight, $width, $height);
     
         imagejpeg($finalImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($finalImage);
     }
     
     /**
@@ -200,9 +188,6 @@ class ImageResize
         imagecopy($finalImage, $resizedImage, $targetWidth - $newWidth, 0, 0, 0, $targetWidth, $targetHeight);
     
         imagejpeg($finalImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($resizedImage);
-        imagedestroy($finalImage);
     }
     
     /**
@@ -234,9 +219,6 @@ class ImageResize
         imagecopy($finalImage, $resizedImage, 0, $targetHeight - $newHeight, 0, 0, $targetWidth, $targetHeight);
     
         imagejpeg($finalImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($resizedImage);
-        imagedestroy($finalImage);
     }
     
     /**
@@ -268,9 +250,6 @@ class ImageResize
         imagecopy($finalImage, $resizedImage, $targetWidth - $newWidth, $targetHeight - $newHeight, 0, 0, $targetWidth, $targetHeight);
     
         imagejpeg($finalImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($resizedImage);
-        imagedestroy($finalImage);
     }
     
     /**
@@ -291,8 +270,6 @@ class ImageResize
         }
 
         imagejpeg($flippedImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($flippedImage);
     }
 
     /**
@@ -313,8 +290,6 @@ class ImageResize
         }
 
         imagejpeg($flippedImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($flippedImage);
     }
 
     /**
@@ -328,8 +303,6 @@ class ImageResize
         $image = imagecreatefromjpeg($sourcePath);
         $rotatedImage = imagerotate($image, -90, 0);
         imagejpeg($rotatedImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($rotatedImage);
     }
 
     /**
@@ -343,8 +316,6 @@ class ImageResize
         $image = imagecreatefromjpeg($sourcePath);
         $rotatedImage = imagerotate($image, 180, 0);
         imagejpeg($rotatedImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($rotatedImage);
     }
 
     /**
@@ -358,8 +329,6 @@ class ImageResize
         $image = imagecreatefromjpeg($sourcePath);
         $rotatedImage = imagerotate($image, 90, 0);
         imagejpeg($rotatedImage, $destPath);
-        imagedestroy($image);
-        imagedestroy($rotatedImage);
     }
     
     /**
@@ -384,7 +353,6 @@ class ImageResize
         // Load the watermark image
         $watermarkImage = imagecreatefrompng($watermarkPath);
         if (!$watermarkImage) {
-            imagedestroy($sourceImage); // Free memory for the source image
             return false; // Return false if the watermark cannot be loaded
         }
 
@@ -437,10 +405,6 @@ class ImageResize
 
         // Save the resulting image
         imagejpeg($sourceImage, $outputPath);
-
-        // Free memory for the images
-        imagedestroy($sourceImage);
-        imagedestroy($watermarkImage);
 
         return true; // Return true on successful watermarking
     }

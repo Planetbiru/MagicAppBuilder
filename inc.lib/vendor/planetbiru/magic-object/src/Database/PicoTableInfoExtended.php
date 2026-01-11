@@ -15,9 +15,9 @@ namespace MagicObject\Database;
  */
 class PicoTableInfoExtended extends PicoTableInfo
 {
-    const NAME      = "name"; // Key for the column name
+    const NAME      = "name";           // Key for the column name
     const PREV_NAME = "prevColumnName"; // Key for the previous column name
-    const ELEMENT   = "element"; // Key for the element
+    const ELEMENT   = "element";        // Key for the element
 
     /**
      * Gets an instance of PicoTableInfoExtended.
