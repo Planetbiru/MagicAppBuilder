@@ -47,7 +47,6 @@ class PicoDatabaseDump // NOSONAR
      */
     protected $columns = array();
     
-<<<<<<< Updated upstream
     /**
      * Generates a SQL CREATE TABLE statement based on the provided entity schema.
      * * This method detects the database type and utilizes the appropriate utility 
@@ -122,63 +121,11 @@ class PicoDatabaseDump // NOSONAR
         $query = array();
 
         // 5. Add DROP TABLE with comment
-=======
-    public function dumpStructureFromSchema($entity, $databaseType, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
-    {
-        $tableName = $entity['name'];
-        if ($databaseType == PicoDatabaseType::DATABASE_TYPE_MARIADB || $databaseType == PicoDatabaseType::DATABASE_TYPE_MYSQL) 
-        {
-            $tool = new PicoDatabaseUtilMySql();
-        } 
-        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL) 
-        {
-            $tool = new PicoDatabaseUtilPostgreSql();
-        }
-        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE) 
-        {
-            $tool = new PicoDatabaseUtilSqlite();
-        }
-        else if($databaseType == PicoDatabaseType::DATABASE_TYPE_SQLSERVER) 
-        {
-            $tool = new PicoDatabaseUtilSqlServer();
-        }
-        else
-        {
-            return "";
-        }
-        $columns = array();
-        $primaryKeys = array();
-        $autoIncrementKeys = array();
-        foreach($entity['columns'] as $col)
-        {
-            if($col['primaryKey'])
-            {
-                $primaryKeys[] = $col['name'];
-            }
-            if($col['autoIncrement'])
-            {
-                $autoIncrementKeys[$col['name']];
-            }
-        }
-        foreach($entity['columns'] as $col)
-        {
-            $column = $tool->createColumn($col, $autoIncrementKeys, $primaryKeys);
-            $columns[] = "\t".$column;
-        }
-        if(!empty($primaryKeys))
-        {
-            $columns[] = "\tPRIMARY KEY(".implode(", ", $primaryKeys).")";
-        }
-        
-        $query = array();
-        
->>>>>>> Stashed changes
         if ($dropIfExists) {
             $query[] = "-- DROP TABLE IF EXISTS $tableName;";
             $query[] = "";
         }
 
-<<<<<<< Updated upstream
         // 6. Create Statement
         $createStatement = "CREATE TABLE" . ($createIfNotExists ? " IF NOT EXISTS" : "");
         $query[] = "$createStatement $tableName (";
@@ -314,16 +261,6 @@ class PicoDatabaseDump // NOSONAR
         $ret->length = isset($column['length']) ? $column['length'] : null;
         $ret->normalizedType = $this->normalizeDbType($column['type'], $ret->length);
         return $ret;
-=======
-        $createStatement = "CREATE TABLE";
-        if ($createIfNotExists) {
-            $createStatement .= " IF NOT EXISTS";
-        }
-
-        $query[] = "$createStatement $tableName (";
-        $query[] = implode(",\r\n", $columns);
-        $query[] = ");";
->>>>>>> Stashed changes
     }
 
     /**
