@@ -338,14 +338,11 @@ class DataTable extends SetterGetter
     }
 
     /**
-     * Appends table rows based on class properties.
-     *
-     * This method generates rows for the table based on the properties of the class 
-     * and appends them to the provided DOM node.
+     * Appends table rows based on class properties using reflection and annotations.
      *
      * @param DOMDocument $doc The DOM document used to create elements.
      * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
-     * @param array $props Array of ReflectionProperty objects representing class properties.
+     * @param ReflectionProperty[] $props Array of ReflectionProperty objects.
      * @param string $className Name of the class for reflection.
      * @return self Returns the current instance for method chaining.
      */
@@ -353,33 +350,51 @@ class DataTable extends SetterGetter
     {
         foreach ($props as $prop) {
             $key = $prop->name;
-            $label = $key;
             $value = $this->get($key);
-            if (is_scalar($value)) {
-                $tr = $tbody->appendChild($doc->createElement(self::TAG_TR));
 
-                $reflexProp = new PicoAnnotationParser($className, $key, PicoAnnotationParser::PROPERTY);
-
-                if ($reflexProp != null) {
-                    $parameters = $reflexProp->getParametersAsObject();
-                    if ($parameters->issetLabel()) {
-                        $label = $this->label($reflexProp, $parameters, $key, $label);
+            // Inclusion of null values often necessary for table structure consistency
+            if (is_scalar($value) || $value === null) {
+                $label = $key;
+                
+                // Parse annotations for custom label
+                try {
+                    $reflexProp = new PicoAnnotationParser($className, $key, PicoAnnotationParser::PROPERTY);
+                    if ($reflexProp != null) {
+                        $parameters = $reflexProp->getParametersAsObject();
+                        // Assuming issetLabel() or similar check exists in your annotation parser
+                        if (method_exists($parameters, 'issetLabel') && $parameters->issetLabel()) {
+                            $label = $this->label($reflexProp, $parameters, $key, $label);
+                        }
                     }
+                } catch (Exception $e) {
+                    // Fallback to property name if annotation parsing fails
+                    $label = $key;
                 }
 
-                $td1 = $tr->appendChild($doc->createElement(self::TAG_TD));
-                $td1->setAttribute(self::KEY_CLASS, self::TD_LABEL);
-                $td1->textContent = $label;
+                // Create Row
+                $tr = $doc->createElement(self::TAG_TR);
+                $tbody->appendChild($tr);
 
-                $td2 = $tr->appendChild($doc->createElement(self::TAG_TD));
+                // Column 1: Label
+                $td1 = $doc->createElement(self::TAG_TD);
+                $td1->setAttribute(self::KEY_CLASS, self::TD_LABEL);
+                $td1->appendChild($doc->createTextNode($label));
+                $tr->appendChild($td1);
+
+                // Column 2: Value
+                $td2 = $doc->createElement(self::TAG_TD);
                 $td2->setAttribute(self::KEY_CLASS, self::TD_VALUE);
-                $td2->textContent = isset($value) ? $value : "";
+                
+                // Safe formatting for boolean/null/strings
+                $displayValue = $this->formatScalarValue($value);
+                $td2->appendChild($doc->createTextNode($displayValue));
+                $tr->appendChild($td2);
             }
         }
         return $this;
     }
 
-     /**
+    /**
      * Appends table rows based on provided values.
      *
      * This method takes an array of values and creates rows in the table, 
@@ -387,26 +402,53 @@ class DataTable extends SetterGetter
      *
      * @param DOMDocument $doc The DOM document used to create elements.
      * @param DOMNode $tbody The DOM node representing the <tbody> of the table.
-     * @param stdClass $values Data to append as rows.
+     * @param array|stdClass $values Data to append as rows.
      * @return self Returns the current instance for method chaining.
      */
     private function appendByValues($doc, $tbody, $values)
     {
+        if (empty($values)) {
+            return $this;
+        }
+
         foreach ($values as $propertyName => $value) {
-            if (is_scalar($value)) {
-                $tr = $tbody->appendChild($doc->createElement(self::TAG_TR));
+            // Check if value can be displayed as string
+            if (is_scalar($value) || $value === null) {
+                $tr = $doc->createElement(self::TAG_TR);
+                $tbody->appendChild($tr);
+
                 $label = $this->getLabel($propertyName);
-
-                $td1 = $tr->appendChild($doc->createElement(self::TAG_TD));
+                
+                // Column 1: Label
+                $td1 = $doc->createElement(self::TAG_TD);
                 $td1->setAttribute(self::KEY_CLASS, self::TD_LABEL);
-                $td1->textContent = $label;
+                // Use createTextNode for safer character handling
+                $td1->appendChild($doc->createTextNode($label));
+                $tr->appendChild($td1);
 
-                $td2 = $tr->appendChild($doc->createElement(self::TAG_TD));
+                // Column 2: Value
+                $td2 = $doc->createElement(self::TAG_TD);
                 $td2->setAttribute(self::KEY_CLASS, self::TD_VALUE);
-                $td2->textContent = isset($value) ? $value : "";
+                
+                // Format boolean or null if necessary
+                $displayValue = $this->formatScalarValue($value);
+                $td2->appendChild($doc->createTextNode($displayValue));
+                $tr->appendChild($td2);
             }
         }
         return $this;
+    }
+
+    /**
+     * Helper to ensure value is safe string for DOM
+     * @param mixed $value
+     * @return string
+     */
+    private function formatScalarValue($value)
+    {
+        if ($value === true) return 'true';
+        if ($value === false) return 'false';
+        return (string)(isset($value) ? $value : "");
     }
 
     /**

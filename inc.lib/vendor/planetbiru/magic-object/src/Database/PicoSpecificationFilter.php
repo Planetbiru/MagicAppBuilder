@@ -14,14 +14,14 @@ namespace MagicObject\Database;
  */
 class PicoSpecificationFilter
 {
-    const DATA_TYPE_NUMBER = "number";
-    const DATA_TYPE_STRING = "string";
-    const DATA_TYPE_BOOLEAN = "boolean";
-    const DATA_TYPE_ARRAY_NUMBER = "number[]";
-    const DATA_TYPE_ARRAY_STRING = "string[]";
+    const DATA_TYPE_NUMBER        = "number";
+    const DATA_TYPE_STRING        = "string";
+    const DATA_TYPE_BOOLEAN       = "boolean";
+    const DATA_TYPE_ARRAY_NUMBER  = "number[]";
+    const DATA_TYPE_ARRAY_STRING  = "string[]";
     const DATA_TYPE_ARRAY_BOOLEAN = "boolean[]";
-    const DATA_TYPE_FULLTEXT = "fulltext";
-    const DATA_TYPE_TEXT_EQUALS = "textequals";
+    const DATA_TYPE_FULLTEXT      = "fulltext";
+    const DATA_TYPE_TEXT_EQUALS   = "textequals";
 
     /**
      * The name of the column this filter applies to.

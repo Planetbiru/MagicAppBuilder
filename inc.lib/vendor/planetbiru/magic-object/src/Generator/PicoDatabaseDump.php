@@ -48,24 +48,18 @@ class PicoDatabaseDump // NOSONAR
     protected $columns = array();
     
     /**
-     * Generates a SQL CREATE TABLE statement based on the provided entity schema.
-     * * This method detects the database type and utilizes the appropriate utility 
-     * class to format columns, primary keys, and auto-increment constraints. 
-     * It supports MySQL, MariaDB, PostgreSQL, SQLite, and SQL Server.
+     * Instantiates the appropriate database dump utility based on the database type.
      *
-     * @param array $entity The entity schema containing 'name' and 'columns' (an array of column definitions).
-     * @param string $databaseType The type of database (e.g., PicoDatabaseType::DATABASE_TYPE_MARIADB).
-     * @param bool $createIfNotExists Whether to add the "IF NOT EXISTS" clause to the CREATE statement.
-     * @param bool $dropIfExists Whether to prepend a commented-out "DROP TABLE IF EXISTS" statement.
-     * @param string $engine The storage engine to use (default is 'InnoDB', primarily for MySQL/MariaDB).
-     * @param string $charset The character set for the table (default is 'utf8mb4').
-     * * @return string The generated SQL DDL statement or an empty string if the database type is unsupported.
+     * This factory method maps specific database engines to their respective 
+     * utility classes (MySQL, PostgreSQL, SQLite, or SQL Server) to handle 
+     * database-specific dumping operations.
+     *
+     * @param string $databaseType The type of database (e.g., MySQL, PostgreSQL, SQLite).
+     * @return PicoDatabaseUtilBase|string Returns an instance of the database utility tool 
+     * or an empty string if the database type is not supported.
      */
-    public function dumpStructureFromSchema($entity, $databaseType, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
+    private function getDatabaseDumpTool($databaseType)
     {
-        $tableName = $entity['name'];
-        
-        // 1. Initialize Tool based on Database Type
         switch ($databaseType) {
             case PicoDatabaseType::DATABASE_TYPE_MARIADB:
             case PicoDatabaseType::DATABASE_TYPE_MYSQL:
@@ -84,6 +78,29 @@ class PicoDatabaseDump // NOSONAR
             default:
                 return "";
         }
+        return $tool;
+    }
+    
+    /**
+     * Generates a SQL CREATE TABLE statement based on the provided entity schema.
+     * * This method detects the database type and utilizes the appropriate utility 
+     * class to format columns, primary keys, and auto-increment constraints. 
+     * It supports MySQL, MariaDB, PostgreSQL, SQLite, and SQL Server.
+     *
+     * @param array $entity The entity schema containing 'name' and 'columns' (an array of column definitions).
+     * @param string $databaseType The type of database (e.g., PicoDatabaseType::DATABASE_TYPE_MARIADB).
+     * @param bool $createIfNotExists Whether to add the "IF NOT EXISTS" clause to the CREATE statement.
+     * @param bool $dropIfExists Whether to prepend a commented-out "DROP TABLE IF EXISTS" statement.
+     * @param string $engine The storage engine to use (default is 'InnoDB', primarily for MySQL/MariaDB).
+     * @param string $charset The character set for the table (default is 'utf8mb4').
+     * @return string The generated SQL DDL statement or an empty string if the database type is unsupported.
+     */
+    public function dumpStructureFromSchema($entity, $databaseType, $createIfNotExists = false, $dropIfExists = false, $engine = 'InnoDB', $charset = 'utf8mb4')
+    {
+        $tableName = $entity['name'];
+        
+        // 1. Initialize Tool based on Database Type
+        $tool = $this->getDatabaseDumpTool($databaseType);
 
         $columns = array();
         $primaryKeys = array();
@@ -154,15 +171,11 @@ class PicoDatabaseDump // NOSONAR
     {
         // Check if the target database is PostgreSQL
         $isPgSql = $databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL || $databaseType == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL;
-        $columnInfo = array();
+        
         $tableName = $entity['name'];
 
         // 1. Prepare Column Information for type-casting
-        if (isset($entity['columns']) && is_array($entity['columns'])) {
-            foreach ($entity['columns'] as $column) {
-                $columnInfo[$column['name']] = $this->getColumnInfo($column);
-            }
-        }
+        $columnInfo = $this->prepareColumnInfo($entity);
 
         $validColumnNames = array_keys($columnInfo);
 
@@ -203,10 +216,32 @@ class PicoDatabaseDump // NOSONAR
                     . implode(",\r\n", $rows)
                     . ";\r\n\r\n";
             }
-
         }
 
         return $allSql;
+    }
+    
+    /**
+     * Prepares and normalizes column metadata from the entity schema.
+     *
+     * This method iterates through the column definitions of an entity and
+     * transforms them into a structured associative array of column information,
+     * indexed by the column names.
+     *
+     * @param array $entity The entity schema containing the 'columns' definition.
+     * @return array<string, \stdClass> An associative array where keys are column names 
+     * and values are column metadata objects.
+     */
+    private function prepareColumnInfo($entity)
+    {
+        $columnInfo = array();
+        if (isset($entity['columns']) && is_array($entity['columns'])) {
+            foreach ($entity['columns'] as $column) {
+                // Assuming getColumnInfo returns an object/stdClass based on previous code
+                $columnInfo[$column['name']] = $this->getColumnInfo($column);
+            }
+        }
+        return $columnInfo;
     }
     
     /**

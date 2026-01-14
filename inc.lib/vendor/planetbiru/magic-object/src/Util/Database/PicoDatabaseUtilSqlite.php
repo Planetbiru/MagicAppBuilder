@@ -485,7 +485,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
      * @param array $autoIncrementKeys List of keys designated as auto-incrementing.
      * @param array $primaryKeys List of all primary key columns to determine if a 
      * composite key (multiple PKs) exists.
-     * * @return string The formatted SQL column definition string.
+     * @return string The formatted SQL column definition string.
      */
     public function createColumn($column, $autoIncrementKeys, $primaryKeys)
     {
@@ -669,7 +669,7 @@ class PicoDatabaseUtilSqlite extends PicoDatabaseUtilBase implements PicoDatabas
         }
         catch(Exception $e)
         {
-            error_log($e->getMessage());
+            // Do nothing
         }
         return $config;
     }

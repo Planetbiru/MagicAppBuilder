@@ -439,7 +439,6 @@ class PicoDatabaseUtilBase // NOSONAR
             return false;
 
         } catch (Exception $e) {
-            error_log($e->getMessage());
             return false; 
         }
     }
@@ -541,7 +540,6 @@ class PicoDatabaseUtilBase // NOSONAR
         }
         catch(Exception $e)
         {
-            error_log($e->getMessage());
             return false;
         }
         return true;

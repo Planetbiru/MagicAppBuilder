@@ -4040,6 +4040,206 @@ class EntityEditor {
     }
 
     /**
+     * Parses Markdown text and extracts table definitions into schema objects.
+     *
+     * This method scans the given Markdown content line by line, detects Markdown
+     * tables, and converts each table into a schema structure containing:
+     * - Generated table name
+     * - Column metadata (derived from table headers)
+     * - Row data (derived from table body)
+     *
+     * Each detected table is transformed into a schema object compatible with
+     * the internal entity/model representation.
+     *
+     * @param {string} md
+     *        The Markdown content containing one or more tables.
+     *
+     * @returns {Array<Object>}
+     *          An array of schema objects generated from Markdown tables.
+     */
+    parseFromMarkdown(md) {
+        let time = Date.now();
+        const lines = md.trim().split(/\r?\n/);
+        const schemas = [];
+        let i = 0, tableIndex = 0;
+
+        // Iterate through all lines in the markdown content
+        while (i < lines.length) {
+            const line = lines[i].trim();
+
+            // Detect a markdown table header (starts with '|' and followed by a separator row)
+            if (line.startsWith("|") && i + 1 < lines.length && lines[i + 1].includes("---")) {
+                const headerLine = lines[i];
+                const separatorLine = lines[i + 1];
+                const bodyLines = [];
+
+                // Move index past header and separator
+                i += 2;
+
+                // Collect table body rows
+                while (i < lines.length && lines[i].trim().startsWith("|")) {
+                    bodyLines.push(lines[i]);
+                    i++;
+                }
+
+                // Extract column headers
+                const headers = headerLine
+                    .replace(/^\||\|$/g, "")
+                    .split("|")
+                    .map(h => h.trim());
+
+                // Extract table rows
+                const rows = bodyLines.map(line =>
+                    line.replace(/^\||\|$/g, "")
+                        .split("|")
+                        .map(cell => cell.trim())
+                );
+
+                // Build column metadata based on headers
+                const columns = headers.map((h, idx) => ({
+                    name: this.snakeize(h),
+                    type: "VARCHAR",
+                    length: "50",
+                    nullable: true,
+                    default: null,
+                    primaryKey: idx === 0,
+                    autoIncrement: false,
+                    values: null,
+                    description: null
+                }));
+
+                // Build row data objects
+                const data = rows.map(row => {
+                    const obj = {};
+                    headers.forEach((h, j) => {
+                        obj[this.snakeize(h)] = row[j] === "" ? null : row[j];
+                    });
+                    return obj;
+                });
+
+                // Generate a unique table name and push schema definition
+                let tableName = this.createTableName(tableIndex + 1, time);
+                schemas.push({
+                    index: tableIndex++,
+                    name: tableName,
+                    columns,
+                    data,
+                    description: "",
+                    creationDate: Date.now(),
+                    modificationDate: Date.now(),
+                    creator: "{{userName}}",
+                    modifier: "{{userName}}"
+                });
+            } else {
+                // Skip non-table lines
+                i++;
+            }
+        }
+
+        return schemas;
+    }
+
+
+    /**
+     * Imports entities from Markdown content.
+     *
+     * This method parses Markdown tables into schemas, converts them into Entity
+     * instances, and appends them to the current entity collection if they do not
+     * already exist.
+     *
+     * Optionally executes a callback function after import completion.
+     *
+     * @param {string} md
+     *        The Markdown content containing table definitions.
+     *
+     * @param {Function} [callback]
+     *        Optional callback function invoked after import,
+     *        receiving the updated entities list as argument.
+     *
+     * @returns {void}
+     */
+    importFromMarkdown(md, callback)
+    {
+        let index = this.entities.length;
+        const schemas = this.parseFromMarkdown(md);
+
+        schemas.forEach(schema => {
+            let entityName = this.snakeize(schema.name);
+
+            // Prevent duplicate entity creation
+            if (!this.isEntityExists(entityName)) {
+                let entity = new Entity(entityName, index);
+
+                // Convert schema columns into Column objects
+                schema.columns.forEach(col => {
+                    const column = new Column(
+                        col.name,          // Column name
+                        col.type,          // SQL data type
+                        col.length,        // Column length or precision
+                        col.nullable,      // NULL allowance
+                        col['default'],    // Default value
+                        col.primaryKey,    // Primary key flag
+                        col.autoIncrement, // Auto-increment flag
+                        col.description    // Column description or value constraints
+                    );
+
+                    // Add column to entity
+                    entity.addColumn(column);
+                });
+
+                // Assign row data to the entity
+                entity.data = schema.data;
+
+                // Register the entity
+                this.entities.push(entity);
+                index++;
+            }
+        });
+
+        // Execute callback if provided
+        if (typeof callback === 'function') {
+            callback(this.entities);
+        }
+    }
+
+
+    /**
+     * Generates a unique table name based on timestamp and index.
+     *
+     * @param {number} index
+     *        Sequential index of the table.
+     *
+     * @param {number} time
+     *        Timestamp used to ensure uniqueness.
+     *
+     * @returns {string}
+     *          Generated table name.
+     */
+    createTableName(index, time)
+    {
+        return `table_${time}_${index}`;
+    }
+
+
+    /**
+     * Determines whether the given text contains a Markdown table.
+     *
+     * This method checks for the presence of a valid Markdown table
+     * header and separator row using a regular expression.
+     *
+     * @param {string} text
+     *        The text to be analyzed.
+     *
+     * @returns {boolean}
+     *          True if a Markdown table is detected, otherwise false.
+     */
+    isMarkdownTable(text) {
+        const markdownTableRegex = /^\s*\|(.+)\|\s*\r?\n\s*\|?[-:]+[-| :]*\|?\s*$/m;
+        return markdownTableRegex.test(text);
+    }
+
+
+    /**
      * Fixes primary key column types and lengths for imported entities by checking other entities for the most common matching type and length.
      *
      * If a primary key column is a VARCHAR(255), it is assumed to be an ID type from a GraphQL schema import.
@@ -4174,6 +4374,12 @@ class EntityEditor {
                 } catch (jsonErr) {
                     console.error("Invalid JSON format despite having signature:", jsonErr);
                 }
+            } else if (_this.isMarkdownTable(text)) {
+                _this.importFromMarkdown(text, function(entities){
+                    _this.renderEntities();
+                    let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+                    sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
+                });
             } else {
                 // Text or HTML
                 parsed = this.parseTextToJSON(text);

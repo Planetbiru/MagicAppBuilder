@@ -1004,6 +1004,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch (jsonErr) {
                         console.error("Invalid JSON format despite having signature:", jsonErr);
                     }
+                } else if (editor.isMarkdownTable(text)) {
+                    editor.importFromMarkdown(text, function(entities){
+                        editor.renderEntities();
+                        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+                        sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, entities);
+                    });
                 } else {
                     parsed = editor.parseTextToJSON(text);
                     editor.importFromData(parsed);

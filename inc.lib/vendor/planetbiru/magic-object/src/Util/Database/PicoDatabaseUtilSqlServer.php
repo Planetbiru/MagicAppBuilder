@@ -336,7 +336,7 @@ class PicoDatabaseUtilSqlServer extends PicoDatabaseUtilBase implements PicoData
             }
             $config->setTable($tables);
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            // Do nothing
         }
         return $config;
     }
