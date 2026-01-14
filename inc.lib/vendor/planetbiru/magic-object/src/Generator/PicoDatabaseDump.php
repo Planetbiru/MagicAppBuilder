@@ -171,6 +171,12 @@ class PicoDatabaseDump // NOSONAR
     {
         // Check if the target database is PostgreSQL
         $isPgSql = $databaseType == PicoDatabaseType::DATABASE_TYPE_PGSQL || $databaseType == PicoDatabaseType::DATABASE_TYPE_POSTGRESQL;
+
+        // Check if the target database is SQLite
+        $isSqlite = $databaseType == PicoDatabaseType::DATABASE_TYPE_SQLITE;
+
+        // Check if the target database is SQL Server
+        $isSqlServer = $databaseType == PicoDatabaseType::DATABASE_TYPE_SQLSERVER;
         
         $tableName = $entity['name'];
 
@@ -208,7 +214,7 @@ class PicoDatabaseDump // NOSONAR
 
                 $rows = array();
                 foreach ($filteredBatch as $data) {
-                    $rows[] = "(" . implode(", ", $this->fixData($data, $columnInfo, $isPgSql)) . ")";
+                    $rows[] = "(" . implode(", ", $this->fixData($data, $columnInfo, $isPgSql, $isSqlite, $isSqlServer)) . ")";
                 }
 
                 $allSql .= implode("\r\n", $sqlInsert)
@@ -250,9 +256,11 @@ class PicoDatabaseDump // NOSONAR
      * @param array $data Associative array of column => value.
      * @param array $columnInfo Metadata for each column.
      * @param bool $isPgSql Whether the target database is PostgreSQL.
+     * @param bool $isSqlite Whether the target database is SQLite.
+     * @param bool $isSqlServer Whether the target database is SQL Server.
      * @return array The formatted data array.
      */
-    public function fixData($data, $columnInfo, $isPgSql)
+    public function fixData($data, $columnInfo, $isPgSql, $isSqlite, $isSqlServer)
     {
         foreach ($data as $key => $value) {
             if ($value === null) {
@@ -261,9 +269,23 @@ class PicoDatabaseDump // NOSONAR
             } else if (isset($columnInfo[$key]) && in_array($columnInfo[$key]->normalizedType, ['integer', 'float'])) {
                 // Keep numeric values as they are (no quotes)
                 $data[$key] = $value;
-            } else if (isset($columnInfo[$key]) && in_array($columnInfo[$key]->normalizedType, ['boolean', 'bool']) && $isPgSql) {
-                // Handle PostgreSQL boolean conversion
-                $data[$key] = $this->toBoolean($value) ? 'true' : 'false';
+            } else if (isset($columnInfo[$key]) && in_array($columnInfo[$key]->normalizedType, ['boolean', 'bool'])) {
+                // Handle boolean values
+                if($isPgSql)
+                {
+                    // Force to boolean
+                    $data[$key] = $this->toBoolean($value) ? 'true' : 'false';
+                }
+                else if($isSqlite || $isSqlServer)
+                {
+                    // Force to integer
+                    $data[$key] = $this->toBoolean($value) ? '1' : '0';
+                }
+                else
+                {
+                    // MySQL and MariaDB
+                    $data[$key] = $this->toBoolean($value) ? 'true' : 'false';
+                }
             } else {
                 // Treat as string: escape single quotes and wrap in quotes
                 $data[$key] = "'" . str_replace("'", "''", $value) . "'";
