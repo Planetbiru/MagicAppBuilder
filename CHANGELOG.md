@@ -4087,3 +4087,15 @@ With **MagicAppBuilder 2.0**, all filter-related queries are now **merged into a
 
 A filter that previously required **8 separate queries** for 8 related entities now needs only **1 merged query**, provided that the total filter size is within the defined safe limit.
 
+# MagicAppBuilder Version 2.1.0
+
+Date: Januari 15th, 2026
+
+## New Feature: Import Database from Markdown  
+
+In line with MagicAppBuilder’s mission to make data import as seamless as possible, version **2.1** introduces support for importing databases from **Markdown**.  
+
+Since Markdown is a text-based format, the import process does not involve selecting a Markdown file directly. Instead, users open their Markdown file, copy the content to the clipboard, and paste it into the editor. MagicAppBuilder will automatically detect and extract all tables from the pasted content.  
+
+After import, users are expected to adjust table names and column names to align with MagicAppBuilder’s naming conventions. Importantly, all data from the Markdown document remains intact, even if column names are modified.  
+
