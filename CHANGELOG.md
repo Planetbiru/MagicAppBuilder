@@ -4089,7 +4089,7 @@ A filter that previously required **8 separate queries** for 8 related entities 
 
 # MagicAppBuilder Version 2.1.0
 
-Date: Januari 15th, 2026
+Date: January 15th, 2026
 
 ## New Feature: Import Database from Markdown  
 
