@@ -25,7 +25,7 @@ class AppMenuCacheImpl extends MagicObject
 	 * Menu Cache ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="menu_cache_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Menu Cache ID")
 	 * @MaxLength(value=40)

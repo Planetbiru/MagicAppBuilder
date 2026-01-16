@@ -25,7 +25,7 @@ class Country extends MagicObject
 	 * Country ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="country_id", type="varchar(5)", length=5, nullable=false)
 	 * @Label(content="Country ID")

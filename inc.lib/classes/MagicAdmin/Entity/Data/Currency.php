@@ -25,7 +25,7 @@ class Currency extends MagicObject
 	 * Currency ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="currency_id", type="varchar(5)", length=5, nullable=false)
 	 * @Label(content="Currency ID")

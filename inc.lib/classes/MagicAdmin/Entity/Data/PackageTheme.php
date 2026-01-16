@@ -25,7 +25,7 @@ class PackageTheme extends MagicObject
 	 * Package Theme ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="package_theme_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Package Theme ID")

@@ -25,7 +25,7 @@ class EntityStarApplication extends MagicObject
 	 * Star Application ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="star_application_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Star Application ID")

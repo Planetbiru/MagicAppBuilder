@@ -25,7 +25,7 @@ class AppModuleGroupMinImpl extends MagicObject
 	 * Module Group ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="module_group_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Module Group ID")
 	 * @MaxLength(value=40)

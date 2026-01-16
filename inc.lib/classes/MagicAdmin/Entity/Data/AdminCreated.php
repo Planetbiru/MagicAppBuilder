@@ -25,7 +25,7 @@ class AdminCreated extends MagicObject
 	 * Period
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="period", type="varchar(6)", length=6, nullable=true)
 	 * @Label(content="Period")
 	 * @MaxLength(value=6)

@@ -25,7 +25,7 @@ class AppMenuGroupTranslationImpl extends MagicObject
 	 * Menu Group Translation ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="menu_group_translation_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="Menu Group Translation ID")
 	 * @MaxLength(value=40)

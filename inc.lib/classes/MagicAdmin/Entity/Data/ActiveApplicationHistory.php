@@ -25,7 +25,7 @@ class ActiveApplicationHistory extends MagicObject
 	 * Active Application History ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="active_application_history_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Active Application History ID")
 	 * @var string

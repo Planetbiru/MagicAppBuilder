@@ -25,7 +25,7 @@ class AppModuleImpl extends MagicObject
 	 * Module ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="module_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Module ID")
 	 * @MaxLength(value=40)

@@ -29,14 +29,6 @@ use stdClass;
  * - Fetching results in different formats (array, object, etc.).
  * - Generating unique IDs and retrieving the last inserted ID.
  *
- * **Example:**
- * ```php
- * <?php
- * $db = new PicoDatabase($credentials);
- * $db->connect();
- * $result = $db->fetch("SELECT * FROM users WHERE id = ?", 123);
- * ```
- *
  * @author Kamshory
  * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
@@ -1255,6 +1247,66 @@ class PicoDatabase // NOSONAR
         }
         $random = sprintf('%06x', mt_rand(0, 16777215));
         return sprintf('%s%s', $uuid, $random);
+    }
+
+    /**
+     * Generate a random UUID (Universally Unique Identifier) version 4.
+     *
+     * This function creates a 128-bit UUID using random bytes and applies
+     * the proper version (4) and variant (RFC 4122) bits. The result is
+     * formatted as a canonical string representation:
+     *     xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+     *
+     * Example output:
+     *     ad271d69-6c5a-4002-b2d2-3e0f84f7dfa3
+     *
+     * @return string A UUID v4 string in standard format.
+     */
+    public function generateUUID() {
+        // Generate 16 bytes (128 bit) random data
+        $data = random_bytes(16);
+
+        // Set versi ke 0100 (UUID v4)
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+        // Set variant ke 10xxxxxx
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+
+        // Format ke string UUID
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    /**
+     * Generates a unique hexadecimal ID based on the current epoch time in nanoseconds
+     * combined with a 3-hex-digit random suffix.
+     *
+     * The ID consists of:
+     * - A 17-character hexadecimal timestamp derived from microtime()
+     * - A 3-character hexadecimal random value
+     *
+     * @return string Unique hexadecimal identifier
+     */
+    public function generateTimeBasedId()
+    {
+        // Get microtime as "microseconds seconds"
+        $microtimeParts = explode(' ', microtime());
+
+        // Format microseconds to 9 decimal places
+        $microsecondsFormatted = sprintf('%11.9f', $microtimeParts[0]);
+
+        // Split seconds and fractional microseconds
+        $microsecondsParts = explode('.', $microsecondsFormatted);
+
+        // Combine seconds and fractional part into a nanosecond-like integer string
+        $epochNanoString = sprintf('%d%+9s', $microtimeParts[1], $microsecondsParts[1]);
+
+        // Convert the timestamp to a fixed-length hexadecimal string
+        $timestampHex = sprintf('%017x', (int) $epochNanoString);
+
+        // Generate a 3-hex-digit random value
+        $randomHex = sprintf('%03x', mt_rand(0, 0xFFF));
+
+        // Concatenate timestamp and random suffix
+        return $timestampHex . $randomHex;
     }
 
     /**

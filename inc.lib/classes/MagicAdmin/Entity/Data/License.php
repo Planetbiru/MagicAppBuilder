@@ -25,7 +25,7 @@ class License extends MagicObject
 	 * License ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="license_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="License ID")

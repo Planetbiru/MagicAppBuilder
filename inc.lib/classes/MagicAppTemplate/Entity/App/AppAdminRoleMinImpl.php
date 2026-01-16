@@ -25,7 +25,7 @@ class AppAdminRoleMinImpl extends MagicObject
      * Admin Role ID
      * 
      * @Id
-     * @GeneratedValue(strategy=GenerationType.UUID)
+     * @GeneratedValue(strategy=GenerationType.TIMEBASED)
      * @Column(name="admin_role_id", type="varchar(40)", length=40, nullable=false)
      * @Label(content="Admin Role ID")
      * @MaxLength(value=40)

@@ -26,15 +26,15 @@ use MagicObject\Util\ClassUtil\PicoAnnotationParser;
  */
 class PicoDatabaseStructure
 {
-    const ANNOTATION_TABLE = "Table";
+    const ANNOTATION_TABLE  = "Table";
     const ANNOTATION_COLUMN = "Column";
-    const ANNOTATION_ID = "Id";
-    const KEY_NAME = "name";
-    const KEY_TYPE = "type";
-    const KEY_NULL = "null";
-    const KEY_NOT_NULL = "notnull";
-    const KEY_NULLABLE = "nullable";
-    const KEY_PRIMARY = "primary";
+    const ANNOTATION_ID     = "Id";
+    const KEY_NAME          = "name";
+    const KEY_TYPE          = "type";
+    const KEY_NULL          = "null";
+    const KEY_NOT_NULL      = "notnull";
+    const KEY_NULLABLE      = "nullable";
+    const KEY_PRIMARY       = "primary";
 
     /**
      * The associated MagicObject instance.
