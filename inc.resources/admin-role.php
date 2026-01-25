@@ -15,8 +15,6 @@ use MagicAppTemplate\AppUserPermissionImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
-use MagicObject\Database\PicoPage;
-use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
@@ -30,73 +28,113 @@ require_once __DIR__ . "/inc.app/auth.php";
 $attributeChecked = ' checked="checked"';
 
 /**
- * Sorts the modules by group and module order.
+ * Retrieve the first existing property value from an object
+ * based on a list of possible property names.
  *
- * @param MagicObject[] $modules The array of modules to be sorted.
+ * This is useful when data sources use different naming conventions
+ * (camelCase, snake_case, etc.) but the codebase wants to stay consistent.
+ *
+ * @param object|null $obj
+ * @param string[]    $possibleNames List of possible property names
+ *
+ * @return mixed|null Returns the property value if found, otherwise null
+ */
+function getPropertyValue($obj, $possibleNames)
+{
+    if (!$obj) {
+        return null;
+    }
+
+    foreach ($possibleNames as $name) {
+        if (isset($obj->$name)) {
+            return $obj->$name;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Retrieve a sorting order value from an object.
+ *
+ * Supports multiple naming styles:
+ * - sortOrder   (camelCase)
+ * - sort_order  (snake_case)
+ * - order
+ * - sequence
+ *
+ * @param object|null $obj
+ *
+ * @return int|null Returns sort order if available, otherwise null
+ */
+function getSortOrder($obj)
+{
+    return getPropertyValue($obj, array(
+        'sortOrder',
+        'sort_order',
+        'order',
+        'sequence'
+    ));
+}
+
+/**
+ * Sort modules by:
+ * 1) Module group sort order
+ * 2) Module sort order
+ * 3) Module name (alphabetical, case-insensitive)
+ *
+ * Sorting is performed in-place (passed by reference).
+ *
+ * @param array $modules Array of module-role objects
+ *
  * @return void
  */
 function sortModulesByGroupAndModuleOrder(&$modules) // NOSONAR
 {
-    usort($modules, function ($a, $b) // NOSONAR
-	{
-        // Get groupSort and module->sortOrder for both modules
-        $aGroupSort = isset($a->groupModule) && isset($a->groupModule->module) && isset($a->groupModule->module->sortOrder)
-            ? $a->groupModule->module->sortOrder
-            : null;
+    usort($modules, function ($a, $b) {
 
-        $bGroupSort = isset($b->groupModule) && isset($b->groupModule->module) && isset($b->groupModule->module->sortOrder)
-            ? $b->groupModule->module->sortOrder
-            : null;
+        // ===== Group sort =====
+        $aGroupSort = getSortOrder(
+            isset($a->module->moduleGroup)
+                ? $a->module->moduleGroup
+                : (isset($a->module->module_group) ? $a->module->module_group : null)
+        );
 
-        // Compare groupSort values
-        if ($aGroupSort !== null && $bGroupSort !== null) {
-            if ($aGroupSort < $bGroupSort) 
-			{
-				return -1;
-			}
-            if ($aGroupSort > $bGroupSort) 
-			{
-				return 1;
-			}
-            $cmp = 0;
-        } elseif ($aGroupSort !== null) {
-            $cmp = -1;
-        } elseif ($bGroupSort !== null) {
-            $cmp = 1;
-        } else {
-            $cmp = 0;
+        $bGroupSort = getSortOrder(
+            isset($b->module->moduleGroup)
+                ? $b->module->moduleGroup
+                : (isset($b->module->module_group) ? $b->module->module_group : null)
+        );
+
+        $aGroupSort = ($aGroupSort !== null) ? $aGroupSort : PHP_INT_MAX;
+        $bGroupSort = ($bGroupSort !== null) ? $bGroupSort : PHP_INT_MAX;
+
+        if ($aGroupSort !== $bGroupSort) {
+            return ($aGroupSort < $bGroupSort) ? -1 : 1;
         }
 
-        // If groupSort values are equal, compare module->sortOrder
-        if ($cmp === 0) {
-            $aSort = isset($a->module) && isset($a->module->sortOrder) ? $a->module->sortOrder : null;
-            $bSort = isset($b->module) && isset($b->module->sortOrder) ? $b->module->sortOrder : null;
+        // ===== Module sort =====
+        $aSort = getSortOrder(isset($a->module) ? $a->module : null);
+        $bSort = getSortOrder(isset($b->module) ? $b->module : null);
 
-            if ($aSort !== null && $bSort !== null) {
-                if ($aSort < $bSort) 
-				{
-					return -1;
-				}
-                if ($aSort > $bSort) 
-				{
-					return 1;
-				}
-                return 0;
-            } elseif ($aSort !== null) {
-                return -1;
-            } elseif ($bSort !== null) {
-                return 1;
-            } else {
-                return 0;
-            }
+        $aSort = ($aSort !== null) ? $aSort : PHP_INT_MAX;
+        $bSort = ($bSort !== null) ? $bSort : PHP_INT_MAX;
+
+        if ($aSort !== $bSort) {
+            return ($aSort < $bSort) ? -1 : 1;
         }
-        return $cmp;
+
+        // ===== Stabilizer =====
+        $aName = isset($a->module->name) ? $a->module->name : '';
+        $bName = isset($b->module->name) ? $b->module->name : '';
+
+        return strcasecmp($aName, $bName);
     });
 }
 
 /**
  * Clean up admin role from the database.
- * 
+ *
  * This function deletes admin roles that do not have an admin level or module.
  *
  * @param PicoDatabase $database The database connection.
@@ -117,7 +155,7 @@ function cleanUpRole($database)
 			{
 				// Delete the admin role if it does not have an admin level or module
 				$adminRole->delete();
-				
+
 				// Increment the deleted count
 				$deleted++;
 			}
@@ -148,12 +186,12 @@ $dataFilter = null;
 
 
 if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_role_id']) && is_array($_POST['admin_role_id'])) {
-	
+
 	$database->startTransaction();
 
 	try {
 		// Mulai transaksi untuk memastikan data konsisten
-		
+
 		$multiLevelMenuTool = new AppMultiLevelMenu($database);
 		$multiLevelMenuTool->createParentModule($currentAction);
 
@@ -168,13 +206,13 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			$allowedSortOrder = isset($_POST['allowed_sort_order']) && isset($_POST['allowed_sort_order'][$adminRoleId]);
 			$allowedExport = isset($_POST['allowed_export']) && isset($_POST['allowed_export'][$adminRoleId]);
 			$allowedRestore = isset($_POST['allowed_restore']) && isset($_POST['allowed_restore'][$adminRoleId]);
-			
+
 			// Create a new instance of AppAdminRoleImpl
 			// and set the database connection
 			// to the instance
 			// This is a placeholder, replace with actual database connection
 			$adminRole = new AppAdminRoleImpl(null, $database);
-			
+
 			// Set the values for the adminRole object
 			// and update the database
 			$adminRole->where(PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->adminRoleId, $adminRoleId)))
@@ -190,11 +228,11 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 			->update();
 
 			// Update parent role
-			$multiLevelMenuTool->updateParentRole($adminRoleId);	
+			$multiLevelMenuTool->updateParentRole($adminRoleId);
 		}
 
 		$database->commit();
-		
+
 		// Update the application menu cache
 		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
 		// Clear the application menu cache for all users
@@ -202,7 +240,7 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 	} catch (PDOException $e) {
 		$database->rollBack();
 	}
-	
+
 	$currentModule->redirectToItself();
 }
 
@@ -210,7 +248,7 @@ if($inputGet->getUserAction() == 'generate')
 {
 	// Clean up admin role
 	cleanUpRole($database);
-	
+
 	// Generate admin role
 	// for all active modules
 	// for the selected admin level
@@ -298,7 +336,6 @@ $specification->addAnd($dataFilter);
 // Pay attention to security issues
 $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
 
-$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $dataControlConfig->getPageSize()), $sortable);
 $dataLoader = new AppAdminRoleImpl(null, $database);
 
 $subqueryMap = array(
@@ -309,7 +346,7 @@ $subqueryMap = array(
 	"primaryKey" => "admin_level_id",
 	"objectName" => "admin_level",
 	"propertyName" => "name"
-), 
+),
 "moduleId" => array(
 	"columnName" => "module_id",
 	"entityName" => "ModuleMin",
@@ -331,23 +368,23 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<span class="filter-control">
 						<select class="form-control" name="admin_level_id" onchange="this.form.submit()">
 							<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-							<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminLevelMinImpl(null, $database), 
+							<?php echo AppFormBuilder::getInstance()->createSelectOption(new AppAdminLevelMinImpl(null, $database),
 							PicoSpecification::getInstance()
 								->addAnd(new PicoPredicate(Field::of()->active, true))
-								->addAnd(new PicoPredicate(Field::of()->draft, false)), 
+								->addAnd(new PicoPredicate(Field::of()->draft, false)),
 							PicoSortable::getInstance()
 								->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-								->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+								->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)),
 							Field::of()->adminLevelId, Field::of()->name, $inputGet->getAdminLevelId())
 							; ?>
 						</select>
 					</span>
 				</span>
-				
+
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success" id="show_data"><?php echo $appLanguage->getButtonShow();?></button>
 				</span>
-				
+
 				<span class="filter-group">
 					<button type="submit" name="user_action" value="generate" class="btn btn-success" id="generate_data"><?php echo $appLanguage->getButtonGenerate();?></button>
 				</span>
@@ -360,9 +397,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		?>
 		<div class="data-section" data-ajax-name="main-data">
 			<?php try{
-				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true);
+
+				$pageData = $dataLoader->findAll($specification, null, $sortable, true);
 				if($pageData->getTotalResult() > 0)
-				{		
+				{
 				    $pageControl = $pageData->getPageControl(Field::of()->page, $currentModule->getSelf())
 				    ->setNavigation(
 				        $dataControlConfig->getPrev(), $dataControlConfig->getNext(),
@@ -370,17 +408,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				    )
 				    ->setPageRange($dataControlConfig->getPageRange())
 				    ;
-					
+
 					$sortedModule = $pageData->getResult();
 					sortModulesByGroupAndModuleOrder($sortedModule);
-					
-					
+
+
 			?>
-			<div class="pagination pagination-top">
-			    <div class="pagination-number">
-			    <?php echo $pageControl; ?>
-			    </div>
-			</div>
 			<form action="" method="post" class="data-form">
 				<div class="data-wrapper">
 					<table class="table table-row table-sort-by-column">
@@ -401,37 +434,37 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="allowed_all" class="order-controll"><label for="allowed_all"><input id="allowed_all" type="checkbox" class="checkbox check-master" data-selector=".allowed_all"> <?php echo $appEntityLanguage->getAll();?></label></td>
 							</tr>
 						</thead>
-					
+
 						<tbody data-offset="<?php echo $pageData->getDataOffset();?>">
-							<?php 
+							<?php
 							$dataIndex = 0;
 							foreach($sortedModule as $idx=>$adminRole)
 							{
 								// Get the module name
 								$moduleName = $adminRole->issetModule() ? $adminRole->getModule()->getName() : "";
-								
+
 								// Get the admin level name
 								$adminLevelName = $adminRole->issetAdminLevel() ? $adminRole->getAdminLevel()->getName() : "";
-								
+
 								// Increment data index
-							
+
 								$dataIndex++;
-								
+
 								$id = $adminRole->getAdminRoleId();
-								
+
 								$moduleClass = "module-".str_replace(".", "-", $adminRole->getModuleCode())."-".$adminRole->getAdminRoleId();
 							?>
-		
+
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?>
 									<input type="hidden" name="admin_role_id[<?php echo $idx;?>]" value="<?php echo $id;?>">
 								</td>
-								
+
 								<!-- Module Name -->
 								<td data-col-name="module_id">
 									<?php echo $adminRole->issetModule() ? $adminRole->getModule()->getName() : "";?>
 								</td>
-								
+
 								<!-- Module Group -->
 								<td data-col-name="module_group_id">
 									<?php echo $adminRole->issetModule() && $adminRole->getModule()->issetModuleGroup() ? $adminRole->getModule()->getModuleGroup()->getName() : "";?>
@@ -440,8 +473,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed List (checkbox) -->
 								<td data-col-name="allowed_list">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_list <?php echo $moduleClass;?>" name="allowed_list[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedList($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_list <?php echo $moduleClass;?>" name="allowed_list[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedList($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -449,8 +482,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Detail (checkbox) -->
 								<td data-col-name="allowed_detail">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_detail <?php echo $moduleClass;?>" name="allowed_detail[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedDetail($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_detail <?php echo $moduleClass;?>" name="allowed_detail[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedDetail($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -458,8 +491,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Create (checkbox) -->
 								<td data-col-name="allowed_create">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_create <?php echo $moduleClass;?>" name="allowed_create[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedCreate($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_create <?php echo $moduleClass;?>" name="allowed_create[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedCreate($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -467,8 +500,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Update (checkbox) -->
 								<td data-col-name="allowed_update">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_update <?php echo $moduleClass;?>" name="allowed_update[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedUpdate($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_update <?php echo $moduleClass;?>" name="allowed_update[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedUpdate($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -476,8 +509,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Delete (checkbox) -->
 								<td data-col-name="allowed_delete">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_delete <?php echo $moduleClass;?>" name="allowed_delete[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedDelete($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_delete <?php echo $moduleClass;?>" name="allowed_delete[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedDelete($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -485,8 +518,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Approve (checkbox) -->
 								<td data-col-name="allowed_approve">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_approve <?php echo $moduleClass;?>" name="allowed_approve[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedApprove($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_approve <?php echo $moduleClass;?>" name="allowed_approve[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedApprove($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -494,8 +527,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Sort Order (checkbox) -->
 								<td data-col-name="allowed_sort_order">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_sort_order <?php echo $moduleClass;?>" name="allowed_sort_order[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedSortOrder($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_sort_order <?php echo $moduleClass;?>" name="allowed_sort_order[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedSortOrder($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -503,8 +536,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Export (checkbox) -->
 								<td data-col-name="allowed_export">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_export <?php echo $moduleClass;?>" name="allowed_export[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedExport($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_export <?php echo $moduleClass;?>" name="allowed_export[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedExport($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
@@ -512,12 +545,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<!-- Allowed Restore (checkbox) -->
 								<td data-col-name="allowed_restore">
 									<label>
-										<input type="checkbox" class="checkbox check-slave allowed_all allowed_restore <?php echo $moduleClass;?>" name="allowed_restore[<?php echo $id;?>]" value="1" 
-											<?php echo $adminRole->optionAllowedRestore($attributeChecked, "");?>> 
+										<input type="checkbox" class="checkbox check-slave allowed_all allowed_restore <?php echo $moduleClass;?>" name="allowed_restore[<?php echo $id;?>]" value="1"
+											<?php echo $adminRole->optionAllowedRestore($attributeChecked, "");?>>
 										<?php echo $appLanguage->getYes();?>
 									</label>
 								</td>
-								
+
 								<!-- Allowed All (checkbox) -->
 								<td data-col-name="allowed_all">
 									<label>
@@ -527,10 +560,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 							</tr>
 
-							<?php 
+							<?php
 							}
 							?>
-		
+
 						</tbody>
 					</table>
 				</div>
@@ -543,13 +576,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</div>
 				</div>
 			</form>
-			<div class="pagination pagination-bottom">
-			    <div class="pagination-number">
-			    <?php echo $pageControl; ?>
-			    </div>
-			</div>
-			
-			<?php 
+
+
+			<?php
 			}
 			else
 			{
@@ -558,7 +587,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			    <?php
 			}
 			?>
-			
+
 			<?php
 			}
 			catch(Exception $e)
@@ -566,7 +595,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			    ?>
 			    <div class="alert alert-danger"><?php echo $appInclude->printException($e);?></div>
 			    <?php
-			} 
+			}
 			?>
 		</div>
 		<?php
@@ -580,6 +609,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		?>
 	</div>
 </div>
-<?php 
+<?php
 require_once $appInclude->mainAppFooter(__DIR__);
 /*ajaxSupport*/
