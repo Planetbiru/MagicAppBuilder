@@ -25,7 +25,7 @@ class EntityPackageThemeTrash extends MagicObject
 	 * Package Theme Trash ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="package_theme_trash_id", type="varchar(40)", length=40, nullable=false)
 	 * @DefaultColumn(value="NULL")

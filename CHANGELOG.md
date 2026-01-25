@@ -4091,11 +4091,44 @@ A filter that previously required **8 separate queries** for 8 related entities 
 
 Date: January 15th, 2026
 
-## New Feature: Import Database from Markdown  
+## What's New
+
+### New Feature: Import Database from Markdown  
 
 In line with MagicAppBuilder’s mission to make data import as seamless as possible, version **2.1** introduces support for importing databases from **Markdown**.  
 
 Since Markdown is a text-based format, the import process does not involve selecting a Markdown file directly. Instead, users open their Markdown file, copy the content to the clipboard, and paste it into the editor. MagicAppBuilder will automatically detect and extract all tables from the pasted content.  
 
 After import, users are expected to adjust table names and column names to align with MagicAppBuilder’s naming conventions. Importantly, all data from the Markdown document remains intact, even if column names are modified.  
+
+### New Feature: Add Special Access for Key Module
+
+In the previous version, there was a potential risk of users losing access to key modules, such as modules for adding users, adding modules, managing user permissions, and so on, due to data errors. Version 2.1 ensures that users will not lose access to these modules because they are marked as key modules in the program code.
+
+## What's Changed
+
+### Updated Primary Key Strategy for String-Based Identifiers
+
+In version **2.1**, MagicAppBuilder updates its strategy for generating **string-based primary key values**, aligning with the latest improvements in **MagicObject**.
+
+Previously, MagicAppBuilder used a `UUID`-based approach; however, the generated values were **not standard UUIDs**. Starting from version 2.1, the default strategy has been replaced with a new standard: **`TIMEBASED` string identifiers**.
+
+The `TIMEBASED` string strategy offers several advantages:
+
+1. It represents the creation time of the record, even though the timestamp is not fully precise.
+2. It supports **nanosecond-level resolution**, significantly reducing the likelihood of key collisions.
+3. It is augmented with **2096 bits of random data** to further minimize collision risk.
+4. The identifier is encoded in **hexadecimal format**, making it shorter and more human-readable.
+5. It has a fixed length of **20 characters**, ensuring efficient storage without excessive space usage.
+6. The **first 17 characters** represent the time component, which can be converted back into a timestamp if needed.
+
+This change provides a better balance between uniqueness, performance, readability, and storage efficiency compared to the previous non-standard UUID approach.
+
+### Standard UUID Support
+
+In version **2.1**, the `UUID` strategy now generates **standard-compliant UUIDs**. This means that when users select the `UUID` strategy, the application will produce UUID values that fully conform to the official UUID specification.
+
+As a result, users upgrading **MagicObject from version 3.21 to 3.22** will experience a **primary key value transition**, since the newly generated UUIDs will differ from those produced by the previous non-standard implementation.
+
+If maintaining the legacy UUID generation behavior is required, it is recommended to continue using **MagicObject version 3.21.x**. Version **3.22.x** should be adopted only for **new applications** where a clean primary key strategy can be applied from the start.
 

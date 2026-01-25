@@ -25,7 +25,7 @@ class PackageDatabase extends MagicObject
 	 * Package Database ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="package_database_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Package Database ID")

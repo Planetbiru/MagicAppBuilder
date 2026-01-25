@@ -25,7 +25,7 @@ class EntityGeneralCache extends MagicObject
 	 * General Cache ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="general_cache_id", type="varchar(40)", length=40, nullable=true)
 	 * @Label(content="General Cache ID")
 	 * @var string

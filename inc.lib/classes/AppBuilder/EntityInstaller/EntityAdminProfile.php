@@ -25,7 +25,7 @@ class EntityAdminProfile extends MagicObject
 	 * Admin Profile ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="admin_profile_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Admin Profile ID")

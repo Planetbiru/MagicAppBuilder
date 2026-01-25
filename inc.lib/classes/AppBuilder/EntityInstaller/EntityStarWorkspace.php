@@ -25,7 +25,7 @@ class EntityStarWorkspace extends MagicObject
 	 * Star Workspace ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="star_workspace_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Star Workspace ID")

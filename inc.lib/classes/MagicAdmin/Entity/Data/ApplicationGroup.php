@@ -25,7 +25,7 @@ class ApplicationGroup extends MagicObject
 	 * Application Group ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="application_group_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Application Group ID")

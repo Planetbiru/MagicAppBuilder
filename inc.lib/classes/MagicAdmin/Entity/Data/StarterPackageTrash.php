@@ -25,7 +25,7 @@ class StarterPackageTrash extends MagicObject
 	 * Starter Package Trash ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="starter_package_trash_id", type="varchar(40)", length=40, nullable=false)
 	 * @DefaultColumn(value="NULL")

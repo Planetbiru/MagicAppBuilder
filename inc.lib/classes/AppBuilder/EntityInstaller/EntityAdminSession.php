@@ -25,7 +25,7 @@ class EntityAdminSession extends MagicObject
 	 * Admin Session ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="admin_session_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Admin Session ID")

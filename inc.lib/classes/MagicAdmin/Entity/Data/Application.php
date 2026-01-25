@@ -25,7 +25,7 @@ class Application extends MagicObject
 	 * Application ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="application_id", type="varchar(100)", length=100, nullable=false)
 	 * @Label(content="Application ID")

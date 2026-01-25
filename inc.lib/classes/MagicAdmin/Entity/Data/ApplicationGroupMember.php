@@ -25,7 +25,7 @@ class ApplicationGroupMember extends MagicObject
 	 * Application Group Member ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="application_group_member_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Application Group Member ID")

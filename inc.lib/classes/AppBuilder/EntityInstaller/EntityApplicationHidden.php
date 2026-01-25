@@ -25,7 +25,7 @@ class EntityApplicationHidden extends MagicObject
 	 * Application Hidden ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="application_hidden_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Application Hidden ID")

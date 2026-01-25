@@ -125,7 +125,7 @@ class PicoEntityGenerator
         if (!empty($columnKey) && stripos($columnKey, "PRI") === 0) {
             $docs[] = "\t * @Id";
             if (stripos($columnExtra, "auto_increment") === false) {
-                $docs[] = "\t * @GeneratedValue(strategy=GenerationType.UUID)";
+                $docs[] = "\t * @GeneratedValue(strategy=GenerationType.TIMEBASED)";
             }
         }
 

@@ -1125,6 +1125,26 @@ class PicoDatabasePersistence // NOSONAR
     }
 
     /**
+     * Determines whether a value should be generated for the given property
+     * during the first invocation of the generation process.
+     *
+     * A value will be generated only if:
+     * - This is the first call of the generation lifecycle
+     * - The specified property does not yet have a value (null or empty string)
+     * - No generated value has been assigned previously
+     *
+     * @param bool   $firstCall Indicates whether this is the first call in the generation lifecycle.
+     * @param string $prop      The property name to be evaluated.
+     * @return bool Returns true if a new value should be generated; false otherwise.
+     */
+    private function shouldGenerateValueOnFirstCall($firstCall, $prop)
+    {
+        return $firstCall
+            && ($this->object->get($prop) === null || $this->object->get($prop) === '')
+            && !$this->generatedValue;
+    }
+
+    /**
      * Set a generated value for a specified property based on its generation strategy.
      *
      * @param string $prop The property name to set the generated value for.
@@ -1134,30 +1154,42 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function setGeneratedValue($prop, $strategy, $firstCall)
     {
-        if(stripos($strategy, "UUID") !== false)
-        {
-            if($firstCall && ($this->object->get($prop) == null || $this->object->get($prop) == "") && !$this->generatedValue)
-            {
-                $generatedValue = $this->database->generateNewId();
-                $this->object->set($prop, $generatedValue);
-                $this->generatedValue = true;
-            }
-        }
-        else if(stripos($strategy, "IDENTITY") !== false)
-        {
-            if($firstCall)
-            {
+        // Handle IDENTITY strategy separately (DB-driven)
+        if (stripos($strategy, 'IDENTITY') !== false) {
+            if ($firstCall) {
                 $this->requireDbAutoincrement = true;
-            }
-            else if($this->requireDbAutoincrement && !$this->dbAutoinrementCompleted)
-            {
-                $generatedValue = $this->database->getDatabaseConnection()->lastInsertId();
-                $this->object->set($prop, $generatedValue);
+            } elseif ($this->requireDbAutoincrement && !$this->dbAutoinrementCompleted) {
+                $this->object->set(
+                    $prop,
+                    $this->database->getDatabaseConnection()->lastInsertId()
+                );
                 $this->dbAutoinrementCompleted = true;
             }
+
+            return $this;
         }
+
+        // Map strategy to generator method
+        $generatorMap = [
+            'UUID'             => 'generateUUID',
+            'TIMEBASED'        => 'generateTimeBasedId',
+            'LEGACY_TIMEBASED' => 'generateNewId',
+        ];
+
+        foreach ($generatorMap as $key => $method) {
+            if (
+                stripos($strategy, $key) !== false &&
+                $this->shouldGenerateValueOnFirstCall($firstCall, $prop)
+            ) {
+                $this->object->set($prop, $this->database->{$method}());
+                $this->generatedValue = true;
+                break;
+            }
+        }
+
         return $this;
     }
+
 
     /**
      * Insert the current object's data into the database.
@@ -1266,11 +1298,29 @@ class PicoDatabasePersistence // NOSONAR
         }
 
         /**
-         * 1. TABLE - Indicates that the persistence provider must assign primary keys for the entity using an underlying database table to ensure uniqueness.
-         * 2. SEQUENCE - Indicates that the persistence provider must assign primary keys for the entity using a database sequence.
-         * 3. IDENTITY - Indicates that the persistence provider must assign primary keys for the entity using a database identity column.
-         * 4. AUTO - Indicates that the persistence provider should pick an appropriate strategy for the particular database. The AUTO generation strategy may expect a database resource to exist, or it may attempt to create one. A vendor may provide documentation on how to create such resources in the event that it does not support schema generation or cannot create the schema resource at runtime.
-         * 5. UUID - Indicates that the persistence provider must assign primary keys for the entity with a UUID value.
+         * 1. TABLE - Indicates that the persistence provider must assign primary keys for the entity
+         *    using an underlying database table to ensure uniqueness.
+         *
+         * 2. SEQUENCE - Indicates that the persistence provider must assign primary keys for the entity
+         *    using a database sequence.
+         *
+         * 3. IDENTITY - Indicates that the persistence provider must assign primary keys for the entity
+         *    using a database identity column.
+         *
+         * 4. AUTO - Indicates that the persistence provider should select an appropriate strategy for
+         *    the specific database. The AUTO generation strategy may expect a database resource to
+         *    already exist, or it may attempt to create one. A vendor may provide documentation on how
+         *    to create such resources if schema generation is not supported or if the resource cannot
+         *    be created at runtime.
+         *
+         * 5. UUID - Indicates that the persistence provider must assign primary keys for the entity
+         *    using a standard UUID value.
+         *
+         * 6. TIME_BASED - Indicates that the persistence provider must assign primary keys for the entity
+         *    using the current epoch time in nanoseconds, combined with a 3-hex-digit random suffix.
+         *
+         * 7. LEGACY_TIMEBASED - Indicates that the persistence provider must assign primary keys for the
+         *    entity using the legacy, non-standard UUID-based strategy from earlier versions.
          */
 
         if($info->getAutoIncrementKeys() != null)
@@ -1302,7 +1352,7 @@ class PicoDatabasePersistence // NOSONAR
      */
     private function isRequireGenerateValue($strategy, $propertyName)
     {
-        return stripos($strategy, "UUID") !== false
+        return (stripos($strategy, "UUID") !== false || stripos($strategy, "TIMEBASED") !== false || stripos($strategy, "LEGACY_TIMEBASED") !== false)
                 && ($this->object->get($propertyName) == null || $this->object->get($propertyName) == "")
                 && !$this->generatedValue;
     }

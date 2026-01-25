@@ -25,7 +25,7 @@ class AppAdminLevelImpl extends MagicObject
 	 * Admin Level ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="admin_level_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Admin ID")
 	 * @MaxLength(value=40)

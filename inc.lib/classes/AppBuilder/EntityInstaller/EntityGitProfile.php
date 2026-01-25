@@ -25,7 +25,7 @@ class EntityGitProfile extends MagicObject
 	 * Git Profile ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="git_profile_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Git Profile ID")

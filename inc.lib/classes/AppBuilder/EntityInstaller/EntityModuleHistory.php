@@ -25,7 +25,7 @@ class EntityModuleHistory extends MagicObject
 	 * Module History ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="module_history_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Module ID")

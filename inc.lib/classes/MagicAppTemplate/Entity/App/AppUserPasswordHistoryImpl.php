@@ -25,7 +25,7 @@ class AppUserPasswordHistoryImpl extends MagicObject
 	 * User Password History ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="user_password_history_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="User Password History ID")

@@ -25,7 +25,7 @@ class EntityPackageCode extends MagicObject
 	 * Package Code ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="package_code_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Package Code ID")

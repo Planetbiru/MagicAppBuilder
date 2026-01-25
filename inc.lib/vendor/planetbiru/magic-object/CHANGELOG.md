@@ -1482,3 +1482,22 @@ The powerful `retrieve()` method, which allows for easy access to nested propert
 ```php
 $secretConfig->retrieve('database', 'credentials', 'username');
 ```
+
+# MagicObject Version 3.22.0
+
+## What's New
+
+1. **UUID Generator**
+   Added a native UUID generator that produces standards-compliant UUID values, suitable for distributed systems and cross-database compatibility.
+
+2. **Time-Based ID Generator**
+   Introduced a time-based ID generator that creates sortable, time-ordered identifiers, improving indexing performance and data traceability.
+
+## What's Changed
+
+1. **Default Primary Key Generation**
+   The default primary key generation strategy for `VARCHAR` columns has been changed to use the **time-based ID generator**, replacing the previous approach.
+
+2. **Improved UUID Implementation**
+   Replaced the legacy unique ID generation based on PHP’s `uniqid()` function with a **real UUID implementation**, ensuring better uniqueness guarantees and compliance with UUID standards.
+

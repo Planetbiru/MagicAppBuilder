@@ -25,7 +25,7 @@ class StarterPackage extends MagicObject
 	 * Starter Package ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @NotNull
 	 * @Column(name="starter_package_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Starter Package ID")

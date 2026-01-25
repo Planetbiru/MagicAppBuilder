@@ -25,7 +25,7 @@ class AppMessageFolderMinImpl extends MagicObject
 	 * Message Folder ID
 	 * 
 	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
+	 * @GeneratedValue(strategy=GenerationType.TIMEBASED)
 	 * @Column(name="message_folder_id", type="varchar(40)", length=40, nullable=false)
 	 * @Label(content="Message Folder ID")
 	 * @MaxLength(value=40)
