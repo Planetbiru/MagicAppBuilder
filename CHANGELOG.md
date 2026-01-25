@@ -4101,7 +4101,9 @@ Since Markdown is a text-based format, the import process does not involve selec
 
 After import, users are expected to adjust table names and column names to align with MagicAppBuilder’s naming conventions. Importantly, all data from the Markdown document remains intact, even if column names are modified.  
 
-Berikut terjemahan **dan sedikit pengembangan** pada bagian **What’s Changed** dalam bahasa Inggris, dengan gaya yang konsisten dengan bagian *What’s New*:
+### New Feature: Add Special Access for Key Module
+
+In the previous version, there was a potential risk of users losing access to key modules, such as modules for adding users, adding modules, managing user permissions, and so on, due to data errors. Version 2.1 ensures that users will not lose access to these modules because they are marked as key modules in the program code.
 
 ## What's Changed
 
