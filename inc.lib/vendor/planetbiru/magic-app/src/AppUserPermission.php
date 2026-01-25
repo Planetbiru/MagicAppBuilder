@@ -134,6 +134,13 @@ class AppUserPermission
      * @var string
      */
     private $userAction;
+
+    /**
+     * Special access
+     *
+     * @var bool
+     */
+    private $specialAccess;
     
     /**
      * Constructor
@@ -145,9 +152,10 @@ class AppUserPermission
      * @param PicoDatabase $database The database connection object.
      * @param MagicObject $appUserRole The user role entity.
      * @param PicoModule $currentModule The current module being accessed.
+     * @param bool $specialAccess Mark the current module to be special access module.
      * @param AppUser $currentUser The current user object.
      */
-    public function __construct($appConfig, $database, $appUserRole, $currentModule, $currentUser)
+    public function __construct($appConfig, $database, $appUserRole, $currentModule, $currentUser, $specialAccess = false)
     {
         $this->appConfig = $appConfig;
         $this->entity = $appUserRole;
@@ -161,6 +169,7 @@ class AppUserPermission
         {
             $this->adminLevelId = $currentUser->getAdminLevelId();
         }
+        $this->specialAccess = $specialAccess;
     }
     
     /**
@@ -173,6 +182,7 @@ class AppUserPermission
      */
     public function loadPermission()
     {
+        
         if($this->appConfig->getBypassRole() || 
         (
             $this->currentModule != null
@@ -251,6 +261,10 @@ class AppUserPermission
             try
             {
                 $this->currentModule->getAppModule()->findOneByModuleCode($this->currentModule->getModuleName());
+                if($this->specialAccess)
+                {
+                    $this->currentModule->getAppModule()->setSpecialAccess(true);
+                }
             }
             catch(Exception $e)
             {
