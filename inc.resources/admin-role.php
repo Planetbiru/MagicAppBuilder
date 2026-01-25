@@ -15,8 +15,6 @@ use MagicAppTemplate\AppUserPermissionImpl;
 use MagicAppTemplate\Entity\App\AppAdminLevelMinImpl;
 use MagicAppTemplate\Entity\App\AppAdminRoleImpl;
 use MagicAppTemplate\Entity\App\AppModuleImpl;
-use MagicObject\Database\PicoPage;
-use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
