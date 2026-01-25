@@ -4132,3 +4132,11 @@ As a result, users upgrading **MagicObject from version 3.21 to 3.22** will expe
 
 If maintaining the legacy UUID generation behavior is required, it is recommended to continue using **MagicObject version 3.21.x**. Version **3.22.x** should be adopted only for **new applications** where a clean primary key strategy can be applied from the start.
 
+## Bug Fixes
+
+### Admin Role Module Sorting
+
+Version 2.1 fixes an issue in the Admin Role management where modules were not sorted by their module groups. In previous versions, modules appeared in an unsorted order, making it difficult for administrators to configure roles efficiently.
+
+In version 2.1, modules are now sorted first by **module group order**, and then by **module order**. This ensures a consistent and logical display of modules, significantly improving usability when managing admin roles.
+
