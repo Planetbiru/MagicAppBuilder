@@ -2393,8 +2393,8 @@ class EntityEditor {
 
         const selectedEntities = qsa(this.selector+" .right-panel .selected-entity-structure:checked");
         selectedEntities.forEach(checkbox => {
-            const entityIndex = parseInt(checkbox.value);
-            const entity = this.entities[entityIndex];
+            const entityName = checkbox.dataset.name;
+            const entity = this.getEntityByName(entityName);
             if (entity) {
                 sql.push(entity.toSQL(dialect));
             }
@@ -2402,8 +2402,8 @@ class EntityEditor {
 
         const selectedEntitiesData = qsa(this.selector+" .right-panel .selected-entity-data:checked");
         selectedEntitiesData.forEach(checkbox => {
-            const entityIndex = parseInt(checkbox.value);
-            const entity = this.entities[entityIndex];
+            const entityName = checkbox.dataset.name;
+            const entity = this.getEntityByName(entityName);
             if (entity) {
                 let query = entity.toSQLInsert(dialect);
                 if(query != '')
