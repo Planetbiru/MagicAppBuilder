@@ -4140,3 +4140,9 @@ Version 2.1 fixes an issue in the Admin Role management where modules were not s
 
 In version 2.1, modules are now sorted first by **module group order**, and then by **module order**. This ensures a consistent and logical display of modules, significantly improving usability when managing admin roles.
 
+### SQL Export Bug Fix (Entity Editor)
+
+Version 2.1 fixes a bug in the Entity Editor where SQL exports incorrectly used entity indexes instead of entity names. This could lead to entity index errors during SQL execution.
+
+In version 2.1, SQL exports now correctly use **entity names rather than entity indexes**, preventing index-related errors and ensuring more reliable SQL generation.
+
