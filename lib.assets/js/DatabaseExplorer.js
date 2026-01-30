@@ -1842,7 +1842,9 @@ function sendEntityToServer(applicationId, databaseType, databaseName, databaseS
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
-        entities: entities
+        entities: entities,
+        saveEntity: true,
+        saveDiagram: false
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object
@@ -1885,7 +1887,9 @@ function sendDiagramToServer(applicationId, databaseType, databaseName, database
         databaseType: databaseType,
         databaseName: databaseName,
         databaseSchema: databaseSchema,
-        diagrams: diagrams
+        diagrams: diagrams,
+        saveDiagram: true,
+        saveEntity: false
     };
 
     const xhr = new XMLHttpRequest(); // Create a new XMLHttpRequest object

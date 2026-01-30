@@ -52,12 +52,11 @@ if (isset($inputPost) && $inputPost['databaseName'] !== null) {
             $data = array('entities' => array(), 'diagrams' => array());
         }
 
-        if (!empty($diagrams)) {
+        if ($inputPost['saveDiagram']) {
             $data['diagrams'] = $diagrams;
-            file_put_contents($path, json_encode($data));
         }
         $entityCount = 0;
-        if (!empty($entities)) {
+        if ($inputPost['saveEntity']) {
             $data['entities'] = $entities;
 
             // Update entity->creator and entity->modifier
@@ -71,8 +70,8 @@ if (isset($inputPost) && $inputPost['databaseName'] !== null) {
                 $entityCount++;
             }
             
-            file_put_contents($path, json_encode($data));
         }
+        file_put_contents($path, json_encode($data));
 
         if(!file_exists($indexPath))
         {
