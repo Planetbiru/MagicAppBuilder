@@ -581,6 +581,6 @@ Whether you're building standard data entry modules or complex enterprise system
 
 In today’s fast-moving development landscape, **MagicAppBuilder** enables teams to stay ahead—focusing on innovation rather than boilerplate code.
 
-## YouTube Channel
+## Visit Our Website
 
-[MagicAppBuilder](https://www.youtube.com/watch?v=f2zxrZUJLtY&list=PLHDNsAnl30En3hr4a-9TuRHogodCCAOhT)
+Visit our website at https://magicappbuilder.com 
