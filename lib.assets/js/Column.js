@@ -10,7 +10,7 @@ const DIALECT_TYPE_MAP = {
         timestamp: 'TIMESTAMP',
         float: 'FLOAT',
         double: 'DOUBLE',
-        decimal: 'DOUBLE',
+        decimal: 'DECIMAL',
         enum: 'ENUM',
         set: 'SET',
     },
@@ -192,7 +192,7 @@ class Column {
 
         // All constants are compared in UPPERCASE
         const isEnumOrSet = ['ENUM', 'SET'].includes(typeKey);
-        const isRangeType = ['NUMERIC', 'DECIMAL', 'DOUBLE', 'FLOAT'].includes(typeKey);
+        const isRangeType = ['NUMERIC', 'DECIMAL'].includes(typeKey);
         const isLengthType = [
             'VARCHAR', 'CHAR', 'BINARY', 'VARBINARY',
             'BIT', 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'BIGINT'

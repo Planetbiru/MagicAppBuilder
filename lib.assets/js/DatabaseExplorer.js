@@ -978,9 +978,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         let tables = div.querySelectorAll('table');
 
                         if (tables && tables.length > 0) {
-                            parsed = editor.parseHtmlToJSON(tables[0]);
-                            editor.importFromData(parsed);
-                            return; // Return after finding an HTML table
+                            let isFromMagicAppBuilder = editor.isFromMagicAppBuilder(tables);
+                            if(isFromMagicAppBuilder)
+                            {
+                                editor.parseHtmlTableFromDocument(tables);
+                                return;
+                            }
+                            else
+                            {
+                                parsed = editor.parseHtmlToJSON(tables[0]);
+                                editor.importFromData(parsed);
+                                return; // Return after finding an HTML table
+                            }
+                            
                         }
                     }
                 }
