@@ -4581,6 +4581,172 @@ class EntityEditor {
     }
 
     /**
+     * Checks whether the provided tables originate from MagicAppBuilder.
+     *
+     * This function iterates through a collection of table elements and determines
+     * if at least one table has both the `entity-table` and
+     * `entity-table-magicappbuilder` CSS classes.
+     *
+     * @param {HTMLElement[]|NodeList} tables
+     *        A collection of table elements to be inspected.
+     *
+     * @returns {boolean}
+     *          Returns true if any table is identified as coming from MagicAppBuilder,
+     *          otherwise returns false.
+     */
+    isFromMagicAppBuilder(tables)
+    {
+        let flag = false;
+        if(tables && tables.length > 0)
+        {
+            tables.forEach(table => {
+                if(table.classList.contains('entity-table') && table.classList.contains('entity-table-magicappbuilder'))
+                {
+                    flag = true;
+                }
+            });
+        }
+        return flag;
+    }
+
+    /**
+     * Parses HTML schema tables and converts them into Entity objects with Column definitions.
+     *
+     * This method scans a list of HTML table elements and processes only tables that:
+     * - Contain the class `entity-table`
+     * - Contain the class `entity-table-magicappbuilder`
+     *
+     * For each valid table:
+     * - The table name is taken from the `data-name` attribute.
+     * - Column metadata is extracted from the table header (`thead`).
+     * - Each row inside `tbody` is converted into a `Column` instance.
+     * - A new `Entity` object is created and populated with parsed columns.
+     * - The entity is added to `this.entities` if it does not already exist.
+     *
+     * Header matching is case-insensitive and supports variations such as:
+     * - Name, Column Name
+     * - Type
+     * - Length
+     * - Nullable
+     * - Default
+     * - PK, Primary, Primary Key
+     * - Serial, Increment, Identity
+     * - Description, Comment
+     *
+     * After parsing all tables, this method:
+     * - Re-renders entities in the UI
+     * - Triggers a save callback with the updated entity list
+     *
+     * @param {HTMLTableElement[]|NodeList} tables
+     *        A collection of HTML table elements representing database schema definitions.
+     *
+     * @returns {void}
+     */
+    parseHtmlTableFromDocument(tables)
+    {
+        if (tables && tables.length > 0)
+        {
+            tables.forEach(table => {
+
+                // Hanya proses entity-table (kecuali magicappbuilder)
+                if (
+                    table.classList.contains('entity-table') &&
+                    table.classList.contains('entity-table-magicappbuilder')
+                )
+                {
+                    const tableName = table.dataset.name;
+
+                    if (!tableName) return;
+                    if(!this.getEntityByName(tableName))
+                    {
+                        // Find index from header
+                        let indexName = 0;
+                        let indexType = 0;
+                        let indexLength = 0;
+                        let indexNullable = 0;
+                        let indexDefault = 0;
+                        let indexPrimaryKey = 0;
+                        let indexSerial = 0;
+                        let indexDescription = 0;
+
+                        table.querySelectorAll('thead tr th').forEach((th, index) => {
+
+                            const text = th.textContent.trim().toLowerCase();
+
+                            if (text.includes('name')) {
+                                indexName = index;
+                            }
+                            else if (text.includes('type')) {
+                                indexType = index;
+                            }
+                            else if (text.includes('length')) {
+                                indexLength = index;
+                            }
+                            else if (text.includes('nullable')) {
+                                indexNullable = index;
+                            }
+                            else if (text.includes('default')) {
+                                indexDefault = index;
+                            }
+                            else if (text.includes('pk') || text.includes('primary')) {
+                                indexPrimaryKey = index;
+                            }
+                            else if (text.includes('serial') || text.includes('increment') || text.includes('identity')) {
+                                indexSerial = index;
+                            }
+                            else if (text.includes('description') || text.includes('comment')) {
+                                indexDescription = index;
+                            }
+
+                        });
+                        
+                        if (table.tBodies && table.tBodies.length > 0)
+                        {
+                            let columns = [];
+
+                            table.querySelectorAll('tbody tr').forEach(tr => {
+
+                                const tds = tr.querySelectorAll('td');
+
+                                const name        = tds[indexName]?.textContent.trim() || '';
+                                const type        = tds[indexType]?.textContent.trim() || 'VARCHAR';
+                                const length      = tds[indexLength]?.textContent.trim() || '';
+                                const nullable    = (tds[indexNullable]?.textContent.trim() || '').toLowerCase() === 'true';
+                                const defValue    = tds[indexDefault]?.textContent.trim() || '';
+                                const primaryKey  = (tds[indexPrimaryKey]?.textContent.trim() || '').toLowerCase() === 'true';
+                                const serial      = (tds[indexSerial]?.textContent.trim() || '').toLowerCase() === 'true';
+                                const description= tds[indexDescription]?.textContent.trim() || '';
+
+                                const column = new Column(
+                                    name,
+                                    type,
+                                    length,
+                                    nullable,
+                                    defValue,
+                                    primaryKey,
+                                    serial,
+                                    "",            // values (ENUM/SET) - belum dari tabel
+                                    description
+                                );
+
+                                columns.push(column);
+                            });
+                            let entity = new Entity(tableName, this.entities.length);
+                            if(columns.length > 0)
+                            {
+                                entity.columns = columns;
+                                this.entities.push(entity);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        this.renderEntities();
+        this.callbackSaveEntity(this.entities);
+    }
+
+    /**
      * Parses an HTML table element and converts its content into a structured JSON object.
      * * This function is designed to handle three scenarios:
      * 1. A table with a <thead> and <tbody>: It uses the <thead> for column headers.
@@ -6226,6 +6392,9 @@ Mode
     createHtmlEntity(entity) {
         let _this = this;
         let table = document.createElement('table');
+        table.dataset.name = entity.name;
+        table.classList.add('entity-table');
+        table.classList.add('entity-table-magicappbuilder');
 
         // Create table header
         let thead = document.createElement('thead');
