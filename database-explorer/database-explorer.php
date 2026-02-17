@@ -213,6 +213,9 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                             <div class="foreign-key-container">
                                 <label><input type="checkbox" class="with-foreign-key"> With Foreign Key</label>
                             </div>
+                            <div class="index-container">
+                                <label><input type="checkbox" class="with-index"> With Index</label>
+                            </div>
                             <div>
                                 <textarea class="query-generated" spellcheck="false" autocomplete="off" readonly></textarea>
                             </div>
@@ -269,12 +272,14 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <input class="entity-name" type="text" id="entity-name" placeholder="Enter entity name">
                                 <button class="btn" onclick="editor.addColumn(true)">Add Column</button>
                                 <button class="btn" onclick="editor.addColumnFromTemplate()">Add Column from Template</button>
-                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
+                                <button class="btn" onclick="editor.editForeignKeys()">Foreign Key</button>
+                                <button class="btn" onclick="editor.manageIndexes()">Index</button>
+                                <button class="btn" onclick="editor.showDescriptionDialog()">Description</button>
+                                <button class="btn btn-data" onclick="editor.viewData()">Data</button>
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
                                 <button class="btn" onclick="editor.preference()">Preferences</button>
+                                <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
-                                <button class="btn btn-data" onclick="editor.showDescriptionDialog()">Description</button>
-                                <button class="btn btn-data" onclick="editor.viewData()">Data</button>
                                 <div class="table-container">
                                     <table id="table-entity-editor">
                                         <thead>
@@ -522,6 +527,39 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
         </div>
     </div>
 
+    <!-- Index Editor Modal -->
+    <div id="indexEditorModal" class="modal modal-lg" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Manage Indexes for <span class="entity-name-title"></span></h3>
+                <span class="close-btn cancel-button" onclick="this.closest('.modal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body">
+                <table id="index-editor-table" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Index Name</th>
+                            <th>Columns</th>
+                            <th width="80">Unique</th>
+                            <th width="80">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary add-index-row">Add Index</button>
+                &nbsp;
+                <button type="button" class="btn btn-success save-indexes">Save Indexes</button>
+                &nbsp;
+                <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal modal-sm" id="descriptionModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
@@ -629,6 +667,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
             <li id="menu-edit-foreign-key"><a href="javascript:;" onclick="editor.editForeignKeyContextMenu(event);">Edit Foreign Key</a></li>
+            <li id="menu-edit-index"><a href="javascript:;" onclick="editor.editIndexContextMenu();">Manage Indexes</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
         </ul>
@@ -648,6 +687,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
             <li id="menu-edit-foreign-key"><a href="javascript:;" onclick="editor.editForeignKeyContextMenu(event);">Edit Foreign Key</a></li>
+            <li id="menu-edit-index"><a href="javascript:;" onclick="editor.editIndexContextMenu();">Manage Indexes</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
             <li class="dropdown-divider"></li>

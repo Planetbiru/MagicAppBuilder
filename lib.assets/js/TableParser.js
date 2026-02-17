@@ -351,6 +351,9 @@ class TableParser {
         // Regex untuk foreign key
         let rg_fk = /(?:CONSTRAINT\s+(?<fkname>\w+)\s+)?FOREIGN\s+KEY\s*\((?<col>[^)]+)\)\s+REFERENCES\s+(?<refTable>\w+)\s*\((?<refCol>[^)]+)\)(?:\s+ON\s+UPDATE\s+(?<onUpdate>\w+))?(?:\s+ON\s+DELETE\s+(?<onDelete>\w+))?/gi;
 
+        // Regex for indexes
+        const rg_idx = /(?:(UNIQUE)\s+)?(?:INDEX|KEY)\s*(?:`([^`]+)`|(\w+))?\s*\(([^)]+)\)/gi;
+
         let result = rg_tb.exec(sql);
         let tableName = result.groups.tb;
 
@@ -359,6 +362,7 @@ class TableParser {
         let columnList = [];
         let primaryKeyList = [];
         let foreignKeys = []; // <--- array baru untuk foreign keys
+        let indexes = []; // Array for indexes
 
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
@@ -512,8 +516,25 @@ class TableParser {
             fieldList = this.updatePrimaryKey(fieldList, primaryKey);
         }
 
+        // Parse indexes
+        rg_idx.lastIndex = 0; // Reset index
+        let idxMatch;
+        while ((idxMatch = rg_idx.exec(sql)) !== null) {
+            const indexName = (idxMatch[2] || idxMatch[3] || '').trim();
+            const columns = idxMatch[4].split(',').map(c => c.trim().replace(/[`"']/g, ''));
+            const isUnique = idxMatch[1] !== undefined;
 
-        return { tableName: tableName, columns: fieldList, primaryKey: primaryKey, foreignKeys: foreignKeys };
+            // Avoid capturing PRIMARY KEY as a regular index here
+            if (indexName.toUpperCase() !== 'PRIMARY') {
+                indexes.push({
+                    name: indexName,
+                    columns: columns,
+                    unique: isUnique
+                });
+            }
+        }
+
+        return { tableName: tableName, columns: fieldList, primaryKey: primaryKey, foreignKeys: foreignKeys, indexes: indexes };
     }
 
     /**

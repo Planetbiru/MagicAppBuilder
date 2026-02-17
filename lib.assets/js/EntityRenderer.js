@@ -124,7 +124,7 @@ class EntityRenderer {
             height = height - this.betweenY;
         }
 
-        let finalWidth = (2 * this.xPadding) + (maxMod * (this.betweenX + this.tableWidth)) - (this.betweenX) + 2;
+        let finalWidth = (2 * this.xPadding) + (Math.max(1, maxMod) * (this.betweenX + this.tableWidth)) - (this.betweenX) + 2;
         let finalHeight = (2 * this.yPadding) + height - 2;
 
         this.svg.setAttribute('height', finalHeight);
