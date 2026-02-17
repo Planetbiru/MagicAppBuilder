@@ -186,20 +186,18 @@ body {
         border: $panel-border;
         width: calc(30% - 5px);
         background-color: $primary-bg-color;
-        .foreign-key-container, .index-container{
+        .foreign-key-container{
             height: 22px;
             padding: 2px 0;
         }
         textarea {
-            height: calc(100vh - 592px);
+            height: calc(100vh - 575px);
             min-height: 100px;
             width: 100%;
             padding: 10px;
             box-sizing: border-box;
             resize: none;
             tab-size: 2;
-            display: block;
-            margin-bottom: 0;
 
             &:focus-visible {
                 outline: none;
@@ -309,24 +307,20 @@ body {
                 }
 
                 &:nth-child(3) {
-                    width: 16%;
-                }
-
-                &:nth-child(4) {
                     width: 12%;
                 }
 
-                &:nth-child(5) {
+                &:nth-child(4) {
                     width: 10%;
                 }
 
-                &:nth-child(6) {
-                    width: 11%;
-                }
-                &:nth-child(7) {
-                    width: 11%;
+                &:nth-child(5) {
+                    width: 15%;
                 }
 
+                &:nth-child(6) {
+                    width: 12%;
+                }
             }
 
             td {
@@ -363,65 +357,36 @@ body {
                 }
             }
 
-            tr.has-index,
-            tr.has-foreign-key,
-            tr.is-primary-key {
+            tr.has-foreign-key{
                 .entity-column-name {
                     position: relative;
-
                     &::after {
+                        content: "🔗";
                         position: absolute;
                         right: 4px;
                         top: 50%;
                         transform: translateY(-50%);
-                        font-size: 9px;
-                        white-space: nowrap;
                     }
-
                     input[type="text"] {
-                        padding-right: 44px; // cukup untuk 3 icon
+                        padding-right: 20px;
                     }
                 }
             }
-
-            /* ===== Kombinasi 3 ===== */
-            tr.has-index.has-foreign-key.is-primary-key
-            .entity-column-name::after {
-                content: "🔑 🔗 🗂";
+            tr.is-primary-key{
+                .entity-column-name {
+                    position: relative;
+                    &::after {
+                        content: "🔑";
+                        position: absolute;
+                        right: 4px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                    }
+                    input[type="text"] {
+                        padding-right: 20px;
+                    }
+                }
             }
-
-            /* ===== Kombinasi 2 ===== */
-            tr.is-primary-key.has-foreign-key
-            .entity-column-name::after {
-                content: "🔑 🔗";
-            }
-
-            tr.is-primary-key.has-index
-            .entity-column-name::after {
-                content: "🔑 🗂";
-            }
-
-            tr.has-foreign-key.has-index
-            .entity-column-name::after {
-                content: "🔗 🗂";
-            }
-
-            /* ===== Single ===== */
-            tr.is-primary-key:not(.has-foreign-key):not(.has-index)
-            .entity-column-name::after {
-                content: "🔑";
-            }
-
-            tr.has-foreign-key:not(.is-primary-key):not(.has-index)
-            .entity-column-name::after {
-                content: "🔗";
-            }
-
-            tr.has-index:not(.is-primary-key):not(.has-foreign-key)
-            .entity-column-name::after {
-                content: "🗂";
-            }
-
         }
     }
 
@@ -863,7 +828,7 @@ label {
     }
 }
 
-.foreign-key-editor-table, #index-editor-table {
+.foreign-key-editor-table {
     td .form-control {
         width: 100%;
     }
@@ -924,13 +889,7 @@ label {
     }
 }
 
-.foreign-key-editor-table, .index-editor-table{
-    th {
-        text-align: center;
-    }
-    td {
-        padding: 4px;
-    }
+.foreign-key-editor-table{
     tr.pk-draft{
         background-color: #fff7ef;
     }
@@ -939,11 +898,10 @@ label {
     }
 }
 .dark-mode {
-    .foreign-key-editor-table, .index-editor-table{
+    .foreign-key-editor-table{
         th {
-            background-color: #1c1c1c;
+            background-color: #000;
             color: #e1e1e1;
-            text-align: center;
         }
         th, td {
             border: 1px solid #606060;
@@ -958,21 +916,4 @@ label {
     overflow-x: auto;
     overflow-y: auto;
     max-height: calc(100vh - 156px);
-    th.remover{
-        width: 36px;
-        text-align: center;
-    }
-    th[align="center"], td[align="center"] {
-        text-align: center;
-    }
-}
-
-#index-editor-table {
-    th.remover{
-        width: 36px;
-        text-align: center;
-    }
-    th[align="center"], td[align="center"] {
-        text-align: center;
-    }
 }

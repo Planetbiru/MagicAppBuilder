@@ -499,11 +499,13 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             </div>
             <div class="modal-body">
                 <p class="label-entity-name"></p>
+                <p class="entity-name"></p>
                 <form>
                     <table class="foreign-key-editor-table">
                         <thead>
                             <tr>
                                 <th align="center" class="remover">❌</th>
+                                <th>❌</th>
                                 <th>Column Name</th>
                                 <th>Key Name</th>
                                 <th>Reference Table</th>
