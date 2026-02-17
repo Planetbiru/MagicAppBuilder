@@ -348,6 +348,9 @@ class TableParser {
         let rg_pk2 = /(PRIMARY|UNIQUE) KEY[a-zA-Z_0-9\s]+\(([a-zA-Z_0-9,\s]+)\)/gi; // NOSONAR
         let rg_pk_composite = /primary\s+key\s*\(([^)]+)\)/i;
 
+        // Regex untuk foreign key
+        let rg_fk = /(?:CONSTRAINT\s+(?<fkname>\w+)\s+)?FOREIGN\s+KEY\s*\((?<col>[^)]+)\)\s+REFERENCES\s+(?<refTable>\w+)\s*\((?<refCol>[^)]+)\)(?:\s+ON\s+UPDATE\s+(?<onUpdate>\w+))?(?:\s+ON\s+DELETE\s+(?<onDelete>\w+))?/gi;
+
         let result = rg_tb.exec(sql);
         let tableName = result.groups.tb;
 
@@ -355,6 +358,7 @@ class TableParser {
         let primaryKey = null;
         let columnList = [];
         let primaryKeyList = [];
+        let foreignKeys = []; // <--- array baru untuk foreign keys
 
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
@@ -362,7 +366,7 @@ class TableParser {
 
             line = line.replace(/[\r\n]+/g, ' ');
 
-            // Reset regex for field parsing
+            // Reset regex untuk field parsing
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
 
@@ -394,7 +398,6 @@ class TableParser {
             }
 
             if (this.isValidType(dataType.toString()) || this.isValidType(dataTypeOriginal.toString())) {
-
                 let attr = fld_def.groups.fattr.replace(',', '').trim();
                 let nullable = !rg_not_null.test(attr);
                 let attr2 = attr.replace(rg_not_null, '');
@@ -428,15 +431,15 @@ class TableParser {
                         nullable = false;
                     }
                     let column = {
-                        'Field': columnName,
-                        'Type': dataType,
-                        'Length': length,
-                        'Key': isPk,
-                        'Nullable': nullable,
-                        'Default': defaultValue, // Only include the default value (no COMMENT)
-                        'AutoIncrement': isAi,
-                        'EnumValues': enumArray,
-                        'Comment': comment // Store the comment separately
+                        Field: columnName,
+                        Type: dataType,
+                        Length: length,
+                        Key: isPk,
+                        Nullable: nullable,
+                        Default: defaultValue,
+                        AutoIncrement: isAi,
+                        EnumValues: enumArray,
+                        Comment: comment
                     };
 
                     fieldList.push(column);
@@ -449,6 +452,21 @@ class TableParser {
                 if (primaryKey == null) {
                     primaryKey = matched ? matched[1] : null;
                 }
+            }
+
+            // Parsing foreign key di setiap baris
+            rg_fk.lastIndex = 0;
+            let fkMatch;
+            while ((fkMatch = rg_fk.exec(f)) != null) {
+                let colName = fkMatch.groups.col.trim();
+                foreignKeys.push({
+                    name: fkMatch.groups.fkname || null,
+                    columnName: colName,
+                    referencedTable: fkMatch.groups.refTable.trim(),
+                    referencedColumn: fkMatch.groups.refCol.trim(),
+                    onUpdate: fkMatch.groups.onUpdate || null,
+                    onDelete: fkMatch.groups.onDelete || null
+                });
             }
 
             if (primaryKey != null) {
@@ -495,7 +513,7 @@ class TableParser {
         }
 
 
-        return { tableName: tableName, columns: fieldList, primaryKey: primaryKey };
+        return { tableName: tableName, columns: fieldList, primaryKey: primaryKey, foreignKeys: foreignKeys };
     }
 
     /**

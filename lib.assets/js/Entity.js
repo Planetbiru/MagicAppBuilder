@@ -16,12 +16,48 @@ class Entity {
         this.index = index;
         this.name = name;
         this.columns = [];
+        this.foreignKeys = [];
         this.data = [];
         this.description = ''; // Description of the entity
         this.creationDate = null; // Timestamp of creation
         this.modificationDate = null; // Timestamp of last modification
         this.creator = null; // User who created the entity
         this.modifier = null; // User who last modified the entity
+    }
+
+    /**
+     * Creates an Entity instance from a plain object.
+     *
+     * @param {Object} entity - A plain object representing the entity.
+     * @returns {Entity} An instance of the Entity class.
+     */
+    static valueOf(entity) {
+        const newEntity = new Entity(entity.name, entity.index);
+        if (entity.columns) {
+            entity.columns.forEach(col => {
+                newEntity.addColumn(Column.valueOf(col));
+            });
+        }
+        if (entity.data) {
+            newEntity.setData(entity.data);
+        }
+        if (entity.description) {
+            newEntity.description = entity.description;
+        }
+        if (entity.creationDate) {
+            newEntity.creationDate = entity.creationDate;
+        }
+        if (entity.modificationDate) {
+            newEntity.modificationDate = entity.modificationDate;
+        }
+        if (entity.creator) {
+            newEntity.creator = entity.creator;
+        }
+        if (entity.modifier) {
+            newEntity.modifier = entity.modifier;
+        }
+        newEntity.foreignKeys = entity.foreignKeys;
+        return newEntity;
     }
 
     /**
@@ -63,6 +99,10 @@ class Entity {
     appendData(newData) {
         if (!newData || newData.length === 0) {
             return 0;
+        }
+        if(!this.data || Array.isArray(this.data))
+        {
+            this.data = [];
         }
 
         const primaryKeyColumns = this.getPrimaryKeyColumns();
@@ -139,6 +179,9 @@ class Entity {
             : keys.join(', ');
     }
 
+    getForeignKeys() {
+        return this.foreignKeys;
+    }
 
     /**
      * Converts the entity (table definition with its columns) into a valid SQL `CREATE TABLE` statement.
@@ -153,23 +196,231 @@ class Entity {
      * the primary key constraint is placed separately at the end of the column list.
      *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", or "sqlserver".
+     * @param {boolean} withForeignKey - Whether to include foreign key constraints in the generated SQL.
      * @returns {string} The generated SQL `CREATE TABLE` statement.
      */
-    toSQL(dialect = "mysql") {
-        let separatePrimaryKey = this.countPrimaryKey() > 1;
-        let cols = [];
-        let sql = `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
+    toSQL(dialect = "mysql", withForeignKey = false) {
+
+        const separatePrimaryKey = this.countPrimaryKey() > 1;
+        const cols = [];
+        const indexStatements = [];
+
+        let sql = '';
+
+        sql += `-- TABLE ${this.name} BEGIN\r\n\r\n`;
+
+        sql += `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
+
         this.columns.forEach(col => {
             cols.push(`\t${col.toSQL(dialect, separatePrimaryKey)}`);
         });
-        if(separatePrimaryKey)
-        {
+
+        if (separatePrimaryKey) {
             cols.push(`\tPRIMARY KEY(${this.getPrimaryKeyColumnsAsString(dialect)})`);
         }
-        sql += cols.join(",\r\n"); // Remove trailing comma and newline
+
+        if (withForeignKey && this.foreignKeys) {
+
+            const fks = Array.isArray(this.foreignKeys) ? this.foreignKeys : Object.values(this.foreignKeys);
+
+            fks.forEach(fk => {
+                const fkStr = this.createForeignKey(fk, dialect);
+                if (fkStr) {
+                    cols.push(`\t${fkStr}`);
+                }
+
+                const idxStr = this.createIndexStandalone(fk, dialect);
+                if (idxStr) {
+                    indexStatements.push(idxStr);
+                }
+            });
+        }
+
+        sql += cols.join(",\r\n");
         sql += "\r\n);\r\n\r\n";
+
+        // Tambahkan index setelah CREATE TABLE
+        if (indexStatements.length) {
+            sql += indexStatements.join("\r\n") + "\r\n\r\n";
+        }
+
+        sql += `-- TABLE ${this.name} END\r\n\r\n`;
+
         return sql;
     }
+
+
+    /**
+     * Creates a foreign key constraint for the entity.
+     * @param {*} fk - An object representing the foreign key definition, containing:
+     * {
+     *   name: fkName,
+     *   columnName: columnName,
+     *   referencedTable: selectedReferencedTable,
+     *   referencedColumn: selectedReferencedColumn,
+     *   onUpdate: onUpdateAction,
+     *   onDelete: onDeleteAction
+     * }
+     * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", or "sqlserver".
+     * @returns {string} The generated SQL statement for the foreign key constraint.
+     */
+    createForeignKey(fk, dialect = "mysql") {
+        if (!fk || !fk.columnName || !fk.referencedTable || !fk.referencedColumn) {
+            return '';
+        }
+
+        const constraintName = fk.name
+            ? `CONSTRAINT ${fk.name} `
+            : '';
+
+        const normalizeAction = (action) => {
+            if (!action) return '';
+            const allowed = ["NO ACTION", "RESTRICT", "CASCADE", "SET NULL", "SET DEFAULT"];
+            const upper = action.toUpperCase();
+            return allowed.includes(upper) ? upper : '';
+        };
+
+        let onUpdate = '';
+        let onDelete = '';
+
+        if (dialect === "postgresql") {
+            const updateAction = normalizeAction(fk.onUpdate);
+            const deleteAction = normalizeAction(fk.onDelete);
+
+            if (updateAction) onUpdate = ` ON UPDATE ${updateAction}`;
+            if (deleteAction) onDelete = ` ON DELETE ${deleteAction}`;
+
+            // PostgreSQL best practice (optional but recommended)
+            const deferrable = fk.deferrable
+                ? ` DEFERRABLE INITIALLY DEFERRED`
+                : '';
+
+            return `${constraintName}FOREIGN KEY (${fk.columnName}) REFERENCES ${fk.referencedTable}(${fk.referencedColumn})${onUpdate}${onDelete}${deferrable}`;
+        }
+
+        // SQLite handling
+        if (dialect === "sqlite") {
+            const allowed = ["CASCADE", "SET NULL", "SET DEFAULT", "NO ACTION"];
+            if (fk.onUpdate && allowed.includes(fk.onUpdate.toUpperCase())) {
+                onUpdate = ` ON UPDATE ${fk.onUpdate.toUpperCase()}`;
+            }
+            if (fk.onDelete && allowed.includes(fk.onDelete.toUpperCase())) {
+                onDelete = ` ON DELETE ${fk.onDelete.toUpperCase()}`;
+            }
+
+            return `${constraintName}FOREIGN KEY (${fk.columnName}) REFERENCES ${fk.referencedTable}(${fk.referencedColumn})${onUpdate}${onDelete}`;
+        }
+
+        // Default (MySQL & SQL Server)
+        if (fk.onUpdate) onUpdate = ` ON UPDATE ${fk.onUpdate.toUpperCase()}`;
+        if (fk.onDelete) onDelete = ` ON DELETE ${fk.onDelete.toUpperCase()}`;
+
+        return `${constraintName}FOREIGN KEY (${fk.columnName}) REFERENCES ${fk.referencedTable}(${fk.referencedColumn})${onUpdate}${onDelete}`;
+    }
+
+    /**
+     * Generates inline index definition for CREATE TABLE statement.
+     * 
+     * Only MySQL supports inline INDEX inside CREATE TABLE.
+     * Other dialects (PostgreSQL, SQLite, SQL Server) require
+     * standalone CREATE INDEX statements.
+     *
+     * @param {Object} fk - Foreign key definition object.
+     * @param {string} fk.name - Optional index or foreign key name.
+     * @param {string} fk.columnName - Column name to be indexed.
+     * @param {string} [dialect="mysql"] - SQL dialect (mysql, postgresql, sqlite, sqlserver).
+     * @returns {string} Inline index SQL fragment or empty string if not supported.
+     */
+    createIndex(fk, dialect = "mysql") {
+        if (!fk || !fk.columnName) return '';
+
+        let indexName = fk.name;
+        if (!indexName) {
+            indexName = `idx_${this.name}_${fk.columnName}`;
+        }
+        else if(indexName.startsWith("fk_"))
+        {
+            indexName = 'idx_' + indexName.substring(3);
+        }
+        else if(fk.columnName)
+        {
+            indexName = 'idx_' + this.name + '_' + fk.columnName;
+        }
+
+        switch (dialect) {
+
+            case "mysql":
+                // MySQL mendukung inline INDEX
+                return `INDEX ${indexName} (${fk.columnName})`;
+
+            case "postgresql":
+                // PostgreSQL TIDAK mendukung INDEX di dalam CREATE TABLE
+                return '';
+
+            case "sqlite":
+                // SQLite juga tidak mendukung inline index
+                return '';
+
+            case "sqlserver":
+                // SQL Server tidak mendukung inline index biasa
+                return '';
+
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * Generates standalone CREATE INDEX statement.
+     * 
+     * Used for dialects that do not support inline INDEX
+     * inside CREATE TABLE (PostgreSQL, SQLite, SQL Server).
+     * MySQL also supports standalone index creation.
+     *
+     * PostgreSQL and SQLite use IF NOT EXISTS to prevent errors
+     * when the index already exists.
+     *
+     * @param {Object} fk - Foreign key definition object.
+     * @param {string} fk.name - Optional index or foreign key name.
+     * @param {string} fk.columnName - Column name to be indexed.
+     * @param {string} [dialect="mysql"] - SQL dialect (mysql, postgresql, sqlite, sqlserver).
+     * @returns {string} Complete CREATE INDEX SQL statement or empty string.
+     */
+    createIndexStandalone(fk, dialect = "mysql") {
+        if (!fk || !fk.columnName) return '';
+
+        let indexName = fk.name;
+        if (!indexName) {
+            indexName = `idx_${this.name}_${fk.columnName}`;
+        }
+        else if(indexName.startsWith("fk_"))
+        {
+            indexName = 'idx_' + indexName.substring(3);
+        }
+        else if(fk.columnName)
+        {
+            indexName = 'idx_' + this.name + '_' + fk.columnName;
+        }
+
+        switch (dialect) {
+
+            case "mysql":
+                return `CREATE INDEX ${indexName} ON ${this.name} (${fk.columnName});`;
+
+            case "postgresql":
+                return `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.name} (${fk.columnName});`;
+
+            case "sqlite":
+                return `CREATE INDEX IF NOT EXISTS ${indexName} ON ${this.name} (${fk.columnName});`;
+
+            case "sqlserver":
+                return `CREATE INDEX ${indexName} ON ${this.name} (${fk.columnName});`;
+
+            default:
+                return '';
+        }
+    }
+
 
     /**
      * Generates one or more SQL INSERT statements, each containing up to `maxRow` rows.

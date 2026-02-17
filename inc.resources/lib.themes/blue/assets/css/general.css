@@ -352,7 +352,6 @@ table.responsive-three-cols > tbody > tr > td:nth-child(1) {
 
 tbody.data-table-manual-sort .data-sort-body {
   width: 8px;
-  cursor: move;
 }
 tbody.data-table-manual-sort .data-sort-body::before {
   content: "\f58e";
@@ -363,6 +362,9 @@ tbody.data-table-manual-sort .data-sort-body::before {
   box-sizing: border-box;
   text-align: center;
   display: block;
+}
+tbody.data-table-manual-sort .data-sort-body {
+  cursor: move;
 }
 
 thead .data-sort-header {

@@ -1662,20 +1662,11 @@ ul {
   background-color: #f0f0f0;
 }
 
-.container-file-manager {
-  /* Styling for icons using pseudo-elements */
-  /* Icon for 'open' operation (Green) */
-  /* Icon for 'rename' operation (Orange) */
-  /* Icon for 'download' operation (Blue) */
-  /* Icon for 'delete' operation (Red) */
-  /* Icon for 'new' operation (Purple) */
-  /* Icon for 'new-dir' operation (Yellow) */
-  /* Icon for 'upload' operation (Green for upload) */
-  /* Icon for 'reset' operation (Gray for Reset Content) */
-  /* Icon for 'view-image' operation (Teal for image preview) */
-}
 .container-file-manager .context-menu ul li {
   padding: 5px 10px 5px 10px;
+}
+.container-file-manager {
+  /* Styling for icons using pseudo-elements */
 }
 .container-file-manager .context-menu li::before {
   content: ""; /* Default content */
@@ -1688,37 +1679,64 @@ ul {
   font-weight: 900;
   width: 12px;
 }
+.container-file-manager {
+  /* Icon for 'open' operation (Green) */
+}
 .container-file-manager .context-menu [data-operation=open]::before {
   content: "\f06e"; /* Font Awesome icon for file (open) */
   color: #4CAF50; /* Green for open */
+}
+.container-file-manager {
+  /* Icon for 'rename' operation (Orange) */
 }
 .container-file-manager .context-menu [data-operation=rename]::before {
   content: "\f044"; /* Font Awesome icon for pencil (rename) */
   color: #FF9800; /* Orange for rename */
 }
+.container-file-manager {
+  /* Icon for 'download' operation (Blue) */
+}
 .container-file-manager .context-menu [data-operation=download]::before, .container-file-manager .context-menu [data-operation=compress]::before, .container-file-manager .context-menu [data-operation=root-dowload]::before {
   content: "\f019"; /* Font Awesome icon for download */
   color: #2196F3; /* Blue for download */
+}
+.container-file-manager {
+  /* Icon for 'delete' operation (Red) */
 }
 .container-file-manager .context-menu [data-operation=delete]::before {
   content: "\f1f8"; /* Font Awesome icon for trash (delete) */
   color: #F44336; /* Red for delete */
 }
+.container-file-manager {
+  /* Icon for 'new' operation (Purple) */
+}
 .container-file-manager .context-menu [data-operation=new-file]::before, .container-file-manager .context-menu [data-operation=root-new-file]::before {
   content: "\f15b"; /* Font Awesome icon for file (new) */
   color: #007cff; /* Blue for new */
+}
+.container-file-manager {
+  /* Icon for 'new-dir' operation (Yellow) */
 }
 .container-file-manager .context-menu [data-operation=new-dir]::before, .container-file-manager .context-menu [data-operation=root-new-dir]::before {
   content: "\f114"; /* Font Awesome icon for folder (new directory) */
   color: #FFC107; /* Yellow for new directory */
 }
+.container-file-manager {
+  /* Icon for 'upload' operation (Green for upload) */
+}
 .container-file-manager .context-menu [data-operation=upload-file]::before {
   content: "\f093"; /* Font Awesome icon for upload */
   color: #4CAF50; /* Green for upload */
 }
+.container-file-manager {
+  /* Icon for 'reset' operation (Gray for Reset Content) */
+}
 .container-file-manager .context-menu [data-operation=reset]::before, .container-file-manager .context-menu [data-operation=refresh-dir]::before {
   content: "\f021"; /* Font Awesome icon for refresh (reset) */
   color: #2196F3; /* Blue for reset */
+}
+.container-file-manager {
+  /* Icon for 'view-image' operation (Teal for image preview) */
 }
 .container-file-manager .context-menu [data-operation=view-image]::before {
   content: "\f03e"; /* Font Awesome icon for image */

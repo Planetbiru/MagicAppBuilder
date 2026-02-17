@@ -713,10 +713,6 @@ tr[data-active=false] td {
   background-color: #312e2e;
 }
 
-#menuSearchResults {
-  overflow: auto;
-  max-height: calc(100vh - 106px);
-}
 #menuSearchResults .list-group-item {
   padding: 0;
 }
@@ -729,6 +725,10 @@ tr[data-active=false] td {
 }
 #menuSearchResults .list-group-item:hover {
   background-color: #eaeaea;
+}
+#menuSearchResults {
+  overflow: auto;
+  max-height: calc(100vh - 106px);
 }
 
 .dark-mode #menuSearchResults .list-group-item {

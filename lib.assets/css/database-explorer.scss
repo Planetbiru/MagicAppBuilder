@@ -801,64 +801,56 @@ tr.group-header {
 
 .has-submenu:hover>.submenu {
     display: block;
-    
+
 }
 
 .copy-feedback {
-  position: fixed;
-  width: 64px;
-  height: 64px;
-  border: 2px solid #4CAF50;
-  border-radius: 50%;
-  pointer-events: none;
-  animation: shrinkFade 0.4s ease-out forwards;
-  z-index: 9999;
+    position: fixed;
+    width: 64px;
+    height: 64px;
+    border: 2px solid #4CAF50;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: shrinkFade 0.4s ease-out forwards;
+    z-index: 9999;
 }
 
 @keyframes shrinkFade {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.2);
-    opacity: 0;
-  }
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.2);
+        opacity: 0;
+    }
 }
 
 .download-feedback {
-  position: fixed;
-  pointer-events: none;
-  animation: dropFade 0.4s ease-out forwards;
-  z-index: 9999;
+    position: fixed;
+    pointer-events: none;
+    animation: dropFade 0.4s ease-out forwards;
+    z-index: 9999;
 }
 
 @keyframes dropFade {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(300px); /* move down ~300px */
-    opacity: 0;
-  }
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(300px);
+        /* move down ~300px */
+        opacity: 0;
+    }
 }
-.button-area{
+
+.button-area {
     padding-top: 4px;
 }
 
-.suggestions-container{
+.suggestions-container {
     padding-bottom: 4px;
-}
-
-.btn-group{
-    display: inline-block;
-    padding: 4px 4px 0px 4px;
-    border-radius: 4px;
-    background-color: #FAFAFA;
-}
-.btn-group-with-label .group-label{
-    display: inline-block;
-    padding: 0px 2px;
-    color: #383838;
 }

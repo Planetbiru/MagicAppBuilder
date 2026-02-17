@@ -127,6 +127,25 @@ class Column {
     }
 
     /**
+     * Creates a Column instance from a plain object.
+     * @param {Object} column - The column object to convert into a Column instance.
+     * @returns {Column} A new Column instance initialized with the properties from the input object.
+     */
+    static valueOf(column) {
+        return new Column(
+            column.name,
+            column.type,
+            column.length,
+            column.nullable,
+            column.default,
+            column.primaryKey,
+            column.autoIncrement,
+            column.values,
+            column.description
+        );
+    }
+
+    /**
      * Normalizes SQL column type by removing length parameter for BOOLEAN types only.
      *
      * Examples:

@@ -213,8 +213,7 @@ function init() {
     {
         importFromEntityButton.onclick = function()
         {
-            let dialect = document.querySelector('meta[name="database-type"]').getAttribute('content');
-            let sql = editor.generateSQL(dialect);
+            let sql = editor.generateSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());;
             document.querySelector('[name="query"]').value = sql.join("\r\n");
             modalEntityEditor.style.display = "none";
         };
@@ -274,7 +273,12 @@ function init() {
         });
     });
 
-    document.querySelector('.draw-relationship').addEventListener('change', function(e){
+    document.querySelector('.draw-auto-relationship').addEventListener('change', function(e){
+        editor.refreshEntities();
+        editor.updateDiagram();
+    });
+
+    document.querySelector('.draw-fk-relationship').addEventListener('change', function(e){
         editor.refreshEntities();
         editor.updateDiagram();
     });
@@ -307,12 +311,12 @@ function init() {
                 entity.checked = checked;
             })
         }
-        editor.exportToSQL();
+        editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
     });
 
     document.querySelector(".right-panel .table-list-for-export").addEventListener('change', (event) => {
         if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
-            editor.exportToSQL();
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
         }
 
         if (event.target.classList.contains('export-structure-system')) {
@@ -320,7 +324,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL();
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
         }
 
         if (event.target.classList.contains('export-structure-custom')) {
@@ -328,7 +332,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL();
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
         }
 
         if (event.target.classList.contains('export-data-system')) {
@@ -336,7 +340,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL();
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
         }
 
         if (event.target.classList.contains('export-data-custom')) {
@@ -344,7 +348,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL();
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
         }
     });
 
@@ -380,6 +384,25 @@ function init() {
                 loadApplicationData(dataset.applicationId, dataset.databaseName, dataset.databaseSchema, dataset.databaseType, dataset.hash);
             }
         }
+    });
+
+    window.addEventListener('resize', function () {
+        // Get the updated width of the SVG container
+        editor.refreshEntities();
+        editor.updateDiagram();
+    });
+
+    window.addEventListener('click', function() {
+        document.querySelectorAll('.button-container .dropdown.show').forEach(function(openDropdown) {
+            openDropdown.classList.remove('show');
+            let menu = openDropdown.querySelector('.dropdown-menu');
+            if(menu) {
+                menu.style.top = '';
+                menu.style.bottom = '';
+                menu.style.marginTop = '';
+                menu.style.marginBottom = '';
+            }
+        });
     });
 }
 
@@ -1111,10 +1134,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.addEventListener('resize', function () {
-        // Get the updated width of the SVG container
-        editor.refreshEntities();
-        editor.updateDiagram();
+    document.querySelector(".with-foreign-key").addEventListener('change', (event) => {
+        editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
     });
 
     document.querySelector('.add-diagram').addEventListener('click', function(e){
@@ -1297,6 +1318,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         })
+    });
+
+    // Dropdown toggle logic
+    document.querySelectorAll('.button-container .dropdown-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function(event) {
+            event.stopPropagation();
+            let dropdown = this.parentElement;
+            
+            // Close other open dropdowns within the same container
+            let container = dropdown.closest('.button-container');
+            if(container) {
+                container.querySelectorAll('.dropdown.show').forEach(function(openDropdown) {
+                    if (openDropdown !== dropdown) {
+                        openDropdown.classList.remove('show');
+                        let menu = openDropdown.querySelector('.dropdown-menu');
+                        if(menu) {
+                            menu.style.top = '';
+                            menu.style.bottom = '';
+                            menu.style.marginTop = '';
+                            menu.style.marginBottom = '';
+                        }
+                    }
+                });
+            }
+
+            let isShown = dropdown.classList.toggle('show');
+            let menu = dropdown.querySelector('.dropdown-menu');
+            if(isShown && menu) {
+                // Reset styles to measure correctly
+                menu.style.top = '';
+                menu.style.bottom = '';
+                menu.style.marginTop = '';
+                menu.style.marginBottom = '';
+                
+                let rect = menu.getBoundingClientRect();
+                if (rect.bottom > window.innerHeight) {
+                    menu.style.top = 'auto';
+                    menu.style.bottom = '100%';
+                    menu.style.marginTop = '0';
+                    menu.style.marginBottom = '2px';
+                }
+            } else if (menu) {
+                menu.style.top = '';
+                menu.style.bottom = '';
+                menu.style.marginTop = '';
+                menu.style.marginBottom = '';
+            }
+        });
     });
 
     // Apply to both tables

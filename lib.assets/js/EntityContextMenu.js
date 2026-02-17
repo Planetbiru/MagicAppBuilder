@@ -78,6 +78,7 @@ function initDiagramContextMenu(svg) {
                     checkAll = input;
                 }
             });
+            
 
             // Add submenu items dynamically based on entity's relations
             const result = renderReferenceSubmenu(entity, submenu);
@@ -150,7 +151,7 @@ function initAllEntitiesContextMenu(svg) {
  */
 function renderReferenceSubmenu(entity, submenu) {
     const tableName = entity.dataset.entity;
-    const columns = entity.querySelectorAll('.diagram-column-name');
+    const columns = entity.querySelectorAll('.svg-column-name');
     let count = 0;
     let checked = 0;
 
@@ -163,11 +164,12 @@ function renderReferenceSubmenu(entity, submenu) {
             if (testInput) {
                 const li = document.createElement('li');
 
+                const label = document.createElement('label');
+                label.textContent = ` ${columnName}`; // teks label
+
                 const input = document.createElement('input');
-                const inputId = `reference-checkbox-${index}`;
                 input.type = 'checkbox';
                 input.dataset.name = refTable;
-                input.id = inputId;
 
                 const isChecked = isSelectedTable(refTable);
                 input.checked = isChecked;
@@ -175,11 +177,8 @@ function renderReferenceSubmenu(entity, submenu) {
 
                 input.addEventListener('change', selectTable);
 
-                const label = document.createElement('label');
-                label.setAttribute('for', inputId);
-                label.textContent = ` ${columnName}`; // Spasi sebelum teks agar rapi
+                label.insertBefore(input, label.firstChild);
 
-                li.appendChild(input);
                 li.appendChild(label);
                 submenu.appendChild(li);
                 count++;
@@ -200,7 +199,7 @@ function renderContextMenu(entity) {
     const ul = contextMenu.querySelector('ul');
 
     const tableName = entity.dataset.entity;
-    const columns = entity.querySelectorAll('.diagram-column-name');
+    const columns = entity.querySelectorAll('.svg-column-name');
     let count = 0;
 
     columns.forEach((col, index) => {

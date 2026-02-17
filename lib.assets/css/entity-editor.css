@@ -86,10 +86,12 @@ body {
   padding: 0 1rem 0 0;
   margin: 0;
   white-space: nowrap;
-  line-height: 1.5;
 }
 .entity-editor .left-panel .object-container .table-list li a {
   font-size: 0.6rem;
+}
+.entity-editor .left-panel .object-container .table-list li {
+  line-height: 1.5;
 }
 .entity-editor .left-panel .entities-container {
   margin: 0;
@@ -148,8 +150,12 @@ body {
   width: calc(30% - 5px);
   background-color: #fbfbfb;
 }
+.entity-editor .right-panel .foreign-key-container {
+  height: 22px;
+  padding: 2px 0;
+}
 .entity-editor .right-panel textarea {
-  height: calc(100vh - 555px);
+  height: calc(100vh - 575px);
   min-height: 100px;
   width: 100%;
   padding: 10px;
@@ -197,7 +203,8 @@ body {
 .entity-editor .editor-form .table-container table > tbody > tr:hover > td {
   background-color: #f3f3f3;
 }
-.entity-editor .editor-form .table-container table > tbody > tr:hover > td input[type=text], .entity-editor .editor-form .table-container table > tbody > tr:hover > td select {
+.entity-editor .editor-form .table-container table > tbody > tr:hover > td input[type=text],
+.entity-editor .editor-form .table-container table > tbody > tr:hover > td select {
   background-color: transparent !important;
 }
 .entity-editor .editor-form table {
@@ -283,6 +290,32 @@ body {
   border: none;
   background-color: transparent;
 }
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name {
+  position: relative;
+}
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name::after {
+  content: "🔗";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name input[type=text] {
+  padding-right: 20px;
+}
+.entity-editor .editor-form table tr.is-primary-key .entity-column-name {
+  position: relative;
+}
+.entity-editor .editor-form table tr.is-primary-key .entity-column-name::after {
+  content: "🔑";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.entity-editor .editor-form table tr.is-primary-key .entity-column-name input[type=text] {
+  padding-right: 20px;
+}
 .entity-editor input[type=checkbox] {
   margin: 0 5px;
 }
@@ -365,17 +398,21 @@ body {
   overflow: auto;
   margin-bottom: 10px;
 }
-.entity-editor .table-export-sql-container table thead tr th:nth-child(1), .entity-editor .table-export-sql-container table thead tr th:nth-child(2),
-.entity-editor .table-export-sql-container table thead tr td:nth-child(1), .entity-editor .table-export-sql-container table thead tr td:nth-child(2) {
+.entity-editor .table-export-sql-container table thead tr th:nth-child(1),
+.entity-editor .table-export-sql-container table thead tr th:nth-child(2),
+.entity-editor .table-export-sql-container table thead tr td:nth-child(1),
+.entity-editor .table-export-sql-container table thead tr td:nth-child(2) {
   width: 16px;
   text-align: center;
 }
-.entity-editor .table-export-sql-container table th, .entity-editor .table-export-sql-container table td {
-  font-size: 12px;
-}
-.entity-editor .table-export-sql-container table th input[type=checkbox], .entity-editor .table-export-sql-container table td input[type=checkbox] {
+.entity-editor .table-export-sql-container table th input[type=checkbox],
+.entity-editor .table-export-sql-container table td input[type=checkbox] {
   margin-left: 0;
   margin-right: 0px;
+}
+.entity-editor .table-export-sql-container table th,
+.entity-editor .table-export-sql-container table td {
+  font-size: 12px;
 }
 .entity-editor .btn-data {
   display: none;
@@ -431,7 +468,8 @@ body {
   margin-left: -6px;
   margin-top: 5px;
 }
-.tabs li.diagram-tab .icon-emoji::before, .tabs li.diagram-tab .icon-emoji::after {
+.tabs li.diagram-tab .icon-emoji::before,
+.tabs li.diagram-tab .icon-emoji::after {
   font-size: 10px;
 }
 .tabs li.diagram-tab input[type=text] {
@@ -611,18 +649,94 @@ label {
 .profile-table {
   border: none;
 }
-.profile-table tr td, .profile-table tr th {
+.profile-table tr td,
+.profile-table tr th {
   padding: 3px 4px;
   border: none;
   vertical-align: top;
 }
-.profile-table tr td input[type=text], .profile-table tr th input[type=text] {
+.profile-table tr td input[type=text],
+.profile-table tr th input[type=text] {
   width: 100%;
   height: calc(1.32em + 0.6rem + 1px);
 }
-.profile-table tr td:first-child, .profile-table tr th:first-child {
+.profile-table tr td:first-child,
+.profile-table tr th:first-child {
   padding-left: 0px;
 }
-.profile-table tr td:last-child, .profile-table tr th:last-child {
+.profile-table tr td:last-child,
+.profile-table tr th:last-child {
   padding-right: 0px;
+}
+
+.foreign-key-editor-table td .form-control {
+  width: 100%;
+}
+
+/* Dropdown styles for Import/Export */
+.button-container .dropdown {
+  position: relative;
+  display: inline-block;
+}
+.button-container .dropdown.show .dropdown-menu {
+  display: block;
+}
+.button-container .dropdown-toggle::after {
+  display: inline-block;
+  margin-left: 0.255em;
+  vertical-align: 0.255em;
+  content: "";
+  border-top: 0.3em solid;
+  border-right: 0.3em solid transparent;
+  border-bottom: 0;
+  border-left: 0.3em solid transparent;
+}
+.button-container .dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1071;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0;
+  border: 1px solid #ccc;
+  margin-top: 2px;
+}
+.button-container .dropdown-menu .dropdown-item {
+  color: black;
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.button-container .dropdown-menu .dropdown-item:hover {
+  background-color: #e9e9e9;
+}
+
+.foreign-key-editor-table tr.pk-draft {
+  background-color: #fff7ef;
+}
+.foreign-key-editor-table select {
+  padding-right: 24px;
+}
+
+.dark-mode .foreign-key-editor-table th {
+  background-color: #000;
+  color: #e1e1e1;
+}
+.dark-mode .foreign-key-editor-table th, .dark-mode .foreign-key-editor-table td {
+  border: 1px solid #606060;
+  white-space: nowrap;
+}
+.dark-mode .foreign-key-editor-table tr.pk-draft {
+  background-color: #513316;
+}
+
+#foreignKeyBulkModal .modal-body {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 156px);
 }/*# sourceMappingURL=entity-editor.css.map */

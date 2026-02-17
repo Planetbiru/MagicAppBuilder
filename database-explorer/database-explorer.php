@@ -34,25 +34,30 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
     <link rel="stylesheet" href="../lib.assets/css/database-explorer.min.css">
     <script src="../lib.assets/jquery/js/jquery-1.11.1.min.js"></script>
     <script src="../lib.assets/datetimepicker/jquery.datetimepicker.full.min.js"></script>
-    <script src="../lib.assets/js/TableParser.min.js"></script>
-    <script src="../lib.assets/js/SQLConverter.min.js"></script>
-    <script src="../lib.assets/js/Column.min.js"></script>
-    <script src="../lib.assets/js/Entity.min.js"></script>
-    <script src="../lib.assets/js/Diagram.min.js"></script>
-    <script src="../lib.assets/js/DatabaseExplorer.min.js"></script>
-    <script src="../lib.assets/js/EntityEditor.min.js"></script>
-    <script src="../lib.assets/js/EntityRenderer.min.js"></script>
-    <script src="../lib.assets/js/ResizablePanel.min.js"></script>
-    <script src="../lib.assets/js/EntityContextMenu.min.js"></script>
+    <script src="../lib.assets/js/TableParser.js"></script>
+    <script src="../lib.assets/js/SQLConverter.js"></script>
+    <script src="../lib.assets/js/MWBConverter.js"></script>
+    <script src="../lib.assets/js/Column.js"></script>
+    <script src="../lib.assets/js/Entity.js"></script>
+    <script src="../lib.assets/js/Diagram.js"></script>
+    <script src="../lib.assets/js/DatabaseExplorer.js"></script>
+    <script src="../lib.assets/js/EntityEditor.js"></script>
+    <script src="../lib.assets/js/EntityRenderer.js"></script>
+    <script src="../lib.assets/js/ResizablePanel.js"></script>
+    <script src="../lib.assets/js/EntityContextMenu.js"></script>
     <script src="../lib.assets/js/TabDragger.min.js"></script>
     <script src="../lib.assets/js/SVGtoPNG.min.js"></script>
     <script src="../lib.assets/js/GraphQLSchemaUtils.min.js"></script>
     <script src="../lib.assets/wasm/sql-wasm.min.js"></script>
-    <link rel="stylesheet" href="../lib.assets/css/entity-editor.min.css">
+    <script src="../lib.assets/jszip/jszip.min.js"></script>
+    <link rel="stylesheet" href="../lib.assets/css/entity-editor.css">
     <link rel="stylesheet" href="../lib.assets/datetimepicker/jquery.datetimepicker.min.css">
     <script src="../lib.assets/xlsx/xlsx.full.min.js"></script>
     <script src="../lib.assets/papaparse/papaparse.min.js"></script>
     <script src="../lib.assets/dbf/DBFParser.min.js"></script>
+    <style>
+        
+    </style>
 </head>
 
 <body data-from-default-app="<?php echo $fromDefaultApp ? 'true' : 'false'; ?>" database-type="<?php echo $dbType;?>" data-no-table="<?php echo empty($table) ? "true" : "false";?>">
@@ -205,7 +210,12 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 </tbody>
                             </table>
                             </div>
-                            <textarea class="query-generated" spellcheck="false" autocomplete="off" readonly></textarea>
+                            <div class="foreign-key-container">
+                                <label><input type="checkbox" class="with-foreign-key"> With Foreign Key</label>
+                            </div>
+                            <div>
+                                <textarea class="query-generated" spellcheck="false" autocomplete="off" readonly></textarea>
+                            </div>
                         </div>
                     </div>
                     <div class="editor-container">
@@ -216,36 +226,40 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <button class="btn" onclick="editor.showEditor(-1)">Add New Entity</button>
                             </span>
 
-                            <!-- Import group -->
-                            <span class="btn-group btn-group-with-label">
-                                <span class="group-label">Import</span>
-                                <button class="btn" onclick="editor.uploadEntities()">Entity</button>
-                                <button class="btn" onclick="editor.importSQL()">SQL</button>
-                                <button class="btn" onclick="editor.importSheet()">Spreadsheet</button>
-                                <button class="btn" onclick="editor.triggerImportFromClipboard()">Clipboard</button>
-                                <button class="btn" onclick="editor.importGraphQLSchema()">GraphQL</button>
+                            <div class="btn-group dropdown">
+                                <button class="btn dropdown-toggle" type="button">Import</button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" onclick="editor.uploadEntities()">MagicAppBuilder Model</a>
+                                    <a class="dropdown-item" onclick="editor.importSQL()">Database File</a>
+                                    <a class="dropdown-item" onclick="editor.importSheet()">Spreadsheet File</a>
+                                    <a class="dropdown-item" onclick="editor.triggerImportFromClipboard()">Clipboard</a>
+                                    <a class="dropdown-item" onclick="editor.importGraphQLSchema()">GraphQL Schema</a>
+                                </div>
                                 <input class="import-file-json" type="file" accept=".json" style="display: none;" />
-                                <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db" style="display: none;" />
+                                <input class="import-file-sql" type="file" accept=".sql,.sqlite,.db,.mwb" style="display: none;" />
                                 <input class="import-file-sheet" type="file" accept=".xlsx,.xls,.ods,.csv,.dbf" style="display: none;" />
                                 <input class="import-file-graphql" type="file" accept=".graphqls" style="display: none;" />
-                            </span>
+                            </div>
 
-                            <!-- Export group -->
-                            <span class="btn-group btn-group-with-label">
-                                <span class="group-label">Export</span>
-                                <button class="btn" onclick="editor.downloadEntities()">Entity</button>
-                                <button class="btn" onclick="downloadSVG()">SVG</button>
-                                <button class="btn" onclick="downloadPNG()">PNG</button>
-                                <button class="btn" onclick="downloadMD()">MD</button>
-                                <button class="btn" onclick="downloadHTML()">HTML</button>
-                                <button class="btn" onclick="editor.downloadSQL()">SQL</button>
-                                <button class="btn" onclick="editor.showEntitySelector()">GraphQL</button>
-                            </span>
+                            <div class="btn-group dropdown">
+                                <button class="btn dropdown-toggle" type="button">Export</button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" onclick="editor.downloadEntities()">MagicAppBuilder Model</a>
+                                    <a class="dropdown-item" onclick="editor.downloadMWB()">MySQL Workbench Model</a>
+                                    <a class="dropdown-item" onclick="editor.downloadSVG()">SVG Image</a>
+                                    <a class="dropdown-item" onclick="editor.downloadPNG()">PNG Image</a>
+                                    <a class="dropdown-item" onclick="editor.downloadMD()">Markdown</a>
+                                    <a class="dropdown-item" onclick="editor.downloadHTML()">HTML</a>
+                                    <a class="dropdown-item" onclick="editor.downloadSQL()">SQL File</a>
+                                    <a class="dropdown-item" onclick="editor.showEntitySelector()">GraphQL Application</a>
+                                </div>
+                            </div>
 
                             <span class="btn-group">
                                 <button class="btn" onclick="editor.sortEntities()">Sort</button>
                                 <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>
-                                <label for="draw-relationship"><input type="checkbox" id="draw-relationship" class="draw-relationship" checked> Relationship</label>
+                                <label for="draw-auto-relationship"><input type="checkbox" id="draw-auto-relationship" class="draw-auto-relationship" checked> Auto Relationship</label>
+                                <label for="draw-fk-relationship"><input type="checkbox" id="draw-fk-relationship" class="draw-fk-relationship" checked> Foreign Key Relationship</label>
                             </span>
                         </div>
 
@@ -412,6 +426,102 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
         </div>
     </div>
 
+    <div class="modal modal-md" id="foreignKeyModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Foreign Key Settings</h3>
+                <span class="close-btn cancel-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Entity Name</label>
+                        <input type="text" class="form-control entity_name_selector" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Column Name</label>
+                        <input type="text" class="form-control column_name_selector" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Key Name</label>
+                        <input type="text" class="form-control foreign_key_name_selector">
+                    </div>
+                    <div class="form-group">
+                        <label>Reference Table</label>
+                        <select class="form-control reference_table_selector"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Reference Column</label>
+                        <select class="form-control reference_column_selector"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>On Update</label>
+                        <select class="form-control on_update_action_selector">
+                            <option value="NO ACTION">NO ACTION</option>
+                            <option value="CASCADE">CASCADE</option>
+                            <option value="SET NULL">SET NULL</option>
+                            <option value="RESTRICT">RESTRICT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>On Delete</label>
+                        <select class="form-control on_delete_action_selector">
+                            <option value="NO ACTION">NO ACTION</option>
+                            <option value="CASCADE">CASCADE</option>
+                            <option value="SET NULL">SET NULL</option>
+                            <option value="RESTRICT">RESTRICT</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger delete-foreign-key">Delete</button>
+                &nbsp;
+                <button class="btn btn-success save-foreign-key">Save</button>
+                &nbsp;
+                <button class="btn btn-secondary cancel-foreign-key">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-xl" id="foreignKeyBulkModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Foreign Key Settings</h3>
+                <span class="close-btn cancel-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="entity-name"></p>
+                <form>
+                    <table class="foreign-key-editor-table">
+                        <thead>
+                            <tr>
+                                <th>❌</th>
+                                <th>Column Name</th>
+                                <th>Key Name</th>
+                                <th>Reference Table</th>
+                                <th>Reference Column</th>
+                                <th>On Update</th>
+                                <th>On Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary add-foreign-key" onclick="editor.addForeignKey(this);">Add</button>
+                &nbsp;
+                <button class="btn btn-success save-foreign-key-bulk">Save</button>
+                &nbsp;
+                <button class="btn btn-secondary cancel-foreign-key-bulk">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal modal-sm" id="descriptionModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
@@ -518,6 +628,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li class="dropdown-divider"></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
+            <li id="menu-edit-foreign-key"><a href="javascript:;" onclick="editor.editForeignKeyContextMenu(event);">Edit Foreign Key</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
         </ul>
@@ -536,6 +647,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li class="dropdown-divider"></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
+            <li id="menu-edit-foreign-key"><a href="javascript:;" onclick="editor.editForeignKeyContextMenu(event);">Edit Foreign Key</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
             <li class="dropdown-divider"></li>

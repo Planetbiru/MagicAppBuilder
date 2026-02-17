@@ -63,10 +63,11 @@ class EntityRenderer {
      *
      * @param {number} width - The width of the SVG canvas, used to set the `width` attribute for the SVG element.
      *
-     * @param {boolean} drawRelationship - A flag to indicate whether to draw relationships between tables.
+     * @param {boolean} drawAutoRelationship - A flag to indicate whether to draw relationships between tables.
      *   If `true`, the method will create relationship lines between the tables after placing them.
+     * @param {boolean} drawFkRelationship - A flag to indicate whether to draw foreign key relationships between tables.
      */
-    createERD(data, width, drawRelationship) {
+    createERD(data, width, drawAutoRelationship, drawFkRelationship) {
         this.svg = qs(this.selector); // The SVG element to render the ERD
         this.lastMaxCol = 0;
         this.maxCol = 0;
@@ -82,7 +83,7 @@ class EntityRenderer {
 
         // Loop through each entity (table) and create it
         this.data.entities.forEach(entity => {
-            const tableGroup = this.createTable(entity, entity.index, xPos, yPos);
+            const tableGroup = this.createTable(entity, entity.index, xPos, yPos, drawAutoRelationship, drawFkRelationship);
             this.tables[entity.name] = {
                 table: tableGroup,
                 xPos: xPos,
@@ -130,18 +131,37 @@ class EntityRenderer {
         this.svg.setAttribute('width', finalWidth);
 
         // Create the relationships (lines) between tables
-        if(drawRelationship)
+        if(drawFkRelationship)
         {
-            this.createRelationships();
+            // If the flag for drawing foreign key relationships is set, create lines based on foreign key columns
+            this.createFkRelationships();
         }
+        else if(drawAutoRelationship)
+        {
+            // If the flag for drawing automatic relationships is set, create lines based on column naming conventions (e.g., columns ending with "_id")
+            this.createAutoRelationships();
+        }
+        
         this.svg = qs(this.selector); // The SVG element to render the ERD
+    }
+
+    createFkRelationships() {
+        Object.values(this.data.entities).forEach(entity => {
+            const fks = Array.isArray(entity.foreignKeys) ? entity.foreignKeys : Object.values(entity.foreignKeys || {});
+            fks.forEach(fk => {
+                const refEntityName = fk.referencedTable;
+                const refColumnName = fk.referencedColumn;
+                const index = this.getColumnIndex(entity, fk.columnName);
+                this.createRelationship(entity, fk.columnName, index, refEntityName, refColumnName);
+            });
+        });
     }
 
     /**
      * Method to create relationships between tables based on foreign key columns.
      * It will look for columns that end with "_id" and create lines between the relevant tables.
      */
-    createRelationships() {
+    createAutoRelationships() {
         this.data.entities.forEach(entity => {
             entity.columns.forEach((col, index) => {
                 // Check if the column is a foreign key (ends with "_id")
@@ -170,6 +190,15 @@ class EntityRenderer {
         return (index * this.buttonSpace) + this.buttonMargin;
     }
 
+    hasForeignKeys(entity, colName) {
+        if (!entity?.foreignKeys) return false;
+        if (Array.isArray(entity.foreignKeys)) {
+            return entity.foreignKeys.some(fk => fk.columnName === colName);
+        }
+        return entity.foreignKeys.hasOwnProperty(colName) && entity.foreignKeys[colName] !== undefined;
+    }
+
+
     /**
      * Creates an SVG representation of a database table entity for visual modeling.
      *
@@ -195,6 +224,9 @@ class EntityRenderer {
      * @param {number} index - The index of the entity in the overall entity list (used for action buttons).
      * @param {number} x - The X-coordinate to place the table on the SVG canvas.
      * @param {number} y - The Y-coordinate to place the table on the SVG canvas.
+     * @param {boolean} drawAutoRelationship - A flag to indicate whether to draw relationships between tables.
+     *   If `true`, the method will create relationship lines between the tables after placing them.
+     * @param {boolean} drawFkRelationship - A flag to indicate whether to draw foreign key relationships between tables.
      *
      * @returns {SVGGElement} An SVG `<g>` group element containing the rendered table and its interactive parts.
      *
@@ -202,7 +234,7 @@ class EntityRenderer {
      * @see createSvgForeignText
      * @see getFormattedType
      */
-    createTable(entity, index, x, y) {
+    createTable(entity, index, x, y, drawAutoRelationship, drawFkRelationship) {
         let yOffset = 40;
         let yOffsetCol = 26;
 
@@ -215,6 +247,10 @@ class EntityRenderer {
         const tableHeight = (entity.columns.length * this.columnHeight) + 26;
 
         const rect = this.createSvgRect(0, 0, this.tableWidth, tableHeight, "#ffffff", this.stroke, this.entityStrokeWidth);
+        
+        rect.setAttribute('rx', 1);
+        rect.setAttribute('ry', 1);
+
         group.appendChild(rect);
 
         const headerRect = this.createSvgRect(1, 1, this.tableWidth - 2, 24, this.headerBackgroundColor);
@@ -253,14 +289,14 @@ class EntityRenderer {
             group.appendChild(iconRect);
         });
 
+        const group2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        group2.classList.add('svg-entity-columns');
+
         entity.columns.forEach((col, i) => {
+            const group3 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            group3.classList.add('svg-entity-column');
             const yPosition = yOffset + (i * this.columnHeight);
             const yLine = yOffsetCol + (i * this.columnHeight);
-
-            if (col.primaryKey) {
-                const pkRect = this.createSvgRect(1, yLine + 1, this.tableWidth - 2, this.columnHeight - 2, "#f4f8ff");
-                group.appendChild(pkRect);
-            }
 
             const columnText = document.createElementNS("http://www.w3.org/2000/svg", "text");
             columnText.setAttribute("x", 10);
@@ -268,8 +304,21 @@ class EntityRenderer {
             columnText.setAttribute("font-size", this.columnFontSize);
             columnText.setAttribute("fill", this.columnTextColor);
             columnText.textContent = col.name;
-            columnText.classList.add('diagram-column-name');
-            group.appendChild(columnText);
+            columnText.classList.add('svg-column-name');
+
+            if (col.primaryKey) {
+                const pkRect = this.createSvgRect(1, yLine + 1, this.tableWidth - 2, this.columnHeight - 2, "#fff4f4bb");
+                group2.appendChild(pkRect);
+                columnText.setAttribute("data-primary-key", "true");
+            }
+
+            if(drawFkRelationship && this.hasForeignKeys(entity, col.name)) {
+                const fkRect = this.createSvgRect(1, yLine + 1, this.tableWidth - 2, this.columnHeight - 2, "#f4f8ffbb");
+                group2.appendChild(fkRect);
+                columnText.setAttribute("data-foreign-key", "true");
+            }
+
+            group3.appendChild(columnText);
 
             const typeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
             typeText.setAttribute("x", this.tableWidth - 10);
@@ -277,10 +326,10 @@ class EntityRenderer {
             typeText.setAttribute("font-size", this.columnTypeFontSize);
             typeText.setAttribute("fill", this.columnTextColor);
             typeText.setAttribute("text-anchor", "end");
-
+            typeText.classList.add('svg-column-type');
             const colType = this.getFormattedType(col);
             typeText.textContent = colType;
-            group.appendChild(typeText);
+            group3.appendChild(typeText);
 
             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
             line.setAttribute("x1", 0);
@@ -289,8 +338,11 @@ class EntityRenderer {
             line.setAttribute("y2", yLine);
             line.setAttribute("stroke", this.stroke);
             line.setAttribute("stroke-width", this.entityStrokeWidth);
-            group.appendChild(line);
+            group3.appendChild(line);
+            group2.appendChild(group3);
         });
+
+        group.appendChild(group2);
 
         this.svg.appendChild(group);
         return group;
@@ -398,10 +450,13 @@ class EntityRenderer {
      * @param {Object} entity - The entity representing the table with the foreign key.
      * @param {Object} col - The column representing the foreign key.
      * @param {number} index - The index of the foreign key column in the entity's columns.
+     * @param {string} [refEntityName] - The name of the referenced entity (table). If not provided, it will be derived from the column name.
+     * @param {string} [refColumnName] - The name of the referenced column (primary key). If not provided, it will be derived from the foreign key column name.
      */
-    createRelationship(entity, col, index) {
+    createRelationship(entity, col, index, refEntityName = null, refColumnName = null) {
+
         // Determine the name of the referenced table by removing '_id' from the foreign key column name
-        let refEntityName = col.name.replace("_id", "");
+        refEntityName = refEntityName || col.name.replace("_id", "");
 
         // Get the referenced entity using the reference entity's name
         let referenceEntity = this.getEntityByName(refEntityName);
@@ -409,7 +464,7 @@ class EntityRenderer {
         // If the reference entity exists
         if (referenceEntity != null) {
             // Get the index of the column in the referenced entity (primary key)
-            let refIndex = this.getColumnIndex(referenceEntity, col.name);
+            let refIndex = this.getColumnIndex(referenceEntity, refColumnName || col.name);
 
             // Get the 'from' and 'to' tables based on the entities
             let fromTable = this.tables[entity.name].table;
@@ -552,24 +607,15 @@ class EntityRenderer {
     {
         let ul = qs('.diagram-list.tabs');
         let input = ul.querySelector('.diagram-tab.active input[type="text"]');
-        let { applicationId, databaseName } = getMetaValues();
+        let shemaName = qs('meta[name="schema-name"]').getAttribute('content');
         let fileName = '';
-        let name = '';
-        if(databaseName != '')
-        {
-            name = databaseName;
-        }
-        else
-        {
-            name = applicationId;
-        }
         if(input != null)
         {
-            fileName = name + ' - ' + input.value;
+            fileName = shemaName + ' - ' + input.value;
         }
         else
         {
-            fileName = name;
+            fileName = shemaName;
         }
         return fileName;
     }
@@ -603,7 +649,8 @@ class EntityRenderer {
         </style>
     </defs>
     ${svgData}
-</svg>`;
+</svg>
+`;
     }
 
     /**
@@ -756,7 +803,6 @@ class EntityRenderer {
         link.click();
         URL.revokeObjectURL(url);
     }
-
 
     /**
      * Formats a given timestamp into a localized date-time string.

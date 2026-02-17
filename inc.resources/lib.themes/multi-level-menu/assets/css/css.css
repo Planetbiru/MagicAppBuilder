@@ -1136,12 +1136,12 @@ select[multiple].form-control {
 .dark-mode .multi-select .multi-select-options .multi-select-all .multi-select-option-radio {
   border: 1px solid #717171;
 }
+.dark-mode .multi-select .multi-select-all:hover, .dark-mode .multi-select .multi-select-all:active {
+  background-color: #52525e;
+}
 .dark-mode .multi-select .multi-select-all {
   border-color: #444444;
   border-radius: 0;
-}
-.dark-mode .multi-select .multi-select-all:hover, .dark-mode .multi-select .multi-select-all:active {
-  background-color: #52525e;
 }
 .dark-mode .multi-select .multi-select-option:hover, .dark-mode .multi-select .multi-select-option:active {
   background-color: #52525e;
