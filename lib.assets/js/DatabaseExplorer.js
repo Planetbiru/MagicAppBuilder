@@ -23,6 +23,28 @@ let timeoutDownload = setTimeout('', 100);
 let isExporting = false;
 
 /**
+ * Selects the first DOM element that matches the given CSS selector.
+ *
+ * @function qs
+ * @param {string} selector - CSS selector string used to query an element.
+ * @returns {Element|null} The first matched element, or null if no match is found.
+ */
+function qs(selector) {
+    return document.querySelector(selector);
+}
+
+/**
+ * Selects all DOM elements that match the given CSS selector.
+ *
+ * @function qsa
+ * @param {string} selector - CSS selector string used to query elements.
+ * @returns {NodeListOf<Element>} A NodeList containing all matched elements.
+ */
+function qsa(selector) {
+    return document.querySelectorAll(selector);
+}
+
+/**
  * Creates a debounced version of the given function that delays its execution
  * until after a specified wait time has passed since the last invocation.
  *
@@ -65,11 +87,11 @@ function debounce(func, delay) {
  */
 function getMetaValues() {
     return {
-        applicationId: document.querySelector('meta[name="application-id"]').getAttribute('content'),
-        databaseName: document.querySelector('meta[name="database-name"]').getAttribute('content'),
-        databaseSchema: document.querySelector('meta[name="database-schema"]').getAttribute('content'),
-        databaseType: document.querySelector('meta[name="database-type"]').getAttribute('content'),
-        hash: document.querySelector('meta[name="hash"]').getAttribute('content'),
+        applicationId: qs('meta[name="application-id"]').getAttribute('content'),
+        databaseName: qs('meta[name="database-name"]').getAttribute('content'),
+        databaseSchema: qs('meta[name="database-schema"]').getAttribute('content'),
+        databaseType: qs('meta[name="database-type"]').getAttribute('content'),
+        hash: qs('meta[name="hash"]').getAttribute('content'),
     };
 }
 
@@ -89,11 +111,11 @@ function getMetaValues() {
  */
 function setMetaValues(applicationId, databaseName, databaseSchema, databaseType, hash)
 {
-    document.querySelector('meta[name="application-id"]').setAttribute('content', applicationId);
-    document.querySelector('meta[name="database-name"]').setAttribute('content', databaseName);
-    document.querySelector('meta[name="database-schema"]').setAttribute('content', databaseSchema);
-    document.querySelector('meta[name="database-type"]').setAttribute('content', databaseType);
-    document.querySelector('meta[name="hash"]').setAttribute('content', hash);
+    qs('meta[name="application-id"]').setAttribute('content', applicationId);
+    qs('meta[name="database-name"]').setAttribute('content', databaseName);
+    qs('meta[name="database-schema"]').setAttribute('content', databaseSchema);
+    qs('meta[name="database-type"]').setAttribute('content', databaseType);
+    qs('meta[name="hash"]').setAttribute('content', hash);
 }
 
 
@@ -111,7 +133,7 @@ function saveScrollPosition() {
  * from the value stored in localStorage.
  */
 function restoreScrollPosition() {
-    scrollElement = document.querySelector('.table-list');
+    scrollElement = qs('.table-list');
     if (!scrollElement) return;
 
     const saved = localStorage.getItem(SCROLL_POSITION_KEY);
@@ -126,7 +148,7 @@ function restoreScrollPosition() {
  * and restores the saved position on page load.
  */
 function initTableScrollPosition() {
-    scrollElement = document.querySelector('.table-list');
+    scrollElement = qs('.table-list');
     if (!scrollElement) return;
 
     const debouncedSave = debounce(saveScrollPosition, 300); // 300ms debounce
@@ -142,16 +164,16 @@ function init() {
     converter = new SQLConverter();
     let modalQueryTranslator = document.getElementById("queryTranslatorModal");
     let modalEntityEditor = document.getElementById("entityEditorModal");
-    let closeModalButton = document.querySelectorAll(".cancel-button");
-    let openModalQuertTranslatorButton = document.querySelector(".import-structure");
-    let openModalEntityEditorButton = document.querySelector(".open-entity-editor");
-    let openFileButton  = document.querySelector(".open-structure");
-    let translateButton  = document.querySelector(".translate-structure");
-    let importFromEntityButton = document.querySelector('.import-from-entity');
-    let clearButton  = document.querySelector(".clear");
-    let original = document.querySelector('.original');
-    let query = document.querySelector('[name="query"]');
-    let deleteCells = document.querySelectorAll('.cell-delete a');
+    let closeModalButton = qsa(".cancel-button");
+    let openModalQuertTranslatorButton = qs(".import-structure");
+    let openModalEntityEditorButton = qs(".open-entity-editor");
+    let openFileButton  = qs(".open-structure");
+    let translateButton  = qs(".translate-structure");
+    let importFromEntityButton = qs('.import-from-entity');
+    let clearButton  = qs(".clear");
+    let original = qs('.original');
+    let query = qs('[name="query"]');
+    let deleteCells = qsa('.cell-delete a');
 
     initTableScrollPosition();
 
@@ -194,9 +216,9 @@ function init() {
         translateButton.onclick = function()
         {
             let sql = original.value;
-            let type = document.querySelector('meta[name="database-type"]').getAttribute('content');
+            let type = qs('meta[name="database-type"]').getAttribute('content');
             let converted = converter.translate(sql, type);
-            document.querySelector('[name="query"]').value = converted;
+            qs('[name="query"]').value = converted;
             modalQueryTranslator.style.display = "none";
         };
     }
@@ -205,7 +227,7 @@ function init() {
     {
         openFileButton.onclick = function()
         {
-            document.querySelector('.structure-sql').click();
+            qs('.structure-sql').click();
         }
     }
 
@@ -214,7 +236,7 @@ function init() {
         importFromEntityButton.onclick = function()
         {
             let sql = editor.generateSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());;
-            document.querySelector('[name="query"]').value = sql.join("\r\n");
+            qs('[name="query"]').value = sql.join("\r\n");
             modalEntityEditor.style.display = "none";
         };
     }
@@ -247,7 +269,7 @@ function init() {
             modalQueryTranslator.style.display = "none";
         }
     };
-    document.querySelector('.structure-sql').addEventListener('change', function(e){
+    qs('.structure-sql').addEventListener('change', function(e){
         openStructure(this.files[0]);
     });
 
@@ -257,7 +279,7 @@ function init() {
         const filter = event.target.value.toLowerCase().trim();
 
         // Get the parent container of the list items
-        const tableList = document.querySelector(".object-container .table-list");
+        const tableList = qs(".object-container .table-list");
 
         // Get all the list items inside the container
         const items = tableList.querySelectorAll("li");
@@ -273,12 +295,12 @@ function init() {
         });
     });
 
-    document.querySelector('.draw-auto-relationship').addEventListener('change', function(e){
+    qs('.draw-auto-relationship').addEventListener('change', function(e){
         editor.refreshEntities();
         editor.updateDiagram();
     });
 
-    document.querySelector('.draw-fk-relationship').addEventListener('change', function(e){
+    qs('.draw-fk-relationship').addEventListener('change', function(e){
         editor.refreshEntities();
         editor.updateDiagram();
     });
@@ -287,7 +309,7 @@ function init() {
         if (e.target.classList.contains('check-group-structure')) {
             const group = e.target.dataset.group;
             const checked = e.target.checked;
-            document.querySelectorAll('.check-structure-' + group).forEach(cb => {
+            qsa('.check-structure-' + group).forEach(cb => {
                 cb.checked = checked;
             });
         }
@@ -295,13 +317,13 @@ function init() {
         if (e.target.classList.contains('check-group-data')) {
             const group = e.target.dataset.group;
             const checked = e.target.checked;
-            document.querySelectorAll('.check-data-' + group).forEach(cb => {
+            qsa('.check-data-' + group).forEach(cb => {
                 cb.checked = checked;
             });
         }
     });
 
-    document.querySelector(".check-all-entity-data").addEventListener('change', (event) => {
+    qs(".check-all-entity-data").addEventListener('change', (event) => {
         let checked = event.target.checked;
         let allEntities = event.target.closest('table').querySelector('tbody').querySelectorAll(".selected-entity-data");
 
@@ -314,13 +336,13 @@ function init() {
         editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
     });
 
-    document.querySelector(".right-panel .table-list-for-export").addEventListener('change', (event) => {
+    qs(".right-panel .table-list-for-export").addEventListener('change', (event) => {
         if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
             editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
         }
 
         if (event.target.classList.contains('export-structure-system')) {
-            let seletion = document.querySelectorAll('.entity-structure-system');
+            let seletion = qsa('.entity-structure-system');
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
@@ -328,7 +350,7 @@ function init() {
         }
 
         if (event.target.classList.contains('export-structure-custom')) {
-            let seletion = document.querySelectorAll('.entity-structure-custom');
+            let seletion = qsa('.entity-structure-custom');
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
@@ -336,7 +358,7 @@ function init() {
         }
 
         if (event.target.classList.contains('export-data-system')) {
-            let seletion = document.querySelectorAll('.entity-data-system');
+            let seletion = qsa('.entity-data-system');
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
@@ -344,7 +366,7 @@ function init() {
         }
 
         if (event.target.classList.contains('export-data-custom')) {
-            let seletion = document.querySelectorAll('.entity-data-custom');
+            let seletion = qsa('.entity-data-custom');
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
@@ -352,7 +374,7 @@ function init() {
         }
     });
 
-    document.querySelector('.entity-selector-container').addEventListener('change', function(e){
+    qs('.entity-selector-container').addEventListener('change', function(e){
         // Check if the changed element is a <select> inside the form
         if(e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')
         {
@@ -361,7 +383,7 @@ function init() {
             }, 400);
         }
     });
-    document.querySelector('.entity-type-selector').addEventListener('change', function(e){
+    qs('.entity-type-selector').addEventListener('change', function(e){
         setTimeout(function(){
             saveFormState(e.target.form);
         }, 400);
@@ -370,7 +392,7 @@ function init() {
     let { applicationId, databaseName, databaseSchema, databaseType, hash } = getMetaValues();
 
     loadDatabaseIndex(applicationId, hash);
-    let profile = document.querySelector('.graphql-app-profile').value;
+    let profile = qs('.graphql-app-profile').value;
     loadGraphQlEntityFromServer(applicationId, databaseType, databaseName, databaseSchema, profile, function(data){
         editor.graphqlAppData = data;
     });
@@ -393,7 +415,7 @@ function init() {
     });
 
     window.addEventListener('click', function() {
-        document.querySelectorAll('.button-container .dropdown.show').forEach(function(openDropdown) {
+        qsa('.button-container .dropdown.show').forEach(function(openDropdown) {
             openDropdown.classList.remove('show');
             let menu = openDropdown.querySelector('.dropdown-menu');
             if(menu) {
@@ -442,7 +464,7 @@ function loadDatabaseIndex(applicationId, hash)
         data: {applicationId: applicationId},
         dataType: 'json',
         success: function(data) {
-            let select = document.querySelector('.schema-selector');
+            let select = qs('.schema-selector');
             select.innerHTML = '';
             for(let index in data)
             {
@@ -470,36 +492,6 @@ function loadDatabaseIndex(applicationId, hash)
             console.error(err);
         }
     })
-}
-
-/**
- * Selects all DOM elements that match the given CSS selector.
- *
- * @param {string} selector - CSS selector string used to query elements.
- * @returns {NodeListOf<Element>} A NodeList containing all matched elements.
- *
- * @example
- * // Ambil semua elemen dengan class "item"
- * const items = qsa('.item');
- * items.forEach(el => console.log(el.textContent));
- */
-function qsa(selector) {
-    return document.querySelectorAll(selector);
-}
-
-/**
- * Selects the first DOM element that matches the given CSS selector.
- *
- * @param {string} selector - CSS selector string used to query an element.
- * @returns {Element|null} The first matched element, or null if no match is found.
- *
- * @example
- * // Ambil elemen pertama dengan id "header"
- * const header = qs('#header');
- * console.log(header?.textContent);
- */
-function qs(selector) {
-    return document.querySelector(selector);
 }
 
 /**
@@ -770,7 +762,7 @@ function readAsText(file) {
     const reader = new FileReader();
     reader.onload = function (e) {
         try {
-            document.querySelector('.original').value = e.target.result;
+            qs('.original').value = e.target.result;
         } catch (err) {
             console.error("Error displaying file content: " + err.message);
         }
@@ -820,7 +812,7 @@ function openSQLiteStructure(file) {
                 const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
 
                 if (res.length === 0 || res[0].values.length === 0) {
-                    document.querySelector('.original').value = '-- No tables found in database.';
+                    qs('.original').value = '-- No tables found in database.';
                     return;
                 }
 
@@ -845,20 +837,20 @@ function openSQLiteStructure(file) {
                     }
                 });
 
-                document.querySelector('.original').value = sqlContent;
+                qs('.original').value = sqlContent;
             }).catch(err => {
                 console.error("SQL.js initialization error:", err);
-                document.querySelector('.original').value = '-- Failed to initialize SQL.js.';
+                qs('.original').value = '-- Failed to initialize SQL.js.';
             });
         } catch (err) {
             console.error("Error processing SQLite file:", err);
-            document.querySelector('.original').value = '-- Error reading SQLite database.';
+            qs('.original').value = '-- Error reading SQLite database.';
         }
     };
 
     reader.onerror = () => {
         console.error("Failed to read SQLite file.");
-        document.querySelector('.original').value = '-- Unable to read file.';
+        qs('.original').value = '-- Unable to read file.';
     };
 
     reader.readAsArrayBuffer(file); // Important: reads binary content
@@ -875,13 +867,13 @@ function openSQLiteStructure(file) {
  * @returns {boolean} True if the element is editable, false otherwise.
  *
  * @example
- * const input = document.querySelector('input');
+ * const input = qs('input');
  * console.log(isEditableElement(input)); // true
  *
- * const div = document.querySelector('div[contenteditable="true"]');
+ * const div = qs('div[contenteditable="true"]');
  * console.log(isEditableElement(div)); // true
  *
- * const span = document.querySelector('span');
+ * const span = qs('span');
  * console.log(isEditableElement(span)); // false
  */
 function isEditableElement(element)
@@ -924,7 +916,7 @@ function syncDatabaseSchema()
 document.addEventListener('DOMContentLoaded', () => {
 
     // Select all toggle buttons within collapsible elements
-    const toggles = document.querySelectorAll('.collapsible .button-toggle');
+    const toggles = qsa('.collapsible .button-toggle');
     entityRenderer = new EntityRenderer(".erd-svg");
 
     // Attach event listeners to each toggle button
@@ -1053,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.querySelector('[type="submit"].execute').addEventListener('click', function(event) {
+    qs('[type="submit"].execute').addEventListener('click', function(event) {
         event.preventDefault();
         showConfirmationDialog('Are you sure you want to execute the query?', 'Execute Query Confirmation', 'Yes', 'No', function(isConfirmed) {
             if (isConfirmed) {
@@ -1062,9 +1054,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelector('[type="button"].save').addEventListener('click', function(event) {
+    qs('[type="button"].save').addEventListener('click', function(event) {
         event.preventDefault();
-        let query = document.querySelector('textarea[name="query"]').value.trim();
+        let query = qs('textarea[name="query"]').value.trim();
         if(query.length > 0)
         {
             const blob = new Blob([query], { type: "text/plain" });
@@ -1083,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    let btnTableExport = document.querySelector('[type="submit"][name="___export_table___"]');
+    let btnTableExport = qs('[type="submit"][name="___export_table___"]');
     if(btnTableExport != null)
     {
         btnTableExport.addEventListener('click', function(event) {
@@ -1104,7 +1096,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    let btnDatabaseExport = document.querySelector('[type="submit"][name="___export_database___"]');
+    let btnDatabaseExport = qs('[type="submit"][name="___export_database___"]');
     if(btnDatabaseExport != null)
     {
         btnDatabaseExport.addEventListener('click', function(event) {
@@ -1117,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Export Database', 'Yes', 'No', function(isOk) {
                 if (isOk)
                 {
-                    let select = document.querySelector('[name="target_database_type"]');
+                    let select = qs('[name="target_database_type"]');
                     disableOtherOptions(select);
                     startExportDatabase(selector, function(){
                         enableAllOptions(select);
@@ -1125,20 +1117,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 else
                 {
-                    let select = document.querySelector('[name="target_database_type"]');
+                    let select = qs('[name="target_database_type"]');
                     enableAllOptions(select);
-                    document.querySelector('#exportModal').style.display = 'none'
+                    qs('#exportModal').style.display = 'none'
                 }
             });
             listTableToExport(selector, tableName);
         });
     }
 
-    document.querySelector(".with-foreign-key").addEventListener('change', (event) => {
+    qs(".with-foreign-key").addEventListener('change', (event) => {
         editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
     });
 
-    document.querySelector('.add-diagram').addEventListener('click', function(e){
+    qs('.add-diagram').addEventListener('click', function(e){
         e.preventDefault();
         let ul = e.target.closest('ul');
         let diagramName = editor.getNewDiagramName();
@@ -1148,10 +1140,10 @@ document.addEventListener('DOMContentLoaded', () => {
         editor.saveDiagram();
     });
 
-    document.querySelector('[data-id="all-entities"]').addEventListener('click', function(e){
+    qs('[data-id="all-entities"]').addEventListener('click', function(e){
         e.preventDefault();
         let li = e.target.parentNode;
-        let diagramContainer = document.querySelector('.diagram-container');
+        let diagramContainer = qs('.diagram-container');
 
         li.closest('ul').querySelectorAll('li.diagram-tab').forEach(tab => {
             tab.classList.remove('active');
@@ -1162,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('active');
         let selector = 'all-entities';
         diagramContainer.querySelector('#'+selector).classList.add('active');
-        document.querySelector('.entity-editor .left-panel .table-list').querySelectorAll('li').forEach(li => {
+        qs('.entity-editor .left-panel .table-list').querySelectorAll('li').forEach(li => {
             let input = li.querySelector('input[type="checkbox"]');
             input.checked = false;
             input.disabled = true;
@@ -1173,7 +1165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('change', function (e) {
         if (e.target.closest('.table-list input[type="checkbox"]')) {
 
-            let diagram = document.querySelector('.diagram-container .diagram.active');
+            let diagram = qs('.diagram-container .diagram.active');
             let source = diagram.dataset.entities || '';
             let currentSelection = source.split(',');
             let selectedEntities = new Set(); // Use a Set to store selected entities
@@ -1224,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         checkbox.checked = isChecked;
                     }
                     let selector = `.selected-entity[data-name="${checkbox.dataset.name}"]`;
-                    let cb = document.querySelector(selector);
+                    let cb = qs(selector);
                     if(cb)
                     {
                         cb.checked = checkbox.checked;
@@ -1246,7 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resizablePanels = new ResizablePanels('.entity-editor', '.left-panel', '.right-panel', '.resize-bar', 200);
 
-    tabsLinkContainer = document.querySelector('.tabs-link-container');
+    tabsLinkContainer = qs('.tabs-link-container');
 
     qs('.tab-mover li a.move-first').addEventListener('click', function(event) {
         event.preventDefault();
@@ -1258,12 +1250,12 @@ document.addEventListener('DOMContentLoaded', () => {
         moveTabToLast();
     });
 
-    document.querySelector('.tab-mover li a.move-left').addEventListener('click', function(event) {
+    qs('.tab-mover li a.move-left').addEventListener('click', function(event) {
         event.preventDefault();
         updateMarginLeft(30);
     });
 
-    document.querySelector('.tab-mover li a.move-right').addEventListener('click', function(event) {
+    qs('.tab-mover li a.move-right').addEventListener('click', function(event) {
         event.preventDefault();
         updateMarginLeft(-30);
     });
@@ -1276,27 +1268,27 @@ document.addEventListener('DOMContentLoaded', () => {
         updateMarginLeft(delta > 0 ? -step : step);
     });
 
-    document.querySelector('.export-data-entity').addEventListener('click', function(){
+    qs('.export-data-entity').addEventListener('click', function(){
         editor.exportData();
     });
 
-    document.querySelector('.import-data-entity').addEventListener('click', function(){
-        document.querySelector('#importDataFileInput').click();
+    qs('.import-data-entity').addEventListener('click', function(){
+        qs('#importDataFileInput').click();
     });
 
-    document.querySelector('.add-data-entity').addEventListener('click', function(e){
+    qs('.add-data-entity').addEventListener('click', function(e){
         editor.addData(true);
     });
 
-    document.querySelector('.clear-data-entity').addEventListener('click', function(){
+    qs('.clear-data-entity').addEventListener('click', function(){
         editor.clearData();
     });
 
-    document.querySelector('.save-data-entity').addEventListener('click', function(){
+    qs('.save-data-entity').addEventListener('click', function(){
         editor.saveData();
     });
 
-    document.querySelector('#importDataFileInput').addEventListener('change', function(event) {
+    qs('#importDataFileInput').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (!file) return;
 
@@ -1321,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Dropdown toggle logic
-    document.querySelectorAll('.button-container .dropdown-toggle').forEach(function(toggle) {
+    qsa('.button-container .dropdown-toggle').forEach(function(toggle) {
         toggle.addEventListener('click', function(event) {
             event.stopPropagation();
             let dropdown = this.parentElement;
@@ -1395,7 +1387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    initAllEntitiesContextMenu(document.querySelector('#all-entities .erd-svg'));
+    initAllEntitiesContextMenu(qs('#all-entities .erd-svg'));
 });
 
 /**
@@ -1420,7 +1412,7 @@ function downloadHTML()
  * @param {string} tableSelector - A CSS selector for the table element.
  */
 function enableArrowKeyNavigation(tableSelector) {
-    document.querySelector(tableSelector)?.addEventListener('keydown', function (event) {
+    qs(tableSelector)?.addEventListener('keydown', function (event) {
         // Only process text input fields
         if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'text') return;
 
@@ -1638,7 +1630,7 @@ function exportTable(selector, onFinish) {
         }
 
         // Get the target database type from the form input.
-        let targetDatabaseType = document.querySelector('[name="target_database_type"]').value;
+        let targetDatabaseType = qs('[name="target_database_type"]').value;
 
         // Send AJAX request to the server to export the current table.
         $.ajax({
@@ -1744,7 +1736,7 @@ function listTableToExport(selector, tableName) {
  * @returns {HTMLElement} - The modal DOM element.
  */
 function showExportDialog(selector, message, title, captionOk, captionCancel, callback) {
-    const modal = document.querySelector(selector);
+    const modal = qs(selector);
     const okBtn = modal.querySelector('.button-ok');
     const cancelBtn = modal.querySelector('.button-cancel');
 
@@ -1860,7 +1852,7 @@ function downloadMD() {
  */
 function showConfirmationDialog(message, title, captionOk, captionCancel, callback) {
     // Get modal and buttons
-    const modal = document.querySelector('#asyncConfirm');
+    const modal = qs('#asyncConfirm');
     let okBtn = modal.querySelector('.confirm-ok');
     let cancelBtn = modal.querySelector('.confirm-cancel');
     okBtn = removeAllEventListeners(okBtn);

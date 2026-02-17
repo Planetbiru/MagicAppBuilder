@@ -607,7 +607,7 @@ class EntityRenderer {
     {
         let ul = qs('.diagram-list.tabs');
         let input = ul.querySelector('.diagram-tab.active input[type="text"]');
-        let shemaName = qs('meta[name="schema-name"]').getAttribute('content');
+        let shemaName = qs('meta[name="application-id"]').getAttribute('content');
         let fileName = '';
         if(input != null)
         {

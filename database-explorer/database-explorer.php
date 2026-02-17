@@ -258,8 +258,8 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                             <span class="btn-group">
                                 <button class="btn" onclick="editor.sortEntities()">Sort</button>
                                 <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>
-                                <label for="draw-auto-relationship"><input type="checkbox" id="draw-auto-relationship" class="draw-auto-relationship" checked> Auto Relationship</label>
                                 <label for="draw-fk-relationship"><input type="checkbox" id="draw-fk-relationship" class="draw-fk-relationship" checked> Foreign Key Relationship</label>
+                                <label for="draw-auto-relationship"><input type="checkbox" id="draw-auto-relationship" class="draw-auto-relationship"> Auto Relationship</label>
                             </span>
                         </div>
 

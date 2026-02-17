@@ -4191,4 +4191,12 @@ Foreign keys are now fully supported in:
 
 This enhancement guarantees relational consistency throughout the entire database lifecycle — from design and migration to deployment.
 
+## What’s Changed
+
+The button layout in the Entity Editor has been redesigned.
+
+Previously, there were too many buttons displayed below the diagram, which required a high screen resolution to view them all properly. In version 2.2.0, several of these buttons have been moved into dropdown menus.
+
+This improvement makes the interface cleaner, more organized, and more accessible on lower-resolution screens.
+
 MagicAppBuilder 2.2.0 continues to strengthen database modeling capabilities while improving integration with industry-standard tools.
