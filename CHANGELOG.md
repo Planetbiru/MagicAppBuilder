@@ -4146,3 +4146,49 @@ Version 2.1 fixes a bug in the Entity Editor where SQL exports incorrectly used 
 
 In version 2.1, SQL exports now correctly use **entity names rather than entity indexes**, preventing index-related errors and ensuring more reliable SQL generation.
 
+# MagicAppBuilder Version 2.2.0
+
+Date: February 18th, 2026
+
+## What’s New
+
+### Import Database Schema from MySQL Workbench Model
+
+MagicAppBuilder 2.2.0 introduces the ability to import database schemas directly from a MySQL Workbench model file. This feature helps streamline migration and accelerates project setup by preserving structural and relational integrity.
+
+**What is imported?**
+
+1. **Table structures** – Including columns, data types, primary keys, indexes, and constraints.
+2. **Foreign keys** – All defined relationships between tables are recognized and reconstructed.
+3. **Table data** – Existing records can be imported along with the schema.
+4. **Diagrams** – Visual database diagrams are preserved to maintain layout and design context.
+
+This ensures that both logical structure and visual representation are retained during the import process.
+
+### Export Database Schema to MySQL Workbench Model
+
+You can now export your database design from MagicAppBuilder into a MySQL Workbench model format. This makes it easier to collaborate with teams that use MySQL Workbench or to continue development in other tools.
+
+**What is exported?**
+
+1. **Table structures** – Complete definitions including columns, primary keys, indexes, and constraints.
+2. **Foreign keys** – All table relationships are exported accurately.
+3. **Table data** – Optional export of data along with schema definitions.
+4. **Diagrams** – Database diagrams are generated to reflect the current design layout.
+
+This feature ensures compatibility and smooth interoperability between MagicAppBuilder and MySQL Workbench.
+
+### Enhanced Foreign Key Support
+
+MagicAppBuilder version 2.2.0 significantly improves foreign key support across multiple workflows.
+
+Foreign keys are now fully supported in:
+
+* Database design creation
+* Schema import
+* Schema export
+* Database query export
+
+This enhancement guarantees relational consistency throughout the entire database lifecycle — from design and migration to deployment.
+
+MagicAppBuilder 2.2.0 continues to strengthen database modeling capabilities while improving integration with industry-standard tools.

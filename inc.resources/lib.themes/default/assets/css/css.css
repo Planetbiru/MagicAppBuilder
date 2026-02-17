@@ -713,10 +713,6 @@ tr[data-active=false] td {
   background-color: #312e2e;
 }
 
-#menuSearchResults {
-  overflow: auto;
-  max-height: calc(100vh - 106px);
-}
 #menuSearchResults .list-group-item {
   padding: 0;
 }
@@ -729,6 +725,10 @@ tr[data-active=false] td {
 }
 #menuSearchResults .list-group-item:hover {
   background-color: #eaeaea;
+}
+#menuSearchResults {
+  overflow: auto;
+  max-height: calc(100vh - 106px);
 }
 
 .dark-mode #menuSearchResults .list-group-item {
@@ -1030,12 +1030,12 @@ select[multiple].form-control {
 .dark-mode .multi-select .multi-select-options .multi-select-all .multi-select-option-radio {
   border: 1px solid #717171;
 }
+.dark-mode .multi-select .multi-select-all:hover, .dark-mode .multi-select .multi-select-all:active {
+  background-color: #52525e;
+}
 .dark-mode .multi-select .multi-select-all {
   border-color: #444444;
   border-radius: 0;
-}
-.dark-mode .multi-select .multi-select-all:hover, .dark-mode .multi-select .multi-select-all:active {
-  background-color: #52525e;
 }
 .dark-mode .multi-select .multi-select-option:hover, .dark-mode .multi-select .multi-select-option:active {
   background-color: #52525e;

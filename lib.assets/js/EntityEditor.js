@@ -157,6 +157,10 @@ class EntityEditor {
         this.graphqlAppProfile = {
 
         };
+
+        this.foreignKeyDraft = {
+
+        };
     }
 
     /**
@@ -269,7 +273,7 @@ class EntityEditor {
                     entity.checked = checked;
                 })
             }
-            _this.exportToSQL();
+            _this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
         });
 
         document.addEventListener('change', function (event) {
@@ -295,11 +299,17 @@ class EntityEditor {
                             tr.querySelector('.column-autoIncrement').disabled = true;
                             tr.querySelector('.column-autoIncrement').checked = false;
                         }
+                        tr.classList.add('is-primary-key');
+                    }
+                    else
+                    {
+                        tr.classList.remove('is-primary-key');
                     }
                 }
                 else
                 {
                     tr.querySelector('.column-nullable').disabled = false;
+                    tr.classList.remove('is-primary-key');
                 }
             }
 
@@ -467,6 +477,51 @@ class EntityEditor {
     }
 
     /**
+     * Checks whether a foreign key definition exists for the specified column.
+     *
+     * The foreignKeys parameter may be either:
+     * - An array of foreign key objects
+     * - An object map where values are foreign key objects
+     *
+     * @param {Array<Object>|Object<string, Object>} foreignKeys - Collection of foreign key definitions.
+     * @param {string} columnName - Column name to check.
+     * @returns {boolean} True if a foreign key exists for the given column name, otherwise false.
+     */
+    isForeignKeyContains(foreignKeys, columnName)
+    {
+        if (!foreignKeys)
+        {
+            return false;
+        }
+        
+        const fks = Array.isArray(foreignKeys) ? foreignKeys : Object.values(foreignKeys);
+        return fks.some(fk => fk.columnName == columnName);
+    }
+
+
+    /**
+     * Retrieves the foreign key definition for the specified column.
+     *
+     * The foreignKeys parameter may be either:
+     * - An array of foreign key objects
+     * - An object map where values are foreign key objects
+     *
+     * @param {Array<Object>|Object<string, Object>} foreignKeys - Collection of foreign key definitions.
+     * @param {string} columnName - Column name to search for.
+     * @returns {Object|null} The matching foreign key object if found, otherwise null.
+     */
+    getForeignKeyByColumnName(foreignKeys, columnName)
+    {
+        if (!foreignKeys)
+        {
+            return null;
+        }
+
+        const fks = Array.isArray(foreignKeys) ? foreignKeys : Object.values(foreignKeys);
+        return fks.find(fk => fk.columnName == columnName) || null;
+    }
+
+    /**
      * Shows the entity editor with the columns of an existing entity or prepares
      * a new entity for editing.
      *
@@ -597,15 +652,26 @@ class EntityEditor {
         }
 
         let columnDescription = column.description ? column.description : '';
+        let currentEntity = this.entities?.[this.currentEntityIndex];
+
+        let hasFk = this.isForeignKeyContains(currentEntity?.foreignKeys, column.name);
+
+        if(hasFk) {
+            row.classList.add('has-foreign-key');
+        }
+        if(column.primaryKey) {
+            row.classList.add('is-primary-key');
+        }
 
         row.innerHTML = `
 <td class="drag-handle"></td>
 <td class="column-action">
+    <button onclick="editor.foreignKeyEdit(this)" class="icon-emoji icon-edit"></button>
     <button onclick="editor.removeColumn(this)" class="icon-emoji icon-delete"></button>
     <button onclick="editor.moveUp(this)" class="icon-emoji icon-move-up"></button>
     <button onclick="editor.moveDown(this)" class="icon-emoji icon-move-down"></button>
 </td>
-<td><input type="text" class="column-name" value="${column.name}" data-original-name="${originalName}" placeholder="Column Name"></td>
+<td class="entity-column-name"><input type="text" class="column-name" value="${column.name}" data-original-name="${originalName}" placeholder="Column Name"></td>
 <td>
     <select class="column-type" onchange="editor.updateColumnLengthInput(this)">
         ${this.mysqlDataTypes.map(typeOption => `<option value="${typeOption}" ${typeOption === typeSimple ? 'selected' : ''}>${typeOption}</option>`).join('')}
@@ -625,6 +691,632 @@ class EntityEditor {
         {
             row.querySelector('.column-name').select();
         }
+    }
+
+    /**
+     * Triggered when the foreign key edit button is clicked.
+     * Retrieves the current row, extracts the column name and entity name,
+     * and opens the foreign key editor modal if the column name is defined.
+     *
+     * @param {HTMLElement} button - The button element that triggered the action.
+     */
+    foreignKeyEdit(button) {
+        const row = button.closest('tr');
+        const columnName = row.qs('.column-name').value;
+        const entityName = qs(this.selector + " .entity-name").value;
+        if (columnName) {
+            this.showForeignKeyEditor(entityName, columnName, row);
+        }
+    }
+
+    /**
+     * Displays and initializes the Foreign Key editor modal.
+     * It loads existing foreign key definitions (from draft or entity schema),
+     * populates selectable referenced tables and columns,
+     * and handles save, cancel, and delete operations.
+     *
+     * @param {string} entityName - The name of the current entity (table).
+     * @param {string} columnName - The column name that will act as a foreign key.
+     * @param {HTMLTableRowElement} row - The table row element associated with the column.
+     */
+    showForeignKeyEditor(entityName, columnName, row) {
+        const _this = this;
+        // Show foreignKeyModal
+        const modal = qs('#foreignKeyModal');
+
+        let fkName = `fk_${entityName}_${columnName}`;
+
+        let fk = this.foreignKeyDraft[entityName]?.[columnName] || null;
+        if(!fk) {
+            const entity = this.getEntityByName(entityName);
+            // Handle if entity.foreignKeys is array or object
+            fk = this.getForeignKeyByColumnName(entity.foreignKeys, columnName);
+        }
+
+        modal.querySelector('.reference_table_selector').innerHTML = '';
+        let referencedTable = ''; // Initialize referencedTable to an empty string
+        let referencedColumn = ''; // Initialize referencedColumn to an empty string
+        let referencedTableCandidate = '';
+        this.entities.forEach(entity => {
+            if (entity.name !== entityName) {
+                const option = document.createElement('option');
+                option.value = entity.name;
+                option.textContent = entity.name;
+                modal.querySelector('.reference_table_selector').appendChild(option);
+                if(fk?.referencedTable == entity.name || `${entity.name}_id` == columnName) {
+                    option.selected = true;
+                    referencedTableCandidate = entity.name;
+                }
+            }
+        });
+
+        if(fk) {
+            referencedTable = fk.referencedTable;
+            referencedColumn = fk.referencedColumn;
+            fkName = fk.name;
+        }
+        else {
+            referencedColumn = columnName;
+            referencedTable = referencedTableCandidate;
+        }
+
+        // Populate modal with column information
+        modal.querySelector('.entity_name_selector').value = entityName;
+        modal.querySelector('.column_name_selector').value = columnName;
+        modal.querySelector('.foreign_key_name_selector').value = columnName;
+
+        modal.querySelector('.reference_table_selector').addEventListener('change', function () {
+            const selectedTable = this.value;
+            const selectedEntity = editor.getEntityByName(selectedTable);
+            const columnSelect = modal.querySelector('.reference_column_selector');
+            columnSelect.innerHTML = '';
+            if (selectedEntity) {
+                selectedEntity.columns.forEach(col => {
+                    const option = document.createElement('option');
+                    option.value = col.name;
+                    option.textContent = col.name;
+                    columnSelect.appendChild(option);
+
+                });
+            }
+        });
+
+        if(referencedTable) {
+            const selectedEntity = editor.getEntityByName(referencedTable);
+            const columnSelect = modal.querySelector('.reference_column_selector');
+            columnSelect.innerHTML = '';
+            if (selectedEntity) {
+                selectedEntity.columns.forEach(col => {
+                    const option = document.createElement('option');
+                    option.value = col.name;
+                    option.textContent = col.name;
+                    if(col.name == referencedColumn) {
+                        option.selected = true;
+                    }
+                    columnSelect.appendChild(option);
+
+                });
+            }
+        };
+
+        // Set up event listener for saving foreign key settings
+        const saveButton = qs('.save-foreign-key');
+        const cancelButton = qs('.cancel-foreign-key');
+        const deleteButton = qs('.delete-foreign-key');
+
+        const onSave = () => {
+            // Get selected referenced table and column from the modal inputs
+
+            let selectedReferencedTable = modal.querySelector('.reference_table_selector').value;
+            let selectedReferencedColumn = modal.querySelector('.reference_column_selector').value;
+            let onUpdateAction = modal.querySelector('.on_update_action_selector').value;
+            let onDeleteAction = modal.querySelector('.on_delete_action_selector').value;
+            let fkName = modal.querySelector('.foreign_key_name_selector').value;
+
+            // This draft object will be used to update the entity's foreign keys when the user saves the entity.
+            _this.foreignKeyDraft[entityName] = _this.foreignKeyDraft[entityName] || {};
+            _this.foreignKeyDraft[entityName][columnName] = {
+                name: fkName,
+                columnName: columnName,
+                referencedTable: selectedReferencedTable,
+                referencedColumn: selectedReferencedColumn,
+                onUpdate: onUpdateAction,
+                onDelete: onDeleteAction
+            };
+
+            // Optionally, update the UI to indicate that this column has a foreign key
+            row.classList.add('has-foreign-key');
+
+            // Clean up event listeners
+            saveButton.removeEventListener('click', onSave);
+            cancelButton.removeEventListener('click', onCancel);
+
+            // Hide the modal
+            modal.style.display = 'none';
+            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+        }
+        const onCancel = () => {
+            // Clean up event listeners
+            saveButton.removeEventListener('click', onSave);
+            cancelButton.removeEventListener('click', onCancel);
+
+            // Hide the modal
+            modal.style.display = 'none';
+        }
+        const onDelete = () => {
+            if(_this.foreignKeyDraft[entityName]?.[columnName]) {
+                delete _this.foreignKeyDraft[entityName][columnName];
+                row.classList.remove('has-foreign-key');
+            }
+            // Hide the modal
+            modal.style.display = 'none';
+        };
+
+        modal.style.display = 'block';
+
+        saveButton.addEventListener('click', onSave);
+        cancelButton.addEventListener('click', onCancel);
+        deleteButton.addEventListener('click', onDelete);
+    }
+
+    /**
+     * Removes the "_id" suffix from a column name if present.
+     * Useful for deriving entity names from foreign key columns.
+     *
+     * @param {string} columnName - The column name to process.
+     * @returns {string} The column name without the "_id" suffix.
+     */
+    excludeSuffixId(columnName)
+    {
+        if(columnName.length > 3 && columnName.endsWith('_id'))
+        {
+            return columnName.substring(0, columnName.length - 3);
+        }
+        return columnName;
+    }
+
+    /**
+     * Generates a text input HTML string with a specified class and value.
+     *
+     * @param {string} classname - Additional CSS class for the input element.
+     * @param {string} value - Default value of the input field.
+     * @returns {string} HTML string representing the input element.
+     */
+    createInputText(classname, value)
+    {
+        return `<input type="text" class="form-control ${classname}" value="${value}">`;
+    }
+
+    /**
+     * Create a <select> element as an HTML string with dynamic options.
+     *
+     * @param {string} classname - CSS class name for the select element.
+     * @param {string|null} value - Selected value (optional).
+     * @param {Array<string|Object>} options - List of options.
+     *        Supported formats:
+     *          ["INT", "VARCHAR"]
+     *          [{ value: "int", label: "INT" }]
+     *
+     * @returns {string} HTML string of the select element.
+     */
+    createSelectOption(classname, value, options, onchange = null)
+    {
+        if (!Array.isArray(options)) {
+            console.warn("Options must be an array.");
+            return "";
+        }
+
+        const escape = (str) =>
+            String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        let evt = "";
+        if(onchange)
+        {
+            evt = ` onchange="${onchange}"`;
+        }
+        let html = `<select${classname ? ` class="form-control ${escape(classname)}"` : ""}${evt}>\r\n`;
+        html += `<option value=""></option>\r\n`;
+
+        options.forEach(opt => {
+            let optValue = "";
+            let optLabel = "";
+
+            if (typeof opt === "string") {
+                optValue = opt;
+                optLabel = opt;
+            } else if (typeof opt === "object" && opt !== null) {
+                optValue = opt.value ?? "";
+                optLabel = opt.label ?? opt.value ?? "";
+            }
+
+            const selected = (value != null && optValue == value) ? " selected" : "";
+
+            html += `<option value="${escape(optValue)}"${selected}>${escape(optLabel)}</option>\r\n`;
+        });
+
+        html += `</select>\r\n`;
+
+        return html;
+    }
+
+    /**
+     * Removes a foreign key row from the editor table.
+     *
+     * This function is triggered when the delete (❌) button
+     * inside a foreign key row is clicked. It removes the
+     * corresponding table row from the DOM.
+     *
+     * @param {HTMLElement} elem - The clicked delete element inside the row.
+     * @returns {boolean} Always returns false to prevent default link behavior.
+     */
+    removeForeignKey(elem)
+    {
+        const row = elem.closest('tr');
+        row.parentNode.removeChild(row);
+        return false;
+    }
+
+    /**
+     * Adds a new draft foreign key row to the modal editor.
+     *
+     * This method:
+     * - Determines the current entity from the selected context.
+     * - Collects existing foreign key column assignments.
+     * - Selects the first available non-primary key column not already used.
+     * - Generates a default foreign key name using naming convention.
+     * - Appends a new draft row to the foreign key editor table.
+     *
+     * @param {HTMLElement} elem - The element that triggered the add action.
+     * @returns {void}
+     */
+    addForeignKey(elem)
+    {
+        let modal = elem.closest('.modal');
+        let tbody = modal.querySelector('tbody');
+        let entityName = selectedElement.dataset.entity;
+        let existingColumn = [];
+        let columnList = [];
+        let firstColumn = '';
+        tbody.querySelectorAll('.column-name')?.forEach((col) => {
+            existingColumn.push(col.value);
+        });
+        this.getEntityByName(entityName)?.columns.forEach((column) => {
+            columnList.push(column.name);
+            if(!existingColumn.includes(column.name) && !column.primaryKey && firstColumn == '')
+            {
+                firstColumn = column.name;
+            }
+        });
+        // Create foreign key
+        let fk = {
+            name: `fk_${entityName}_${firstColumn}`,
+            columnName: firstColumn,
+            referencedTable: null,
+            referencedColumn: null,
+            onUpdate: 'NO ACTION',
+            onDelete: 'NO ACTION',
+            draft: true
+        };
+        tbody.appendChild(this.createForeignKeyRow(fk));
+    }
+
+    /**
+     * Updates the foreign key name automatically when the source column changes.
+     *
+     * This enforces the naming convention:
+     *   {tableName}_{columnName}
+     *
+     * Triggered when the column select value changes.
+     *
+     * @param {HTMLSelectElement} elem - The column select element.
+     * @returns {void}
+     */
+    updateForeignKeyColumn(elem)
+    {
+        const row = elem.closest('tr');
+        const selectedColumn = elem.value;
+        const selectedTable = selectedElement.dataset.entity;
+        let fkName = `${selectedTable}_${selectedColumn}`;
+        row.querySelector('.foreign-key-name').value = fkName;
+    }
+
+    /**
+     * Updates the referenced column options when the referenced table changes.
+     *
+     * This method:
+     * - Retrieves the selected referenced table.
+     * - Clears existing referenced column options.
+     * - Populates the dropdown with columns from the selected table.
+     * - Defaults selection to the primary key if available.
+     *
+     * @param {HTMLSelectElement} elem - The referenced table select element.
+     * @returns {void}
+     */
+    updateForeignKeyReferencedColumn(elem)
+    {
+        const row = elem.closest('tr');
+        const selectedTable = elem.value;
+        const selectedColumnSelector = row.querySelector('.referenced-column');
+        let currentValue = selectedColumnSelector.value; // Save this
+        selectedColumnSelector.dataset.currentValue = currentValue;
+
+        // Update option
+        const entity = this.getEntityByName(selectedTable);
+        const columnSelect = row.querySelector('.referenced-column');
+        columnSelect.innerHTML = '';
+        if (entity) {
+            entity.columns.forEach(col => {
+                columnSelect.appendChild(this.createOption(col));
+            });
+        }
+    }
+
+    /**
+     * Creates a single <option> element for a select dropdown.
+     *
+     * If the column is marked as a primary key, it will be selected by default.
+     *
+     * @param {Object} col - The column object containing metadata.
+     * @param {string} col.name - The column name.
+     * @param {boolean} col.primaryKey - Whether the column is a primary key.
+     * @returns {HTMLOptionElement} The generated option element.
+     */
+    createOption(col) {
+        let option = document.createElement('option');
+        option.value = col.name;
+        option.textContent = col.name;
+        if(col.primaryKey)
+        {
+            option.setAttribute('selected', 'selected');
+        }
+        return option;
+    }
+
+    /**
+     * Creates a fully populated table row (<tr>) representing a foreign key definition.
+     *
+     * This method:
+     * - Collects available tables for referenced table selection.
+     * - Collects available columns for the current entity.
+     * - Collects referenced columns for the selected referenced table.
+     * - Generates select inputs for:
+     *      - Source column
+     *      - Referenced table
+     *      - Referenced column
+     *      - ON UPDATE action
+     *      - ON DELETE action
+     * - Applies styling based on draft or saved status.
+     *
+     * @param {Object} fk - The foreign key definition object.
+     * @param {string} fk.name - The foreign key constraint name.
+     * @param {string} fk.columnName - The source column name.
+     * @param {string|null} fk.referencedTable - The referenced table name.
+     * @param {string|null} fk.referencedColumn - The referenced column name.
+     * @param {string} fk.onUpdate - ON UPDATE action.
+     * @param {string} fk.onDelete - ON DELETE action.
+     * @param {boolean} [fk.draft] - Indicates whether this is a draft foreign key.
+     * @returns {HTMLTableRowElement} The generated table row element.
+     */
+    createForeignKeyRow(fk)
+    {
+        let tableList = [];
+        let columnList = [];
+        let referencedColumnList = [];
+        this.entities.forEach((entity) => {
+            tableList.push(entity.name);
+        });
+        this.getEntityByName(selectedElement.dataset.entity)?.columns.forEach((column) => {
+            columnList.push(column.name);
+        });
+
+        if(!fk.referencedTable)
+        {
+            let candidate = this.excludeSuffixId(fk.columnName);
+            if(candidate && tableList.includes(candidate))
+            {
+                fk.referencedTable = candidate;
+            }
+            
+        }
+
+        this.getEntityByName(fk.referencedTable)?.columns.forEach((column) => {
+            referencedColumnList.push(column.name);
+            if(!fk.referencedColumn && column.primaryKey)
+            {
+                fk.referencedColumn = column.name;
+            }
+        });
+        
+        const actionList = [
+            'NO ACTION',
+            'RESTRICT',
+            'CASCADE',
+            'SET NULL'
+        ];
+        const row = document.createElement('tr');
+        row.innerHTML = `<td><a href="javascript:" onclick="return editor.removeForeignKey(this)">❌</a></td>
+        <td>${this.createSelectOption('column-name', fk.columnName, columnList, 'editor.updateForeignKeyColumn(this)')}</td>
+        <td>${this.createInputText('foreign-key-name', fk.name)}</td>
+        <td>${this.createSelectOption('referenced-table', fk.referencedTable, tableList, 'editor.updateForeignKeyReferencedColumn(this)')}</td>
+        <td>${this.createSelectOption('referenced-column', fk.referencedColumn, referencedColumnList)}</td>
+        <td>${this.createSelectOption('on-update', fk.onUpdate, actionList)}</td>
+        <td>${this.createSelectOption('on-delete', fk.onDelete, actionList)}</td>`;
+
+        if(fk.draft)
+        {
+            row.classList.add('pk-draft');
+        }
+        else
+        {
+            row.classList.add('pk-saved');
+        }
+        return row;
+    }
+    
+    /**
+     * Displays the Foreign Key bulk configuration modal for the selected entity.
+     *
+     * Responsibilities:
+     * 1. Retrieves the selected entity from the current context.
+     * 2. Creates a deep clone of existing foreign keys into a draft state.
+     * 3. Auto-generates draft foreign keys for `_id` columns when a matching table exists.
+     * 4. Renders all draft foreign keys into the modal table.
+     * 5. Attaches save and cancel handlers.
+     *
+     * Save Behavior:
+     * - Validates that all required foreign key fields are filled.
+     * - Builds a temporary foreign key object.
+     * - Replaces the entity's foreignKeys only if validation passes.
+     * - Persists changes via callbackSaveEntity().
+     * - Re-renders entities and updates the diagram.
+     * - Cleans up event listeners to prevent duplicate bindings.
+     *
+     * Cancel Behavior:
+     * - Removes event listeners.
+     * - Closes the modal without modifying entity data.
+     *
+     * @param {Event} event - The triggering DOM event.
+     */
+    editForeignKeyContextMenu(event)
+    {
+        const modal = qs('#foreignKeyBulkModal');
+
+        let tableList = [];
+        this.entities.forEach((entity) => {
+            tableList.push(entity.name);
+        });
+
+        // Set up event listener for saving foreign key settings
+        const saveButton = qs('.save-foreign-key-bulk');
+        const cancelButton = qs('.cancel-foreign-key-bulk');
+
+        // Populate foreign key form
+
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        
+        // Convert to object for draft
+        let fks = entity.foreignKeys || [];
+        if (Array.isArray(fks)) {
+            let fkObj = {};
+            fks.forEach(fk => fkObj[fk.columnName] = fk);
+            this.foreignKeyDraft[entity.name] = JSON.parse(JSON.stringify(fkObj));
+        } else {
+            this.foreignKeyDraft[entity.name] = JSON.parse(JSON.stringify(fks));
+        }
+
+        entity.columns.forEach((column) => {
+            let tbl = this.excludeSuffixId(column.name);
+            if(
+                tbl != entity.name
+                && !this.foreignKeyDraft[entity.name][column.name]
+                && tbl && tableList.includes(tbl)
+                && column.name.endsWith('_id')
+            )
+            {
+                this.foreignKeyDraft[entity.name][column.name] = {
+                    name: `fk_${entity.name}_${column.name}`,
+                    columnName: column.name,
+                    referencedTable: tbl,
+                    referencedColumn: column.name,
+                    onUpdate: 'NO ACTION',
+                    onDelete: 'NO ACTION',
+                    draft: true
+                };
+            }
+        });
+
+
+
+        const tbody = modal.querySelector('.foreign-key-editor-table tbody');
+        modal.querySelector('.entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
+        tbody.innerHTML = ''; // Clear
+        Object.entries(this.foreignKeyDraft[entity.name]).forEach(([columnName, fk]) => {
+            tbody.appendChild(this.createForeignKeyRow(fk));
+        });
+        modal.style.display = 'block';
+
+        const onSave = () => {
+            // Get selected referenced table and column from the modal inputs
+
+            let tempForeignKeys = {}; // Remove all foreign keys
+            let valid = true;
+
+            let trs = tbody.querySelectorAll('tr');
+            if(trs)
+            {
+                trs.forEach((tr) => {
+                    let fkName = tr.querySelector('.foreign-key-name').value;
+                    let columnName = tr.querySelector('.column-name').value;
+                    let selectedReferencedTable = tr.querySelector('.referenced-table').value;
+                    let selectedReferencedColumn = tr.querySelector('.referenced-column').value;
+                    let onUpdateAction = tr.querySelector('.on-update').value;
+                    let onDeleteAction = tr.querySelector('.on-delete').value;
+                    
+                    if(fkName.trim() == ''
+                        || columnName.trim() == ''
+                        || selectedReferencedTable.trim() == ''
+                        || selectedReferencedColumn.trim() == ''
+                        || onUpdateAction.trim() == ''
+                        || onDeleteAction.trim() == ''
+                    )
+                    {
+                        let message = `Invalid foreign key definition for ${columnName}.`;
+                        let title = 'Invalid Foreign Key';
+                        this.showAlertDialog(message, title, 'Close');
+                        valid = false;
+                        return;
+                    }
+                    
+                    tempForeignKeys[columnName] = {
+                        name: fkName,
+                        columnName: columnName,
+                        referencedTable: selectedReferencedTable,
+                        referencedColumn: selectedReferencedColumn,
+                        onUpdate: onUpdateAction,
+                        onDelete: onDeleteAction
+                    };
+                });
+            }
+
+            if(valid)
+            {
+                // Save as array
+                entity.foreignKeys = Object.values(tempForeignKeys);
+                this.callbackSaveEntity(this.entities);
+                this.renderEntities();
+                this.updateDiagram();
+
+                // Check for an active diagram tab and re-select it to refresh the diagram.
+                const activeDiagram = qs('.tabs-link-container li.diagram-tab.active');
+                if (activeDiagram) {
+                    this.selectDiagram(activeDiagram);
+                }
+                this.cancelEdit();
+
+                // Clean up event listeners
+                saveButton.removeEventListener('click', onSave);
+                cancelButton.removeEventListener('click', onCancel);
+
+                // Hide the modal
+                modal.style.display = 'none';
+                this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+            }
+        }
+
+        const onCancel = () => {
+            // Clean up event listeners
+            saveButton.removeEventListener('click', onSave);
+            cancelButton.removeEventListener('click', onCancel);
+
+            // Hide the modal
+            modal.style.display = 'none';
+        }
+        saveButton.addEventListener('click', onSave);
+        cancelButton.addEventListener('click', onCancel);
+        hideContextMenu();
     }
 
     /**
@@ -985,6 +1677,9 @@ class EntityEditor {
             this.entities[this.currentEntityIndex].columns = columns;
             this.entities[this.currentEntityIndex].modificationDate = (new Date()).getTime();
             this.entities[this.currentEntityIndex].modifier = '{{userName}}'; // Replace with actual user name if available
+            let draft = this.foreignKeyDraft[entityName] ? Object.values(this.foreignKeyDraft[entityName]) : null;
+            this.entities[this.currentEntityIndex].foreignKeys = draft || this.entities[this.currentEntityIndex].foreignKeys || [];
+            this.foreignKeyDraft[entityName] = null;
         } else {
             // Add a new entity
             const newEntity = new Entity(entityName, this.entities.length);
@@ -1005,13 +1700,15 @@ class EntityEditor {
             newEntity.creationDate = newEntity.modificationDate;
             newEntity.creator = '{{userName}}'; // Replace with actual user name if available
             newEntity.modifier = '{{userName}}'; // Replace with actual user name if available
+            newEntity.foreignKeys = this.foreignKeyDraft[entityName] ? Object.values(this.foreignKeyDraft[entityName]) : [];
+            this.foreignKeyDraft[entityName] = null;
             this.entities.push(newEntity);
         }
 
         this.renderEntities();
         this.updateDiagram();
         this.cancelEdit();
-        this.exportToSQL();
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
         if(typeof this.callbackSaveEntity == 'function')
         {
             this.callbackSaveEntity(this.entities);
@@ -1042,7 +1739,7 @@ class EntityEditor {
             {
                 updatedWidth = 240;
             }
-            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, qs('#draw-relationship').checked);
+            diagramRenderer[id].createERD({entities: data}, updatedWidth - 240, qs('#draw-auto-relationship').checked, qs('#draw-fk-relationship').checked);
             let svg = diagram.querySelector('svg');
             _this.removeDiagramEventListener(svg);
             _this.addDiagramEventListener(svg);
@@ -1300,6 +1997,9 @@ class EntityEditor {
             entity.modifier = entityData.modifier; // Replace with actual user name if available
             entity.description = entityData.description || '';
 
+            // Ensure foreignKeys is array
+            entity.foreignKeys = Array.isArray(entityData.foreignKeys) ? entityData.foreignKeys : Object.values(entityData.foreignKeys || {});
+
             entity.setData(entityData.data);
 
             // Add the entity to the entities array
@@ -1379,6 +2079,8 @@ class EntityEditor {
             entity.modificationDate = entity.creationDate;
             entity.creator = '{{userName}}'; // Replace with actual user name if available
             entity.modifier = '{{userName}}'; // Replace with actual user name if available
+
+            entity.foreignKeys = Array.isArray(table.foreignKeys) ? table.foreignKeys : Object.values(table.foreignKeys || {});
 
             // Add the entity to the entities array
             entities.push(entity);
@@ -1474,7 +2176,8 @@ class EntityEditor {
 
         const tabelListForExport = qs(this.selector + " .table-list-for-export");
         const tabelListMain = qs(this.selector + " .left-panel .table-list");
-        let drawRelationship = qs(this.selector + " .draw-relationship").checked;
+        let drawAutoRelationship = qs(this.selector + " .draw-auto-relationship").checked;
+        let drawFkRelationship = qs(this.selector + " .draw-fk-relationship").checked;
 
         tabelListMain.innerHTML = '';
         tabelListForExport.innerHTML = '';
@@ -1574,7 +2277,7 @@ class EntityEditor {
             updatedWidth = 240;
         }
         updatedWidth = updatedWidth - 240;
-        entityRenderer.createERD(editor.getData(), updatedWidth, drawRelationship);
+        entityRenderer.createERD(editor.getData(), updatedWidth, drawAutoRelationship, drawFkRelationship);
     }
 
     /**
@@ -2159,7 +2862,7 @@ class EntityEditor {
             // Re-render the entities after the change
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
-            this.exportToSQL();
+            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
 
             if(typeof this.callbackSaveEntity == 'function')
             {
@@ -2186,7 +2889,7 @@ class EntityEditor {
             // Re-render the entities after the change
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
-            this.exportToSQL();
+            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
 
             if(typeof this.callbackSaveEntity == 'function')
             {
@@ -2215,7 +2918,7 @@ class EntityEditor {
         // Re-render the sorted list of entities
         this.renderEntities();
         this.restoreCheckedEntitiesFromCurrentDiagram();
-        this.exportToSQL();
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
         if(typeof this.callbackSaveEntity == 'function')
         {
             this.callbackSaveEntity(this.entities);
@@ -2254,7 +2957,7 @@ class EntityEditor {
         // Re-render the sorted list of entities in the UI
         this.renderEntities();
         this.restoreCheckedEntitiesFromCurrentDiagram();
-        this.exportToSQL();
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
         if(typeof this.callbackSaveEntity === 'function') {
             this.callbackSaveEntity(this.entities);
         }
@@ -2356,23 +3059,49 @@ class EntityEditor {
             if(this.autonumberTypes.includes(tr.querySelector('.column-type').value))
             {
                 tr.querySelector('.column-autoIncrement').disabled = false;
+                tr.classList.add('is-primary-key');
             }
             else
             {
                 tr.querySelector('.column-autoIncrement').disabled = true;
                 tr.querySelector('.column-autoIncrement').checked = false;
+                tr.classList.remove('is-primary-key');
+                
             }
         }
+    }
+
+    async downloadMWB() {
+        let mwb = new MWBConverter();
+        let zip = await mwb.convertJsonToMwbOld({
+            entities: this.entities,
+            diagrams: this.getDiagrams()
+        });
+        const blob = await zip.generateAsync({type: "blob"});
+
+        let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
+
+        const fileName = `${applicationId} - ${databaseName}.mwb`;
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     /**
      * Exports the selected entities as a MySQL SQL statement for creating the tables.
      *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
+     * @param {boolean} withForeignKey - Whether to include foreign key constraints in the generated SQL.
      */
-    exportToSQL(dialect = "mysql") {
-        let sql = this.generateSQL(dialect);
-        qs(this.selector+" .query-generated").value = sql.join("\r\n");
+    exportToSQL(dialect = "mysql", withForeignKey = false) {
+        let sql = this.generateSQL(dialect, withForeignKey);
+        qs(this.selector + " .query-generated").value = sql.join("\r\n");
     }
 
     /**
@@ -2385,18 +3114,23 @@ class EntityEditor {
      * The statements generated will use the currently selected SQL dialect (MySQL, PostgreSQL, SQLite).
      *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
+     * @param {boolean} withForeignKey - Whether to include foreign key constraints in the generated SQL.
      * @returns {string[]} Array of SQL statements to be exported.
      */
-    generateSQL(dialect)
-    {
+    generateSQL(dialect, withForeignKey = false) {
         let sql = [];
+
+        if(withForeignKey)
+        {
+            sql.push(this.getDisableForeignKeySQL(dialect));
+        }
 
         const selectedEntities = qsa(this.selector+" .right-panel .selected-entity-structure:checked");
         selectedEntities.forEach(checkbox => {
             const entityName = checkbox.dataset.name;
             const entity = this.getEntityByName(entityName);
             if (entity) {
-                sql.push(entity.toSQL(dialect));
+                sql.push(entity.toSQL(dialect, withForeignKey));
             }
         });
 
@@ -2412,7 +3146,96 @@ class EntityEditor {
                 }
             }
         });
+
+        if(withForeignKey)
+        {
+            sql.push(this.getEnableForeignKeySQL(dialect));
+        }
+
         return sql;
+    }
+
+    /**
+     * Generate SQL statement to temporarily disable foreign key enforcement
+     * based on the provided database dialect.
+     *
+     * This is typically used during data migration or bulk insert operations
+     * where referential integrity checks must be bypassed temporarily to avoid
+     * ordering issues.
+     *
+     * Supported dialect prefixes:
+     * - mysql / mariadb   → SET FOREIGN_KEY_CHECKS = 0;
+     * - sqlite            → PRAGMA foreign_keys = OFF;
+     * - postgres          → SET session_replication_role = replica;
+     * - sqlserver / mssql → Not globally supported (comment returned)
+     *
+     * Matching is performed using case-insensitive prefix checking.
+     *
+     * @param {string} dialect - Database dialect identifier (e.g. "mysql", "postgres", "sqlite").
+     * @returns {string} SQL statement to disable foreign key checks,
+     *                   or empty string if the dialect is unsupported.
+     */
+    getDisableForeignKeySQL(dialect) {
+        const d = (dialect || "").toLowerCase();
+
+        if (d.startsWith("mysql") || d.startsWith("mariadb")) {
+            return "-- DISABLE FOREIGN KEY CHECKS\r\nSET FOREIGN_KEY_CHECKS = 0;\r\n";
+        }
+
+        if (d.startsWith("sqlite")) {
+            return "-- DISABLE FOREIGN KEY CHECKS\r\nPRAGMA foreign_keys = OFF;\r\n";
+        }
+
+        if (d.startsWith("postgres")) {
+            return "-- DISABLE FOREIGN KEY CHECKS\r\nSET session_replication_role = replica;\r\n";
+        }
+
+        if (d.startsWith("sqlserver") || d.startsWith("mssql")) {
+            return "-- Disable FK per table required in SQL Server";
+        }
+
+        return "";
+    }
+
+    /**
+     * Generate SQL statement to re-enable foreign key enforcement
+     * based on the provided database dialect.
+     *
+     * This should be executed after bulk data operations complete
+     * to restore referential integrity validation.
+     *
+     * Supported dialect prefixes:
+     * - mysql / mariadb   → SET FOREIGN_KEY_CHECKS = 1;
+     * - sqlite            → PRAGMA foreign_keys = ON;
+     * - postgres          → SET session_replication_role = DEFAULT;
+     * - sqlserver / mssql → Not globally supported (comment returned)
+     *
+     * Matching is performed using case-insensitive prefix checking.
+     *
+     * @param {string} dialect - Database dialect identifier (e.g. "mysql", "postgres", "sqlite").
+     * @returns {string} SQL statement to enable foreign key checks,
+     *                   or empty string if the dialect is unsupported.
+     */
+    getEnableForeignKeySQL(dialect) {
+        const d = (dialect || "").toLowerCase();
+
+        if (d.startsWith("mysql") || d.startsWith("mariadb")) {
+            return "-- ENABLE FOREIGN KEY CHECKS\r\nSET FOREIGN_KEY_CHECKS = 1;\r\n";
+        }
+
+        if (d.startsWith("sqlite")) {
+            return "-- ENABLE FOREIGN KEY CHECKS\r\nPRAGMA foreign_keys = ON;\r\n";
+        }
+
+        if (d.startsWith("postgres")) {
+            return "-- ENABLE FOREIGN KEY CHECKS\r\nSET session_replication_role = DEFAULT;\r\n";
+        }
+
+        if (d.startsWith("sqlserver") || d.startsWith("mssql")) {
+            return "-- Enable FK per table required in SQL Server";
+        }
+
+        return "";
     }
 
     /**
@@ -3474,6 +4297,96 @@ class EntityEditor {
         }
     }
 
+    importMySQLWorkbench(file, callback) {
+        let _this = this;
+        const reader = new FileReader(); // Create a FileReader object
+        reader.onload = async function (event) {
+            const arrayBuffer = event.target.result; // Get file data as an ArrayBuffer
+            const mwb = new MWBConverter(); // Create a new MWBConverter instance
+            try {
+                console.log('ok');
+                await mwb.loadBinary(arrayBuffer, {mwb:true});
+                let importedEntities = mwb.getEntities();
+
+                let importedDiagrams = mwb.getDiagrams();
+                if(importedEntities && importedEntities.length > 0)
+                {
+                    if (_this.clearBeforeImport) {
+                        _this.entities = importedEntities || [];
+                        _this.diagrams = importedDiagrams || [];
+                        _this.clearEntities(); // Clear the existing entities
+                        _this.clearDiagrams(); // Clear the existing diagrams
+                        _this.renderEntities(); // Update the view with the fetched entities
+                    } else {
+                        let existing = [];
+                        _this.entities.forEach((entity) => {
+                            existing.push(entity.name);
+                        });
+                        importedEntities.forEach((importedEntity) => {
+                            let entity = Entity.valueOf(importedEntity);
+                            if(entity.columns && entity.columns.length > 0) {
+                                if (!existing.includes(entity.name)) {
+                                    entity.index = _this.entities.length;
+                                    _this.entities.push(entity);
+                                }
+                            }
+                        });
+                        importedDiagrams.forEach((diagram) => {
+                            let diagramNames = _this.diagrams.map(d => d.name);
+                            if (!diagramNames.includes(diagram.name))
+                            {
+                                _this.diagrams.push(diagram);
+                            }
+                        });
+                        _this.prepareDiagram(); // Prepare the diagram by loading saved entities and diagrams
+                        _this.updateDiagram(); // Update the diagram with the imported entities
+                        _this.saveDiagram(); // Save the current diagram state
+                        _this.renderEntities(); // Update the view with the fetched entities
+                    }
+                    if (typeof callback === 'function') {
+                        callback(_this.entities); // Execute callback with the updated entities
+                    }
+                    _this.restoreCheckedEntitiesFromCurrentDiagram(); // Restore checked entities from the current diagram
+
+                    // Load data asynchronously to avoid blocking the UI
+                    (async () => {
+                        try {
+                            const entityData = await mwb.getEntityData();
+
+                            if (!entityData || typeof entityData !== "object") {
+                                console.warn("No entity data returned from MWB");
+                                return;
+                            }
+                            for (const [tableName, tableData] of Object.entries(entityData)) {
+
+                                const existingEntity = _this.getEntityByName(tableName);
+                                if (!existingEntity) continue;
+
+                                if (!Array.isArray(existingEntity.columns)) {
+                                    console.warn(`Entity ${tableName} has no columns defined`);
+                                    continue;
+                                }
+                                const normalizedData = _this.snakeizeData(
+                                    tableData,
+                                    existingEntity.columns
+                                );
+                                existingEntity.data = normalizedData;
+                            }
+                            _this.callbackSaveEntity(_this.entities);
+                        } catch (error) {
+                            console.error("Failed to fetch or apply MWB entity data:", error);
+                        }
+                    })();
+
+                }
+            } catch (e) {
+                console.error("Error importing MWB file:", e);
+                _this.showAlertDialog("Error importing MWB file: " + e.message, 'Alert', 'OK');
+            }
+        };
+        reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer
+    }
+
     /**
      * Imports an SQL file and processes its content.
      *
@@ -3495,9 +4408,15 @@ class EntityEditor {
         const blob = file.slice(0, 512);
         reader.onload = function (e) {
             const buffer = new Uint8Array(e.target.result);
-            if (_this.looksLikeSQLite(buffer)) {
+            console.log(1);
+            if (_this.looksLikeMySqlWorkbench(buffer)) {
+                console.log(2);
+                _this.importMySQLWorkbench(file, callback);
+            } else if (_this.looksLikeSQLite(buffer)) {
+                console.log(3);
                 _this.importSQLite(file, callback);
             } else {
+                console.log(4);
                 _this.importSQLQuery(file, callback);
             }
         };
@@ -3521,6 +4440,18 @@ class EntityEditor {
             0x74, 0x20, 0x33, 0x00
         ];
         return sqliteHeader.every((byte, i) => buffer[i] === byte);
+    }
+
+    /**
+     * Checks whether the given buffer starts with the standard MySQL Workbench ZIP file signature.
+     * MySQL Workbench ZIP files begin with the standard ZIP file header: "PK" (0x50 0x4B).
+     *
+     * @param {Uint8Array} buffer - The byte buffer to check.
+     * @returns {boolean} - Returns true if the buffer matches the MySQL Workbench ZIP file signature.
+     */
+    looksLikeMySqlWorkbench(buffer) {
+        // Check if fist 2 bytes is 'PK'
+        return buffer[0] === 0x50 && buffer[1] === 0x4B;
     }
 
     /**
@@ -6158,7 +7089,7 @@ Mode
         entity.setData(newData);
         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities);
-        this.exportToSQL();
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
         modal.style.display = 'none';
     }
 
@@ -6933,6 +7864,28 @@ Mode
                 diagram.parentNode.removeChild(diagram);
             });
         }
+    }
+
+    /**
+     * Gets the currently selected database dialect from the UI.
+     *
+     * @returns {string} The selected database dialect value
+     * (e.g., "mysql", "postgresql", "sqlite", "sqlserver").
+     */
+    getSelectedDialect()
+    {
+        return qs('meta[name="database-type"]').getAttribute('content');;
+    }
+
+    /**
+     * Checks whether foreign key generation is enabled.
+     *
+     * @returns {boolean} True if the "with-foreign-key" option is checked,
+     * otherwise false.
+     */
+    isGenerateForeignKey()
+    {
+        return qs('.with-foreign-key').checked;
     }
 
 }

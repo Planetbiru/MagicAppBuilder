@@ -328,7 +328,6 @@ table.responsive-three-cols > tbody > tr > td:nth-child(1) {
 
 tbody.data-table-manual-sort .data-sort-body {
   width: 8px;
-  cursor: move;
 }
 tbody.data-table-manual-sort .data-sort-body::before {
   content: "\f58e";
@@ -340,6 +339,9 @@ tbody.data-table-manual-sort .data-sort-body::before {
   text-align: center;
   display: block;
 }
+tbody.data-table-manual-sort .data-sort-body {
+  cursor: move;
+}
 
 .light-mode tbody.data-table-manual-sort .data-sort-body::before {
   color: #2964a4;
@@ -347,7 +349,6 @@ tbody.data-table-manual-sort .data-sort-body::before {
 
 thead .data-sort-header {
   width: 8px;
-  cursor: move;
 }
 thead .data-sort-header::before {
   content: "\f58e";
@@ -358,6 +359,9 @@ thead .data-sort-header::before {
   box-sizing: border-box;
   text-align: center;
   display: block;
+}
+thead .data-sort-header {
+  cursor: move;
 }
 
 .table-row td {
@@ -701,7 +705,6 @@ tr[data-active=false] td {
 .main-menu-container {
   height: calc(100vh - 52px);
   overflow-y: auto;
-  /* If there is a sibling with the .show class */
 }
 .main-menu-container .nav-link[data-toggle=collapse]::after {
   font-family: "Font Awesome 5 Free";
@@ -710,6 +713,9 @@ tr[data-active=false] td {
   float: right;
   transition: transform 0.3s ease;
   opacity: 0.7;
+}
+.main-menu-container {
+  /* If there is a sibling with the .show class */
 }
 .main-menu-container .nav-link[data-toggle=collapse] + .show,
 .main-menu-container .nav-link[data-toggle=collapse] ~ .show {

@@ -203,6 +203,7 @@ class SQLConverter {
         let sqliteTable = {
             tableName: table.tableName,
             primaryKey: table.primaryKey,
+            foreignKeys: table.foreignKeys,
             columns: table.columns.map(column => {
                 let columnCopy = { ...column }; // Using object spread instead of Object.assign
                 columnCopy.Type = this.toSqliteType(columnCopy.Type, columnCopy.Length);
@@ -222,6 +223,7 @@ class SQLConverter {
         let mysqlTable = {
             tableName: table.tableName,
             primaryKey: table.primaryKey,
+            foreignKeys: table.foreignKeys,
             columns: table.columns.map(column => {
                 let columnCopy = { ...column, Field: column.Field }; // Spread and copy Field directly
                 columnCopy.Type = this.toMySQLType(columnCopy.Type, columnCopy.Length, columnCopy.EnumValues);
@@ -241,6 +243,7 @@ class SQLConverter {
         let pgTable = {
             tableName: table.tableName,
             primaryKey: table.primaryKey,
+            foreignKeys: table.foreignKeys,
             columns: table.columns.map(column => {
                 let columnCopy = { ...column }; // Create a shallow copy of the column
                 columnCopy.Type = this.toPostgreSQLType(columnCopy.Type, columnCopy.Length);
@@ -536,8 +539,37 @@ class SQLConverter {
 
             linesCol.push(colDef);
         }
-        lines.push(linesCol.join(',\r\n'));
+
+        let constraints = [];
+
+        // ===== FOREIGN KEYS =====
+        if (table.foreignKeys) {
+            let fks = Array.isArray(table.foreignKeys) ? table.foreignKeys : Object.values(table.foreignKeys);
+            for (let fk of fks) {
+
+                let colName = this.fixColumnName(fk.columnName, targetType);
+                let refTable = this.fixTableName(fk.referencedTable, targetType);
+                let refCol = this.fixColumnName(fk.referencedColumn, targetType);
+
+                let fkLine = `\tFOREIGN KEY (${colName}) REFERENCES ${refTable} (${refCol})`;
+
+                if (fk.onUpdate && fk.onUpdate !== 'NO ACTION') {
+                    fkLine += ` ON UPDATE ${fk.onUpdate}`;
+                }
+
+                if (fk.onDelete && fk.onDelete !== 'NO ACTION') {
+                    fkLine += ` ON DELETE ${fk.onDelete}`;
+                }
+
+                constraints.push(fkLine);
+            }
+        }
+
+        let allLines = linesCol.concat(constraints);
+
+        lines.push(allLines.join(',\r\n'));
         lines.push(');');
+
         let createTable = lines.join('\r\n');
 
         createTable = createTable

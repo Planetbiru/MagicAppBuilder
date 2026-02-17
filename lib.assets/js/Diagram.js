@@ -39,10 +39,11 @@ class Diagram {
         /**
          * Creates the ERD for this diagram.
          * @param {number} updatedWidth - The width for rendering.
-         * @param {boolean} drawRelationship - Whether to draw relationships.
+         * @param {boolean} drawAutoRelationship - Whether to draw relationships.
+         * @param {boolean} drawFkRelationship - Whether to draw foreign key relationships.
          */
-        this.createERD = function (updatedWidth, drawRelationship) {
-            this.entityRenderer.createERD(this.getData(), updatedWidth, drawRelationship);
+        this.createERD = function (updatedWidth, drawAutoRelationship, drawFkRelationship) {
+            this.entityRenderer.createERD(this.getData(), updatedWidth, drawAutoRelationship, drawFkRelationship);
         };
     }
 
@@ -50,7 +51,7 @@ class Diagram {
      * Gets the entities included in this diagram.
      * @returns {Entity[]} The entities in the diagram.
      */
-    tgetData() {
+    getData() {
         let entities = [];
         for (let entity of this.originalEntities) {
             if (this.entitieNames.includes(entity.name)) {
