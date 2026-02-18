@@ -13,10 +13,11 @@ class Entity {
      * @param {number} index - The index of the entity (table).
      */
     constructor(name, index) {
-        this.index = index;
+        this.index = index; // Internal index
         this.name = name;
         this.columns = [];
-        this.foreignKeys = [];
+        this.foreignKeys = []; // Foreign keys
+        this.indexes = []; // Insexes
         this.data = [];
         this.description = ''; // Description of the entity
         this.creationDate = null; // Timestamp of creation
@@ -57,6 +58,7 @@ class Entity {
             newEntity.modifier = entity.modifier;
         }
         newEntity.foreignKeys = entity.foreignKeys;
+        newEntity.indexes = entity.indexes || [];
         return newEntity;
     }
 
@@ -197,9 +199,10 @@ class Entity {
      *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite", or "sqlserver".
      * @param {boolean} withForeignKey - Whether to include foreign key constraints in the generated SQL.
+     * @param {boolean} createIndex - Whether to create index into the generated SQL.
      * @returns {string} The generated SQL `CREATE TABLE` statement.
      */
-    toSQL(dialect = "mysql", withForeignKey = false) {
+    toSQL(dialect = "mysql", withForeignKey = false, createIndex = false) {
 
         const separatePrimaryKey = this.countPrimaryKey() > 1;
         const cols = [];
@@ -207,9 +210,16 @@ class Entity {
 
         let sql = '';
 
+        const supportsCreateIfNotExists =
+            dialect === 'mysql' ||
+            dialect === 'postgresql' ||
+            dialect === 'sqlite';
+
+        const ifNotExists = supportsCreateIfNotExists ? 'IF NOT EXISTS ' : '';
+
         sql += `-- TABLE ${this.name} BEGIN\r\n\r\n`;
 
-        sql += `CREATE TABLE IF NOT EXISTS ${this.name} (\r\n`;
+        sql += `CREATE TABLE ${ifNotExists}${this.name} (\r\n`;
 
         this.columns.forEach(col => {
             cols.push(`\t${col.toSQL(dialect, separatePrimaryKey)}`);
@@ -217,6 +227,29 @@ class Entity {
 
         if (separatePrimaryKey) {
             cols.push(`\tPRIMARY KEY(${this.getPrimaryKeyColumnsAsString(dialect)})`);
+        }
+
+        if (createIndex && this.indexes && Array.isArray(this.indexes)) {
+            this.indexes.forEach(index => {
+                if (index && index.columns && index.columns.length > 0) {
+                    const indexName = index.name || `idx_${this.name}_${index.columns.join('_')}`;
+                    const unique = index.unique ? 'UNIQUE ' : '';
+        
+                    if (dialect === 'mysql') {
+                        const indexCols = index.columns.map(c => `${c}`).join(', ');
+                        // Add index inside CREATE TABLE for MySQL
+                        cols.push(`\t${unique}INDEX \`${indexName}\` (${indexCols})`);
+                    } else {
+                        const indexCols = index.columns.map(c => `${c}`).join(', ');
+                        const qIndexName = `${indexName}`;
+                        const qTableName = `${this.name}`;
+
+                        // Generate separate CREATE INDEX for other dialects
+                        const ifNotExists = (dialect === 'sqlite' || dialect === 'postgresql') ? 'IF NOT EXISTS ' : '';
+                        indexStatements.push(`CREATE ${unique}INDEX ${ifNotExists}${qIndexName} ON ${qTableName} (${indexCols});`);
+                    }
+                }
+            });
         }
 
         if (withForeignKey && this.foreignKeys) {

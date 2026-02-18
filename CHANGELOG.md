@@ -4191,4 +4191,29 @@ Foreign keys are now fully supported in:
 
 This enhancement guarantees relational consistency throughout the entire database lifecycle — from design and migration to deployment.
 
-MagicAppBuilder 2.2.0 continues to strengthen database modeling capabilities while improving integration with industry-standard tools.
+### Enhanced Index Support
+
+MagicAppBuilder 2.2.0 introduces comprehensive improvements to index management across the entire database modeling workflow.
+
+Indexes are now fully supported in:
+
+* Database design creation
+* Schema import
+* Schema export
+* Database query export
+
+This enhancement ensures that index definitions — including single-column and multi-column indexes — are accurately preserved during import and export operations.
+
+Index indicators are also visually integrated into the Entity Editor, allowing users to quickly identify indexed columns directly within the column list. This improves clarity when designing performance-sensitive schemas.
+
+With these improvements, MagicAppBuilder provides more reliable performance modeling and better consistency between logical design and generated database structures.
+
+## What’s Changed
+
+The button layout in the Entity Editor has been redesigned.
+
+Previously, there were too many buttons displayed below the diagram, which required a high screen resolution to view them all properly. In version 2.2.0, several of these buttons have been moved into dropdown menus.
+
+This improvement makes the interface cleaner, more organized, and more accessible on lower-resolution screens.
+
+MagicAppBuilder 2.2.0 represents a significant step forward in database modeling, delivering stronger relational support, improved performance design, and seamless integration with professional database tools.

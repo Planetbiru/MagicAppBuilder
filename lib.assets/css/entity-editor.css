@@ -150,12 +150,12 @@ body {
   width: calc(30% - 5px);
   background-color: #fbfbfb;
 }
-.entity-editor .right-panel .foreign-key-container {
+.entity-editor .right-panel .foreign-key-container, .entity-editor .right-panel .index-container {
   height: 22px;
   padding: 2px 0;
 }
 .entity-editor .right-panel textarea {
-  height: calc(100vh - 575px);
+  height: calc(100vh - 585px);
   min-height: 100px;
   width: 100%;
   padding: 10px;
@@ -252,16 +252,16 @@ body {
   text-align: center;
 }
 .entity-editor .editor-form table th:nth-child(3) {
-  width: 12%;
+  width: 16%;
 }
 .entity-editor .editor-form table th:nth-child(4) {
-  width: 10%;
+  width: 12%;
 }
 .entity-editor .editor-form table th:nth-child(5) {
-  width: 15%;
+  width: 10%;
 }
 .entity-editor .editor-form table th:nth-child(6) {
-  width: 12%;
+  width: 11%;
 }
 .entity-editor .editor-form table td {
   border: 1px solid #ccc;
@@ -290,31 +290,55 @@ body {
   border: none;
   background-color: transparent;
 }
-.entity-editor .editor-form table tr.has-foreign-key .entity-column-name {
-  position: relative;
-}
-.entity-editor .editor-form table tr.has-foreign-key .entity-column-name::after {
-  content: "🔗";
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.entity-editor .editor-form table tr.has-foreign-key .entity-column-name input[type=text] {
-  padding-right: 20px;
-}
+.entity-editor .editor-form table tr.has-index .entity-column-name,
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name,
 .entity-editor .editor-form table tr.is-primary-key .entity-column-name {
   position: relative;
 }
+.entity-editor .editor-form table tr.has-index .entity-column-name::after,
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name::after,
 .entity-editor .editor-form table tr.is-primary-key .entity-column-name::after {
-  content: "🔑";
   position: absolute;
   right: 4px;
   top: 50%;
   transform: translateY(-50%);
+  font-size: 9px;
+  white-space: nowrap;
 }
+.entity-editor .editor-form table tr.has-index .entity-column-name input[type=text],
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name input[type=text],
 .entity-editor .editor-form table tr.is-primary-key .entity-column-name input[type=text] {
-  padding-right: 20px;
+  padding-right: 44px;
+}
+.entity-editor .editor-form table {
+  /* ===== Kombinasi 3 ===== */
+}
+.entity-editor .editor-form table tr.has-index.has-foreign-key.is-primary-key .entity-column-name::after {
+  content: "🔑 🔗 🗂";
+}
+.entity-editor .editor-form table {
+  /* ===== Kombinasi 2 ===== */
+}
+.entity-editor .editor-form table tr.is-primary-key.has-foreign-key .entity-column-name::after {
+  content: "🔑 🔗";
+}
+.entity-editor .editor-form table tr.is-primary-key.has-index .entity-column-name::after {
+  content: "🔑 🗂";
+}
+.entity-editor .editor-form table tr.has-foreign-key.has-index .entity-column-name::after {
+  content: "🔗 🗂";
+}
+.entity-editor .editor-form table {
+  /* ===== Single ===== */
+}
+.entity-editor .editor-form table tr.is-primary-key:not(.has-foreign-key):not(.has-index) .entity-column-name::after {
+  content: "🔑";
+}
+.entity-editor .editor-form table tr.has-foreign-key:not(.is-primary-key):not(.has-index) .entity-column-name::after {
+  content: "🔗";
+}
+.entity-editor .editor-form table tr.has-index:not(.is-primary-key):not(.has-foreign-key) .entity-column-name::after {
+  content: "🗂";
 }
 .entity-editor input[type=checkbox] {
   margin: 0 5px;
@@ -669,7 +693,7 @@ label {
   padding-right: 0px;
 }
 
-.foreign-key-editor-table td .form-control {
+.foreign-key-editor-table td .form-control, #index-editor-table td .form-control {
   width: 100%;
 }
 
@@ -739,4 +763,11 @@ label {
   overflow-x: auto;
   overflow-y: auto;
   max-height: calc(100vh - 156px);
+}
+
+#index-editor-table td.td-index-unique, #index-editor-table td.td-index-remove {
+  text-align: center;
+}
+#index-editor-table td.td-index-remove .btn.remove-index-row {
+  min-width: 30px;
 }/*# sourceMappingURL=entity-editor.css.map */

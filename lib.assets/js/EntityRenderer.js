@@ -124,7 +124,7 @@ class EntityRenderer {
             height = height - this.betweenY;
         }
 
-        let finalWidth = (2 * this.xPadding) + (maxMod * (this.betweenX + this.tableWidth)) - (this.betweenX) + 2;
+        let finalWidth = (2 * this.xPadding) + (Math.max(1, maxMod) * (this.betweenX + this.tableWidth)) - (this.betweenX) + 2;
         let finalHeight = (2 * this.yPadding) + height - 2;
 
         this.svg.setAttribute('height', finalHeight);
@@ -607,7 +607,7 @@ class EntityRenderer {
     {
         let ul = qs('.diagram-list.tabs');
         let input = ul.querySelector('.diagram-tab.active input[type="text"]');
-        let shemaName = qs('meta[name="schema-name"]').getAttribute('content');
+        let shemaName = qs('meta[name="application-id"]').getAttribute('content');
         let fileName = '';
         if(input != null)
         {
