@@ -4158,12 +4158,13 @@ MagicAppBuilder 2.2.0 introduces the ability to import database schemas directly
 
 **What is imported?**
 
-1. **Table structures** – Including columns, data types, primary keys, indexes, and constraints.
-2. **Foreign keys** – All defined relationships between tables are recognized and reconstructed.
-3. **Table data** – Existing records can be imported along with the schema.
-4. **Diagrams** – Visual database diagrams are preserved to maintain layout and design context.
+1. **Table structures** – Including columns, data types, primary keys, constraints, and table options.
+2. **Indexes** – All single-column and multi-column indexes are imported, including unique indexes.
+3. **Foreign keys** – All defined relationships between tables are recognized and reconstructed.
+4. **Table data** – Existing records can be imported along with the schema.
+5. **Diagrams** – Visual database diagrams are preserved to maintain layout and design context.
 
-This ensures that both logical structure and visual representation are retained during the import process.
+This ensures that logical structure, performance-related definitions, and visual representation are retained during the import process.
 
 ### Export Database Schema to MySQL Workbench Model
 
@@ -4171,12 +4172,13 @@ You can now export your database design from MagicAppBuilder into a MySQL Workbe
 
 **What is exported?**
 
-1. **Table structures** – Complete definitions including columns, primary keys, indexes, and constraints.
-2. **Foreign keys** – All table relationships are exported accurately.
-3. **Table data** – Optional export of data along with schema definitions.
-4. **Diagrams** – Database diagrams are generated to reflect the current design layout.
+1. **Table structures** – Complete definitions including columns, primary keys, constraints, and table configuration.
+2. **Indexes** – All index definitions (single-column, multi-column, and unique indexes) are exported accurately.
+3. **Foreign keys** – All table relationships are exported with full referential definitions.
+4. **Table data** – Optional export of data along with schema definitions.
+5. **Diagrams** – Database diagrams are generated to reflect the current design layout.
 
-This feature ensures compatibility and smooth interoperability between MagicAppBuilder and MySQL Workbench.
+This feature ensures compatibility and smooth interoperability between MagicAppBuilder and MySQL Workbench while preserving performance-related metadata.
 
 ### Enhanced Foreign Key Support
 
@@ -4202,7 +4204,7 @@ Indexes are now fully supported in:
 * Schema export
 * Database query export
 
-This enhancement ensures that index definitions — including single-column and multi-column indexes — are accurately preserved during import and export operations.
+This enhancement ensures that index definitions — including single-column, multi-column, and unique indexes — are accurately preserved during import and export operations.
 
 Index indicators are also visually integrated into the Entity Editor, allowing users to quickly identify indexed columns directly within the column list. This improves clarity when designing performance-sensitive schemas.
 
