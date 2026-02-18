@@ -945,13 +945,21 @@ label {
     overflow-x: auto;
     overflow-y: auto;
     max-height: calc(100vh - 156px);
+    th.remover{
+        width: 36px;
+        text-align: center;
+    }
+    th[align="center"], td[align="center"] {
+        text-align: center;
+    }
 }
 
 #index-editor-table {
-    td.td-index-unique, td.td-index-remove{
+    th.remover{
+        width: 36px;
         text-align: center;
     }
-    td.td-index-remove .btn.remove-index-row{
-        min-width: 30px;
+    th[align="center"], td[align="center"] {
+        text-align: center;
     }
 }

@@ -503,7 +503,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                     <table class="foreign-key-editor-table">
                         <thead>
                             <tr>
-                                <th>❌</th>
+                                <th align="center" class="remover">❌</th>
                                 <th>Column Name</th>
                                 <th>Key Name</th>
                                 <th>Reference Table</th>
@@ -531,17 +531,18 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
     <div id="indexEditorModal" class="modal modal-lg" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Manage Indexes for <span class="entity-name-title"></span></h3>
+                <h3>Manage Indexes</h3>
                 <span class="close-btn cancel-button" onclick="this.closest('.modal').style.display='none'">&times;</span>
             </div>
             <div class="modal-body">
+                <p class="entity-name"></p>
                 <table id="index-editor-table" class="table table-bordered">
                     <thead>
                         <tr>
+                            <th align="center" class="remover">❌</th>
                             <th>Index Name</th>
                             <th>Columns</th>
                             <th width="80">Unique</th>
-                            <th width="80">Action</th>
                         </tr>
                     </thead>
                     <tbody>

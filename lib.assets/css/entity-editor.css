@@ -764,10 +764,18 @@ label {
   overflow-y: auto;
   max-height: calc(100vh - 156px);
 }
-
-#index-editor-table td.td-index-unique, #index-editor-table td.td-index-remove {
+#foreignKeyBulkModal .modal-body th.remover {
+  width: 36px;
   text-align: center;
 }
-#index-editor-table td.td-index-remove .btn.remove-index-row {
-  min-width: 30px;
+#foreignKeyBulkModal .modal-body th[align=center], #foreignKeyBulkModal .modal-body td[align=center] {
+  text-align: center;
+}
+
+#index-editor-table th.remover {
+  width: 36px;
+  text-align: center;
+}
+#index-editor-table th[align=center], #index-editor-table td[align=center] {
+  text-align: center;
 }/*# sourceMappingURL=entity-editor.css.map */

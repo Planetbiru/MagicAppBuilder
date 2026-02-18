@@ -724,8 +724,7 @@ class EntityEditor {
             console.error("Index editor modal (#indexEditorModal) not found in the DOM.");
             return;
         }
-
-        modal.querySelector('.entity-name-title').textContent = entity.name;
+        modal.querySelector('.entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
         const tbody = modal.querySelector('#index-editor-table tbody');
         tbody.innerHTML = '';
 
@@ -808,6 +807,7 @@ class EntityEditor {
         ).join('');
 
         row.innerHTML = `
+            <td align="center"><a href="javascript:" class="remove-index-row">❌</a></td>
             <td class="td-index-name"><input type="text" class="form-control index-name" value="${indexName}" placeholder="e.g., idx_name_status"></td>
             <td class="td-index-columns">
                 <select class="form-control index-columns" multiple style="min-height: 80px;">
@@ -815,7 +815,6 @@ class EntityEditor {
                 </select>
             </td>
             <td class="td-index-unique"><input type="checkbox" class="index-unique" ${isUnique ? 'checked' : ''}></td>
-            <td class="td-index-remove"><button type="button" class="btn btn-danger btn-sm remove-index-row">&times;</button></td>
         `;
 
         row.querySelector('.remove-index-row').onclick = () => {
@@ -1269,7 +1268,7 @@ class EntityEditor {
             'SET NULL'
         ];
         const row = document.createElement('tr');
-        row.innerHTML = `<td><a href="javascript:" onclick="return editor.removeForeignKey(this)">❌</a></td>
+        row.innerHTML = `<td align="center"><a href="javascript:" onclick="return editor.removeForeignKey(this)">❌</a></td>
         <td>${this.createSelectOption('column-name', fk.columnName, columnList, 'editor.updateForeignKeyColumn(this)')}</td>
         <td>${this.createInputText('foreign-key-name', fk.name)}</td>
         <td>${this.createSelectOption('referenced-table', fk.referencedTable, tableList, 'editor.updateForeignKeyReferencedColumn(this)')}</td>
