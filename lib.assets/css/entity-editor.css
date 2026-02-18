@@ -263,6 +263,9 @@ body {
 .entity-editor .editor-form table th:nth-child(6) {
   width: 11%;
 }
+.entity-editor .editor-form table th:nth-child(7) {
+  width: 11%;
+}
 .entity-editor .editor-form table td {
   border: 1px solid #ccc;
   padding: 0;
@@ -740,22 +743,23 @@ label {
   background-color: #e9e9e9;
 }
 
-.foreign-key-editor-table tr.pk-draft {
+.foreign-key-editor-table tr.pk-draft, .index-editor-table tr.pk-draft {
   background-color: #fff7ef;
 }
-.foreign-key-editor-table select {
+.foreign-key-editor-table select, .index-editor-table select {
   padding-right: 24px;
 }
 
-.dark-mode .foreign-key-editor-table th {
-  background-color: #000;
+.dark-mode .foreign-key-editor-table th, .dark-mode .index-editor-table th {
+  background-color: #1c1c1c;
   color: #e1e1e1;
+  text-align: center;
 }
-.dark-mode .foreign-key-editor-table th, .dark-mode .foreign-key-editor-table td {
+.dark-mode .foreign-key-editor-table th, .dark-mode .foreign-key-editor-table td, .dark-mode .index-editor-table th, .dark-mode .index-editor-table td {
   border: 1px solid #606060;
   white-space: nowrap;
 }
-.dark-mode .foreign-key-editor-table tr.pk-draft {
+.dark-mode .foreign-key-editor-table tr.pk-draft, .dark-mode .index-editor-table tr.pk-draft {
   background-color: #513316;
 }
 

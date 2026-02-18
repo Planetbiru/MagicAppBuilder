@@ -498,7 +498,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                 <span class="close-btn cancel-button">&times;</span>
             </div>
             <div class="modal-body">
-                <p class="entity-name"></p>
+                <p class="label-entity-name"></p>
                 <form>
                     <table class="foreign-key-editor-table">
                         <thead>
@@ -535,7 +535,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                 <span class="close-btn cancel-button" onclick="this.closest('.modal').style.display='none'">&times;</span>
             </div>
             <div class="modal-body">
-                <p class="entity-name"></p>
+                <p class="label-entity-name"></p>
                 <table id="index-editor-table" class="table table-bordered">
                     <thead>
                         <tr>

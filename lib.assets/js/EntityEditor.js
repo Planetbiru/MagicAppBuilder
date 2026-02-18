@@ -724,7 +724,7 @@ class EntityEditor {
             console.error("Index editor modal (#indexEditorModal) not found in the DOM.");
             return;
         }
-        modal.querySelector('.entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
+        modal.querySelector('.label-entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
         const tbody = modal.querySelector('#index-editor-table tbody');
         tbody.innerHTML = '';
 
@@ -1442,7 +1442,7 @@ class EntityEditor {
 
 
         const tbody = modal.querySelector('.foreign-key-editor-table tbody');
-        modal.querySelector('.entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
+        modal.querySelector('.label-entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
         tbody.innerHTML = ''; // Clear
         Object.entries(this.foreignKeyDraft[entity.name]).forEach(([columnName, fk]) => {
             tbody.appendChild(this.createForeignKeyRow(fk));
