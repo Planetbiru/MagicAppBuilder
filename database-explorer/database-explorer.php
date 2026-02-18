@@ -553,6 +553,8 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary add-index-row">Add Index</button>
                 &nbsp;
+                <button type="button" class="btn btn-primary add-index-from-fk">From Foreign Key</button>
+                &nbsp;
                 <button type="button" class="btn btn-success save-indexes">Save Indexes</button>
                 &nbsp;
                 <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').style.display='none'">Cancel</button>
@@ -660,9 +662,10 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li id="menu-export-png"><a href="javascript:;" onclick="editor.downloadEntityPNG(event);">Export PNG</a></li>
             <li id="menu-export-md"><a href="javascript:;" onclick="editor.downloadDiagramMD(event);">Export MD</a></li>
             <li class="dropdown-divider"></li>
-            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy Structure</a></li>
+            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy DDL</a></li>
+            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableIndexes(event);">Copy Indexes</a></li>
             <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy Data</a></li>
-            <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy All</a></li>
+            <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy DDL + Data</a></li>
             <li id="menu-paste-clipboard"><a href="javascript:;" onclick="editor.triggerImportFromClipboard();">Import from Clipboard</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
@@ -680,8 +683,9 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li id="menu-export-png"><a href="javascript:;" onclick="editor.downloadEntityPNG(event);">Export PNG</a></li>
             <li id="menu-export-md"><a href="javascript:;" onclick="editor.downloadDiagramMD(event);">Export MD</a></li>
             <li class="dropdown-divider"></li>
-            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy Structure</a></li>
-            <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy Data</a></li>
+            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableStructure(event);">Copy DDL</a></li>
+            <li id="menu-copy-structure"><a href="javascript:;" onclick="editor.copyTableIndexes(event);">Copy Indexes</a></li>
+            <li id="menu-copy-data"><a href="javascript:;" onclick="editor.copyTableData(event);">Copy DDL + Data</a></li>
             <li id="menu-copy-both"><a href="javascript:;" onclick="editor.copyTableStructureAndData(event);">Copy All</a></li>
             <li id="menu-paste-clipboard"><a href="javascript:;" onclick="editor.triggerImportFromClipboard();">Import from Clipboard</a></li>
             <li class="dropdown-divider"></li>
