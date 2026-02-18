@@ -229,14 +229,22 @@ class Entity {
             cols.push(`\tPRIMARY KEY(${this.getPrimaryKeyColumnsAsString(dialect)})`);
         }
 
+        const processedIndexColumns = new Set();
+
         if (createIndex && this.indexes && Array.isArray(this.indexes)) {
             this.indexes.forEach(index => {
                 if (index && index.columns && index.columns.length > 0) {
+                    const indexSignature = index.columns.slice().sort().join(',');
+                    if (processedIndexColumns.has(indexSignature)) {
+                        return;
+                    }
+                    processedIndexColumns.add(indexSignature);
+
                     const indexName = index.name || `idx_${this.name}_${index.columns.join('_')}`;
                     const unique = index.unique ? 'UNIQUE ' : '';
         
                     if (dialect === 'mysql') {
-                        const indexCols = index.columns.map(c => `${c}`).join(', ');
+                        const indexCols = index.columns.map(c => `\`${c}\``).join(', ');
                         // Add index inside CREATE TABLE for MySQL
                         cols.push(`\t${unique}INDEX \`${indexName}\` (${indexCols})`);
                     } else {
@@ -253,7 +261,6 @@ class Entity {
         }
 
         if (withForeignKey && this.foreignKeys) {
-
             const fks = Array.isArray(this.foreignKeys) ? this.foreignKeys : Object.values(this.foreignKeys);
 
             fks.forEach(fk => {
@@ -262,9 +269,14 @@ class Entity {
                     cols.push(`\t${fkStr}`);
                 }
 
-                const idxStr = this.createIndexStandalone(fk, dialect);
-                if (idxStr) {
-                    indexStatements.push(idxStr);
+                const fkColumns = fk.columnName.split(',').map(c => c.trim());
+                const fkIndexSignature = fkColumns.slice().sort().join(',');
+                if (!processedIndexColumns.has(fkIndexSignature)) {
+                    const idxStr = this.createIndexStandalone(fk, dialect);
+                    if (idxStr) {
+                        indexStatements.push(idxStr);
+                        processedIndexColumns.add(fkIndexSignature);
+                    }
                 }
             });
         }
@@ -280,6 +292,67 @@ class Entity {
         sql += `-- TABLE ${this.name} END\r\n\r\n`;
 
         return sql;
+    }
+
+    /**
+     * Generates standalone SQL `CREATE INDEX` statements for the current entity.
+     *
+     * This method creates index definitions based on the configured indexes
+     * associated with the entity. It supports multiple SQL dialects and
+     * automatically adjusts syntax differences such as `IF NOT EXISTS`
+     * support where applicable.
+     *
+     * Behavior:
+     * - Generates standard `CREATE INDEX` or `CREATE UNIQUE INDEX` statements.
+     * - Automatically generates index names using the convention:
+     *   `idx_<table>_<column1>_<column2>` if no explicit name is provided.
+     * - Adds `IF NOT EXISTS` for PostgreSQL and SQLite.
+     * - Ensures compatibility with MySQL and SQL Server
+     *   (without `IF NOT EXISTS`, as not supported).
+     *
+     * Note:
+     * This method generates standalone index statements and does not embed
+     * indexes inside the `CREATE TABLE` statement. It is intended to be used
+     * after table creation.
+     *
+     * @param {string} dialect - Target SQL dialect:
+     *                           "mysql", "postgresql", "sqlite", or "sqlserver".
+     * @param {boolean} createIndex - Whether to generate index statements.
+     *                                If false, an empty array is returned.
+     * @returns {string[]} An array of SQL `CREATE INDEX` statements.
+     */
+    createIndexStatements(dialect = "mysql", createIndex = true) {
+
+        const indexStatements = [];
+
+        if (!createIndex || !this.indexes || !Array.isArray(this.indexes)) {
+            return indexStatements;
+        }
+
+        const supportsIfNotExists =
+            dialect === 'postgresql' ||
+            dialect === 'sqlite';
+
+        const indexIfNotExists = supportsIfNotExists ? 'IF NOT EXISTS ' : '';
+
+        this.indexes.forEach(index => {
+
+            if (!index || !index.columns || index.columns.length === 0) {
+                return;
+            }
+
+            const indexName =
+                index.name || `idx_${this.name}_${index.columns.join('_')}`;
+
+            const unique = index.unique ? 'UNIQUE ' : '';
+            const indexCols = index.columns.join(', ');
+
+            indexStatements.push(
+                `CREATE ${unique}INDEX ${indexIfNotExists}${indexName} ON ${this.name} (${indexCols});`
+            );
+        });
+
+        return indexStatements;
     }
 
 

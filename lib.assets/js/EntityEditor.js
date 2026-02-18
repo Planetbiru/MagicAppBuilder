@@ -724,7 +724,7 @@ class EntityEditor {
             console.error("Index editor modal (#indexEditorModal) not found in the DOM.");
             return;
         }
-        modal.querySelector('.entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
+        modal.querySelector('.label-entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
         const tbody = modal.querySelector('#index-editor-table tbody');
         tbody.innerHTML = '';
 
@@ -743,6 +743,10 @@ class EntityEditor {
 
         modal.querySelector('.add-index-row').onclick = () => {
             this.addIndexRowToModal(tbody, currentColumns);
+        };
+
+        modal.querySelector('.add-index-from-fk').onclick = () => {
+            this.addIndexFromForeignKey(tbody, currentColumns, entity);
         };
 
         modal.querySelector('.save-indexes').onclick = () => {
@@ -822,6 +826,56 @@ class EntityEditor {
         };
 
         tbody.appendChild(row);
+    }
+
+    addIndexFromForeignKey(tbody, currentColumns, entity)
+    {
+        let existingIndexes = [];
+        tbody.querySelectorAll('tr').forEach(row => {
+            let name = row.querySelector('.index-name').value;
+            let columns = Array.from(row.querySelector('.index-columns').selectedOptions).map(opt => opt.value);
+            existingIndexes.push({name: name, columns: columns});
+        });
+
+        let foreignKeys = entity.foreignKeys || [];
+        if(!Array.isArray(foreignKeys))
+        {
+            foreignKeys = Object.values(foreignKeys);
+        }
+
+        foreignKeys.forEach(fk => {
+            if(!fk.columnName) return;
+            let indexName = fk.name || '';
+            if(indexName.startsWith('fk_'))
+            {
+                indexName = 'idx_' + indexName.substring(3);
+            }
+            else
+            {
+                indexName = 'idx_' + indexName;
+            }
+            
+            let columns = fk.columnName.split(',').map(s => s.trim());
+            
+            let exists = existingIndexes.some(idx => {
+                if(idx.name == indexName) return true;
+                if(idx.columns.length !== columns.length) return false;
+                for(let i = 0; i < columns.length; i++) {
+                    if(idx.columns[i] !== columns[i]) return false;
+                }
+                return true;
+            });
+
+            if(!exists)
+            {
+                this.addIndexRowToModal(tbody, currentColumns, {
+                    name: indexName,
+                    columns: columns,
+                    unique: false
+                });
+                existingIndexes.push({name: indexName, columns: columns});
+            }
+        });
     }
 
     /**
@@ -1388,7 +1442,7 @@ class EntityEditor {
 
 
         const tbody = modal.querySelector('.foreign-key-editor-table tbody');
-        modal.querySelector('.entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
+        modal.querySelector('.label-entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
         tbody.innerHTML = ''; // Clear
         Object.entries(this.foreignKeyDraft[entity.name]).forEach(([columnName, fk]) => {
             tbody.appendChild(this.createForeignKeyRow(fk));
@@ -4041,8 +4095,21 @@ class EntityEditor {
     }
 
     /**
-     * Copy the SQL CREATE TABLE statement of the selected entity to clipboard.
-     * @param {MouseEvent} e - The mouse event that triggered the copy action.
+     * Copies the SQL `CREATE TABLE` statement of the selected entity to the clipboard.
+     *
+     * This method:
+     * - Detects the active SQL dialect from the `<meta name="database-type">` tag.
+     * - Retrieves the currently selected entity from the SVG context.
+     * - Generates the table creation SQL using `toSQL(dialect)`.
+     * - Writes the generated SQL statement to the system clipboard.
+     * - Displays a visual confirmation effect and hides the context menu.
+     *
+     * Note:
+     * This action copies the table structure only. Indexes and foreign key
+     * constraints are not included unless explicitly generated within `toSQL()`.
+     *
+     * @param {MouseEvent} e - The mouse event that triggered the copy action,
+     *                         used to determine the position of the visual feedback.
      */
     copyTableStructure(e) {
         let _this = this;
@@ -4052,10 +4119,47 @@ class EntityEditor {
 
         // Get the entity from the selected SVG element
         let entity = this.getEntityByName(selectedElement.dataset.entity);
-        sql.push(entity.toSQL(dialect));
+        sql.push(entity.toSQL(dialect)); // Skip indexes and foreign keys
 
         // Write SQL to clipboard
         navigator.clipboard.writeText(sql.join(''))
+        .then(() => {
+            // Show visual feedback and hide context menu
+            _this.showCopyEffect(e.clientX, e.clientY);
+            hideContextMenu();
+        })
+        .catch(err => {
+            // Error handling (not implemented)
+        });
+    }
+
+    /**
+     * Copies all index definitions of the selected entity to the system clipboard.
+     *
+     * This method:
+     * - Detects the active SQL dialect from the `<meta name="database-type">` tag.
+     * - Retrieves the currently selected entity based on the SVG element context.
+     * - Generates standalone `CREATE INDEX` statements using `createIndexStatements()`.
+     * - Copies the generated SQL statements to the clipboard.
+     * - Displays a visual copy confirmation effect.
+     *
+     * The copied output includes all index definitions associated with the entity,
+     * formatted according to the selected SQL dialect.
+     *
+     * @param {MouseEvent} e - The mouse event used to determine cursor position
+     *                         for displaying visual feedback.
+     */
+    copyTableIndexes(e) {
+        let _this = this;
+        // Get the SQL dialect from the <meta> tag
+        let dialect = qs('meta[name="database-type"]').getAttribute('content');
+
+        // Get the entity from the selected SVG element
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        let sql = entity.createIndexStatements(dialect);
+
+        // Write SQL to clipboard
+        navigator.clipboard.writeText(sql.join("\r\n")+"\r\n")
         .then(() => {
             // Show visual feedback and hide context menu
             _this.showCopyEffect(e.clientX, e.clientY);
