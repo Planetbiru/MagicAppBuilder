@@ -923,6 +923,12 @@ label {
 }
 
 .foreign-key-editor-table, .index-editor-table{
+    th {
+        text-align: center;
+    }
+    td {
+        padding: 4px;
+    }
     tr.pk-draft{
         background-color: #fff7ef;
     }
