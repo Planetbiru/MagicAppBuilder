@@ -322,7 +322,11 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 		{
 			// Do somtething here when data is not found
 			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			<div class="page page-jambi">
+				<div class="jambi-wrapper">
+					<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+				</div>
+			</div>
 			<?php 
 		}
 require_once __DIR__ ."/inc.app/simple-footer.php";
@@ -339,6 +343,7 @@ require_once __DIR__ ."/inc.app/simple-footer.php";
 }
 else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
+require_once __DIR__ ."/inc.app/simple-header.php";
 	$specification = PicoSpecification::getInstanceOf(Field::of()->gitProfileId, $inputGet->getGitProfileId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$gitProfile = new GitProfile(null, $database);
@@ -373,7 +378,6 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		if($gitProfile->issetGitProfileId())
 		{
 $appEntityLanguage = new AppEntityLanguageImpl(new GitProfile(), $appConfig, $currentUser->getLanguageId());
-require_once __DIR__ ."/inc.app/simple-header.php";
 			// Define map here
 			$mapForPlatform = array(
 				"github" => array("value" => "github", "label" => "Github", "group" => "", "selected" => false),
@@ -474,7 +478,11 @@ require_once __DIR__ ."/inc.app/simple-footer.php";
 		{
 			// Do somtething here when data is not found
 			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			<div class="page page-jambi">
+				<div class="jambi-wrapper">
+					<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+				</div>
+			</div>
 			<?php 
 		}
 	}

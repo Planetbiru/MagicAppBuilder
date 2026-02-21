@@ -4218,4 +4218,12 @@ Previously, there were too many buttons displayed below the diagram, which requi
 
 This improvement makes the interface cleaner, more organized, and more accessible on lower-resolution screens.
 
+## Fixes
+
+### DOM Structure Fix in Update and Detail Pages
+
+In previous versions, there was an incorrect DOM structure in the Update and Detail pages. Although this issue did not directly affect the default appearance, it could cause layout instability if users modified the generated code — potentially resulting in broken or disorganized page structures.
+
+Version 2.2.0 resolves this DOM structure issue, ensuring a cleaner and more stable markup foundation. This improvement makes the modules safer and more reliable for customization and further development.
+
 MagicAppBuilder 2.2.0 represents a significant step forward in database modeling, delivering stronger relational support, improved performance design, and seamless integration with professional database tools.

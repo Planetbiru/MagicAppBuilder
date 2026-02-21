@@ -261,7 +261,11 @@ require_once __DIR__ ."/inc.app/simple-header.php";
 		{
 			// Do somtething here when data is not found
 			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			<div class="page page-jambi">
+				<div class="jambi-wrapper">
+					<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+				</div>
+			</div>
 			<?php 
 		}
 require_once __DIR__ ."/inc.app/simple-footer.php";
@@ -454,7 +458,11 @@ require_once __DIR__ ."/inc.app/simple-footer.php";
 		{
 			// Do somtething here when data is not found
 			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			<div class="page page-jambi">
+				<div class="jambi-wrapper">
+					<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+				</div>
+			</div>
 			<?php 
 		}
 	}
