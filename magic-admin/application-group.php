@@ -258,6 +258,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 }
 else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
+require_once $appInclude->mainAppHeader(__DIR__);
 	$specification = PicoSpecification::getInstanceOf(Field::of()->applicationGroupId, $inputGet->getApplicationGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$applicationGroup = new ApplicationGroup(null, $database);
@@ -266,7 +267,6 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		if($applicationGroup->issetApplicationGroupId())
 		{
 $appEntityLanguage = new AppEntityLanguageImpl(new ApplicationGroup(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
@@ -320,23 +320,31 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		{
 			// Do somtething here when data is not found
 			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			<div class="page page-jambi">
+				<div class="jambi-wrapper">
+					<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+				</div>
+			</div>
 			<?php 
 		}
-require_once $appInclude->mainAppFooter(__DIR__);
+
 	}
 	catch(Exception $e)
 	{
-require_once $appInclude->mainAppHeader(__DIR__);
 		// Do somtething here when exception
 		?>
-		<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
+		<div class="page page-jambi">
+			<div class="jambi-wrapper">
+				<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
+			</div>
+		</div>
 		<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
 	}
+require_once $appInclude->mainAppFooter(__DIR__);
 }
 else if($inputGet->getUserAction() == UserAction::DETAIL)
 {
+require_once $appInclude->mainAppHeader(__DIR__);
 	$specification = PicoSpecification::getInstanceOf(Field::of()->applicationGroupId, $inputGet->getApplicationGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS));
 	$specification->addAnd($dataFilter);
 	$applicationGroup = new ApplicationGroup(null, $database);
@@ -363,7 +371,6 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		if($applicationGroup->issetApplicationGroupId())
 		{
 $appEntityLanguage = new AppEntityLanguageImpl(new ApplicationGroup(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
 			// Define map here
 			
 ?>
@@ -442,25 +449,31 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	</div>
 </div>
 <?php 
-require_once $appInclude->mainAppFooter(__DIR__);
 		}
 		else
 		{
 			// Do somtething here when data is not found
 			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			<div class="page page-jambi">
+				<div class="jambi-wrapper">
+					<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+				</div>
+			</div>
 			<?php 
 		}
 	}
 	catch(Exception $e)
 	{
-require_once $appInclude->mainAppHeader(__DIR__);
 		// Do somtething here when exception
 		?>
-		<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
+		<div class="page page-jambi">
+			<div class="jambi-wrapper">
+				<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
+			</div>
+		</div>
 		<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
 	}
+require_once $appInclude->mainAppFooter(__DIR__);
 }
 else 
 {

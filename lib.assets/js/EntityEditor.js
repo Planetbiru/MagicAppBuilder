@@ -3220,7 +3220,7 @@ class EntityEditor {
                 _this.updateEntityIndex();
                 _this.renderEntities();
                 _this.restoreCheckedEntitiesFromCurrentDiagram();
-                _this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
+                _this.exportToSQL(_this.getSelectedDialect(), _this.isGenerateForeignKey(), _this.isGenerateIndex());
                 if(typeof _this.callbackSaveEntity == 'function')
                 {
                     _this.callbackSaveEntity(_this.entities);

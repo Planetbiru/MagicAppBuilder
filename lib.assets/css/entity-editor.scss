@@ -191,13 +191,15 @@ body {
             padding: 2px 0;
         }
         textarea {
-            height: calc(100vh - 585px);
+            height: calc(100vh - 592px);
             min-height: 100px;
             width: 100%;
             padding: 10px;
             box-sizing: border-box;
             resize: none;
             tab-size: 2;
+            display: block;
+            margin-bottom: 0;
 
             &:focus-visible {
                 outline: none;
@@ -923,6 +925,12 @@ label {
 }
 
 .foreign-key-editor-table, .index-editor-table{
+    th {
+        text-align: center;
+    }
+    td {
+        padding: 4px;
+    }
     tr.pk-draft{
         background-color: #fff7ef;
     }

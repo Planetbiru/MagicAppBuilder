@@ -155,7 +155,7 @@ body {
   padding: 2px 0;
 }
 .entity-editor .right-panel textarea {
-  height: calc(100vh - 585px);
+  height: calc(100vh - 592px);
   min-height: 100px;
   width: 100%;
   padding: 10px;
@@ -164,6 +164,8 @@ body {
   -moz-tab-size: 2;
     -o-tab-size: 2;
        tab-size: 2;
+  display: block;
+  margin-bottom: 0;
 }
 .entity-editor .right-panel textarea:focus-visible {
   outline: none;
@@ -743,6 +745,12 @@ label {
   background-color: #e9e9e9;
 }
 
+.foreign-key-editor-table th, .index-editor-table th {
+  text-align: center;
+}
+.foreign-key-editor-table td, .index-editor-table td {
+  padding: 4px;
+}
 .foreign-key-editor-table tr.pk-draft, .index-editor-table tr.pk-draft {
   background-color: #fff7ef;
 }
