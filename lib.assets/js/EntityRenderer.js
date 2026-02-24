@@ -166,7 +166,7 @@ class EntityRenderer {
             entity.columns.forEach((col, index) => {
                 // Check if the column is a foreign key (ends with "_id")
                 if (col.name.endsWith("_id")) {
-                    const refEntityName = col.name.replace("_id", "");
+                    const refEntityName = col.name.substring(0, col.name.length - 3);
                     // Check if the referenced entity exists in the tables list
                     if (entity.name != refEntityName && this.tables[refEntityName]) {
                         this.createRelationship(entity, col, index);
@@ -456,7 +456,9 @@ class EntityRenderer {
     createRelationship(entity, col, index, refEntityName = null, refColumnName = null) {
 
         // Determine the name of the referenced table by removing '_id' from the foreign key column name
-        refEntityName = refEntityName || col.name.replace("_id", "");
+        if (!refEntityName && col?.name?.endsWith("_id") && col.name.length > 3) {
+            refEntityName = col.name.slice(0, -3);
+        }
 
         // Get the referenced entity using the reference entity's name
         let referenceEntity = this.getEntityByName(refEntityName);
