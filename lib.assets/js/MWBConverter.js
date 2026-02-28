@@ -256,23 +256,43 @@ class MWBConverter {
             const pkIndexIdNode = this.getNode(table, 'primaryKey');
             const pkIndexId = pkIndexIdNode ? pkIndexIdNode.textContent : null;
             let pkColumnIds = [];
+            const indexes = [];
 
             // Find PK columns via indices
-            if (pkIndexId) {
-                const indicesNode = this.getNode(table, 'indices');
-                if (indicesNode) {
-                    for (const indexNode of indicesNode.children) {
-                        if (indexNode.getAttribute('id') === pkIndexId) {
-                            const idxColsNode = this.getNode(indexNode, 'columns');
-                            if (idxColsNode) {
-                                for (const idxCol of idxColsNode.children) {
-                                    const refColNode = this.getNode(idxCol, 'referencedColumn');
-                                    if (refColNode) {
-                                        pkColumnIds.push(refColNode.textContent);
-                                    }
+            const indicesNode = this.getNode(table, 'indices');
+            if (indicesNode) {
+                for (const indexNode of indicesNode.children) {
+                    const indexId = indexNode.getAttribute('id');
+                    const isPk = (pkIndexId && indexId === pkIndexId);
+                    
+                    const idxCols = [];
+                    const idxColIds = [];
+
+                    const idxColsNode = this.getNode(indexNode, 'columns');
+                    if (idxColsNode) {
+                        for (const idxCol of idxColsNode.children) {
+                            const refColNode = this.getNode(idxCol, 'referencedColumn');
+                            if (refColNode) {
+                                const colId = refColNode.textContent;
+                                idxColIds.push(colId);
+                                if (this.idMap[colId]) {
+                                    idxCols.push(this.idMap[colId].name);
                                 }
                             }
-                            break;
+                        }
+                    }
+
+                    if (isPk) {
+                        pkColumnIds = idxColIds;
+                    } else {
+                        const indexName = this.getValue(indexNode, 'name');
+                        const isUnique = this.getValue(indexNode, 'unique') == 1;
+                        if (idxCols.length > 0) {
+                            indexes.push({
+                                name: indexName,
+                                columns: idxCols,
+                                unique: isUnique
+                            });
                         }
                     }
                 }
@@ -295,6 +315,12 @@ class MWBConverter {
                     let lengthStr = "";
                     if (lengthVal && parseInt(lengthVal) > -1) {
                         lengthStr = lengthVal;
+                    } else if (['TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'BIGINT'].includes(type)) {
+                        // Fallback: Check precision for integer types if length is not set
+                        const precisionVal = this.getValue(col, 'precision');
+                        if (precisionVal && parseInt(precisionVal) > -1) {
+                            lengthStr = precisionVal;
+                        }
                     }
 
                     const isNotNull = this.getValue(col, 'isNotNull') == 1;
@@ -393,7 +419,8 @@ class MWBConverter {
                     modificationDate: now,
                     creator: "{{userName}}",
                     modifier: "{{userName}}",
-                    foreignKeys: foreignKeys
+                    foreignKeys: foreignKeys,
+                    indexes: indexes
                 });
             }
         });
@@ -930,6 +957,7 @@ class MWBConverter {
             });
 
             let foreignKeys = table.foreignKeys || {};
+            let indexes = table.indexes || [];
             
 
             tableMap[table.name.trim()] = {
@@ -939,7 +967,8 @@ class MWBConverter {
                 columns: colsWithIds,
                 colMap: colMap,
                 data: table.data,
-                foreignKeys: foreignKeys
+                foreignKeys: foreignKeys,
+                indexes: indexes
             };
         });
 
@@ -1019,13 +1048,32 @@ class MWBConverter {
                 xml += `                      <value type="int" key="isNotNull">${col.nullable === false ? 1 : 0}</value>\n`;
                 
                 let len = -1;
-                if (col.length && parseInt(col.length) > 0) len = parseInt(col.length);
+                let prec = -1;
+                let scale = -1;
+
+                let val = -1;
+                if (col.length && parseInt(col.length) > 0) {
+                    val = parseInt(col.length);
+                } else {
+                    const matches = (col.type || "").match(/\((\d+)\)/);
+                    if (matches && matches[1]) {
+                        val = parseInt(matches[1]);
+                    }
+                }
+
+                const baseType = (col.type || "").replace(/\(.*/, '').toUpperCase();
+                if (['TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER', 'BIGINT'].includes(baseType)) {
+                    prec = val;
+                } else {
+                    len = val;
+                }
+
                 xml += `                      <value type="int" key="length">${len}</value>\n`;
                 xml += `                      <value type="string" key="name">${col.name}</value>\n`;
                 xml += `                      <value type="string" key="oldName">${col.name}</value>\n`;
                 xml += `                      <link type="object" struct-name="GrtObject" key="owner">${tableInfo.id}</link>\n`;
-                xml += '                      <value type="int" key="precision">-1</value>\n';
-                xml += '                      <value type="int" key="scale">-1</value>\n';
+                xml += `                      <value type="int" key="precision">${prec}</value>\n`;
+                xml += `                      <value type="int" key="scale">${scale}</value>\n`;
                 xml += `                      <link type="object" struct-name="db.SimpleDatatype" key="simpleType">${simpleType}</link>\n`;
                 xml += '                    </value>\n';
             });
@@ -1227,7 +1275,7 @@ class MWBConverter {
             }
             
             // FK Indices
-            processedFKs.forEach(fk => {
+            processedFKs?.forEach(fk => {
                     xml += `                    <value type="object" struct-name="db.mysql.Index" id="${fk.indexId}">\n`;
                     xml += '                      <value type="string" key="algorithm"></value>\n';
                     xml += `                      <value _ptr_="${this._generatePtr()}" type="list" content-type="object" content-struct-name="db.mysql.IndexColumn" key="columns">\n`;
@@ -1270,6 +1318,55 @@ class MWBConverter {
                     xml += `                      <value type="string" key="oldName"></value>\n`;
                     xml += '                    </value>\n';
             });
+
+            // Add other indexes from entity.indexes
+            if (tableInfo.indexes && Array.isArray(tableInfo.indexes)) {
+                tableInfo?.indexes?.forEach(index => {
+                    const indexId = this._generateUUID();
+                    xml += `                    <value type="object" struct-name="db.mysql.Index" id="${indexId}">\n`;
+                    xml += '                      <value type="string" key="algorithm"></value>\n';
+                    xml += `                      <value _ptr_="${this._generatePtr()}" type="list" content-type="object" content-struct-name="db.mysql.IndexColumn" key="columns">\n`;
+                    
+                    index?.columns?.forEach(colName => {
+                        const colId = findColId(tableInfo.colMap, colName);
+                        if (colId) {
+                            const idxColId = this._generateUUID();
+                            xml += `                        <value type="object" struct-name="db.mysql.IndexColumn" id="${idxColId}">\n`;
+                            xml += '                          <value type="int" key="columnLength">0</value>\n';
+                            xml += '                          <value type="string" key="comment"></value>\n';
+                            xml += '                          <value type="int" key="descend">0</value>\n';
+                            xml += '                          <value type="string" key="expression"></value>\n';
+                            xml += '                          <value type="string" key="name"></value>\n';
+                            xml += `                          <link type="object" struct-name="GrtObject" key="owner">${indexId}</link>\n`;
+                            xml += `                          <link type="object" struct-name="db.Column" key="referencedColumn">${colId}</link>\n`;
+                            xml += '                        </value>\n';
+                        }
+                    });
+
+                    xml += '                      </value>\n'; // end columns list
+                    xml += '                      <value type="string" key="indexKind"></value>\n';
+                    xml += '                      <value type="int" key="keyBlockSize">0</value>\n';
+                    xml += '                      <value type="string" key="lockOption"></value>\n';
+                    xml += '                      <value type="int" key="visible">1</value>\n';
+                    xml += '                      <value type="string" key="withParser"></value>\n';
+                    xml += '                      <value type="string" key="comment"></value>\n';
+                    xml += '                      <value type="int" key="deferability">0</value>\n';
+                    xml += `                      <value type="string" key="indexType">${index.type || 'INDEX'}</value>\n`;
+                    xml += '                      <value type="int" key="isPrimary">0</value>\n';
+                    xml += `                      <value type="string" key="name">${index.name}</value>\n`;
+                    xml += `                      <value type="int" key="unique">${index.unique ? 1 : 0}</value>\n`;
+                    xml += '                      <value type="int" key="commentedOut">0</value>\n';
+                    xml += '                      <value type="string" key="createDate"></value>\n';
+                    xml += '                      <value type="dict" key="customData"/>\n';
+                    xml += '                      <value type="string" key="lastChangeDate"></value>\n';
+                    xml += '                      <value type="int" key="modelOnly">0</value>\n';
+                    xml += `                      <link type="object" struct-name="GrtNamedObject" key="owner">${tableInfo.id}</link>\n`;
+                    xml += '                      <value type="string" key="temp_sql"></value>\n';
+                    xml += `                      <value type="string" key="oldName"></value>\n`;
+                    xml += '                    </value>\n';
+                });
+            }
+
             xml += '                  </value>\n';
             xml += '                  <value type="string" key="keyBlockSize"></value>\n';
             xml += '                  <value type="string" key="maxRows"></value>\n';
@@ -1542,7 +1639,7 @@ class MWBConverter {
         xml += '  </value>\n'; // End Document
         xml += '</data>';
 
-        zip.file("document.mwb.xml", xml);
+        zip.file("document.mwb.xml", xml, { compression: "DEFLATE", compressionOptions: { level: 9 } });
 
         // 3. Generate SQLite
         let hasData = false;
@@ -1554,7 +1651,7 @@ class MWBConverter {
         }
 
         if (typeof initSqlJs === 'undefined') {
-            await this.loadScript('schema-editor/wasm/sql-wasm.js');
+            await this.loadScript('../lib.assets/wasm/sql-wasm.js');
         }
         const SQL = await initSqlJs({ locateFile: file => `../lib.assets/wasm/sql-wasm.wasm` });
         const db = new SQL.Database();
@@ -1581,7 +1678,7 @@ class MWBConverter {
         }
 
         const binary = db.export();
-        zip.file("@db/data.db", binary);
+        zip.file("@db/data.db", binary, { compression: "DEFLATE", compressionOptions: { level: 9 } });
         
 
         return zip;
