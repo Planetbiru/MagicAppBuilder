@@ -4227,4 +4227,3 @@ In previous versions, there was an incorrect DOM structure in the Update and Det
 Version 2.2.0 resolves this DOM structure issue, ensuring a cleaner and more stable markup foundation. This improvement makes the modules safer and more reliable for customization and further development.
 
 MagicAppBuilder 2.2.0 represents a significant step forward in database modeling, delivering stronger relational support, improved performance design, and seamless integration with professional database tools.
-

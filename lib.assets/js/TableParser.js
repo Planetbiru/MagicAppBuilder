@@ -361,7 +361,7 @@ class TableParser {
         let primaryKey = null;
         let columnList = [];
         let primaryKeyList = [];
-        let foreignKeys = []; // Array for foreign keys
+        let foreignKeys = []; // <--- array baru untuk foreign keys
         let indexes = []; // Array for indexes
 
         while ((result = rg_fld.exec(sql)) != null) {
@@ -370,7 +370,7 @@ class TableParser {
 
             line = line.replace(/[\r\n]+/g, ' ');
 
-            // Reset regex for field parsing
+            // Reset regex untuk field parsing
             rg_fld2.lastIndex = 0;
             let fld_def = rg_fld2.exec(f);
 
@@ -458,7 +458,7 @@ class TableParser {
                 }
             }
 
-            // Parsing foreign key each line
+            // Parsing foreign key di setiap baris
             rg_fk.lastIndex = 0;
             let fkMatch;
             while ((fkMatch = rg_fk.exec(f)) != null) {

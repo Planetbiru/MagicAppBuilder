@@ -150,12 +150,12 @@ body {
   width: calc(30% - 5px);
   background-color: #fbfbfb;
 }
-.entity-editor .right-panel .foreign-key-container {
+.entity-editor .right-panel .foreign-key-container, .entity-editor .right-panel .index-container {
   height: 22px;
   padding: 2px 0;
 }
 .entity-editor .right-panel textarea {
-  height: calc(100vh - 575px);
+  height: calc(100vh - 592px);
   min-height: 100px;
   width: 100%;
   padding: 10px;
@@ -164,6 +164,8 @@ body {
   -moz-tab-size: 2;
     -o-tab-size: 2;
        tab-size: 2;
+  display: block;
+  margin-bottom: 0;
 }
 .entity-editor .right-panel textarea:focus-visible {
   outline: none;
@@ -252,16 +254,19 @@ body {
   text-align: center;
 }
 .entity-editor .editor-form table th:nth-child(3) {
-  width: 12%;
+  width: 16%;
 }
 .entity-editor .editor-form table th:nth-child(4) {
-  width: 10%;
+  width: 12%;
 }
 .entity-editor .editor-form table th:nth-child(5) {
-  width: 15%;
+  width: 10%;
 }
 .entity-editor .editor-form table th:nth-child(6) {
-  width: 12%;
+  width: 11%;
+}
+.entity-editor .editor-form table th:nth-child(7) {
+  width: 11%;
 }
 .entity-editor .editor-form table td {
   border: 1px solid #ccc;
@@ -290,31 +295,55 @@ body {
   border: none;
   background-color: transparent;
 }
-.entity-editor .editor-form table tr.has-foreign-key .entity-column-name {
-  position: relative;
-}
-.entity-editor .editor-form table tr.has-foreign-key .entity-column-name::after {
-  content: "🔗";
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.entity-editor .editor-form table tr.has-foreign-key .entity-column-name input[type=text] {
-  padding-right: 20px;
-}
+.entity-editor .editor-form table tr.has-index .entity-column-name,
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name,
 .entity-editor .editor-form table tr.is-primary-key .entity-column-name {
   position: relative;
 }
+.entity-editor .editor-form table tr.has-index .entity-column-name::after,
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name::after,
 .entity-editor .editor-form table tr.is-primary-key .entity-column-name::after {
-  content: "🔑";
   position: absolute;
   right: 4px;
   top: 50%;
   transform: translateY(-50%);
+  font-size: 9px;
+  white-space: nowrap;
 }
+.entity-editor .editor-form table tr.has-index .entity-column-name input[type=text],
+.entity-editor .editor-form table tr.has-foreign-key .entity-column-name input[type=text],
 .entity-editor .editor-form table tr.is-primary-key .entity-column-name input[type=text] {
-  padding-right: 20px;
+  padding-right: 44px;
+}
+.entity-editor .editor-form table {
+  /* ===== Kombinasi 3 ===== */
+}
+.entity-editor .editor-form table tr.has-index.has-foreign-key.is-primary-key .entity-column-name::after {
+  content: "🔑 🔗 🗂";
+}
+.entity-editor .editor-form table {
+  /* ===== Kombinasi 2 ===== */
+}
+.entity-editor .editor-form table tr.is-primary-key.has-foreign-key .entity-column-name::after {
+  content: "🔑 🔗";
+}
+.entity-editor .editor-form table tr.is-primary-key.has-index .entity-column-name::after {
+  content: "🔑 🗂";
+}
+.entity-editor .editor-form table tr.has-foreign-key.has-index .entity-column-name::after {
+  content: "🔗 🗂";
+}
+.entity-editor .editor-form table {
+  /* ===== Single ===== */
+}
+.entity-editor .editor-form table tr.is-primary-key:not(.has-foreign-key):not(.has-index) .entity-column-name::after {
+  content: "🔑";
+}
+.entity-editor .editor-form table tr.has-foreign-key:not(.is-primary-key):not(.has-index) .entity-column-name::after {
+  content: "🔗";
+}
+.entity-editor .editor-form table tr.has-index:not(.is-primary-key):not(.has-foreign-key) .entity-column-name::after {
+  content: "🗂";
 }
 .entity-editor input[type=checkbox] {
   margin: 0 5px;
@@ -669,7 +698,7 @@ label {
   padding-right: 0px;
 }
 
-.foreign-key-editor-table td .form-control {
+.foreign-key-editor-table td .form-control, #index-editor-table td .form-control {
   width: 100%;
 }
 
@@ -716,27 +745,61 @@ label {
   background-color: #e9e9e9;
 }
 
-.foreign-key-editor-table tr.pk-draft {
+.foreign-key-editor-table th, .index-editor-table th {
+  text-align: center;
+}
+.foreign-key-editor-table td, .index-editor-table td {
+  padding: 4px;
+}
+.foreign-key-editor-table tr.pk-draft, .index-editor-table tr.pk-draft {
   background-color: #fff7ef;
 }
-.foreign-key-editor-table select {
+.foreign-key-editor-table select, .index-editor-table select {
   padding-right: 24px;
 }
 
-.dark-mode .foreign-key-editor-table th {
-  background-color: #000;
+.dark-mode .foreign-key-editor-table th, .dark-mode .index-editor-table th {
+  background-color: #1c1c1c;
   color: #e1e1e1;
+  text-align: center;
 }
-.dark-mode .foreign-key-editor-table th, .dark-mode .foreign-key-editor-table td {
+.dark-mode .foreign-key-editor-table th, .dark-mode .foreign-key-editor-table td, .dark-mode .index-editor-table th, .dark-mode .index-editor-table td {
   border: 1px solid #606060;
   white-space: nowrap;
 }
-.dark-mode .foreign-key-editor-table tr.pk-draft {
+.dark-mode .foreign-key-editor-table tr.pk-draft, .dark-mode .index-editor-table tr.pk-draft {
   background-color: #513316;
+}
+
+#foreignKeyModal .form-group {
+  margin-bottom: 16px;
+}
+#foreignKeyModal .form-group label {
+  padding: 0px 0px 4px 0;
+  display: block;
+}
+#foreignKeyModal .form-group .form-control {
+  width: 100%;
+  display: block;
 }
 
 #foreignKeyBulkModal .modal-body {
   overflow-x: auto;
   overflow-y: auto;
   max-height: calc(100vh - 156px);
+}
+#foreignKeyBulkModal .modal-body th.remover {
+  width: 36px;
+  text-align: center;
+}
+#foreignKeyBulkModal .modal-body th[align=center], #foreignKeyBulkModal .modal-body td[align=center] {
+  text-align: center;
+}
+
+#index-editor-table th.remover {
+  width: 36px;
+  text-align: center;
+}
+#index-editor-table th[align=center], #index-editor-table td[align=center] {
+  text-align: center;
 }/*# sourceMappingURL=entity-editor.css.map */

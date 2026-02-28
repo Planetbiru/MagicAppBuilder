@@ -435,7 +435,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Foreign Key Settings</h3>
+                <h3>Edit Foreign Key</h3>
                 <span class="close-btn cancel-button">&times;</span>
             </div>
             <div class="modal-body">
@@ -494,18 +494,16 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
         <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Foreign Key Settings</h3>
+                <h3>Edit Foreign Key</h3>
                 <span class="close-btn cancel-button">&times;</span>
             </div>
             <div class="modal-body">
                 <p class="label-entity-name"></p>
-                <p class="entity-name"></p>
                 <form>
                     <table class="foreign-key-editor-table">
                         <thead>
                             <tr>
                                 <th align="center" class="remover">❌</th>
-                                <th>❌</th>
                                 <th>Column Name</th>
                                 <th>Key Name</th>
                                 <th>Reference Table</th>
@@ -533,7 +531,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
     <div id="indexEditorModal" class="modal modal-lg" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Manage Indexes</h3>
+                <h3>Edit Index</h3>
                 <span class="close-btn cancel-button" onclick="this.closest('.modal').style.display='none'">&times;</span>
             </div>
             <div class="modal-body">
@@ -673,7 +671,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
             <li id="menu-edit-foreign-key"><a href="javascript:;" onclick="editor.editForeignKeyContextMenu(event);">Edit Foreign Key</a></li>
-            <li id="menu-edit-index"><a href="javascript:;" onclick="editor.editIndexContextMenu();">Manage Indexes</a></li>
+            <li id="menu-edit-index"><a href="javascript:;" onclick="editor.editIndexContextMenu();">Edit Index</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
         </ul>
@@ -694,7 +692,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.editEntityContextMenu();">Edit Entity</a></li>
             <li id="menu-edit-entity"><a href="javascript:;" onclick="editor.dataEntityContextMenu();">Edit Data</a></li>
             <li id="menu-edit-foreign-key"><a href="javascript:;" onclick="editor.editForeignKeyContextMenu(event);">Edit Foreign Key</a></li>
-            <li id="menu-edit-index"><a href="javascript:;" onclick="editor.editIndexContextMenu();">Manage Indexes</a></li>
+            <li id="menu-edit-index"><a href="javascript:;" onclick="editor.editIndexContextMenu();">Edit Index</a></li>
             <li class="dropdown-divider"></li>
             <li id="menu-duplicate-entity"><a href="javascript:;" onclick="editor.duplicateEntity();">Duplicate Entity</a></li>
             <li class="dropdown-divider"></li>

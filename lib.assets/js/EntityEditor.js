@@ -127,6 +127,7 @@ class EntityEditor {
         this.tbody = null;
         this.operation = 'create';
         this.currentEntityData = [];
+        this.indexDraft = [];
 
         this.systemEntities = [
             'admin',
@@ -273,7 +274,7 @@ class EntityEditor {
                     entity.checked = checked;
                 })
             }
-            _this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+            _this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
         });
 
         document.addEventListener('change', function (event) {
@@ -498,6 +499,16 @@ class EntityEditor {
         return fks.some(fk => fk.columnName == columnName);
     }
 
+    hasColumnIndex(indexes, columnName)
+    {
+        if (!indexes)
+        {
+            return false;
+        }
+        const idxs = Array.isArray(indexes) ? indexes : Object.values(indexes);
+        return idxs.some(index => index.columns && index.columns.includes(columnName));
+    }
+
 
     /**
      * Retrieves the foreign key definition for the specified column.
@@ -532,12 +543,14 @@ class EntityEditor {
             this.operation = 'update';
             this.currentEntityIndex = entityIndex;
             const entity = this.entities[entityIndex];
+            this.indexDraft = JSON.parse(JSON.stringify(entity.indexes || []));
             qs(this.selector).dataset.state = 'update';
             qs(this.selector+" .entity-name").value = entity.name;
             qs(this.selector+" .entity-columns-table-body").innerHTML = '';
             entity.columns.forEach(col => this.addColumnToTable(col, false, false));
         } else {
             this.operation = 'create';
+            this.indexDraft = [];
             this.currentEntityIndex = -1;
             let newTableName = this.getNewTableName();
             qs(this.selector).dataset.state = 'create';
@@ -655,9 +668,13 @@ class EntityEditor {
         let currentEntity = this.entities?.[this.currentEntityIndex];
 
         let hasFk = this.isForeignKeyContains(currentEntity?.foreignKeys, column.name);
+        let hasIndex = this.hasColumnIndex(currentEntity?.indexes, column.name);
 
         if(hasFk) {
             row.classList.add('has-foreign-key');
+        }
+        if(hasIndex) {
+            row.classList.add('has-index');
         }
         if(column.primaryKey) {
             row.classList.add('is-primary-key');
@@ -694,6 +711,174 @@ class EntityEditor {
     }
 
     /**
+     * Displays a modal for managing indexes on the current entity.
+     */
+    showIndexEditor(entity) {
+        if (!entity) {
+            this.showAlertDialog("Please enter an entity name first.", "Entity Name Required", "OK");
+            return;
+        }
+
+        const modal = qs('#indexEditorModal');
+        if (!modal) {
+            console.error("Index editor modal (#indexEditorModal) not found in the DOM.");
+            return;
+        }
+        modal.querySelector('.label-entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
+        const tbody = modal.querySelector('#index-editor-table tbody');
+        tbody.innerHTML = '';
+
+        this.indexDraft = entity.indexes;
+
+        // Get current columns from the editor UI
+        const currentColumns = [];
+        entity.columns.forEach((column) => {
+            currentColumns.push(column.name);
+        });
+
+        // Load existing indexes from draft
+        (this.indexDraft || []).forEach(index => {
+            this.addIndexRowToModal(tbody, currentColumns, index);
+        });
+
+        modal.querySelector('.add-index-row').onclick = () => {
+            this.addIndexRowToModal(tbody, currentColumns);
+        };
+
+        modal.querySelector('.add-index-from-fk').onclick = () => {
+            this.addIndexFromForeignKey(tbody, currentColumns, entity);
+        };
+
+        modal.querySelector('.save-indexes').onclick = () => {
+            const newIndexes = [];
+            tbody.querySelectorAll('tr').forEach(row => {
+                const indexName = row.querySelector('.index-name').value.trim();
+                const isUnique = row.querySelector('.index-unique').checked;
+                const selectedCols = Array.from(row.querySelector('.index-columns').selectedOptions).map(opt => opt.value);
+
+                if (indexName && selectedCols.length > 0) {
+                    newIndexes.push({
+                        name: indexName,
+                        columns: selectedCols,
+                        unique: isUnique
+                    });
+                }
+            });
+            this.indexDraft = newIndexes;
+
+            // Update the entity indexes
+            
+            entity.indexes = newIndexes;
+            let currentEntityOnEditor = this.entities?.[this.currentEntityIndex];
+            if(currentEntityOnEditor?.name == entity.name)
+            {
+                let rows = qsa(this.selector + " #table-entity-editor tbody tr");
+                rows.forEach(row => {
+                    let columnName = row.querySelector('.column-name').value;
+                    if(this.hasColumnIndex(this.indexDraft, columnName))
+                    {
+                        row.classList.add('has-index');
+                    }
+                    else
+                    {
+                        row.classList.remove('has-index');
+                    }
+                });
+            }
+
+            modal.style.display = 'none';
+            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
+            this.callbackSaveEntity(this.entities);
+        };
+
+        modal.style.display = 'block';
+    }
+
+    /**
+     * Adds a new row to the index editor modal's table.
+     * @param {HTMLElement} tbody - The tbody element of the index table.
+     * @param {string[]} availableColumns - An array of column names available for indexing.
+     * @param {object} [index={}] - An optional existing index object to populate the row.
+     */
+    addIndexRowToModal(tbody, availableColumns, index = {}) {
+        const row = document.createElement('tr');
+        const indexName = index.name || '';
+        const indexCols = index.columns || [];
+        const isUnique = index.unique || false;
+
+        const optionsHtml = availableColumns.map(col =>
+            `<option value="${col}" ${indexCols.includes(col) ? 'selected' : ''}>${col}</option>`
+        ).join('');
+
+        row.innerHTML = `
+            <td align="center"><a href="javascript:" class="remove-index-row">❌</a></td>
+            <td class="td-index-name"><input type="text" class="form-control index-name" value="${indexName}" placeholder="e.g., idx_name_status"></td>
+            <td class="td-index-columns">
+                <select class="form-control index-columns" multiple style="min-height: 80px;">
+                    ${optionsHtml}
+                </select>
+            </td>
+            <td class="td-index-unique"><input type="checkbox" class="index-unique" ${isUnique ? 'checked' : ''}></td>
+        `;
+
+        row.querySelector('.remove-index-row').onclick = () => {
+            row.remove();
+        };
+
+        tbody.appendChild(row);
+    }
+
+    addIndexFromForeignKey(tbody, currentColumns, entity)
+    {
+        let existingIndexes = [];
+        tbody.querySelectorAll('tr').forEach(row => {
+            let name = row.querySelector('.index-name').value;
+            let columns = Array.from(row.querySelector('.index-columns').selectedOptions).map(opt => opt.value);
+            existingIndexes.push({name: name, columns: columns});
+        });
+
+        let foreignKeys = entity.foreignKeys || [];
+        if(!Array.isArray(foreignKeys))
+        {
+            foreignKeys = Object.values(foreignKeys);
+        }
+
+        foreignKeys.forEach(fk => {
+            if(!fk.columnName) return;
+            let indexName = fk.name || '';
+            if(indexName.startsWith('fk_'))
+            {
+                indexName = 'idx_' + indexName.substring(3);
+            }
+            else
+            {
+                indexName = 'idx_' + indexName;
+            }
+            
+            let columns = fk.columnName.split(',').map(s => s.trim());
+            
+            let exists = existingIndexes.some(idx => {
+                if(idx.name == indexName) return true;
+                if(idx.columns.length !== columns.length) return false;
+                for(let i = 0; i < columns.length; i++) {
+                    if(idx.columns[i] !== columns[i]) return false;
+                }
+                return true;
+            });
+
+            if(!exists)
+            {
+                this.addIndexRowToModal(tbody, currentColumns, {
+                    name: indexName,
+                    columns: columns,
+                    unique: false
+                });
+                existingIndexes.push({name: indexName, columns: columns});
+            }
+        });
+    }
+
+    /**
      * Triggered when the foreign key edit button is clicked.
      * Retrieves the current row, extracts the column name and entity name,
      * and opens the foreign key editor modal if the column name is defined.
@@ -702,7 +887,7 @@ class EntityEditor {
      */
     foreignKeyEdit(button) {
         const row = button.closest('tr');
-        const columnName = row.qs('.column-name').value;
+        const columnName = row.querySelector('.column-name').value;
         const entityName = qs(this.selector + " .entity-name").value;
         if (columnName) {
             this.showForeignKeyEditor(entityName, columnName, row);
@@ -725,13 +910,12 @@ class EntityEditor {
         const modal = qs('#foreignKeyModal');
 
         let fkName = `fk_${entityName}_${columnName}`;
-
-        let fk = this.foreignKeyDraft[entityName]?.[columnName] || null;
-        if(!fk) {
-            const entity = this.getEntityByName(entityName);
-            // Handle if entity.foreignKeys is array or object
-            fk = this.getForeignKeyByColumnName(entity.foreignKeys, columnName);
+        let entity = this.getEntityByName(entityName);
+        if(!this.foreignKeyDraft[entityName] || !Array.isArray(this.foreignKeyDraft[entityName]))
+        {
+            this.foreignKeyDraft[entityName] = entity.foreignKeys;
         }
+        let fk = this.getForeignKeyByColumnName(entity.foreignKeys, columnName) || null;
 
         modal.querySelector('.reference_table_selector').innerHTML = '';
         let referencedTable = ''; // Initialize referencedTable to an empty string
@@ -814,15 +998,15 @@ class EntityEditor {
             let fkName = modal.querySelector('.foreign_key_name_selector').value;
 
             // This draft object will be used to update the entity's foreign keys when the user saves the entity.
-            _this.foreignKeyDraft[entityName] = _this.foreignKeyDraft[entityName] || {};
-            _this.foreignKeyDraft[entityName][columnName] = {
+            _this.foreignKeyDraft[entityName] = _this.foreignKeyDraft[entityName] || [];
+            _this.foreignKeyDraft[entityName].push({
                 name: fkName,
                 columnName: columnName,
                 referencedTable: selectedReferencedTable,
                 referencedColumn: selectedReferencedColumn,
                 onUpdate: onUpdateAction,
                 onDelete: onDeleteAction
-            };
+            });
 
             // Optionally, update the UI to indicate that this column has a foreign key
             row.classList.add('has-foreign-key');
@@ -833,7 +1017,7 @@ class EntityEditor {
 
             // Hide the modal
             modal.style.display = 'none';
-            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+            _this.exportToSQL(_this.getSelectedDialect(), _this.isGenerateForeignKey(), _this.isGenerateIndex());
         }
         const onCancel = () => {
             // Clean up event listeners
@@ -844,19 +1028,23 @@ class EntityEditor {
             modal.style.display = 'none';
         }
         const onDelete = () => {
-            if(_this.foreignKeyDraft[entityName]?.[columnName]) {
-                delete _this.foreignKeyDraft[entityName][columnName];
-                row.classList.remove('has-foreign-key');
-            }
+            let fks = [];
+            _this.foreignKeyDraft[entityName]?.forEach((fk) => {
+                if(fk.columnName != columnName) {
+                    fks.push(fk);
+                }
+            });
+            row.classList.remove('has-foreign-key');
+            _this.foreignKeyDraft[entityName] = fks;
             // Hide the modal
             modal.style.display = 'none';
         };
 
         modal.style.display = 'block';
 
-        saveButton.addEventListener('click', onSave);
-        cancelButton.addEventListener('click', onCancel);
-        deleteButton.addEventListener('click', onDelete);
+        saveButton.onclick = onSave;
+        cancelButton.onclick = onCancel;
+        deleteButton.onclick = onDelete;
     }
 
     /**
@@ -983,7 +1171,8 @@ class EntityEditor {
         tbody.querySelectorAll('.column-name')?.forEach((col) => {
             existingColumn.push(col.value);
         });
-        this.getEntityByName(entityName)?.columns.forEach((column) => {
+        let entity = this.getEntityByName(entityName);
+        entity.columns.forEach((column) => {
             columnList.push(column.name);
             if(!existingColumn.includes(column.name) && !column.primaryKey && firstColumn == '')
             {
@@ -1000,7 +1189,7 @@ class EntityEditor {
             onDelete: 'NO ACTION',
             draft: true
         };
-        tbody.appendChild(this.createForeignKeyRow(fk));
+        tbody.appendChild(this.createForeignKeyRow(fk, entity));
     }
 
     /**
@@ -1098,9 +1287,10 @@ class EntityEditor {
      * @param {string} fk.onUpdate - ON UPDATE action.
      * @param {string} fk.onDelete - ON DELETE action.
      * @param {boolean} [fk.draft] - Indicates whether this is a draft foreign key.
+     * @param {Entity} entity - The entity
      * @returns {HTMLTableRowElement} The generated table row element.
      */
-    createForeignKeyRow(fk)
+    createForeignKeyRow(fk, entity)
     {
         let tableList = [];
         let columnList = [];
@@ -1108,7 +1298,7 @@ class EntityEditor {
         this.entities.forEach((entity) => {
             tableList.push(entity.name);
         });
-        this.getEntityByName(selectedElement.dataset.entity)?.columns.forEach((column) => {
+        entity.columns.forEach((column) => {
             columnList.push(column.name);
         });
 
@@ -1137,7 +1327,7 @@ class EntityEditor {
             'SET NULL'
         ];
         const row = document.createElement('tr');
-        row.innerHTML = `<td><a href="javascript:" onclick="return editor.removeForeignKey(this)">❌</a></td>
+        row.innerHTML = `<td align="center"><a href="javascript:" onclick="return editor.removeForeignKey(this)">❌</a></td>
         <td>${this.createSelectOption('column-name', fk.columnName, columnList, 'editor.updateForeignKeyColumn(this)')}</td>
         <td>${this.createInputText('foreign-key-name', fk.name)}</td>
         <td>${this.createSelectOption('referenced-table', fk.referencedTable, tableList, 'editor.updateForeignKeyReferencedColumn(this)')}</td>
@@ -1154,6 +1344,20 @@ class EntityEditor {
             row.classList.add('pk-saved');
         }
         return row;
+    }
+
+    editForeignKeys()
+    {
+        let entityName = qs('.entity-container #entity-name').value;
+        let entity = this.getEntityByName(entityName);
+        this.showForeignKeyEditorBulk(entity);
+    }
+
+    manageIndexes()
+    {
+        let entityName = qs('.entity-container #entity-name').value;
+        let entity = this.getEntityByName(entityName);
+        this.showIndexEditor(entity);
     }
     
     /**
@@ -1182,6 +1386,19 @@ class EntityEditor {
      */
     editForeignKeyContextMenu(event)
     {
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        this.showForeignKeyEditorBulk(entity);
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+    }
+    
+    showForeignKeyEditorBulk(entity)
+    {
+        if (!entity) {
+            this.showAlertDialog("Please enter an entity name first.", "Entity Name Required", "OK");
+            return;
+        }
         const modal = qs('#foreignKeyBulkModal');
 
         let tableList = [];
@@ -1195,7 +1412,6 @@ class EntityEditor {
 
         // Populate foreign key form
 
-        let entity = this.getEntityByName(selectedElement.dataset.entity);
         
         // Convert to object for draft
         let fks = entity.foreignKeys || [];
@@ -1231,10 +1447,10 @@ class EntityEditor {
 
 
         const tbody = modal.querySelector('.foreign-key-editor-table tbody');
-        modal.querySelector('.entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
+        modal.querySelector('.label-entity-name').innerHTML = `Entity Name : <strong>${entity.name}</strong>`;
         tbody.innerHTML = ''; // Clear
         Object.entries(this.foreignKeyDraft[entity.name]).forEach(([columnName, fk]) => {
-            tbody.appendChild(this.createForeignKeyRow(fk));
+            tbody.appendChild(this.createForeignKeyRow(fk, entity));
         });
         modal.style.display = 'block';
 
@@ -1302,7 +1518,7 @@ class EntityEditor {
 
                 // Hide the modal
                 modal.style.display = 'none';
-                this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+                this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
             }
         }
 
@@ -1678,6 +1894,7 @@ class EntityEditor {
             this.entities[this.currentEntityIndex].modificationDate = (new Date()).getTime();
             this.entities[this.currentEntityIndex].modifier = '{{userName}}'; // Replace with actual user name if available
             let draft = this.foreignKeyDraft[entityName] ? Object.values(this.foreignKeyDraft[entityName]) : null;
+            this.entities[this.currentEntityIndex].indexes = this.indexDraft;
             this.entities[this.currentEntityIndex].foreignKeys = draft || this.entities[this.currentEntityIndex].foreignKeys || [];
             this.foreignKeyDraft[entityName] = null;
         } else {
@@ -1700,15 +1917,17 @@ class EntityEditor {
             newEntity.creationDate = newEntity.modificationDate;
             newEntity.creator = '{{userName}}'; // Replace with actual user name if available
             newEntity.modifier = '{{userName}}'; // Replace with actual user name if available
+            newEntity.indexes = this.indexDraft;
             newEntity.foreignKeys = this.foreignKeyDraft[entityName] ? Object.values(this.foreignKeyDraft[entityName]) : [];
             this.foreignKeyDraft[entityName] = null;
             this.entities.push(newEntity);
         }
+        this.indexDraft = []; // Reset draft
 
         this.renderEntities();
         this.updateDiagram();
         this.cancelEdit();
-        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
         if(typeof this.callbackSaveEntity == 'function')
         {
             this.callbackSaveEntity(this.entities);
@@ -2000,6 +2219,9 @@ class EntityEditor {
             // Ensure foreignKeys is array
             entity.foreignKeys = Array.isArray(entityData.foreignKeys) ? entityData.foreignKeys : Object.values(entityData.foreignKeys || {});
 
+            // Ensure indexes is array
+            entity.indexes = Array.isArray(entityData.indexes) ? entityData.indexes : Object.values(entityData.indexes || {});
+
             entity.setData(entityData.data);
 
             // Add the entity to the entities array
@@ -2081,6 +2303,8 @@ class EntityEditor {
             entity.modifier = '{{userName}}'; // Replace with actual user name if available
 
             entity.foreignKeys = Array.isArray(table.foreignKeys) ? table.foreignKeys : Object.values(table.foreignKeys || {});
+
+            entity.indexes = Array.isArray(table.indexes) ? table.indexes : Object.values(table.indexes || {});
 
             // Add the entity to the entities array
             entities.push(entity);
@@ -2862,7 +3086,7 @@ class EntityEditor {
             // Re-render the entities after the change
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
-            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
 
             if(typeof this.callbackSaveEntity == 'function')
             {
@@ -2889,7 +3113,7 @@ class EntityEditor {
             // Re-render the entities after the change
             this.renderEntities();
             this.restoreCheckedEntitiesFromCurrentDiagram();
-            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+            this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
 
             if(typeof this.callbackSaveEntity == 'function')
             {
@@ -2918,7 +3142,7 @@ class EntityEditor {
         // Re-render the sorted list of entities
         this.renderEntities();
         this.restoreCheckedEntitiesFromCurrentDiagram();
-        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
         if(typeof this.callbackSaveEntity == 'function')
         {
             this.callbackSaveEntity(this.entities);
@@ -2957,7 +3181,7 @@ class EntityEditor {
         // Re-render the sorted list of entities in the UI
         this.renderEntities();
         this.restoreCheckedEntitiesFromCurrentDiagram();
-        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
         if(typeof this.callbackSaveEntity === 'function') {
             this.callbackSaveEntity(this.entities);
         }
@@ -3001,7 +3225,7 @@ class EntityEditor {
                 _this.updateEntityIndex();
                 _this.renderEntities();
                 _this.restoreCheckedEntitiesFromCurrentDiagram();
-                _this.exportToSQL();
+                _this.exportToSQL(_this.getSelectedDialect(), _this.isGenerateForeignKey(), _this.isGenerateIndex());
                 if(typeof _this.callbackSaveEntity == 'function')
                 {
                     _this.callbackSaveEntity(_this.entities);
@@ -3098,9 +3322,10 @@ class EntityEditor {
      *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
      * @param {boolean} withForeignKey - Whether to include foreign key constraints in the generated SQL.
+     * @param {boolean} createIndex - Whether to create index into the generated SQL.
      */
-    exportToSQL(dialect = "mysql", withForeignKey = false) {
-        let sql = this.generateSQL(dialect, withForeignKey);
+    exportToSQL(dialect = "mysql", withForeignKey = false, createIndex = true) {
+        let sql = this.generateSQL(dialect, withForeignKey, createIndex);
         qs(this.selector + " .query-generated").value = sql.join("\r\n");
     }
 
@@ -3115,9 +3340,10 @@ class EntityEditor {
      *
      * @param {string} dialect - Target SQL dialect: "mysql", "postgresql", "sqlite".
      * @param {boolean} withForeignKey - Whether to include foreign key constraints in the generated SQL.
+     * @param {boolean} createIndex - Whether to create index into the generated SQL.
      * @returns {string[]} Array of SQL statements to be exported.
      */
-    generateSQL(dialect, withForeignKey = false) {
+    generateSQL(dialect, withForeignKey = false, createIndex = false) {
         let sql = [];
 
         if(withForeignKey)
@@ -3130,7 +3356,7 @@ class EntityEditor {
             const entityName = checkbox.dataset.name;
             const entity = this.getEntityByName(entityName);
             if (entity) {
-                sql.push(entity.toSQL(dialect, withForeignKey));
+                sql.push(entity.toSQL(dialect, withForeignKey, createIndex));
             }
         });
 
@@ -3874,8 +4100,21 @@ class EntityEditor {
     }
 
     /**
-     * Copy the SQL CREATE TABLE statement of the selected entity to clipboard.
-     * @param {MouseEvent} e - The mouse event that triggered the copy action.
+     * Copies the SQL `CREATE TABLE` statement of the selected entity to the clipboard.
+     *
+     * This method:
+     * - Detects the active SQL dialect from the `<meta name="database-type">` tag.
+     * - Retrieves the currently selected entity from the SVG context.
+     * - Generates the table creation SQL using `toSQL(dialect)`.
+     * - Writes the generated SQL statement to the system clipboard.
+     * - Displays a visual confirmation effect and hides the context menu.
+     *
+     * Note:
+     * This action copies the table structure only. Indexes and foreign key
+     * constraints are not included unless explicitly generated within `toSQL()`.
+     *
+     * @param {MouseEvent} e - The mouse event that triggered the copy action,
+     *                         used to determine the position of the visual feedback.
      */
     copyTableStructure(e) {
         let _this = this;
@@ -3885,10 +4124,47 @@ class EntityEditor {
 
         // Get the entity from the selected SVG element
         let entity = this.getEntityByName(selectedElement.dataset.entity);
-        sql.push(entity.toSQL(dialect));
+        sql.push(entity.toSQL(dialect)); // Skip indexes and foreign keys
 
         // Write SQL to clipboard
         navigator.clipboard.writeText(sql.join(''))
+        .then(() => {
+            // Show visual feedback and hide context menu
+            _this.showCopyEffect(e.clientX, e.clientY);
+            hideContextMenu();
+        })
+        .catch(err => {
+            // Error handling (not implemented)
+        });
+    }
+
+    /**
+     * Copies all index definitions of the selected entity to the system clipboard.
+     *
+     * This method:
+     * - Detects the active SQL dialect from the `<meta name="database-type">` tag.
+     * - Retrieves the currently selected entity based on the SVG element context.
+     * - Generates standalone `CREATE INDEX` statements using `createIndexStatements()`.
+     * - Copies the generated SQL statements to the clipboard.
+     * - Displays a visual copy confirmation effect.
+     *
+     * The copied output includes all index definitions associated with the entity,
+     * formatted according to the selected SQL dialect.
+     *
+     * @param {MouseEvent} e - The mouse event used to determine cursor position
+     *                         for displaying visual feedback.
+     */
+    copyTableIndexes(e) {
+        let _this = this;
+        // Get the SQL dialect from the <meta> tag
+        let dialect = qs('meta[name="database-type"]').getAttribute('content');
+
+        // Get the entity from the selected SVG element
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        let sql = entity.createIndexStatements(dialect);
+
+        // Write SQL to clipboard
+        navigator.clipboard.writeText(sql.join("\r\n")+"\r\n")
         .then(() => {
             // Show visual feedback and hide context menu
             _this.showCopyEffect(e.clientX, e.clientY);
@@ -3995,6 +4271,18 @@ class EntityEditor {
     {
         hideContextMenu();
         this.viewData(parseInt(selectedElement.dataset.index));
+    }
+
+    /**
+     * Handles the "Manage Indexes" action from the context menu.
+     * Hides the context menu, opens the main entity editor for the selected entity,
+     * and then displays the index management modal.
+     */
+    editIndexContextMenu(event)
+    {
+        let entity = this.getEntityByName(selectedElement.dataset.entity);
+        hideContextMenu();
+        this.showIndexEditor(entity);
     }
 
     /**
@@ -4304,7 +4592,6 @@ class EntityEditor {
             const arrayBuffer = event.target.result; // Get file data as an ArrayBuffer
             const mwb = new MWBConverter(); // Create a new MWBConverter instance
             try {
-                console.log('ok');
                 await mwb.loadBinary(arrayBuffer, {mwb:true});
                 let importedEntities = mwb.getEntities();
 
@@ -4408,15 +4695,11 @@ class EntityEditor {
         const blob = file.slice(0, 512);
         reader.onload = function (e) {
             const buffer = new Uint8Array(e.target.result);
-            console.log(1);
             if (_this.looksLikeMySqlWorkbench(buffer)) {
-                console.log(2);
                 _this.importMySQLWorkbench(file, callback);
             } else if (_this.looksLikeSQLite(buffer)) {
-                console.log(3);
                 _this.importSQLite(file, callback);
             } else {
-                console.log(4);
                 _this.importSQLQuery(file, callback);
             }
         };
@@ -7089,7 +7372,7 @@ Mode
         entity.setData(newData);
         let { applicationId, databaseName, databaseSchema, databaseType } = getMetaValues();
         sendEntityToServer(applicationId, databaseType, databaseName, databaseSchema, this.entities);
-        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey());
+        this.exportToSQL(this.getSelectedDialect(), this.isGenerateForeignKey(), this.isGenerateIndex());
         modal.style.display = 'none';
     }
 
@@ -7886,6 +8169,11 @@ Mode
     isGenerateForeignKey()
     {
         return qs('.with-foreign-key').checked;
+    }
+
+    isGenerateIndex()
+    {
+        return qs('.with-index').checked;
     }
 
 }
