@@ -266,6 +266,15 @@ class PicoDatabaseDump // NOSONAR
             if ($value === null) {
                 // Handle NULL values
                 $data[$key] = 'null';
+            } else if (empty($value)) {
+                if(isset($columnInfo[$key]) && in_array($columnInfo[$key]->normalizedType, ['string', 'text']))
+                {
+                    $data[$key] = "''";
+                }
+                else
+                {
+                    $data[$key] = 'null';
+                }
             } else if (isset($columnInfo[$key]) && in_array($columnInfo[$key]->normalizedType, ['integer', 'float'])) {
                 // Keep numeric values as they are (no quotes)
                 $data[$key] = $value;

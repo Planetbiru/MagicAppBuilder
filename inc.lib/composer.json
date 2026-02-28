@@ -12,7 +12,6 @@
         "meyfa/php-svg": "0.9",
         "phpmailer/phpmailer": "^6.10",
         "planetbiru/magic-math": "^0.0.0",
-        "planetbiru/magic-app": "^3.21",
-        "planetbiru/magic-object": "3.22.0"
+        "planetbiru/magic-app": "^3.22"
     }
 }

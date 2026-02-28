@@ -89,6 +89,9 @@ class PicoYamlUtil
      */
     public static function dump($input, $inline, $indent, $flags) // NOSONAR
     {
+        if (function_exists('yaml_emit')) {
+            return yaml_emit($input, YAML_UTF8_ENCODING);
+        }
         if($inline == null || $inline < 0)
         {
             $inline = self::arrayDepth($input);
@@ -111,6 +114,9 @@ class PicoYamlUtil
      */
     public static function parseFile($file)
     {
+        if (function_exists('yaml_parse_file')) {
+            return yaml_parse_file($file);
+        }
         $yaml = new Spicy();
         return $yaml->loadFile($file);
     }
@@ -128,6 +134,9 @@ class PicoYamlUtil
      */
     public static function parse($rawData)
     {
+        if (function_exists('yaml_parse')) {
+            return yaml_parse($rawData);
+        }
         $yaml = new Spicy();
         return $yaml->loadString($rawData);
     }

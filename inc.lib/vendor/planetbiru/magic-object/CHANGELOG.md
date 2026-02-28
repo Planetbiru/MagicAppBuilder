@@ -1501,3 +1501,28 @@ $secretConfig->retrieve('database', 'credentials', 'username');
 2. **Improved UUID Implementation**
    Replaced the legacy unique ID generation based on PHP’s `uniqid()` function with a **real UUID implementation**, ensuring better uniqueness guarantees and compliance with UUID standards.
 
+
+# MagicObject Version 3.22.1
+
+## Bug Fixes
+
+1. **Empty Value in Insert Query**
+   
+   Fixed a bug when generating `INSERT` queries with empty values.
+   
+   Previously, the generated query was:
+   
+   ```sql
+   INSERT INTO any (any1, any2, any3) VALUES (1, , 'any3');
+   ```
+
+   Now it has been corrected to:
+   
+   ```sql
+   INSERT INTO any (any1, any2, any3) VALUES (1, '', 'any3');
+   ```
+   
+   This change ensures that empty values are properly handled as empty strings (`''`), resulting in valid SQL syntax and improved compatibility across different databases.
+
+
+With this fix, MagicObject now handles optional or missing fields more reliably during insert operations.
