@@ -263,6 +263,7 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <button class="btn" onclick="editor.sortAndGroupEntities()">Sort by Type</button>
                                 <label for="draw-fk-relationship"><input type="checkbox" id="draw-fk-relationship" class="draw-fk-relationship" checked> Foreign Key Relationship</label>
                                 <label for="draw-auto-relationship"><input type="checkbox" id="draw-auto-relationship" class="draw-auto-relationship"> Auto Relationship</label>
+                                <button class="btn" onclick="editor.preference()">Preferences</button>
                             </span>
                         </div>
 
@@ -277,7 +278,6 @@ $hash = md5("$applicationId-$dbType-{$databaseConfig->getDatabaseName()}-$schema
                                 <button class="btn" onclick="editor.showDescriptionDialog()">Description</button>
                                 <button class="btn btn-data" onclick="editor.viewData()">Data</button>
                                 <button class="btn" onclick="editor.showEditorTemplate()">Edit Template</button>
-                                <button class="btn" onclick="editor.preference()">Preferences</button>
                                 <button class="btn" onclick="editor.saveEntity()">Save Entity</button>
                                 <button class="btn" onclick="editor.cancelEdit()">Cancel</button>
                                 <div class="table-container">
