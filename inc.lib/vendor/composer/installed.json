@@ -138,24 +138,24 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "3.22.0",
-            "version_normalized": "3.22.0.0",
+            "version": "3.22.1",
+            "version_normalized": "3.22.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "f4b1c43a9cffbd55055d9204f067e820c842e41e"
+                "reference": "48e20e892ef499c829c0213f252c88f44002f8e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/f4b1c43a9cffbd55055d9204f067e820c842e41e",
-                "reference": "f4b1c43a9cffbd55055d9204f067e820c842e41e",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/48e20e892ef499c829c0213f252c88f44002f8e3",
+                "reference": "48e20e892ef499c829c0213f252c88f44002f8e3",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "planetbiru/magic-object": "^3.21"
             },
-            "time": "2026-01-25T00:49:54+00:00",
+            "time": "2026-02-28T07:03:51+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -175,7 +175,7 @@
             "description": "MagicApp",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/3.22.0"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/3.22.1"
             },
             "install-path": "../planetbiru/magic-app"
         },
@@ -220,23 +220,23 @@
         },
         {
             "name": "planetbiru/magic-object",
-            "version": "3.22.0",
-            "version_normalized": "3.22.0.0",
+            "version": "3.22.1",
+            "version_normalized": "3.22.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "1090e90cd1e49db32042acc08485e347f6a5755a"
+                "reference": "4c760a75f08611c31bccf864a8ff9f8033786f46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/1090e90cd1e49db32042acc08485e347f6a5755a",
-                "reference": "1090e90cd1e49db32042acc08485e347f6a5755a",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/4c760a75f08611c31bccf864a8ff9f8033786f46",
+                "reference": "4c760a75f08611c31bccf864a8ff9f8033786f46",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4"
             },
-            "time": "2026-01-16T03:42:11+00:00",
+            "time": "2026-02-28T06:19:50+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -256,7 +256,7 @@
             "description": "MagicObject",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
-                "source": "https://github.com/Planetbiru/MagicObject/tree/3.22.0"
+                "source": "https://github.com/Planetbiru/MagicObject/tree/3.22.1"
             },
             "install-path": "../planetbiru/magic-object"
         }

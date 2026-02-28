@@ -204,7 +204,6 @@ class SQLConverter {
             tableName: table.tableName,
             primaryKey: table.primaryKey,
             foreignKeys: table.foreignKeys,
-            indexes: table.indexes,
             columns: table.columns.map(column => {
                 let columnCopy = { ...column }; // Using object spread instead of Object.assign
                 columnCopy.Type = this.toSqliteType(columnCopy.Type, columnCopy.Length);
@@ -225,7 +224,6 @@ class SQLConverter {
             tableName: table.tableName,
             primaryKey: table.primaryKey,
             foreignKeys: table.foreignKeys,
-            indexes: table.indexes,
             columns: table.columns.map(column => {
                 let columnCopy = { ...column, Field: column.Field }; // Spread and copy Field directly
                 columnCopy.Type = this.toMySQLType(columnCopy.Type, columnCopy.Length, columnCopy.EnumValues);
@@ -246,7 +244,6 @@ class SQLConverter {
             tableName: table.tableName,
             primaryKey: table.primaryKey,
             foreignKeys: table.foreignKeys,
-            indexes: table.indexes,
             columns: table.columns.map(column => {
                 let columnCopy = { ...column }; // Create a shallow copy of the column
                 columnCopy.Type = this.toPostgreSQLType(columnCopy.Type, columnCopy.Length);
