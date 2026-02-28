@@ -235,7 +235,7 @@ function init() {
     {
         importFromEntityButton.onclick = function()
         {
-            let sql = editor.generateSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());;
+            let sql = editor.generateSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());;
             qs('[name="query"]').value = sql.join("\r\n");
             modalEntityEditor.style.display = "none";
         };
@@ -333,12 +333,12 @@ function init() {
                 entity.checked = checked;
             })
         }
-        editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
+        editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
     });
 
     qs(".right-panel .table-list-for-export").addEventListener('change', (event) => {
         if (event.target.classList.contains('selected-entity-structure') || event.target.classList.contains('selected-entity-data')) {
-            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
         }
 
         if (event.target.classList.contains('export-structure-system')) {
@@ -346,7 +346,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
         }
 
         if (event.target.classList.contains('export-structure-custom')) {
@@ -354,7 +354,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
         }
 
         if (event.target.classList.contains('export-data-system')) {
@@ -362,7 +362,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
         }
 
         if (event.target.classList.contains('export-data-custom')) {
@@ -370,7 +370,7 @@ function init() {
             seletion.forEach(checkbox => {
                 checkbox.checked = event.target.checked;
             });
-            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
+            editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
         }
     });
 
@@ -1127,7 +1127,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     qs(".with-foreign-key").addEventListener('change', (event) => {
-        editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey());
+        editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
+    });
+    qs(".with-index").addEventListener('change', (event) => {
+        editor.exportToSQL(editor.getSelectedDialect(), editor.isGenerateForeignKey(), editor.isGenerateIndex());
     });
 
     qs('.add-diagram').addEventListener('click', function(e){

@@ -20,7 +20,7 @@ class TableParser {
      * Initializes the type list for valid SQL column types.
      */
     init() {
-        const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,LONGTEXT,MEDIUMTEXT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME2,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL,TIME,UUID,MONEY,BLOB,BIT,JSON';
+        const typeList = 'TIMESTAMPTZ,TIMESTAMP,SERIAL4,BIGSERIAL,INT2,INT4,INT8,TINYINT,BIGINT,LONGTEXT,MEDIUMTEXT,TEXT,NVARCHAR,VARCHAR,ENUM,SET,NUMERIC,DECIMAL,CHAR,REAL,FLOAT,INTEGER,INT,DATETIME2,DATETIME,DATE,DOUBLE,BOOLEAN,BOOL,TIME,UUID,MONEY,BLOB,BIT,JSON,JSONB';
         this.typeList = typeList.split(',');
     }
 
@@ -335,7 +335,7 @@ class TableParser {
         sql = sql.replace(/(\bvarchar\s*)\(\s*max\s*\)/gi, 'TEXT');
 
         let rg_tb = /(create\s+table\s+if\s+not\s+exists|create\s+table)\s(?<tb>.*)\s\(/gim;
-        let rg_fld = /(primary\s+key\s*\([^)]+\)|\w+\s+key.*|\w+\s+bigserial|\w+\s+serial4|\w+\s+serial8|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime2.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(([^)]+)\)|\w+\s+set\s*\(([^)]+)\)|\w+\s+numeric\s*\(([^)]+)\)|\w+\s+decimal\s*\(([^)]+)\)|\w+\s+float\s*\(([^)]+)\)|\w+\s+int2.*|\w+\s+int4.*|\w+\s+int8.*|\w+\s+time.*|\w+\s+uuid.*|\w+\s+money.*|\w+\s+blob.*|\w+\s+bit.*|\w+\s+json.*)/gim; // NOSONAR
+        let rg_fld = /(constraint\s+.*|primary\s+key\s*\([^)]+\)|\w+\s+key.*|\w+\s+bigserial.*|\w+\s+serial4.*|\w+\s+serial8.*|\w+\s+tinyint.*|\w+\s+bigint.*|\w+\s+longtext.*|\w+\s+mediumtext.*|\w+\s+text.*|\w+\s+nvarchar.*|\w+\s+varchar.*|\w+\s+char.*|\w+\s+real.*|\w+\s+float.*|\w+\s+integer.*|\w+\s+int.*|\w+\s+datetime2.*|\w+\s+datetime.*|\w+\s+date.*|\w+\s+double.*|\w+\s+timestamp.*|\w+\s+timestamptz.*|\w+\s+boolean.*|\w+\s+bool.*|\w+\s+enum\s*\(([^)]+)\)|\w+\s+set\s*\(([^)]+)\)|\w+\s+numeric\s*\(([^)]+)\)|\w+\s+decimal\s*\(([^)]+)\)|\w+\s+float\s*\(([^)]+)\)|\w+\s+int2.*|\w+\s+int4.*|\w+\s+int8.*|\w+\s+time.*|\w+\s+uuid.*|\w+\s+money.*|\w+\s+blob.*|\w+\s+bit.*|\w+\s+json.*)/gim; // NOSONAR
         let rg_fld2 = /(?<fname>\w+)\s+(?<ftype>\w+)(?<fattr>.*)/gi;
         let rg_enum = /enum\s*\(([^)]+)\)/i;
         let rg_set = /set\s*\(([^)]+)\)/i;
@@ -349,7 +349,10 @@ class TableParser {
         let rg_pk_composite = /primary\s+key\s*\(([^)]+)\)/i;
 
         // Regex untuk foreign key
-        let rg_fk = /(?:CONSTRAINT\s+(?<fkname>\w+)\s+)?FOREIGN\s+KEY\s*\((?<col>[^)]+)\)\s+REFERENCES\s+(?<refTable>\w+)\s*\((?<refCol>[^)]+)\)(?:\s+ON\s+UPDATE\s+(?<onUpdate>\w+))?(?:\s+ON\s+DELETE\s+(?<onDelete>\w+))?/gi;
+        let rg_fk = /(?:CONSTRAINT\s+(?<fkname>["`][^"`]+["`]|\w+)\s+)?FOREIGN\s+KEY\s*\((?<col>[^)]+)\)\s+REFERENCES\s+(?<refTable>["`][^"`]+["`]|[\w\.]+)\s*\((?<refCol>[^)]+)\)(?:\s+ON\s+UPDATE\s+(?<onUpdate>NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT))?(?:\s+ON\s+DELETE\s+(?<onDelete>NO\s+ACTION|RESTRICT|CASCADE|SET\s+NULL|SET\s+DEFAULT))?/gi;
+
+        // Regex for indexes
+        const rg_idx = /(?<!PRIMARY\s|FOREIGN\s)(?:(UNIQUE)\s+)?(?:INDEX|KEY)\s*(?:`([^`]+)`|(\w+))?\s*\(([^)]+)\)/gi;
 
         let result = rg_tb.exec(sql);
         let tableName = result.groups.tb;
@@ -359,6 +362,7 @@ class TableParser {
         let columnList = [];
         let primaryKeyList = [];
         let foreignKeys = []; // <--- array baru untuk foreign keys
+        let indexes = []; // Array for indexes
 
         while ((result = rg_fld.exec(sql)) != null) {
             let f = result[0];
@@ -459,10 +463,19 @@ class TableParser {
             let fkMatch;
             while ((fkMatch = rg_fk.exec(f)) != null) {
                 let colName = fkMatch.groups.col.trim();
+                let fkName = fkMatch.groups.fkname ? fkMatch.groups.fkname.replace(/["`]/g, '') : null;
+                let refTable = fkMatch.groups.refTable.trim().replace(/["`]/g, '');
+
+                if (fkName === null) {
+                    let cleanTableName = tableName.replace(/["`\[\]]/g, '').trim();
+                    let cleanColName = colName.replace(/["`\[\]]/g, '').replace(/,\s*/g, '_').trim();
+                    fkName = `fk_${cleanTableName}_${cleanColName}`;
+                }
+
                 foreignKeys.push({
-                    name: fkMatch.groups.fkname || null,
+                    name: fkName,
                     columnName: colName,
-                    referencedTable: fkMatch.groups.refTable.trim(),
+                    referencedTable: refTable,
                     referencedColumn: fkMatch.groups.refCol.trim(),
                     onUpdate: fkMatch.groups.onUpdate || null,
                     onDelete: fkMatch.groups.onDelete || null
@@ -512,8 +525,25 @@ class TableParser {
             fieldList = this.updatePrimaryKey(fieldList, primaryKey);
         }
 
+        // Parse indexes
+        rg_idx.lastIndex = 0; // Reset index
+        let idxMatch;
+        while ((idxMatch = rg_idx.exec(sql)) !== null) {
+            const indexName = (idxMatch[2] || idxMatch[3] || '').trim();
+            const columns = idxMatch[4].split(',').map(c => c.trim().replace(/[`"']/g, ''));
+            const isUnique = idxMatch[1] !== undefined;
 
-        return { tableName: tableName, columns: fieldList, primaryKey: primaryKey, foreignKeys: foreignKeys };
+            // Avoid capturing PRIMARY KEY as a regular index here
+            if (indexName.toUpperCase() !== 'PRIMARY') {
+                indexes.push({
+                    name: indexName,
+                    columns: columns,
+                    unique: isUnique
+                });
+            }
+        }
+
+        return { tableName: tableName, columns: fieldList, primaryKey: primaryKey, foreignKeys: foreignKeys, indexes: indexes };
     }
 
     /**
