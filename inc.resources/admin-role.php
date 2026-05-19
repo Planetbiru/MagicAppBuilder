@@ -234,7 +234,7 @@ if ($inputPost->getUserAction() == UserAction::UPDATE && isset($_POST['admin_rol
 		$database->commit();
 
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null);
 		// Clear the application menu cache for all users
 		$applicationMenu->clearMenuCache();
 	} catch (PDOException $e) {

@@ -103,7 +103,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 		$newId = $inputPost->getModuleGroupId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS);
 		
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null);
 		// Clear the application menu cache for all users
 		$applicationMenu->clearMenuCache();
 		
@@ -152,7 +152,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 			}
 		}
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null);
 		// Clear the application menu cache for all users
 		$applicationMenu->clearMenuCache();
 	}
@@ -189,7 +189,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 			}
 		}
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null);
 		// Clear the application menu cache for all users
 		$applicationMenu->clearMenuCache();
 	}
@@ -218,7 +218,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			}
 		}
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null);
 		// Clear the application menu cache for all users
 		$applicationMenu->clearMenuCache();
 	}
@@ -254,7 +254,7 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 			}
 		}
 		// Update the application menu cache
-		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null, null);
+		$applicationMenu = new ApplicationMenu($database, $appConfig, null, null, null);
 		// Clear the application menu cache for all users
 		$applicationMenu->clearMenuCache();
 	}
