@@ -3851,7 +3851,6 @@ $subqueryMap = '.$referece.';
             {
                 $input->setAttribute('name', $field->getFieldName());
             }
-
             $input = $this->addAttributeId($input, $id);
             $value = $dom->createElement('option');
             $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->getLabelOptionSelectOne();".self::PHP_CLOSE_TAG;
@@ -3864,7 +3863,6 @@ $subqueryMap = '.$referece.';
             {
                 $input->appendChild($value);
             }
-
             $input = $this->appendOption($dom, $input, $referenceData);
             if($field->getRequired())
             {
@@ -4007,9 +4005,7 @@ $subqueryMap = '.$referece.';
             {
                 $input->setAttribute('name', $fieldName);
             }
-
             $input = $this->addAttributeId($input, $id);
-
             $value = $dom->createElement('option');
             $input->appendChild($dom->createTextNode(self::N_TAB6));
             $caption = self::PHP_OPEN_TAG.self::ECHO.self::VAR."appLanguage->getLabelOptionSelectOne();".self::PHP_CLOSE_TAG;
@@ -4017,9 +4013,11 @@ $subqueryMap = '.$referece.';
             $value->appendChild($textLabel);
             $value->setAttribute('value', '');
             $value->appendChild($textLabel);
-            $input->appendChild($value);
+            if(!$multipleData)
+            {
+                $input->appendChild($value);
+            }
             $referenceData = $field->getReferenceData();
-
             $selectedValue = self::VAR.$objectName.self::CALL_GET.$upperFieldName.self::BRACKETS;
             if($multipleData)
             {
